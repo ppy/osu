@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
@@ -29,9 +30,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values);
+            base.FromDatabaseAttributes(values, onlineInfo);
 
             StarRating = values[ATTRIB_ID_AIM];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];

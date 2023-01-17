@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -11,7 +13,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Components
 {
-    public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
+    public partial class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
         private readonly IAdjustableAudioComponent gameTrackAudio = new AudioAdjustments();
 
@@ -188,7 +190,7 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("track stopped", () => !track.IsRunning);
         }
 
-        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(null);
+        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(CreateAPIBeatmapSet());
 
         private TestPreviewTrackManager.TestPreviewTrack getOwnedTrack()
         {
@@ -199,7 +201,7 @@ namespace osu.Game.Tests.Visual.Components
             return track;
         }
 
-        private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
+        private partial class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
             private readonly PreviewTrack track;
             private readonly bool registerAsOwner;
@@ -225,7 +227,7 @@ namespace osu.Game.Tests.Visual.Components
             }
         }
 
-        public class TestPreviewTrackManager : PreviewTrackManager
+        public partial class TestPreviewTrackManager : PreviewTrackManager
         {
             public bool AllowUpdate = true;
 
@@ -246,7 +248,7 @@ namespace osu.Game.Tests.Visual.Components
                 return base.UpdateSubTree();
             }
 
-            public class TestPreviewTrack : TrackManagerPreviewTrack
+            public partial class TestPreviewTrack : TrackManagerPreviewTrack
             {
                 private readonly ITrackStore trackManager;
 

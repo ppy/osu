@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -17,13 +20,16 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    public class ComposeScreen : EditorScreenWithTimeline
+    public partial class ComposeScreen : EditorScreenWithTimeline, IGameplaySettings
     {
         [Resolved]
         private GameHost host { get; set; }
 
         [Resolved]
         private EditorClock clock { get; set; }
+
+        [Resolved]
+        private IGameplaySettings globalGameplaySettings { get; set; }
 
         private Bindable<string> clipboard { get; set; }
 
@@ -87,7 +93,7 @@ namespace osu.Game.Screens.Edit.Compose
             if (composer == null)
                 return;
 
-            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
+            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
             composer.OnLoadComplete += _ => updateClipboardActionAvailability();
             updateClipboardActionAvailability();
@@ -146,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose
             if (composer == null)
                 return string.Empty;
 
-            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
+            double displayTime = EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime)?.StartTime ?? clock.CurrentTime;
             string selectionAsString = composer.ConvertSelectionToString();
 
             return !string.IsNullOrEmpty(selectionAsString)
@@ -155,5 +161,12 @@ namespace osu.Game.Screens.Edit.Compose
         }
 
         #endregion
+
+        // Combo colour normalisation should not be applied in the editor.
+        // Note this doesn't affect editor test mode.
+        IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => new Bindable<float>();
+
+        // Arguable.
+        IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => globalGameplaySettings.PositionalHitsoundsLevel;
     }
 }

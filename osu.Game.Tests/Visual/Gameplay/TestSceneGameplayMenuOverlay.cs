@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -17,7 +19,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("player pause/fail screens")]
-    public class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
     {
         private FailOverlay failOverlay;
         private PauseOverlay pauseOverlay;

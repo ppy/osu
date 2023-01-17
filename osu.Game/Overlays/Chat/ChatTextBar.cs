@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTextBar : Container
+    public partial class ChatTextBar : Container
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 
@@ -130,9 +128,8 @@ namespace osu.Game.Overlays.Chat
                 chattingTextContainer.FadeTo(showSearch ? 0 : 1);
                 searchIconContainer.FadeTo(showSearch ? 1 : 0);
 
-                // Clear search terms if any exist when switching back to chat mode
-                if (!showSearch)
-                    OnSearchTermsChanged?.Invoke(string.Empty);
+                if (showSearch)
+                    OnSearchTermsChanged?.Invoke(chatTextBox.Current.Value);
             }, true);
 
             currentChannel.BindValueChanged(change =>
@@ -153,6 +150,12 @@ namespace osu.Game.Overlays.Chat
                         chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
                         break;
                 }
+
+                if (change.OldValue != null)
+                    chatTextBox.Current.UnbindFrom(change.OldValue.TextBoxMessage);
+
+                if (newChannel != null)
+                    chatTextBox.Current.BindTo(newChannel.TextBoxMessage);
             }, true);
         }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -11,7 +13,7 @@ namespace osu.Game.Users.Drawables
     /// <summary>
     /// An avatar which can update to a new user when needed.
     /// </summary>
-    public class UpdateableAvatar : ModelBackedDrawable<APIUser>
+    public partial class UpdateableAvatar : ModelBackedDrawable<APIUser>
     {
         public APIUser User
         {

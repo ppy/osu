@@ -3,12 +3,13 @@
 
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public abstract class RulesetSetupSection : SetupSection
+    public abstract partial class RulesetSetupSection : SetupSection
     {
-        public sealed override LocalisableString Title => $"Ruleset ({rulesetInfo.Name})";
+        public sealed override LocalisableString Title => EditorSetupStrings.RulesetHeader(rulesetInfo.Name);
 
         private readonly RulesetInfo rulesetInfo;
 

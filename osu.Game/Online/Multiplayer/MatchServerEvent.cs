@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using MessagePack;
 using osu.Game.Online.Multiplayer.Countdown;
@@ -15,7 +13,8 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
-    [Union(0, typeof(CountdownChangedEvent))]
+    [Union(0, typeof(CountdownStartedEvent))]
+    [Union(1, typeof(CountdownStoppedEvent))]
     public abstract class MatchServerEvent
     {
     }

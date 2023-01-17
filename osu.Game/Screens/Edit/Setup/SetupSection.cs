@@ -12,9 +12,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public abstract class SetupSection : Container
+    public abstract partial class SetupSection : Container
     {
-        private FillFlowContainer flow;
+        private FillFlowContainer flow = null!;
 
         /// <summary>
         /// Used to align some of the child <see cref="LabelledDrawable{T}"/>s together to achieve a grid-like look.
@@ -22,10 +22,10 @@ namespace osu.Game.Screens.Edit.Setup
         protected const float LABEL_WIDTH = 160;
 
         [Resolved]
-        protected OsuColour Colours { get; private set; }
+        protected OsuColour Colours { get; private set; } = null!;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; }
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         protected override Container<Drawable> Content => flow;
 

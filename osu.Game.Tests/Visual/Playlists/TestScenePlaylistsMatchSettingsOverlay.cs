@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -15,7 +18,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
+    public partial class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
@@ -23,17 +26,21 @@ namespace osu.Game.Tests.Visual.Playlists
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = settings = new TestRoomSettings(SelectedRoom.Value)
+            AddStep("create overlay", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = settings = new TestRoomSettings(SelectedRoom.Value)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible }
+                };
+            });
+        }
 
         [Test]
         public void TestButtonEnabledOnlyWithNameAndBeatmap()
@@ -140,9 +147,9 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
+        private partial class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
-            public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
+            public RoundedButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
             public OsuTextBox NameField => ((MatchSettings)Settings).NameField;
             public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;

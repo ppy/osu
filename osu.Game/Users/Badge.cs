@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Newtonsoft.Json;
 
@@ -16,5 +18,8 @@ namespace osu.Game.Users
 
         [JsonProperty("image_url")]
         public string ImageUrl;
+
+        [JsonProperty("url")]
+        public string Url;
     }
 }

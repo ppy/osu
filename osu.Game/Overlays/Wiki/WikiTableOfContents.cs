@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiTableOfContents : CompositeDrawable
+    public partial class WikiTableOfContents : CompositeDrawable
     {
         private readonly FillFlowContainer content;
 
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Wiki
             content.Add(lastMainTitle = entry.With(d => d.Margin = new MarginPadding { Bottom = 5 }));
         }
 
-        private class TableOfContentsEntry : OsuHoverContainer
+        private partial class TableOfContentsEntry : OsuHoverContainer
         {
             private readonly MarkdownHeading target;
 

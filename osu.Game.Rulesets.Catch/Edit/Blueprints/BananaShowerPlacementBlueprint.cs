@@ -10,7 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class BananaShowerPlacementBlueprint : CatchPlacementBlueprint<BananaShower>
+    public partial class BananaShowerPlacementBlueprint : CatchPlacementBlueprint<BananaShower>
     {
         private readonly TimeSpanOutline outline;
 

@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerFill : CircularContainer, IHasAccentColour
+    public partial class SpinnerFill : CircularContainer, IHasAccentColour
     {
         public readonly Box Disc;
 

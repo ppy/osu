@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -22,19 +24,17 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsSongSelect : OnlinePlayTestScene
+    public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
         private BeatmapManager manager;
-
-        private RulesetStore rulesets;
 
         private TestPlaylistsSongSelect songSelect;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private class TestPlaylistsSongSelect : PlaylistsSongSelect
+        private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
 

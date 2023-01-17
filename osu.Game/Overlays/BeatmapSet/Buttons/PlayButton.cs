@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class PlayButton : Container
+    public partial class PlayButton : Container
     {
         public IBindable<bool> Playing => playing;
 
@@ -145,7 +147,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     {
                         // beatmapset may have changed.
                         if (Preview != preview)
+                        {
+                            preview?.Dispose();
                             return;
+                        }
 
                         AddInternal(preview);
                         loading = false;

@@ -9,10 +9,10 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class SampleRowAttribute : RowAttribute
+    public partial class SampleRowAttribute : RowAttribute
     {
-        private AttributeText sampleText;
-        private OsuSpriteText volumeText;
+        private AttributeText sampleText = null!;
+        private OsuSpriteText volumeText = null!;
 
         private readonly Bindable<string> sampleBank;
         private readonly BindableNumber<int> volume;

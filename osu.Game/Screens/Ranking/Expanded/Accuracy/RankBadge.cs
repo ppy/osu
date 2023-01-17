@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// Contains a <see cref="DrawableRank"/> that is positioned around the <see cref="AccuracyCircle"/>.
     /// </summary>
-    public class RankBadge : CompositeDrawable
+    public partial class RankBadge : CompositeDrawable
     {
         /// <summary>
         /// The accuracy value corresponding to the <see cref="ScoreRank"/> displayed by this badge.

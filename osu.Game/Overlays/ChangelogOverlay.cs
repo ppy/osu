@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -18,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
+    public partial class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -68,7 +70,7 @@ namespace osu.Game.Overlays
         /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         public void ShowBuild([NotNull] APIChangelogBuild build)
         {
-            if (build == null) throw new ArgumentNullException(nameof(build));
+            ArgumentNullException.ThrowIfNull(build);
 
             Current.Value = build;
             Show();
@@ -76,8 +78,8 @@ namespace osu.Game.Overlays
 
         public void ShowBuild([NotNull] string updateStream, [NotNull] string version)
         {
-            if (updateStream == null) throw new ArgumentNullException(nameof(updateStream));
-            if (version == null) throw new ArgumentNullException(nameof(version));
+            ArgumentNullException.ThrowIfNull(updateStream);
+            ArgumentNullException.ThrowIfNull(version);
 
             performAfterFetch(() =>
             {

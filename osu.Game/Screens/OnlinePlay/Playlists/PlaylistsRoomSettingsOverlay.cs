@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -25,11 +26,11 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
+    public partial class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
-        public Action EditPlaylist;
+        public Action? EditPlaylist;
 
-        private MatchSettings settings;
+        private MatchSettings settings = null!;
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
@@ -49,32 +50,34 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             EditPlaylist = () => EditPlaylist?.Invoke()
         };
 
-        protected class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
-            public Action EditPlaylist;
+            public Action? EditPlaylist;
 
-            public OsuTextBox NameField, MaxParticipantsField, MaxAttemptsField;
-            public OsuDropdown<TimeSpan> DurationField;
-            public RoomAvailabilityPicker AvailabilityPicker;
-            public TriangleButton ApplyButton;
+            public OsuTextBox NameField = null!, MaxParticipantsField = null!, MaxAttemptsField = null!;
+            public OsuDropdown<TimeSpan> DurationField = null!;
+            public RoomAvailabilityPicker AvailabilityPicker = null!;
+            public RoundedButton ApplyButton = null!;
 
             public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
 
-            public OsuSpriteText ErrorText;
+            public OsuSpriteText ErrorText = null!;
 
-            private LoadingLayer loadingLayer;
-            private DrawableRoomPlaylist playlist;
-            private OsuSpriteText playlistLength;
+            private LoadingLayer loadingLayer = null!;
+            private DrawableRoomPlaylist playlist = null!;
+            private OsuSpriteText playlistLength = null!;
 
-            private PurpleTriangleButton editPlaylistButton;
-
-            [Resolved(CanBeNull = true)]
-            private IRoomManager manager { get; set; }
+            private PurpleRoundedButton editPlaylistButton = null!;
 
             [Resolved]
-            private IAPIProvider api { get; set; }
+            private IRoomManager? manager { get; set; }
+
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
+            private IBindable<APIUser> localUser = null!;
 
             private readonly Room room;
 
@@ -138,9 +141,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         },
                                                         new Section("Duration")
                                                         {
-                                                            Child = DurationField = new DurationDropdown
+                                                            Child = new Container
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
+                                                                Height = 40,
+                                                                Child = DurationField = new DurationDropdown
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X
+                                                                }
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
@@ -215,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     },
                                                                     new Drawable[]
                                                                     {
-                                                                        editPlaylistButton = new PurpleTriangleButton
+                                                                        editPlaylistButton = new PurpleRoundedButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
@@ -297,7 +305,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
-                api.LocalUser.BindValueChanged(populateDurations, true);
+                localUser = api.LocalUser.GetBoundCopy();
+                localUser.BindValueChanged(populateDurations, true);
 
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
@@ -340,7 +349,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
-            private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+            private void onPlaylistChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
                 playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
@@ -406,7 +415,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        public class CreateRoomButton : TriangleButton
+        public partial class CreateRoomButton : RoundedButton
         {
             public CreateRoomButton()
             {
@@ -416,13 +425,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
+                BackgroundColour = colours.YellowDark;
             }
         }
 
-        private class DurationDropdown : OsuDropdown<TimeSpan>
+        private partial class DurationDropdown : OsuDropdown<TimeSpan>
         {
             public DurationDropdown()
             {

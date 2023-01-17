@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.UserInterface;
@@ -11,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A <see cref="BreadcrumbControl{IScreen}"/> which follows the active screen (and allows navigation) in a <see cref="Screen"/> stack.
     /// </summary>
-    public class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
+    public partial class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
     {
         public ScreenBreadcrumbControl(ScreenStack stack)
         {

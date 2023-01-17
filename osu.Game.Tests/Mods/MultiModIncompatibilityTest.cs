@@ -27,10 +27,10 @@ namespace osu.Game.Tests.Mods
         [TestCase(typeof(ManiaRuleset))]
         public void TestAllMultiModsFromRulesetAreIncompatible(Type rulesetType)
         {
-            var ruleset = (Ruleset)Activator.CreateInstance(rulesetType);
+            var ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
             Assert.That(ruleset, Is.Not.Null);
 
-            var allMultiMods = getMultiMods(ruleset);
+            var allMultiMods = getMultiMods(ruleset!);
 
             Assert.Multiple(() =>
             {
@@ -60,6 +60,6 @@ namespace osu.Game.Tests.Mods
         /// This local helper is used rather than <see cref="Ruleset.CreateAllMods"/>, because the aforementioned method flattens multi mods.
         /// </remarks>>
         private static IEnumerable<MultiMod> getMultiMods(Ruleset ruleset)
-            => Enum.GetValues(typeof(ModType)).Cast<ModType>().SelectMany(ruleset.GetModsFor).OfType<MultiMod>();
+            => Enum.GetValues<ModType>().SelectMany(ruleset.GetModsFor).OfType<MultiMod>();
     }
 }

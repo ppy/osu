@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -26,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
@@ -36,6 +38,7 @@ namespace osu.Game.Overlays
         private const float transition_length = 800;
         private const float progress_height = 10;
         private const float bottom_black_area_height = 55;
+        private const float margin = 10;
 
         private Drawable background;
         private ProgressBar progressBar;
@@ -51,6 +54,7 @@ namespace osu.Game.Overlays
 
         private Container dragContainer;
         private Container playerContainer;
+        private Container playlistContainer;
 
         protected override string PopInSampleName => "UI/now-playing-pop-in";
         protected override string PopOutSampleName => "UI/now-playing-pop-out";
@@ -67,7 +71,7 @@ namespace osu.Game.Overlays
         public NowPlayingOverlay()
         {
             Width = 400;
-            Margin = new MarginPadding(10);
+            Margin = new MarginPadding(margin);
         }
 
         [BackgroundDependencyLoader]
@@ -80,7 +84,6 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
                         playerContainer = new Container
@@ -97,7 +100,7 @@ namespace osu.Game.Overlays
                             },
                             Children = new[]
                             {
-                                background = new Background(),
+                                background = Empty(),
                                 title = new OsuSpriteText
                                 {
                                     Origin = Anchor.BottomCentre,
@@ -180,8 +183,13 @@ namespace osu.Game.Overlays
                                 }
                             },
                         },
+                        playlistContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Y = player_height + margin,
+                        }
                     }
-                }
+                },
             };
         }
 
@@ -191,11 +199,10 @@ namespace osu.Game.Overlays
             {
                 LoadComponentAsync(playlist = new PlaylistOverlay
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Y = player_height + 10,
+                    RelativeSizeAxes = Axes.Both,
                 }, _ =>
                 {
-                    dragContainer.Add(playlist);
+                    playlistContainer.Add(playlist);
 
                     playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
@@ -240,7 +247,18 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            Height = dragContainer.Height;
+            playlistContainer.Height = MathF.Min(Parent.DrawHeight - margin * 3 - player_height, PlaylistOverlay.PLAYLIST_HEIGHT);
+
+            float height = player_height;
+
+            if (playlist != null)
+            {
+                height += playlist.DrawHeight;
+                if (playlist.State.Value == Visibility.Visible)
+                    height += margin;
+            }
+
+            Height = dragContainer.Height = height;
         }
 
         protected override void Update()
@@ -338,7 +356,7 @@ namespace osu.Game.Overlays
                 musicController.TrackChanged -= trackChanged;
         }
 
-        private class MusicIconButton : IconButton
+        private partial class MusicIconButton : IconButton
         {
             public MusicIconButton()
             {
@@ -362,7 +380,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class Background : BufferedContainer
+        private partial class Background : BufferedContainer
         {
             private readonly Sprite sprite;
             private readonly WorkingBeatmap beatmap;
@@ -395,13 +413,13 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }
         }
 
-        private class DragContainer : Container
+        private partial class DragContainer : Container
         {
             protected override bool OnDragStart(DragStartEvent e)
             {
@@ -425,7 +443,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class HoverableProgressBar : ProgressBar
+        private partial class HoverableProgressBar : ProgressBar
         {
             public HoverableProgressBar()
                 : base(true)

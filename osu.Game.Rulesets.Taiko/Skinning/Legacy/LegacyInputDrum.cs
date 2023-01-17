@@ -8,8 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -18,15 +16,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// <summary>
     /// A component of the playfield that captures input and displays input as a drum.
     /// </summary>
-    internal class LegacyInputDrum : Container
+    internal partial class LegacyInputDrum : Container
     {
-        private LegacyHalfDrum left;
-        private LegacyHalfDrum right;
-        private Container content;
+        private Container content = null!;
+        private LegacyHalfDrum left = null!;
+        private LegacyHalfDrum right = null!;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class LegacyHalfDrum : Container, IKeyBindingHandler<TaikoAction>
+        private partial class LegacyHalfDrum : Container, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.
@@ -111,9 +110,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             public readonly Sprite Rim;
             public readonly Sprite Centre;
-
-            [Resolved]
-            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
             public LegacyHalfDrum(bool flipped)
             {
@@ -144,17 +140,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
-                Drawable target = null;
+                Drawable? target = null;
 
                 if (e.Action == CentreAction)
                 {
                     target = Centre;
-                    sampleTriggerSource.Play(HitType.Centre);
                 }
                 else if (e.Action == RimAction)
                 {
                     target = Rim;
-                    sampleTriggerSource.Play(HitType.Rim);
                 }
 
                 if (target != null)

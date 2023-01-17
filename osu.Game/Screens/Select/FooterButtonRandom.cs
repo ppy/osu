@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -15,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonRandom : FooterButton
+    public partial class FooterButtonRandom : FooterButton
     {
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
@@ -117,7 +119,7 @@ namespace osu.Game.Screens.Select
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == MouseButton.Right)
+            if (e.Button == MouseButton.Right && IsHovered)
             {
                 rewindSearch = true;
                 TriggerClick();
@@ -136,7 +138,8 @@ namespace osu.Game.Screens.Select
                 return false;
             }
 
-            TriggerClick();
+            if (!e.Repeat)
+                TriggerClick();
             return true;
         }
 

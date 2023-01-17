@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -15,7 +18,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class SpectatorPlayer : Player
+    public abstract partial class SpectatorPlayer : Player
     {
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; }
@@ -43,6 +46,20 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                {
+                    if (master.UserPlaybackRate.Value > 1 && waiting.NewValue)
+                        master.UserPlaybackRate.Value = 1;
+                }
+            }, true);
+        }
+
         protected override void StartGameplay()
         {
             base.StartGameplay();
@@ -68,6 +85,7 @@ namespace osu.Game.Screens.Play
             foreach (var frame in bundle.Frames)
             {
                 IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
+                Debug.Assert(convertibleFrame != null);
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;

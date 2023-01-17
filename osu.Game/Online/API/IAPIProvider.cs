@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -15,19 +14,16 @@ namespace osu.Game.Online.API
     {
         /// <summary>
         /// The local user.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<APIUser> LocalUser { get; }
 
         /// <summary>
         /// The user's friends.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindableList<APIUser> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<UserActivity> Activity { get; }
 
@@ -116,6 +112,11 @@ namespace osu.Game.Online.API
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
         IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
+
+        /// <summary>
+        /// Constructs a new <see cref="NotificationsClientConnector"/>.
+        /// </summary>
+        NotificationsClientConnector GetNotificationsConnector();
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

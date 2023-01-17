@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -13,33 +15,37 @@ using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
+    public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
         private DrawableRoomParticipantsList list;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room
-            {
-                Name = { Value = "test room" },
-                Host =
-                {
-                    Value = new APIUser
-                    {
-                        Id = 2,
-                        Username = "peppy",
-                    }
-                }
-            };
+            base.SetUpSteps();
 
-            Child = list = new DrawableRoomParticipantsList
+            AddStep("create list", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                NumberOfCircles = 4
-            };
-        });
+                SelectedRoom.Value = new Room
+                {
+                    Name = { Value = "test room" },
+                    Host =
+                    {
+                        Value = new APIUser
+                        {
+                            Id = 2,
+                            Username = "peppy",
+                        }
+                    }
+                };
+
+                Child = list = new DrawableRoomParticipantsList
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    NumberOfCircles = 4
+                };
+            });
+        }
 
         [Test]
         public void TestCircleCountNearLimit()

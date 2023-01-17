@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneButtonSystem : OsuManualInputManagerTestScene
+    public partial class TestSceneButtonSystem : OsuManualInputManagerTestScene
     {
         private OsuLogo logo;
         private ButtonSystem buttons;

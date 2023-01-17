@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
@@ -9,7 +11,7 @@ using osu.Game.Screens.Select.Options;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [Description("bottom beatmap details")]
-    public class TestSceneBeatmapOptionsOverlay : OsuTestScene
+    public partial class TestSceneBeatmapOptionsOverlay : OsuTestScene
     {
         public TestSceneBeatmapOptionsOverlay()
         {

@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -108,30 +111,30 @@ namespace osu.Game.Tests.Online
         }
 
         [Test]
-        public void TestDeserialiseSubmittableScoreWithEmptyMods()
+        public void TestDeserialiseSoloScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo
+            var score = SoloScoreInfo.ForSubmission(new ScoreInfo
             {
                 User = new APIUser(),
                 Ruleset = new OsuRuleset().RulesetInfo,
             });
 
-            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
+            var deserialised = JsonConvert.DeserializeObject<SoloScoreInfo>(JsonConvert.SerializeObject(score));
 
             Assert.That(deserialised?.Mods.Length, Is.Zero);
         }
 
         [Test]
-        public void TestDeserialiseSubmittableScoreWithCustomModSetting()
+        public void TestDeserialiseSoloScoreWithCustomModSetting()
         {
-            var score = new SubmittableScore(new ScoreInfo
+            var score = SoloScoreInfo.ForSubmission(new ScoreInfo
             {
                 Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } },
                 User = new APIUser(),
                 Ruleset = new OsuRuleset().RulesetInfo,
             });
 
-            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
+            var deserialised = JsonConvert.DeserializeObject<SoloScoreInfo>(JsonConvert.SerializeObject(score));
 
             Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
         }
@@ -145,6 +148,16 @@ namespace osu.Game.Tests.Online
             mod.SpeedChange.Value = 1.5;
 
             Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
+        }
+
+        [Test]
+        public void TestSerialisedModSettingPresence()
+        {
+            var mod = new TestMod();
+
+            mod.TestSetting.Value = mod.TestSetting.Default;
+            JObject serialised = JObject.Parse(JsonConvert.SerializeObject(new APIMod(mod)));
+            Assert.False(serialised.ContainsKey("settings"));
         }
 
         private class TestRuleset : Ruleset
@@ -170,7 +183,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
@@ -187,35 +200,27 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]
-            public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+            public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1.5)
             {
                 MinValue = 1,
                 MaxValue = 2,
-                Default = 1.5,
-                Value = 1.5,
                 Precision = 0.01,
             };
 
             [SettingSource("Final rate", "The speed increase to ramp towards")]
-            public override BindableNumber<double> FinalRate { get; } = new BindableDouble
+            public override BindableNumber<double> FinalRate { get; } = new BindableDouble(0.5)
             {
                 MinValue = 0,
                 MaxValue = 1,
-                Default = 0.5,
-                Value = 0.5,
                 Precision = 0.01,
             };
 
             [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-            public override BindableBool AdjustPitch { get; } = new BindableBool
-            {
-                Default = true,
-                Value = true
-            };
+            public override BindableBool AdjustPitch { get; } = new BindableBool(true);
         }
 
         private class TestModDifficultyAdjust : ModDifficultyAdjust

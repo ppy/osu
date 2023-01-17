@@ -16,12 +16,12 @@ using Direction = osu.Framework.Graphics.Direction;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchSelectionHandler : EditorSelectionHandler
+    public partial class CatchSelectionHandler : EditorSelectionHandler
     {
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (hitObject)
             {
-                case BananaShower _:
+                case BananaShower:
                     return false;
 
                 case JuiceStream juiceStream:

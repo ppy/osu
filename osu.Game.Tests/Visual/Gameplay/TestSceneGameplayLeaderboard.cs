@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,41 +18,66 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneGameplayLeaderboard : OsuTestScene
+    public partial class TestSceneGameplayLeaderboard : OsuTestScene
     {
-        private readonly TestGameplayLeaderboard leaderboard;
+        private TestGameplayLeaderboard leaderboard;
 
-        private readonly BindableDouble playerScore = new BindableDouble();
+        private readonly BindableLong playerScore = new BindableLong();
 
         public TestSceneGameplayLeaderboard()
         {
-            Add(leaderboard = new TestGameplayLeaderboard
+            AddStep("toggle expanded", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(2),
+                if (leaderboard != null)
+                    leaderboard.Expanded.Value = !leaderboard.Expanded.Value;
             });
+
+            AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        [Test]
+        public void TestLayoutWithManyScores()
         {
-            AddStep("reset leaderboard", () =>
+            createLeaderboard();
+
+            AddStep("add many scores in one go", () =>
             {
-                leaderboard.Clear();
-                playerScore.Value = 1222333;
+                for (int i = 0; i < 32; i++)
+                    createRandomScore(new APIUser { Username = $"Player {i + 1}" });
+
+                // Add player at end to force an animation down the whole list.
+                playerScore.Value = 0;
+                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
             });
 
-            AddStep("add local player", () => createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true));
-            AddStep("toggle expanded", () => leaderboard.Expanded.Value = !leaderboard.Expanded.Value);
-            AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
+            // Gameplay leaderboard has custom scroll logic, which when coupled with LayoutDuration
+            // has caused layout to not work in the past.
+
+            AddUntilStep("wait for fill flow layout",
+                () => leaderboard.ChildrenOfType<FillFlowContainer<GameplayLeaderboardScore>>().First().ScreenSpaceDrawQuad.Intersects(leaderboard.ScreenSpaceDrawQuad));
+
+            AddUntilStep("wait for some scores not masked away",
+                () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Any(s => leaderboard.ScreenSpaceDrawQuad.Contains(s.ScreenSpaceDrawQuad.Centre)));
+
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
+
+            AddStep("change score to middle", () => playerScore.Value = 1000000);
+            AddWaitStep("wait for movement", 5);
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
+
+            AddStep("change score to first", () => playerScore.Value = 5000000);
+            AddWaitStep("wait for movement", 5);
+            AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
         }
 
         [Test]
         public void TestPlayerScore()
         {
-            var player2Score = new BindableDouble(1234567);
-            var player3Score = new BindableDouble(1111111);
+            createLeaderboard();
+            addLocalPlayer();
+
+            var player2Score = new BindableLong(1234567);
+            var player3Score = new BindableLong(1111111);
 
             AddStep("add player 2", () => createLeaderboardScore(player2Score, new APIUser { Username = "Player 2" }));
             AddStep("add player 3", () => createLeaderboardScore(player3Score, new APIUser { Username = "Player 3" }));
@@ -71,6 +100,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRandomScores()
         {
+            createLeaderboard();
+            addLocalPlayer();
+
             int playerNumber = 1;
             AddRepeatStep("add player with random score", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 10);
         }
@@ -78,6 +110,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExistingUsers()
         {
+            createLeaderboard();
+            addLocalPlayer();
+
             AddStep("add peppy", () => createRandomScore(new APIUser { Username = "peppy", Id = 2 }));
             AddStep("add smoogipoo", () => createRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
             AddStep("add flyte", () => createRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
@@ -87,6 +122,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMaxHeight()
         {
+            createLeaderboard();
+            addLocalPlayer();
+
             int playerNumber = 1;
             AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
             checkHeight(4);
@@ -101,15 +139,37 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (GameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
         }
 
-        private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), user);
+        private void addLocalPlayer()
+        {
+            AddStep("add local player", () =>
+            {
+                playerScore.Value = 1222333;
+                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+            });
+        }
 
-        private void createLeaderboardScore(BindableDouble score, APIUser user, bool isTracked = false)
+        private void createLeaderboard()
+        {
+            AddStep("create leaderboard", () =>
+            {
+                Child = leaderboard = new TestGameplayLeaderboard
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(2),
+                };
+            });
+        }
+
+        private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
+
+        private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false)
         {
             var leaderboardScore = leaderboard.Add(user, isTracked);
             leaderboardScore.TotalScore.BindTo(score);
         }
 
-        private class TestGameplayLeaderboard : GameplayLeaderboard
+        private partial class TestGameplayLeaderboard : GameplayLeaderboard
         {
             public float Spacing => Flow.Spacing.Y;
 

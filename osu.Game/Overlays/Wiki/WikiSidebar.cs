@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -13,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiSidebar : OverlaySidebar
+    public partial class WikiSidebar : OverlaySidebar
     {
         private WikiTableOfContents tableOfContents;
 

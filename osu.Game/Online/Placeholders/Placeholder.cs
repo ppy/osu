@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Online.Placeholders
 {
-    public abstract class Placeholder : OsuTextFlowContainer, IEquatable<Placeholder>
+    public abstract partial class Placeholder : OsuTextFlowContainer, IEquatable<Placeholder>
     {
         protected const float TEXT_SIZE = 22;
 

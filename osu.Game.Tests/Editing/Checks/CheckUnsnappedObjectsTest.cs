@@ -19,8 +19,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckUnsnappedObjectsTest
     {
-        private CheckUnsnappedObjects check;
-        private ControlPointInfo cpi;
+        private CheckUnsnappedObjects check = null!;
+        private ControlPointInfo cpi = null!;
 
         [SetUp]
         public void Setup()

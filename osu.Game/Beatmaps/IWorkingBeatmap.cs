@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -16,7 +18,12 @@ using osu.Game.Storyboards;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// A more expensive representation of a beatmap which allows access to various associated resources.
+    /// - Access textures and other resources via <see cref="GetStream"/>.
+    /// - Access the storyboard via <see cref="Storyboard"/>.
+    /// - Access a local skin via <see cref="Skin"/>.
+    /// - Access the track via <see cref="LoadTrack"/> (and then <see cref="Track"/> for subsequent accesses).
+    /// - Create a playable <see cref="Beatmap"/> via <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod})"/>.
     /// </summary>
     public interface IWorkingBeatmap
     {
@@ -127,6 +134,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
         /// </summary>
-        void PrepareTrackForPreviewLooping();
+        void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0);
     }
 }

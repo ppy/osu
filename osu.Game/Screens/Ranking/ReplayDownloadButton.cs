@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ReplayDownloadButton : CompositeDrawable
+    public partial class ReplayDownloadButton : CompositeDrawable
     {
         public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
 
@@ -31,7 +33,7 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (!string.IsNullOrEmpty(Score.Value?.Hash))
+                if (Score.Value?.HasReplay == true)
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerTeamResultsScreen : MultiplayerResultsScreen
+    public partial class MultiplayerTeamResultsScreen : MultiplayerResultsScreen
     {
         private readonly SortedDictionary<int, BindableLong> teamScores;
 

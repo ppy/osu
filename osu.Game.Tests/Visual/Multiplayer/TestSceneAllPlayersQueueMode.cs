@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +15,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
@@ -24,26 +23,14 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneAllPlayersQueueMode : QueueModeTestScene
+    public partial class TestSceneAllPlayersQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.AllPlayers;
 
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemAddedToTheEndOfQueue()
-        {
-            addItem(() => OtherBeatmap);
-            AddAssert("playlist has 2 items", () => MultiplayerClient.APIRoom?.Playlist.Count == 2);
-
-            addItem(() => InitialBeatmap);
-            AddAssert("playlist has 3 items", () => MultiplayerClient.APIRoom?.Playlist.Count == 3);
-
-            AddAssert("first item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddUntilStep("first item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -51,12 +38,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RunGameplay();
 
-            AddAssert("playlist has only one item", () => MultiplayerClient.APIRoom?.Playlist.Count == 1);
-            AddAssert("playlist item is expired", () => MultiplayerClient.APIRoom?.Playlist[0].Expired == true);
-            AddAssert("last item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
+            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * TearDown : System.TimeoutException : "wait for ongoing operation to complete" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
+        public void TestItemAddedToTheEndOfQueue()
+        {
+            addItem(() => OtherBeatmap);
+            AddUntilStep("playlist has 2 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
+
+            addItem(() => InitialBeatmap);
+            AddUntilStep("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
+
+            AddUntilStep("first item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest] // See above
         public void TestNextItemSelectedAfterGameplayFinish()
         {
             addItem(() => OtherBeatmap);
@@ -64,16 +72,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             RunGameplay();
 
-            AddAssert("first item expired", () => MultiplayerClient.APIRoom?.Playlist[0].Expired == true);
-            AddAssert("next item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[1].ID);
+            AddUntilStep("first item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("next item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
 
             RunGameplay();
 
-            AddAssert("second item expired", () => MultiplayerClient.APIRoom?.Playlist[1].Expired == true);
-            AddAssert("next item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[2].ID);
+            AddUntilStep("second item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == true);
+            AddUntilStep("next item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[2].ID);
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestItemsNotClearedWhenSwitchToHostOnlyMode()
         {
             addItem(() => OtherBeatmap);
@@ -83,12 +92,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RunGameplay();
 
             AddStep("change queue mode", () => MultiplayerClient.ChangeSettings(queueMode: QueueMode.HostOnly));
-            AddAssert("playlist has 3 items", () => MultiplayerClient.APIRoom?.Playlist.Count == 3);
-            AddAssert("item 2 is not expired", () => MultiplayerClient.APIRoom?.Playlist[1].Expired == false);
-            AddAssert("current item is the other beatmap", () => MultiplayerClient.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
+            AddUntilStep("item 2 is not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
+            AddUntilStep("current item is the other beatmap", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectItemSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap);
@@ -96,6 +106,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectRulesetSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap, new CatchRuleset().RulesetInfo);
@@ -113,6 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectModsSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap, mods: new Mod[] { new OsuModDoubleTime() });
@@ -141,6 +153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
             AddUntilStep("wait for loaded", () => songSelect.AsNonNull().BeatmapSetsLoaded);
+            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
 
             if (ruleset != null)
                 AddStep($"set {ruleset.Name} ruleset", () => songSelect.AsNonNull().Ruleset.Value = ruleset);

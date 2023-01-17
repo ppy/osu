@@ -11,18 +11,18 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class LevelBadge : CompositeDrawable, IHasTooltip
+    public partial class LevelBadge : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserStatistics.LevelInfo?> LevelInfo = new Bindable<UserStatistics.LevelInfo?>();
 
         public LocalisableString TooltipText { get; private set; }
 
-        private OsuSpriteText levelText;
+        private OsuSpriteText levelText = null!;
 
         public LevelBadge()
         {
@@ -47,14 +47,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Font = OsuFont.GetFont(size: 20)
                 }
             };
-
-            User.BindValueChanged(user => updateLevel(user.NewValue));
         }
 
-        private void updateLevel(APIUser user)
+        protected override void LoadComplete()
         {
-            levelText.Text = user?.Statistics?.Level.Current.ToString() ?? "0";
-            TooltipText = UsersStrings.ShowStatsLevel(user?.Statistics?.Level.Current.ToString());
+            base.LoadComplete();
+
+            LevelInfo.BindValueChanged(level => updateLevel(level.NewValue), true);
+        }
+
+        private void updateLevel(UserStatistics.LevelInfo? levelInfo)
+        {
+            string level = levelInfo?.Current.ToString() ?? "0";
+            levelText.Text = level;
+            TooltipText = UsersStrings.ShowStatsLevel(level);
         }
     }
 }

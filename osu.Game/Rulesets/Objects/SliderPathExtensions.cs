@@ -6,8 +6,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderPathExtensions

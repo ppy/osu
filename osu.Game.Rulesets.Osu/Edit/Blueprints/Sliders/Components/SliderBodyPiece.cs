@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
@@ -11,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : BlueprintPiece<Slider>
+    public partial class SliderBodyPiece : BlueprintPiece<Slider>
     {
         private readonly ManualSliderBody body;
 
@@ -38,16 +40,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
         }
 
+        private int? lastVersion;
+
         public override void UpdateFrom(Slider hitObject)
         {
             base.UpdateFrom(hitObject);
 
             body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
-            var vertices = new List<Vector2>();
-            hitObject.Path.GetPathToProgress(vertices, 0, 1);
+            if (lastVersion != hitObject.Path.Version.Value)
+            {
+                lastVersion = hitObject.Path.Version.Value;
 
-            body.SetVertices(vertices);
+                var vertices = new List<Vector2>();
+                hitObject.Path.GetPathToProgress(vertices, 0, 1);
+
+                body.SetVertices(vertices);
+            }
 
             Size = body.Size;
             OriginPosition = body.PathOffset;

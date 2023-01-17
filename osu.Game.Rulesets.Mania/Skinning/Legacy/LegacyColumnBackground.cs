@@ -15,12 +15,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
+    public partial class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Container lightContainer;
-        private Sprite light;
+        private Container lightContainer = null!;
+        private Sprite light = null!;
 
         public LegacyColumnBackground()
         {

@@ -5,29 +5,24 @@ using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osuTK;
-using osuTK.Graphics;
 using Squirrel;
 using Squirrel.SimpleSplat;
+using LogLevel = Squirrel.SimpleSplat.LogLevel;
+using UpdateManager = osu.Game.Updater.UpdateManager;
 
 namespace osu.Desktop.Updater
 {
     [SupportedOSPlatform("windows")]
-    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
+    public partial class SquirrelUpdateManager : UpdateManager
     {
-        private UpdateManager updateManager;
-        private INotificationOverlay notificationOverlay;
+        private Squirrel.UpdateManager? updateManager;
+        private INotificationOverlay notificationOverlay = null!;
 
-        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
+        public Task PrepareUpdateAsync() => Squirrel.UpdateManager.RestartAppWhenExited();
 
         private static readonly Logger logger = Logger.GetLogger("updater");
 
@@ -37,6 +32,9 @@ namespace osu.Desktop.Updater
         private bool updatePending;
 
         private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(INotificationOverlay notifications)
@@ -48,12 +46,12 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
-            const string github_token = null; // TODO: populate.
+            const string? github_token = null; // TODO: populate.
 
             try
             {
@@ -66,7 +64,14 @@ namespace osu.Desktop.Updater
                     if (updatePending)
                     {
                         // the user may have dismissed the completion notice, so show it again.
-                        notificationOverlay.Post(new UpdateCompleteNotification(this));
+                        notificationOverlay.Post(new UpdateApplicationCompleteNotification
+                        {
+                            Activated = () =>
+                            {
+                                restartToApplyUpdate();
+                                return true;
+                            },
+                        });
                         return true;
                     }
 
@@ -78,19 +83,21 @@ namespace osu.Desktop.Updater
 
                 if (notification == null)
                 {
-                    notification = new UpdateProgressNotification(this) { State = ProgressNotificationState.Active };
+                    notification = new UpdateProgressNotification
+                    {
+                        CompletionClickAction = restartToApplyUpdate,
+                    };
+
                     Schedule(() => notificationOverlay.Post(notification));
                 }
 
-                notification.Progress = 0;
-                notification.Text = @"Downloading update...";
+                notification.StartDownload();
 
                 try
                 {
                     await updateManager.DownloadReleases(info.ReleasesToApply, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
-                    notification.Progress = 0;
-                    notification.Text = @"Installing update...";
+                    notification.StartInstall();
 
                     await updateManager.ApplyReleases(info, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
@@ -110,9 +117,7 @@ namespace osu.Desktop.Updater
                     else
                     {
                         // In the case of an error, a separate notification will be displayed.
-                        notification.State = ProgressNotificationState.Cancelled;
-                        notification.Close();
-
+                        notification.FailDownload();
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -134,84 +139,24 @@ namespace osu.Desktop.Updater
             return true;
         }
 
+        private bool restartToApplyUpdate()
+        {
+            PrepareUpdateAsync()
+                .ContinueWith(_ => Schedule(() => game.AttemptExit()));
+            return true;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             updateManager?.Dispose();
         }
 
-        private class UpdateCompleteNotification : ProgressCompletionNotification
-        {
-            [Resolved]
-            private OsuGame game { get; set; }
-
-            public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
-            {
-                Text = @"Update ready to install. Click to restart!";
-
-                Activated = () =>
-                {
-                    updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
-                    return true;
-                };
-            }
-        }
-
-        private class UpdateProgressNotification : ProgressNotification
-        {
-            private readonly SquirrelUpdateManager updateManager;
-
-            public UpdateProgressNotification(SquirrelUpdateManager updateManager)
-            {
-                this.updateManager = updateManager;
-            }
-
-            protected override Notification CreateCompletionNotification()
-            {
-                return new UpdateCompleteNotification(updateManager);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconContent.AddRange(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
-                        Size = new Vector2(20),
-                    }
-                });
-            }
-
-            public override void Close()
-            {
-                // cancelling updates is not currently supported by the underlying updater.
-                // only allow dismissing for now.
-
-                switch (State)
-                {
-                    case ProgressNotificationState.Cancelled:
-                        base.Close();
-                        break;
-                }
-            }
-        }
-
         private class SquirrelLogger : ILogger, IDisposable
         {
-            public Squirrel.SimpleSplat.LogLevel Level { get; set; } = Squirrel.SimpleSplat.LogLevel.Info;
+            public LogLevel Level { get; set; } = LogLevel.Info;
 
-            public void Write(string message, Squirrel.SimpleSplat.LogLevel logLevel)
+            public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;

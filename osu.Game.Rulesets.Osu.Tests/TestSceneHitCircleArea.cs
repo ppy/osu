@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleArea : OsuManualInputManagerTestScene
+    public partial class TestSceneHitCircleArea : OsuManualInputManagerTestScene
     {
         private HitCircle hitCircle;
         private DrawableHitCircle drawableHitCircle;
@@ -33,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            Child = new SkinProvidingContainer(new DefaultSkin(null))
+            Child = new SkinProvidingContainer(new TrianglesSkin(null!))
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = drawableHitCircle = new DrawableHitCircle(hitCircle)

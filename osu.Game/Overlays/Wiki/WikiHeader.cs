@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -12,7 +14,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiHeader : BreadcrumbControlOverlayHeader
+    public partial class WikiHeader : BreadcrumbControlOverlayHeader
     {
         private const string index_path = "Main_Page";
 
@@ -73,7 +75,7 @@ namespace osu.Game.Overlays.Wiki
 
         protected override OverlayTitle CreateTitle() => new WikiHeaderTitle();
 
-        private class WikiHeaderTitle : OverlayTitle
+        private partial class WikiHeaderTitle : OverlayTitle
         {
             public WikiHeaderTitle()
             {

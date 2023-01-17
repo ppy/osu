@@ -1,13 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Models
 {
@@ -21,8 +20,8 @@ namespace osu.Game.Models
 
         public RealmNamedFileUsage(RealmFile file, string filename)
         {
-            File = file;
-            Filename = filename;
+            File = file ?? throw new ArgumentNullException(nameof(file));
+            Filename = filename ?? throw new ArgumentNullException(nameof(filename));
         }
 
         [UsedImplicitly]

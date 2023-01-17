@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -12,18 +14,21 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Select.Details;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
-    public class TestSceneBeatmapSetOverlay : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
-
-        protected override bool UseOnlineAPI => true;
 
         private int nextBeatmapSetId = 1;
 
@@ -35,16 +40,13 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private IRulesetStore rulesets { get; set; }
 
+        [SetUp]
+        public void SetUp() => Schedule(() => SelectedMods.Value = Array.Empty<Mod>());
+
         [Test]
         public void TestLoading()
         {
             AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
-        }
-
-        [Test]
-        public void TestOnline()
-        {
-            AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
         }
 
         [Test]
@@ -54,6 +56,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new APIBeatmapSet
                 {
+                    Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Future genre" },
+                    Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "Future language" },
                     OnlineID = 1235,
                     Title = @"an awesome beatmap",
                     Artist = @"naru narusegawa",
@@ -107,6 +111,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("status is loved", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Loved);
             AddAssert("scores container is visible", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 1);
+            AddAssert("mod selector is visible", () => overlay.ChildrenOfType<LeaderboardModSelector>().Single().Alpha == 1);
 
             AddStep("go to second beatmap", () => overlay.ChildrenOfType<BeatmapPicker.DifficultySelectorButton>().ElementAt(1).TriggerClick());
 
@@ -212,6 +217,21 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestSelectedModsDontAffectStatistics()
+        {
+            AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
+            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
+            AddStep("set AR10 diff adjust", () => SelectedMods.Value = new[]
+            {
+                new OsuModDifficultyAdjust
+                {
+                    ApproachRate = { Value = 10 }
+                }
+            });
+            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value == (0, null));
+        }
+
+        [Test]
         public void TestHide()
         {
             AddStep(@"hide", overlay.Hide);
@@ -221,6 +241,44 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowWithNoReload()
         {
             AddStep(@"show without reload", overlay.Show);
+        }
+
+        [TestCase(BeatmapSetLookupType.BeatmapId)]
+        [TestCase(BeatmapSetLookupType.SetId)]
+        public void TestFetchLookupType(BeatmapSetLookupType lookupType)
+        {
+            string type = string.Empty;
+
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetBeatmapSetRequest getBeatmapSet:
+                            type = getBeatmapSet.Type.ToString();
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep(@"fetch", () =>
+            {
+                switch (lookupType)
+                {
+                    case BeatmapSetLookupType.BeatmapId:
+                        overlay.FetchAndShowBeatmap(55);
+                        break;
+
+                    case BeatmapSetLookupType.SetId:
+                        overlay.FetchAndShowBeatmapSet(55);
+                        break;
+                }
+            });
+
+            AddAssert(@"type is correct", () => type == lookupType.ToString());
         }
 
         private APIBeatmapSet createManyDifficultiesBeatmapSet()
@@ -267,7 +325,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
-        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        private partial class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
             public new BeatmapSetHeader Header => base.Header;
         }

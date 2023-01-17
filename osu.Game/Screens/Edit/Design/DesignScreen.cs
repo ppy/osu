@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Edit.Design
 {
-    public class DesignScreen : EditorScreen
+    public partial class DesignScreen : EditorScreen
     {
         public DesignScreen()
             : base(EditorScreenMode.Design)

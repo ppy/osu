@@ -16,21 +16,21 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueTable : EditorTable
+    public partial class IssueTable : EditorTable
     {
-        [Resolved]
-        private VerifyScreen verify { get; set; }
-
-        private Bindable<Issue> selectedIssue;
+        private Bindable<Issue> selectedIssue = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        private VerifyScreen verify { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorClock clock { get; set; } = null!;
 
         [Resolved]
-        private Editor editor { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private Editor editor { get; set; } = null!;
 
         public IEnumerable<Issue> Issues
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Verify
                 Content = null;
                 BackgroundFlow.Clear();
 
-                if (value == null)
+                if (!value.Any())
                     return;
 
                 foreach (var issue in value)
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Verify
             selectedIssue = verify.SelectedIssue.GetBoundCopy();
             selectedIssue.BindValueChanged(issue =>
             {
-                foreach (var b in BackgroundFlow) b.Selected = b.Item == issue.NewValue;
+                SetSelectedRow(issue.NewValue);
             }, true);
         }
 

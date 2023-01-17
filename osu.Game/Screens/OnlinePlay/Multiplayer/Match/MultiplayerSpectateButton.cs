@@ -1,18 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerSpectateButton : MultiplayerRoomComposite
+    public partial class MultiplayerSpectateButton : MultiplayerRoomComposite
     {
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
@@ -22,11 +23,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private readonly ButtonWithTrianglesExposed button;
+        private readonly RoundedButton button;
 
         public MultiplayerSpectateButton()
         {
-            InternalChild = button = new ButtonWithTrianglesExposed
+            InternalChild = button = new RoundedButton
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.ToggleSpectate().ContinueWith(t => endOperation());
+            Client.ToggleSpectate().ContinueWith(_ => endOperation());
 
             void endOperation() => clickOperation?.Dispose();
         }
@@ -65,26 +66,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 default:
                     button.Text = "Spectate";
                     button.BackgroundColour = colours.BlueDark;
-                    button.Triangles.ColourDark = colours.BlueDarker;
-                    button.Triangles.ColourLight = colours.Blue;
                     break;
 
                 case MultiplayerUserState.Spectating:
                     button.Text = "Stop spectating";
                     button.BackgroundColour = colours.Gray4;
-                    button.Triangles.ColourDark = colours.Gray5;
-                    button.Triangles.ColourLight = colours.Gray6;
                     break;
             }
 
             button.Enabled.Value = Client.Room != null
                                    && Client.Room.State != MultiplayerRoomState.Closed
                                    && !operationInProgress.Value;
-        }
-
-        private class ButtonWithTrianglesExposed : TriangleButton
-        {
-            public new Triangles Triangles => base.Triangles;
         }
     }
 }

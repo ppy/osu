@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
+    public partial class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
     {
         [Test]
         public void TestPreviousHitWindowDoesNotExtendPastNextObject()
@@ -74,8 +76,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             performTest(objects, new List<ReplayFrame>());
 
-            addJudgementAssert(objects[0], HitResult.IgnoreHit);
-            addJudgementAssert(objects[1], HitResult.IgnoreHit);
+            addJudgementAssert(objects[0], HitResult.IgnoreMiss);
+            addJudgementAssert(objects[1], HitResult.IgnoreMiss);
         }
 
         [Test]
@@ -139,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             AddStep("load player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
+                Beatmap.Value = CreateWorkingBeatmap(new ManiaBeatmap(new StageDefinition(4))
                 {
                     HitObjects = hitObjects,
                     BeatmapInfo =
@@ -169,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

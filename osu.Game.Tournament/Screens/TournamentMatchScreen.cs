@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class TournamentMatchScreen : TournamentScreen
+    public abstract partial class TournamentMatchScreen : TournamentScreen
     {
         protected readonly Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
         private WarningBox noMatchWarning;

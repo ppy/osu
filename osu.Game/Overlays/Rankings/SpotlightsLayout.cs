@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightsLayout : CompositeDrawable
+    public partial class SpotlightsLayout : CompositeDrawable
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 

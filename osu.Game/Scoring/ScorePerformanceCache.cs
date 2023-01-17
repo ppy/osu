@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +18,7 @@ namespace osu.Game.Scoring
     /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, PerformanceAttributes>
+    public partial class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, PerformanceAttributes>
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }

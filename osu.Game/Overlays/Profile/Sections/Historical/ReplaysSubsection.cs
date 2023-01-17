@@ -8,15 +8,15 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class ReplaysSubsection : ChartProfileSubsection
+    public partial class ReplaysSubsection : ChartProfileSubsection
     {
         protected override LocalisableString GraphCounterName => UsersStrings.ShowExtraHistoricalReplaysWatchedCountsCountLabel;
 
-        public ReplaysSubsection(Bindable<APIUser> user)
+        public ReplaysSubsection(Bindable<UserProfileData?> user)
             : base(user, UsersStrings.ShowExtraHistoricalReplaysWatchedCountsTitle)
         {
         }
 
-        protected override APIUserHistoryCount[] GetValues(APIUser user) => user?.ReplaysWatchedCounts;
+        protected override APIUserHistoryCount[]? GetValues(APIUser? user) => user?.ReplaysWatchedCounts;
     }
 }

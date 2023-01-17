@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NF";
         public override IconUsage? Icon => OsuIcon.ModNoFail;
         public override ModType Type => ModType.DifficultyReduction;
-        public override string Description => "You can't fail, no matter what.";
+        public override LocalisableString Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModAutoplay) };
     }

@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// <summary>
     /// Represents a <see cref="Droplet"/> caught by the catcher.
     /// </summary>
-    public class CaughtDroplet : CaughtObject
+    public partial class CaughtDroplet : CaughtObject
     {
         public override bool StaysOnPlate => false;
 

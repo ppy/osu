@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
+using osu.Game.IO.Serialization;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -25,7 +25,12 @@ namespace osu.Game.Scoring.Legacy
         /// Database version in stable-compatible YYYYMMDD format.
         /// Should be incremented if any changes are made to the format/usage.
         /// </summary>
-        public const int LATEST_VERSION = FIRST_LAZER_VERSION;
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
+        /// </list>
+        /// </remarks>
+        public const int LATEST_VERSION = 30000001;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -53,9 +58,9 @@ namespace osu.Game.Scoring.Legacy
                 throw new ArgumentException(@"Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
-        public void Encode(Stream stream)
+        public void Encode(Stream stream, bool leaveOpen = false)
         {
-            using (SerializationWriter sw = new SerializationWriter(stream))
+            using (SerializationWriter sw = new SerializationWriter(stream, leaveOpen))
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(LATEST_VERSION);
@@ -78,6 +83,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.WriteByteArray(createReplayData());
                 sw.Write((long)0);
                 writeModSpecificData(score.ScoreInfo, sw);
+                sw.WriteByteArray(createScoreInfoData());
             }
         }
 
@@ -85,9 +91,13 @@ namespace osu.Game.Scoring.Legacy
         {
         }
 
-        private byte[] createReplayData()
+        private byte[] createReplayData() => compress(replayStringContent);
+
+        private byte[] createScoreInfoData() => compress(LegacyReplaySoloScoreInfo.FromScore(score.ScoreInfo).Serialize());
+
+        private byte[] compress(string data)
         {
-            byte[] content = new ASCIIEncoding().GetBytes(replayStringContent);
+            byte[] content = new ASCIIEncoding().GetBytes(data);
 
             using (var outStream = new MemoryStream())
             {
@@ -145,6 +155,7 @@ namespace osu.Game.Scoring.Legacy
                     return legacyFrame;
 
                 case IConvertibleReplayFrame convertibleFrame:
+                    Debug.Assert(beatmap != null);
                     return convertibleFrame.ToLegacy(beatmap);
 
                 default:

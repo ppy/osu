@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -24,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropdown<T> : Dropdown<T>
+    public partial class OsuDropdown<T> : Dropdown<T>
     {
         private const float corner_radius = 5;
 
@@ -34,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        protected class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
+        protected partial class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -137,7 +135,7 @@ namespace osu.Game.Graphics.UserInterface
 
             #region DrawableOsuDropdownMenuItem
 
-            public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem
+            public partial class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem
             {
                 // IsHovered is used
                 public override bool HandlePositionalInput => true;
@@ -205,7 +203,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected override Drawable CreateContent() => new Content();
 
-                protected new class Content : CompositeDrawable, IHasText
+                protected new partial class Content : CompositeDrawable, IHasText
                 {
                     public LocalisableString Text
                     {
@@ -299,7 +297,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #endregion
 
-        public class OsuDropdownHeader : DropdownHeader
+        public partial class OsuDropdownHeader : DropdownHeader
         {
             protected readonly SpriteText Text;
 

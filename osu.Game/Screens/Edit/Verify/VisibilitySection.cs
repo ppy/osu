@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class VisibilitySection : EditorRoundedScreenSettingsSection
+    internal partial class VisibilitySection : EditorRoundedScreenSettingsSection
     {
         private readonly IssueType[] configurableIssueTypes =
         {

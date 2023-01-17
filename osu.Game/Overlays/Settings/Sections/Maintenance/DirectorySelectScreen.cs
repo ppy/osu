@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -11,16 +13,15 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public abstract class DirectorySelectScreen : OsuScreen
+    public abstract partial class DirectorySelectScreen : OsuScreen
     {
-        private TriangleButton selectionButton;
+        private RoundedButton selectionButton;
 
         private OsuDirectorySelector directorySelector;
 
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             },
                             new Drawable[]
                             {
-                                selectionButton = new TriangleButton
+                                selectionButton = new RoundedButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,

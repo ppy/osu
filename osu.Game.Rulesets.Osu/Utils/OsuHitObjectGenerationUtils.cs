@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -109,44 +112,46 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectHorizontally(OsuHitObject osuObject)
+        public static void ReflectHorizontallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
 
-            if (!(osuObject is Slider slider))
+            if (osuObject is not Slider slider)
                 return;
 
-            // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
+            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - nested.Position.X, nested.Position.Y);
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
 
-            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position = new Vector2(-point.Position.X, point.Position.Y);
-
-            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+            modifySlider(slider, reflectNestedObject, reflectControlPoint);
         }
 
         /// <summary>
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectVertically(OsuHitObject osuObject)
+        public static void ReflectVerticallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
-            if (!(osuObject is Slider slider))
+            if (osuObject is not Slider slider)
                 return;
 
-            // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.Position.X, OsuPlayfield.BASE_SIZE.Y - nested.Position.Y);
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
 
-            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position = new Vector2(point.Position.X, -point.Position.Y);
+            modifySlider(slider, reflectNestedObject, reflectControlPoint);
+        }
 
-            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        /// <summary>
+        /// Flips the position of the <see cref="Slider"/> around its start position horizontally.
+        /// </summary>
+        /// <param name="slider">The slider to be flipped.</param>
+        public static void FlipSliderInPlaceHorizontally(Slider slider)
+        {
+            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(slider.X - (nested.X - slider.X), nested.Y);
+            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
+
+            modifySlider(slider, flipNestedObject, flipControlPoint);
         }
 
         /// <summary>
@@ -157,14 +162,20 @@ namespace osu.Game.Rulesets.Osu.Utils
         public static void RotateSlider(Slider slider, float rotation)
         {
             void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
+            void rotateControlPoint(PathControlPoint point) => point.Position = rotateVector(point.Position, rotation);
 
+            modifySlider(slider, rotateNestedObject, rotateControlPoint);
+        }
+
+        private static void modifySlider(Slider slider, Action<OsuHitObject> modifyNestedObject, Action<PathControlPoint> modifyControlPoint)
+        {
             // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(modifyNestedObject);
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(modifyNestedObject);
 
             var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
             foreach (var point in controlPoints)
-                point.Position = rotateVector(point.Position, rotation);
+                modifyControlPoint(point);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
@@ -183,6 +194,40 @@ namespace osu.Game.Rulesets.Osu.Utils
                 length * MathF.Cos(angle),
                 length * MathF.Sin(angle)
             );
+        }
+
+        /// <param name="beatmap">The beatmap hitObject is a part of.</param>
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> that should be checked.</param>
+        /// <param name="downbeatsOnly">If true, this method only returns true if hitObject is on a downbeat.
+        /// If false, it returns true if hitObject is on any beat.</param>
+        /// <returns>true if hitObject is on a (down-)beat, false otherwise.</returns>
+        public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
+        {
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
+
+            double timeSinceTimingPoint = hitObject.StartTime - timingPoint.Time;
+
+            double beatLength = timingPoint.BeatLength;
+
+            if (downbeatsOnly)
+                beatLength *= timingPoint.TimeSignature.Numerator;
+
+            // Ensure within 1ms of expected location.
+            return Math.Abs(timeSinceTimingPoint + 1) % beatLength < 2;
+        }
+
+        /// <summary>
+        /// Generates a random number from a normal distribution using the Box-Muller transform.
+        /// </summary>
+        public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
+        {
+            // Generate 2 random numbers in the interval (0,1].
+            // x1 must not be 0 since log(0) = undefined.
+            double x1 = 1 - rng.NextDouble();
+            double x2 = 1 - rng.NextDouble();
+
+            double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(2 * Math.PI * x2);
+            return mean + stdDev * (float)stdNormal;
         }
     }
 }

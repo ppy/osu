@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -17,7 +19,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsLoungeSubScreen : LoungeSubScreen
+    public partial class PlaylistsLoungeSubScreen : LoungeSubScreen
     {
         [Resolved]
         private IAPIProvider api { get; set; }

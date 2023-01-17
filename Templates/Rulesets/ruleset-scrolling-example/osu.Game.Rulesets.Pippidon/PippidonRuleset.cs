@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Pippidon
                     return new[] { new PippidonModAutoplay() };
 
                 default:
-                    return new Mod[] { null };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -46,10 +45,9 @@ namespace osu.Game.Rulesets.Pippidon
             new KeyBinding(InputKey.S, PippidonAction.MoveDown),
         };
 
-        public override Drawable CreateIcon() => new Sprite
-        {
-            Margin = new MarginPadding { Top = 3 },
-            Texture = new TextureStore(new TextureLoaderStore(CreateResourceStore()), false).Get("Textures/coin"),
-        };
+        public override Drawable CreateIcon() => new PippidonRulesetIcon(this);
+
+        // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
     }
 }

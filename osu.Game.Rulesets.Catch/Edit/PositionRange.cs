@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Catch.Edit
 {
     /// <summary>

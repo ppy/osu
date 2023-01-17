@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderComboChange : TestSceneSlider
+    public partial class TestSceneSliderComboChange : TestSceneSlider
     {
         private readonly Bindable<int> comboIndex = new Bindable<int>();
 

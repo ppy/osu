@@ -9,12 +9,12 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacySliderHeadHitCircle : LegacyMainCirclePiece
+    public partial class LegacySliderHeadHitCircle : LegacyMainCirclePiece
     {
         [Resolved(canBeNull: true)]
-        private DrawableHitObject drawableHitObject { get; set; }
+        private DrawableHitObject? drawableHitObject { get; set; }
 
-        private Drawable proxiedOverlayLayer;
+        private Drawable proxiedOverlayLayer = null!;
 
         public LegacySliderHeadHitCircle()
             : base("sliderstartcircle")

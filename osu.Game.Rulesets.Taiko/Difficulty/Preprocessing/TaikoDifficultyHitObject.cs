@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -15,25 +18,35 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
         /// <summary>
+        /// The list of all <see cref="TaikoDifficultyHitObject"/> of the same colour as this <see cref="TaikoDifficultyHitObject"/> in the beatmap.
+        /// </summary>
+        private readonly IReadOnlyList<TaikoDifficultyHitObject>? monoDifficultyHitObjects;
+
+        /// <summary>
+        /// The index of this <see cref="TaikoDifficultyHitObject"/> in <see cref="monoDifficultyHitObjects"/>.
+        /// </summary>
+        public readonly int MonoIndex;
+
+        /// <summary>
+        /// The list of all <see cref="TaikoDifficultyHitObject"/> that is either a regular note or finisher in the beatmap
+        /// </summary>
+        private readonly IReadOnlyList<TaikoDifficultyHitObject> noteDifficultyHitObjects;
+
+        /// <summary>
+        /// The index of this <see cref="TaikoDifficultyHitObject"/> in <see cref="noteDifficultyHitObjects"/>.
+        /// </summary>
+        public readonly int NoteIndex;
+
+        /// <summary>
         /// The rhythm required to hit this hit object.
         /// </summary>
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
         /// <summary>
-        /// The hit type of this hit object.
+        /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
+        /// by other skills in the future.
         /// </summary>
-        public readonly HitType? HitType;
-
-        /// <summary>
-        /// The index of the object in the beatmap.
-        /// </summary>
-        public readonly int ObjectIndex;
-
-        /// <summary>
-        /// Whether the object should carry a penalty due to being hittable using special techniques
-        /// making it easier to do so.
-        /// </summary>
-        public bool StaminaCheese;
+        public readonly TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
         /// Creates a new difficulty hit object.
@@ -42,16 +55,44 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
         /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
-        /// <param name="objectIndex">The index of the object in the beatmap.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
-            : base(hitObject, lastObject, clockRate)
+        /// <param name="objects">The list of all <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
+        /// <param name="centreHitObjects">The list of centre (don) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
+        /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
+        /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a drumroll or swell) in the current beatmap.</param>
+        /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
+                                        List<DifficultyHitObject> objects,
+                                        List<TaikoDifficultyHitObject> centreHitObjects,
+                                        List<TaikoDifficultyHitObject> rimHitObjects,
+                                        List<TaikoDifficultyHitObject> noteObjects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
         {
-            var currentHit = hitObject as Hit;
+            noteDifficultyHitObjects = noteObjects;
 
+            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
+            Colour = new TaikoDifficultyHitObjectColour();
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
-            HitType = currentHit?.Type;
 
-            ObjectIndex = objectIndex;
+            switch ((hitObject as Hit)?.Type)
+            {
+                case HitType.Centre:
+                    MonoIndex = centreHitObjects.Count;
+                    centreHitObjects.Add(this);
+                    monoDifficultyHitObjects = centreHitObjects;
+                    break;
+
+                case HitType.Rim:
+                    MonoIndex = rimHitObjects.Count;
+                    rimHitObjects.Add(this);
+                    monoDifficultyHitObjects = rimHitObjects;
+                    break;
+            }
+
+            if (hitObject is Hit)
+            {
+                NoteIndex = noteObjects.Count;
+                noteObjects.Add(this);
+            }
         }
 
         /// <summary>
@@ -90,5 +131,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
+
+        public TaikoDifficultyHitObject? PreviousMono(int backwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
+
+        public TaikoDifficultyHitObject? NextMono(int forwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex + (forwardsIndex + 1));
+
+        public TaikoDifficultyHitObject? PreviousNote(int backwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
+
+        public TaikoDifficultyHitObject? NextNote(int forwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
     }
 }

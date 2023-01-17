@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneOnlineViewContainer : OsuTestScene
+    public partial class TestSceneOnlineViewContainer : OsuTestScene
     {
         private readonly TestOnlineViewContainer onlineView;
 
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);
         }
 
-        private class TestOnlineViewContainer : OnlineViewContainer
+        private partial class TestOnlineViewContainer : OnlineViewContainer
         {
             public new LoadingSpinner LoadingSpinner => base.LoadingSpinner;
 

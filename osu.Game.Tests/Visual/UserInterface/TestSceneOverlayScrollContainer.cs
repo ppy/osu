@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -98,7 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("invocation count is 1", () => invocationCount == 1);
         }
 
-        private class TestScrollContainer : OverlayScrollContainer
+        private partial class TestScrollContainer : OverlayScrollContainer
         {
             public new ScrollToTopButton Button => base.Button;
         }

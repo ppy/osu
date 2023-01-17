@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using MessagePack;
 using osu.Game.Online.Multiplayer.Countdown;
@@ -15,15 +13,28 @@ namespace osu.Game.Online.Multiplayer
     [MessagePackObject]
     [Union(0, typeof(MatchStartCountdown))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
     [Union(1, typeof(ForceGameplayStartCountdown))]
+    [Union(2, typeof(ServerShuttingDownCountdown))]
     public abstract class MultiplayerCountdown
     {
+        /// <summary>
+        /// A unique identifier for this countdown.
+        /// </summary>
+        [Key(0)]
+        public int ID { get; set; }
+
         /// <summary>
         /// The amount of time remaining in the countdown.
         /// </summary>
         /// <remarks>
-        /// This is only sent once from the server upon initial retrieval of the <see cref="MultiplayerRoom"/> or via a <see cref="CountdownChangedEvent"/>.
+        /// This is only sent once from the server upon initial retrieval of the <see cref="MultiplayerRoom"/> or via a <see cref="CountdownStartedEvent"/>.
         /// </remarks>
-        [Key(0)]
+        [Key(1)]
         public TimeSpan TimeRemaining { get; set; }
+
+        /// <summary>
+        /// Whether only a single instance of this <see cref="MultiplayerCountdown"/> type may be active at any one time.
+        /// </summary>
+        [IgnoreMember]
+        public virtual bool IsExclusive => true;
     }
 }

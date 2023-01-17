@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -21,7 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelList : Container
+    public partial class ChannelList : Container
     {
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
@@ -101,7 +99,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
 
             channelMap.Remove(channel);
-            flow.Remove(item);
+            flow.Remove(item, true);
 
             updateVisibility();
         }
@@ -142,7 +140,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 announceChannelGroup.Show();
         }
 
-        private class ChannelGroup : FillFlowContainer
+        private partial class ChannelGroup : FillFlowContainer
         {
             public readonly FillFlowContainer<ChannelListItem> ItemFlow;
 

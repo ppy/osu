@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Schedule
 {
-    public class ScheduleScreen : TournamentScreen // IProvidesVideo
+    public partial class ScheduleScreen : TournamentScreen
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;
@@ -207,7 +209,7 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
         }
 
-        public class ScheduleMatch : DrawableTournamentMatch
+        public partial class ScheduleMatch : DrawableTournamentMatch
         {
             public ScheduleMatch(TournamentMatch match, bool showTimestamp = true)
                 : base(match)
@@ -247,7 +249,7 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
         }
 
-        public class ScheduleMatchDate : DrawableDate
+        public partial class ScheduleMatchDate : DrawableDate
         {
             public ScheduleMatchDate(DateTimeOffset date, float textSize = OsuFont.DEFAULT_FONT_SIZE, bool italic = true)
                 : base(date, textSize, italic)
@@ -259,7 +261,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                 : $"Starting {base.Format()}";
         }
 
-        public class ScheduleContainer : Container
+        public partial class ScheduleContainer : Container
         {
             protected override Container<Drawable> Content => content;
 

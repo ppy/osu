@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,11 +20,13 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
 
@@ -36,7 +40,7 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
+        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
 
         public Exception LastLoginError { get; private set; }
 
@@ -102,114 +106,39 @@ namespace osu.Game.Online.API
         /// </summary>
         private int failureCount;
 
+        /// <summary>
+        /// The main API thread loop, which will continue to run until the game is shut down.
+        /// </summary>
         private void run()
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                switch (State.Value)
+                if (state.Value == APIState.Failing)
                 {
-                    case APIState.Failing:
-                        //todo: replace this with a ping request.
-                        log.Add(@"In a failing state, waiting a bit before we try again...");
-                        Thread.Sleep(5000);
+                    // To recover from a failing state, falling through and running the full reconnection process seems safest for now.
+                    // This could probably be replaced with a ping-style request if we want to avoid the reconnection overheads.
+                    log.Add($@"{nameof(APIAccess)} is in a failing state, waiting a bit before we try again...");
+                    Thread.Sleep(5000);
+                }
 
-                        if (!IsLoggedIn) goto case APIState.Connecting;
+                // Ensure that we have valid credentials.
+                // If not, setting the offline state will allow the game to prompt the user to provide new credentials.
+                if (!HasLogin)
+                {
+                    state.Value = APIState.Offline;
+                    Thread.Sleep(50);
+                    continue;
+                }
 
-                        if (queue.Count == 0)
-                        {
-                            log.Add(@"Queueing a ping request");
-                            Queue(new GetUserRequest());
-                        }
+                Debug.Assert(HasLogin);
 
-                        break;
+                // Ensure that we are in an online state. If not, attempt a connect.
+                if (state.Value != APIState.Online)
+                {
+                    attemptConnect();
 
-                    case APIState.Offline:
-                    case APIState.Connecting:
-                        // work to restore a connection...
-                        if (!HasLogin)
-                        {
-                            state.Value = APIState.Offline;
-                            Thread.Sleep(50);
-                            continue;
-                        }
-
-                        state.Value = APIState.Connecting;
-
-                        // save the username at this point, if the user requested for it to be.
-                        config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
-
-                        if (!authentication.HasValidAccessToken)
-                        {
-                            LastLoginError = null;
-
-                            try
-                            {
-                                authentication.AuthenticateWithLogin(ProvidedUsername, password);
-                            }
-                            catch (Exception e)
-                            {
-                                //todo: this fails even on network-related issues. we should probably handle those differently.
-                                LastLoginError = e;
-                                log.Add(@"Login failed!");
-                                password = null;
-                                authentication.Clear();
-                                continue;
-                            }
-                        }
-
-                        var userReq = new GetUserRequest();
-
-                        userReq.Failure += ex =>
-                        {
-                            if (ex is WebException webException && webException.Message == @"Unauthorized")
-                            {
-                                log.Add(@"Login no longer valid");
-                                Logout();
-                            }
-                            else
-                                failConnectionProcess();
-                        };
-                        userReq.Success += u =>
-                        {
-                            localUser.Value = u;
-
-                            // todo: save/pull from settings
-                            localUser.Value.Status.Value = new UserStatusOnline();
-
-                            failureCount = 0;
-                        };
-
-                        if (!handleRequest(userReq))
-                        {
-                            failConnectionProcess();
-                            continue;
-                        }
-
-                        // getting user's friends is considered part of the connection process.
-                        var friendsReq = new GetFriendsRequest();
-
-                        friendsReq.Failure += _ => failConnectionProcess();
-                        friendsReq.Success += res =>
-                        {
-                            friends.AddRange(res);
-
-                            //we're connected!
-                            state.Value = APIState.Online;
-                        };
-
-                        if (!handleRequest(friendsReq))
-                        {
-                            failConnectionProcess();
-                            continue;
-                        }
-
-                        // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
-                        // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
-                        // before actually going online.
-                        while (State.Value > APIState.Offline && State.Value < APIState.Online)
-                            Thread.Sleep(500);
-
-                        break;
+                    if (state.Value != APIState.Online)
+                        continue;
                 }
 
                 // hard bail if we can't get a valid access token.
@@ -219,29 +148,134 @@ namespace osu.Game.Online.API
                     continue;
                 }
 
-                while (true)
-                {
-                    APIRequest req;
-
-                    lock (queue)
-                    {
-                        if (queue.Count == 0) break;
-
-                        req = queue.Dequeue();
-                    }
-
-                    handleRequest(req);
-                }
-
+                processQueuedRequests();
                 Thread.Sleep(50);
             }
+        }
 
-            void failConnectionProcess()
+        /// <summary>
+        /// Dequeue from the queue and run each request synchronously until the queue is empty.
+        /// </summary>
+        private void processQueuedRequests()
+        {
+            while (true)
             {
-                // if something went wrong during the connection process, we want to reset the state (but only if still connecting).
-                if (State.Value == APIState.Connecting)
-                    state.Value = APIState.Failing;
+                APIRequest req;
+
+                lock (queue)
+                {
+                    if (queue.Count == 0) return;
+
+                    req = queue.Dequeue();
+                }
+
+                handleRequest(req);
             }
+        }
+
+        /// <summary>
+        /// From a non-connected state, perform a full connection flow, obtaining OAuth tokens and populating the local user and friends.
+        /// </summary>
+        /// <remarks>
+        /// This method takes control of <see cref="state"/> and transitions from <see cref="APIState.Connecting"/> to either
+        /// - <see cref="APIState.Online"/>  (successful connection)
+        /// - <see cref="APIState.Failing"/> (failed connection but retrying)
+        /// - <see cref="APIState.Offline"/> (failed and can't retry, clear credentials and require user interaction)
+        /// </remarks>
+        /// <returns>Whether the connection attempt was successful.</returns>
+        private void attemptConnect()
+        {
+            state.Value = APIState.Connecting;
+
+            if (localUser.IsDefault)
+            {
+                // Show a placeholder user if saved credentials are available.
+                // This is useful for storing local scores and showing a placeholder username after starting the game,
+                // until a valid connection has been established.
+                setLocalUser(new APIUser
+                {
+                    Username = ProvidedUsername,
+                });
+            }
+
+            // save the username at this point, if the user requested for it to be.
+            config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+
+            if (!authentication.HasValidAccessToken)
+            {
+                LastLoginError = null;
+
+                try
+                {
+                    authentication.AuthenticateWithLogin(ProvidedUsername, password);
+                }
+                catch (Exception e)
+                {
+                    //todo: this fails even on network-related issues. we should probably handle those differently.
+                    LastLoginError = e;
+                    log.Add($@"Login failed for username {ProvidedUsername} ({LastLoginError.Message})!");
+
+                    Logout();
+                    return;
+                }
+            }
+
+            var userReq = new GetUserRequest();
+            userReq.Failure += ex =>
+            {
+                if (ex is APIException)
+                {
+                    LastLoginError = ex;
+                    log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
+                    Logout();
+                }
+                else if (ex is WebException webException && webException.Message == @"Unauthorized")
+                {
+                    log.Add(@"Login no longer valid");
+                    Logout();
+                }
+                else
+                {
+                    state.Value = APIState.Failing;
+                }
+            };
+            userReq.Success += user =>
+            {
+                // todo: save/pull from settings
+                user.Status.Value = new UserStatusOnline();
+
+                setLocalUser(user);
+
+                // we're connected!
+                state.Value = APIState.Online;
+                failureCount = 0;
+            };
+
+            if (!handleRequest(userReq))
+            {
+                state.Value = APIState.Failing;
+                return;
+            }
+
+            var friendsReq = new GetFriendsRequest();
+            friendsReq.Failure += _ => state.Value = APIState.Failing;
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
+
+            if (!handleRequest(friendsReq))
+            {
+                state.Value = APIState.Failing;
+                return;
+            }
+
+            // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
+            // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
+            // before actually going online.
+            while (State.Value == APIState.Connecting && !cancellationToken.IsCancellationRequested)
+                Thread.Sleep(500);
         }
 
         public void Perform(APIRequest request)
@@ -271,6 +305,9 @@ namespace osu.Game.Online.API
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
             new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
+        public NotificationsClientConnector GetNotificationsConnector() =>
+            new WebSocketNotificationsClientConnector(this);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -292,12 +329,35 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken(@"form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
-                    // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    e.Rethrow();
+                    try
+                    {
+                        // attempt to parse a non-form error message
+                        var response = JObject.Parse(req.GetResponseString().AsNonNull());
+
+                        string redirect = (string)response.SelectToken(@"url", true);
+                        string message = (string)response.SelectToken(@"error", false);
+
+                        if (!string.IsNullOrEmpty(redirect))
+                        {
+                            return new RegistrationRequest.RegistrationRequestErrors
+                            {
+                                Redirect = redirect,
+                                Message = message,
+                            };
+                        }
+
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
+                    catch
+                    {
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
                 }
             }
 
@@ -319,8 +379,7 @@ namespace osu.Game.Online.API
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
 
-                // we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn) state.Value = APIState.Online;
+                // Reset failure count if this request succeeded.
                 failureCount = 0;
                 return true;
             }
@@ -387,14 +446,14 @@ namespace osu.Game.Online.API
             failureCount++;
             log.Add($@"API failure count is now {failureCount}");
 
-            if (failureCount >= 3 && State.Value == APIState.Online)
+            if (failureCount >= 3)
             {
                 state.Value = APIState.Failing;
                 flushQueue();
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public void Queue(APIRequest request)
         {
@@ -434,7 +493,7 @@ namespace osu.Game.Online.API
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
             {
-                localUser.Value = createGuestUser();
+                setLocalUser(createGuestUser());
                 friends.Clear();
             });
 
@@ -443,6 +502,8 @@ namespace osu.Game.Online.API
         }
 
         private static APIUser createGuestUser() => new GuestUser();
+
+        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
 
         protected override void Dispose(bool isDisposing)
         {

@@ -7,15 +7,15 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DropletPiece : CatchHitObjectPiece
+    public partial class DropletPiece : CatchHitObjectPiece
     {
-        protected override HyperBorderPiece HyperBorderPiece { get; }
+        protected override Drawable HyperBorderPiece { get; }
 
         public DropletPiece()
         {
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS / 2);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new Pulp
                 {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -14,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
     {
         private Container content;
         protected override Container<Drawable> Content => content;
@@ -62,7 +64,7 @@ namespace osu.Game.Tests.Visual.Editing
             }));
         }
 
-        private class SnappingCursorContainer : CompositeDrawable
+        private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;
 

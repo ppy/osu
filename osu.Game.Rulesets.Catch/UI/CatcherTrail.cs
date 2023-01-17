@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// A trail of the catcher.
     /// It also represents a hyper dash afterimage.
     /// </summary>
-    public class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
+    public partial class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
     {
         private readonly SkinnableCatcher body;
 

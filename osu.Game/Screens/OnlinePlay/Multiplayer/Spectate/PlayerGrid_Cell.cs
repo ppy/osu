@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// A cell of the grid. Contains the content and tracks to the linked facade.
         /// </summary>
-        private class Cell : CompositeDrawable
+        private partial class Cell : CompositeDrawable
         {
             /// <summary>
             /// The index of the original facade of this cell.

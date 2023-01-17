@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerSpectatorPlayerGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneMultiplayerSpectatorPlayerGrid : OsuManualInputManagerTestScene
     {
         private PlayerGrid grid;
 
@@ -103,7 +105,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             bool checkAction() => Precision.AlmostEquals(grid.MaximisedFacade.DrawSize, grid.Content.ElementAt(index).DrawSize, 10) == shouldBeMaximised;
         }
 
-        private class GridContent : Box
+        private partial class GridContent : Box
         {
             public GridContent()
             {

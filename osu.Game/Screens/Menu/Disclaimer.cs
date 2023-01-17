@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : StartupScreen
+    public partial class Disclaimer : StartupScreen
     {
         private SpriteIcon icon;
         private Color4 iconColour;
@@ -146,16 +148,17 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText(" to help support osu!'s development", formatSemiBold);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
+                    heart = t;
+
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).Drawables.First();
 
-                if (IsLoaded)
-                    animateHeart();
+                    Schedule(() => heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop());
+                });
 
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
@@ -169,6 +172,14 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(nextScreen);
 
             ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            base.OnSuspending(e);
+
+            // Once this screen has finished being displayed, we don't want to unnecessarily handle user change events.
+            currentUser.UnbindAll();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -206,14 +217,12 @@ namespace osu.Game.Screens.Menu
             foreach (var c in textFlow.Children)
                 c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-            animateHeart();
-
             this
                 .FadeInFromZero(500)
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d =>
+                .Finally(_ =>
                 {
                     if (nextScreen != null)
                         this.Push(nextScreen);
@@ -230,7 +239,7 @@ namespace osu.Game.Screens.Menu
                 "New features are coming online every update. Make sure to stay up-to-date!",
                 "If you find the UI too large or small, try adjusting UI scale in settings!",
                 "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
-                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-D!",
+                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
                 "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
                 "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
                 "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
@@ -243,11 +252,6 @@ namespace osu.Game.Screens.Menu
             };
 
             return tips[RNG.Next(0, tips.Length)];
-        }
-
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

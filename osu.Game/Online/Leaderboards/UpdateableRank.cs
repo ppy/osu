@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class UpdateableRank : ModelBackedDrawable<ScoreRank?>
+    public partial class UpdateableRank : ModelBackedDrawable<ScoreRank?>
     {
         public ScoreRank? Rank
         {
@@ -15,7 +17,7 @@ namespace osu.Game.Online.Leaderboards
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank? rank)
+        public UpdateableRank(ScoreRank? rank = null)
         {
             Rank = rank;
         }

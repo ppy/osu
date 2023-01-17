@@ -5,33 +5,29 @@ using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
-        private readonly IBeatmapInfo beatmapInfo;
-
-        private readonly string filename;
+        public readonly IBeatmapInfo BeatmapInfo;
+        public readonly string Filename;
 
         public GetBeatmapRequest(IBeatmapInfo beatmapInfo)
         {
-            this.beatmapInfo = beatmapInfo;
-
-            filename = (beatmapInfo as BeatmapInfo)?.Path ?? string.Empty;
+            BeatmapInfo = beatmapInfo;
+            Filename = (beatmapInfo as BeatmapInfo)?.Path ?? string.Empty;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var request = base.CreateWebRequest();
 
-            if (beatmapInfo.OnlineID > 0)
-                request.AddParameter(@"id", beatmapInfo.OnlineID.ToString());
-            if (!string.IsNullOrEmpty(beatmapInfo.MD5Hash))
-                request.AddParameter(@"checksum", beatmapInfo.MD5Hash);
-            if (!string.IsNullOrEmpty(filename))
-                request.AddParameter(@"filename", filename);
+            if (BeatmapInfo.OnlineID > 0)
+                request.AddParameter(@"id", BeatmapInfo.OnlineID.ToString());
+            if (!string.IsNullOrEmpty(BeatmapInfo.MD5Hash))
+                request.AddParameter(@"checksum", BeatmapInfo.MD5Hash);
+            if (!string.IsNullOrEmpty(Filename))
+                request.AddParameter(@"filename", Filename);
 
             return request;
         }

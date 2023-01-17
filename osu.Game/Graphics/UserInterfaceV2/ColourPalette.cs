@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -20,13 +23,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// <summary>
     /// A component which displays a collection of colours in individual <see cref="ColourDisplay"/>s.
     /// </summary>
-    public class ColourPalette : CompositeDrawable
+    public partial class ColourPalette : CompositeDrawable
     {
         public BindableList<Colour4> Colours { get; } = new BindableList<Colour4>();
 
-        private string colourNamePrefix = "Colour";
+        private LocalisableString colourNamePrefix = "Colour";
 
-        public string ColourNamePrefix
+        public LocalisableString ColourNamePrefix
         {
             get => colourNamePrefix;
             set
@@ -116,7 +119,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        internal class AddColourButton : CompositeDrawable
+        internal partial class AddColourButton : CompositeDrawable
         {
             public Action Action
             {

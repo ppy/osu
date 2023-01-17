@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class CarouselHeader : Container
+    public partial class CarouselHeader : Container
     {
         public Container BorderContainer;
 
@@ -91,11 +91,11 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        public class HoverLayer : HoverSampleDebounceComponent
+        public partial class HoverLayer : HoverSampleDebounceComponent
         {
-            private Sample sampleHover;
+            private Sample? sampleHover;
 
-            private Box box;
+            private Box box = null!;
 
             public HoverLayer()
             {

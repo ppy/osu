@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig.Extensions.Tables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownTableCell : MarkdownTableCell
+    public partial class OsuMarkdownTableCell : MarkdownTableCell
     {
         private readonly bool isHeading;
 
@@ -43,7 +45,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             return new TableBodyBorder();
         }
 
-        private class TableHeadBorder : Box
+        private partial class TableHeadBorder : Box
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -56,7 +58,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
-        private class TableBodyBorder : Box
+        private partial class TableBodyBorder : Box
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -67,7 +69,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
-        private class TableCellTextFlowContainer : OsuMarkdownTextFlowContainer
+        private partial class TableCellTextFlowContainer : OsuMarkdownTextFlowContainer
         {
             public FontWeight Weight { get; set; }
 

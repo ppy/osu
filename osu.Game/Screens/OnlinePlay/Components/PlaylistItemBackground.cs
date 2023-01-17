@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -11,7 +9,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class PlaylistItemBackground : Background
+    public partial class PlaylistItemBackground : Background
     {
         public readonly IBeatmapInfo? Beatmap;
 

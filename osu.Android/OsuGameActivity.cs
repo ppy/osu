@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -72,11 +75,23 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
+#pragma warning disable 618 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
+#pragma warning restore 618
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             bool isTablet = smallestWidthDp >= 600f;
 
             RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+
+            // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
+            // The assembly files are not available as files either after native AOT.
+            // Manually load them so that they can be loaded by RulesetStore.loadFromAppDomain.
+            // REMEMBER to fully uninstall previous version every time when investigating this!
+            // Don't forget osu.Game.Tests.Android too.
+            Assembly.Load("osu.Game.Rulesets.Osu");
+            Assembly.Load("osu.Game.Rulesets.Taiko");
+            Assembly.Load("osu.Game.Rulesets.Catch");
+            Assembly.Load("osu.Game.Rulesets.Mania");
         }
 
         protected override void OnNewIntent(Intent intent) => handleIntent(intent);
@@ -125,7 +140,7 @@ namespace osu.Android
 
                 cursor.MoveToFirst();
 
-                int filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+                int filenameColumn = cursor.GetColumnIndex(IOpenableColumns.DisplayName);
                 string filename = cursor.GetString(filenameColumn);
 
                 // SharpCompress requires archive streams to be seekable, which the stream opened by

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneAccuracyCircle : OsuTestScene
+    public partial class TestSceneAccuracyCircle : OsuTestScene
     {
         [TestCase(0.2, ScoreRank.D)]
         [TestCase(0.5, ScoreRank.D)]

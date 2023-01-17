@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class EditorSidebarSection : Container
+    public partial class EditorSidebarSection : Container
     {
         protected override Container<Drawable> Content { get; }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components
             };
         }
 
-        public class SectionHeader : CompositeDrawable
+        public partial class SectionHeader : CompositeDrawable
         {
             private readonly LocalisableString text;
 

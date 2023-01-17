@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -22,7 +24,7 @@ using osu.Game.Rulesets.Mania.UI;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneTimingBasedNoteColouring : OsuTestScene
+    public partial class TestSceneTimingBasedNoteColouring : OsuTestScene
     {
         private Bindable<bool> configTimingBasedNoteColouring;
 
@@ -83,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             const double beat_length = 500;
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 })
+            var beatmap = new ManiaBeatmap(new StageDefinition(1))
             {
                 HitObjects =
                 {

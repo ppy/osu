@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosionContainer : PooledDrawableWithLifetimeContainer<HitExplosionEntry, HitExplosion>
+    public partial class HitExplosionContainer : PooledDrawableWithLifetimeContainer<HitExplosionEntry, HitExplosion>
     {
         protected override bool RemoveRewoundEntry => true;
 

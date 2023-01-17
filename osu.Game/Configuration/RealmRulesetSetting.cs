@@ -3,8 +3,6 @@
 
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Configuration
 {
     [MapTo(@"RulesetSetting")]

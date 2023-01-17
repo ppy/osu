@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,8 +34,6 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        public Waveform Waveform => waveform.Value;
-
         public Storyboard Storyboard => storyboard.Value;
 
         public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
@@ -46,10 +46,11 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -58,7 +59,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
@@ -106,11 +106,20 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
-
-        public void PrepareTrackForPreviewLooping()
+        public Track LoadTrack()
         {
-            Track.Looping = true;
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+            // the track may have changed, recycle the current waveform.
+            waveform?.Dispose();
+            waveform = null;
+
+            return track;
+        }
+
+        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
+        {
+            Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
             if (Track.RestartPoint == -1)
@@ -123,6 +132,8 @@ namespace osu.Game.Beatmaps
 
                 Track.RestartPoint = 0.4f * Track.Length;
             }
+
+            Track.RestartPoint += offsetFromPreviewPoint;
         }
 
         /// <summary>
@@ -144,6 +155,7 @@ namespace osu.Game.Beatmaps
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
+        [NotNull]
         public Track Track
         {
             get
@@ -163,6 +175,12 @@ namespace osu.Game.Beatmaps
 
             return audioManager.Tracks.GetVirtual(length);
         }
+
+        #endregion
+
+        #region Waveform
+
+        public Waveform Waveform => waveform ??= GetWaveform();
 
         #endregion
 
@@ -277,12 +295,15 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                mod.ApplyToBeatmapProcessor(processor);
+            if (processor != null)
+            {
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
 
-            processor?.PreProcess();
+                processor.PreProcess();
+            }
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)

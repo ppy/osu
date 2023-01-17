@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLower().EndsWith);
+        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLowerInvariant().EndsWith);
         private bool probablyHasAudioData(Stream data) => data.Length > min_bytes_threshold;
 
         public class IssueTemplateTooShort : IssueTemplate

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -8,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ExpandingToolboxContainer : ExpandingContainer
+    public partial class ExpandingToolboxContainer : ExpandingContainer
     {
         protected override double HoverExpansionDelay => 250;
 
@@ -17,7 +19,8 @@ namespace osu.Game.Rulesets.Edit
         {
             RelativeSizeAxes = Axes.Y;
 
-            FillFlow.Spacing = new Vector2(10);
+            FillFlow.Spacing = new Vector2(5);
+            Padding = new MarginPadding { Vertical = 5 };
         }
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && anyToolboxHovered(screenSpacePos);

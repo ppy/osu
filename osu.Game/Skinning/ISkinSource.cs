@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace osu.Game.Skinning
 {
@@ -22,8 +21,7 @@ namespace osu.Game.Skinning
         /// This should be used for cases where subsequent lookups (for related components) need to occur on the same skin.
         /// </summary>
         /// <returns>The skin to be used for subsequent lookups, or <c>null</c> if none is available.</returns>
-        [CanBeNull]
-        ISkin FindProvider(Func<ISkin, bool> lookupFunction);
+        ISkin? FindProvider(Func<ISkin, bool> lookupFunction);
 
         /// <summary>
         /// Retrieve all sources available for lookup, with highest priority source first.

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Overlays.News;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsHeader : OsuTestScene
+    public partial class TestSceneNewsHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -45,7 +47,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("1 tab total", () => header.TabCount == 1);
         }
 
-        private class TestHeader : NewsHeader
+        private partial class TestHeader : NewsHeader
         {
             public int TabCount => TabControl.Items.Count;
         }

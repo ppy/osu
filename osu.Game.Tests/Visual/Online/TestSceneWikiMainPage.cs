@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +12,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiMainPage : OsuTestScene
+    public partial class TestSceneWikiMainPage : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);

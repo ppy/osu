@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -30,21 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples().Concat(TailSamples).ToArray();
-
-        public IList<HitSampleInfo> CreateSlidingSamples()
-        {
-            var slidingSamples = new List<HitSampleInfo>();
-
-            var normalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
-            if (normalSample != null)
-                slidingSamples.Add(normalSample.With("sliderslide"));
-
-            var whistleSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
-            if (whistleSample != null)
-                slidingSamples.Add(whistleSample.With("sliderwhistle"));
-
-            return slidingSamples;
-        }
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
@@ -154,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, __) => UpdateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
@@ -163,11 +151,15 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+#pragma warning disable 618
+            var legacyDifficultyPoint = DifficultyControlPoint as LegacyBeatmapDecoder.LegacyDifficultyControlPoint;
+#pragma warning restore 618
 
             double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
+            bool generateTicks = legacyDifficultyPoint?.GenerateTicks ?? true;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
+            TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

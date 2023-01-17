@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -11,7 +13,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class Multiplayer : OnlinePlayScreen
+    public partial class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
         private MultiplayerClient client { get; set; }

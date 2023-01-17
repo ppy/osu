@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
+    public partial class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
     {
         [Resolved]
         private AudioManager audio { get; set; }
@@ -103,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new CatchExposedPlayer(userHasCustomColours);
 
-        private class CatchExposedPlayer : ExposedPlayer
+        private partial class CatchExposedPlayer : ExposedPlayer
         {
             public CatchExposedPlayer(bool userHasCustomColours)
                 : base(userHasCustomColours)

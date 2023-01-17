@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -8,7 +10,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneHoldToConfirmOverlay : OsuTestScene
+    public partial class TestSceneHoldToConfirmOverlay : OsuTestScene
     {
         protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
 
@@ -57,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait until fired again", () => overlay.Fired);
         }
 
-        private class TestHoldToConfirmOverlay : ExitConfirmOverlay
+        private partial class TestHoldToConfirmOverlay : ExitConfirmOverlay
         {
             public void Begin() => BeginConfirm();
         }

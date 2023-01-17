@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class TimeSpanOutline : CompositeDrawable
+    public partial class TimeSpanOutline : CompositeDrawable
     {
         private const float border_width = 4;
 

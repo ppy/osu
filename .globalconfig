@@ -53,3 +53,7 @@ dotnet_diagnostic.CA2225.severity = none
 
 # Banned APIs
 dotnet_diagnostic.RS0030.severity = error
+
+# Temporarily disable analysing CanBeNull = true in NRT contexts due to mobile issues.
+# See: https://github.com/ppy/osu/pull/19677
+dotnet_diagnostic.OSUF001.severity = none

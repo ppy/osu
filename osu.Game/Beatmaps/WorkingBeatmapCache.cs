@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
@@ -54,7 +58,7 @@ namespace osu.Game.Beatmaps
             this.resources = resources;
             this.host = host;
             this.files = files;
-            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
+            largeTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), host?.CreateTextureLoaderStore(files));
             this.trackStore = trackStore;
         }
 
@@ -74,9 +78,12 @@ namespace osu.Game.Beatmaps
                 {
                     Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                    OnInvalidated?.Invoke(working);
                 }
             }
         }
+
+        public event Action<WorkingBeatmap> OnInvalidated;
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
@@ -105,6 +112,7 @@ namespace osu.Game.Beatmaps
 
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
+        IRenderer IStorageResourceProvider.Renderer => host?.Renderer ?? new DummyRenderer();
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         RealmAccess IStorageResourceProvider.RealmAccess => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
@@ -132,8 +140,20 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
-                        return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
+                    string fileStorePath = BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path);
+
+                    // TODO: check validity of file
+
+                    var stream = GetStream(fileStorePath);
+
+                    if (stream == null)
+                    {
+                        Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} not found on disk at expected location {fileStorePath}).", level: LogLevel.Error);
+                        return null;
+                    }
+
+                    using (var reader = new LineBufferedReader(stream))
+                        return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
                 }
                 catch (Exception e)
                 {
@@ -149,7 +169,16 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return resources.LargeTextureStore.Get(BeatmapSetInfo.GetPathForFile(Metadata.BackgroundFile));
+                    string fileStorePath = BeatmapSetInfo.GetPathForFile(Metadata.BackgroundFile);
+                    var texture = resources.LargeTextureStore.Get(fileStorePath);
+
+                    if (texture == null)
+                    {
+                        Logger.Log($"Beatmap background failed to load (file {Metadata.BackgroundFile} not found on disk at expected location {fileStorePath}).");
+                        return null;
+                    }
+
+                    return texture;
                 }
                 catch (Exception e)
                 {
@@ -168,7 +197,16 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return resources.Tracks.Get(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
+                    string fileStorePath = BeatmapSetInfo.GetPathForFile(Metadata.AudioFile);
+                    var track = resources.Tracks.Get(fileStorePath);
+
+                    if (track == null)
+                    {
+                        Logger.Log($"Beatmap failed to load (file {Metadata.AudioFile} not found on disk at expected location {fileStorePath}).", level: LogLevel.Error);
+                        return null;
+                    }
+
+                    return track;
                 }
                 catch (Exception e)
                 {
@@ -187,8 +225,17 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    var trackData = GetStream(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new Waveform(trackData);
+                    string fileStorePath = BeatmapSetInfo.GetPathForFile(Metadata.AudioFile);
+
+                    var trackData = GetStream(fileStorePath);
+
+                    if (trackData == null)
+                    {
+                        Logger.Log($"Beatmap waveform failed to load (file {Metadata.AudioFile} not found on disk at expected location {fileStorePath}).", level: LogLevel.Error);
+                        return null;
+                    }
+
+                    return new Waveform(trackData);
                 }
                 catch (Exception e)
                 {
@@ -206,20 +253,38 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
+                    string fileStorePath = BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path);
+                    var beatmapFileStream = GetStream(fileStorePath);
+
+                    if (beatmapFileStream == null)
                     {
-                        var decoder = Decoder.GetDecoder<Storyboard>(stream);
+                        Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} not found on disk at expected location {fileStorePath})", level: LogLevel.Error);
+                        return null;
+                    }
 
-                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+                    using (var reader = new LineBufferedReader(beatmapFileStream))
+                    {
+                        var decoder = Decoder.GetDecoder<Storyboard>(reader);
 
-                        // todo: support loading from both set-wide storyboard *and* beatmap specific.
-                        if (string.IsNullOrEmpty(storyboardFilename))
-                            storyboard = decoder.Decode(stream);
-                        else
+                        Stream storyboardFileStream = null;
+
+                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename is string storyboardFilename)
                         {
-                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(storyboardFilename))))
-                                storyboard = decoder.Decode(stream, secondaryStream);
+                            string storyboardFileStorePath = BeatmapSetInfo?.GetPathForFile(storyboardFilename);
+                            storyboardFileStream = GetStream(storyboardFileStorePath);
+
+                            if (storyboardFileStream == null)
+                                Logger.Log($"Storyboard failed to load (file {storyboardFilename} not found on disk at expected location {storyboardFileStorePath})", level: LogLevel.Error);
                         }
+
+                        if (storyboardFileStream != null)
+                        {
+                            // Stand-alone storyboard was found, so parse in addition to the beatmap's local storyboard.
+                            using (var secondaryReader = new LineBufferedReader(storyboardFileStream))
+                                storyboard = decoder.Decode(reader, secondaryReader);
+                        }
+                        else
+                            storyboard = decoder.Decode(reader);
                     }
                 }
                 catch (Exception e)

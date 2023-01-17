@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +16,7 @@ using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
+    public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
         protected PlacementBlueprint CurrentBlueprint { get; private set; }
@@ -28,10 +30,15 @@ namespace osu.Game.Tests.Visual
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.CacheAs(new EditorClock());
-
             var playable = GetPlayableBeatmap();
-            dependencies.CacheAs(new EditorBeatmap(playable));
+
+            var editorClock = new EditorClock();
+            base.Content.Add(editorClock);
+            dependencies.CacheAs(editorClock);
+
+            var editorBeatmap = new EditorBeatmap(playable);
+            // Not adding to hierarchy as we don't satisfy its dependencies. Probably not good.
+            dependencies.CacheAs(editorBeatmap);
 
             return dependencies;
         }
@@ -65,7 +72,7 @@ namespace osu.Game.Tests.Visual
         protected void ResetPlacement()
         {
             if (CurrentBlueprint != null)
-                Remove(CurrentBlueprint);
+                Remove(CurrentBlueprint, true);
             Add(CurrentBlueprint = CreateBlueprint());
         }
 

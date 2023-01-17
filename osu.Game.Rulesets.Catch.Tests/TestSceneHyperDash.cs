@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +17,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneHyperDash : TestSceneCatchPlayer
+    public partial class TestSceneHyperDash : TestSceneCatchPlayer
     {
         protected override bool Autoplay => true;
 
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 hyperDashCount = 0;
 
                 // this needs to be done within the frame stable context due to how quickly hyperdash state changes occur.
-                Player.DrawableRuleset.FrameStableComponents.OnUpdate += d =>
+                Player.DrawableRuleset.FrameStableComponents.OnUpdate += _ =>
                 {
                     var catcher = Player.ChildrenOfType<Catcher>().FirstOrDefault();
 

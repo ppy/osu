@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -26,7 +24,10 @@ namespace osu.Game.Tests.Gameplay
             var workingBeatmap = new TestWorkingBeatmap(beatmap);
             var playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            return new GameplayState(playableBeatmap, ruleset, mods, score);
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+            return new GameplayState(playableBeatmap, ruleset, mods, score, scoreProcessor);
         }
     }
 }

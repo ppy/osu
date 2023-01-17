@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
@@ -13,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid, IKeyBindingHandler<GlobalAction>
+    public partial class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid, IKeyBindingHandler<GlobalAction>
     {
         private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
 

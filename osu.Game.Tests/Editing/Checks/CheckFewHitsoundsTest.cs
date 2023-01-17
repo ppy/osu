@@ -18,10 +18,10 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckFewHitsoundsTest
     {
-        private CheckFewHitsounds check;
+        private CheckFewHitsounds check = null!;
 
-        private List<HitSampleInfo> notHitsounded;
-        private List<HitSampleInfo> hitsounded;
+        private List<HitSampleInfo> notHitsounded = null!;
+        private List<HitSampleInfo> hitsounded = null!;
 
         [SetUp]
         public void Setup()

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -28,7 +30,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
+    public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
         public event Action<ButtonState> StateChanged;
 

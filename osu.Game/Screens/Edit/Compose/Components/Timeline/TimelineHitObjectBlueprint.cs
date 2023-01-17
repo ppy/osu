@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -27,23 +28,23 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
+    public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
         private const float circle_size = 38;
 
-        private Container repeatsContainer;
+        private Container? repeatsContainer;
 
-        public Action<DragEvent> OnDragHandled;
+        public Action<DragEvent?>? OnDragHandled = null!;
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        private Bindable<int> indexInCurrentComboBindable;
+        private Bindable<int>? indexInCurrentComboBindable;
 
-        private Bindable<int> comboIndexBindable;
-        private Bindable<int> comboIndexWithOffsetsBindable;
+        private Bindable<int>? comboIndexBindable;
+        private Bindable<int>? comboIndexWithOffsetsBindable;
 
-        private Bindable<Color4> displayColourBindable;
+        private Bindable<Color4> displayColourBindable = null!;
 
         private readonly ExtendableCircle circle;
         private readonly Border border;
@@ -52,7 +53,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly OsuSpriteText comboIndexText;
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public TimelineHitObjectBlueprint(HitObject item)
             : base(item)
@@ -122,7 +126,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 case IHasComboInformation comboInfo:
                     indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
-                    indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+                    indexInCurrentComboBindable.BindValueChanged(_ =>
+                    {
+                        comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
+                    }, true);
 
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
                     comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
@@ -147,8 +154,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateColour();
         }
 
-        private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
-
         private void updateColour()
         {
             Color4 colour;
@@ -164,7 +169,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 default:
-                    return;
+                    colour = colourProvider.Highlight1;
+                    break;
             }
 
             if (IsSelected)
@@ -181,11 +187,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(averageColour);
         }
 
-        private SamplePointPiece sampleOverrideDisplay;
-        private DifficultyPointPiece difficultyOverrideDisplay;
+        private SamplePointPiece? sampleOverrideDisplay;
+        private DifficultyPointPiece? difficultyOverrideDisplay;
 
-        private DifficultyControlPoint difficultyControlPoint;
-        private SampleControlPoint sampleControlPoint;
+        private DifficultyControlPoint difficultyControlPoint = null!;
+        private SampleControlPoint sampleControlPoint = null!;
 
         protected override void Update()
         {
@@ -203,7 +209,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     updateRepeats(repeats);
             }
 
-            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
             {
                 difficultyControlPoint = Item.DifficultyControlPoint;
                 difficultyOverrideDisplay?.Expire();
@@ -218,7 +224,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            if (sampleControlPoint != Item.SampleControlPoint)
+            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
             {
                 sampleControlPoint = Item.SampleControlPoint;
                 sampleOverrideDisplay?.Expire();
@@ -261,7 +267,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        private class Tick : Circle
+        private partial class Tick : Circle
         {
             public Tick()
             {
@@ -272,18 +278,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        public class DragArea : Circle
+        public partial class DragArea : Circle
         {
-            private readonly HitObject hitObject;
+            private readonly HitObject? hitObject;
 
             [Resolved]
-            private Timeline timeline { get; set; }
+            private EditorBeatmap beatmap { get; set; } = null!;
 
-            public Action<DragEvent> OnDragHandled;
+            [Resolved]
+            private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
+
+            [Resolved]
+            private Timeline timeline { get; set; } = null!;
+
+            [Resolved]
+            private IEditorChangeHandler? changeHandler { get; set; }
+
+            private ScheduledDelegate? dragOperation;
+
+            public Action<DragEvent?>? OnDragHandled;
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragArea(HitObject hitObject)
+            public DragArea(HitObject? hitObject)
             {
                 this.hitObject = hitObject;
 
@@ -354,22 +371,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
-            [Resolved]
-            private EditorBeatmap beatmap { get; set; }
-
-            [Resolved]
-            private IBeatSnapProvider beatSnapProvider { get; set; }
-
-            [Resolved(CanBeNull = true)]
-            private IEditorChangeHandler changeHandler { get; set; }
-
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
                 return true;
             }
-
-            private ScheduledDelegate dragOperation;
 
             protected override void OnDrag(DragEvent e)
             {
@@ -391,7 +397,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed)
                                 {
-                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                    if (ReferenceEquals(hitObject.DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                                         hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
                                     double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
@@ -418,9 +424,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 break;
 
                             case IHasDuration endTimeHitObject:
-                                double snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                double snappedTime = Math.Max(hitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(hitObject.StartTime), beatSnapProvider.SnapTime(time));
 
-                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
+                                if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
                                 endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
@@ -435,12 +441,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.OnDragEnd(e);
 
-                OnDragHandled?.Invoke(null);
+                dragOperation?.Cancel();
+                dragOperation = null;
+
                 changeHandler?.EndChange();
+                OnDragHandled?.Invoke(null);
             }
         }
 
-        public class Border : ExtendableCircle
+        public partial class Border : ExtendableCircle
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -456,7 +465,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
         /// </summary>
-        public class ExtendableCircle : CompositeDrawable
+        public partial class ExtendableCircle : CompositeDrawable
         {
             protected readonly Circle Content;
 

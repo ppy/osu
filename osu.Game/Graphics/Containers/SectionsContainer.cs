@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace osu.Game.Graphics.Containers
     /// A container that can scroll to each section inside it.
     /// </summary>
     [Cached]
-    public class SectionsContainer<T> : Container<T>
+    public partial class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
@@ -33,7 +35,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == expandableHeader) return;
 
                 if (expandableHeader != null)
-                    RemoveInternal(expandableHeader);
+                    RemoveInternal(expandableHeader, false);
 
                 expandableHeader = value;
 
@@ -53,6 +55,7 @@ namespace osu.Game.Graphics.Containers
 
                 fixedHeader?.Expire();
                 fixedHeader = value;
+
                 if (value == null) return;
 
                 AddInternal(fixedHeader);
@@ -68,8 +71,10 @@ namespace osu.Game.Graphics.Containers
                 if (value == footer) return;
 
                 if (footer != null)
-                    scrollContainer.Remove(footer);
+                    scrollContainer.Remove(footer, false);
+
                 footer = value;
+
                 if (value == null) return;
 
                 footer.Anchor |= Anchor.y2;
@@ -235,7 +240,9 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                float smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
+                var flowChildren = scrollContentContainer.FlowingChildren.OfType<T>();
+
+                float smallestSectionHeight = flowChildren.Any() ? flowChildren.Min(d => d.Height) : 0;
 
                 // scroll offset is our fixed header height if we have it plus 10% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
@@ -244,7 +251,7 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
 
-                var presentChildren = Children.Where(c => c.IsPresent);
+                var presentChildren = flowChildren.Where(c => c.IsPresent);
 
                 if (lastClickedSection != null)
                     SelectedSection.Value = lastClickedSection;

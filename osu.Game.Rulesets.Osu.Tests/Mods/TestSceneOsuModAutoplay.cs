@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -14,7 +15,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAutoplay : OsuModTestScene
+    public partial class TestSceneOsuModAutoplay : OsuModTestScene
     {
         [Test]
         public void TestSpmUnaffectedByRateAdjust()
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private void runSpmTest(Mod mod)
         {
-            SpinnerSpmCalculator spmCalculator = null;
+            SpinnerSpmCalculator? spmCalculator = null;
 
             CreateModTest(new ModTestData
             {
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 return spmCalculator != null;
             });
 
-            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCalculator.Result.Value, 477, 5));
+            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCalculator.AsNonNull().Result.Value, 477, 5));
         }
     }
 }

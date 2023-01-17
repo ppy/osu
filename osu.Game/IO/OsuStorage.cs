@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -36,15 +38,20 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.management",
         };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.note",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.lock",
+        };
+
+        public override string[] IgnoreSuffixes => new[]
+        {
+            // Realm pipe files don't play well with copy operations
+            ".note",
+            ".lock",
+            ".management",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
@@ -92,6 +99,8 @@ namespace osu.Game.IO
             error = OsuStorageError.None;
             Storage lastStorage = UnderlyingStorage;
 
+            Logger.Log($"Attempting to use custom storage location {CustomStoragePath}");
+
             try
             {
                 Storage userStorage = host.GetStorage(CustomStoragePath);
@@ -100,12 +109,16 @@ namespace osu.Game.IO
                     error = OsuStorageError.AccessibleButEmpty;
 
                 ChangeTargetStorage(userStorage);
+                Logger.Log($"Storage successfully changed to {CustomStoragePath}.");
             }
             catch
             {
                 error = OsuStorageError.NotAccessible;
                 ChangeTargetStorage(lastStorage);
             }
+
+            if (error != OsuStorageError.None)
+                Logger.Log($"Custom storage location could not be used ({error}).");
 
             return error == OsuStorageError.None;
         }

@@ -4,21 +4,33 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyDrumRoll : CompositeDrawable, IHasAccentColour
+    public partial class LegacyDrumRoll : CompositeDrawable, IHasAccentColour
     {
-        private LegacyCirclePiece headCircle;
+        public override Quad ScreenSpaceDrawQuad
+        {
+            get
+            {
+                var headDrawQuad = headCircle.ScreenSpaceDrawQuad;
+                var tailDrawQuad = tailCircle.ScreenSpaceDrawQuad;
 
-        private Sprite body;
+                return new Quad(headDrawQuad.TopLeft, tailDrawQuad.TopRight, headDrawQuad.BottomLeft, tailDrawQuad.BottomRight);
+            }
+        }
 
-        private Sprite end;
+        private LegacyCirclePiece headCircle = null!;
+
+        private Sprite body = null!;
+
+        private Sprite tailCircle = null!;
 
         public LegacyDrumRoll()
         {
@@ -30,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             InternalChildren = new Drawable[]
             {
-                end = new Sprite
+                tailCircle = new Sprite
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
@@ -80,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             headCircle.AccentColour = colour;
             body.Colour = colour;
-            end.Colour = colour;
+            tailCircle.Colour = colour;
         }
     }
 }

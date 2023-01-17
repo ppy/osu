@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class DroppedObjectContainer : Container<CaughtObject>
+    public partial class DroppedObjectContainer : Container<CaughtObject>
     {
         public DroppedObjectContainer()
         {

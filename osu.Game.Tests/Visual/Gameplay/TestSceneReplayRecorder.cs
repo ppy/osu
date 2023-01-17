@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,7 +31,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneReplayRecorder : OsuManualInputManagerTestScene
+    public partial class TestSceneReplayRecorder : OsuManualInputManagerTestScene
     {
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
@@ -38,8 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private TestReplayRecorder recorder;
 
-        [Cached]
-        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
+        private GameplayState gameplayState;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -50,81 +51,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 replay = new Replay();
 
-                Add(new GridContainer
+                gameplayState = TestGameplayState.Create(new OsuRuleset());
+                gameplayState.Score.Replay = replay;
+
+                Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
-                            {
-                                Recorder = recorder = new TestReplayRecorder(new Score
-                                {
-                                    Replay = replay,
-                                    ScoreInfo =
-                                    {
-                                        BeatmapInfo = gameplayState.Beatmap.BeatmapInfo,
-                                        Ruleset = new OsuRuleset().RulesetInfo,
-                                    }
-                                })
-                                {
-                                    ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
-                                },
-                                Child = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            Colour = Color4.Brown,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = "Recording",
-                                            Scale = new Vector2(3),
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        },
-                                        new TestInputConsumer()
-                                    }
-                                },
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
-                            {
-                                ReplayInputHandler = new TestFramedReplayInputHandler(replay)
-                                {
-                                    GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
-                                },
-                                Child = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            Colour = Color4.DarkBlue,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = "Playback",
-                                            Scale = new Vector2(3),
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        },
-                                        new TestInputConsumer()
-                                    }
-                                },
-                            }
-                        }
-                    }
-                });
+                    CachedDependencies = new (Type, object)[] { (typeof(GameplayState), gameplayState) },
+                    Child = createContent(),
+                };
             });
         }
 
@@ -201,6 +136,74 @@ namespace osu.Game.Tests.Visual.Gameplay
             recorder = null;
         }
 
+        private Drawable createContent() => new GridContainer
+        {
+            RelativeSizeAxes = Axes.Both,
+            Content = new[]
+            {
+                new Drawable[]
+                {
+                    recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                    {
+                        Recorder = recorder = new TestReplayRecorder(gameplayState.Score)
+                        {
+                            ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
+                        },
+                        Child = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = Color4.Brown,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = "Recording",
+                                    Scale = new Vector2(3),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                new TestInputConsumer()
+                            }
+                        },
+                    }
+                },
+                new Drawable[]
+                {
+                    playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                    {
+                        ReplayInputHandler = new TestFramedReplayInputHandler(replay)
+                        {
+                            GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
+                        },
+                        Child = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = Color4.DarkBlue,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = "Playback",
+                                    Scale = new Vector2(3),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                new TestInputConsumer()
+                            }
+                        },
+                    }
+                }
+            }
+        };
+
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
         {
             public TestFramedReplayInputHandler(Replay replay)
@@ -215,7 +218,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
+        public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
 
@@ -258,7 +261,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestRulesetInputManager : RulesetInputManager<TestAction>
+        public partial class TestRulesetInputManager : RulesetInputManager<TestAction>
         {
             public TestRulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -268,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override KeyBindingContainer<TestAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 => new TestKeyBindingContainer();
 
-            internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
+            internal partial class TestKeyBindingContainer : KeyBindingContainer<TestAction>
             {
                 public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
                 {
@@ -296,7 +299,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Down,
         }
 
-        internal class TestReplayRecorder : ReplayRecorder<TestAction>
+        internal partial class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public TestReplayRecorder(Score target)
                 : base(target)

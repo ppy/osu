@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using osu.Framework.Allocation;
@@ -8,12 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -54,11 +57,6 @@ namespace osu.Game.Storyboards.Drawables
             get => vectorScale;
             set
             {
-                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
-                    value.X = Precision.FLOAT_EPSILON;
-                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
-                    value.Y = Precision.FLOAT_EPSILON;
-
                 if (vectorScale == value)
                     return;
 
@@ -93,6 +91,9 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private ISkinSource skin { get; set; }
 
+        [Resolved]
+        private IBeatSyncProvider beatSyncProvider { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
@@ -118,13 +119,25 @@ namespace osu.Game.Storyboards.Drawables
             Animation.ApplyTransforms(this);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Framework animation class tries its best to synchronise the animation at LoadComplete,
+            // but in some cases (such as fast forward) this results in an incorrect start offset.
+            //
+            // In the case of storyboard animations, we want to synchronise with game time perfectly
+            // so let's get a correct time based on gameplay clock and earliest transform.
+            PlaybackPosition = (beatSyncProvider.Clock?.CurrentTime ?? Clock.CurrentTime) - Animation.EarliestTransformTime;
+        }
+
         private void skinSourceChanged()
         {
             ClearFrames();
 
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
-            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path), default, default, true, string.Empty, out _))
+            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path)!, default, default, true, string.Empty, out _))
                 AddFrame(texture, Animation.FrameDelay);
         }
 

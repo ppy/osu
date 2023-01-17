@@ -46,6 +46,10 @@ namespace osu.Game.Replays.Legacy
         [IgnoreMember]
         public bool MouseRight2 => ButtonState.HasFlagFast(ReplayButtonState.Right2);
 
+        [JsonIgnore]
+        [IgnoreMember]
+        public bool Smoke => ButtonState.HasFlagFast(ReplayButtonState.Smoke);
+
         [Key(3)]
         public ReplayButtonState ButtonState;
 
