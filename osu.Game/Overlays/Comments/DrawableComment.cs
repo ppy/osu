@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Comments
         private GridContainer content = null!;
         private VotePill votePill = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public DrawableComment(Comment comment)
