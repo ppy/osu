@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -10,8 +9,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class SliderAdjustmentTick<T> : Component
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+    public partial class SliderAdjustmentTick : Component
     {
         private Sample sample = null!;
 

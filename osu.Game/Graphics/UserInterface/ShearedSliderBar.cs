@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly SquareNub Nub;
         private readonly Container nubContainer;
-        private readonly SliderAdjustmentTick<T> adjustmentTick;
+        private readonly SliderAdjustmentTick adjustmentTick;
         protected Box RightBox;
         protected Box LeftBox;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                         RelativePositionAxes = Axes.X,
                     },
                 },
-                adjustmentTick = new SliderAdjustmentTick<T>(),
+                adjustmentTick = new SliderAdjustmentTick(),
                 hoverClickSounds = new HoverClickSounds()
             };
         }

@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int max_decimal_digits = 5;
 
         protected readonly Nub Nub;
-        private readonly SliderAdjustmentTick<T> adjustmentTick;
+        private readonly SliderAdjustmentTick adjustmentTick;
         private readonly Container nubContainer;
         protected Box RightBox;
         protected Box LeftBox;
@@ -121,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
                         Current = { Value = true }
                     },
                 },
-                adjustmentTick = new SliderAdjustmentTick<T>(),
+                adjustmentTick = new SliderAdjustmentTick(),
                 hoverClickSounds = new HoverClickSounds()
             };
         }
