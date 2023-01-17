@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -26,6 +27,9 @@ namespace osu.Game.Tests.Visual.Editing
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         private TimingScreen timingScreen;
         private EditorBeatmap editorBeatmap;
@@ -72,6 +76,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestTrackingCurrentTimeWhileRunning()
         {
+            AddStep("set track timingpoint true", () => config.SetValue(OsuSetting.TrackTimingPoint, true));
+
             AddStep("Select first effect point", () =>
             {
                 InputManager.MoveMouseTo(Child.ChildrenOfType<EffectRowAttribute>().First());
@@ -90,6 +96,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestTrackingCurrentTimeWhilePaused()
         {
+            AddStep("set track timingpoint true", () => config.SetValue(OsuSetting.TrackTimingPoint, true));
+
             AddStep("Select first effect point", () =>
             {
                 InputManager.MoveMouseTo(Child.ChildrenOfType<EffectRowAttribute>().First());
@@ -106,6 +114,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestScrollControlGroupIntoView()
         {
+            AddStep("set track timingpoint true", () => config.SetValue(OsuSetting.TrackTimingPoint, true));
+
             AddStep("Add many control points", () =>
             {
                 editorBeatmap.ControlPointInfo.Clear();
@@ -132,6 +142,32 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Seek to last point", () => EditorClock.Seek(101 * 1000));
 
             AddUntilStep("Scrolled to end", () => timingScreen.ChildrenOfType<OsuScrollContainer>().First().IsScrolledToEnd());
+        }
+
+        [Test]
+        public void TestNotTrackingCurrentTime()
+        {
+            AddStep("set track timingpoint false", () => config.SetValue(OsuSetting.TrackTimingPoint, false));
+
+            AddStep("Select first effect point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<EffectRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
+            AddUntilStep("Ensure not seeked to correct time", () => EditorClock.CurrentTimeAccurate != 54670);
+
+            AddStep("Select first effect point again", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<EffectRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("Ensure not seek to correct time", () => EditorClock.CurrentTimeAccurate == 54670);
+
+            AddStep("Seek to later", () => EditorClock.Seek(80000));
+            AddUntilStep("Selection not changed", () => timingScreen.SelectedGroup.Value.Time == 54670);
         }
 
         protected override void Dispose(bool isDisposing)
