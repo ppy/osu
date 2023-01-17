@@ -42,8 +42,6 @@ namespace osu.Game.Screens.Play.HUD
             set => showBackground.Value = value;
         }
 
-        public BindableBool Darken = new BindableBool();
-
         private const float alpha_threshold = 2500;
 
         public Action<double>? OnSeek { get; set; }
