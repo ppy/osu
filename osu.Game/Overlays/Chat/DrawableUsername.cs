@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Chat
         private UserProfileOverlay? profileOverlay { get; set; }
 
         [Resolved]
-        private Bindable<Channel>? currentChannel { get; set; }
+        private Bindable<Channel?>? currentChannel { get; set; }
 
         private readonly APIUser user;
         private readonly OsuSpriteText drawableText;
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Chat
                 if (!user.Equals(api.LocalUser.Value))
                     items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
-                if (currentChannel != null)
+                if (currentChannel?.Value != null)
                 {
                     items.Add(new OsuMenuItem(ChatStrings.MentionUser, MenuItemType.Standard, () =>
                     {
