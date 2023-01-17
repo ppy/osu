@@ -127,9 +127,6 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender)
         {
-            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
-            transferRulesetValue();
-
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
                 AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
@@ -142,6 +139,9 @@ namespace osu.Game.Screens.Select
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
+
+            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
+            transferRulesetValue();
 
             AddRangeInternal(new Drawable[]
             {
@@ -859,9 +859,6 @@ namespace osu.Game.Screens.Select
 
             Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-
-            // We want to check for null since this method gets called before the loading of the carousel.
-            if (Carousel.IsNull()) return true;
 
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
