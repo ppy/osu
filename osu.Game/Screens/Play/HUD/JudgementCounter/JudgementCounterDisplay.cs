@@ -26,10 +26,10 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public Bindable<Direction> FlowDirection { get; set; } = new Bindable<Direction>();
 
         [SettingSource("Show judgement names")]
-        public BindableBool ShowName { get; set; } = new BindableBool(true);
+        public BindableBool ShowJudgementNames { get; set; } = new BindableBool(true);
 
         [SettingSource("Show max judgement")]
-        public BindableBool ShowMax { get; set; } = new BindableBool(true);
+        public BindableBool ShowMaxJudgement { get; set; } = new BindableBool(true);
 
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     counter.Direction.Value = getFillDirection(direction.NewValue);
             }, true);
             Mode.BindValueChanged(_ => updateMode(), true);
-            ShowMax.BindValueChanged(value =>
+            ShowMaxJudgement.BindValueChanged(value =>
             {
                 var firstChild = JudgementContainer.Children.FirstOrDefault();
                 firstChild.FadeTo(value.NewValue ? 1 : 0, TRANSFORM_DURATION, Easing.OutQuint);
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             JudgementCounter counter = new JudgementCounter(info)
             {
                 State = { Value = Visibility.Visible },
-                ShowName = { BindTarget = ShowName }
+                ShowName = { BindTarget = ShowJudgementNames }
             };
             return counter;
         }
