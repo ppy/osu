@@ -122,7 +122,38 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestSimpleInputButtonsDisabled()
+        public void TestMovementWhileDisallowed()
+        {
+            // aka "autopilot" mod
+
+            AddStep("Disallow gameplay cursor movement", () => osuInputManager.AllowUserCursorMovement = false);
+
+            Vector2? positionBefore = null;
+
+            AddStep("Store cursor position", () => positionBefore = osuInputManager.CurrentState.Mouse.Position);
+            beginTouch(TouchSource.Touch1);
+
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            AddAssert("Cursor position unchanged", () => osuInputManager.CurrentState.Mouse.Position, () => Is.EqualTo(positionBefore));
+        }
+
+        [Test]
+        public void TestActionWhileDisallowed()
+        {
+            // aka "relax" mod
+
+            AddStep("Disallow gameplay actions", () => osuInputManager.AllowGameplayInputs = false);
+
+            beginTouch(TouchSource.Touch1);
+
+            assertKeyCounter(0, 0);
+            checkNotPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+        }
+
+        [Test]
+        public void TestInputWhileMouseButtonsDisabled()
         {
             AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
 
