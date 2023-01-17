@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            // The mouse button disable setting affects touch. It's a bit weird.
+            // This is mostly just doing the same as what is done in RulesetInputManager to match behaviour.
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
