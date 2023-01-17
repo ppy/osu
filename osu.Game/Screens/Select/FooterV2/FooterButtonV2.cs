@@ -117,21 +117,22 @@ namespace osu.Game.Screens.Select.FooterV2
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
                         },
-                        new Container
-                        {
-                            // The X offset has to multiplied as such to account for the fact that we only want to offset by the distance from the CenterLeft point of the container
-                            // not the whole shear width
-                            Position = new Vector2(-SHEAR.X * (button_height / 2 - 10), -10),
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(120, 6),
-                            Masking = true,
-                            CornerRadius = 3,
-                            Child = bar = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        }
+                    }
+                },
+                new Container
+                {
+                    // The X offset has to multiplied as such to account for the fact that we only want to offset by the distance from the CenterLeft point of the container
+                    // not the whole shear width
+                    Shear = -SHEAR,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.Centre,
+                    Y = -10,
+                    Size = new Vector2(120, 6),
+                    Masking = true,
+                    CornerRadius = 3,
+                    Child = bar = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
                     }
                 }
             };
@@ -153,20 +154,10 @@ namespace osu.Game.Screens.Select.FooterV2
             return true;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateDisplay();
-        }
+        protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return !Enabled.Value || base.OnMouseDown(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            return !Enabled.Value || base.OnClick(e);
-        }
+        protected override bool OnMouseDown(MouseDownEvent e) => !Enabled.Value || base.OnMouseDown(e);
+        protected override bool OnClick(ClickEvent e) => !Enabled.Value || base.OnClick(e);
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
