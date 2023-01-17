@@ -101,10 +101,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleJudgementNames()
         {
-            AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = false);
+            AddStep("Hide judgement names", () => counterDisplay.ShowJudgementNames.Value = false);
             AddWaitStep("wait some", 2);
             AddAssert("Assert hidden", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
-            AddStep("Hide judgement names", () => counterDisplay.ShowName.Value = true);
+            AddStep("Hide judgement names", () => counterDisplay.ShowJudgementNames.Value = true);
             AddWaitStep("wait some", 2);
             AddAssert("Assert shown", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
         }
@@ -112,10 +112,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestHideMaxValue()
         {
-            AddStep("Hide max judgement", () => counterDisplay.ShowMax.Value = false);
+            AddStep("Hide max judgement", () => counterDisplay.ShowMaxJudgement.Value = false);
             AddWaitStep("wait some", 2);
             AddAssert("Check max hidden", () => counterDisplay.JudgementContainer.ChildrenOfType<JudgementCounter>().First().Alpha == 0);
-            AddStep("Show max judgement", () => counterDisplay.ShowMax.Value = true);
+            AddStep("Show max judgement", () => counterDisplay.ShowMaxJudgement.Value = true);
         }
 
         [Test]
