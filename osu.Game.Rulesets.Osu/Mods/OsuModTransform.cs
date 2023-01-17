@@ -54,80 +54,70 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyTransform(DrawableHitObject drawable)
         {
-            switch (Move.Value)
+            switch (drawable)
             {
-                case TransformMovementType.Rotate:
-                    applyRotateState(drawable);
-                    break;
-
-                case TransformMovementType.Radiate:
-                    applyRadiateState(drawable);
-                    break;
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
+                    return;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+
+                    switch (Move.Value)
+                    {
+                        case TransformMovementType.Rotate:
+                            applyRotateState(drawable);
+                            break;
+
+                        case TransformMovementType.Radiate:
+                            applyRadiateState(drawable);
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    return;
             }
         }
 
         private void applyRotateState(DrawableHitObject drawable)
         {
-            switch (drawable)
+            var hitObject = (OsuHitObject)drawable.HitObject;
+            float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn);
+
+            Vector2 originalPosition = drawable.Position;
+            Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
+
+            // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+            double moveDuration = hitObject.TimePreempt + 1;
+
+            using (drawable.BeginAbsoluteSequence(appearTime))
             {
-                case DrawableSliderHead:
-                case DrawableSliderTail:
-                case DrawableSliderTick:
-                case DrawableSliderRepeat:
-                    return;
-
-                default:
-                    var hitObject = (OsuHitObject)drawable.HitObject;
-                    float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn);
-
-                    Vector2 originalPosition = drawable.Position;
-                    Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
-
-                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                    double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-                    double moveDuration = hitObject.TimePreempt + 1;
-
-                    using (drawable.BeginAbsoluteSequence(appearTime))
-                    {
-                        drawable
-                            .MoveToOffset(appearOffset)
-                            .MoveTo(originalPosition, moveDuration, Easing.Out);
-                    }
-
-                    theta += (float)hitObject.TimeFadeIn / 1000;
-                    break;
+                drawable
+                    .MoveToOffset(appearOffset)
+                    .MoveTo(originalPosition, moveDuration, Easing.Out);
             }
+
+            theta += (float)hitObject.TimeFadeIn / 1000;
         }
 
         private void applyRadiateState(DrawableHitObject drawable)
         {
-            switch (drawable)
+            var hitObject = (OsuHitObject)drawable.HitObject;
+            Vector2 origin = drawable.Position;
+
+            // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+            double moveDuration = hitObject.TimePreempt + 1;
+            Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
+
+            using (drawable.BeginAbsoluteSequence(appearTime))
             {
-                case DrawableSliderHead:
-                case DrawableSliderTail:
-                case DrawableSliderTick:
-                case DrawableSliderRepeat:
-                    return;
-
-                default:
-                    var hitObject = (OsuHitObject)drawable.HitObject;
-                    Vector2 origin = drawable.Position;
-
-                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                    double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-                    double moveDuration = hitObject.TimePreempt + 1;
-                    Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
-
-                    using (drawable.BeginAbsoluteSequence(appearTime))
-                    {
-                        drawable.ScaleTo(.6f).Then().ScaleTo(1, moveDuration, Easing.OutSine);
-                        drawable.MoveTo(playfieldCenter).Then().MoveTo(origin, moveDuration, Easing.Out);
-                    }
-
-                    break;
+                drawable.ScaleTo(.6f).Then().ScaleTo(1, moveDuration, Easing.OutSine);
+                drawable.MoveTo(playfieldCenter).Then().MoveTo(origin, moveDuration, Easing.Out);
             }
         }
     }
