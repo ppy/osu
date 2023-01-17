@@ -16,15 +16,12 @@ namespace osu.Game.Rulesets.Osu.UI
     public partial class OsuTouchInputMapper : Drawable
     {
         /// <summary>
-        /// This is our parent <see cref="osuInputManager"/>.
-        /// </summary>
-        private readonly OsuInputManager osuInputManager;
-
-        /// <summary>
         /// All the active <see cref="TouchSource"/>s and the <see cref="OsuAction"/> that it triggered (if any).
         /// Ordered from oldest to newest touch chronologically.
         /// </summary>
         private readonly List<TrackedTouch> trackedTouches = new List<TrackedTouch>();
+
+        private readonly OsuInputManager osuInputManager;
 
         private Bindable<bool> mouseDisabled = null!;
 
