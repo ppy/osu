@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -18,6 +19,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressInfo info;
         private readonly ArgonSongProgressGraph graph;
         private readonly ArgonSongProgressBar bar;
+        private readonly Container graphContainer;
 
         private const float bar_height = 10;
 
@@ -38,6 +40,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
+            Masking = true;
+            CornerRadius = 5;
             Children = new Drawable[]
             {
                 info = new SongProgressInfo
@@ -48,20 +52,27 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.X,
                     ShowProgress = false
                 },
-                graph = new ArgonSongProgressGraph
-                {
-                    Name = "Difficulty graph",
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                },
                 bar = new ArgonSongProgressBar(bar_height)
                 {
                     Name = "Seek bar",
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     OnSeek = time => player?.Seek(time),
-                }
+                },
+                graphContainer = new Container
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Masking = true,
+                    CornerRadius = 5,
+                    Child = graph = new ArgonSongProgressGraph
+                    {
+                        Name = "Difficulty graph",
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive
+                    },
+                    RelativeSizeAxes = Axes.X,
+                },
             };
             RelativeSizeAxes = Axes.X;
         }
@@ -111,7 +122,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
             Height = bar.Height + bar_height + info.Height;
-            graph.Height = bar.Height;
+            graphContainer.Height = bar.Height;
         }
 
         protected override void PopIn()

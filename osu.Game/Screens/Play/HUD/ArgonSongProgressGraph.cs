@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 objects = value;
 
-                const int granularity = 300;
+                const int granularity = 200;
                 int[] values = new int[granularity];
 
                 if (!objects.Any())
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
             var colours = new List<Colour4>();
 
             for (int i = 0; i < 5; i++)
-                colours.Add(Colour4.White.Opacity(1 / 5f * 0.85f));
+                colours.Add(Colour4.White.Darken(1 + 1 / 5f).Opacity(1 / 5f));
 
             TierColours = colours;
         }
