@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.PauseGameplay:
-                    BackAction.Invoke();
+                    InternalButtons.Children.First().TriggerClick();
                     return true;
             }
 
