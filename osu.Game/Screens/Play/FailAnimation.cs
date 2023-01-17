@@ -15,11 +15,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,7 +50,7 @@ namespace osu.Game.Screens.Play
 
         private const float duration = 2500;
 
-        private Sample? failSample;
+        private ISample? failSample;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -73,10 +75,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
+        private void load(AudioManager audio, ISkinSource skin, IBindable<WorkingBeatmap> beatmap)
         {
             track = beatmap.Value.Track;
-            failSample = audio.Samples.Get(@"Gameplay/failsound");
+            failSample = skin.GetSample(new SampleInfo(@"Gameplay/failsound"));
 
             AddRangeInternal(new Drawable[]
             {
