@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public partial class TouchVisualiser : CompositeDrawable
         {
-            private readonly Drawable?[] drawableTouches = new Drawable?[10];
+            private readonly Drawable?[] drawableTouches = new Drawable?[TouchState.MAX_TOUCH_COUNT];
 
             public TouchVisualiser()
             {
@@ -341,6 +341,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override void OnTouchUp(TouchUpEvent e)
             {
                 var circle = drawableTouches[(int)e.Touch.Source];
+
+                Debug.Assert(circle != null);
+
                 circle.FadeOut(200, Easing.OutQuint).Expire();
                 drawableTouches[(int)e.Touch.Source] = null;
             }
