@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModVisualAdjusts : ModVisualAdjusts, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject
+    internal class OsuModIncognito : ModIncognito, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject
     {
         [SettingSource("Disable follow points", "No more hints for where to follow...")]
         public BindableBool DisableFollowPoints { get; } = new BindableBool();
