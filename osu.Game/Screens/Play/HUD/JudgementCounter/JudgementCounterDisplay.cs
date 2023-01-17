@@ -34,13 +34,13 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
 
-        protected FillFlowContainer<JudgementCounter> JudgementContainer = null!;
+        protected FillFlowContainer<JudgementCounter> CounterFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = JudgementContainer = new FillFlowContainer<JudgementCounter>
+            InternalChild = CounterFlow = new FillFlowContainer<JudgementCounter>
             {
                 Direction = getFillDirection(FlowDirection.Value),
                 Spacing = new Vector2(10),
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             };
 
             foreach (var result in tally.Results)
-                JudgementContainer.Add(createCounter(result));
+                CounterFlow.Add(createCounter(result));
         }
 
         protected override void LoadComplete()
@@ -57,23 +57,23 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
             FlowDirection.BindValueChanged(direction =>
             {
-                JudgementContainer.Direction = getFillDirection(direction.NewValue);
+                CounterFlow.Direction = getFillDirection(direction.NewValue);
 
                 //Can't pass directly due to Enum conversion
-                foreach (var counter in JudgementContainer.Children)
+                foreach (var counter in CounterFlow.Children)
                     counter.Direction.Value = getFillDirection(direction.NewValue);
             }, true);
             Mode.BindValueChanged(_ => updateMode(), true);
             ShowMaxJudgement.BindValueChanged(value =>
             {
-                var firstChild = JudgementContainer.Children.FirstOrDefault();
+                var firstChild = CounterFlow.Children.FirstOrDefault();
                 firstChild.FadeTo(value.NewValue ? 1 : 0, TRANSFORM_DURATION, Easing.OutQuint);
             }, true);
         }
 
         private void updateMode()
         {
-            foreach (var counter in JudgementContainer.Children.Where(counter => !counter.Result.Type.IsBasic()))
+            foreach (var counter in CounterFlow.Children.Where(counter => !counter.Result.Type.IsBasic()))
             {
                 switch (Mode.Value)
                 {
