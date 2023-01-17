@@ -67,7 +67,7 @@ namespace osu.Game.Skinning.Components
         //The number of instances, that listen to changes.
         //should only be accessed or modified atomically.
         //The programm counts on the correctness of the value in the Dispose method.
-        private static long instances = 0;
+        private static long instances;
         private bool enabled = true;
 
         //should only be accessed or modified by modifyingInstance.
