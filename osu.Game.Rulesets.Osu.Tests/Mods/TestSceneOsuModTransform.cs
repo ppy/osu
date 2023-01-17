@@ -6,29 +6,17 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModTransform : OsuModTestScene
+    public partial class TestSceneOsuModTransform : OsuModTestScene
     {
-        [Test]
-        public void TestRotateSetting()
+        [TestCase(TransformMovementType.Rotate)]
+        [TestCase(TransformMovementType.Radiate)]
+        public void TestRotateSetting(TransformMovementType type)
         {
             CreateModTest(new ModTestData
             {
                 Mod = new OsuModTransform
                 {
-                    Move = { Value = TransformMovementType.Rotate }
-                },
-                PassCondition = () => true
-            });
-        }
-
-        [Test]
-        public void TestRadiateSetting()
-        {
-            CreateModTest(new ModTestData
-            {
-                Mod = new OsuModTransform
-                {
-                    Move = { Value = TransformMovementType.Radiate }
+                    MovementType = { Value = type }
                 },
                 PassCondition = () => true
             });

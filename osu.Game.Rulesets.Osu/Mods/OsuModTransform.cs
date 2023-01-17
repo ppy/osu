@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject);
 
         [SettingSource("Movement type", "Change where the circles originate from")]
-        public Bindable<TransformMovementType> Move { get; } = new Bindable<TransformMovementType>();
+        public Bindable<TransformMovementType> MovementType { get; } = new Bindable<TransformMovementType>();
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 default:
 
-                    switch (Move.Value)
+                    switch (MovementType.Value)
                     {
                         case TransformMovementType.Rotate:
                             applyRotateState(drawable);
@@ -107,17 +107,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void applyRadiateState(DrawableHitObject drawable)
         {
             var hitObject = (OsuHitObject)drawable.HitObject;
-            Vector2 origin = drawable.Position;
+
+            Vector2 originalPosition = drawable.Position;
+            Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
 
             // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
             double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
             double moveDuration = hitObject.TimePreempt + 1;
-            Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
 
             using (drawable.BeginAbsoluteSequence(appearTime))
             {
                 drawable.ScaleTo(.6f).Then().ScaleTo(1, moveDuration, Easing.OutSine);
-                drawable.MoveTo(playfieldCenter).Then().MoveTo(origin, moveDuration, Easing.Out);
+                drawable.MoveTo(playfieldCenter).Then().MoveTo(originalPosition, moveDuration, Easing.Out);
             }
         }
     }
