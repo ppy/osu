@@ -16,7 +16,8 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
     public partial class JudgementCounterDisplay : CompositeDrawable, ISkinnableDrawable
     {
-        public const int TRANSFORM_DURATION = 500;
+        public const int TRANSFORM_DURATION = 250;
+
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Display mode")]
