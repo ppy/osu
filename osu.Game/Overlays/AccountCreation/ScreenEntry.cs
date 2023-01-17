@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LocalisationManager localisationManager)
         {
             InternalChildren = new Drawable[]
             {
@@ -138,9 +139,12 @@ namespace osu.Game.Overlays.AccountCreation
             emailAddressDescription.AddText(AccountCreationStrings.EmailUsage);
             emailAddressDescription.AddText(AccountCreationStrings.MakeSureToGetIt, cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
-            passwordDescription.AddText(AccountCreationStrings.BeforeCharactersLong);
+            string[] passwordReq = localisationManager.GetLocalisedBindableString(AccountCreationStrings.PasswordRequirements("{}")).Value.Split("{}");
+            if (passwordReq.Length != 2) passwordReq = AccountCreationStrings.PasswordRequirements("{}").ToString().Split("{}");
+
+            passwordDescription.AddText(passwordReq[0]);
             characterCheckText = passwordDescription.AddText(AccountCreationStrings.CharactersLong);
-            passwordDescription.AddText(AccountCreationStrings.AfterCharactersLong);
+            passwordDescription.AddText(passwordReq[1]);
 
             passwordTextBox.Current.BindValueChanged(_ => updateCharacterCheckTextColour(), true);
             characterCheckText.DrawablePartsRecreated += _ => updateCharacterCheckTextColour();

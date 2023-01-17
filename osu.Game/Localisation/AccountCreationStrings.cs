@@ -52,20 +52,15 @@ namespace osu.Game.Localisation
         public static LocalisableString MakeSureToGetIt => new TranslatableString(getKey(@"make_sure_to_get_it"), @" Make sure to get it right!");
 
         /// <summary>
-        /// "At least "
+        /// "At least {0}. Choose something long but also something you will remember, like a line from your favourite song."
         /// </summary>
-        public static LocalisableString BeforeCharactersLong => new TranslatableString(getKey(@"before_characters_long"), @"At least ");
+        public static LocalisableString PasswordRequirements(string arg0) => new TranslatableString(getKey(@"password_requirements"),
+            @"At least {0}. Choose something long but also something you will remember, like a line from your favourite song.", arg0);
 
         /// <summary>
         /// "8 characters long"
         /// </summary>
         public static LocalisableString CharactersLong => new TranslatableString(getKey(@"characters_long"), @"8 characters long");
-
-        /// <summary>
-        /// ". Choose something long but also something you will remember, like a line from your favourite song."
-        /// </summary>
-        public static LocalisableString AfterCharactersLong =>
-            new TranslatableString(getKey(@"after_characters_long"), @". Choose something long but also something you will remember, like a line from your favourite song.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
