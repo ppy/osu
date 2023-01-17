@@ -409,7 +409,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
-
         public override Vector2 ScreenSpaceEndPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset)
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation);
 
