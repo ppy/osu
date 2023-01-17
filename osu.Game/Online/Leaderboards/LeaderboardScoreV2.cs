@@ -21,7 +21,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -33,7 +32,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -220,7 +218,8 @@ namespace osu.Game.Online.Leaderboards
                     },
                     new FillFlowContainer
                     {
-                        Spacing = new Vector2(5, 0),
+                        Margin = new MarginPadding { Right = 40 },
+                        Spacing = new Vector2(25, 0),
                         Shear = -shear,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
@@ -290,7 +289,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected (CaseTransformableString, LocalisableString DisplayAccuracy)[] GetStatistics(ScoreInfo model) => new[]
         {
-            (EditorSetupStrings.ComboColourPrefix.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
+            (BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
             (BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
             (getResultNames(score).ToUpper(), getResults(score).ToUpper())
         };
@@ -380,7 +379,7 @@ namespace osu.Game.Online.Leaderboards
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
-                AutoSizeAxes = Axes.Y;
+                AutoSizeAxes = Axes.Both;
                 OsuSpriteText value;
                 Child = content = new FillFlowContainer
                 {
@@ -396,24 +395,17 @@ namespace osu.Game.Online.Leaderboards
                         },
                         value = new OsuSpriteText
                         {
+                            // We don't want the value setting the horizontal size, since it leads to wonky accuracy container length,
+                            // since the accuracy is sometimes longer than its name.
+                            BypassAutoSizeAxes = Axes.X,
                             Text = statisticInfo.Value,
                             Font = OsuFont.GetFont(size: 19, weight: FontWeight.Medium),
                         }
                     }
                 };
 
-                if (statisticInfo.Name == EditorSetupStrings.ComboColourPrefix.ToUpper())
-                {
-                    Width = 45;
-
-                    if (score.Combo != score.MaxCombo) return;
-
+                if (score.Combo != score.MaxCombo && statisticInfo.Name == BeatmapsetsStrings.ShowScoreboardHeadersCombo)
                     value.Colour = colours.Lime1;
-
-                    return;
-                }
-
-                Width = statisticInfo.Name == BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper() ? 60 : 120;
             }
         }
 
@@ -446,7 +438,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
+        private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
         {
             private readonly IMod mod;
 
@@ -474,7 +466,7 @@ namespace osu.Game.Online.Leaderboards
                 Background.Colour = colours.Yellow;
             }
 
-            public virtual LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
+            public LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
         }
 
         #endregion
@@ -499,52 +491,22 @@ namespace osu.Game.Online.Leaderboards
 
         private LocalisableString getResults(ScoreInfo score)
         {
-            string resultString = score.GetStatisticsForDisplay().Where(s => s.Result.IsBasic()).Aggregate(string.Empty, (current, result) =>
-                current.Insert(current.Length, $"{result.Count}/"));
+            string resultString = score.GetStatisticsForDisplay()
+                                       .Where(s => s.Result.IsBasic())
+                                       .Aggregate(string.Empty, (current, result) =>
+                                           current.Insert(current.Length, $"{result.Count}/"));
 
             return resultString.Remove(resultString.Length - 1);
         }
 
         private LocalisableString getResultNames(ScoreInfo score)
         {
-            string resultName = string.Empty;
+            string resultName = score.GetStatisticsForDisplay()
+                                     .Where(s => s.Result.IsBasic())
+                                     .Aggregate(string.Empty, (current, hitResult) =>
+                                         current.Insert(current.Length, $"{hitResult.DisplayName.ToString().ToUpperInvariant()}/"));
 
-            foreach (var hitResult in score.GetStatisticsForDisplay().Where(s => s.Result.IsBasic()))
-            {
-                switch (hitResult.Result)
-                {
-                    case HitResult.Perfect:
-                        appendToString("320/");
-                        break;
-
-                    case HitResult.Great:
-                        appendToString("300/");
-                        break;
-
-                    case HitResult.Good:
-                        appendToString("200/");
-                        break;
-
-                    case HitResult.Ok:
-                        appendToString("100/");
-                        break;
-
-                    case HitResult.Meh:
-                        appendToString("50/");
-                        break;
-
-                    case HitResult.Miss:
-                        appendToString("X");
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            void appendToString(string appendedString) => resultName = resultName.Insert(resultName.Length, appendedString);
-
-            return resultName.Remove(resultName.Length);
+            return resultName.Remove(resultName.Length - 1);
         }
     }
 }
