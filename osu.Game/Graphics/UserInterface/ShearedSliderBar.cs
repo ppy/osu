@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Overlays;
@@ -32,8 +33,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly SquareNub Nub;
         private readonly Container nubContainer;
-        private readonly SliderBoxes sliderBoxes;
         private readonly SliderSounds<T> sounds;
+        protected Box RightBox;
+        protected Box LeftBox;
 
         public virtual LocalisableString TooltipText { get; private set; }
 
@@ -52,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                sliderBoxes.LeftBox.Colour = value.Darken(0.1f);
+                LeftBox.Colour = value.Darken(0.1f);
             }
         }
 
@@ -64,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 backgroundColour = value;
-                sliderBoxes.RightBox.Colour = value;
+                RightBox.Colour = value;
             }
         }
 
@@ -90,10 +92,22 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.CentreLeft,
                         Masking = true,
                         CornerRadius = 5,
-                        Child = sliderBoxes = new SliderBoxes
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 30
+                            RightBox = new Box
+                            {
+                                Height = 30,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight
+                            },
+                            LeftBox = new Box
+                            {
+                                Height = 30,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft
+                            }
                         }
                     },
                 },
@@ -191,8 +205,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            sliderBoxes.LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X, 0, Math.Max(0, DrawWidth)), 1);
-            sliderBoxes.RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value) => Nub.MoveToX(value, 250, Easing.OutQuint);
