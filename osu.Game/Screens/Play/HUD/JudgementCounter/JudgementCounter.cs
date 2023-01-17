@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     },
                     ResultName = new OsuSpriteText
                     {
+                        Alpha = 0,
                         Font = OsuFont.Numeric.With(size: 8),
                         Text = ruleset.Value.CreateInstance().GetDisplayNameForHitResult(Result.Type)
                     }
