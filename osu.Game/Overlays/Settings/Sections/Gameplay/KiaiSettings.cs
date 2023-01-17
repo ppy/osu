@@ -7,7 +7,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 
-namespace osu.Game.Overlays.Settings.Sections.Graphics
+namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public partial class KiaiSettings : SettingsSubsection
     {
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.KiaiFlash,
                     TransferValueOnCommit = true,
-                    Current = osuConfig.GetBindable<float>(OsuSetting.KiaiFlash),
+                    Current = osuConfig.GetBindable<float>(OsuSetting.KiaiFlashIntensity),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                     Keywords = new[] { "kiai", "glow", "highlight" },

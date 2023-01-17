@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         private const double fade_length = 80;
 
-        private readonly Bindable<float> flashOpacity = new BindableFloat();
+        private readonly Bindable<float> flashIntensity = new BindableFloat();
 
         public KiaiFlash()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KiaiFlash, flashOpacity);
+            config.BindWith(OsuSetting.KiaiFlashIntensity, flashIntensity);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 return;
 
             Child
-                .FadeTo(flashOpacity.Value, EarlyActivationMilliseconds, Easing.OutQuint)
+                .FadeTo(flashIntensity.Value, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
                 .FadeOut(Math.Max(fade_length, timingPoint.BeatLength - fade_length), Easing.OutSine);
         }

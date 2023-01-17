@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Gameplay;
 using osu.Game.Overlays.Settings.Sections.Graphics;
+using KiaiSettings = osu.Game.Overlays.Settings.Sections.Gameplay.KiaiSettings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {

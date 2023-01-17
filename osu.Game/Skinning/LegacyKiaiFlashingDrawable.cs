@@ -48,7 +48,7 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KiaiFlash, flashOpacity);
+            config.BindWith(OsuSetting.KiaiFlashIntensity, flashOpacity);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
