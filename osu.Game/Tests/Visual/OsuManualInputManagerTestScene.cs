@@ -46,8 +46,6 @@ namespace osu.Game.Tests.Visual
         {
             var mainContent = content = new Container { RelativeSizeAxes = Axes.Both };
 
-            var inputContainer = new Container { RelativeSizeAxes = Axes.Both };
-
             if (DisplayCursorForManualInput)
             {
                 var cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
@@ -57,12 +55,11 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both,
                 });
 
-                inputContainer.Add(cursorDisplay);
-                mainContent = inputContainer;
+                mainContent.Add(cursorDisplay);
             }
 
             if (CreateNestedActionContainer)
-                inputContainer.Add(new GlobalActionContainer(null));
+                mainContent.Add(new GlobalActionContainer(null));
 
             base.Content.AddRange(new Drawable[]
             {
