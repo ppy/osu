@@ -28,10 +28,13 @@ namespace osu.Game.Graphics.UserInterface
         private const int max_decimal_digits = 5;
 
         protected readonly Nub Nub;
-        private readonly SliderSounds<T> sounds;
+        private readonly SliderAdjustmentTick<T> adjustmentTick;
         private readonly Container nubContainer;
         protected Box RightBox;
         protected Box LeftBox;
+
+        private double lastSampleTime;
+        private T lastSampleValue;
 
         public virtual LocalisableString TooltipText { get; private set; }
 
@@ -118,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
                         Current = { Value = true }
                     },
                 },
-                sounds = new SliderSounds<T>(),
+                adjustmentTick = new SliderAdjustmentTick<T>(),
                 hoverClickSounds = new HoverClickSounds()
             };
         }
@@ -180,8 +183,17 @@ namespace osu.Game.Graphics.UserInterface
             base.OnUserChange(value);
             TooltipText = getTooltipText(value);
 
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
+                return;
+
+            if (value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = value;
+            lastSampleTime = Clock.CurrentTime;
+
             if (PlaySamplesOnAdjust)
-                sounds.PlaySample(value, NormalizedValue);
+                adjustmentTick.PlaySample(NormalizedValue);
         }
 
         private LocalisableString getTooltipText(T value)

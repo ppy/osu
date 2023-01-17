@@ -33,9 +33,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly SquareNub Nub;
         private readonly Container nubContainer;
-        private readonly SliderSounds<T> sounds;
+        private readonly SliderAdjustmentTick<T> adjustmentTick;
         protected Box RightBox;
         protected Box LeftBox;
+
+        private double lastSampleTime;
+        private T lastSampleValue;
 
         public virtual LocalisableString TooltipText { get; private set; }
 
@@ -120,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                         RelativePositionAxes = Axes.X,
                     },
                 },
-                sounds = new SliderSounds<T>(),
+                adjustmentTick = new SliderAdjustmentTick<T>(),
                 hoverClickSounds = new HoverClickSounds()
             };
         }
@@ -180,7 +183,17 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(T value)
         {
             base.OnUserChange(value);
-            sounds.PlaySample(value, NormalizedValue);
+
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
+                return;
+
+            if (value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = value;
+            lastSampleTime = Clock.CurrentTime;
+
+            adjustmentTick.PlaySample(NormalizedValue);
             TooltipText = getTooltipText(value);
         }
 

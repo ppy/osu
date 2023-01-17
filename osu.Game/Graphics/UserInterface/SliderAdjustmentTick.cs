@@ -10,12 +10,10 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class SliderSounds<T> : Component
+    public partial class SliderAdjustmentTick<T> : Component
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         private Sample sample = null!;
-        private double lastSampleTime;
-        private T lastSampleValue;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
@@ -23,17 +21,12 @@ namespace osu.Game.Graphics.UserInterface
             sample = audio.Samples.Get(@"UI/notch-tick");
         }
 
-        public void PlaySample(T value, float normalizedValue)
+        /// <summary>
+        /// the value by which to adjust the slider tick noise based on the location of the nub on the slider, normalized to be from 0 to 1.
+        /// </summary>
+        /// <param name="normalizedValue"></param>
+        public void PlaySample(float normalizedValue)
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
-                return;
-
-            if (value.Equals(lastSampleValue))
-                return;
-
-            lastSampleValue = value;
-            lastSampleTime = Clock.CurrentTime;
-
             var channel = sample.GetChannel();
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + normalizedValue * 0.2f;
