@@ -136,14 +136,12 @@ namespace osu.Game.Beatmaps
         /// <param name="rulesetInfo">The ruleset with which the new difficulty should be created.</param>
         public virtual WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
         {
-            var playableBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(rulesetInfo);
-
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone())
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceWorkingBeatmap.Metadata.DeepClone())
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
-            foreach (var timingPoint in playableBeatmap.ControlPointInfo.TimingPoints)
+            foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
