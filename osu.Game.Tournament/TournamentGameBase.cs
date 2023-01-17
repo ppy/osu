@@ -156,7 +156,7 @@ namespace osu.Game.Tournament
                 addedInfo |= addSeedingBeatmaps();
 
                 if (addedInfo)
-                    SaveChanges();
+                    saveChanges();
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
@@ -318,6 +318,11 @@ namespace osu.Game.Tournament
                 return;
             }
 
+            saveChanges();
+        }
+
+        private void saveChanges()
+        {
             foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
