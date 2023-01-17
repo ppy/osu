@@ -28,14 +28,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
-        private float theta;
-
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject);
-
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject);
-
         [SettingSource("Movement type", "Change where the circles originate from")]
         public Bindable<TransformMovementType> MovementType { get; } = new Bindable<TransformMovementType>();
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject);
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject);
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -81,6 +78,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
             }
         }
+
+        private float theta;
 
         private void applyRotateState(DrawableHitObject drawable)
         {
