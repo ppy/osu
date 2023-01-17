@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class ZoomableScrollContainer : OsuScrollContainer
+    public partial class ZoomableScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The time to zoom into/out of a point.
@@ -56,7 +56,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected ZoomableScrollContainer()
             : base(Direction.Horizontal)
         {
-            base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
+            base.Content.Add(zoomedContent = new Container
+            {
+                RelativeSizeAxes = Axes.Y,
+                // We must hide content until SetupZoom is called.
+                // If not, a child component that relies on its DrawWidth (via RelativeSizeAxes) may see a very incorrect value
+                // momentarily, as noticed in the TimelineTickDisplay, which would render thousands of ticks incorrectly.
+                Alpha = 0,
+            });
 
             AddLayout(zoomedContentWidthCache);
         }
@@ -92,8 +99,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             minZoom = minimum;
             maxZoom = maximum;
+
             CurrentZoom = zoomTarget = initial;
+            zoomedContentWidthCache.Invalidate();
+
             isZoomSetUp = true;
+            zoomedContent.Show();
         }
 
         /// <summary>
@@ -118,9 +129,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 CurrentZoom = zoomTarget = newZoom;
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (!zoomedContentWidthCache.IsValid)
                 updateZoomedContentWidth();

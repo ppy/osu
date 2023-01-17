@@ -13,7 +13,7 @@ using System;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgressInfo : Container
+    public partial class SongProgressInfo : Container
     {
         private SizePreservingSpriteText timeCurrent;
         private SizePreservingSpriteText timeLeft;
@@ -47,10 +47,7 @@ namespace osu.Game.Screens.Play.HUD
             if (clock != null)
                 gameplayClock = clock;
 
-            // Lock height so changes in text autosize (if character height changes)
-            // don't cause parent invalidation.
-            Height = 14;
-
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container

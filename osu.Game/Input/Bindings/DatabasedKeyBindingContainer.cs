@@ -18,7 +18,7 @@ namespace osu.Game.Input.Bindings
     /// A KeyBindingInputManager with a database backing for custom overrides.
     /// </summary>
     /// <typeparam name="T">The type of the custom action.</typeparam>
-    public class DatabasedKeyBindingContainer<T> : KeyBindingContainer<T>
+    public partial class DatabasedKeyBindingContainer<T> : KeyBindingContainer<T>
         where T : struct
     {
         private readonly RulesetInfo ruleset;
@@ -55,13 +55,13 @@ namespace osu.Game.Input.Bindings
             {
                 // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
                 // but this is safest in case the subscription is restored after a context recycle.
-                reloadMappings(sender.AsQueryable());
+                ReloadMappings(sender.AsQueryable());
             });
 
             base.LoadComplete();
         }
 
-        protected override void ReloadMappings() => reloadMappings(queryRealmKeyBindings(realm.Realm));
+        protected sealed override void ReloadMappings() => ReloadMappings(queryRealmKeyBindings(realm.Realm));
 
         private IQueryable<RealmKeyBinding> queryRealmKeyBindings(Realm realm)
         {
@@ -70,7 +70,7 @@ namespace osu.Game.Input.Bindings
                         .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
         }
 
-        private void reloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
+        protected virtual void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
         {
             var defaults = DefaultKeyBindings.ToList();
 

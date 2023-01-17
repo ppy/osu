@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogDangerousButton : PopupDialogButton
+    public partial class PopupDialogDangerousButton : PopupDialogButton
     {
         private Box progressBox;
         private DangerousConfirmContainer confirmContainer;
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Dialog
             confirmContainer.Progress.BindValueChanged(progress => progressBox.Width = (float)progress.NewValue, true);
         }
 
-        private class DangerousConfirmContainer : HoldToConfirmContainer
+        private partial class DangerousConfirmContainer : HoldToConfirmContainer
         {
             public DangerousConfirmContainer()
                 : base(isDangerousAction: true)

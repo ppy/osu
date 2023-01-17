@@ -1,20 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuHitWindows : HitWindows
     {
+        /// <summary>
+        /// osu! ruleset has a fixed miss window regardless of difficulty settings.
+        /// </summary>
+        public const double MISS_WINDOW = 400;
+
         private static readonly DifficultyRange[] osu_ranges =
         {
             new DifficultyRange(HitResult.Great, 80, 50, 20),
             new DifficultyRange(HitResult.Ok, 140, 100, 60),
             new DifficultyRange(HitResult.Meh, 200, 150, 100),
-            new DifficultyRange(HitResult.Miss, 400, 400, 400),
+            new DifficultyRange(HitResult.Miss, MISS_WINDOW, MISS_WINDOW, MISS_WINDOW),
         };
 
         public override bool IsHitResultAllowed(HitResult result)

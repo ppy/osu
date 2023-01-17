@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Timing;
 using osu.Game.Online.Multiplayer;
@@ -10,7 +8,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
+    public partial class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
     {
         public MultiSpectatorLeaderboard(MultiplayerRoomUser[] users)
             : base(users)

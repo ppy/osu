@@ -44,6 +44,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
+            if (mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimRating = Math.Pow(aimRating, 0.8);
+                flashlightRating = Math.Pow(flashlightRating, 0.8);
+            }
+
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
@@ -127,6 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
+            new OsuModTouchDevice(),
             new OsuModDoubleTime(),
             new OsuModHalfTime(),
             new OsuModEasy(),

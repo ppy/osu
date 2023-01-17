@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public partial class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
 
@@ -133,6 +133,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     // If inserting in the path (not appending),
                     // update indices of existing connections after insert location
                     if (e.NewStartingIndex < Pieces.Count)
@@ -164,6 +166,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var point in e.OldItems.Cast<PathControlPoint>())
                     {
                         foreach (var piece in Pieces.Where(p => p.ControlPoint == point).ToArray())
@@ -248,6 +252,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
             }
 
+            slider.Path.ExpectedDistance.Value = null;
             piece.ControlPoint.Type = type;
         }
 
@@ -303,11 +308,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
+                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition));
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - slider.Position;
+
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
                     var controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
-                        controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
+                        controlPoint.Position = dragStartPositions[i] + movementDelta;
                 }
             }
 

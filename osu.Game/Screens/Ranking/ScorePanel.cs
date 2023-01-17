@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ScorePanel : CompositeDrawable, IStateful<PanelState>
+    public partial class ScorePanel : CompositeDrawable, IStateful<PanelState>
     {
         /// <summary>
         /// Width of the panel when contracted.
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Ranking
         protected override void Update()
         {
             base.Update();
-            audioContent.Balance.Value = (ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1;
+            audioContent.Balance.Value = ((ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
         }
 
         private void playAppearSample()

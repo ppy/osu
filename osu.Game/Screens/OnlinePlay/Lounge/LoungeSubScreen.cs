@@ -35,7 +35,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     [Cached]
-    public abstract class LoungeSubScreen : OnlinePlaySubScreen
+    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
 

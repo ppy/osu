@@ -12,7 +12,7 @@ using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -20,15 +20,15 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class OsuManualInputManagerTestScene : OsuTestScene
+    public abstract partial class OsuManualInputManagerTestScene : OsuTestScene
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
         protected readonly ManualInputManager InputManager;
 
-        private readonly TriangleButton buttonTest;
-        private readonly TriangleButton buttonLocal;
+        private readonly RoundedButton buttonTest;
+        private readonly RoundedButton buttonLocal;
 
         /// <summary>
         /// Whether to create a nested container to handle <see cref="GlobalAction"/>s that result from local (manual) test input.
@@ -36,21 +36,30 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool CreateNestedActionContainer => true;
 
+        /// <summary>
+        /// Whether a menu cursor controlled by the manual input manager should be displayed.
+        /// True by default, but is disabled for <see cref="OsuGameTestScene"/>s as they provide their own global cursor.
+        /// </summary>
+        protected virtual bool DisplayCursorForManualInput => true;
+
         protected OsuManualInputManagerTestScene()
         {
-            GlobalCursorDisplay cursorDisplay;
+            var mainContent = content = new Container { RelativeSizeAxes = Axes.Both };
 
-            CompositeDrawable mainContent = cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
-
-            cursorDisplay.Child = content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
+            if (DisplayCursorForManualInput)
             {
-                RelativeSizeAxes = Axes.Both
-            };
+                var cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
+
+                cursorDisplay.Add(content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+
+                mainContent.Add(cursorDisplay);
+            }
 
             if (CreateNestedActionContainer)
-            {
-                mainContent = new GlobalActionContainer(null).WithChild(mainContent);
-            }
+                mainContent.Add(new GlobalActionContainer(null));
 
             base.Content.AddRange(new Drawable[]
             {
@@ -100,13 +109,13 @@ namespace osu.Game.Tests.Visual
 
                                     Children = new Drawable[]
                                     {
-                                        buttonLocal = new TriangleButton
+                                        buttonLocal = new RoundedButton
                                         {
                                             Text = "local",
                                             Size = new Vector2(50, 30),
                                             Action = returnUserInput
                                         },
-                                        buttonTest = new TriangleButton
+                                        buttonTest = new RoundedButton
                                         {
                                             Text = "test",
                                             Size = new Vector2(50, 30),

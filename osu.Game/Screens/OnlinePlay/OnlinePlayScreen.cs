@@ -21,7 +21,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
+    public abstract partial class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -105,7 +105,8 @@ namespace osu.Game.Screens.OnlinePlay
                 while (this.IsCurrentScreen())
                     this.Exit();
             }
-            else
+            // Also handle the case where a child screen is current (ie. gameplay).
+            else if (this.GetChildScreen() != null)
             {
                 this.MakeCurrent();
                 Schedule(forcefullyExit);
@@ -147,9 +148,14 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            var subScreen = screenStack.CurrentScreen as Drawable;
-            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(e))
-                return true;
+            while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not LoungeSubScreen)
+            {
+                var subScreen = (Screen)screenStack.CurrentScreen;
+                if (subScreen.IsLoaded && subScreen.OnExiting(e))
+                    return true;
+
+                subScreen.Exit();
+            }
 
             RoomManager.PartRoom();
 
@@ -216,7 +222,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected abstract LoungeSubScreen CreateLounge();
 
-        private class MultiplayerWaveContainer : WaveContainer
+        private partial class MultiplayerWaveContainer : WaveContainer
         {
             protected override bool StartHidden => true;
 

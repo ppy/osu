@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -10,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class TestSceneHitJudgements : JudgementTest
+    public partial class TestSceneHitJudgements : JudgementTest
     {
         [Test]
         public void TestHitCentreHit()
@@ -128,6 +129,33 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AssertJudgementCount(2);
             AssertResult<Hit>(0, HitResult.Miss);
             AssertResult<StrongNestedHitObject>(0, HitResult.IgnoreMiss);
+        }
+
+        [Test]
+        public void TestHighVelocityHit()
+        {
+            const double hit_time = 1000;
+
+            var beatmap = CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = hit_time,
+            });
+
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 6 });
+            beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 10 });
+
+            var hitWindows = new HitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time - hitWindows.WindowFor(HitResult.Great), TaikoAction.LeftCentre),
+            }, beatmap);
+
+            AssertJudgementCount(1);
+            AssertResult<Hit>(0, HitResult.Ok);
         }
     }
 }

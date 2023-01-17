@@ -32,7 +32,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -109,7 +109,7 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Container
                             {
-                                Name = "Menu container",
+                                Name = @"Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
                                 Height = MENU_HEIGHT,
@@ -122,14 +122,14 @@ namespace osu.Game.Skinning.Editor
                                         RelativeSizeAxes = Axes.Both,
                                         Items = new[]
                                         {
-                                            new MenuItem("File")
+                                            new MenuItem(CommonStrings.MenuBarFile)
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
@@ -234,7 +234,6 @@ namespace osu.Game.Skinning.Editor
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
-
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
@@ -253,7 +252,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("Currently editing ", cp =>
             {
@@ -314,7 +313,7 @@ namespace osu.Game.Skinning.Editor
 
         private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget getTarget(SkinnableTarget target)
+        private ISkinnableTarget getTarget(GlobalSkinComponentLookup.LookupType target)
         {
             return availableTargets.FirstOrDefault(c => c.Target == target);
         }
@@ -411,7 +410,7 @@ namespace osu.Game.Skinning.Editor
             return Task.CompletedTask;
         }
 
-        public Task Import(params ImportTask[] tasks) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
         public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
 
@@ -424,7 +423,7 @@ namespace osu.Game.Skinning.Editor
             game?.UnregisterImportHandler(this);
         }
 
-        private class SkinEditorToast : Toast
+        private partial class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)

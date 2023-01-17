@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneCursorParticles : TestSceneOsuPlayer
+    public partial class TestSceneCursorParticles : TestSceneOsuPlayer
     {
         protected override bool Autoplay => autoplay;
         protected override bool HasCustomSteps => true;
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("setup default legacy skin", () =>
             {
-                skinManager.CurrentSkinInfo.Value = skinManager.DefaultLegacySkin.SkinInfo;
+                skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
             });
         });
     }

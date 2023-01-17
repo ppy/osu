@@ -17,7 +17,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual.Spectator
 {
-    public class TestSpectatorClient : SpectatorClient
+    public partial class TestSpectatorClient : SpectatorClient
     {
         /// <summary>
         /// Maximum number of frames sent per bundle via <see cref="SendFramesFromUser"/>.
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);

@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
@@ -522,7 +522,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
-        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
+        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }

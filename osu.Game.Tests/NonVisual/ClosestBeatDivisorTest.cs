@@ -17,7 +17,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestExactDivisors()
         {
             var cpi = new ControlPointInfo();
-            cpi.Add(-1000, new TimingControlPoint { BeatLength = 1000 });
+            cpi.Add(0, new TimingControlPoint { BeatLength = 1000 });
 
             double[] divisors = { 3, 1, 16, 12, 8, 6, 4, 3, 2, 1 };
 
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestExactDivisorsHighBPMStream()
         {
             var cpi = new ControlPointInfo();
-            cpi.Add(-50, new TimingControlPoint { BeatLength = 50 }); // 1200 BPM 1/4 (limit testing)
+            cpi.Add(0, new TimingControlPoint { BeatLength = 50 }); // 1200 BPM 1/4 (limit testing)
 
             // A 1/4 stream should land on 1/1, 1/2 and 1/4 divisors.
             double[] divisors = { 4, 4, 4, 4, 4, 4, 4, 4 };
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestApproximateDivisors()
         {
             var cpi = new ControlPointInfo();
-            cpi.Add(-1000, new TimingControlPoint { BeatLength = 1000 });
+            cpi.Add(0, new TimingControlPoint { BeatLength = 1000 });
 
             double[] divisors = { 3.03d, 0.97d, 14, 13, 7.94d, 6.08d, 3.93d, 2.96d, 2.02d, 64 };
             double[] closestDivisors = { 3, 1, 16, 12, 8, 6, 4, 3, 2, 1 };
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.NonVisual
             assertClosestDivisors(divisors, closestDivisors, cpi);
         }
 
-        private void assertClosestDivisors(IReadOnlyList<double> divisors, IReadOnlyList<double> closestDivisors, ControlPointInfo cpi, double step = 1)
+        private static void assertClosestDivisors(IReadOnlyList<double> divisors, IReadOnlyList<double> closestDivisors, ControlPointInfo cpi, double step = 1)
         {
             List<HitObject> hitobjects = new List<HitObject>();
             double offset = cpi.TimingPoints[0].Time;

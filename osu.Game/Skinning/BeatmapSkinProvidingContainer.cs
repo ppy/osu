@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A container which overrides existing skin options with beatmap-local values.
     /// </summary>
-    public class BeatmapSkinProvidingContainer : SkinProvidingContainer
+    public partial class BeatmapSkinProvidingContainer : SkinProvidingContainer
     {
         private Bindable<bool> beatmapSkins;
         private Bindable<bool> beatmapColours;
@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        protected override bool AllowDrawableLookup(ISkinComponent component)
+        protected override bool AllowDrawableLookup(ISkinComponentLookup lookup)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
@@ -67,9 +67,12 @@ namespace osu.Game.Skinning
             return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
         }
 
+        private readonly ISkin skin;
+
         public BeatmapSkinProvidingContainer(ISkin skin)
             : base(skin)
         {
+            this.skin = skin;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -84,11 +87,21 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SkinManager skins)
         {
             beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
             beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
+
+            // If the beatmap skin looks to have skinnable resources, add the default classic skin as a fallback opportunity.
+            if (skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
+            {
+                SetSources(new[]
+                {
+                    skin,
+                    skins.DefaultClassicSkin
+                });
+            }
         }
     }
 }

@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
@@ -39,10 +38,8 @@ namespace osu.Game.Rulesets.Mods
         private double finalRateTime;
         private double beginRampTime;
 
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
         {
-            Default = 1,
-            Value = 1,
             Precision = 0.01,
         };
 
@@ -73,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
             SpeedChange.SetDefault();
 
             double firstObjectStart = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
-            double lastObjectEnd = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
+            double lastObjectEnd = beatmap.HitObjects.Any() ? beatmap.GetLastObjectTime() : 0;
 
             beginRampTime = firstObjectStart;
             finalRateTime = firstObjectStart + FINAL_RATE_PROGRESS * (lastObjectEnd - firstObjectStart);
