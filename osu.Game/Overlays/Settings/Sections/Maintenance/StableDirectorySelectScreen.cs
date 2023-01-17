@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +11,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class StableDirectorySelectScreen : DirectorySelectScreen
+    public partial class StableDirectorySelectScreen : DirectorySelectScreen
     {
         private readonly TaskCompletionSource<string> taskCompletionSource;
 

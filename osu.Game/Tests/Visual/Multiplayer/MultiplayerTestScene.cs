@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
+#nullable disable
+
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -12,7 +13,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// The base test scene for all multiplayer components and screens.
     /// </summary>
-    public abstract class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestSceneDependencies
+    public abstract partial class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestSceneDependencies
     {
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
@@ -31,13 +32,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             this.joinRoom = joinRoom;
         }
-
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            if (joinRoom)
-                SelectedRoom.Value = CreateRoom();
-        });
 
         protected virtual Room CreateRoom()
         {
@@ -61,7 +55,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             if (joinRoom)
             {
-                AddStep("join room", () => RoomManager.CreateRoom(SelectedRoom.Value));
+                AddStep("join room", () =>
+                {
+                    SelectedRoom.Value = CreateRoom();
+                    RoomManager.CreateRoom(SelectedRoom.Value);
+                });
+
                 AddUntilStep("wait for room join", () => RoomJoined);
             }
         }

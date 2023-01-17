@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,7 +10,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -27,7 +28,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneGameplayCursor : OsuSkinnableTestScene
+    public partial class TestSceneGameplayCursor : OsuSkinnableTestScene
     {
         [Cached]
         private GameplayState gameplayState;
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TopLeftCursorSkin : ISkin
         {
-            public Drawable GetDrawableComponent(ISkinComponent component) => null;
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
 
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class ClickingCursorContainer : OsuCursorContainer
+        private partial class ClickingCursorContainer : OsuCursorContainer
         {
             private bool pressed;
 
@@ -160,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class MovingCursorInputManager : ManualInputManager
+        private partial class MovingCursorInputManager : ManualInputManager
         {
             public MovingCursorInputManager()
             {

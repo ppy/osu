@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -16,17 +17,27 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
+    public partial class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
-        private HitEventTimingDistributionGraph graph;
+        private HitEventTimingDistributionGraph graph = null!;
+        private readonly BindableFloat width = new BindableFloat(600);
+        private readonly BindableFloat height = new BindableFloat(130);
 
         private static readonly HitObject placeholder_object = new HitCircle();
+
+        public TestSceneHitEventTimingDistributionGraph()
+        {
+            width.BindValueChanged(e => graph.Width = e.NewValue);
+            height.BindValueChanged(e => graph.Height = e.NewValue);
+        }
 
         [Test]
         public void TestManyDistributedEvents()
         {
             createTest(CreateDistributedHitEvents());
             AddStep("add adjustment", () => graph.UpdateOffset(10));
+            AddSliderStep("width", 0.0f, 1000.0f, width.Value, width.Set);
+            AddSliderStep("height", 0.0f, 1000.0f, height.Value, height.Set);
         }
 
         [Test]
@@ -39,6 +50,65 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestAroundCentre()
         {
             createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, placeholder_object, placeholder_object, null)).ToList());
+        }
+
+        [Test]
+        public void TestSparse()
+        {
+            createTest(new List<HitEvent>
+            {
+                new HitEvent(-7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+            });
+        }
+
+        [Test]
+        public void TestVariousTypesOfHitResult()
+        {
+            createTest(CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 36 ? HitResult.Miss
+                    : offset > 32 ? HitResult.Meh
+                    : offset > 24 ? HitResult.Ok
+                    : offset > 16 ? HitResult.Good
+                    : offset > 8 ? HitResult.Great
+                    : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            }).ToList());
+        }
+
+        [Test]
+        public void TestMultipleWindowsOfHitResult()
+        {
+            var wide = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 36 ? HitResult.Miss
+                    : offset > 32 ? HitResult.Meh
+                    : offset > 24 ? HitResult.Ok
+                    : offset > 16 ? HitResult.Good
+                    : offset > 8 ? HitResult.Great
+                    : HitResult.Perfect;
+
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            var narrow = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                double offset = Math.Abs(h.TimeOffset);
+                HitResult result = offset > 25 ? HitResult.Miss
+                    : offset > 20 ? HitResult.Meh
+                    : offset > 15 ? HitResult.Ok
+                    : offset > 10 ? HitResult.Good
+                    : offset > 5 ? HitResult.Great
+                    : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            createTest(wide.Concat(narrow).ToList());
         }
 
         [Test]
@@ -78,7 +148,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(600, 130)
+                    Size = new Vector2(width.Value, height.Value)
                 }
             };
         });

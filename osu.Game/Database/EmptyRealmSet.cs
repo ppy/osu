@@ -9,8 +9,6 @@ using System.ComponentModel;
 using Realms;
 using Realms.Schema;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     public class EmptyRealmSet<T> : IRealmCollection<T>

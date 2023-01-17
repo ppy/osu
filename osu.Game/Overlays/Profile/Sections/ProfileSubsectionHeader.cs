@@ -15,7 +15,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileSubsectionHeader : CompositeDrawable, IHasCurrentValue<int>
+    public partial class ProfileSubsectionHeader : CompositeDrawable, IHasCurrentValue<int>
     {
         private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
 
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly LocalisableString text;
         private readonly CounterVisibilityState counterState;
 
-        private CounterPill counterPill;
+        private CounterPill counterPill = null!;
 
         public ProfileSubsectionHeader(LocalisableString text, CounterVisibilityState counterState)
         {

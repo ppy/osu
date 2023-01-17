@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class FruitOutline : CompositeDrawable
+    public partial class FruitOutline : CompositeDrawable
     {
         public FruitOutline()
         {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -25,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneExpandedPanelMiddleContent : OsuTestScene
+    public partial class TestSceneExpandedPanelMiddleContent : OsuTestScene
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
@@ -96,13 +98,14 @@ namespace osu.Game.Tests.Visual.Ranking
             beatmap.Metadata.Author = author;
             beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";
             beatmap.Metadata.Artist = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap artist";
+            beatmap.DifficultyName = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong difficulty name";
 
             return beatmap;
         }
 
         private bool containsAny(string text, params string[] stringsToMatch) => stringsToMatch.Any(text.Contains);
 
-        private class ExpandedPanelMiddleContentContainer : Container
+        private partial class ExpandedPanelMiddleContentContainer : Container
         {
             public ExpandedPanelMiddleContentContainer(ScoreInfo score)
             {

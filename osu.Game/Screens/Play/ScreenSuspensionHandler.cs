@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -13,10 +15,10 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Ensures screen is not suspended / dimmed while gameplay is active.
     /// </summary>
-    public class ScreenSuspensionHandler : Component
+    public partial class ScreenSuspensionHandler : Component
     {
         private readonly GameplayClockContainer gameplayClockContainer;
-        private Bindable<bool> isPaused;
+        private IBindable<bool> isPaused;
 
         private readonly Bindable<bool> disableSuspensionBindable = new Bindable<bool>();
 

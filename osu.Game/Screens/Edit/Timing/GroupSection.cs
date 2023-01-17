@@ -13,23 +13,23 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class GroupSection : CompositeDrawable
+    internal partial class GroupSection : CompositeDrawable
     {
-        private LabelledTextBox textBox;
+        private LabelledTextBox textBox = null!;
 
-        private OsuButton button;
-
-        [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
+        private OsuButton button = null!;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; }
+        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        [Resolved]
+        private EditorClock clock { get; set; } = null!;
+
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

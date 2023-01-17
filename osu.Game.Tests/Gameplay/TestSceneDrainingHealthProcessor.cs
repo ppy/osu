@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneDrainingHealthProcessor : OsuTestScene
+    public partial class TestSceneDrainingHealthProcessor : OsuTestScene
     {
         private HealthProcessor processor;
         private ManualClock clock;
@@ -190,7 +192,7 @@ namespace osu.Game.Tests.Gameplay
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
-            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
         }
 

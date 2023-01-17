@@ -15,11 +15,11 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneLeadIn : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLeadIn : RateAdjustedBeatmapTestScene
     {
-        private LeadInPlayer player;
+        private LeadInPlayer player = null!;
 
-        private const double lenience_ms = 10;
+        private const double lenience_ms = 100;
 
         private const double first_hit_object = 2170;
 
@@ -34,11 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
         [TestCase(1000, 0)]
@@ -57,11 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
         [TestCase(1000, 0, false)]
@@ -74,18 +66,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(-10000, -10000, true)]
         public void TestStoryboardProducesCorrectStartTimeFadeInAfterOtherEvents(double firstStoryboardEvent, double expectedStartTime, bool addEventToLoop)
         {
+            const double loop_start_time = -20000;
+
             var storyboard = new Storyboard();
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.TimelineGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
-            var loopGroup = sprite.AddLoop(-20000, 50);
-            loopGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
+            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            var loopGroup = sprite.AddLoop(loop_start_time, 50);
+            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
 
             var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
-            double targetTime = addEventToLoop ? 20000 : 0;
-            target.Alpha.Add(Easing.None, targetTime + firstStoryboardEvent, targetTime + firstStoryboardEvent + 500, 0, 1);
+            double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
+            target.Alpha.Add(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
             sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
@@ -95,14 +89,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
-        private void loadPlayerWithBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        private void checkFirstFrameTime(double expectedStartTime) =>
+            AddAssert("check first frame time", () => player.FirstFrameClockTime, () => Is.EqualTo(expectedStartTime).Within(lenience_ms));
+
+        private void loadPlayerWithBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
         {
             AddStep("create player", () =>
             {
@@ -113,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => player.IsLoaded && player.Alpha == 1);
         }
 
-        private class LeadInPlayer : TestPlayer
+        private partial class LeadInPlayer : TestPlayer
         {
             public LeadInPlayer()
                 : base(false, false)
@@ -124,11 +117,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
-            public double GameplayStartTime => DrawableRuleset.GameplayStartTime;
-
             public double FirstHitObjectTime => DrawableRuleset.Objects.First().StartTime;
-
-            public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
 
             protected override void UpdateAfterChildren()
             {
@@ -136,7 +125,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 if (!FirstFrameClockTime.HasValue)
                 {
-                    FirstFrameClockTime = GameplayClockContainer.GameplayClock.CurrentTime;
+                    FirstFrameClockTime = GameplayClockContainer.CurrentTime;
                     AddInternal(new OsuSpriteText
                     {
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "

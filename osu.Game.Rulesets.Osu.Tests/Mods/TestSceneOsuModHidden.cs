@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModHidden : OsuModTestScene
+    public partial class TestSceneOsuModHidden : OsuModTestScene
     {
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new HitObject FirstObject => base.FirstObject;
+            public new HitObject? FirstObject => base.FirstObject;
         }
     }
 }

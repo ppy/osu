@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +13,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -26,7 +27,7 @@ namespace osu.Game.Tests.Skins
 {
     [TestFixture]
     [HeadlessTest]
-    public class TestSceneSkinConfigurationLookup : OsuTestScene
+    public partial class TestSceneSkinConfigurationLookup : OsuTestScene
     {
         private UserSkinSource userSource;
         private BeatmapSkinSource beatmapSource;
@@ -59,11 +60,13 @@ namespace osu.Game.Tests.Skins
             AddAssert("Check float parse lookup", () => requester.GetConfig<string, float>("FloatTest")?.Value == 1.1f);
         }
 
-        [Test]
-        public void TestBoolLookup()
+        [TestCase("0", false)]
+        [TestCase("1", true)]
+        [TestCase("2", true)] // https://github.com/ppy/osu/issues/18579
+        public void TestBoolLookup(string originalValue, bool expectedParsedValue)
         {
-            AddStep("Add config values", () => userSource.Configuration.ConfigDictionary["BoolTest"] = "1");
-            AddAssert("Check bool parse lookup", () => requester.GetConfig<string, bool>("BoolTest")?.Value == true);
+            AddStep("Add config values", () => userSource.Configuration.ConfigDictionary["BoolTest"] = originalValue);
+            AddAssert("Check bool parse lookup", () => requester.GetConfig<string, bool>("BoolTest")?.Value == expectedParsedValue);
         }
 
         [Test]
@@ -143,7 +146,8 @@ namespace osu.Game.Tests.Skins
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 
             AddAssert("Check retrieved combo colours from user skin", () =>
-                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false);
+                userSource.Configuration.ComboColours != null &&
+                (requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false));
         }
 
         [Test]
@@ -207,7 +211,7 @@ namespace osu.Game.Tests.Skins
             }
         }
 
-        public class SkinRequester : Drawable, ISkin
+        public partial class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 
@@ -217,7 +221,7 @@ namespace osu.Game.Tests.Skins
                 this.skin = skin;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => skin.GetDrawableComponent(lookup);
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => skin.GetTexture(componentName, wrapModeS, wrapModeT);
 

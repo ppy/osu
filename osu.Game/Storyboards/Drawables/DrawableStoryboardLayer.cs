@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : CompositeDrawable
+    public partial class DrawableStoryboardLayer : CompositeDrawable
     {
         public StoryboardLayer Layer { get; }
         public bool Enabled;
@@ -30,7 +32,7 @@ namespace osu.Game.Storyboards.Drawables
             InternalChild = ElementContainer = new LayerElementContainer(layer);
         }
 
-        protected class LayerElementContainer : LifetimeManagementContainer
+        protected partial class LayerElementContainer : LifetimeManagementContainer
         {
             private readonly StoryboardLayer storyboardLayer;
 

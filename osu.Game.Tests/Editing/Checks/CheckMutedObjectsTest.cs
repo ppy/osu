@@ -19,8 +19,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckMutedObjectsTest
     {
-        private CheckMutedObjects check;
-        private ControlPointInfo cpi;
+        private CheckMutedObjects check = null!;
+        private ControlPointInfo cpi = null!;
 
         private const int volume_regular = 50;
         private const int volume_low = 15;

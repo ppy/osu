@@ -4,9 +4,9 @@
 using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -18,8 +18,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckBackgroundQualityTest
     {
-        private CheckBackgroundQuality check;
-        private IBeatmap beatmap;
+        private CheckBackgroundQuality check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = string.Empty;
-            var context = getContext(null, new MemoryStream(Array.Empty<byte>()));
+            var context = getContext(null!, new MemoryStream(Array.Empty<byte>()));
 
             Assert.That(check.Run(context), Is.Empty);
         }
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestAcceptable()
         {
-            var context = getContext(new Texture(1920, 1080));
+            var context = getContext(new DummyRenderer().CreateTexture(1920, 1080));
 
             Assert.That(check.Run(context), Is.Empty);
         }
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooHighResolution()
         {
-            var context = getContext(new Texture(3840, 2160));
+            var context = getContext(new DummyRenderer().CreateTexture(3840, 2160));
 
             var issues = check.Run(context).ToList();
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestLowResolution()
         {
-            var context = getContext(new Texture(640, 480));
+            var context = getContext(new DummyRenderer().CreateTexture(640, 480));
 
             var issues = check.Run(context).ToList();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooLowResolution()
         {
-            var context = getContext(new Texture(100, 100));
+            var context = getContext(new DummyRenderer().CreateTexture(100, 100));
 
             var issues = check.Run(context).ToList();
 
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooUncompressed()
         {
-            var context = getContext(new Texture(1920, 1080), new MemoryStream(new byte[1024 * 1024 * 3]));
+            var context = getContext(new DummyRenderer().CreateTexture(1920, 1080), new MemoryStream(new byte[1024 * 1024 * 3]));
 
             var issues = check.Run(context).ToList();
 
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestStreamClosed()
         {
-            var background = new Texture(1920, 1080);
+            var background = new DummyRenderer().CreateTexture(1920, 1080);
             var stream = new Mock<MemoryStream>(new byte[1024 * 1024]);
 
             var context = getContext(background, stream.Object);
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Editing.Checks
             stream.Verify(x => x.Close(), Times.Once());
         }
 
-        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] Stream stream = null)
+        private BeatmapVerifierContext getContext(Texture background, Stream? stream = null)
         {
             return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, stream).Object);
         }
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Editing.Checks
         /// </summary>
         /// <param name="background">The texture of the background.</param>
         /// <param name="stream">The stream representing the background file.</param>
-        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, [CanBeNull] Stream stream = null)
+        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, Stream? stream = null)
         {
             stream ??= new MemoryStream(new byte[1024 * 1024]);
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,12 +10,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
-using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
-    public abstract class ImportTest
+    public abstract partial class ImportTest
     {
         protected virtual TestOsuGameBase LoadOsuIntoHost(GameHost host, bool withBeatmap = false)
         {
@@ -43,9 +45,9 @@ namespace osu.Game.Tests
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
-        public class TestOsuGameBase : OsuGameBase
+        public partial class TestOsuGameBase : OsuGameBase
         {
-            public CollectionManager CollectionManager { get; private set; }
+            public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 
             private readonly bool withBeatmap;
 
@@ -60,8 +62,6 @@ namespace osu.Game.Tests
                 // Beatmap must be imported before the collection manager is loaded.
                 if (withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
-
-                AddInternal(CollectionManager = new CollectionManager(Storage));
             }
         }
     }

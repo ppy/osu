@@ -8,15 +8,15 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class EffectRowAttribute : RowAttribute
+    public partial class EffectRowAttribute : RowAttribute
     {
         private readonly Bindable<bool> kiaiMode;
         private readonly Bindable<bool> omitBarLine;
         private readonly BindableNumber<double> scrollSpeed;
 
-        private AttributeText kiaiModeBubble;
-        private AttributeText omitBarLineBubble;
-        private AttributeText text;
+        private AttributeText kiaiModeBubble = null!;
+        private AttributeText omitBarLineBubble = null!;
+        private AttributeText text = null!;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")

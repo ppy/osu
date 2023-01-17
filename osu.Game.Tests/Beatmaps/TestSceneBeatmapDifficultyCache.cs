@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -20,7 +22,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public class TestSceneBeatmapDifficultyCache : OsuTestScene
+    public partial class TestSceneBeatmapDifficultyCache : OsuTestScene
     {
         public const double BASE_STARS = 5.55;
 
@@ -155,12 +157,12 @@ namespace osu.Game.Tests.Beatmaps
         [TestCase(8.3, DifficultyRating.ExpertPlus)]
         public void TestDifficultyRatingMapping(double starRating, DifficultyRating expectedBracket)
         {
-            var actualBracket = BeatmapDifficultyCache.GetDifficultyRating(starRating);
+            var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
             Assert.AreEqual(expectedBracket, actualBracket);
         }
 
-        private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
+        private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
             public Func<DifficultyCacheLookup, StarDifficulty> ComputeDifficulty { get; set; }
 

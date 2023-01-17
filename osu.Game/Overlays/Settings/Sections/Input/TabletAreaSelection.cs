@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletAreaSelection : CompositeDrawable
+    public partial class TabletAreaSelection : CompositeDrawable
     {
         public bool IsWithinBounds { get; private set; }
 
@@ -123,11 +125,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint);
 
-                int x = (int)val.NewValue.X;
-                int y = (int)val.NewValue.Y;
+                int x = (int)Math.Round(val.NewValue.X);
+                int y = (int)Math.Round(val.NewValue.Y);
                 int commonDivider = greatestCommonDivider(x, y);
 
-                usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
+                usableAreaText.Text = $"{x / commonDivider}:{y / commonDivider}";
                 checkBounds();
             }, true);
 

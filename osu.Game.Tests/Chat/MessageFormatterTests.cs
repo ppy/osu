@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Online.Chat;
 
@@ -22,6 +24,16 @@ namespace osu.Game.Tests.Chat
         public void OneTimeTearDown()
         {
             MessageFormatter.WebsiteRootUrl = originalWebsiteRootUrl;
+        }
+
+        [Test]
+        public void TestUnsupportedProtocolLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a gopher://really-old-protocol we don't support." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("gopher://really-old-protocol", result.Links[0].Url);
         }
 
         [Test]

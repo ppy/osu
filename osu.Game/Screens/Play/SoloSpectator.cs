@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -16,7 +18,7 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -31,7 +33,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
+    public partial class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
     {
         [NotNull]
         private readonly APIUser targetUser;
@@ -52,7 +54,7 @@ namespace osu.Game.Screens.Play
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private Container beatmapPanelContainer;
-        private TriangleButton watchButton;
+        private RoundedButton watchButton;
         private SettingsCheckbox automaticDownload;
 
         /// <summary>
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
-                            watchButton = new PurpleTriangleButton
+                            watchButton = new PurpleRoundedButton
                             {
                                 Text = "Start Watching",
                                 Width = 250,
@@ -180,7 +182,7 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         }
 
-        protected override void EndGameplay(int userId, SpectatorState state)
+        protected override void QuitGameplay(int userId)
         {
             scheduledStart?.Cancel();
             immediateSpectatorGameplayState = null;

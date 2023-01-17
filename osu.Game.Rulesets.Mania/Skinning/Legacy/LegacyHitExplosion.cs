@@ -15,13 +15,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
+    public partial class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
     {
         public const double FADE_IN_DURATION = 80;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Drawable explosion;
+        private Drawable? explosion;
 
         public LegacyHitExplosion()
         {

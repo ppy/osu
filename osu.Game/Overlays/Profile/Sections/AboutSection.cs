@@ -6,7 +6,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class AboutSection : ProfileSection
+    public partial class AboutSection : ProfileSection
     {
         public override LocalisableString Title => UsersStrings.ShowExtraMeTitle;
 

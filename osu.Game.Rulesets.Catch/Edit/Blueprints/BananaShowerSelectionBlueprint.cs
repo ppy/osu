@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class BananaShowerSelectionBlueprint : CatchSelectionBlueprint<BananaShower>
+    public partial class BananaShowerSelectionBlueprint : CatchSelectionBlueprint<BananaShower>
     {
         public BananaShowerSelectionBlueprint(BananaShower hitObject)
             : base(hitObject)

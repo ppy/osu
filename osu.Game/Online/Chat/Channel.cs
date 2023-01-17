@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,6 +98,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public Bindable<Message> HighlightedMessage = new Bindable<Message>();
 
+        /// <summary>
+        /// The current text box message while in this <see cref="Channel"/>.
+        /// </summary>
+        public Bindable<string> TextBoxMessage = new Bindable<string>(string.Empty);
+
         [JsonConstructor]
         public Channel()
         {
@@ -132,6 +139,14 @@ namespace osu.Game.Online.Chat
         /// <param name="messages"></param>
         public void AddNewMessages(params Message[] messages)
         {
+            foreach (var m in messages)
+            {
+                LocalEchoMessage localEcho = pendingMessages.FirstOrDefault(local => local.Uuid == m.Uuid);
+
+                if (localEcho != null)
+                    ReplaceMessage(localEcho, m);
+            }
+
             messages = messages.Except(Messages).ToArray();
 
             if (messages.Length == 0) return;
@@ -145,6 +160,20 @@ namespace osu.Game.Online.Chat
             purgeOldMessages();
 
             NewMessagesArrived?.Invoke(messages);
+        }
+
+        public void RemoveMessagesFromUser(int userId)
+        {
+            for (int i = 0; i < Messages.Count; i++)
+            {
+                var message = Messages[i];
+
+                if (message.SenderId == userId)
+                {
+                    Messages.RemoveAt(i--);
+                    MessageRemoved?.Invoke(message);
+                }
+            }
         }
 
         /// <summary>
@@ -169,6 +198,10 @@ namespace osu.Game.Online.Chat
                 throw new InvalidOperationException("Attempted to add the same message again");
 
             Messages.Add(final);
+
+            if (final.Id > LastMessageId)
+                LastMessageId = final.Id;
+
             PendingMessageResolved?.Invoke(echo, final);
         }
 

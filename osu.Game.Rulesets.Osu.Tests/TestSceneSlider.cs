@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
@@ -24,7 +26,7 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSlider : OsuSkinnableTestScene
+    public partial class TestSceneSlider : OsuSkinnableTestScene
     {
         private int depthIndex;
 
@@ -158,9 +160,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             static bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
         }
 
-        private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
+        private Drawable testSimpleBig(int repeats = 0) => createSlider(repeats: repeats);
 
-        private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
+        private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(repeats: repeats, stackHeight: 10);
 
         private Drawable testDistanceOverflow(int repeats = 0)
         {

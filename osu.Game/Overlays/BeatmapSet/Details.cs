@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class Details : FillFlowContainer
+    public partial class Details : FillFlowContainer
     {
         protected readonly UserRatings Ratings;
 
@@ -105,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDisplay();
         }
 
-        private class DetailBox : Container
+        private partial class DetailBox : Container
         {
             private readonly Container content;
             private readonly Box background;

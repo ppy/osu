@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +11,6 @@ using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -40,9 +37,9 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<SkinnableTarget, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public IDictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        private readonly Dictionary<SkinnableTarget, SkinnableInfo[]> drawableComponentInfo = new Dictionary<SkinnableTarget, SkinnableInfo[]>();
+        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -71,14 +68,16 @@ namespace osu.Game.Skinning
 
                 storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
 
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
-
                 var samples = resources.AudioManager?.GetSampleStore(storage);
                 if (samples != null)
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
+
                 Samples = samples;
-                Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
             }
             else
             {
@@ -98,7 +97,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues<GlobalSkinComponentLookup.LookupType>())
             {
                 string filename = $"{skinnableTarget}.json";
 
@@ -110,6 +109,13 @@ namespace osu.Game.Skinning
                 try
                 {
                     string jsonContent = Encoding.UTF8.GetString(bytes);
+
+                    // handle namespace changes...
+
+                    // can be removed 2023-01-31
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+
                     var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
                     if (deserializedContent == null)
@@ -148,12 +154,16 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable? GetDrawableComponent(ISkinComponent component)
+        public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
+                // This fallback is important for user skins which use SkinnableSprites.
+                case SkinnableSprite.SpriteComponentLookup sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
+                case GlobalSkinComponentLookup target:
+                    if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
                         return null;
 
                     var components = new List<Drawable>();

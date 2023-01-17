@@ -8,7 +8,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class RanksSection : ProfileSection
+    public partial class RanksSection : ProfileSection
     {
         public override LocalisableString Title => UsersStrings.ShowExtraTopRanksTitle;
 

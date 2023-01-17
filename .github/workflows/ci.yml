@@ -1,5 +1,11 @@
 on: [push, pull_request]
 name: Continuous Integration
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
 
 jobs:
   inspect-code:
@@ -25,13 +31,13 @@ jobs:
         run: dotnet tool restore
 
       - name: Restore Packages
-        run: dotnet restore
+        run: dotnet restore osu.Desktop.slnf
 
       - name: Restore inspectcode cache
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/inspectcode
-          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', '.editorconfig', '.globalconfig', 'CodeAnalysis/*') }}
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
 
       - name: Dotnet code style
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
@@ -82,7 +88,7 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
         shell: pwsh
 
       # Attempt to upload results even if test fails.
@@ -96,45 +102,47 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
-    runs-on: macos-latest
+    runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
-      # See: https://github.com/xamarin/xamarin-android/issues/6284
-      # This can be removed/reverted when the fix makes it to upstream and is deployed on github runners.
-      - name: Set default Xamarin SDK version
-        run: |
-            $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
 
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
-      - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+      - name: Install .NET workloads
+        run: dotnet workload install maui-android
+
+      - name: Compile
+        run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    # change to macos-latest once GitHub finishes migrating all repositories to macOS 12.
+    runs-on: macos-12
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      # see https://github.com/actions/runner-images/issues/6771#issuecomment-1354713617
+      # remove once all workflow VMs use Xcode 14.1
+      - name: Set Xcode Version
+        shell: bash
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_14.1.app"
+          echo "MD_APPLE_SDK_ROOT=/Applications/Xcode_14.1.app" >> $GITHUB_ENV
 
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
+      - name: Install .NET Workloads
+        run: dotnet workload install maui-ios
+
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+        run: dotnet build -c Debug osu.iOS

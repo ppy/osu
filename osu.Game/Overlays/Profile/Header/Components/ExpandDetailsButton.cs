@@ -15,15 +15,15 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ExpandDetailsButton : ProfileHeaderButton
+    public partial class ExpandDetailsButton : ProfileHeaderButton
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 
         public override LocalisableString TooltipText => DetailsVisible.Value ? CommonStrings.ButtonsCollapse : CommonStrings.ButtonsExpand;
 
-        private SpriteIcon icon;
-        private Sample sampleOpen;
-        private Sample sampleClose;
+        private SpriteIcon icon = null!;
+        private Sample? sampleOpen;
+        private Sample? sampleClose;
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds();
 

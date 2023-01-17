@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -66,10 +67,10 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
             {
-                var bindable = (IBindable)property.GetValue(component);
+                var bindable = (IBindable)property.GetValue(component)!;
 
                 if (!bindable.IsDefault)
-                    Settings.Add(property.Name.Underscore(), bindable.GetUnderlyingSettingValue());
+                    Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
 
             if (component is Container<Drawable> container)
@@ -87,7 +88,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             try
             {
-                Drawable d = (Drawable)Activator.CreateInstance(Type);
+                Drawable d = (Drawable)Activator.CreateInstance(Type)!;
                 d.ApplySkinnableInfo(this);
                 return d;
             }
@@ -96,6 +97,15 @@ namespace osu.Game.Screens.Play.HUD
                 Logger.Error(e, $"Unable to create skin component {Type.Name}");
                 return Drawable.Empty();
             }
+        }
+
+        public static Type[] GetAllAvailableDrawables()
+        {
+            return typeof(OsuGame).Assembly.GetTypes()
+                                  .Where(t => !t.IsInterface && !t.IsAbstract)
+                                  .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                  .OrderBy(t => t.Name)
+                                  .ToArray();
         }
     }
 }

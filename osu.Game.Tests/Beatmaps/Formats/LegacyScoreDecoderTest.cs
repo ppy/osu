@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -14,7 +16,9 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
@@ -60,6 +64,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
+
+                Assert.That(score.Replay.Frames, Is.Not.Empty);
+            }
+        }
+
+        [Test]
+        public void TestDecodeTaikoReplay()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.AreEqual(1, score.ScoreInfo.Ruleset.OnlineID);
+                Assert.AreEqual(4, score.ScoreInfo.Statistics[HitResult.Great]);
+                Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.LargeBonus]);
+                Assert.AreEqual(4, score.ScoreInfo.MaxCombo);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
             }
@@ -156,6 +178,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode.ScoreInfo.Date, Is.EqualTo(scoreInfo.Date));
 
                 Assert.That(decodedAfterEncode.Replay.Frames.Count, Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public void TestSoloScoreData()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            scoreInfo.Mods = new Mod[]
+            {
+                new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
+            };
+
+            var beatmap = new TestBeatmap(ruleset);
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton)
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.ScoreInfo.Statistics, Is.EqualTo(scoreInfo.Statistics));
+                Assert.That(decodedAfterEncode.ScoreInfo.MaximumStatistics, Is.EqualTo(scoreInfo.MaximumStatistics));
+                Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
             });
         }
 

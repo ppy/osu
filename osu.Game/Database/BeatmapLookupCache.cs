@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,7 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Database
 {
-    public class BeatmapLookupCache : OnlineLookupCache<int, APIBeatmap, GetBeatmapsRequest>
+    public partial class BeatmapLookupCache : OnlineLookupCache<int, APIBeatmap, GetBeatmapsRequest>
     {
         /// <summary>
         /// Perform an API lookup on the specified beatmap, populating a <see cref="APIBeatmap"/> model.

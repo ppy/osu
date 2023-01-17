@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osuTK;
@@ -14,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container
+    public partial class Footer : Container
     {
         private readonly Box modeLight;
 
@@ -55,7 +57,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
+        private void updateModeLight()
+        {
+            var selectedButton = buttons.FirstOrDefault(b => b.Enabled.Value && b.IsHovered);
+
+            if (selectedButton != null)
+            {
+                modeLight.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                modeLight.FadeColour(selectedButton.SelectedColour, TRANSITION_LENGTH, Easing.OutQuint);
+            }
+            else
+                modeLight.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+        }
 
         public Footer()
         {
@@ -76,6 +89,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     Height = 3,
                     Position = new Vector2(0, -3),
+                    Colour = Color4.Black,
                 },
                 new FillFlowContainer
                 {

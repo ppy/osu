@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,7 +45,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                                 continue;
 
                             // ReSharper disable once PossibleNullReferenceException
-                            string[] split = line.Split(':');
+                            string[] split = line.Split(':', StringSplitOptions.TrimEntries);
 
                             if (split.Length < 2)
                             {
@@ -53,9 +55,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                             teams.Add(new TournamentTeam
                             {
-                                FullName = { Value = split[1].Trim(), },
-                                Acronym = { Value = split.Length >= 3 ? split[2].Trim() : null, },
-                                FlagName = { Value = split[0].Trim() }
+                                FullName = { Value = split[1], },
+                                Acronym = { Value = split.Length >= 3 ? split[2] : null, },
+                                FlagName = { Value = split[0] }
                             });
                         }
                     }

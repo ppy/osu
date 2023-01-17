@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -16,14 +14,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyNotePiece : LegacyManiaColumnElement
+    public partial class LegacyNotePiece : LegacyManiaColumnElement
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Container directionContainer;
+        private Container directionContainer = null!;
 
-        [CanBeNull]
-        private Drawable noteAnimation;
+        private Drawable noteAnimation = null!;
 
         private float? minimumColumnWidth;
 
@@ -54,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Update();
 
-            Texture texture = null;
+            Texture? texture = null;
 
             if (noteAnimation is Sprite sprite)
                 texture = sprite.Texture;
@@ -83,11 +80,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
         }
 
-        [CanBeNull]
-        protected virtual Drawable GetAnimation(ISkinSource skin) => GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
+        protected virtual Drawable? GetAnimation(ISkinSource skin) => GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
 
-        [CanBeNull]
-        protected Drawable GetAnimationFromLookup(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
+        protected Drawable? GetAnimationFromLookup(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
         {
             string suffix = string.Empty;
 

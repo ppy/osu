@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -27,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -122,16 +124,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "beat snap",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre
-                            },
-                        },
-                        new Drawable[]
-                        {
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -171,6 +163,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 }
                             }
                         },
+                        new Drawable[]
+                        {
+                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                            {
+                                Padding = new MarginPadding { Horizontal = 15, Vertical = 8 },
+                                Text = "beat snap",
+                                RelativeSizeAxes = Axes.X,
+                                TextAnchor = Anchor.TopCentre,
+                            },
+                        },
                     },
                     RowDimensions = new[]
                     {
@@ -207,7 +209,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        internal class DivisorDisplay : OsuAnimatedButton, IHasPopover
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ShiftPressed && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                beatDivisor.SetArbitraryDivisor(e.Key - Key.Number0);
+                return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -257,7 +270,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        internal class CustomDivisorPopover : OsuPopover
+        internal partial class CustomDivisorPopover : OsuPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -291,7 +304,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
-                divisorTextBox.OnCommit += (_, __) => setPresets();
+                divisorTextBox.OnCommit += (_, _) => setPresets();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
             }
@@ -304,17 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
                 }
 
-                if (!BeatDivisor.ValidDivisors.Value.Presets.Contains(divisor))
-                {
-                    if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
-                    else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
-                    else
-                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
-                }
-
-                BeatDivisor.Value = divisor;
+                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }
@@ -325,7 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class DivisorTypeText : OsuSpriteText
+        private partial class DivisorTypeText : OsuSpriteText
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -344,7 +347,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        internal class ChevronButton : IconButton
+        internal partial class ChevronButton : IconButton
         {
             public ChevronButton()
             {
@@ -367,7 +370,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class TickSliderBar : SliderBar<int>
+        private partial class TickSliderBar : SliderBar<int>
         {
             private Marker marker;
 
@@ -476,13 +479,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // copied from SliderBar so we can do custom spacing logic.
                 float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
-                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
+                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.MinBy(d => Math.Abs(getMappedPosition(d) - xPosition));
                 OnUserChange(Current.Value);
             }
 
             private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
 
-            private class Tick : Circle
+            private partial class Tick : Circle
             {
                 public Tick(int divisor)
                 {
@@ -491,7 +494,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             }
 
-            private class Marker : CompositeDrawable
+            private partial class Marker : CompositeDrawable
             {
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; }

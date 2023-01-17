@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class ScoreCounter : RollingCounter<double>
+    public abstract partial class ScoreCounter : RollingCounter<long>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
@@ -34,10 +36,10 @@ namespace osu.Game.Graphics.UserInterface
             UpdateDisplay();
         }
 
-        protected override double GetProportionalDuration(double currentValue, double newValue) =>
+        protected override double GetProportionalDuration(long currentValue, long newValue) =>
             currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
-        protected override LocalisableString FormatCount(double count) => ((long)count).ToLocalisableString(formatString);
+        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString(formatString);
 
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));

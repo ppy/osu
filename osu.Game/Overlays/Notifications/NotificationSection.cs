@@ -17,11 +17,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class NotificationSection : AlwaysUpdateFillFlowContainer<Drawable>
+    public partial class NotificationSection : AlwaysUpdateFillFlowContainer<Drawable>
     {
-        private OsuSpriteText countDrawable;
+        private OsuSpriteText countDrawable = null!;
 
-        private FlowContainer<Notification> notifications;
+        private FlowContainer<Notification> notifications = null!;
 
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
         public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
@@ -31,15 +31,17 @@ namespace osu.Game.Overlays.Notifications
             notifications.Insert((int)position, notification);
         }
 
-        public IEnumerable<Type> AcceptTypes;
+        public IEnumerable<Type> AcceptedNotificationTypes { get; }
 
-        private readonly string clearButtonText;
+        private readonly LocalisableString clearButtonText;
 
         private readonly LocalisableString titleText;
 
-        public NotificationSection(LocalisableString title, string clearButtonText)
+        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes, LocalisableString clearButtonText)
         {
-            this.clearButtonText = clearButtonText.ToUpperInvariant();
+            AcceptedNotificationTypes = acceptedNotificationTypes.ToArray();
+
+            this.clearButtonText = clearButtonText.ToUpper();
             titleText = title;
         }
 
@@ -104,14 +106,13 @@ namespace osu.Game.Overlays.Notifications
                     RelativeSizeAxes = Axes.X,
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
-                    Spacing = new Vector2(3),
                 }
             });
         }
 
         private void clearAll()
         {
-            notifications.Children.ForEach(c => c.Close());
+            notifications.Children.ForEach(c => c.Close(true));
         }
 
         protected override void Update()
@@ -134,7 +135,7 @@ namespace osu.Game.Overlays.Notifications
             return count;
         }
 
-        private class ClearAllButton : OsuClickableContainer
+        private partial class ClearAllButton : OsuClickableContainer
         {
             private readonly OsuSpriteText text;
 
@@ -157,11 +158,11 @@ namespace osu.Game.Overlays.Notifications
 
         public void MarkAllRead()
         {
-            notifications?.Children.ForEach(n => n.Read = true);
+            notifications.Children.ForEach(n => n.Read = true);
         }
     }
 
-    public class AlwaysUpdateFillFlowContainer<T> : FillFlowContainer<T>
+    public partial class AlwaysUpdateFillFlowContainer<T> : FillFlowContainer<T>
         where T : Drawable
     {
         // this is required to ensure correct layout and scheduling on children.

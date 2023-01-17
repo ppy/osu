@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using ManagedBass.Fx;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.Audio
 {
-    public class TestSceneAudioFilter : OsuTestScene
+    public partial class TestSceneAudioFilter : OsuTestScene
     {
         private OsuSpriteText lowPassText;
         private AudioFilter lowPassFilter;

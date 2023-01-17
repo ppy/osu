@@ -14,17 +14,17 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
-        private readonly LegacyJudgementPieceOld temporaryOldStyle;
+        private readonly LegacyJudgementPieceOld? temporaryOldStyle;
 
         private readonly Drawable mainPiece;
 
-        private readonly ParticleExplosion particles;
+        private readonly ParticleExplosion? particles;
 
-        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture particleTexture)
+        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
             if (result != HitResult.Miss)
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
@@ -122,6 +122,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
+        public Drawable? GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
     }
 }

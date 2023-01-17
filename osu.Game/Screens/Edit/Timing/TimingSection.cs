@@ -9,10 +9,10 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TimingSection : Section<TimingControlPoint>
+    internal partial class TimingSection : Section<TimingControlPoint>
     {
-        private LabelledTimeSignature timeSignature;
-        private BPMTextBox bpmTextEntry;
+        private LabelledTimeSignature timeSignature = null!;
+        private BPMTextBox bpmTextEntry = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private bool isRebinding;
 
-        protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint> point)
+        protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint?> point)
         {
             if (point.NewValue != null)
             {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
-        private class BPMTextBox : LabelledTextBox
+        private partial class BPMTextBox : LabelledTextBox
         {
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 Label = "BPM";
 
-                OnCommit += (val, isNew) =>
+                OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
 

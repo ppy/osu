@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,13 +31,13 @@ namespace osu.Game.Extensions
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            task.ContinueWith(t =>
+            task.ContinueWith(_ =>
             {
                 // the previous task has finished execution or been cancelled, so we can run the provided continuation.
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    tcs.SetCanceled();
+                    tcs.SetCanceled(cancellationToken);
                 }
                 else
                 {

@@ -1,14 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays.News
 {
     [LongRunningLoad]
-    public class NewsPostBackground : Sprite
+    public partial class NewsPostBackground : Sprite
     {
         private readonly string sourceUrl;
 
@@ -21,6 +24,12 @@ namespace osu.Game.Overlays.News
         private void load(LargeTextureStore store)
         {
             Texture = store.Get(createUrl(sourceUrl));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.FadeInFromZero(500, Easing.OutQuint);
         }
 
         private string createUrl(string source)

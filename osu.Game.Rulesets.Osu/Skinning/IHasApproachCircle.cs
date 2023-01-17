@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// <summary>
         /// The approach circle drawable.
         /// </summary>
-        Drawable ApproachCircle { get; }
+        Drawable? ApproachCircle { get; }
     }
 }

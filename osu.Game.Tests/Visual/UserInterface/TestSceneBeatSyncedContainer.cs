@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneBeatSyncedContainer : OsuTestScene
+    public partial class TestSceneBeatSyncedContainer : OsuTestScene
     {
         private TestBeatSyncedContainer beatContainer;
 
@@ -68,7 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Set time before zero", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (i, timingControlPoint, _, _) =>
                 {
                     lastActuationTime = gameplayClockContainer.CurrentTime;
                     lastTimingPoint = timingControlPoint;
@@ -103,7 +105,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Set time before zero", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (i, timingControlPoint, _, _) =>
                 {
                     lastBeatIndex = i;
                     lastBpm = timingControlPoint.BPM;
@@ -124,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("bind event", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) => lastBpm = timingControlPoint.BPM;
+                beatContainer.NewBeat = (_, timingControlPoint, _, _) => lastBpm = timingControlPoint.BPM;
             });
 
             AddUntilStep("wait for trigger", () => lastBpm != null);
@@ -155,7 +157,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 actualEffectPoint = null;
                 beatContainer.AllowMistimedEventFiring = false;
 
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (_, _, effectControlPoint, _) =>
                 {
                     if (Precision.AlmostEquals(gameplayClockContainer.CurrentTime + earlyActivationMilliseconds, expectedEffectPoint.Time, BeatSyncedContainer.MISTIMED_ALLOWANCE))
                         actualEffectPoint = effectControlPoint;
@@ -169,7 +171,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("effect has kiai", () => actualEffectPoint != null && ((EffectControlPoint)actualEffectPoint).KiaiMode);
         }
 
-        private class TestBeatSyncedContainer : BeatSyncedContainer
+        private partial class TestBeatSyncedContainer : BeatSyncedContainer
         {
             private const int flash_layer_height = 150;
 
@@ -267,7 +269,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
-                if (timingPoints[^1] == current)
+                if (ReferenceEquals(timingPoints[^1], current))
                     return current;
 
                 int index = timingPoints.IndexOf(current); // -1 means that this is a "default beat"
@@ -279,7 +281,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 if (timingPoints.Count == 0) return 0;
 
-                if (timingPoints[^1] == current)
+                if (ReferenceEquals(timingPoints[^1], current))
                 {
                     Debug.Assert(BeatSyncSource.Clock != null);
 
@@ -319,7 +321,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class InfoString : FillFlowContainer
+        private partial class InfoString : FillFlowContainer
         {
             private const int text_size = 20;
             private const int margin = 7;

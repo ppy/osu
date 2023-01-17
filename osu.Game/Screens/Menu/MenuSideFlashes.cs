@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,7 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MenuSideFlashes : BeatSyncedContainer
+    public partial class MenuSideFlashes : BeatSyncedContainer
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 

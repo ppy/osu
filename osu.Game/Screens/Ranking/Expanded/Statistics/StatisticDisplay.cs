@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A statistic from the score to be displayed in the <see cref="ExpandedPanelMiddleContent"/>.
     /// </summary>
-    public abstract class StatisticDisplay : CompositeDrawable
+    public abstract partial class StatisticDisplay : CompositeDrawable
     {
         protected SpriteText HeaderText { get; private set; }
 

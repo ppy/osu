@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,14 +9,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
-    public static class LegacySkinExtensions
+    public static partial class LegacySkinExtensions
     {
         public static Drawable? GetAnimation(this ISkin? source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
                                              bool startAtCurrentTime = true, double? frameLength = null)
@@ -149,7 +146,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class SkinnableTextureAnimation : TextureAnimation
+        public partial class SkinnableTextureAnimation : TextureAnimation
         {
             [Resolved(canBeNull: true)]
             private IAnimationTimeReference? timeReference { get; set; }

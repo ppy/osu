@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -14,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -25,8 +28,10 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinEditorSceneLibrary : CompositeDrawable
+    public partial class SkinEditorSceneLibrary : CompositeDrawable
     {
+        public const float HEIGHT = BUTTON_HEIGHT + padding * 2;
+
         public const float BUTTON_HEIGHT = 40;
 
         private const float padding = 10;
@@ -42,7 +47,7 @@ namespace osu.Game.Skinning.Editor
 
         public SkinEditorSceneLibrary()
         {
-            Height = BUTTON_HEIGHT + padding * 2;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
@@ -62,7 +67,7 @@ namespace osu.Game.Skinning.Editor
                     {
                         new FillFlowContainer
                         {
-                            Name = "Scene library",
+                            Name = @"Scene library",
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
                             Spacing = new Vector2(padding),
@@ -72,14 +77,14 @@ namespace osu.Game.Skinning.Editor
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Scene library",
+                                    Text = SkinEditorStrings.SceneLibrary,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding(10),
                                 },
                                 new SceneButton
                                 {
-                                    Text = "Song Select",
+                                    Text = SkinEditorStrings.SongSelect,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => performer?.PerformFromScreen(screen =>
@@ -92,7 +97,7 @@ namespace osu.Game.Skinning.Editor
                                 },
                                 new SceneButton
                                 {
-                                    Text = "Gameplay",
+                                    Text = SkinEditorStrings.Gameplay,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => performer?.PerformFromScreen(screen =>
@@ -116,7 +121,7 @@ namespace osu.Game.Skinning.Editor
             };
         }
 
-        public class SceneButton : OsuButton
+        public partial class SceneButton : OsuButton
         {
             public SceneButton()
             {

@@ -13,15 +13,15 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class RowAttribute : CompositeDrawable
+    public partial class RowAttribute : CompositeDrawable
     {
         protected readonly ControlPoint Point;
 
         private readonly string label;
 
-        protected Drawable Background { get; private set; }
+        protected Drawable Background { get; private set; } = null!;
 
-        protected FillFlowContainer Content { get; private set; }
+        protected FillFlowContainer Content { get; private set; } = null!;
 
         public RowAttribute(ControlPoint point, string label)
         {

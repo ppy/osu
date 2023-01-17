@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -19,7 +23,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
 {
-    public class ScoreProcessorTest
+    public partial class ScoreProcessorTest
     {
         private ScoreProcessor scoreProcessor;
         private IBeatmap beatmap;
@@ -304,7 +308,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.ComputeFinalScore(ScoringMode.Standardised, new ScoreInfo
+            Assert.That(scoreProcessor.ComputeScore(ScoringMode.Standardised, new ScoreInfo
             {
                 Ruleset = new TestRuleset().RulesetInfo,
                 MaxCombo = result.AffectsCombo() ? 1 : 0,
@@ -312,15 +316,77 @@ namespace osu.Game.Tests.Rulesets.Scoring
             }), Is.EqualTo(expectedScore).Within(0.5d));
         }
 
+#pragma warning disable CS0618
+        [Test]
+        public void TestLegacyComboIncrease()
+        {
+            Assert.That(HitResult.LegacyComboIncrease.IncreasesCombo(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.BreaksCombo(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.AffectsCombo(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.AffectsAccuracy(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsBasic(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsTick(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsBonus(), Is.False);
+            Assert.That(HitResult.LegacyComboIncrease.IsHit(), Is.True);
+            Assert.That(HitResult.LegacyComboIncrease.IsScorable(), Is.True);
+            Assert.That(HitResultExtensions.ALL_TYPES, Does.Not.Contain(HitResult.LegacyComboIncrease));
+
+            // Cannot be used to apply results.
+            Assert.Throws<ArgumentException>(() => scoreProcessor.ApplyBeatmap(new Beatmap
+            {
+                HitObjects = { new TestHitObject(HitResult.LegacyComboIncrease) }
+            }));
+
+            ScoreInfo testScore = new ScoreInfo
+            {
+                MaxCombo = 1,
+                Statistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, 1 }
+                },
+                MaximumStatistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, 1 },
+                    { HitResult.LegacyComboIncrease, 1 }
+                }
+            };
+
+            double totalScore = new TestScoreProcessor().ComputeScore(ScoringMode.Standardised, testScore);
+            Assert.That(totalScore, Is.EqualTo(750_000)); // 500K from accuracy (100%), and 250K from combo (50%).
+        }
+#pragma warning restore CS0618
+
+        [Test]
+        public void TestAccuracyWhenNearPerfect()
+        {
+            const int count_judgements = 1000;
+            const int count_misses = 1;
+
+            double actual = new TestScoreProcessor().ComputeAccuracy(new ScoreInfo
+            {
+                Statistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, count_judgements - count_misses },
+                    { HitResult.Miss, count_misses }
+                }
+            });
+
+            const double expected = (count_judgements - count_misses) / (double)count_judgements;
+
+            Assert.That(actual, Is.Not.EqualTo(0.0));
+            Assert.That(actual, Is.Not.EqualTo(1.0));
+            Assert.That(actual, Is.EqualTo(expected).Within(Precision.FLOAT_EPSILON));
+        }
+
         private class TestRuleset : Ruleset
         {
-            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new System.NotImplementedException();
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description => string.Empty;
             public override string ShortName => string.Empty;
@@ -348,6 +414,34 @@ namespace osu.Game.Tests.Rulesets.Scoring
             public TestHitObject(HitResult maxResult)
             {
                 this.maxResult = maxResult;
+            }
+        }
+
+        private partial class TestScoreProcessor : ScoreProcessor
+        {
+            protected override double DefaultAccuracyPortion => 0.5;
+            protected override double DefaultComboPortion => 0.5;
+
+            public TestScoreProcessor()
+                : base(new TestRuleset())
+            {
+            }
+
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            private class TestRuleset : Ruleset
+            {
+                protected override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
+
+                public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
+
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+
+                public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+
+                public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+
+                public override string Description => string.Empty;
+                public override string ShortName => string.Empty;
             }
         }
     }

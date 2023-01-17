@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
@@ -16,8 +18,10 @@ namespace osu.Game.Graphics.UserInterface
     /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
-    public class LoadingLayer : LoadingSpinner
+    public partial class LoadingLayer : LoadingSpinner
     {
+        private readonly bool blockInput;
+
         [CanBeNull]
         protected Box BackgroundDimLayer { get; }
 
@@ -26,9 +30,11 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="dimBackground">Whether the full background area should be dimmed while loading.</param>
         /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
-        public LoadingLayer(bool dimBackground = false, bool withBox = true)
+        /// <param name="blockInput">Whether to block input of components behind the loading layer.</param>
+        public LoadingLayer(bool dimBackground = false, bool withBox = true, bool blockInput = true)
             : base(withBox)
         {
+            this.blockInput = blockInput;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(1);
 
@@ -50,15 +56,18 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool Handle(UIEvent e)
         {
+            if (!blockInput)
+                return false;
+
             switch (e)
             {
                 // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
-                case ScrollEvent _:
+                case ScrollEvent:
                     return false;
 
                 // blocking touch events causes the ISourcedFromTouch versions to not be fired, potentially impeding behaviour of drawables *above* the loading layer that may utilise these.
                 // note that this will not work well if touch handling elements are beneath this loading layer (something to consider for the future).
-                case TouchEvent _:
+                case TouchEvent:
                     return false;
             }
 
@@ -81,7 +90,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 30, 100));
+            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 100));
         }
     }
 }

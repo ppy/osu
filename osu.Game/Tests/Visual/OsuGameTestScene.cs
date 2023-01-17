@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -15,8 +17,10 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -32,13 +36,15 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
+    public abstract partial class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         protected TestOsuGame Game;
 
         protected override bool UseFreshStoragePerRun => true;
 
         protected override bool CreateNestedActionContainer => false;
+
+        protected override bool DisplayCursorForManualInput => false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,10 +62,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
-                {
-                    Remove(Game);
-                    Game.Dispose();
-                }
+                    Remove(Game, true);
 
                 RecycleLocalStorage(false);
 
@@ -73,7 +76,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [TearDownSteps]
-        public void TearDownSteps()
+        public virtual void TearDownSteps()
         {
             if (DebugUtils.IsNUnitRunning && Game != null)
             {
@@ -112,13 +115,15 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
 
-        public class TestOsuGame : OsuGame
+        public partial class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+
+            public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;
 
             public new BackButton BackButton => base.BackButton;
 
@@ -132,6 +137,8 @@ namespace osu.Game.Tests.Visual
 
             public new NotificationOverlay Notifications => base.Notifications;
 
+            public new FirstRunSetupOverlay FirstRunOverlay => base.FirstRunOverlay;
+
             public new MusicController MusicController => base.MusicController;
 
             public new OsuConfigManager LocalConfig => base.LocalConfig;
@@ -141,6 +148,8 @@ namespace osu.Game.Tests.Visual
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
             public override Version AssemblyVersion => new Version(0, 0);
@@ -167,6 +176,11 @@ namespace osu.Game.Tests.Visual
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
+
+                // set applied version to latest so that the BackgroundBeatmapProcessor doesn't consider
+                // beatmap star ratings as outdated and reset them throughout the test.
+                foreach (var ruleset in RulesetStore.AvailableRulesets)
+                    ruleset.LastAppliedDifficultyVersion = ruleset.CreateInstance().CreateDifficultyCalculator(Beatmap.Default).Version;
             }
 
             protected override void Update()
@@ -178,11 +192,11 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class TestLoader : Loader
+        public partial class TestLoader : Loader
         {
             protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler();
 
-            private class TestShaderPrecompiler : ShaderPrecompiler
+            private partial class TestShaderPrecompiler : ShaderPrecompiler
             {
                 protected override bool AllLoaded => true;
             }

@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
@@ -22,28 +23,39 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class MetronomeDisplay : BeatSyncedContainer
+    public partial class MetronomeDisplay : BeatSyncedContainer
     {
-        private Container swing;
+        private Container swing = null!;
 
-        private OsuSpriteText bpmText;
+        private OsuSpriteText bpmText = null!;
 
-        private Drawable weight;
-        private Drawable stick;
+        private Drawable weight = null!;
+        private Drawable stick = null!;
 
-        private IAdjustableClock metronomeClock;
+        private IAdjustableClock metronomeClock = null!;
 
-        private Sample clunk;
+        private Sample? sampleTick;
+        private Sample? sampleTickDownbeat;
+        private Sample? sampleLatch;
+
+        private ScheduledDelegate? tickPlaybackDelegate;
 
         [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; }
+        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
         public bool EnableClicking { get; set; } = true;
+
+        public MetronomeDisplay()
+        {
+            AllowMistimedEventFiring = false;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            clunk = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            sampleTick = audio.Samples.Get(@"UI/metronome-tick");
+            sampleTickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
+            sampleLatch = audio.Samples.Get(@"UI/metronome-latch");
 
             const float taper = 25;
             const float swing_vertical_offset = -23;
@@ -209,11 +221,13 @@ namespace osu.Game.Screens.Edit.Timing
 
         private double beatLength;
 
-        private TimingControlPoint timingPoint;
+        private TimingControlPoint timingPoint = null!;
 
         private bool isSwinging;
 
         private readonly BindableInt interpolatedBpm = new BindableInt();
+
+        private ScheduledDelegate? latchDelegate;
 
         protected override void LoadComplete()
         {
@@ -249,13 +263,28 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 swing.ClearTransforms(true);
 
-                using (swing.BeginDelayedSequence(350))
+                isSwinging = false;
+
+                tickPlaybackDelegate?.Cancel();
+                tickPlaybackDelegate = null;
+
+                // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
+                if (Precision.AlmostEquals(swing.Rotation, 0, 1))
+                {
+                    swing.RotateTo(0, 60, Easing.OutQuint);
+                    stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
+                    sampleLatch?.Play();
+                    return;
+                }
+
+                using (BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
                     stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
-                }
 
-                isSwinging = false;
+                    using (BeginDelayedSequence(380))
+                        latchDelegate = Schedule(() => sampleLatch?.Play());
+                }
             }
         }
 
@@ -270,6 +299,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             isSwinging = true;
 
+            latchDelegate?.Cancel();
+            latchDelegate = null;
+
             float currentAngle = swing.Rotation;
             float targetAngle = currentAngle > 0 ? -angle : angle;
 
@@ -281,18 +313,18 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
 
-                    Schedule(() =>
+                    tickPlaybackDelegate = Schedule(() =>
                     {
                         if (!EnableClicking)
                             return;
 
-                        var channel = clunk?.GetChannel();
+                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
 
-                        if (channel != null)
-                        {
-                            channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                            channel.Play();
-                        }
+                        if (channel == null)
+                            return;
+
+                        channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                        channel.Play();
                     });
                 }
             }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,7 +14,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// Display a beatmap background from a local source, but fallback to online source if not available.
     /// </summary>
-    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<IBeatmapInfo>
+    public partial class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<IBeatmapInfo>
     {
         public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 

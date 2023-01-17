@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -8,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -29,7 +32,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneBackgroundScreenDefault : OsuTestScene
+    public partial class TestSceneBackgroundScreenDefault : OsuTestScene
     {
         private BackgroundScreenStack stack;
         private TestBackgroundScreenDefault screen;
@@ -40,6 +43,9 @@ namespace osu.Game.Tests.Visual.Background
 
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        [Resolved]
+        private IRenderer renderer { get; set; }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -243,10 +249,10 @@ namespace osu.Game.Tests.Visual.Background
                 Id = API.LocalUser.Value.Id + 1,
             });
 
-        private WorkingBeatmap createTestWorkingBeatmapWithUniqueBackground() => new UniqueBackgroundTestWorkingBeatmap(Audio);
+        private WorkingBeatmap createTestWorkingBeatmapWithUniqueBackground() => new UniqueBackgroundTestWorkingBeatmap(renderer, Audio);
         private WorkingBeatmap createTestWorkingBeatmapWithStoryboard() => new TestWorkingBeatmapWithStoryboard(Audio);
 
-        private class TestBackgroundScreenDefault : BackgroundScreenDefault
+        private partial class TestBackgroundScreenDefault : BackgroundScreenDefault
         {
             private bool? lastLoadTriggerCausedChange;
 
@@ -272,15 +278,18 @@ namespace osu.Game.Tests.Visual.Background
 
         private class UniqueBackgroundTestWorkingBeatmap : TestWorkingBeatmap
         {
-            public UniqueBackgroundTestWorkingBeatmap(AudioManager audioManager)
+            private readonly IRenderer renderer;
+
+            public UniqueBackgroundTestWorkingBeatmap(IRenderer renderer, AudioManager audioManager)
                 : base(new Beatmap(), null, audioManager)
             {
+                this.renderer = renderer;
             }
 
-            protected override Texture GetBackground() => new Texture(1, 1);
+            protected override Texture GetBackground() => renderer.CreateTexture(1, 1);
         }
 
-        private class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
+        private partial class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
         {
             public TestWorkingBeatmapWithStoryboard(AudioManager audioManager)
                 : base(new Beatmap(), createStoryboard(), audioManager)
@@ -306,7 +315,7 @@ namespace osu.Game.Tests.Visual.Background
                 public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
             }
 
-            private class DrawableTestStoryboardElement : OsuSpriteText
+            private partial class DrawableTestStoryboardElement : OsuSpriteText
             {
                 public override bool RemoveWhenNotAlive => false;
 

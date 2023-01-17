@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A container that handles <see cref="Storyboard"/> loading, as well as applies user-specified visual settings to it.
     /// </summary>
-    public class DimmableStoryboard : UserDimContainer
+    public partial class DimmableStoryboard : UserDimContainer
     {
         public Container OverlayLayerContainer { get; private set; }
 

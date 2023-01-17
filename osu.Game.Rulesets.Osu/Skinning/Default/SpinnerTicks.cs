@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerTicks : Container, IHasAccentColour
+    public partial class SpinnerTicks : Container, IHasAccentColour
     {
         public SpinnerTicks()
         {

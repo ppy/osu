@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ using osu.Game.Overlays.Changelog;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChangelogOverlay : OsuTestScene
+    public partial class TestSceneChangelogOverlay : OsuTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -106,6 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                 Version = "2018.712.0",
                 DisplayVersion = "2018.712.0",
                 UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                CreatedAt = new DateTime(2018, 7, 12),
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
                     new APIChangelogEntry
@@ -169,6 +172,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Version = "2019.920.0",
                 DisplayVersion = "2019.920.0",
+                CreatedAt = new DateTime(2019, 9, 20),
                 UpdateStream = new APIUpdateStream
                 {
                     Name = "Test",
@@ -197,7 +201,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show build", () => changelog.ShowBuild(requestedBuild));
         }
 
-        private class TestChangelogOverlay : ChangelogOverlay
+        private partial class TestChangelogOverlay : ChangelogOverlay
         {
             public new List<APIUpdateStream> Streams => base.Streams;
 

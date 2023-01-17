@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -18,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
+    public partial class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
     {
         [Test]
         public void TestGameplayKeyBindings()
@@ -54,6 +56,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => new PlaySongSelect());
 
             AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
+            AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
 
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
 
@@ -89,6 +92,8 @@ namespace osu.Game.Tests.Visual.Navigation
                                                                   .All<RealmKeyBinding>()
                                                                   .AsEnumerable()
                                                                   .First(k => k.RulesetName == "osu" && k.ActionInt == 0);
+
+        private Screens.Select.SongSelect songSelect => Game.ScreenStack.CurrentScreen as Screens.Select.SongSelect;
 
         private Player player => Game.ScreenStack.CurrentScreen as Player;
 

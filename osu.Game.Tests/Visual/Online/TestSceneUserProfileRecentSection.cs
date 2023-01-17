@@ -18,7 +18,7 @@ using osu.Game.Overlays.Profile.Sections.Recent;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileRecentSection : OsuTestScene
+    public partial class TestSceneUserProfileRecentSection : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
@@ -84,7 +84,28 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Approved,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Loved,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
                     Approval = BeatmapApproval.Qualified,
+                    Beatmapset = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.BeatmapsetApprove,
+                    Approval = BeatmapApproval.Ranked,
                     Beatmapset = dummyBeatmap,
                 },
                 new APIRecentActivity

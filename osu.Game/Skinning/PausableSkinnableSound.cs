@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -11,7 +13,7 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
-    public class PausableSkinnableSound : SkinnableSound
+    public partial class PausableSkinnableSound : SkinnableSound
     {
         public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
 

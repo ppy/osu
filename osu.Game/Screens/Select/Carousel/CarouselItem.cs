@@ -36,20 +36,25 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// Used as a default sort method for <see cref="CarouselItem"/>s of differing types.
         /// </summary>
-        internal ulong ChildID;
+        internal ulong ItemID;
 
         /// <summary>
         /// Create a fresh drawable version of this item.
         /// </summary>
-        public abstract DrawableCarouselItem CreateDrawableRepresentation();
+        public abstract DrawableCarouselItem? CreateDrawableRepresentation();
 
         public virtual void Filter(FilterCriteria criteria)
         {
         }
 
-        public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ChildID.CompareTo(other.ChildID);
+        public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ItemID.CompareTo(other.ItemID);
 
-        public int CompareTo(CarouselItem other) => CarouselYPosition.CompareTo(other.CarouselYPosition);
+        public int CompareTo(CarouselItem? other)
+        {
+            if (other == null) return 1;
+
+            return CarouselYPosition.CompareTo(other.CarouselYPosition);
+        }
     }
 
     public enum CarouselItemState

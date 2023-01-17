@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// A graph which displays the distribution of hit timing in a series of <see cref="HitEvent"/>s.
     /// </summary>
-    public class HitEventTimingDistributionGraph : CompositeDrawable
+    public partial class HitEventTimingDistributionGraph : CompositeDrawable
     {
         /// <summary>
         /// The number of bins on each side of the timing distribution.
@@ -46,6 +45,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
+        private readonly IDictionary<HitResult, int>[] bins;
+        private double binSize;
+        private double hitOffset;
+
+        private Bar[]? barDrawables;
+
         /// <summary>
         /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
         /// </summary>
@@ -53,21 +58,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
+            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
         }
-
-        private int[] bins;
-        private double binSize;
-        private double hitOffset;
-
-        private Bar[] barDrawables;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (hitEvents == null || hitEvents.Count == 0)
+            if (hitEvents.Count == 0)
                 return;
-
-            bins = new int[total_timing_distribution_bins];
 
             binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
@@ -87,7 +85,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             bool roundUp = true;
 
-            Array.Clear(bins, 0, bins.Length);
+            foreach (var bin in bins)
+                bin.Clear();
 
             foreach (var e in hitEvents)
             {
@@ -108,23 +107,23 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 // may be out of range when applying an offset. for such cases we can just drop the results.
                 if (index >= 0 && index < bins.Length)
-                    bins[index]++;
+                {
+                    bins[index].TryGetValue(e.Result, out int value);
+                    bins[index][e.Result] = ++value;
+                }
             }
 
             if (barDrawables != null)
             {
                 for (int i = 0; i < barDrawables.Length; i++)
                 {
-                    barDrawables[i].UpdateOffset(bins[i]);
+                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
                 }
             }
             else
             {
-                int maxCount = bins.Max();
-                barDrawables = new Bar[total_timing_distribution_bins];
-
-                for (int i = 0; i < barDrawables.Length; i++)
-                    barDrawables[i] = new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index);
+                int maxCount = bins.Max(b => b.Values.Sum());
+                barDrawables = bins.Select((bin, i) => new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index)).ToArray();
 
                 Container axisFlow;
 
@@ -205,52 +204,104 @@ namespace osu.Game.Screens.Ranking.Statistics
             }
         }
 
-        private class Bar : CompositeDrawable
+        private partial class Bar : CompositeDrawable
         {
-            private readonly float value;
+            private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
+            private readonly bool isCentre;
+            private readonly float totalValue;
 
-            private readonly Circle boxOriginal;
-            private Circle boxAdjustment;
+            private float basalHeight;
+            private float offsetAdjustment;
 
-            private const float minimum_height = 0.05f;
+            private Circle[] boxOriginals = null!;
 
-            public Bar(float value, float maxValue, bool isCentre)
+            private Circle? boxAdjustment;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            private const double duration = 300;
+
+            public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
-                this.value = value;
+                this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
+                this.isCentre = isCentre;
+                totalValue = values.Sum(v => v.Value);
+                offsetAdjustment = totalValue;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
+            }
 
-                InternalChildren = new Drawable[]
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                if (values.Any())
                 {
-                    boxOriginal = new Circle
+                    boxOriginals = values.Select((v, i) => new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
-                        Height = minimum_height,
-                    },
-                };
+                        Colour = isCentre && i == 0 ? Color4.White : colours.ForHitResult(v.Key),
+                        Height = 0,
+                    }).ToArray();
+                    // The bars of the stacked bar graph will be processed (stacked) from the bottom, which is the base position,
+                    // to the top, and the bottom bar should be drawn more toward the front by design,
+                    // while the drawing order is from the back to the front, so the order passed to `InternalChildren` is the opposite.
+                    InternalChildren = boxOriginals.Reverse().ToArray();
+                }
+                else
+                {
+                    // A bin with no value draws a grey dot instead.
+                    Circle dot = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = isCentre ? Color4.White : Color4.Gray,
+                        Height = 0,
+                    };
+                    InternalChildren = boxOriginals = new[] { dot };
+                }
             }
-
-            private const double duration = 300;
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                float height = Math.Clamp(value / maxValue, minimum_height, 1);
+                if (!values.Any())
+                    return;
 
-                if (height > minimum_height)
-                    boxOriginal.ResizeHeightTo(height, duration, Easing.OutQuint);
+                updateBasalHeight();
+
+                foreach (var boxOriginal in boxOriginals)
+                {
+                    boxOriginal.Y = 0;
+                    boxOriginal.Height = basalHeight;
+                }
+
+                float offsetValue = 0;
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
+                    boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
+                    offsetValue -= values[i].Value;
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                updateBasalHeight();
             }
 
             public void UpdateOffset(float adjustment)
             {
-                bool hasAdjustment = adjustment != value && adjustment / maxValue >= minimum_height;
+                bool hasAdjustment = adjustment != totalValue;
 
                 if (boxAdjustment == null)
                 {
@@ -269,7 +320,53 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, minimum_height, 1), duration, Easing.OutQuint);
+                offsetAdjustment = adjustment;
+                drawAdjustmentBar();
+            }
+
+            private void updateBasalHeight()
+            {
+                float newBasalHeight = DrawHeight > DrawWidth ? DrawWidth / DrawHeight : 1;
+
+                if (newBasalHeight == basalHeight)
+                    return;
+
+                basalHeight = newBasalHeight;
+                foreach (var dot in boxOriginals)
+                    dot.Height = basalHeight;
+
+                draw();
+            }
+
+            private float offsetForValue(float value) => (1 - basalHeight) * value / maxValue;
+
+            private float heightForValue(float value) => MathF.Max(basalHeight + offsetForValue(value), 0);
+
+            private void draw()
+            {
+                resizeBars();
+
+                if (boxAdjustment != null)
+                    drawAdjustmentBar();
+            }
+
+            private void resizeBars()
+            {
+                float offsetValue = 0;
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    boxOriginals[i].Y = offsetForValue(offsetValue) * DrawHeight;
+                    boxOriginals[i].Height = heightForValue(values[i].Value);
+                    offsetValue -= values[i].Value;
+                }
+            }
+
+            private void drawAdjustmentBar()
+            {
+                bool hasAdjustment = offsetAdjustment != totalValue;
+
+                boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }

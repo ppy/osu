@@ -7,8 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
@@ -65,11 +63,17 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
         }
 
+        [JsonProperty(@"convert")]
+        public bool Convert { get; set; }
+
         [JsonProperty(@"count_circles")]
         public int CircleCount { get; set; }
 
         [JsonProperty(@"count_sliders")]
         public int SliderCount { get; set; }
+
+        [JsonProperty(@"count_spinners")]
+        public int SpinnerCount { get; set; }
 
         [JsonProperty(@"version")]
         public string DifficultyName { get; set; } = string.Empty;
@@ -79,6 +83,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
+
+        [JsonProperty(@"last_updated")]
+        public DateTimeOffset LastUpdated { get; set; }
 
         public double BPM { get; set; }
 
@@ -107,7 +114,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
 
-        private class APIRuleset : IRulesetInfo
+        public class APIRuleset : IRulesetInfo
         {
             public int OnlineID { get; set; } = -1;
 
@@ -139,7 +146,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
 
-            public int CompareTo(IRulesetInfo other)
+            public int CompareTo(IRulesetInfo? other)
             {
                 if (!(other is APIRuleset ruleset))
                     throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));

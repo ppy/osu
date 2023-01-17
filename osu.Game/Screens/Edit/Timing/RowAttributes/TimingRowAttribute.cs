@@ -11,11 +11,11 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class TimingRowAttribute : RowAttribute
+    public partial class TimingRowAttribute : RowAttribute
     {
         private readonly BindableNumber<double> beatLength;
         private readonly Bindable<TimeSignature> timeSignature;
-        private OsuSpriteText text;
+        private OsuSpriteText text = null!;
 
         public TimingRowAttribute(TimingControlPoint timing)
             : base(timing, "timing")

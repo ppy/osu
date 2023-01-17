@@ -12,11 +12,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileWeightedScore : DrawableProfileScore
+    public partial class DrawableProfileWeightedScore : DrawableProfileScore
     {
         private readonly double weight;
 
-        public DrawableProfileWeightedScore(APIScore score, double weight)
+        public DrawableProfileWeightedScore(SoloScoreInfo score, double weight)
             : base(score)
         {
             this.weight = weight;
@@ -40,12 +40,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         CreateDrawableAccuracy(),
                         new Container
                         {
-                            AutoSizeAxes = Axes.Y,
-                            Width = 50,
+                            Size = new Vector2(50, 14),
                             Child = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                Text = $"{Score.PP * weight:0}pp",
+                                Text = Score.PP.HasValue ? $"{Score.PP * weight:0}pp" : string.Empty,
                             },
                         }
                     }

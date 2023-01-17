@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Catch.Edit
                 case Droplet droplet:
                     return droplet is TinyDroplet ? PositionRange.EMPTY : new PositionRange(droplet.OriginalX);
 
-                case JuiceStream _:
+                case JuiceStream:
                     return GetPositionRange(hitObject.NestedHitObjects);
 
-                case BananaShower _:
+                case BananaShower:
                     // A banana shower occupies the whole screen width.
                     return new PositionRange(0, CatchPlayfield.WIDTH);
 

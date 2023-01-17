@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,11 +11,12 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentModDisplay : TournamentTestScene
+    public partial class TestSceneTournamentModDisplay : TournamentTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -51,7 +54,7 @@ namespace osu.Game.Tournament.Tests.Components
 
             foreach (var mod in mods)
             {
-                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
+                fillFlow.Add(new TournamentBeatmapPanel(new TournamentBeatmap(beatmap), mod.Acronym)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre

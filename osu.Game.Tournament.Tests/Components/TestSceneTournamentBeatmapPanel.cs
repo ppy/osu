@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
@@ -8,10 +10,11 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentBeatmapPanel : TournamentTestScene
+    public partial class TestSceneTournamentBeatmapPanel : TournamentTestScene
     {
         /// <remarks>
         /// Warning: the below API instance is actually the online API, rather than the dummy API provided by the test.
@@ -30,7 +33,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap beatmap)
         {
-            Add(new TournamentBeatmapPanel(beatmap)
+            Add(new TournamentBeatmapPanel(new TournamentBeatmap(beatmap))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre

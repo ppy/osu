@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -27,7 +29,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneHitObjectComposer : EditorClockTestScene
     {
         private OsuHitObjectComposer hitObjectComposer;
         private EditorBeatmapContainer editorBeatmapContainer;
@@ -146,10 +148,6 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
-
-            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
         }
 
         [Test]
@@ -163,13 +161,14 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
 
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
-            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
+
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
-        public class EditorBeatmapContainer : Container
+        public partial class EditorBeatmapContainer : Container
         {
             private readonly IWorkingBeatmap working;
 

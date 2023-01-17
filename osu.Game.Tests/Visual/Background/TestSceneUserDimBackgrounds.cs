@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -35,7 +37,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : ScreenTestScene
+    public partial class TestSceneUserDimBackgrounds : ScreenTestScene
     {
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
@@ -47,7 +49,7 @@ namespace osu.Game.Tests.Visual.Background
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
             Dependencies.Cache(Realm);
 
@@ -242,7 +244,10 @@ namespace osu.Game.Tests.Visual.Background
         public void TestResumeFromPlayer()
         {
             performFullSetup();
-            AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Move mouse to Visual Settings location", () => InputManager.MoveMouseTo(playerLoader.ScreenSpaceDrawQuad.TopRight
+                                                                                             + new Vector2(-playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Width,
+                                                                                                 playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
+                                                                                             )));
             AddStep("Resume PlayerLoader", () => player.Restart());
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -294,7 +299,7 @@ namespace osu.Game.Tests.Visual.Background
             rulesets?.Dispose();
         }
 
-        private class DummySongSelect : PlaySongSelect
+        private partial class DummySongSelect : PlaySongSelect
         {
             private FadeAccessibleBackground background;
 
@@ -341,7 +346,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
         }
 
-        private class FadeAccessibleResults : ResultsScreen
+        private partial class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score, true)
@@ -353,7 +358,7 @@ namespace osu.Game.Tests.Visual.Background
             public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
         }
 
-        private class LoadBlockingTestPlayer : TestPlayer
+        private partial class LoadBlockingTestPlayer : TestPlayer
         {
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
@@ -395,7 +400,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestPlayerLoader : PlayerLoader
+        private partial class TestPlayerLoader : PlayerLoader
         {
             private FadeAccessibleBackground background;
 
@@ -414,7 +419,7 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() => background = new FadeAccessibleBackground(Beatmap.Value);
         }
 
-        private class FadeAccessibleBackground : BackgroundScreenBeatmap
+        private partial class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
@@ -434,7 +439,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
+        private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
             public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;

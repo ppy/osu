@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -11,16 +13,18 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
         private readonly float finalScale;
+        private readonly bool forceTransforms;
 
-        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f)
+        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
             this.result = result;
             this.finalScale = finalScale;
+            this.forceTransforms = forceTransforms;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
@@ -41,8 +45,8 @@ namespace osu.Game.Skinning
             this.FadeInFromZero(fade_in_length);
             this.Delay(fade_out_delay).FadeOut(fade_out_length);
 
-            // legacy judgements don't play any transforms if they are an animation.
-            if (animation?.FrameCount > 1)
+            // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
+            if (animation?.FrameCount > 1 && !forceTransforms)
                 return;
 
             switch (result)

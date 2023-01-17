@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,7 +12,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSample : PausableSkinnableSound
+    public partial class DrawableStoryboardSample : PausableSkinnableSound
     {
         /// <summary>
         /// The amount of time allowable beyond the start time of the sample, for the sample to start.

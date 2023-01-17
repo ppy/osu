@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,7 +57,12 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Importer.Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
+            return Task.Run(async () =>
+            {
+                var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
+
+                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

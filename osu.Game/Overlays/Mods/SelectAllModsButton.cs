@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -14,7 +16,7 @@ using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class SelectAllModsButton : ShearedButton, IKeyBindingHandler<PlatformAction>
+    public partial class SelectAllModsButton : ShearedButton, IKeyBindingHandler<PlatformAction>
     {
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>();

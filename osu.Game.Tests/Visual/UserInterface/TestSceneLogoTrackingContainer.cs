@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLogoTrackingContainer : OsuTestScene
+    public partial class TestSceneLogoTrackingContainer : OsuTestScene
     {
         private OsuLogo logo;
         private TestLogoTrackingContainer trackingContainer;
@@ -257,7 +259,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void removeFacade()
         {
-            trackingContainer.Remove(logoFacade);
+            trackingContainer.Remove(logoFacade, false);
             visualBox.Colour = Color4.White;
             moveLogoFacade();
         }
@@ -275,7 +277,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Schedule(moveLogoFacade);
         }
 
-        private class TestLogoTrackingContainer : LogoTrackingContainer
+        private partial class TestLogoTrackingContainer : LogoTrackingContainer
         {
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.

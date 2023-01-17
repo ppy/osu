@@ -15,7 +15,7 @@ namespace osu.Game.Localisation
         public static LocalisableString JoystickGamepad => new TranslatableString(getKey(@"joystick_gamepad"), @"Joystick / Gamepad");
 
         /// <summary>
-        /// "Deadzone Threshold"
+        /// "Deadzone"
         /// </summary>
         public static LocalisableString DeadzoneThreshold => new TranslatableString(getKey(@"deadzone_threshold"), @"Deadzone");
 

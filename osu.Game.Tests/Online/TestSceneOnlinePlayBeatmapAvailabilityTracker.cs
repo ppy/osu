@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -33,7 +34,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
+    public partial class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;
@@ -76,7 +77,7 @@ namespace osu.Game.Tests.Online
                 }
             };
 
-            beatmaps.AllowImport = new TaskCompletionSource<bool>();
+            beatmaps.AllowImport.Reset();
 
             testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
 
@@ -124,13 +125,13 @@ namespace osu.Game.Tests.Online
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
-            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).SetProgress(0.4f));
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.SetProgress(0.4f));
             addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4f));
 
-            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
             AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
@@ -139,7 +140,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsSoftDeleting()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
@@ -153,7 +154,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsChecksum()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
             addAvailabilityCheckStep("initially locally available", BeatmapAvailability.LocallyAvailable);
 
@@ -200,35 +201,37 @@ namespace osu.Game.Tests.Online
 
         private class TestBeatmapManager : BeatmapManager
         {
-            public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
+            public readonly ManualResetEventSlim AllowImport = new ManualResetEventSlim();
 
             public Live<BeatmapSetInfo> CurrentImport { get; private set; }
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources,
                                       GameHost host = null, WorkingBeatmap defaultBeatmap = null)
-                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
+                : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
+            protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm)
             {
-                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue);
+                return new TestBeatmapImporter(this, storage, realm);
             }
 
-            internal class TestBeatmapModelManager : BeatmapModelManager
+            internal class TestBeatmapImporter : BeatmapImporter
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
+                public TestBeatmapImporter(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess)
+                    : base(storage, databaseAccess)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default)
                 {
-                    testBeatmapManager.AllowImport.Task.WaitSafely();
-                    return (testBeatmapManager.CurrentImport = base.Import(item, archive, lowPriority, cancellationToken));
+                    if (!testBeatmapManager.AllowImport.Wait(TimeSpan.FromSeconds(10), cancellationToken))
+                        throw new TimeoutException("Timeout waiting for import to be allowed.");
+
+                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken));
                 }
             }
         }
@@ -244,7 +247,7 @@ namespace osu.Game.Tests.Online
                 => new TestDownloadRequest(set);
         }
 
-        private class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
+        internal class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
             public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);

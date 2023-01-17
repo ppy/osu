@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsResultsScreen : ScreenTestScene
+    public partial class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
@@ -59,6 +61,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore = TestResources.CreateTestScoreInfo();
                 userScore.TotalScore = 0;
                 userScore.Statistics = new Dictionary<HitResult, int>();
+                userScore.MaximumStatistics = new Dictionary<HitResult, int>();
 
                 bindHandler();
 
@@ -185,8 +188,8 @@ namespace osu.Game.Tests.Visual.Playlists
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
             {
-                case ShowPlaylistUserScoreRequest _:
-                case IndexPlaylistScoresRequest _:
+                case ShowPlaylistUserScoreRequest:
+                case IndexPlaylistScoresRequest:
                     break;
 
                 default:
@@ -362,7 +365,7 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistsResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;

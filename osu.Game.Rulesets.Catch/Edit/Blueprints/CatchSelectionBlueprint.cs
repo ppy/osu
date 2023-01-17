@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public abstract class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
+    public abstract partial class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
         where THitObject : CatchHitObject
     {
         protected override bool AlwaysShowWhenSelected => true;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         protected CatchSelectionBlueprint(THitObject hitObject)
             : base(hitObject)

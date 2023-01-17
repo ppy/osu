@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -11,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneStarCounter : OsuTestScene
+    public partial class TestSceneStarCounter : OsuTestScene
     {
         private readonly StarCounter starCounter;
         private readonly OsuSpriteText starsLabel;

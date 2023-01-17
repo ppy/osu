@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,39 +14,38 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
+    public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
 
-        private Action<BeatmapSetInfo> restoreHiddenRequested;
-        private Action<int> viewDetails;
+        private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
+        private Action<int>? viewDetails;
 
-        [Resolved(CanBeNull = true)]
-        private IDialogOverlay dialogOverlay { get; set; }
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
 
-        [CanBeNull]
-        private Container<DrawableCarouselItem> beatmapContainer;
+        private Container<DrawableCarouselItem>? beatmapContainer;
 
-        private BeatmapSetInfo beatmapSet;
+        private BeatmapSetInfo beatmapSet = null!;
 
-        [CanBeNull]
-        private Task beatmapsLoadTask;
+        private Task? beatmapsLoadTask;
 
         [Resolved]
-        private BeatmapManager manager { get; set; }
+        private BeatmapManager manager { get; set; } = null!;
 
         protected override void FreeAfterUse()
         {
@@ -58,8 +56,8 @@ namespace osu.Game.Screens.Select.Carousel
             ClearTransforms();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay beatmapOverlay)
+        [BackgroundDependencyLoader]
+        private void load(BeatmapSetOverlay? beatmapOverlay)
         {
             restoreHiddenRequested = s =>
             {
@@ -75,10 +73,11 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Update();
 
+            Debug.Assert(Item != null);
+
             // position updates should not occur if the item is filtered away.
             // this avoids panels flying across the screen only to be eventually off-screen or faded out.
-            if (!Item.Visible)
-                return;
+            if (!Item.Visible) return;
 
             float targetY = Item.CarouselYPosition;
 
@@ -148,9 +147,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateBeatmapDifficulties()
         {
+            Debug.Assert(Item != null);
+
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
+            var visibleBeatmaps = carouselBeatmapSet.Items.Where(c => c.Visible).ToArray();
 
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()!)
                 };
 
                 beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
@@ -193,10 +194,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
-            bool isSelected = Item.State.Value == CarouselItemState.Selected;
+            bool isSelected = Item?.State.Value == CarouselItemState.Selected;
 
             foreach (var panel in beatmapContainer.Children)
             {
+                Debug.Assert(panel.Item != null);
+
                 if (isSelected)
                 {
                     panel.MoveToY(yPos, 800, Easing.OutQuint);
@@ -215,20 +218,17 @@ namespace osu.Game.Screens.Select.Carousel
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item.State.Value == CarouselItemState.NotSelected)
+                if (Item?.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));
 
-                if (collectionManager != null)
-                {
-                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
-                    if (manageCollectionsDialog != null)
-                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(createCollectionMenuItem).ToList();
+                if (manageCollectionsDialog != null)
+                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
-                }
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapMD5Hashes.Contains(b.MD5Hash));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;
@@ -254,24 +254,29 @@ namespace osu.Game.Screens.Select.Carousel
             else
                 state = TernaryState.False;
 
-            return new TernaryStateToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            var liveCollection = collection.ToLive(realm);
+
+            return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                foreach (var b in beatmapSet.Beatmaps)
+                liveCollection.PerformWrite(c =>
                 {
-                    switch (s)
+                    foreach (var b in beatmapSet.Beatmaps)
                     {
-                        case TernaryState.True:
-                            if (collection.Beatmaps.Contains(b))
-                                continue;
+                        switch (s)
+                        {
+                            case TernaryState.True:
+                                if (c.BeatmapMD5Hashes.Contains(b.MD5Hash))
+                                    continue;
 
-                            collection.Beatmaps.Add(b);
-                            break;
+                                c.BeatmapMD5Hashes.Add(b.MD5Hash);
+                                break;
 
-                        case TernaryState.False:
-                            collection.Beatmaps.Remove(b);
-                            break;
+                            case TernaryState.False:
+                                c.BeatmapMD5Hashes.Remove(b.MD5Hash);
+                                break;
+                        }
                     }
-                }
+                });
             })
             {
                 State = { Value = state }

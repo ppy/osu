@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Scoring
@@ -117,10 +119,24 @@ namespace osu.Game.Rulesets.Scoring
         [EnumMember(Value = "ignore_hit")]
         [Order(12)]
         IgnoreHit,
+
+        /// <summary>
+        /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
+        /// </summary>
+        /// <remarks>
+        /// DO NOT USE.
+        /// </remarks>
+        [EnumMember(Value = "legacy_combo_increase")]
+        [Order(99)]
+        [Obsolete("Do not use.")]
+        LegacyComboIncrease = 99
     }
 
+#pragma warning disable CS0618
     public static class HitResultExtensions
     {
+        private static readonly IList<HitResult> order = EnumExtensions.GetValuesInOrder<HitResult>().ToList();
+
         /// <summary>
         /// Whether a <see cref="HitResult"/> increases the combo.
         /// </summary>
@@ -148,6 +164,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.Perfect:
                 case HitResult.LargeTickHit:
                 case HitResult.LargeTickMiss:
+                case HitResult.LegacyComboIncrease:
                     return true;
 
                 default:
@@ -159,13 +176,25 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether a <see cref="HitResult"/> affects the accuracy portion of the score.
         /// </summary>
         public static bool AffectsAccuracy(this HitResult result)
-            => IsScorable(result) && !IsBonus(result);
+        {
+            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
+            if (result == HitResult.LegacyComboIncrease)
+                return false;
+
+            return IsScorable(result) && !IsBonus(result);
+        }
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> is a non-tick and non-bonus result.
         /// </summary>
         public static bool IsBasic(this HitResult result)
-            => IsScorable(result) && !IsTick(result) && !IsBonus(result);
+        {
+            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
+            if (result == HitResult.LegacyComboIncrease)
+                return false;
+
+            return IsScorable(result) && !IsTick(result) && !IsBonus(result);
+        }
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> should be counted as a tick.
@@ -223,12 +252,19 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> is scorable.
         /// </summary>
-        public static bool IsScorable(this HitResult result) => result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+        public static bool IsScorable(this HitResult result)
+        {
+            // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
+            if (result == HitResult.LegacyComboIncrease)
+                return true;
+
+            return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+        }
 
         /// <summary>
         /// An array of all scorable <see cref="HitResult"/>s.
         /// </summary>
-        public static readonly HitResult[] ALL_TYPES = ((HitResult[])Enum.GetValues(typeof(HitResult))).ToArray();
+        public static readonly HitResult[] ALL_TYPES = Enum.GetValues<HitResult>().Except(new[] { HitResult.LegacyComboIncrease }).ToArray();
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> is valid within a given <see cref="HitResult"/> range.
@@ -248,5 +284,13 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(minResult <= maxResult);
             return result > minResult && result < maxResult;
         }
+
+        /// <summary>
+        /// Ordered index of a <see cref="HitResult"/>. Used for consistent order when displaying hit results to the user.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to get the index of.</param>
+        /// <returns>The index of <paramref name="result"/>.</returns>
+        public static int GetIndexForOrderedDisplay(this HitResult result) => order.IndexOf(result);
     }
+#pragma warning restore CS0618
 }

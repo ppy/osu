@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterDisplay : Container<KeyCounter>
+    public partial class KeyCounterDisplay : Container<KeyCounter>
     {
         private const int duration = 100;
         private const double key_fade_time = 80;
@@ -37,6 +39,7 @@ namespace osu.Game.Screens.Play
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
+                Alpha = 0,
             };
         }
 
@@ -51,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         public override void Add(KeyCounter key)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             base.Add(key);
             key.IsCounting = IsCounting;
@@ -138,7 +141,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public class Receptor : Drawable
+        public partial class Receptor : Drawable
         {
             protected readonly KeyCounterDisplay Target;
 
@@ -155,10 +158,10 @@ namespace osu.Game.Screens.Play
             {
                 switch (e)
                 {
-                    case KeyDownEvent _:
-                    case KeyUpEvent _:
-                    case MouseDownEvent _:
-                    case MouseUpEvent _:
+                    case KeyDownEvent:
+                    case KeyUpEvent:
+                    case MouseDownEvent:
+                    case MouseUpEvent:
                         return Target.Children.Any(c => c.TriggerEvent(e));
                 }
 

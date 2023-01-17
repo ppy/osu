@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu
         SliderBall,
         SliderBody,
         SpinnerBody,
+        CursorSmoke,
         ApproachCircle,
     }
 }

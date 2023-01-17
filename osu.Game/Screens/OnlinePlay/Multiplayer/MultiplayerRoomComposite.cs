@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Online.Multiplayer;
@@ -8,7 +10,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public abstract class MultiplayerRoomComposite : OnlinePlayComposite
+    public abstract partial class MultiplayerRoomComposite : OnlinePlayComposite
     {
         [CanBeNull]
         protected MultiplayerRoom Room => Client.Room;
@@ -108,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (Client != null)
             {
                 Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.LoadRequested -= invokeOnRoomLoadRequested;
                 Client.UserLeft -= invokeUserLeft;
                 Client.UserKicked -= invokeUserKicked;
                 Client.UserJoined -= invokeUserJoined;

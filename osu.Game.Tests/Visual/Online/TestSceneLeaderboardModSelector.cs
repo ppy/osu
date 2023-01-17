@@ -20,14 +20,14 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneLeaderboardModSelector : OsuTestScene
+    public partial class TestSceneLeaderboardModSelector : OsuTestScene
     {
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
             FillFlowContainer<SpriteText> selectedMods;
 
-            var ruleset = new Bindable<IRulesetInfo>();
+            var ruleset = new Bindable<IRulesetInfo?>();
 
             Add(selectedMods = new FillFlowContainer<SpriteText>
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 if (selected.Text == mod.Acronym)
                                 {
-                                    selectedMods.Remove(selected);
+                                    selectedMods.Remove(selected, true);
                                     break;
                                 }
                             }
