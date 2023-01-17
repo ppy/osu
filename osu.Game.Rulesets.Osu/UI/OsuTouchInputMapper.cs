@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
-            var tracked = trackedTouches.First(t => t.Source == e.Touch.Source);
+            var tracked = trackedTouches.Single(t => t.Source == e.Touch.Source);
 
             if (tracked.Action is OsuAction action)
                 osuInputManager.KeyBindingContainer.TriggerReleased(action);
