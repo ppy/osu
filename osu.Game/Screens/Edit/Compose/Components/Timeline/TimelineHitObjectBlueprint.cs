@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [Resolved]
             private Timeline timeline { get; set; } = null!;
 
-            [Resolved(CanBeNull = true)]
+            [Resolved]
             private IEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;

@@ -36,18 +36,9 @@ namespace osu.Game.Overlays.Profile
             // todo: pending implementation.
             // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
-            TabControlContainer.Add(new ProfileRulesetSelector
-            {
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                User = { BindTarget = User }
-            });
-
             // Haphazardly guaranteed by OverlayHeader constructor (see CreateBackground / CreateContent).
             Debug.Assert(centreHeaderContainer != null);
             Debug.Assert(detailHeaderContainer != null);
-
-            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
         protected override Drawable CreateBackground() =>
@@ -82,7 +73,7 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
-                centreHeaderContainer = new CentreHeaderContainer
+                new MedalHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -92,7 +83,7 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
-                new MedalHeaderContainer
+                centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -106,6 +97,11 @@ namespace osu.Game.Overlays.Profile
         };
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
+
+        protected override Drawable CreateTabControlContent() => new ProfileRulesetSelector
+        {
+            User = { BindTarget = User }
+        };
 
         private void updateDisplay(UserProfileData? user) => coverContainer.User = user?.User;
 

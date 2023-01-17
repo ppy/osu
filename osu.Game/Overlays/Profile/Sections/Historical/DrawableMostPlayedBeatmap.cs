@@ -112,8 +112,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                IdleColour = colourProvider.Background4;
-                HoverColour = colourProvider.Background3;
+                IdleColour = colourProvider.Background3;
+                HoverColour = colourProvider.Background2;
             }
         }
 

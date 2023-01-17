@@ -16,7 +16,9 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -926,10 +928,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // 10 sets that go osu! -> taiko -> catch -> osu! -> ...
             for (int i = 0; i < 10; i++)
-            {
-                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 3);
-                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { rulesetInfo }));
-            }
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { getRuleset(i) }));
 
             // Sort mode is important to keep the ruleset order
             loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
@@ -937,12 +936,28 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 1; i < 10; i++)
             {
-                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 3);
+                var rulesetInfo = getRuleset(i % 3);
+
                 AddStep($"Set ruleset to {rulesetInfo.ShortName}", () =>
                 {
                     carousel.Filter(new FilterCriteria { Ruleset = rulesetInfo, Sort = SortMode.Title }, false);
                 });
                 waitForSelection(i + 1, 1);
+            }
+
+            static RulesetInfo getRuleset(int index)
+            {
+                switch (index % 3)
+                {
+                    default:
+                        return new OsuRuleset().RulesetInfo;
+
+                    case 1:
+                        return new TaikoRuleset().RulesetInfo;
+
+                    case 2:
+                        return new CatchRuleset().RulesetInfo;
+                }
             }
         }
 
@@ -953,10 +968,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // 10 sets that go taiko, osu!, osu!, osu!, taiko, osu!, osu!, osu!, ...
             for (int i = 0; i < 10; i++)
-            {
-                var rulesetInfo = rulesets.AvailableRulesets.ElementAt(i % 4 == 0 ? 1 : 0);
-                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { rulesetInfo }));
-            }
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { getRuleset(i) }));
 
             // Sort mode is important to keep the ruleset order
             loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
@@ -973,6 +985,18 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false);
                 });
+            }
+
+            static RulesetInfo getRuleset(int index)
+            {
+                switch (index % 4)
+                {
+                    case 0:
+                        return new TaikoRuleset().RulesetInfo;
+
+                    default:
+                        return new OsuRuleset().RulesetInfo;
+                }
             }
         }
 
