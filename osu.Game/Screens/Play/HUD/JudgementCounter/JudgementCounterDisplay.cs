@@ -76,8 +76,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         private void updateMode()
         {
-            foreach (var counter in CounterFlow.Children.Where(counter => !counter.Result.Type.IsBasic()))
+            foreach (var counter in CounterFlow.Children)
             {
+                if (counter.Result.Type.IsBasic())
+                {
+                    counter.Show();
+                    continue;
+                }
+
                 switch (Mode.Value)
                 {
                     case DisplayMode.Simple:
@@ -116,7 +122,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         private JudgementCounter createCounter(JudgementTally.JudgementCount info) =>
             new JudgementCounter(info)
             {
-                State = { Value = Visibility.Visible },
+                State = { Value = Visibility.Hidden },
                 ShowName = { BindTarget = ShowJudgementNames }
             };
 
