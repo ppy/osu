@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
             osuInputManager = inputManager;
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
