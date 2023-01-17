@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModIncognito : Mod
     {
         public override string Name => "Incognito";
-        public override LocalisableString Description => "Obscure some gameplay visual elements.";
+        public override LocalisableString Description => "Obscure some gameplay elements.";
         public override double ScoreMultiplier => 1;
         public override string Acronym => "IC";
         public override IconUsage? Icon => FontAwesome.Solid.UserSecret;

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModIncognito : ModIncognito, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject
     {
-        [SettingSource("Disable follow points", "No more hints for where to follow...")]
+        [SettingSource("Disable follow points", "The lines... where are they?")]
         public BindableBool DisableFollowPoints { get; } = new BindableBool();
 
         [SettingSource("No combo colours", "The combo colours won't tell you anything now...")]
