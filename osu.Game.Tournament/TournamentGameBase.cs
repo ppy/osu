@@ -165,9 +165,21 @@ namespace osu.Game.Tournament
                 addedInfo |= addSeedingBeatmaps();
 
                 if (addedInfo)
-                    SaveChanges();
+                    saveChanges();
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+
+                ladder.Ruleset.BindValueChanged(r =>
+                {
+                    // Refetch player rank data on next startup as the ruleset has changed.
+                    foreach (var team in ladder.Teams)
+                    {
+                        foreach (var player in team.Players)
+                            player.Rank = null;
+                    }
+
+                    SaveChanges();
+                });
             }
             catch (Exception e)
             {
@@ -315,6 +327,11 @@ namespace osu.Game.Tournament
                 return;
             }
 
+            saveChanges();
+        }
+
+        private void saveChanges()
+        {
             foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
