@@ -94,8 +94,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestChangeFlowDirection()
         {
-            AddStep("Set direction vertical", () => counterDisplay.FlowDirection.Value = JudgementCounterDisplay.Flow.Vertical);
-            AddStep("Set direction horizontal", () => counterDisplay.FlowDirection.Value = JudgementCounterDisplay.Flow.Horizontal);
+            AddStep("Set direction vertical", () => counterDisplay.FlowDirection.Value = Direction.Vertical);
+            AddStep("Set direction horizontal", () => counterDisplay.FlowDirection.Value = Direction.Horizontal);
         }
 
         [Test]
