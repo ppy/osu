@@ -34,13 +34,13 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private JudgementTally tally { get; set; } = null!;
 
-        protected FillFlowContainer JudgementContainer = null!;
+        protected FillFlowContainer<JudgementCounter> JudgementContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = JudgementContainer = new FillFlowContainer
+            InternalChild = JudgementContainer = new FillFlowContainer<JudgementCounter>
             {
                 Direction = getFillDirection(FlowDirection.Value),
                 Spacing = new Vector2(10),
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 JudgementContainer.Direction = getFillDirection(direction.NewValue);
 
                 //Can't pass directly due to Enum conversion
-                foreach (var counter in JudgementContainer.Children.OfType<JudgementCounter>())
+                foreach (var counter in JudgementContainer.Children)
                     counter.Direction.Value = getFillDirection(direction.NewValue);
             }, true);
             Mode.BindValueChanged(_ => updateMode(), true);
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         private void updateMode()
         {
-            foreach (var counter in JudgementContainer.Children.OfType<JudgementCounter>().Where(counter => !counter.Result.Type.IsBasic()))
+            foreach (var counter in JudgementContainer.Children.Where(counter => !counter.Result.Type.IsBasic()))
             {
                 switch (Mode.Value)
                 {
@@ -110,15 +110,12 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
-        private JudgementCounter createCounter(JudgementTally.JudgementCount info)
-        {
-            JudgementCounter counter = new JudgementCounter(info)
+        private JudgementCounter createCounter(JudgementTally.JudgementCount info) =>
+            new JudgementCounter(info)
             {
                 State = { Value = Visibility.Visible },
                 ShowName = { BindTarget = ShowJudgementNames }
             };
-            return counter;
-        }
 
         public enum DisplayMode
         {
