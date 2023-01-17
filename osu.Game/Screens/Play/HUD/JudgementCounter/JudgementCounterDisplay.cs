@@ -57,13 +57,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
             FlowDirection.BindValueChanged(direction =>
             {
-                CounterFlow.Direction = getFillDirection(direction.NewValue);
+                var convertedDirection = getFillDirection(direction.NewValue);
 
-                //Can't pass directly due to Enum conversion
+                CounterFlow.Direction = convertedDirection;
+
                 foreach (var counter in CounterFlow.Children)
-                    counter.Direction.Value = getFillDirection(direction.NewValue);
+                    counter.Direction.Value = convertedDirection;
             }, true);
+
             Mode.BindValueChanged(_ => updateMode(), true);
+
             ShowMaxJudgement.BindValueChanged(value =>
             {
                 var firstChild = CounterFlow.Children.FirstOrDefault();
