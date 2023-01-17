@@ -178,6 +178,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
+
+            SetDefault(OsuSetting.TrackTimingPoint, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -375,5 +377,6 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        TrackTimingPoint,
     }
 }

@@ -176,6 +176,7 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
+        private Bindable<bool> trackTimingPoint;
 
         public Editor(EditorLoader loader = null)
         {
@@ -263,6 +264,7 @@ namespace osu.Game.Screens.Edit
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
+            trackTimingPoint = config.GetBindable<bool>(OsuSetting.TrackTimingPoint);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -327,7 +329,11 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = new MenuItem[]
                                         {
-                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime)
+                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
+                                            new ToggleMenuItem(EditorStrings.TrackTimingPoint)
+                                            {
+                                                State = { BindTarget = trackTimingPoint },
+                                            }
                                         }
                                     }
                                 }

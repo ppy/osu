@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -67,9 +68,13 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private IEditorChangeHandler? changeHandler { get; set; }
 
+            private Bindable<bool> trackTimingPoint = null!;
+
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colours)
+            private void load(OverlayColourProvider colours, OsuConfigManager config)
             {
+                trackTimingPoint = config.GetBindable<bool>(OsuSetting.TrackTimingPoint);
+
                 RelativeSizeAxes = Axes.Both;
 
                 const float margins = 10;
@@ -170,6 +175,9 @@ namespace osu.Game.Screens.Edit.Timing
             /// </summary>
             private void trackActivePoint()
             {
+                if (!trackTimingPoint.Value)
+                    return;
+
                 // For simplicity only match on the first type of the active control point.
                 if (selectedGroup.Value == null)
                     trackedType = null;

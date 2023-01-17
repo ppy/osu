@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Track timing point in Timing screen"
+        /// </summary>
+        public static LocalisableString TrackTimingPoint => new TranslatableString(getKey(@"track_timing_point"), @"Track timing point in Timing screen");
+
+        /// <summary>
         /// "Export package"
         /// </summary>
         public static LocalisableString ExportPackage => new TranslatableString(getKey(@"export_package"), @"Export package");

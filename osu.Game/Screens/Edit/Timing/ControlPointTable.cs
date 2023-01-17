@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -26,7 +27,15 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorClock clock { get; set; } = null!;
 
+        private Bindable<bool> trackTimingPoint = null!;
+
         public const float TIMING_COLUMN_WIDTH = 230;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            trackTimingPoint = config.GetBindable<bool>(OsuSetting.TrackTimingPoint);
+        }
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
@@ -44,8 +53,13 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         Action = () =>
                         {
+                            var previousGroup = selectedGroup.Value;
+
                             selectedGroup.Value = group;
-                            clock.SeekSmoothlyTo(group.Time);
+
+                            // previousGroup may null.
+                            if (trackTimingPoint.Value || (previousGroup != null && selectedGroup.Value.Equals(previousGroup)))
+                                clock.SeekSmoothlyTo(group.Time);
                         }
                     });
                 }
