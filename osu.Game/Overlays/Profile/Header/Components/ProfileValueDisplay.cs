@@ -1,19 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class OverlinedInfoContainer : CompositeDrawable
+    public partial class ProfileValueDisplay : CompositeDrawable
     {
-        private readonly Circle line;
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
 
@@ -27,12 +25,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             set => content.Text = value;
         }
 
-        public Color4 LineColour
-        {
-            set => line.Colour = value;
-        }
-
-        public OverlinedInfoContainer(bool big = false, int minimumWidth = 60)
+        public ProfileValueDisplay(bool big = false, int minimumWidth = 60)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
@@ -41,19 +34,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    line = new Circle
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 2,
-                        Margin = new MarginPadding { Bottom = 2 }
-                    },
                     title = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(size: 12)
                     },
                     content = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
+                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: FontWeight.Light)
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {
@@ -61,6 +48,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            title.Colour = colourProvider.Content1;
+            content.Colour = colourProvider.Content2;
         }
     }
 }
