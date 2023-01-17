@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Osu
         /// </remarks>
         public bool AllowGameplayInputs
         {
+            get => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs;
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 

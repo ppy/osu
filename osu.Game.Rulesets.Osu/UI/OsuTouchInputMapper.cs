@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 : OsuAction.LeftButton;
 
             // Ignore any taps which trigger an action which is already handled. But track them for potential positional input in the future.
-            bool shouldResultInAction = !mouseDisabled.Value && trackedTouches.All(t => t.Action != action);
+            bool shouldResultInAction = osuInputManager.AllowGameplayInputs && !mouseDisabled.Value && trackedTouches.All(t => t.Action != action);
 
             trackedTouches.Add(new TrackedTouch(e.Touch.Source, shouldResultInAction ? action : null));
 
@@ -68,6 +68,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             // Movement should only be tracked for the most recent touch.
             if (touchEvent.Touch.Source != trackedTouches.Last().Source)
+                return;
+
+            if (!osuInputManager.AllowUserCursorMovement)
                 return;
 
             new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
