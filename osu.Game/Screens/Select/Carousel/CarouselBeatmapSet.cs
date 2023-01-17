@@ -61,50 +61,79 @@ namespace osu.Game.Screens.Select.Carousel
             if (!(other is CarouselBeatmapSet otherSet))
                 return base.CompareTo(criteria, other);
 
+            int comparison = 0;
+
             switch (criteria.Sort)
             {
                 default:
                 case SortMode.Artist:
-                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+                    break;
 
                 case SortMode.Title:
-                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+                    break;
 
                 case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    break;
 
                 case SortMode.Source:
-                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+                    break;
 
                 case SortMode.DateAdded:
-                    return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+                    comparison = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+                    break;
 
                 case SortMode.DateRanked:
                     // Beatmaps which have no ranked date should already be filtered away in this mode.
                     if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
-                        return 0;
+                        break;
 
-                    return otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+                    comparison = otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+                    break;
 
                 case SortMode.LastPlayed:
-                    return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    comparison = -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    break;
 
                 case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
+                    comparison = compareUsingAggregateMax(otherSet, b => b.BPM);
+                    break;
 
                 case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
+                    comparison = compareUsingAggregateMax(otherSet, b => b.Length);
+                    break;
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    comparison = compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    break;
 
                 case SortMode.DateSubmitted:
                     // Beatmaps which have no submitted date should already be filtered away in this mode.
                     if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
-                        return 0;
+                        break;
 
-                    return otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
+                    comparison = otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
+                    break;
             }
+
+            if (comparison != 0) return comparison;
+
+            // If the initial sort could not differentiate, attempt to use DateAdded and OnlineID to order sets in a stable fashion.
+            // This directionality is a touch arbitrary as while DateAdded puts newer beatmaps first, the OnlineID fallback puts lower IDs first.
+            // Can potentially be changed in the future if users actually notice / have preference, but keeping it this way matches historical tests.
+
+            comparison = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+            if (comparison != 0) return comparison;
+
+            comparison = BeatmapSet.OnlineID.CompareTo(otherSet.BeatmapSet.OnlineID);
+            if (comparison != 0) return comparison;
+
+            // If no online ID is available, fallback to our internal GUID for stability.
+            // This basically means it's a stable random sort.
+            return otherSet.BeatmapSet.ID.CompareTo(BeatmapSet.ID);
         }
 
         /// <summary>
