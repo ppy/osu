@@ -34,6 +34,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSingleItemExpiredAfterGameplay()
+        {
+            RunGameplay();
+
+            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
+            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest]
+        /*
+         * TearDown : System.TimeoutException : "wait for ongoing operation to complete" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestItemAddedToTheEndOfQueue()
         {
             addItem(() => OtherBeatmap);
@@ -46,16 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSingleItemExpiredAfterGameplay()
-        {
-            RunGameplay();
-
-            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
-            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
-            AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
+        [FlakyTest] // See above
         public void TestNextItemSelectedAfterGameplayFinish()
         {
             addItem(() => OtherBeatmap);
@@ -73,6 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestItemsNotClearedWhenSwitchToHostOnlyMode()
         {
             addItem(() => OtherBeatmap);
@@ -88,6 +98,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectItemSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap);
@@ -95,6 +106,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectRulesetSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap, new CatchRuleset().RulesetInfo);
@@ -112,6 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestCorrectModsSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap, mods: new Mod[] { new OsuModDoubleTime() });
