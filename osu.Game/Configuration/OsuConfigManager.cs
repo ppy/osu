@@ -275,7 +275,7 @@ namespace osu.Game.Configuration
                 ),
                 new TrackedSetting<float>(OsuSetting.KiaiFlashIntensity, strength => new SettingDescription(
                         rawValue: strength,
-                        name: GraphicsSettingsStrings.KiaiFlash,
+                        name: GraphicsSettingsStrings.KiaiFlashIntensity,
                         value: $"{strength * 100:N0}%"
                     )
                 ),

@@ -33,6 +33,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = GraphicsSettingsStrings.KiaiFlashIntensity,
+                    TransferValueOnCommit = true,
+                    Current = config.GetBindable<float>(OsuSetting.KiaiFlashIntensity),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                    Keywords = new[] { @"glow", @"highlight" },
+                }
             };
         }
     }
