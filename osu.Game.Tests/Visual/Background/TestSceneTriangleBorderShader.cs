@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Rendering;
 
 namespace osu.Game.Tests.Visual.Background
 {
-    public class TestSceneTriangleBorderShader : OsuTestScene
+    public partial class TestSceneTriangleBorderShader : OsuTestScene
     {
         private readonly TriangleBorder border;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Background
             AddSliderStep("Thickness", 0f, 1f, 0.02f, t => border.Thickness = t);
         }
 
-        private class TriangleBorder : Sprite
+        private partial class TriangleBorder : Sprite
         {
             private float thickness = 0.02f;
 

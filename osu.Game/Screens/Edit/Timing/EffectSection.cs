@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,12 +11,12 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class EffectSection : Section<EffectControlPoint>
+    internal partial class EffectSection : Section<EffectControlPoint>
     {
-        private LabelledSwitchButton kiai;
-        private LabelledSwitchButton omitBarLine;
+        private LabelledSwitchButton kiai = null!;
+        private LabelledSwitchButton omitBarLine = null!;
 
-        private SliderWithTextBoxInput<double> scrollSpeedSlider;
+        private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -55,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private bool isRebinding;
 
-        protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint> point)
+        protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint?> point)
         {
             if (point.NewValue != null)
             {

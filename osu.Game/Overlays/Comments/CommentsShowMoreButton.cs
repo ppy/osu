@@ -11,7 +11,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsShowMoreButton : ShowMoreButton
+    public partial class CommentsShowMoreButton : ShowMoreButton
     {
         public readonly BindableInt Current = new BindableInt();
 

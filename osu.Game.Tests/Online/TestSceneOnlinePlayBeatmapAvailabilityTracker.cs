@@ -34,7 +34,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
+    public partial class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;
@@ -226,12 +226,12 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default)
                 {
                     if (!testBeatmapManager.AllowImport.Wait(TimeSpan.FromSeconds(10), cancellationToken))
                         throw new TimeoutException("Timeout waiting for import to be allowed.");
 
-                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, batchImport, cancellationToken));
+                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken));
                 }
             }
         }

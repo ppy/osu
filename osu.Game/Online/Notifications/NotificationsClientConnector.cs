@@ -27,7 +27,7 @@ namespace osu.Game.Online.Notifications
 
         protected sealed override async Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
         {
-            var client = await BuildNotificationClientAsync(cancellationToken);
+            var client = await BuildNotificationClientAsync(cancellationToken).ConfigureAwait(false);
 
             client.ChannelJoined = c => ChannelJoined?.Invoke(c);
             client.ChannelParted = c => ChannelParted?.Invoke(c);

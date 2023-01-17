@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class HealthProcessor : JudgementProcessor
+    public abstract partial class HealthProcessor : JudgementProcessor
     {
         /// <summary>
         /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 foreach (var condition in FailConditions.GetInvocationList())
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result });
+                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
                     if (conditionResult)
                         return true;
                 }

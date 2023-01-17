@@ -20,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
+    public abstract partial class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         protected TestOsuGame Game;
 
@@ -114,7 +115,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
 
-        public class TestOsuGame : OsuGame
+        public partial class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
@@ -147,6 +148,8 @@ namespace osu.Game.Tests.Visual
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
             public override Version AssemblyVersion => new Version(0, 0);
@@ -189,11 +192,11 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class TestLoader : Loader
+        public partial class TestLoader : Loader
         {
             protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler();
 
-            private class TestShaderPrecompiler : ShaderPrecompiler
+            private partial class TestShaderPrecompiler : ShaderPrecompiler
             {
                 protected override bool AllLoaded => true;
             }

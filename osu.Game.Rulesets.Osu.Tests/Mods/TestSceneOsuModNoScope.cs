@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModNoScope : OsuModTestScene
+    public partial class TestSceneOsuModNoScope : OsuModTestScene
     {
         [Test]
         public void TestVisibleDuringBreak()

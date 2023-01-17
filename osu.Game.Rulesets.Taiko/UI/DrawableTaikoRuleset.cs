@@ -27,11 +27,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
+    public partial class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
+        public readonly BindableBool LockPlayfieldMaxAspect = new BindableBool(true);
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect }
+            LockPlayfieldMaxAspect = { BindTarget = LockPlayfieldMaxAspect }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);

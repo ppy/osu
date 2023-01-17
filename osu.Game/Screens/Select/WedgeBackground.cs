@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
-    public class WedgeBackground : Container
+    public partial class WedgeBackground : Container
     {
         public WedgeBackground()
         {

@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +11,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
+    public abstract partial class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
@@ -42,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRotation => ScalingContainer.Rotation;
 
-        protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
+        protected DrawablePalpableCatchHitObject(CatchHitObject? h)
             : base(h)
         {
             Origin = Anchor.Centre;

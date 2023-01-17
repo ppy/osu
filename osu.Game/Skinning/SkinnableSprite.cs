@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skinnable element which uses a single texture backing.
     /// </summary>
-    public class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
+    public partial class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class SpriteSelectorControl : SettingsDropdown<string>
+        public partial class SpriteSelectorControl : SettingsDropdown<string>
         {
             protected override void LoadComplete()
             {
@@ -111,13 +111,14 @@ namespace osu.Game.Skinning
                 // Temporarily used to exclude undesirable ISkin implementations
                 static bool isUserSkin(ISkin skin)
                     => skin.GetType() == typeof(TrianglesSkin)
+                       || skin.GetType() == typeof(ArgonProSkin)
                        || skin.GetType() == typeof(ArgonSkin)
                        || skin.GetType() == typeof(DefaultLegacySkin)
                        || skin.GetType() == typeof(LegacySkin);
             }
         }
 
-        public class SpriteNotFound : CompositeDrawable
+        public partial class SpriteNotFound : CompositeDrawable
         {
             public SpriteNotFound(string lookup)
             {

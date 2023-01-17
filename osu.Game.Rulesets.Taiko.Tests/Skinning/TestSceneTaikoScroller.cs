@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
-    public class TestSceneTaikoScroller : TaikoSkinnableTestScene
+    public partial class TestSceneTaikoScroller : TaikoSkinnableTestScene
     {
         private readonly ManualClock clock = new ManualClock();
 

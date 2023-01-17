@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class ExplodePiece : Container
+    public partial class ExplodePiece : Container
     {
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;

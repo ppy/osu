@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class BeatmapSettings : SettingsSubsection
+    public partial class BeatmapSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.BeatmapHeader;
 
@@ -32,11 +32,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "combo", "override" },
                     LabelText = SkinSettingsStrings.BeatmapColours,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "samples", "override" },
                     LabelText = SkinSettingsStrings.BeatmapHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },

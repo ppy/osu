@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectColumn : CompositeDrawable, IHasAccentColour
+    public abstract partial class ModSelectColumn : CompositeDrawable, IHasAccentColour
     {
         public readonly Container TopLevelContent;
 

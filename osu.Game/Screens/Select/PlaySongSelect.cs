@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -20,11 +21,11 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : SongSelect
+    public partial class PlaySongSelect : SongSelect
     {
         private OsuScreen? playerLoader;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        Text = NotificationsStrings.NoAutoplayMod
                     });
                     return false;
                 }

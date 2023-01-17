@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// Display a beatmap background from a local source, but fallback to online source if not available.
     /// </summary>
-    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<IBeatmapInfo>
+    public partial class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<IBeatmapInfo>
     {
         public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 

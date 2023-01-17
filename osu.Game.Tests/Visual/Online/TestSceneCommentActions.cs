@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCommentActions : OsuManualInputManagerTestScene
+    public partial class TestSceneCommentActions : OsuManualInputManagerTestScene
     {
         private Container<Drawable> content = null!;
         protected override Container<Drawable> Content => content;
@@ -77,14 +77,14 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
                 var ourComment = comments.SingleOrDefault(x => x.Comment.Id == 1);
-                return ourComment != null && ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "Delete");
+                return ourComment != null && ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "delete");
             });
 
             AddAssert("Second doesn't", () =>
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
                 var ourComment = comments.Single(x => x.Comment.Id == 2);
-                return ourComment.ChildrenOfType<OsuSpriteText>().All(x => x.Text != "Delete");
+                return ourComment.ChildrenOfType<OsuSpriteText>().All(x => x.Text != "delete");
             });
         }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("It has delete button", () =>
             {
-                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Delete");
+                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "delete");
                 InputManager.MoveMouseTo(btn);
             });
             AddStep("Click delete button", () =>
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("It has delete button", () =>
             {
-                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Delete");
+                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "delete");
                 InputManager.MoveMouseTo(btn);
             });
             AddStep("Click delete button", () =>
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (request is not CommentDeleteRequest req)
                         return false;
 
-                    req.TriggerFailure(new Exception());
+                    req.TriggerFailure(new InvalidOperationException());
                     delete = true;
                     return false;
                 };
@@ -245,7 +245,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Click the button", () =>
             {
-                var btn = targetComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Report");
+                var btn = targetComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "report");
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });

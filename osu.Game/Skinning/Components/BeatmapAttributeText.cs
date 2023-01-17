@@ -24,7 +24,7 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public class BeatmapAttributeText : Container, ISkinnableDrawable
+    public partial class BeatmapAttributeText : Container, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Skinning.Components
                                             .Cast<object?>()
                                             .ToArray();
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
                 numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }

@@ -19,7 +19,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
         public const float HEIGHT = 15;
 
@@ -114,8 +114,7 @@ namespace osu.Game.Graphics.UserInterface
             get => current;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                ArgumentNullException.ThrowIfNull(value);
 
                 current.UnbindBindings();
                 current.BindTo(value);

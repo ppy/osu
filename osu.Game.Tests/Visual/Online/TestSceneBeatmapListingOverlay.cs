@@ -25,7 +25,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
 
@@ -78,6 +78,15 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddStep("reset size", () => localConfig.SetValue(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal));
+        }
+
+        [Test]
+        public void TestFeaturedArtistFilter()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("featured artist filter is on", () => overlay.ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+            AddStep("toggle featured artist filter", () => overlay.ChildrenOfType<FilterTabItem<SearchGeneral>>().First(i => i.Value == SearchGeneral.FeaturedArtists).TriggerClick());
+            AddAssert("featured artist filter is off", () => !overlay.ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
         }
 
         [Test]

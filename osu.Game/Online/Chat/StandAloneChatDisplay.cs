@@ -23,7 +23,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Display a chat channel in an insolated region.
     /// </summary>
-    public class StandAloneChatDisplay : CompositeDrawable
+    public partial class StandAloneChatDisplay : CompositeDrawable
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
@@ -111,7 +111,12 @@ namespace osu.Game.Online.Chat
         {
             drawableChannel?.Expire();
 
+            if (e.OldValue != null)
+                TextBox?.Current.UnbindFrom(e.OldValue.TextBoxMessage);
+
             if (e.NewValue == null) return;
+
+            TextBox?.Current.BindTo(e.NewValue.TextBoxMessage);
 
             drawableChannel = CreateDrawableChannel(e.NewValue);
             drawableChannel.CreateChatLineAction = CreateMessage;
@@ -120,7 +125,7 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : HistoryTextBox
+        public partial class ChatTextBox : HistoryTextBox
         {
             protected override bool OnKeyDown(KeyDownEvent e)
             {
@@ -156,7 +161,7 @@ namespace osu.Game.Online.Chat
             public Action FocusLost;
         }
 
-        public class StandAloneDrawableChannel : DrawableChannel
+        public partial class StandAloneDrawableChannel : DrawableChannel
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 
@@ -170,7 +175,7 @@ namespace osu.Game.Online.Chat
             protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
         }
 
-        protected class StandAloneDaySeparator : DaySeparator
+        protected partial class StandAloneDaySeparator : DaySeparator
         {
             protected override float TextSize => 14;
             protected override float LineHeight => 1;
@@ -190,9 +195,9 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        protected class StandAloneMessage : ChatLine
+        protected partial class StandAloneMessage : ChatLine
         {
-            protected override float TextSize => 15;
+            protected override float FontSize => 15;
             protected override float Spacing => 5;
             protected override float UsernameWidth => 75;
 

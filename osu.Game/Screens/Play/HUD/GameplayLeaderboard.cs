@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class GameplayLeaderboard : CompositeDrawable
+    public abstract partial class GameplayLeaderboard : CompositeDrawable
     {
         private readonly Cached sorting = new Cached();
 
@@ -171,15 +171,15 @@ namespace osu.Game.Screens.Play.HUD
             for (int i = 0; i < Flow.Count; i++)
             {
                 Flow.SetLayoutPosition(orderedByScore[i], i);
-                orderedByScore[i].ScorePosition = CheckValidScorePosition(i + 1) ? i + 1 : null;
+                orderedByScore[i].ScorePosition = CheckValidScorePosition(orderedByScore[i], i + 1) ? i + 1 : null;
             }
 
             sorting.Validate();
         }
 
-        protected virtual bool CheckValidScorePosition(int i) => true;
+        protected virtual bool CheckValidScorePosition(GameplayLeaderboardScore score, int position) => true;
 
-        private class InputDisabledScrollContainer : OsuScrollContainer
+        private partial class InputDisabledScrollContainer : OsuScrollContainer
         {
             public InputDisabledScrollContainer()
             {

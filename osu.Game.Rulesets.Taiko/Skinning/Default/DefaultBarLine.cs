@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class DefaultBarLine : CompositeDrawable
+    public partial class DefaultBarLine : CompositeDrawable
     {
         /// <summary>
         /// The vertical offset of the triangles from the line tracker.

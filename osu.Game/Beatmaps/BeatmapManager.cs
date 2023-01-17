@@ -44,6 +44,16 @@ namespace osu.Game.Beatmaps
 
         public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                beatmapImporter.PauseImports = value;
+            }
+        }
+
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
@@ -126,14 +136,12 @@ namespace osu.Game.Beatmaps
         /// <param name="rulesetInfo">The ruleset with which the new difficulty should be created.</param>
         public virtual WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
         {
-            var playableBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(rulesetInfo);
-
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone())
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceWorkingBeatmap.Metadata.DeepClone())
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
-            foreach (var timingPoint in playableBeatmap.ControlPointInfo.TimingPoints)
+            foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
@@ -456,15 +464,16 @@ namespace osu.Game.Beatmaps
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => beatmapImporter.Import(tasks);
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            beatmapImporter.Import(notification, tasks, parameters);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, parameters, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, default, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
