@@ -19,6 +19,7 @@ using osu.Framework.Threading;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
@@ -420,9 +421,10 @@ namespace osu.Game.Overlays.Comments
             {
                 ShowLoadingSpinner = true;
                 CommentPostRequest req = new CommentPostRequest(commentsContainer.Type.Value, commentsContainer.Id.Value, text);
-                req.Failure += _ => Schedule(() =>
+                req.Failure += e => Schedule(() =>
                 {
                     ShowLoadingSpinner = false;
+                    Logger.Error(e, "Posting comment failed.");
                 });
                 req.Success += cb => Schedule(() =>
                 {
