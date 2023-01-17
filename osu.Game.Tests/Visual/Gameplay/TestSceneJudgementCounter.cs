@@ -103,10 +103,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("Hide judgement names", () => counterDisplay.ShowJudgementNames.Value = false);
             AddWaitStep("wait some", 2);
-            AddAssert("Assert hidden", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 0);
+            AddAssert("Assert hidden", () => counterDisplay.JudgementContainer.Children.First().ResultName.Alpha == 0);
             AddStep("Hide judgement names", () => counterDisplay.ShowJudgementNames.Value = true);
             AddWaitStep("wait some", 2);
-            AddAssert("Assert shown", () => counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First().ResultName.Alpha == 1);
+            AddAssert("Assert shown", () => counterDisplay.JudgementContainer.Children.First().ResultName.Alpha == 1);
         }
 
         [Test]
@@ -132,13 +132,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counterDisplay.JudgementContainer.Children.OfType<JudgementCounter>().First(child => child.Result.Type == HitResult.LargeTickHit);
+            var num = counterDisplay.JudgementContainer.Children.First(child => child.Result.Type == HitResult.LargeTickHit);
             return num.Result.ResultCount.Value;
         }
 
         private partial class TestJudgementCounterDisplay : JudgementCounterDisplay
         {
-            public new FillFlowContainer JudgementContainer => base.JudgementContainer;
+            public new FillFlowContainer<JudgementCounter> JudgementContainer => base.JudgementContainer;
         }
     }
 }
