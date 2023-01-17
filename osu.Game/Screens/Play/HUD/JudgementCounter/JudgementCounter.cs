@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
-    public partial class JudgementCounter : OverlayContainer
+    public partial class JudgementCounter : VisibilityContainer
     {
         public BindableBool ShowName = new BindableBool();
         public Bindable<FillDirection> Direction = new Bindable<FillDirection>();
@@ -30,6 +30,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         private void load(OsuColour colours, IBindable<RulesetInfo> ruleset)
         {
             AutoSizeAxes = Axes.Both;
+
             InternalChild = flowContainer = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
