@@ -580,7 +580,44 @@ namespace osu.Game.Tests.Visual.SongSelect
         /// Ensures stability is maintained on different sort modes for items with equal properties.
         /// </summary>
         [Test]
-        public void TestSortingStability()
+        public void TestSortingStabilityDateAdded()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
+
+                    set.DateAdded = DateTimeOffset.FromUnixTimeSeconds(i);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "a";
+                    beatmap.Metadata.Title = "b";
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
+            AddAssert("Items remain in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert("Items remain in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes for items with equal properties.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityOnlineID()
         {
             var sets = new List<BeatmapSetInfo>();
             int idOffset = 0;
@@ -599,6 +636,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                     beatmap.Metadata.Artist = $"artist {i / 2}";
                     beatmap.Metadata.Title = $"title {9 - i}";
 
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
                     sets.Add(set);
                 }
 
@@ -615,6 +655,58 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
             AddAssert("Items reset to original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithRemovedAndReaddedItem()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+            int idOffset = 0;
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(3);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "same artist";
+                    beatmap.Metadata.Title = "same title";
+
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
+                    sets.Add(set);
+                }
+
+                idOffset = sets.First().OnlineID;
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            assertOriginalOrderMaintained();
+
+            AddStep("Remove item", () => carousel.RemoveBeatmapSet(sets[1]));
+            AddStep("Re-add item", () => carousel.UpdateBeatmapSet(sets[1]));
+
+            assertOriginalOrderMaintained();
+
+            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
+            assertOriginalOrderMaintained();
+
+            void assertOriginalOrderMaintained()
+            {
+                AddAssert("Items remain in original order",
+                    () => carousel.BeatmapSets.Select(s => s.OnlineID), () => Is.EqualTo(carousel.BeatmapSets.Select((set, index) => idOffset + index)));
+            }
         }
 
         /// <summary>
@@ -640,6 +732,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                     beatmap.Metadata.Artist = "same artist";
                     beatmap.Metadata.Title = "same title";
 
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
                     sets.Add(set);
                 }
 
@@ -660,6 +755,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 beatmap.Metadata.Artist = "same artist";
                 beatmap.Metadata.Title = "same title";
+
+                // testing the case where DateAdded happens to equal (quite rare).
+                set.DateAdded = DateTimeOffset.UnixEpoch;
 
                 carousel.UpdateBeatmapSet(set);
             });
