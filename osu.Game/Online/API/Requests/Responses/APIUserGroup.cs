@@ -8,7 +8,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIUserGroup
     {
         [JsonProperty(@"colour")]
-        public string Colour { get; set; } = null!;
+        public string? Colour { get; set; }
 
         [JsonProperty(@"has_listing")]
         public bool HasListings { get; set; }

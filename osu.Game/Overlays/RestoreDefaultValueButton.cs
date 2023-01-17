@@ -6,6 +6,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -17,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays
             FinishTransforms(true);
         }
 
-        public override LocalisableString TooltipText => "revert to default";
+        public override LocalisableString TooltipText => CommonStrings.RevertToDefault.ToLower();
 
         protected override bool OnHover(HoverEvent e)
         {
