@@ -440,7 +440,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Selection Movement
 
         private Vector2[] movementBlueprintOriginalPositions;
-        private Vector2[] movementBlueprintEndPositions;
+        private Vector2[] movementBlueprintOriginalEndPositions;
         private SelectionBlueprint<T>[] movementBlueprints;
         private bool isDraggingBlueprint;
 
@@ -462,7 +462,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint)
                 .ToArray();
-            movementBlueprintEndPositions = movementBlueprints.Where(m => m.ScreenSpaceSelectionPoint != m.ScreenSpaceEndPoint)
+            movementBlueprintOriginalEndPositions = movementBlueprints.Where(m => m.ScreenSpaceSelectionPoint != m.ScreenSpaceEndPoint)
                 .Select(m => m.ScreenSpaceEndPoint)
                 .ToArray();
                 
@@ -475,33 +475,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprints">The blueprints to be moved.</param>
         /// <returns>Sorted blueprints.</returns>
         protected virtual IEnumerable<SelectionBlueprint<T>> SortForMovement(IReadOnlyList<SelectionBlueprint<T>> blueprints) => blueprints;
-
-        /// <summary>
-        /// Check for positional snap for every given positions.
-        /// </summary>
-        /// <param name="distanceTraveled">Distance traveled since start of dragging action. </param>
-        /// <param name="originalPositions">The positions to check for snapping before start of dragging action. </param>
-        /// <param name="currentPositions">The positions to check for snapping at the current time.</param>
-        /// <returns>Whether found object to snap to.</returns>
-        private bool checkSnappingForNearbyObjects(Vector2 distanceTraveled, Vector2[] originalPositions, Vector2[] currentPositions)
-        {
-            for (int i = 0; i < originalPositions.Length; i++)
-            {
-                Vector2 originalPosition = originalPositions[i];
-                var testPosition = originalPosition + distanceTraveled;
-
-                var positionalResult = snapProvider.FindSnappedPositionAndTime(testPosition, SnapType.NearbyObjects);
-
-                if (positionalResult.ScreenSpacePosition == testPosition) continue;
-
-                var delta = positionalResult.ScreenSpacePosition - currentPositions[i];
-
-                // attempt to move the objects, and abort any time based snapping if we can.
-                if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints[i], delta)))
-                    return true;
-            }
-            return false;
-        }
 
         /// <summary>
         /// Moves the current selected blueprints.
@@ -523,8 +496,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (checkSnappingForNearbyObjects(distanceTraveled, movementBlueprintOriginalPositions, currentSelectionPointPositions))
                     return true;
 
-                var currentEndPointPositions = movementBlueprints.Select(m => m.ScreenSpaceEndPoint).ToArray();
-                if (checkSnappingForNearbyObjects(distanceTraveled, movementBlueprintEndPositions, currentEndPointPositions))
+                var currentEndPointPositions = movementBlueprints.Where(m => m.ScreenSpaceSelectionPoint != m.ScreenSpaceEndPoint)
+                    .Select(m => m.ScreenSpaceEndPoint)
+                    .ToArray();
+                if (checkSnappingForNearbyObjects(distanceTraveled, movementBlueprintOriginalEndPositions, currentEndPointPositions))
                     return true;
             }
 
@@ -543,6 +518,33 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return ApplySnapResult(movementBlueprints, result);
+        }
+
+        /// <summary>
+        /// Check for positional snap for every given positions.
+        /// </summary>
+        /// <param name="distanceTraveled">Distance traveled since start of dragging action. </param>
+        /// <param name="originalPositions">The position of objects before start of dragging action. </param>
+        /// <param name="currentPositions">The positions of object at the current time.</param>
+        /// <returns>Whether found object to snap to.</returns>
+        private bool checkSnappingForNearbyObjects(Vector2 distanceTraveled, Vector2[] originalPositions, Vector2[] currentPositions)
+        {
+            for (int i = 0; i < originalPositions.Length; i++)
+            {
+                Vector2 originalPosition = originalPositions[i];
+                var testPosition = originalPosition + distanceTraveled;
+
+                var positionalResult = snapProvider.FindSnappedPositionAndTime(testPosition, SnapType.NearbyObjects);
+
+                if (positionalResult.ScreenSpacePosition == testPosition) continue;
+
+                var delta = positionalResult.ScreenSpacePosition - currentPositions[i];
+
+                // attempt to move the objects, and abort any time based snapping if we can.
+                if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints[i], delta)))
+                    return true;
+            }
+            return false;
         }
 
         protected virtual bool ApplySnapResult(SelectionBlueprint<T>[] blueprints, SnapResult result) =>
