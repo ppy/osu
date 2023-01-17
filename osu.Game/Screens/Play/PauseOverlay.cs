@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private SkinnableSound pauseLoop;
 
-        protected override Action BackAction => () => InternalButtons.Children.First().TriggerClick();
+        protected override Action BackAction => () => InternalButtons.First().TriggerClick();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.PauseGameplay:
-                    InternalButtons.Children.First().TriggerClick();
+                    InternalButtons.First().TriggerClick();
                     return true;
             }
 
