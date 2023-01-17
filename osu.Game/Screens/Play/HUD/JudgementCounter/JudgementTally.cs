@@ -12,19 +12,23 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
+    /// <summary>
+    /// Keeps track of judgements for a current play session, exposing bindable counts which can
+    /// be used for display purposes.
+    /// </summary>
     public partial class JudgementTally : CompositeDrawable
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
-        public List<JudgementCounterInfo> Results = new List<JudgementCounterInfo>();
+        public List<JudgementCount> Results = new List<JudgementCount>();
 
         [BackgroundDependencyLoader]
         private void load(IBindable<RulesetInfo> ruleset)
         {
             foreach (var result in ruleset.Value.CreateInstance().GetHitResults())
             {
-                Results.Add(new JudgementCounterInfo
+                Results.Add(new JudgementCount
                 {
                     Type = result.result,
                     ResultCount = new BindableInt()
@@ -42,8 +46,15 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         private void updateCount(JudgementResult judgement, bool revert)
         {
-            foreach (JudgementCounterInfo result in Results.Where(result => result.Type == judgement.Type))
+            foreach (JudgementCount result in Results.Where(result => result.Type == judgement.Type))
                 result.ResultCount.Value = revert ? result.ResultCount.Value - 1 : result.ResultCount.Value + 1;
+        }
+
+        public struct JudgementCount
+        {
+            public HitResult Type { get; set; }
+
+            public BindableInt ResultCount { get; set; }
         }
     }
 }

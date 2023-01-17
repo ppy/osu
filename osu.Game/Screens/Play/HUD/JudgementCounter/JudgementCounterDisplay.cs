@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             All
         }
 
-        private JudgementCounter createCounter(JudgementCounterInfo info)
+        private JudgementCounter createCounter(JudgementTally.JudgementCount info)
         {
             JudgementCounter counter = new JudgementCounter(info)
             {

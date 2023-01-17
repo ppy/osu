@@ -18,9 +18,9 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public BindableBool ShowName = new BindableBool();
         public Bindable<FillDirection> Direction = new Bindable<FillDirection>();
 
-        public readonly JudgementCounterInfo Result;
+        public readonly JudgementTally.JudgementCount Result;
 
-        public JudgementCounter(JudgementCounterInfo result) => Result = result;
+        public JudgementCounter(JudgementTally.JudgementCount result) => Result = result;
 
         public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;
