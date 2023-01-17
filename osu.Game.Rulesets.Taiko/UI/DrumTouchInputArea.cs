@@ -107,24 +107,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (!validMouse(e))
-                return false;
-
-            handleDown(e.Button, e.ScreenSpaceMousePosition);
-            return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            if (!validMouse(e))
-                return;
-
-            handleUp(e.Button);
-            base.OnMouseUp(e);
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             handleDown(e.Touch.Source, e.ScreenSpaceTouchDownPosition);

@@ -109,7 +109,7 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Container
                             {
-                                Name = "Menu container",
+                                Name = @"Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
                                 Height = MENU_HEIGHT,
@@ -122,14 +122,14 @@ namespace osu.Game.Skinning.Editor
                                         RelativeSizeAxes = Axes.Both,
                                         Items = new[]
                                         {
-                                            new MenuItem("File")
+                                            new MenuItem(CommonStrings.MenuBarFile)
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
@@ -234,7 +234,6 @@ namespace osu.Game.Skinning.Editor
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
-
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
@@ -253,7 +252,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("Currently editing ", cp =>
             {

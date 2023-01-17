@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Practice;
@@ -30,7 +32,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen? playerLoader;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
@@ -45,6 +47,9 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+
+            Debug.Assert(Footer != null);
+
             Footer.Add(new Container
             {
                 Anchor = Anchor.TopCentre,
@@ -109,7 +114,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        Text = NotificationsStrings.NoAutoplayMod
                     });
                     return false;
                 }
