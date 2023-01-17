@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI
             // Ignore any taps which trigger an action which is already handled. But track them for potential positional input in the future.
             bool shouldResultInAction = !mouseDisabled.Value && trackedTouches.All(t => t.Action != action);
 
-            trackedTouches.Add(new TrackedTouch(e.Touch, shouldResultInAction ? action : null));
+            trackedTouches.Add(new TrackedTouch(e.Touch.Source, shouldResultInAction ? action : null));
 
             // Important to update position before triggering the pressed action.
             handleTouchMovement(e);
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private void handleTouchMovement(TouchEvent touchEvent)
         {
             // Movement should only be tracked for the most recent touch.
-            if (touchEvent.Touch != trackedTouches.Last().Touch)
+            if (touchEvent.Touch.Source != trackedTouches.Last().Source)
                 return;
 
             new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
-            var tracked = trackedTouches.First(t => t.Touch.Source == e.Touch.Source);
+            var tracked = trackedTouches.First(t => t.Source == e.Touch.Source);
 
             if (tracked.Action is OsuAction action)
                 osuInputManager.KeyBindingContainer.TriggerReleased(action);
@@ -88,13 +88,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private class TrackedTouch
         {
-            public readonly Touch Touch;
+            public readonly TouchSource Source;
 
             public readonly OsuAction? Action;
 
-            public TrackedTouch(Touch touch, OsuAction? action)
+            public TrackedTouch(TouchSource source, OsuAction? action)
             {
-                Touch = touch;
+                Source = source;
                 Action = action;
             }
         }
