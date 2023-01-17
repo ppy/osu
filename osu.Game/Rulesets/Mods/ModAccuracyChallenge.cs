@@ -45,10 +45,7 @@ namespace osu.Game.Rulesets.Mods
 
         private ScoreProcessor scoreProcessor = null!;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
-        {
-            this.scoreProcessor = scoreProcessor;
-        }
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor) => this.scoreProcessor = scoreProcessor;
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
