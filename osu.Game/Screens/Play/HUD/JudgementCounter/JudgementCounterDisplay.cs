@@ -78,25 +78,27 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             foreach (var counter in CounterFlow.Children)
             {
-                if (counter.Result.Type.IsBasic())
-                {
+                if (shouldShow(counter))
                     counter.Show();
-                    continue;
-                }
+                else
+                    counter.Hide();
+            }
+
+            bool shouldShow(JudgementCounter counter)
+            {
+                if (counter.Result.Type.IsBasic())
+                    return true;
 
                 switch (Mode.Value)
                 {
                     case DisplayMode.Simple:
-                        counter.Hide();
-                        break;
+                        return false;
 
                     case DisplayMode.Normal:
-                        counter.FadeTo(counter.Result.Type.IsBonus() ? 0 : 1);
-                        break;
+                        return !counter.Result.Type.IsBonus();
 
                     case DisplayMode.All:
-                        counter.Show();
-                        break;
+                        return true;
 
                     default:
                         throw new ArgumentOutOfRangeException();
