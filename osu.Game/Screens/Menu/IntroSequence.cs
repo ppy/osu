@@ -16,7 +16,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroSequence : Container
+    public partial class IntroSequence : Container
     {
         private const float logo_size = 460; //todo: this should probably be 480
 
@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private class Ring : Container<Circle>
+        private partial class Ring : Container<Circle>
         {
             public readonly Circle Foreground;
 

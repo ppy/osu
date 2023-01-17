@@ -26,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
+    public partial class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -134,6 +134,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the hit explosion pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (skin != null)
@@ -185,7 +188,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public class ColumnTouchInputArea : Drawable
+        public partial class ColumnTouchInputArea : Drawable
         {
             private readonly Column column;
 
@@ -204,18 +207,6 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override void LoadComplete()
             {
                 keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-                base.OnMouseUp(e);
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)

@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -20,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class FeaturedNewsItemPanel : HomePanel
+    public partial class FeaturedNewsItemPanel : HomePanel
     {
         private readonly APINewsPost post;
 
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        private class ClickableNewsBackground : OsuHoverContainer
+        private partial class ClickableNewsBackground : OsuHoverContainer
         {
             private readonly APINewsPost post;
 
@@ -137,7 +138,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
+        private partial class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
             private readonly DateTimeOffset date;
 
@@ -167,7 +168,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold), // using Bold since there is no 800 weight alternative
                             Colour = colourProvider.Light1,
-                            Text = $"{date:dd}"
+                            Text = date.ToLocalisableString(@"dd")
                         },
                         new TextFlowContainer(f =>
                         {
@@ -178,7 +179,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
-                            Text = $"{date:MMM yyyy}"
+                            Text = date.ToLocalisableString(@"MMM yyyy")
                         }
                     }
                 };

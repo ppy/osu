@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoReplayRecorder : ReplayRecorder<TaikoAction>
+    public partial class TaikoReplayRecorder : ReplayRecorder<TaikoAction>
     {
         public TaikoReplayRecorder(Score score)
             : base(score)

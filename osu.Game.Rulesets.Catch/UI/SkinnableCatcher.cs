@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// The visual representation of the <see cref="Catcher"/>.
     /// It includes the body part of the catcher and the catcher plate.
     /// </summary>
-    public class SkinnableCatcher : SkinnableDrawable
+    public partial class SkinnableCatcher : SkinnableDrawable
     {
         /// <summary>
         /// This is used by skin elements to determine which texture of the catcher is used.

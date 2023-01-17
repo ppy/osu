@@ -22,38 +22,8 @@ namespace osu.Game.Graphics
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
         /// <summary>
-        /// Retrieves the colour for a <see cref="DifficultyRating"/>.
+        /// Retrieves the colour for a given point in the star range.
         /// </summary>
-        /// <remarks>
-        /// Sourced from the @diff-{rating} variables in https://github.com/ppy/osu-web/blob/71fbab8936d79a7929d13854f5e854b4f383b236/resources/assets/less/variables.less.
-        /// </remarks>
-        public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
-        {
-            switch (difficulty)
-            {
-                case DifficultyRating.Easy:
-                    return Color4Extensions.FromHex("4ebfff");
-
-                case DifficultyRating.Normal:
-                    return Color4Extensions.FromHex("66ff91");
-
-                case DifficultyRating.Hard:
-                    return Color4Extensions.FromHex("f7e85d");
-
-                case DifficultyRating.Insane:
-                    return Color4Extensions.FromHex("ff7e68");
-
-                case DifficultyRating.Expert:
-                    return Color4Extensions.FromHex("fe3c71");
-
-                case DifficultyRating.ExpertPlus:
-                    return Color4Extensions.FromHex("6662dd");
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(difficulty));
-            }
-        }
-
         public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
         {
             (0.1f, Color4Extensions.FromHex("aaaaaa")),

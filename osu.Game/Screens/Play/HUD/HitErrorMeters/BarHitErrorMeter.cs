@@ -23,7 +23,7 @@ using osuTK;
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     [Cached]
-    public class BarHitErrorMeter : HitErrorMeter
+    public partial class BarHitErrorMeter : HitErrorMeter
     {
         [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
         public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             MaxValue = 8,
             Precision = 0.1f,
         };
+
+        [SettingSource("Show colour bars")]
+        public Bindable<bool> ColourBarVisibility { get; } = new Bindable<bool>(true);
 
         [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
@@ -108,6 +111,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
+                                Alpha = 0,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
@@ -115,6 +119,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.TopCentre,
+                                Alpha = 0,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 0.5f,
@@ -178,6 +183,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
             LabelStyle.BindValueChanged(style => recreateLabels(style.NewValue), true);
+            ColourBarVisibility.BindValueChanged(visible =>
+            {
+                colourBarsEarly.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+                colourBarsLate.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+            }, true);
 
             // delay the appearance animations for only the initial appearance.
             using (arrowContainer.BeginDelayedSequence(450))
@@ -422,7 +432,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        internal class JudgementLine : PoolableDrawable
+        internal partial class JudgementLine : PoolableDrawable
         {
             public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
 

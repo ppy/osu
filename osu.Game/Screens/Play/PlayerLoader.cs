@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
@@ -31,7 +32,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class PlayerLoader : ScreenWithBeatmapBackground
+    public partial class PlayerLoader : ScreenWithBeatmapBackground
     {
         protected const float BACKGROUND_BLUR = 15;
 
@@ -130,16 +131,16 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
         private AudioManager audioManager { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -544,13 +545,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MutedNotification : SimpleNotification
+        private partial class MutedNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 
             public MutedNotification()
             {
-                Text = "Your game volume is too low to hear anything! Click here to restore it.";
+                Text = NotificationsStrings.GameVolumeTooLow;
             }
 
             [BackgroundDependencyLoader]
@@ -599,13 +600,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class BatteryWarningNotification : SimpleNotification
+        private partial class BatteryWarningNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 
             public BatteryWarningNotification()
             {
-                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+                Text = NotificationsStrings.BatteryLow;
             }
 
             [BackgroundDependencyLoader]

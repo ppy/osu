@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletAreaSelection : CompositeDrawable
+    public partial class TabletAreaSelection : CompositeDrawable
     {
         public bool IsWithinBounds { get; private set; }
 

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A grid which takes user input and returns a quantized ("snapped") position and time.
     /// </summary>
-    public abstract class DistanceSnapGrid : CompositeDrawable
+    public abstract partial class DistanceSnapGrid : CompositeDrawable
     {
         /// <summary>
         /// The spacing between each tick of the beat snapping grid.

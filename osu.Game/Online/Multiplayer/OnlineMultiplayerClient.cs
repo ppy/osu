@@ -18,7 +18,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// A <see cref="MultiplayerClient"/> with online connectivity.
     /// </summary>
-    public class OnlineMultiplayerClient : MultiplayerClient
+    public partial class OnlineMultiplayerClient : MultiplayerClient
     {
         private readonly string endpoint;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Online.Multiplayer
 
             try
             {
-                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
+                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty).ConfigureAwait(false);
             }
             catch (HubException exception)
             {
@@ -88,8 +88,8 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Debug.Assert(connector != null);
 
-                    await connector.Reconnect();
-                    return await JoinRoom(roomId, password);
+                    await connector.Reconnect().ConfigureAwait(false);
+                    return await JoinRoom(roomId, password).ConfigureAwait(false);
                 }
 
                 throw;

@@ -17,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneKeyBindingPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneKeyBindingPanel : OsuManualInputManagerTestScene
     {
         private readonly KeyBindingPanel panel;
 

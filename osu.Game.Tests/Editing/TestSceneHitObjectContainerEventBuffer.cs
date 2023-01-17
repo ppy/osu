@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Editing
 {
     [HeadlessTest]
-    public class TestSceneHitObjectContainerEventBuffer : OsuTestScene
+    public partial class TestSceneHitObjectContainerEventBuffer : OsuTestScene
     {
         private readonly TestHitObject testObj = new TestHitObject();
 
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Editing
             => AddAssert($"began = {began}, finished = {finished}, transferred = {transferred}",
                 () => (beganUsage == testObj) == began && (finishedUsage == testObj) == finished && (transferredUsage == testObj) == transferred);
 
-        private class TestPlayfield : Playfield
+        private partial class TestPlayfield : Playfield
         {
             public TestPlayfield()
             {
@@ -165,11 +165,11 @@ namespace osu.Game.Tests.Editing
             public override string ToString() => "TestHitObject";
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private partial class TestDrawableHitObject : DrawableHitObject
         {
         }
 
-        private class TestDrawable : Drawable
+        private partial class TestDrawable : Drawable
         {
             public new void Schedule(Action action) => base.Schedule(action);
         }

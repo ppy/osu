@@ -21,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
+    public abstract partial class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.

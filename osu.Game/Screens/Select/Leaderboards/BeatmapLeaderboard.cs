@@ -21,7 +21,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
+    public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
         public Action<ScoreInfo>? ScoreSelected;
 
@@ -152,14 +152,23 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            scoreRetrievalRequest?.Cancel();
 
-            scoreRetrievalRequest.Success += response => SetScores(
-                scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
-            );
+            var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            newRequest.Success += response => Schedule(() =>
+            {
+                // Request may have changed since fetch request.
+                // Can't rely on request cancellation due to Schedule inside SetScores so let's play it safe.
+                if (!newRequest.Equals(scoreRetrievalRequest))
+                    return;
 
-            return scoreRetrievalRequest;
+                SetScores(
+                    scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                    response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+                );
+            });
+
+            return scoreRetrievalRequest = newRequest;
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)

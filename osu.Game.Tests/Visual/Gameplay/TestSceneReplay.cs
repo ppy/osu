@@ -15,7 +15,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with a replay.")]
-    public class TestSceneReplay : TestSceneAllRulesetPlayers
+    public partial class TestSceneReplay : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("cannot fail", () => !((ScoreAccessibleReplayPlayer)Player).AllowFail);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;

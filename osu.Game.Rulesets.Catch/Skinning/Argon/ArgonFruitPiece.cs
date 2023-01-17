@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    internal class ArgonFruitPiece : CatchHitObjectPiece
+    internal partial class ArgonFruitPiece : CatchHitObjectPiece
     {
         protected override Drawable HyperBorderPiece => hyperBorderPiece;
 

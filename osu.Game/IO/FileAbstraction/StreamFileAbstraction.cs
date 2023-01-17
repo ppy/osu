@@ -23,8 +23,7 @@ namespace osu.Game.IO.FileAbstraction
 
         public void CloseStream(Stream stream)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
+            ArgumentNullException.ThrowIfNull(stream);
 
             stream.Close();
         }

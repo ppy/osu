@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class EditorSidebarSection : Container
+    public partial class EditorSidebarSection : Container
     {
         protected override Container<Drawable> Content { get; }
 
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components
             };
         }
 
-        public class SectionHeader : CompositeDrawable
+        public partial class SectionHeader : CompositeDrawable
         {
             private readonly LocalisableString text;
 

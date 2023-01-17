@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneGraph : OsuTestScene
+    public partial class TestSceneGraph : OsuTestScene
     {
         public TestSceneGraph()
         {

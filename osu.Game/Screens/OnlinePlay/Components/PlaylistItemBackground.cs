@@ -9,7 +9,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class PlaylistItemBackground : Background
+    public partial class PlaylistItemBackground : Background
     {
         public readonly IBeatmapInfo? Beatmap;
 

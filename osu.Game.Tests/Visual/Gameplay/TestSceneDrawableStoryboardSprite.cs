@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneDrawableStoryboardSprite : SkinnableTestScene
+    public partial class TestSceneDrawableStoryboardSprite : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 

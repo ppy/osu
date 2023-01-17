@@ -20,7 +20,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneTabletSettings : OsuTestScene
+    public partial class TestSceneTabletSettings : OsuTestScene
     {
         private TestTabletHandler tabletHandler;
         private TabletSettings settings;

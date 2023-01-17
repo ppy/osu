@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// Contains a <see cref="DrawableRank"/> that is positioned around the <see cref="AccuracyCircle"/>.
     /// </summary>
-    public class RankBadge : CompositeDrawable
+    public partial class RankBadge : CompositeDrawable
     {
         /// <summary>
         /// The accuracy value corresponding to the <see cref="ScoreRank"/> displayed by this badge.

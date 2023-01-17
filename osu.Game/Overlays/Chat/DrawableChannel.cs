@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class DrawableChannel : Container
+    public partial class DrawableChannel : Container
     {
         public readonly Channel Channel;
         protected FillFlowContainer ChatLineFlow;

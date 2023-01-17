@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LanguageSettings : SettingsSubsection
+    public partial class LanguageSettings : SettingsSubsection
     {
         private SettingsDropdown<Language> languageSelection = null!;
         private Bindable<string> frameworkLocale = null!;
@@ -44,10 +44,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             };
 
-            localisationParameters.BindValueChanged(p
-                => languageSelection.Current.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, p.NewValue), true);
+            frameworkLocale.BindValueChanged(_ => updateSelection());
+            localisationParameters.BindValueChanged(_ => updateSelection(), true);
 
             languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }
+
+        private void updateSelection() =>
+            languageSelection.Current.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
     }
 }

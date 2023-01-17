@@ -97,7 +97,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues(typeof(GlobalSkinComponentLookup.LookupType)))
+            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues<GlobalSkinComponentLookup.LookupType>())
             {
                 string filename = $"{skinnableTarget}.json";
 

@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class DifficultyPointPiece : HitObjectPointPiece, IHasPopover
+    public partial class DifficultyPointPiece : HitObjectPointPiece, IHasPopover
     {
         public readonly HitObject HitObject;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public Popover GetPopover() => new DifficultyEditPopover(HitObject);
 
-        public class DifficultyEditPopover : OsuPopover
+        public partial class DifficultyEditPopover : OsuPopover
         {
             private readonly HitObject hitObject;
 

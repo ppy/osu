@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
+    public partial class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
         public const float EXTENDED_WIDTH = regular_width + top_player_left_width_extension;
 

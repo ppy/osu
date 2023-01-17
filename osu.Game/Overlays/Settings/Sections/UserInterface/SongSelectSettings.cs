@@ -12,7 +12,7 @@ using osu.Game.Overlays.Mods.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class SongSelectSettings : SettingsSubsection
+    public partial class SongSelectSettings : SettingsSubsection
     {
         protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 

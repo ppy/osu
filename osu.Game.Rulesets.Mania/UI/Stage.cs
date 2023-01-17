@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    public class Stage : ScrollingPlayfield
+    public partial class Stage : ScrollingPlayfield
     {
         [Cached]
         public readonly StageDefinition Definition;
@@ -156,6 +156,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the judgement pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (currentSkin != null)

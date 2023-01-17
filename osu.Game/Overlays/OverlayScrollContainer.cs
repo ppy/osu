@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// <see cref="UserTrackingScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay{T}"/>.
     /// </summary>
-    public class OverlayScrollContainer : UserTrackingScrollContainer
+    public partial class OverlayScrollContainer : UserTrackingScrollContainer
     {
         /// <summary>
         /// Scroll position at which the <see cref="ScrollToTopButton"/> will be shown.
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
             Button.State = Visibility.Hidden;
         }
 
-        public class ScrollToTopButton : OsuHoverContainer
+        public partial class ScrollToTopButton : OsuHoverContainer
         {
             private const int fade_duration = 500;
 

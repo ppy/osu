@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public abstract class SkinnableHUDComponentTestScene : SkinnableTestScene
+    public abstract partial class SkinnableHUDComponentTestScene : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 

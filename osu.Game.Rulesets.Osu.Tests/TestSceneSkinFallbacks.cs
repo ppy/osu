@@ -29,7 +29,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSkinFallbacks : TestSceneOsuPlayer
+    public partial class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
         private readonly TestSource testBeatmapSkin;
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override ISkin GetSkin() => skin;
         }
 
-        public class SkinProvidingPlayer : TestPlayer
+        public partial class SkinProvidingPlayer : TestPlayer
         {
             private readonly TestSource userSkin;
 

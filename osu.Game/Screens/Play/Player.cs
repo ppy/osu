@@ -44,7 +44,7 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler, ILocalUserPlayInfo
+    public abstract partial class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler, ILocalUserPlayInfo
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -1159,7 +1159,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
         /// <returns>The <see cref="ResultsScreen"/>.</returns>
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true)
+        {
+            ShowUserStatistics = true
+        };
 
         private void fadeOut(bool instant = false)
         {

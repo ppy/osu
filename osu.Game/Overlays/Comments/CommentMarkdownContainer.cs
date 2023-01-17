@@ -9,13 +9,16 @@ using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentMarkdownContainer : OsuMarkdownContainer
+    public partial class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        protected override bool Autolinks => true;
+        protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+        {
+            Autolinks = true
+        };
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
 
-        private class CommentMarkdownHeading : OsuMarkdownHeading
+        private partial class CommentMarkdownHeading : OsuMarkdownHeading
         {
             public CommentMarkdownHeading(HeadingBlock headingBlock)
                 : base(headingBlock)

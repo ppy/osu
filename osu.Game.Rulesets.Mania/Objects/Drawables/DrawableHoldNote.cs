@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// Visualises a <see cref="HoldNote"/> hit object.
     /// </summary>
-    public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
+    public partial class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
         public override bool DisplayResult => false;
 

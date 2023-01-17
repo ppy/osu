@@ -4,8 +4,11 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using System.Net;
 using NUnit.Framework;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,7 +16,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiOverlay : OsuTestScene
+    public partial class TestSceneWikiOverlay : OsuTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -27,6 +30,15 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpWikiResponse(responseMainPage);
             AddStep("Show main page", () => wiki.Show());
+        }
+
+        [Test]
+        public void TestCancellationDoesntShowError()
+        {
+            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show another page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+
+            AddUntilStep("Current path is not error", () => wiki.CurrentPath != "error");
         }
 
         [Test]
@@ -56,7 +68,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestErrorPage()
         {
             setUpWikiResponse(responseArticlePage);
-            AddStep("Show Error Page", () => wiki.ShowPage("Error"));
+            AddStep("Show nonexistent page", () => wiki.ShowPage("This_page_will_error_out"));
+            AddUntilStep("Wait for error page", () => wiki.CurrentPath == "error");
+            AddUntilStep("Error message correct", () => wiki.ChildrenOfType<SpriteText>().Any(text => text.Text == "\"This_page_will_error_out\"."));
         }
 
         private void setUpWikiResponse(APIWikiPage r, string redirectionPath = null)

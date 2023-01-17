@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerSpmCalculator : Component
+    public partial class SpinnerSpmCalculator : Component
     {
         private readonly Queue<RotationRecord> records = new Queue<RotationRecord>();
         private const double spm_count_duration = 595; // not using hundreds to avoid frame rounding issues

@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// An invisible drawable that brings multiple <see cref="Drawable"/> pieces together to form a consumable clickable link.
     /// </summary>
-    public class DrawableLinkCompiler : OsuHoverContainer
+    public partial class DrawableLinkCompiler : OsuHoverContainer
     {
         /// <summary>
         /// Each word part of a chat link (split for word-wrap support).
@@ -52,7 +52,7 @@ namespace osu.Game.Online.Chat
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
 
-        private class LinkHoverSounds : HoverClickSounds
+        private partial class LinkHoverSounds : HoverClickSounds
         {
             private readonly List<Drawable> parts;
 

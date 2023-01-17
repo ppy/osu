@@ -42,7 +42,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestScenePlaySongSelect : ScreenTestScene
+    public partial class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager = null!;
         private RulesetStore rulesets = null!;
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                    .First(b => !((CarouselBeatmap)b.Item).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
+                                                    .First(b => !((CarouselBeatmap)b.Item!).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
 
                 InputManager.Click(MouseButton.Left);
 
@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                    .First(b => !((CarouselBeatmap)b.Item).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
+                                                    .First(b => !((CarouselBeatmap)b.Item!).BeatmapInfo.Equals(songSelect!.Carousel.SelectedBeatmapInfo)));
 
                 InputManager.PressButton(MouseButton.Left);
 
@@ -614,7 +614,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("selected only shows expected ruleset (plus converts)", () =>
             {
-                var selectedPanel = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item.State.Value == CarouselItemState.Selected);
+                var selectedPanel = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item!.State.Value == CarouselItemState.Selected);
 
                 // special case for converts checked here.
                 return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
@@ -1064,6 +1064,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => manager.Delete());
+            AddWaitStep("wait for debounce", 1);
             AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
@@ -1141,7 +1142,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 rulesets.Dispose();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        private partial class TestSongSelect : PlaySongSelect
         {
             public Action? StartRequested;
 

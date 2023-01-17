@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract class LabelledDrawable<T> : CompositeDrawable
+    public abstract partial class LabelledDrawable<T> : CompositeDrawable
         where T : Drawable
     {
         private float? fixedLabelWidth;

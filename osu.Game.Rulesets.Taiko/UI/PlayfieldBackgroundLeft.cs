@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class PlayfieldBackgroundLeft : CompositeDrawable
+    internal partial class PlayfieldBackgroundLeft : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

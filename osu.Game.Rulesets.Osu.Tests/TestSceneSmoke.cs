@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSmoke : OsuSkinnableTestScene
+    public partial class TestSceneSmoke : OsuSkinnableTestScene
     {
         [Test]
         public void TestSmoking()
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private class SmokingInputManager : ManualInputManager
+        private partial class SmokingInputManager : ManualInputManager
         {
             public double Duration { get; init; }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestSmokeContainer : SmokeContainer
+        private partial class TestSmokeContainer : SmokeContainer
         {
             public double Duration { get; init; }
 

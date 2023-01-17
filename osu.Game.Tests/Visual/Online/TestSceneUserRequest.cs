@@ -20,7 +20,7 @@ using osu.Game.Rulesets.Taiko;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserRequest : OsuTestScene
+    public partial class TestSceneUserRequest : OsuTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
             api.Queue(request);
         }
 
-        private class UserTestContainer : FillFlowContainer
+        private partial class UserTestContainer : FillFlowContainer
         {
             public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// An overlay that captures and displays osu!taiko mouse and touch input.
     /// </summary>
-    public class DrumTouchInputArea : VisibilityContainer
+    public partial class DrumTouchInputArea : VisibilityContainer
     {
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
@@ -107,24 +107,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (!validMouse(e))
-                return false;
-
-            handleDown(e.Button, e.ScreenSpaceMousePosition);
-            return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            if (!validMouse(e))
-                return;
-
-            handleUp(e.Button);
-            base.OnMouseUp(e);
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             handleDown(e.Touch.Source, e.ScreenSpaceTouchDownPosition);
@@ -181,7 +163,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             mainContent.FadeOut(300);
         }
 
-        private class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+        private partial class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
             private readonly Circle overlay;
 

@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoStrongableHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
+    public abstract partial class DrawableTaikoStrongableHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
         where TObject : TaikoStrongableHitObject
         where TStrongNestedObject : StrongNestedHitObject
     {

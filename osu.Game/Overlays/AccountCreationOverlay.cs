@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class AccountCreationOverlay : OsuFocusedOverlayContainer
+    public partial class AccountCreationOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_time = 400;
 

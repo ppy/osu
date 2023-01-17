@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCircleOverlapMarker : BlueprintPiece<HitCircle>
+    public partial class HitCircleOverlapMarker : BlueprintPiece<HitCircle>
     {
         /// <summary>
         /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.

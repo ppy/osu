@@ -13,7 +13,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
+    public partial class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
     {
         private readonly EffectControlPoint effect;
         private Bindable<bool> kiai = null!;

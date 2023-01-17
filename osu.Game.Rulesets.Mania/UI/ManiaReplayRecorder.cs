@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaReplayRecorder : ReplayRecorder<ManiaAction>
+    public partial class ManiaReplayRecorder : ReplayRecorder<ManiaAction>
     {
         public ManiaReplayRecorder(Score score)
             : base(score)

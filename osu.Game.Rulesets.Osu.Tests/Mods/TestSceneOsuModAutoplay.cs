@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAutoplay : OsuModTestScene
+    public partial class TestSceneOsuModAutoplay : OsuModTestScene
     {
         [Test]
         public void TestSpmUnaffectedByRateAdjust()

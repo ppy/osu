@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
+    public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return (snappedPosition, snappedTime);
         }
 
-        private class Ring : CircularProgress
+        private partial class Ring : CircularProgress
         {
             [Resolved]
             private IDistanceSnapProvider snapProvider { get; set; }

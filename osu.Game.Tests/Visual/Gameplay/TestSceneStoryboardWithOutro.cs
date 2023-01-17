@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneStoryboardWithOutro : PlayerTestScene
+    public partial class TestSceneStoryboardWithOutro : PlayerTestScene
     {
         protected override bool HasCustomSteps => true;
 
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             return storyboard;
         }
 
-        protected class OutroPlayer : TestPlayer
+        protected partial class OutroPlayer : TestPlayer
         {
             public void ExitViaPause() => PerformExit(true);
 

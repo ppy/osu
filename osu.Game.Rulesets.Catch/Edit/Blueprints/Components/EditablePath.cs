@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public abstract class EditablePath : CompositeDrawable
+    public abstract partial class EditablePath : CompositeDrawable
     {
         public int PathId => path.InvalidationID;
 
@@ -42,9 +39,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private readonly List<VertexState> previousVertexStates = new List<VertexState>();
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        [Resolved]
+        private IBeatSnapProvider? beatSnapProvider { get; set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {

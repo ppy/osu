@@ -11,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineDragBox : DragBox
+    public partial class TimelineDragBox : DragBox
     {
         public double MinTime { get; private set; }
 

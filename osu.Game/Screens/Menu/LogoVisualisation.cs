@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A visualiser that reacts to music coming from beatmaps.
     /// </summary>
-    public class LogoVisualisation : Drawable
+    public partial class LogoVisualisation : Drawable
     {
         /// <summary>
         /// The number of bars to jump each update iteration.
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Menu
 
         private void addAmplitudesFromSource(IHasAmplitudes source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
 

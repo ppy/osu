@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class ReportCommentPopover : OsuPopover
+    public partial class ReportCommentPopover : OsuPopover
     {
         public Action<CommentReportReason, string>? Action;
 

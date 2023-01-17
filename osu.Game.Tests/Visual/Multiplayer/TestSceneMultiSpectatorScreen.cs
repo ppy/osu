@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
         private OsuGameBase game { get; set; } = null!;

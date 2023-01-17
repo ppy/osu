@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public class TextElement : Container, ISkinnableDrawable
+    public partial class TextElement : Container, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

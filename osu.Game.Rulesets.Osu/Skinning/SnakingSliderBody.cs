@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// <summary>
     /// A <see cref="SliderBody"/> which changes its curve depending on the snaking progress.
     /// </summary>
-    public abstract class SnakingSliderBody : SliderBody, ISliderProgress
+    public abstract partial class SnakingSliderBody : SliderBody, ISliderProgress
     {
         public readonly List<Vector2> CurrentCurve = new List<Vector2>();
 

@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultySpectrumDisplay : CompositeDrawable
+    public partial class DifficultySpectrumDisplay : CompositeDrawable
     {
         private Vector2 dotSize = new Vector2(4, 8);
 
@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        private class RulesetDifficultyGroup : FillFlowContainer
+        private partial class RulesetDifficultyGroup : FillFlowContainer
         {
             private readonly int rulesetId;
             private readonly IEnumerable<IBeatmapInfo> beatmapInfos;
@@ -143,7 +143,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        private class DifficultyDot : CircularContainer
+        private partial class DifficultyDot : CircularContainer
         {
             private readonly double starDifficulty;
 

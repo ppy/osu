@@ -19,6 +19,8 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
@@ -32,7 +34,7 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Overlays.Comments
 {
     [Cached]
-    public class DrawableComment : CompositeDrawable
+    public partial class DrawableComment : CompositeDrawable
     {
         private const int avatar_size = 40;
 
@@ -331,11 +333,11 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink("Copy link", copyUrl);
+            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-                actionsContainer.AddLink("Delete", deleteComment);
+                actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
             else
                 actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
@@ -359,6 +361,8 @@ namespace osu.Game.Overlays.Comments
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         onRepliesAdded(args.NewItems.Cast<DrawableComment>());
                         break;
 
@@ -497,7 +501,7 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class PinnedCommentNotice : FillFlowContainer
+        private partial class PinnedCommentNotice : FillFlowContainer
         {
             public PinnedCommentNotice()
             {
@@ -524,7 +528,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class ParentUsername : FillFlowContainer, IHasTooltip
+        private partial class ParentUsername : FillFlowContainer, IHasTooltip
         {
             public LocalisableString TooltipText => getParentMessage();
 
@@ -553,12 +557,12 @@ namespace osu.Game.Overlays.Comments
                 };
             }
 
-            private string getParentMessage()
+            private LocalisableString getParentMessage()
             {
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
         }
     }

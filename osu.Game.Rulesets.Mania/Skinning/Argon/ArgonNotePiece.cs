@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    internal class ArgonNotePiece : CompositeDrawable
+    internal partial class ArgonNotePiece : CompositeDrawable
     {
         public const float NOTE_HEIGHT = 42;
 
