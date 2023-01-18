@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 applyToArgonProgress(d => d.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
             });
             AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
-            AddStep("start", gameplayClockContainer.Start);
+            AddStep("start", () => gameplayClockContainer.Start());
         }
 
         [Test]
