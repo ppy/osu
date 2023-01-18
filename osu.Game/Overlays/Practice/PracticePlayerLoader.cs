@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Practice
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Practice
                 Origin = Anchor.BottomCentre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 25),
                 Colour = colour.Green,
-                Text = "Practice Mode"
+                Text = PracticePlayerLoaderStrings.PracticeMode
             });
         }
 

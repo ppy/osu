@@ -96,17 +96,17 @@ namespace osu.Game.Overlays.Practice
                             UpperBound = customEnd,
                             NubWidth = Nub.HEIGHT * 2,
                             MinRange = 0.01f,
-                            DefaultStringLowerBound = "Start",
-                            DefaultStringUpperBound = "End",
-                            DefaultTooltipLowerBound = "Start of beatmap",
-                            DefaultTooltipUpperBound = "End of beatmap",
+                            DefaultStringLowerBound = PracticeOverlayStrings.Start.ToString(),
+                            DefaultStringUpperBound = PracticeOverlayStrings.End.ToString(),
+                            DefaultTooltipLowerBound = PracticeOverlayStrings.StartOfBeatmap,
+                            DefaultTooltipUpperBound = PracticeOverlayStrings.EndOfBeatmap,
                             TooltipSuffix = "%",
                             NubFormat = "P1"
                         },
                         RestartButton = new ShearedButton(150)
                         {
                             Y = -5,
-                            Text = "Practice!",
+                            Text = PracticeOverlayStrings.Practice,
                             LighterColour = ColourProvider.Colour1,
                             DarkerColour = ColourProvider.Colour3,
                             Action = () => Restart.Invoke()
