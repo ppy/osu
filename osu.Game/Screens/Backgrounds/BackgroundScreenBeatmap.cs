@@ -132,6 +132,8 @@ namespace osu.Game.Screens.Backgrounds
             /// </remarks>
             public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+            protected override float DimLevel => showReplaceBackgroundStoryboard || !StoryboardReplacesBackground.Value ? base.DimLevel : 1f;
+
             public Background Background
             {
                 get => background;
@@ -177,10 +179,15 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }
 
+            /// <summary>
+            /// Whether the storyboard replace the background
+            /// </summary>
+            private bool showReplaceBackgroundStoryboard => (!ShowStoryboardConfig.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
+
             protected override bool ShowDimContent
                 // The background needs to be hidden in the case of it being replaced by the storyboard
                 // But it should show when dim set to 100% anyway to avoid showing Scaling background.
-                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value || DimLevel == 1;
+                => showReplaceBackgroundStoryboard || base.DimLevel >= 1f;
 
             protected override void UpdateVisuals()
             {
