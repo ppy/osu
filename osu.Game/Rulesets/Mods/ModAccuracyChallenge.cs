@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
-            if (!result.Type.IsScorable() || result.Type.IsBonus())
+            if (!result.Type.AffectsAccuracy())
                 return false;
 
             return getAccuracyWithImminentResultAdded(result) < MinimumAccuracy.Value;
