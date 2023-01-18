@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD
             set => startTime = value;
         }
 
-        public bool ShowProgress = true;
+        public bool ShowProgress { get; init; } = true;
 
         public double EndTime
         {

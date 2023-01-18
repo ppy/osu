@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            info.ShowProgress = false;
             info.TextColour = Colour4.White;
             info.Font = OsuFont.Torus.With(size: 18, weight: FontWeight.Bold);
         }
