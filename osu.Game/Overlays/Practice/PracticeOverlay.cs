@@ -20,8 +20,6 @@ namespace osu.Game.Overlays.Practice
     public partial class PracticeOverlay : ShearedOverlayContainer
     {
         public Action Restart = null!;
-        public Action OnHide = null!;
-        public Action OnShow = null!;
 
         public ShearedButton RestartButton = null!;
 
@@ -55,11 +53,6 @@ namespace osu.Game.Overlays.Practice
 
         [BackgroundDependencyLoader]
         private void load()
-        {
-            createContent();
-        }
-
-        private void createContent()
         {
             Add(new InputBlockingContainer
             {
@@ -125,29 +118,18 @@ namespace osu.Game.Overlays.Practice
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!e.Repeat)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.Select:
-                        RestartButton.TriggerClick();
-                        return true;
-                }
-            }
+            if (e.Repeat) return base.OnPressed(e);
 
-            return base.OnPressed(e);
-        }
+            if (e.Action != GlobalAction.Select) return base.OnPressed(e);
 
-        protected override void PopOut()
-        {
-            base.PopOut();
-            OnHide.Invoke();
+            RestartButton.TriggerClick();
+
+            return true;
         }
 
         protected override void PopIn()
         {
             base.PopIn();
-            OnShow.Invoke();
 
             //We want to make sure its displaying the correct gameplay initially
             preview.SeekTo(customStart.Value);

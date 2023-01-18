@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 {
-    public partial class PracticePercentageCounter : OverlayContainer
+    public partial class PracticePercentageCounter : VisibilityContainer
     {
         private const float panel_height = 35f;
 

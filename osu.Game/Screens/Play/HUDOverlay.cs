@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
         private static bool hasShownNotificationOnce;
 
         private readonly FillFlowContainer bottomRightElements;
-        private readonly FillFlowContainer topRightElements;
+        public readonly FillFlowContainer TopRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
                 {
                     AlwaysPresent = true,
                 },
-                topRightElements = new FillFlowContainer
+                TopRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
             };
 
-            hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, KeyCounter, TopRightElements };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -242,9 +242,9 @@ namespace osu.Game.Screens.Play
             }
 
             if (lowestTopScreenSpaceRight.HasValue)
-                topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
+                TopRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
             else
-                topRightElements.Y = 0;
+                TopRightElements.Y = 0;
 
             if (lowestTopScreenSpaceLeft.HasValue)
                 LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);

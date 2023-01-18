@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Practice.PracticeOverlayComponents;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
-using osuTK;
 
 namespace osu.Game.Overlays.Practice
 {
@@ -32,14 +31,14 @@ namespace osu.Game.Overlays.Practice
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            createPauseOverlay();
+            createPracticeOverlay();
 
             addButtons(colour);
 
             createHUDElements();
         }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
         private IDisposable? practiceOverlayRegistration;
@@ -70,9 +69,7 @@ namespace osu.Game.Overlays.Practice
         {
             //We dont want the gameplay running on the first attempt since the practice screen is being shown automatically
             if (!loader.IsFirstTry)
-            {
                 base.StartGameplay();
-            }
 
             //Set it to false after the last action that depends on it
             loader.IsFirstTry = false;
@@ -93,6 +90,26 @@ namespace osu.Game.Overlays.Practice
 
             OnGameplayStarted += () =>
                 GameplayClockContainer.Delay(grace_period).Then().Schedule(() => BlockFail = false);
+
+            PracticeOverlay.State.ValueChanged += state =>
+            {
+                if (state.NewValue == Visibility.Visible)
+                {
+                    GameplayClockContainer.Hide();
+                    return;
+                }
+
+                GameplayClockContainer.Show();
+
+                // We don't want the pause overlay triggering on exit if the player is not alive
+                if (GameplayState.HasFailed)
+                {
+                    FailOverlay.Show();
+                    return;
+                }
+
+                PauseOverlay.Show();
+            };
         }
 
         protected override void Dispose(bool isDisposing)
@@ -101,33 +118,16 @@ namespace osu.Game.Overlays.Practice
             practiceOverlayRegistration?.Dispose();
         }
 
-        private void createPauseOverlay()
+        private void createPracticeOverlay()
         {
             LoadComponent(PracticeOverlay = new PracticeOverlay(loader)
             {
                 Restart = () =>
                 {
-                    //Stops the pauseoverlay showing for a moment as we restart
+                    // Stops the pause overlay showing for a moment as we restart
                     PauseOverlay.Expire();
                     Restart();
                 },
-                OnShow = () =>
-                {
-                    GameplayClockContainer.Hide();
-                },
-                OnHide = () =>
-                {
-                    GameplayClockContainer.Show();
-
-                    // We don't want the pause overlay triggering on exit if the player is not alive
-                    if (GameplayState.HasFailed)
-                    {
-                        FailOverlay.Show();
-                        return;
-                    }
-
-                    PauseOverlay.Show();
-                }
             });
         }
 
@@ -151,14 +151,10 @@ namespace osu.Game.Overlays.Practice
         }
 
         private void createHUDElements() =>
-            HUDOverlay.Add(new PracticePercentageCounter(loader)
+            // Adding it to top right elements allows us to avoid it overlapping with other overlay elements
+            HUDOverlay.TopRightElements.Add(new PracticePercentageCounter(loader)
             {
-                State = { Value = Visibility.Visible },
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-
-                //We don't want it clipping the health bars on the default skin, this offset also avoids elements on *Most* legacy skins
-                Position = new Vector2(-20, 120),
+                State = { Value = Visibility.Visible }
             });
 
         protected override bool CheckModsAllowFailure() =>
