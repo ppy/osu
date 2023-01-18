@@ -863,6 +863,7 @@ namespace osu.Game.Screens.Select
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
             Carousel.FlushPendingFilterOperations();
+
             return true;
         }
 
