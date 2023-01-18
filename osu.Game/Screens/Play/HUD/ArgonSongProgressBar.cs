@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +20,12 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonSongProgressBar : SliderBar<double>
     {
-        private readonly float baseHeight;
+        public Action<double>? OnSeek { get; set; }
+
+        // Parent will handle restricting the area of valid input.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        private readonly float barHeight;
 
         private readonly RoundedBar playfieldBar;
         private readonly RoundedBar catchupBar;
@@ -32,8 +36,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly ColourInfo mainColour;
         private readonly ColourInfo mainColourDarkened;
-        private ColourInfo altColour;
-        private ColourInfo altColourDarkened;
+        private ColourInfo catchUpColour;
+        private ColourInfo catchUpColourDarkened;
 
         public bool ShowBackground
         {
@@ -42,8 +46,6 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private const float alpha_threshold = 2500;
-
-        public Action<double>? OnSeek { get; set; }
 
         public double StartTime
         {
@@ -84,8 +86,7 @@ namespace osu.Game.Screens.Play.HUD
             EndTime = 1;
 
             RelativeSizeAxes = Axes.X;
-            baseHeight = barHeight;
-            Height = baseHeight;
+            Height = this.barHeight = barHeight;
 
             CornerRadius = 5;
             Masking = true;
@@ -142,31 +143,30 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            catchupBar.AccentColour = altColour = colours.BlueLight;
-            altColourDarkened = colours.BlueLight.Darken(1 / 3f);
+            catchUpColour = colours.BlueLight;
+            catchUpColourDarkened = colours.BlueDark;
+
             showBackground.BindValueChanged(_ => updateBackground(), true);
         }
 
         private void updateBackground()
         {
             background.FadeTo(showBackground.Value ? 1 / 4f : 0, 200, Easing.In);
-            catchupBar.TransformTo(nameof(catchupBar.AccentColour), ShowBackground ? altColour : altColourDarkened, 200, Easing.In);
+            catchupBar.TransformTo(nameof(catchupBar.AccentColour), ShowBackground ? catchUpColour : catchUpColourDarkened, 200, Easing.In);
             playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), ShowBackground ? mainColour : mainColourDarkened, 200, Easing.In);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             if (Interactive)
-                this.ResizeHeightTo(baseHeight * 3.5f, 200, Easing.Out);
+                this.ResizeHeightTo(barHeight * 3.5f, 200, Easing.Out);
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (Interactive)
-                this.ResizeHeightTo(baseHeight, 200, Easing.In);
-
+            this.ResizeHeightTo(barHeight, 800, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
