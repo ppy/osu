@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor(Ruleset ruleset)
         {
-            this.Ruleset = ruleset;
+            Ruleset = ruleset;
 
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
