@@ -614,57 +614,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         /// <summary>
-        /// Ensures stability is maintained on different sort modes for items with equal properties.
-        /// </summary>
-        [Test]
-        public void TestSortingStabilityOnlineID()
-        {
-            var sets = new List<BeatmapSetInfo>();
-            int idOffset = 0;
-
-            AddStep("Populuate beatmap sets", () =>
-            {
-                sets.Clear();
-
-                for (int i = 0; i < 10; i++)
-                {
-                    var set = TestResources.CreateTestBeatmapSetInfo();
-
-                    // only need to set the first as they are a shared reference.
-                    var beatmap = set.Beatmaps.First();
-
-                    beatmap.Metadata.Artist = $"artist {i / 2}";
-                    beatmap.Metadata.Title = $"title {9 - i}";
-
-                    // testing the case where DateAdded happens to equal (quite rare).
-                    set.DateAdded = DateTimeOffset.UnixEpoch;
-
-                    sets.Add(set);
-                }
-
-                idOffset = sets.First().OnlineID;
-            });
-
-            loadBeatmaps(sets);
-
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
-
-            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
-            AddAssert("Items are in reverse order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + sets.Count - index - 1).All(b => b));
-
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Items reset to original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
-        }
-
-        /// <summary>
         /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
         /// </summary>
         [Test]
         public void TestSortingStabilityWithRemovedAndReaddedItem()
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
-            int idOffset = 0;
 
             AddStep("Populuate beatmap sets", () =>
             {
@@ -685,28 +640,24 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     sets.Add(set);
                 }
-
-                idOffset = sets.First().OnlineID;
             });
+
+            Guid[] originalOrder = null!;
 
             loadBeatmaps(sets);
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            assertOriginalOrderMaintained();
+
+            AddAssert("Items in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = carousel.BeatmapSets.Select(s => s.ID).ToArray());
 
             AddStep("Remove item", () => carousel.RemoveBeatmapSet(sets[1]));
             AddStep("Re-add item", () => carousel.UpdateBeatmapSet(sets[1]));
 
-            assertOriginalOrderMaintained();
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
 
             AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
-            assertOriginalOrderMaintained();
-
-            void assertOriginalOrderMaintained()
-            {
-                AddAssert("Items remain in original order",
-                    () => carousel.BeatmapSets.Select(s => s.OnlineID), () => Is.EqualTo(carousel.BeatmapSets.Select((set, index) => idOffset + index)));
-            }
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
         }
 
         /// <summary>
@@ -716,7 +667,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestSortingStabilityWithNewItems()
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
-            int idOffset = 0;
 
             AddStep("Populuate beatmap sets", () =>
             {
@@ -737,14 +687,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     sets.Add(set);
                 }
-
-                idOffset = sets.First().OnlineID;
             });
+
+            Guid[] originalOrder = null!;
 
             loadBeatmaps(sets);
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            assertOriginalOrderMaintained();
+
+            AddAssert("Items in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = carousel.BeatmapSets.Select(s => s.ID).ToArray());
 
             AddStep("Add new item", () =>
             {
@@ -756,22 +708,18 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmap.Metadata.Artist = "same artist";
                 beatmap.Metadata.Title = "same title";
 
-                // testing the case where DateAdded happens to equal (quite rare).
-                set.DateAdded = DateTimeOffset.UnixEpoch;
+                set.DateAdded = DateTimeOffset.FromUnixTimeSeconds(1);
 
                 carousel.UpdateBeatmapSet(set);
+
+                // add set to expected ordering
+                originalOrder = originalOrder.Prepend(set.ID).ToArray();
             });
 
-            assertOriginalOrderMaintained();
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
 
             AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
-            assertOriginalOrderMaintained();
-
-            void assertOriginalOrderMaintained()
-            {
-                AddAssert("Items remain in original order",
-                    () => carousel.BeatmapSets.Select(s => s.OnlineID), () => Is.EqualTo(carousel.BeatmapSets.Select((set, index) => idOffset + index)));
-            }
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
         }
 
         [Test]

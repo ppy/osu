@@ -121,14 +121,10 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (comparison != 0) return comparison;
 
-            // If the initial sort could not differentiate, attempt to use DateAdded and OnlineID to order sets in a stable fashion.
-            // This directionality is a touch arbitrary as while DateAdded puts newer beatmaps first, the OnlineID fallback puts lower IDs first.
-            // Can potentially be changed in the future if users actually notice / have preference, but keeping it this way matches historical tests.
-
+            // If the initial sort could not differentiate, attempt to use DateAdded to order sets in a stable fashion.
+            // The directionality of this matches the current SortMode.DateAdded, but we may want to reconsider if that becomes a user decision (ie. asc / desc).
             comparison = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
-            if (comparison != 0) return comparison;
 
-            comparison = BeatmapSet.OnlineID.CompareTo(otherSet.BeatmapSet.OnlineID);
             if (comparison != 0) return comparison;
 
             // If no online ID is available, fallback to our internal GUID for stability.
