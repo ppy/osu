@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -158,16 +157,18 @@ namespace osu.Game.Graphics.UserInterface
 
         private ColourInfo getSegmentColour(SegmentInfo segment)
         {
-            var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
-            var ourColour = DrawColourInfo.Colour;
-
-            return new ColourInfo
+            var segmentColour = new ColourInfo
             {
-                TopLeft = tierColour * Interpolation.ValueAt<Colour4>(segment.Start, ourColour.TopLeft, ourColour.TopRight, 0, 1),
-                TopRight = tierColour * Interpolation.ValueAt<Colour4>(segment.End, ourColour.TopLeft, ourColour.TopRight, 0, 1),
-                BottomLeft = tierColour * Interpolation.ValueAt<Colour4>(segment.Start, ourColour.BottomLeft, ourColour.BottomRight, 0, 1),
-                BottomRight = tierColour * Interpolation.ValueAt<Colour4>(segment.End, ourColour.BottomLeft, ourColour.BottomRight, 0, 1)
+                TopLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 0f)),
+                TopRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 0f)),
+                BottomLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 1f)),
+                BottomRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 1f))
             };
+
+            var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
+            segmentColour.ApplyChild(tierColour);
+
+            return segmentColour;
         }
 
         protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
