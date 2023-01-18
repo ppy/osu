@@ -410,7 +410,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
         public override Vector2 ScreenSpaceEndPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset)
-                                                             ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation);
+                                                       ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
