@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Select
 {
-    [Cached]
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
         private const float shear_width = 21;
@@ -40,6 +39,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         protected Container? DisplayedContent { get; private set; }
 
@@ -183,6 +185,14 @@ namespace osu.Game.Screens.Select
 
                     removeOldInfo();
                     Add(DisplayedContent = loaded);
+
+                    Info.StarRatingDisplay.DisplayedStars.BindValueChanged(s =>
+                    {
+                        starCounter.Current = (float)s.NewValue;
+                        starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
+
+                        difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
+                    }, true);
                 });
             }
         }
@@ -192,7 +202,7 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText TitleLabel { get; private set; } = null!;
             public OsuSpriteText ArtistLabel { get; private set; } = null!;
 
-            private StarRatingDisplay starRatingDisplay = null!;
+            public StarRatingDisplay StarRatingDisplay = null!;
 
             private ILocalisedBindableString titleBinding = null!;
             private ILocalisedBindableString artistBinding = null!;
@@ -203,13 +213,7 @@ namespace osu.Game.Screens.Select
             private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
             [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-
-            [Resolved]
-            private BeatmapInfoWedgeV2 wedge { get; set; } = null!;
 
             private ModSettingChangeTracker? settingChangeTracker;
 
@@ -246,7 +250,7 @@ namespace osu.Game.Screens.Select
                         Spacing = new Vector2(0f, 5f),
                         Children = new Drawable[]
                         {
-                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
+                            StarRatingDisplay = new StarRatingDisplay(default, animated: true)
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -302,24 +306,16 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                starRatingDisplay.DisplayedStars.BindValueChanged(s =>
-                {
-                    wedge.starCounter.Current = (float)s.NewValue;
-                    wedge.starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
-
-                    wedge.difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
-                }, true);
-
                 starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
-                    starRatingDisplay.Current.Value = s.NewValue ?? default;
+                    StarRatingDisplay.Current.Value = s.NewValue ?? default;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
-                    if (!starRatingDisplay.IsPresent)
-                        starRatingDisplay.FinishTransforms(true);
+                    if (!StarRatingDisplay.IsPresent)
+                        StarRatingDisplay.FinishTransforms(true);
 
-                    starRatingDisplay.FadeIn(transition_duration);
+                    StarRatingDisplay.FadeIn(transition_duration);
                 });
 
                 mods.BindValueChanged(m =>
