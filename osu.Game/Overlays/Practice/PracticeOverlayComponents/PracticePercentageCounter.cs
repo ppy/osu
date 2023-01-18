@@ -22,8 +22,10 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
 
         private readonly PracticePlayerLoader loader;
 
-        public PracticePercentageCounter(PracticePlayerLoader loader) =>
+        public PracticePercentageCounter(PracticePlayerLoader loader)
+        {
             this.loader = loader;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -76,7 +78,8 @@ namespace osu.Game.Overlays.Practice.PracticeOverlayComponents
         {
             base.LoadComplete();
 
-            this.Delay(2500).Then().Schedule(PopOut);
+            using (BeginDelayedSequence(2500))
+                PopOut();
         }
 
         protected override void PopIn() => this.FadeInFromZero(500, Easing.OutQuint);
