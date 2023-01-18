@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space collection of base points that cause this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
         /// The first element of this collection is <see cref="ScreenSpaceSelectionPoint"/>
         /// </summary>
-        public virtual Vector2[] ScreenSpaceSelectionPoints => new Vector2[] { ScreenSpaceSelectionPoint };
+        public virtual Vector2[] ScreenSpaceSnapPoints => new Vector2[] { ScreenSpaceSelectionPoint };
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="HitObjectSelectionBlueprint"/> for selections.
