@@ -225,7 +225,6 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
-            dependencies.CacheAs(DrawableRuleset.FrameStableClock);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.Mods.Value = gameplayMods;
@@ -309,6 +308,8 @@ namespace osu.Game.Screens.Play
                     },
                 });
             }
+
+            dependencies.CacheAs(DrawableRuleset.FrameStableClock);
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
