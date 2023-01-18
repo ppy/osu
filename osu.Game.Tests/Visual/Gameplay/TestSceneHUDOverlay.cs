@@ -213,17 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("attempt seek", () =>
             {
-                switch (getSongProgress())
-                {
-                    case SongProgressBar defaultBar:
-                        InputManager.MoveMouseTo(defaultBar);
-                        break;
-
-                    case ArgonSongProgressBar argonBar:
-                        InputManager.MoveMouseTo(argonBar);
-                        break;
-                }
-
+                InputManager.MoveMouseTo(getSongProgress() as Drawable);
                 InputManager.Click(MouseButton.Left);
             });
 
