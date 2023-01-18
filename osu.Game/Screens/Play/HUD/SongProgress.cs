@@ -36,7 +36,15 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         protected IGameplayClock GameplayClock { get; private set; } = null!;
 
-        private IClock? referenceClock;
+        [Resolved]
+        private IFrameStableClock? frameStableClock { get; set; }
+
+        /// <summary>
+        /// The reference clock is used to accurately tell the current playfield's time (including catch-up lag).
+        /// However, if none is available (i.e. used in tests), we fall back to the gameplay clock.
+        /// </summary>
+        protected IClock FrameStableClock => frameStableClock ?? GameplayClock;
+
         private IEnumerable<HitObject>? objects;
 
         public IEnumerable<HitObject> Objects
@@ -74,7 +82,6 @@ namespace osu.Game.Screens.Play.HUD
                     ((IBindable<bool>)Interactive).BindTo(drawableRuleset.HasReplayLoaded);
 
                 Objects = drawableRuleset.Objects;
-                referenceClock = drawableRuleset.FrameStableClock;
             }
         }
 
@@ -89,9 +96,7 @@ namespace osu.Game.Screens.Play.HUD
             if (objects == null)
                 return;
 
-            // The reference clock is used to accurately tell the playfield's time. This is obtained from the drawable ruleset.
-            // However, if no drawable ruleset is available (i.e. used in tests), we fall back to the gameplay clock.
-            double currentTime = referenceClock?.CurrentTime ?? GameplayClock.CurrentTime;
+            double currentTime = FrameStableClock.CurrentTime;
 
             bool isInIntro = currentTime < FirstHitTime;
 

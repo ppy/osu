@@ -6,11 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -25,13 +23,6 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
-
-        [Resolved]
-        private DrawableRuleset? drawableRuleset { get; set; }
-
-        // Even though `FrameStabilityContainer` caches as a `GameplayClock`, we need to check it directly via `drawableRuleset`
-        // as this calculator is not contained within the `FrameStabilityContainer` and won't see the dependency.
-        private IClock referenceClock => drawableRuleset?.FrameStableClock ?? GameplayClock;
 
         [Resolved]
         private Player? player { get; set; }
@@ -116,12 +107,12 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.ReferenceTime = GameplayClock.CurrentTime;
+            bar.TrackTime = GameplayClock.CurrentTime;
 
             if (isIntro)
                 bar.CurrentTime = 0;
             else
-                bar.CurrentTime = referenceClock.CurrentTime;
+                bar.CurrentTime = FrameStableClock.CurrentTime;
         }
     }
 }
