@@ -7,10 +7,14 @@ namespace osu.Game.Screens.Play.HUD
 {
     public interface ISongProgressBar
     {
-        public Action<double>? OnSeek { get; set; }
-        public double StartTime { set; }
-        public double EndTime { set; }
-        public double CurrentTime { set; }
+        /// <summary>
+        /// Whether the progress bar should allow interaction, ie. to perform seek operations.
+        /// </summary>
         public bool Interactive { get; set; }
+
+        /// <summary>
+        /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
+        /// </summary>
+        public Action<double>? OnSeek { get; set; }
     }
 }
