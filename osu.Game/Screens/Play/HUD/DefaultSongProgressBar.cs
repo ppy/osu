@@ -13,7 +13,7 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SongProgressBar : SliderBar<double>
+    public partial class DefaultSongProgressBar : SliderBar<double>
     {
         /// <summary>
         /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool showHandle;
 
-        public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
+        public DefaultSongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
             CurrentNumber.MinValue = 0;
             CurrentNumber.MaxValue = 1;

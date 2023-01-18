@@ -22,8 +22,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float transition_duration = 200;
 
-        private readonly SongProgressBar bar;
-        private readonly SongProgressGraph graph;
+        private readonly DefaultSongProgressBar bar;
+        private readonly DefaultSongProgressGraph graph;
         private readonly SongProgressInfo info;
 
         [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                 },
-                graph = new SongProgressGraph
+                graph = new DefaultSongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
                     Height = graph_height,
                     Margin = new MarginPadding { Bottom = bottom_bar_height },
                 },
-                bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
+                bar = new DefaultSongProgressBar(bottom_bar_height, graph_height, handle_size)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
