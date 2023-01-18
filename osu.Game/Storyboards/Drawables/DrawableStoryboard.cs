@@ -12,15 +12,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
+using osuTK.Graphics;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
+    public partial class DrawableStoryboard : CompositeDrawable
     {
         [Cached]
         public Storyboard Storyboard { get; }
@@ -32,7 +34,10 @@ namespace osu.Game.Storyboards.Drawables
 
         private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
 
-        protected override Container<DrawableStoryboardLayer> Content { get; }
+        /// <summary>
+        /// All layers in the storyboard.
+        /// </summary>
+        private readonly IList<DrawableStoryboardLayer> layers = new List<DrawableStoryboardLayer>();
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
@@ -76,12 +81,15 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(Content = new Container<DrawableStoryboardLayer>
+            if (Storyboard.ReplacesBackground && Storyboard.HasDrawable)
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
+                AddInternal(new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                });
+            }
         }
 
         [BackgroundDependencyLoader(true)]
@@ -96,7 +104,9 @@ namespace osu.Game.Storyboards.Drawables
             {
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                Add(layer.CreateDrawable());
+                var drawable = layer.CreateDrawable();
+                layers.Add(drawable);
+                AddInternal(drawable);
             }
 
             lastEventEndTime = Storyboard.LatestEventTime;
@@ -108,11 +118,11 @@ namespace osu.Game.Storyboards.Drawables
             hasStoryboardEnded.Value = lastEventEndTime == null || Time.Current >= lastEventEndTime;
         }
 
-        public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
+        public DrawableStoryboardLayer OverlayLayer => layers.Single(layer => layer.Name == "Overlay");
 
         private void updateLayerVisibility()
         {
-            foreach (var layer in Children)
+            foreach (var layer in layers)
                 layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
     }
