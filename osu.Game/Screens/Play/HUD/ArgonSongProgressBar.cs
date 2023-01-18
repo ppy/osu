@@ -22,7 +22,6 @@ namespace osu.Game.Screens.Play.HUD
     public partial class ArgonSongProgressBar : SliderBar<double>
     {
         private readonly float baseHeight;
-        private readonly float catchupBaseDepth;
 
         private readonly RoundedBar playfieldBar;
         private readonly RoundedBar catchupBar;
@@ -118,7 +117,7 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both
                 },
             };
-            catchupBaseDepth = catchupBar.Depth;
+
             mainColourDarkened = Colour4.White.Darken(1 / 3f);
         }
 
@@ -184,9 +183,9 @@ namespace osu.Game.Screens.Play.HUD
             catchupBar.Length = (float)Interpolation.Lerp(catchupBar.Length, normalizedReference, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             if (TrackTime < CurrentTime)
-                ChangeChildDepth(catchupBar, playfieldBar.Depth - 0.1f);
+                ChangeChildDepth(catchupBar, -1);
             else
-                ChangeChildDepth(catchupBar, catchupBaseDepth);
+                ChangeChildDepth(catchupBar, 0);
 
             float timeDelta = (float)(Math.Abs(CurrentTime - TrackTime));
             catchupBar.Alpha = MathHelper.Clamp(timeDelta, 0, alpha_threshold) / alpha_threshold;
