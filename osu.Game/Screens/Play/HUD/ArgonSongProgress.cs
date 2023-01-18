@@ -3,11 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -22,11 +20,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Container graphContainer;
 
         private const float bar_height = 10;
-
-        public readonly Bindable<bool> AllowSeeking = new BindableBool();
-
-        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
-        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         [Resolved]
         private DrawableRuleset? drawableRuleset { get; set; }
@@ -80,14 +73,6 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.LoadComplete();
-
-            if (drawableRuleset != null)
-            {
-                if (player?.Configuration.AllowUserInteraction == true)
-                    ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
-            }
-
             info.ShowProgress = false;
             info.TextColour = Colour4.White;
             info.Font = OsuFont.Torus.With(size: 18, weight: FontWeight.Bold);
@@ -95,7 +80,9 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
-            AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
+            base.LoadComplete();
+
+            Interactive.BindValueChanged(_ => bar.Interactive = Interactive.Value, true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
         }
 
@@ -105,11 +92,6 @@ namespace osu.Game.Screens.Play.HUD
 
             info.StartTime = bar.StartTime = FirstHitTime;
             info.EndTime = bar.EndTime = LastHitTime;
-        }
-
-        private void updateBarVisibility()
-        {
-            bar.Interactive = AllowSeeking.Value;
         }
 
         private void updateGraphVisibility()
@@ -123,16 +105,6 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
             Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
-        }
-
-        protected override void PopIn()
-        {
-            this.FadeIn(500, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            this.FadeOut(100);
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)

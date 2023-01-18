@@ -3,12 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -27,22 +24,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
-        /// <summary>
-        /// Whether seeking is allowed and the progress bar should be shown.
-        /// </summary>
-        public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
-
-        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
-        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
-
-        public override bool HandleNonPositionalInput => AllowSeeking.Value;
-        public override bool HandlePositionalInput => AllowSeeking.Value;
-
         [Resolved]
         private Player? player { get; set; }
-
-        [Resolved]
-        private DrawableRuleset? drawableRuleset { get; set; }
 
         public DefaultSongProgress()
         {
@@ -75,34 +58,18 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            base.LoadComplete();
-
-            if (drawableRuleset != null)
-            {
-                if (player?.Configuration.AllowUserInteraction == true)
-                    ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
-            }
-
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
 
         protected override void LoadComplete()
         {
-            AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
+            Interactive.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
-        }
 
-        protected override void PopIn()
-        {
-            this.FadeIn(500, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            this.FadeOut(100);
+            base.LoadComplete();
         }
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
@@ -133,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateBarVisibility()
         {
-            bar.Interactive = AllowSeeking.Value;
+            bar.Interactive = Interactive.Value;
 
             updateInfoMargin();
         }
@@ -150,7 +117,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateInfoMargin()
         {
-            float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
+            float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }
