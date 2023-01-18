@@ -37,6 +37,9 @@ namespace osu.Game.Overlays.Practice
             Precision = 0.001f
         };
 
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
+
         private PracticeGameplayPreview preview = null!;
 
         public PracticeOverlay(PracticePlayerLoader loader)
@@ -131,6 +134,7 @@ namespace osu.Game.Overlays.Practice
         {
             base.PopIn();
 
+            game.SkinEditor.Hide();
             //We want to make sure its displaying the correct gameplay initially
             preview.SeekTo(customStart.Value);
         }

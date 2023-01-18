@@ -103,7 +103,7 @@ namespace osu.Game
 
         private ChangelogOverlay changelogOverlay;
 
-        private SkinEditorOverlay skinEditor;
+        public SkinEditorOverlay SkinEditor;
 
         private Container overlayContent;
 
@@ -941,7 +941,7 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(SkinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1222,7 +1222,7 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.ToggleSkinEditor:
-                    skinEditor.ToggleVisibility();
+                    SkinEditor.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ResetInputSettings:
@@ -1246,7 +1246,7 @@ namespace osu.Game
                     // Don't allow random skin selection while in the skin editor.
                     // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.
                     // If people want this to work we can potentially avoid selecting default skins when the editor is open, or allow a maximum of one mutable skin somehow.
-                    if (skinEditor.State.Value == Visibility.Visible)
+                    if (SkinEditor.State.Value == Visibility.Visible)
                         return false;
 
                     SkinManager.SelectRandomSkin();
@@ -1390,7 +1390,7 @@ namespace osu.Game
                     BackButton.Hide();
             }
 
-            skinEditor.SetTarget((OsuScreen)newScreen);
+            SkinEditor.SetTarget((OsuScreen)newScreen);
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
