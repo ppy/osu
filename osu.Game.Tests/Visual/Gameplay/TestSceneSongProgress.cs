@@ -54,10 +54,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
                 this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
 
-            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
+            AddStep("allow seeking", () => applyToDefaultProgress(s => s.Interactive.Value = true));
             AddStep("hide graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = false));
-            AddStep("disallow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = false));
-            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
+            AddStep("disallow seeking", () => applyToDefaultProgress(s => s.Interactive.Value = false));
+            AddStep("allow seeking", () => applyToDefaultProgress(s => s.Interactive.Value = true));
             AddStep("show graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = true));
         }
 
