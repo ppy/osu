@@ -460,7 +460,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Movement is tracked from the blueprint of the earliest item, since it only makes sense to distance snap from that item
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintsOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoints).ToArray();
-
             return true;
         }
 
@@ -515,7 +514,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Check for positional snap for given blueprint.
         /// </summary>
         /// <param name="blueprint">The blueprint to check for snapping</param>
-        /// <param name="distanceTravelled">Distance traveled since start of dragging action. </param>
+        /// <param name="distanceTravelled">Distance travelled since start of dragging action. </param>
         /// <param name="originalPositions">The selection positions of blueprint before start of dragging action. </param>
         /// <returns>Whether found object to snap to.</returns>
         private bool checkSnappingBlueprintToNearbyObjects(SelectionBlueprint<T> blueprint, Vector2 distanceTravelled, Vector2[] originalPositions)
@@ -537,7 +536,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(blueprint, delta)))
                     return true;
             }
-
+            
             return false;
         }
 
