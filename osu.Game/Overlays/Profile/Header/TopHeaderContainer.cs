@@ -5,18 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -38,7 +35,6 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
         private OsuSpriteText userCountryText = null!;
-        private FillFlowContainer userStats = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
 
         [BackgroundDependencyLoader]
@@ -164,16 +160,6 @@ namespace osu.Game.Overlays.Profile.Header
                         }
                     }
                 },
-                userStats = new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 300,
-                    Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
-                    Padding = new MarginPadding { Vertical = 15 },
-                    Spacing = new Vector2(0, 2)
-                }
             };
 
             User.BindValueChanged(user => updateUser(user.NewValue));
@@ -192,43 +178,6 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
-
-            userStats.Clear();
-
-            if (user?.Statistics != null)
-            {
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0")));
-            }
-        }
-
-        private partial class UserStatsLine : Container
-        {
-            public UserStatsLine(LocalisableString left, LocalisableString right)
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 15),
-                        Text = left,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
-                        Text = right,
-                    },
-                };
-            }
         }
     }
 }
