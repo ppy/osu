@@ -3,9 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Container graphContainer;
 
         private const float bar_height = 10;
+
+        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
+        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         [Resolved]
         private DrawableRuleset? drawableRuleset { get; set; }

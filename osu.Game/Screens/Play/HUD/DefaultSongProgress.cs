@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -23,6 +25,9 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
+
+        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
+        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         [Resolved]
         private Player? player { get; set; }
