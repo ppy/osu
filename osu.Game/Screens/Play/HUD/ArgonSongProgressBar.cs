@@ -45,8 +45,6 @@ namespace osu.Game.Screens.Play.HUD
             set => showBackground.Value = value;
         }
 
-        private const float alpha_threshold = 2500;
-
         public double StartTime
         {
             private get => CurrentNumber.MinValue;
@@ -152,7 +150,6 @@ namespace osu.Game.Screens.Play.HUD
         private void updateBackground()
         {
             background.FadeTo(showBackground.Value ? 1 / 4f : 0, 200, Easing.In);
-            catchupBar.TransformTo(nameof(catchupBar.AccentColour), ShowBackground ? catchUpColour : catchUpColourDarkened, 200, Easing.In);
             playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), ShowBackground ? mainColour : mainColourDarkened, 200, Easing.In);
         }
 
@@ -188,7 +185,17 @@ namespace osu.Game.Screens.Play.HUD
                 ChangeChildDepth(catchupBar, 0);
 
             float timeDelta = (float)(Math.Abs(CurrentTime - TrackTime));
-            catchupBar.Alpha = MathHelper.Clamp(timeDelta, 0, alpha_threshold) / alpha_threshold;
+
+            const float colour_transition_threshold = 20000;
+
+            catchupBar.AccentColour = Interpolation.ValueAt(
+                Math.Min(timeDelta, colour_transition_threshold),
+                ShowBackground ? mainColour : mainColourDarkened,
+                ShowBackground ? catchUpColour : catchUpColourDarkened,
+                0, colour_transition_threshold,
+                Easing.OutQuint);
+
+            catchupBar.Alpha = Math.Max(1, catchupBar.Length);
         }
 
         private ScheduledDelegate? scheduledSeek;
