@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private DrawableRuleset? drawableRuleset { get; set; }
 
+        // Even though `FrameStabilityContainer` caches as a `GameplayClock`, we need to check it directly via `drawableRuleset`
+        // as this calculator is not contained within the `FrameStabilityContainer` and won't see the dependency.
         private IClock referenceClock => drawableRuleset?.FrameStableClock ?? GameplayClock;
 
         [Resolved]
