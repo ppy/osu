@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -31,9 +30,6 @@ namespace osu.Game.Screens.Play.HUD
         /// By default, this will be automatically decided based on the gameplay state.
         /// </remarks>
         public readonly Bindable<bool> Interactive = new Bindable<bool>();
-
-        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
-        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         public bool UsesFixedAnchor { get; set; }
 
