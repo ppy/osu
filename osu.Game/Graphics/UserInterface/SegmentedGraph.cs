@@ -48,17 +48,14 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Colour4[] tierColours;
+        private IReadOnlyList<Colour4> tierColours;
 
-        public Colour4[] TierColours
+        public IReadOnlyList<Colour4> TierColours
         {
             get => tierColours;
             set
             {
-                if (value.Length == 0 || value == tierColours)
-                    return;
-
-                tierCount = value.Length;
+                tierCount = value.Count;
                 tierColours = value;
 
                 graphNeedsUpdate = true;

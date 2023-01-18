@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
@@ -16,9 +18,18 @@ namespace osu.Game.Screens.Play.HUD
     {
         // Some implementations of this element allow seeking during gameplay playback.
         // Set a sane default of never handling input to override the behaviour provided by OverlayContainer.
-        public override bool HandleNonPositionalInput => false;
-        public override bool HandlePositionalInput => false;
+        public override bool HandleNonPositionalInput => Interactive.Value;
+        public override bool HandlePositionalInput => Interactive.Value;
+
         protected override bool BlockScrollInput => false;
+
+        /// <summary>
+        /// Whether interaction should be allowed (ie. seeking). If <c>false</c>, interaction controls will not be displayed.
+        /// </summary>
+        /// <remarks>
+        /// By default, this will be automatically decided based on the gameplay state.
+        /// </remarks>
+        public readonly Bindable<bool> Interactive = new Bindable<bool>();
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -63,13 +74,20 @@ namespace osu.Game.Screens.Play.HUD
         protected virtual void UpdateObjects(IEnumerable<HitObject> objects) { }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableRuleset? drawableRuleset)
+        private void load(DrawableRuleset? drawableRuleset, Player? player)
         {
             if (drawableRuleset != null)
             {
+                if (player?.Configuration.AllowUserInteraction == true)
+                    ((IBindable<bool>)Interactive).BindTo(drawableRuleset.HasReplayLoaded);
+
                 Objects = drawableRuleset.Objects;
             }
         }
+
+        protected override void PopIn() => this.FadeIn(500, Easing.OutQuint);
+
+        protected override void PopOut() => this.FadeOut(100);
 
         protected override void Update()
         {
