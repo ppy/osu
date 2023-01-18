@@ -57,6 +57,11 @@ namespace osu.Game.Overlays.Comments
         /// </summary>
         public bool WasDeleted { get; protected set; }
 
+        /// <summary>
+        /// Tracks this comment's level of nesting. 0 means that this comment has no parents.
+        /// </summary>
+        public int Level { get; private set; }
+
         private FillFlowContainer childCommentsVisibilityContainer = null!;
         private FillFlowContainer childCommentsContainer = null!;
         private LoadRepliesButton loadRepliesButton = null!;
@@ -70,7 +75,7 @@ namespace osu.Game.Overlays.Comments
         private GridContainer content = null!;
         private VotePill votePill = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
@@ -79,7 +84,7 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public DrawableComment(Comment comment)
@@ -88,11 +93,15 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, DrawableComment? parentComment)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
             CommentMarkdownContainer message;
+
+            Level = parentComment?.Level + 1 ?? 0;
+
+            float childrenPadding = Level < 6 ? 20 : 5;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -248,7 +257,7 @@ namespace osu.Game.Overlays.Comments
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
-                                Padding = new MarginPadding { Left = 20 },
+                                Padding = new MarginPadding { Left = childrenPadding },
                                 Children = new Drawable[]
                                 {
                                     childCommentsContainer = new FillFlowContainer
