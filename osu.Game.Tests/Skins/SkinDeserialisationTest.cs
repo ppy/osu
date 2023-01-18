@@ -44,7 +44,9 @@ namespace osu.Game.Tests.Skins
             // Covers TextElement and BeatmapInfoDrawable
             "Archives/modified-default-20221102.osk",
             // Covers BPM counter.
-            "Archives/modified-default-20221205.osk"
+            "Archives/modified-default-20221205.osk",
+            // Covers judgement counter.
+            "Archives/modified-default-20230117.osk"
         };
 
         /// <summary>
