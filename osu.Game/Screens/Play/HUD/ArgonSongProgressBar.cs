@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateValue(float value)
         {
-            //
+            // Handled in Update
         }
 
         protected override void Update()
