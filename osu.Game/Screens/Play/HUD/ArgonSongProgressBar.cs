@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonSongProgressBar : SliderBar<double>, ISongProgressBar
+    public partial class ArgonSongProgressBar : SliderBar<double>
     {
         private readonly float baseHeight;
         private readonly float catchupBaseDepth;

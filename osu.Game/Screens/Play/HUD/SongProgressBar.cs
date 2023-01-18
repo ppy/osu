@@ -13,16 +13,16 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SongProgressBar : SliderBar<double>, ISongProgressBar
+    public partial class SongProgressBar : SliderBar<double>
     {
+        /// <summary>
+        /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
+        /// </summary>
         public Action<double>? OnSeek { get; set; }
 
-        private readonly Box fill;
-        private readonly Container handleBase;
-        private readonly Container handleContainer;
-
-        private bool showHandle;
-
+        /// <summary>
+        /// Whether the progress bar should allow interaction, ie. to perform seek operations.
+        /// </summary>
         public bool Interactive
         {
             get => showHandle;
@@ -56,6 +56,12 @@ namespace osu.Game.Screens.Play.HUD
         {
             set => CurrentNumber.Value = value;
         }
+
+        private readonly Box fill;
+        private readonly Container handleBase;
+        private readonly Container handleContainer;
+
+        private bool showHandle;
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
