@@ -51,9 +51,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Box colourBox = null!;
 
-        // The purpose of this underline is to avoid the bleed caused by making the colourBox fill the container, without incurring the performance hit of using a buffered container
-        private Box colourUnderline = null!;
-
         private StarRatingDisplay starRatingDisplay = null!;
 
         [Cached]
@@ -102,36 +99,25 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                new Container
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        colourBox = new Box
+                        colourBox = new Box { RelativeSizeAxes = Axes.Both, },
+
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 40,
-                        },
-                        colourUnderline = new Box
-                        {
-                            Alpha = 0,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Masking = true,
+                            CornerRadius = 10,
                             RelativeSizeAxes = Axes.X,
-                            Height = 3
-                        },
+                            // We don't want to match the header's size when its selected, hence no relative sizing.
+                            Height = height,
+                            X = 30,
+                            Colour = colourProvider.Background3,
+                            Child = new Box { RelativeSizeAxes = Axes.Both },
+                        }
                     }
-                },
-                new Container
-                {
-                    Masking = true,
-                    CornerRadius = 10,
-                    RelativeSizeAxes = Axes.X,
-                    // We don't want to match the header's size when its selected, hence no relative sizing.
-                    Height = height,
-                    X = 30,
-                    Colour = colourProvider.Background3,
-                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
 
                 iconContainer = new ConstrainedIconContainer
@@ -211,8 +197,6 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
             Header.Height = height + 2;
-
-            colourUnderline.FadeInFromZero();
         }
 
         protected override void Deselected()
@@ -230,8 +214,6 @@ namespace osu.Game.Screens.Select.Carousel
                 Radius = 10,
                 Colour = Colour4.Black.Opacity(100),
             };
-
-            colourUnderline.FadeOutFromOne();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -264,7 +246,7 @@ namespace osu.Game.Screens.Select.Carousel
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
                     iconContainer.Colour = d.NewValue.Value.Stars > 6.5f ? Colour4.White : colours.B5;
 
-                    starCounter.Colour = colourBox.Colour = colourUnderline.Colour =
+                    starCounter.Colour = colourBox.Colour =
                         colours.ForStarDifficulty(d.NewValue.Value.Stars);
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
