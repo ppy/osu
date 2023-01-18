@@ -9,6 +9,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -27,9 +28,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
+            FrameStabilityContainer frameStabilityContainer;
 
-            Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
+            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
+            {
+                Child = frameStabilityContainer = new FrameStabilityContainer
+                {
+                    MaxCatchUpFrames = 1
+                }
+            });
+
+            Dependencies.CacheAs<IGameplayClock>(frameStabilityContainer);
         }
 
         [SetUpSteps]
