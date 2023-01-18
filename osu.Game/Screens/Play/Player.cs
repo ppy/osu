@@ -225,6 +225,7 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
+            dependencies.CacheAs(DrawableRuleset.FrameStableClock);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.Mods.Value = gameplayMods;
