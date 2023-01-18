@@ -462,8 +462,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
             movementBlueprintOriginalEndPositions = movementBlueprints.Where(m => m.ScreenSpaceSelectionPoint != m.ScreenSpaceEndPoint)
-                .Select(m => m.ScreenSpaceEndPoint).ToArray();
-                
+                                                                      .Select(m => m.ScreenSpaceEndPoint).ToArray();
+
             return true;
         }
 
@@ -491,12 +491,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (snapProvider != null)
             {
                 var currentSelectionPointPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
+
                 if (checkSnappingForNearbyObjects(distanceTraveled, movementBlueprintOriginalPositions, currentSelectionPointPositions))
                     return true;
 
                 var currentEndPointPositions = movementBlueprints.Where(m => m.ScreenSpaceSelectionPoint != m.ScreenSpaceEndPoint)
-                    .Select(m => m.ScreenSpaceEndPoint)
-                    .ToArray();
+                                                                 .Select(m => m.ScreenSpaceEndPoint)
+                                                                 .ToArray();
+
                 if (checkSnappingForNearbyObjects(distanceTraveled, movementBlueprintOriginalEndPositions, currentEndPointPositions))
                     return true;
             }
@@ -542,6 +544,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints[i], delta)))
                     return true;
             }
+
             return false;
         }
 
