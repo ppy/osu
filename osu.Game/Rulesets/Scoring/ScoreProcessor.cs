@@ -97,7 +97,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double ClassicScoreMultiplier => 36;
 
-        private readonly Ruleset ruleset;
+        /// <summary>
+        /// The ruleset this score processor is valid for.
+        /// </summary>
+        public readonly Ruleset Ruleset;
+
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -145,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor(Ruleset ruleset)
         {
-            this.ruleset = ruleset;
+            this.Ruleset = ruleset;
 
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
@@ -291,8 +295,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public double ComputeAccuracy(ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
             extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
@@ -312,8 +316,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
@@ -552,7 +556,7 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            maxResult = maxBasicResult ??= ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
+                            maxResult = maxBasicResult ??= Ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
                             break;
                     }
 
