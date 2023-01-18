@@ -127,6 +127,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestMaxValueStartsHidden()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay
+            {
+                ShowMaxJudgement = { Value = false }
+            });
+            AddAssert("Check max hidden", () => counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().First().Alpha == 0);
+        }
+
+        [Test]
         public void TestCycleDisplayModes()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
