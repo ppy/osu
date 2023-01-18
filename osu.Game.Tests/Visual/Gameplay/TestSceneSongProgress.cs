@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set hit objects", setHitObjects);
             AddStep("hook seeking", () =>
             {
-                applyToDefaultProgress(d => d.ChildrenOfType<SongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
+                applyToDefaultProgress(d => d.ChildrenOfType<DefaultSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
                 applyToArgonProgress(d => d.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
             });
             AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
