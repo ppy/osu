@@ -51,11 +51,22 @@ namespace osu.Game.Rulesets.Mods
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
-            // accuracy calculation logic taken from `ScoreProcessor`. should be updated here if the formula ever changes.
             if (!result.Type.IsScorable() || result.Type.IsBonus())
                 return false;
 
-            return scoreProcessor.Accuracy.Value < MinimumAccuracy.Value;
+            return getAccuracyWithImminentResultAdded(result) < MinimumAccuracy.Value;
+        }
+
+        private double getAccuracyWithImminentResultAdded(JudgementResult result)
+        {
+            var score = new ScoreInfo { Ruleset = scoreProcessor.Ruleset.RulesetInfo };
+
+            // This is super ugly, but if we don't do it this way we will not have the most recent result added to the accuracy value.
+            // Hopefully we can improve this in the future.
+            scoreProcessor.PopulateScore(score);
+            score.Statistics[result.Type]++;
+
+            return scoreProcessor.ComputeAccuracy(score);
         }
     }
 
