@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (comparison != 0) return comparison;
 
-            // If no online ID is available, fallback to our internal GUID for stability.
+            // If DateAdded fails to break the tie, fallback to our internal GUID for stability.
             // This basically means it's a stable random sort.
             return otherSet.BeatmapSet.ID.CompareTo(BeatmapSet.ID);
         }
