@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -38,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void SetupSteps()
         {
             AddStep("reset clock", () => gameplayClockContainer.Reset());
-            AddStep("set hit objects", setHitObjects);
+            AddStep("set hit objects", () => this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = Beatmap.Value.Beatmap.HitObjects));
             AddStep("hook seeking", () =>
             {
                 applyToDefaultProgress(d => d.ChildrenOfType<DefaultSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
@@ -71,15 +69,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
             this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
-
-        private void setHitObjects()
-        {
-            var objects = new List<HitObject>();
-            for (double i = 0; i < 5000; i++)
-                objects.Add(new HitObject { StartTime = i });
-
-            this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
-        }
 
         protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
 
