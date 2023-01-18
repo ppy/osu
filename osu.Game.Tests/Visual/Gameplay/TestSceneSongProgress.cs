@@ -38,7 +38,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Dependencies.CacheAs<IGameplayClock>(frameStabilityContainer);
+            Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
+            Dependencies.CacheAs<IFrameStableClock>(frameStabilityContainer);
         }
 
         [SetUpSteps]

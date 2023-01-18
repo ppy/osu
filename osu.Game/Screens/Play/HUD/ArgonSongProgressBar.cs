@@ -64,21 +64,21 @@ namespace osu.Game.Screens.Play.HUD
             set => CurrentNumber.Value = value;
         }
 
-        public double ReferenceTime
+        public double TrackTime
         {
-            private get => currentReference.Value;
-            set => currentReference.Value = value;
+            private get => currentTrackTime.Value;
+            set => currentTrackTime.Value = value;
         }
 
         private double length => EndTime - StartTime;
 
-        private readonly BindableNumber<double> currentReference;
+        private readonly BindableNumber<double> currentTrackTime;
 
         public bool Interactive { get; set; }
 
         public ArgonSongProgressBar(float barHeight)
         {
-            currentReference = new BindableDouble();
+            currentTrackTime = new BindableDouble();
             setupAlternateValue();
 
             StartTime = 0;
@@ -124,9 +124,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void setupAlternateValue()
         {
-            CurrentNumber.MaxValueChanged += v => currentReference.MaxValue = v;
-            CurrentNumber.MinValueChanged += v => currentReference.MinValue = v;
-            CurrentNumber.PrecisionChanged += v => currentReference.Precision = v;
+            CurrentNumber.MaxValueChanged += v => currentTrackTime.MaxValue = v;
+            CurrentNumber.MinValueChanged += v => currentTrackTime.MinValue = v;
+            CurrentNumber.PrecisionChanged += v => currentTrackTime.Precision = v;
         }
 
         private float normalizedReference
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (EndTime - StartTime == 0)
                     return 1;
 
-                return (float)((ReferenceTime - StartTime) / length);
+                return (float)((TrackTime - StartTime) / length);
             }
         }
 
@@ -183,12 +183,12 @@ namespace osu.Game.Screens.Play.HUD
             playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, NormalizedValue, Math.Clamp(Time.Elapsed / 40, 0, 1));
             catchupBar.Length = (float)Interpolation.Lerp(catchupBar.Length, normalizedReference, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            if (ReferenceTime < CurrentTime)
+            if (TrackTime < CurrentTime)
                 ChangeChildDepth(catchupBar, playfieldBar.Depth - 0.1f);
             else
                 ChangeChildDepth(catchupBar, catchupBaseDepth);
 
-            float timeDelta = (float)(Math.Abs(CurrentTime - ReferenceTime));
+            float timeDelta = (float)(Math.Abs(CurrentTime - TrackTime));
             catchupBar.Alpha = MathHelper.Clamp(timeDelta, 0, alpha_threshold) / alpha_threshold;
         }
 
