@@ -22,6 +22,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -419,8 +420,9 @@ namespace osu.Game.Overlays.Comments
                 if (!ShowDeleted.Value)
                     Hide();
             });
-            request.Failure += _ => Schedule(() =>
+            request.Failure += e => Schedule(() =>
             {
+                Logger.Error(e, "Failed to delete comment");
                 actionsLoading.Hide();
                 actionsContainer.Show();
             });
