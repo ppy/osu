@@ -860,12 +860,9 @@ namespace osu.Game.Screens.Select
             Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
 
-            if (Carousel.IsLoaded)
-            {
-                // if we have a pending filter operation, we want to run it now.
-                // it could change selection (ie. if the ruleset has been changed).
-                Carousel.FlushPendingFilterOperations();
-            }
+            // if we have a pending filter operation, we want to run it now.
+            // it could change selection (ie. if the ruleset has been changed).
+            Carousel.FlushPendingFilterOperations();
 
             return true;
         }
