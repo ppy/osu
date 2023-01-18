@@ -123,12 +123,14 @@ namespace osu.Game.Tests.Visual.Background
             performFullSetup();
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             createFakeStoryboard();
+            AddUntilStep("Background is not black", () => !songSelect.IsBackgroundBlack());
             AddStep("Enable Storyboard", () =>
             {
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
             AddUntilStep("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible);
+            AddUntilStep("Background is black", () => songSelect.IsBackgroundBlack());
             AddStep("Disable Storyboard", () =>
             {
                 player.ReplacesBackground.Value = false;
@@ -361,6 +363,8 @@ namespace osu.Game.Tests.Visual.Background
             /// </summary>
             /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
+
+            public bool IsBackgroundBlack() => background.CurrentDim == 1f;
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
