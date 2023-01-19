@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -66,29 +65,27 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     counter.Direction.Value = convertedDirection;
             }, true);
 
-            Mode.BindValueChanged(_ => updateMode(), true);
-
-            ShowMaxJudgement.BindValueChanged(showMax =>
-            {
-                var firstChild = CounterFlow.Children.FirstOrDefault();
-
-                if (firstChild != null)
-                    firstChild.State.Value = showMax.NewValue ? Visibility.Visible : Visibility.Hidden;
-            }, true);
+            Mode.BindValueChanged(_ => updateDisplay());
+            ShowMaxJudgement.BindValueChanged(_ => updateDisplay(), true);
         }
 
-        private void updateMode()
+        private void updateDisplay()
         {
-            foreach (var counter in CounterFlow.Children)
+            for (int i = 0; i < CounterFlow.Children.Count; i++)
             {
-                if (shouldShow(counter))
+                JudgementCounter counter = CounterFlow.Children[i];
+
+                if (shouldShow(i, counter))
                     counter.Show();
                 else
                     counter.Hide();
             }
 
-            bool shouldShow(JudgementCounter counter)
+            bool shouldShow(int index, JudgementCounter counter)
             {
+                if (index == 0 && !ShowMaxJudgement.Value)
+                    return false;
+
                 if (counter.Result.Type.IsBasic())
                     return true;
 
