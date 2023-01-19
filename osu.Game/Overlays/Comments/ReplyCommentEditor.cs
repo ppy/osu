@@ -36,6 +36,13 @@ namespace osu.Game.Overlays.Comments
             OnCancel = () => this.FadeOut(200).Expire();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            GetContainingInputManager().ChangeFocus(TextBox);
+        }
+
         protected override void OnCommit(string text)
         {
             ShowLoadingSpinner = true;
