@@ -477,8 +477,6 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
-
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
         {
             var page = createRepliesPage(replies);
