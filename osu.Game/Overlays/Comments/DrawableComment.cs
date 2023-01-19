@@ -606,52 +606,5 @@ namespace osu.Game.Overlays.Comments
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
         }
-
-        private partial class ReplyCommentEditor : CancellableCommentEditor
-        {
-            [Resolved]
-            private CommentsContainer commentsContainer { get; set; } = null!;
-
-            [Resolved]
-            private IAPIProvider api { get; set; } = null!;
-
-            private readonly Comment parentComment;
-
-            public Action<DrawableComment[]>? OnPost;
-
-            protected override LocalisableString FooterText => default;
-            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsReply;
-            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderReply;
-
-            public ReplyCommentEditor(Comment parent)
-            {
-                parentComment = parent;
-                OnCancel = () => this.FadeOut(200).Expire();
-            }
-
-            protected override void OnCommit(string text)
-            {
-                ShowLoadingSpinner = true;
-                CommentPostRequest req = new CommentPostRequest(commentsContainer.Type.Value, commentsContainer.Id.Value, text, parentComment.Id);
-                req.Failure += e => Schedule(() =>
-                {
-                    ShowLoadingSpinner = false;
-                    Logger.Error(e, "Posting reply comment failed.");
-                });
-                req.Success += cb => Schedule(processPostedComments, cb);
-                api.Queue(req);
-            }
-
-            private void processPostedComments(CommentBundle cb)
-            {
-                foreach (var comment in cb.Comments)
-                    comment.ParentComment = parentComment;
-
-                var drawables = cb.Comments.Select(commentsContainer.GetDrawableComment).ToArray();
-                OnPost?.Invoke(drawables);
-
-                OnCancel!.Invoke();
-            }
-        }
     }
 }
