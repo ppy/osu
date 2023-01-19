@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.UI
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
-                p.RevertResult += (_, r) => RevertResult?.Invoke(r);
+                p.RevertResult += r => RevertResult?.Invoke(r);
             }));
         }
 

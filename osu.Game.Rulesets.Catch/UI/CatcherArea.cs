@@ -73,10 +73,10 @@ namespace osu.Game.Rulesets.Catch.UI
             comboDisplay.OnNewResult(hitObject, result);
         }
 
-        public void OnRevertResult(DrawableCatchHitObject hitObject, JudgementResult result)
+        public void OnRevertResult(JudgementResult result)
         {
-            comboDisplay.OnRevertResult(hitObject, result);
-            Catcher.OnRevertResult(hitObject, result);
+            comboDisplay.OnRevertResult(result);
+            Catcher.OnRevertResult(result);
         }
 
         protected override void Update()
