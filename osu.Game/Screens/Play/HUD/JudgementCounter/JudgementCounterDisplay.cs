@@ -66,15 +66,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     counter.Direction.Value = convertedDirection;
             }, true);
 
-            Mode.BindValueChanged(_ => updateMode(), true);
+            Mode.BindValueChanged(_ =>
+            {
+                updateMode();
+
+                //Refreshing the counter causes the first child to become visible, so we want to make sure it isn't if it shouldn't be
+                updateFirstChildVisibility();
+            }, true);
 
             ShowMaxJudgement.BindValueChanged(showMax =>
-            {
-                var firstChild = CounterFlow.Children.FirstOrDefault();
-
-                if (firstChild != null)
-                    firstChild.State.Value = showMax.NewValue ? Visibility.Visible : Visibility.Hidden;
-            }, true);
+                updateFirstChildVisibility(), true);
         }
 
         private void updateMode()
@@ -107,6 +108,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        private void updateFirstChildVisibility()
+        {
+            var firstChild = CounterFlow.Children.FirstOrDefault();
+
+            if (firstChild != null)
+                firstChild.State.Value = ShowMaxJudgement.Value ? Visibility.Visible : Visibility.Hidden;
         }
 
         private FillDirection getFillDirection(Direction flow)

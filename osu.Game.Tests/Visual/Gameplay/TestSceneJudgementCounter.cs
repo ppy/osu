@@ -137,6 +137,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestMaxValueHiddenOnModeChange()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
+
+            AddStep("Set max judgement to hide itself", () => counterDisplay.ShowMaxJudgement.Value = false);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddWaitStep("wait some", 2);
+            AddAssert("Assert max judgement hidden", () => counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().First().Alpha == 0);
+        }
+
+        [Test]
         public void TestCycleDisplayModes()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
