@@ -68,10 +68,12 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
             Mode.BindValueChanged(_ => updateMode(), true);
 
-            ShowMaxJudgement.BindValueChanged(value =>
+            ShowMaxJudgement.BindValueChanged(showMax =>
             {
                 var firstChild = CounterFlow.Children.FirstOrDefault();
-                firstChild.FadeTo(value.NewValue ? 1 : 0, TRANSFORM_DURATION, Easing.OutQuint);
+
+                if (firstChild != null)
+                    firstChild.State.Value = showMax.NewValue ? Visibility.Visible : Visibility.Hidden;
             }, true);
         }
 
