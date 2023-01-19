@@ -74,12 +74,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             });
             AddStep("revert second result", () =>
             {
-                catcher.OnRevertResult(drawableObject2, result2);
+                catcher.OnRevertResult(result2);
             });
             checkHyperDash(true);
             AddStep("revert first result", () =>
             {
-                catcher.OnRevertResult(drawableObject1, result1);
+                catcher.OnRevertResult(result1);
             });
             checkHyperDash(false);
         }
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             checkState(CatcherAnimationState.Kiai);
             AddStep("revert result", () =>
             {
-                catcher.OnRevertResult(drawableObject, result);
+                catcher.OnRevertResult(result);
             });
             checkState(CatcherAnimationState.Idle);
         }

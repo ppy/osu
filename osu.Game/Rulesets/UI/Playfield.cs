@@ -22,6 +22,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Rulesets.Scoring;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -35,9 +37,9 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> NewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// Invoked when a judgement result is reverted.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> RevertResult;
+        public event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
@@ -98,6 +100,8 @@ namespace osu.Game.Rulesets.UI
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
+        private readonly Stack<JudgementResultEntry> judgementResults;
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -107,14 +111,15 @@ namespace osu.Game.Rulesets.UI
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
             {
-                h.NewResult += (d, r) => NewResult?.Invoke(d, r);
-                h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.NewResult += onNewResult;
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
 
             entryManager.OnEntryAdded += onEntryAdded;
             entryManager.OnEntryRemoved += onEntryRemoved;
+
+            judgementResults = new Stack<JudgementResultEntry>();
         }
 
         [BackgroundDependencyLoader]
@@ -224,7 +229,7 @@ namespace osu.Game.Rulesets.UI
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
-            otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.RevertResult += r => RevertResult?.Invoke(r);
             otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
             otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
@@ -252,6 +257,10 @@ namespace osu.Game.Rulesets.UI
                         updatable.Update(this);
                 }
             }
+
+            // When rewinding, revert future judgements in the reverse order.
+            while (judgementResults.Count > 0 && Time.Current < judgementResults.Peek().Time)
+                revertResult(judgementResults.Pop());
         }
 
         /// <summary>
@@ -442,6 +451,25 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        private void onNewResult(DrawableHitObject drawable, JudgementResult result)
+        {
+            // Not using result.TimeAbsolute because that might change and also there is a potential precision issue.
+            judgementResults.Push(new JudgementResultEntry(Time.Current, drawable.Entry.AsNonNull(), result));
+
+            NewResult?.Invoke(drawable, result);
+        }
+
+        private void revertResult(JudgementResultEntry entry)
+        {
+            var result = entry.Result;
+            RevertResult?.Invoke(result);
+
+            result.TimeOffset = 0;
+            result.Type = HitResult.None;
+
+            entry.HitObjectEntry.OnRevertResult();
+        }
 
         #region Editor logic
 
