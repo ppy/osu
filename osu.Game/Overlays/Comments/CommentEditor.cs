@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Comments
         private RoundedButton commitButton = null!;
         private LoadingSpinner loadingSpinner = null!;
 
+        protected TextBox TextBox { get; private set; } = null!;
+
         protected bool ShowLoadingSpinner
         {
             set
@@ -51,8 +53,6 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            EditorTextBox textBox;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textBox = new EditorTextBox
+                        TextBox = new EditorTextBox
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textBox.OnCommit += (_, _) => commitButton.TriggerClick();
+            TextBox.OnCommit += (_, _) => commitButton.TriggerClick();
         }
 
         protected override void LoadComplete()
