@@ -186,7 +186,10 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
+            // make sure that collections don't get transferred when adding new difficulties to a set (that function
+            // was added for the scenario of saving the same difficulty), since this path is invoked from copying
+            // an existing difficulty as well.
+            Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -285,7 +288,8 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
+        /// <param name="transferCollections">Whether to transfer the MD5 hashes in collections referencing this beatmap.</param>
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null, bool transferCollections = false)
         {
             var setInfo = beatmapInfo.BeatmapSet;
             Debug.Assert(setInfo != null);
@@ -337,7 +341,8 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+                    if (transferCollections)
+                        beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
