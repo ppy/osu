@@ -58,7 +58,7 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage baseStorage)
         {
-            AddInternal(initialisationText = new TournamentSpriteText
+            Add(initialisationText = new TournamentSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
