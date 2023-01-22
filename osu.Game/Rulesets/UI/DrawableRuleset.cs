@@ -230,7 +230,9 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null
+                && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre)))
+                && Mods.All(mod => !mod.HidesResumeOverlay))
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
