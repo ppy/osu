@@ -78,10 +78,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             // Probationary groups have an opacity of 60%
             if (group.IsProbationary)
             {
-                foreach (var drawable in groupDrawables)
-                {
-                    drawable.Alpha = 0.6f;
-                }
+                Alpha = 0.6f;
             }
 
             if (group.Playmodes?.Length > 0)
