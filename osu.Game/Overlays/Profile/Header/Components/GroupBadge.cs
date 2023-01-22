@@ -35,6 +35,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             CornerRadius = 8;
 
             TooltipText = group.Name;
+
+            if (group.IsProbationary)
+            {
+                Alpha = 0.6f;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -42,15 +47,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             FillFlowContainer innerContainer;
 
-            // Normal background color is 0.75 opacity, probationary doesn't have this cause they are a bit transparent already
-            var bgColor = group.IsProbationary ? colourProvider?.Background6 ?? Colour4.Black : (colourProvider?.Background6 ?? Colour4.Black).Opacity(0.75f);
+            var bgColor = colourProvider?.Background6 ?? Colour4.Black;
 
-            var groupDrawables = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = bgColor
+                    // Normal background color is 0.75 opacity, probationary doesn't have this cause they are a bit transparent already
+                    Colour = group.IsProbationary ? bgColor : bgColor.Opacity(0.75f),
                 },
                 innerContainer = new FillFlowContainer
                 {
@@ -71,15 +76,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         }
                     }
                 }
-            };
-
-            AddRangeInternal(groupDrawables);
-
-            // Probationary groups have an opacity of 60%
-            if (group.IsProbationary)
-            {
-                Alpha = 0.6f;
-            }
+            });
 
             if (group.Playmodes?.Length > 0)
             {
