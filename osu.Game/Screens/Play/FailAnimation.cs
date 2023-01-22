@@ -154,7 +154,10 @@ namespace osu.Game.Screens.Play
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
-        public void StopSampleAndRemoveFilters()
+        /// <summary>
+        /// Stops any and all persistent effects added by the ongoing fail animation.
+        /// </summary>
+        public void Stop()
         {
             failSampleChannel?.Stop();
             removeFilters();
