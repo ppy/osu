@@ -612,8 +612,6 @@ namespace osu.Game.Screens.Play
             // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             resultsDisplayDelegate?.Cancel();
 
-            failAnimationLayer.StopSample();
-
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
             // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
@@ -1075,7 +1073,7 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
-            failAnimationLayer?.RemoveFilters();
+            failAnimationLayer?.StopSampleAndRemoveFilters();
 
             if (LoadedBeatmapSuccessfully)
             {
