@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 var badgeModesList = group.Playmodes.Select(p => rulesets.GetRuleset(p)?.Name).ToList();
 
                 string modesDisplay = string.Join(", ", badgeModesList);
-                this.TooltipText += $" ({modesDisplay})";
+                TooltipText += $" ({modesDisplay})";
             }
         }
     }
