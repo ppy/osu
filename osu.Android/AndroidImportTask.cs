@@ -38,10 +38,11 @@ namespace osu.Android
             if (cursor == null)
                 return null;
 
-            cursor.MoveToFirst();
+            if (!cursor.MoveToFirst())
+                return null;
 
             int filenameColumn = cursor.GetColumnIndex(IOpenableColumns.DisplayName);
-            string filename = cursor.GetString(filenameColumn);
+            string filename = cursor.GetString(filenameColumn) ?? uri.Path ?? string.Empty;
 
             // SharpCompress requires archive streams to be seekable, which the stream opened by
             // OpenInputStream() seems to not necessarily be.
@@ -49,7 +50,12 @@ namespace osu.Android
             var copy = new MemoryStream();
 
             using (var stream = contentResolver.OpenInputStream(uri))
+            {
+                if (stream == null)
+                    return null;
+
                 await stream.CopyToAsync(copy).ConfigureAwait(false);
+            }
 
             return new AndroidImportTask(copy, filename, contentResolver, uri);
         }
