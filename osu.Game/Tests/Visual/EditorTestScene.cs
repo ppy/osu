@@ -178,7 +178,12 @@ namespace osu.Game.Tests.Visual
                     => testBeatmapManager.TestBeatmap;
             }
 
-            public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null, bool transferCollections = false)
+            public override void SaveExistingBeatmap(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+            {
+                // don't actually care about saving for this context.
+            }
+
+            public override void SaveNewBeatmap(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
             {
                 // don't actually care about saving for this context.
             }
