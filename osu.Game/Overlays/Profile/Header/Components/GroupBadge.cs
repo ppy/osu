@@ -34,9 +34,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Masking = true;
             CornerRadius = 8;
 
-
             TooltipText = group.Name;
-
         }
 
         [BackgroundDependencyLoader]
