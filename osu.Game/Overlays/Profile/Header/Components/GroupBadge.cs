@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             FillFlowContainer innerContainer;
 
-            // Normal background color is 0.75 opacity, probationary doesn't have this cause it will make them a bit transparent
+            // Normal background color is 0.75 opacity, probationary doesn't have this cause they are a bit transparent already
             var bgColor = group.IsProbationary ? colourProvider?.Background6 ?? Colour4.Black : (colourProvider?.Background6 ?? Colour4.Black).Opacity(0.75f);
 
             var groupDrawables = new Drawable[]
