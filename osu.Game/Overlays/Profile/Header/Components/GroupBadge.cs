@@ -84,7 +84,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             }
 
-
             if (group.Playmodes?.Length > 0)
             {
                 innerContainer.AddRange(group.Playmodes.Select(p =>
