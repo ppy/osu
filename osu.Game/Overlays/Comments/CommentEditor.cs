@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Comments
         private void updateCommitButtonState() =>
             commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
-        private partial class EditorTextBox : BasicTextBox
+        private partial class EditorTextBox : OsuTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
@@ -172,12 +172,6 @@ namespace osu.Game.Overlays.Comments
             protected override SpriteText CreatePlaceholder() => placeholder = new OsuSpriteText
             {
                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
-            };
-
-            protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) }
             };
         }
 
