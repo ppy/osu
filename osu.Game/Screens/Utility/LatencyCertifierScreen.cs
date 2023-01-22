@@ -33,7 +33,8 @@ namespace osu.Game.Screens.Utility
     public partial class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
-        private double previousActiveHz;
+        private double previousUpdateActiveHz;
+        private double previousDrawActiveHz;
 
         private readonly OsuTextFlowContainer statusText;
 
@@ -50,11 +51,6 @@ namespace osu.Game.Screens.Utility
         public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300, Precision = 1 };
         public readonly BindableDouble SampleApproachRate = new BindableDouble(9) { MinValue = 5, MaxValue = 12, Precision = 0.1 };
         public readonly BindableFloat SampleVisualSpacing = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 1, Precision = 0.1f };
-
-        /// <summary>
-        /// The rate at which the game host should attempt to run.
-        /// </summary>
-        private const int target_host_update_frames = 4000;
 
         [Cached]
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -210,9 +206,11 @@ namespace osu.Game.Screens.Utility
             base.OnEntering(e);
 
             previousFrameSyncMode = config.Get<FrameSync>(FrameworkSetting.FrameSync);
-            previousActiveHz = host.UpdateThread.ActiveHz;
+            previousUpdateActiveHz = host.UpdateThread.ActiveHz;
+            previousDrawActiveHz = host.DrawThread.ActiveHz;
             config.SetValue(FrameworkSetting.FrameSync, FrameSync.Unlimited);
-            host.UpdateThread.ActiveHz = target_host_update_frames;
+            host.UpdateThread.ActiveHz = 0;
+            host.DrawThread.ActiveHz = 0;
             host.AllowBenchmarkUnlimitedFrames = true;
 
             musicController.Stop();
@@ -222,7 +220,8 @@ namespace osu.Game.Screens.Utility
         {
             host.AllowBenchmarkUnlimitedFrames = false;
             config.SetValue(FrameworkSetting.FrameSync, previousFrameSyncMode);
-            host.UpdateThread.ActiveHz = previousActiveHz;
+            host.UpdateThread.ActiveHz = previousUpdateActiveHz;
+            host.DrawThread.ActiveHz = previousDrawActiveHz;
             return base.OnExiting(e);
         }
 
@@ -298,9 +297,7 @@ namespace osu.Game.Screens.Utility
 
             string cannotIncreaseReason = string.Empty;
 
-            if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = "You've reached the maximum level.";
-            else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
+            if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
                 cannotIncreaseReason = "Game is not running fast enough to test this level";
 
             FillFlowContainer buttonFlow;
