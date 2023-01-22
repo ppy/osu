@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
                 // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
-                RemoveFilters(false);
+                removeFilters(false);
                 OnComplete?.Invoke();
             });
 
@@ -159,7 +159,13 @@ namespace osu.Game.Screens.Play
             failSampleChannel?.Stop();
         }
 
-        public void RemoveFilters(bool resetTrackFrequency = true)
+        public void StopSampleAndRemoveFilters()
+        {
+            StopSample();
+            removeFilters();
+        }
+
+        private void removeFilters(bool resetTrackFrequency = true)
         {
             filtersRemoved = true;
 
