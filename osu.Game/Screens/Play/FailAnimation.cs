@@ -154,14 +154,9 @@ namespace osu.Game.Screens.Play
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
-        public void StopSample()
-        {
-            failSampleChannel?.Stop();
-        }
-
         public void StopSampleAndRemoveFilters()
         {
-            StopSample();
+            failSampleChannel?.Stop();
             removeFilters();
         }
 
