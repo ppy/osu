@@ -13,9 +13,9 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public partial class TestSceneGroupBagdes : OsuTestScene
+    public partial class TestSceneGroupBadges : OsuTestScene
     {
-        public TestSceneGroupBagdes()
+        public TestSceneGroupBadges()
         {
             var groups = new[]
             {
