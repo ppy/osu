@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,46 +18,36 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
-        private readonly Box colouredBox;
-        private readonly Box shadow;
+        // private readonly Box shadow;
+        private readonly Box hitLine;
+        private readonly Container hitLineContainer;
 
         public ArgonHoldNoteTailPiece()
         {
             RelativeSizeAxes = Axes.X;
-            Height = ArgonNotePiece.NOTE_HEIGHT;
+            Height = ArgonNotePiece.NOTE_HEIGHT * 2;
 
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
             Masking = true;
 
             InternalChildren = new Drawable[]
             {
-                shadow = new Box
+                hitLineContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.82f,
                     Masking = true,
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
-                    Children = new Drawable[]
-                    {
-                        colouredBox = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                },
-                new Circle
-                {
-                    RelativeSizeAxes = Axes.X,
                     Height = ArgonNotePiece.CORNER_RADIUS * 2,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                },
+                    RelativeSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        hitLine = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
+                }
             };
         }
 
@@ -77,19 +66,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            colouredBox.Anchor = colouredBox.Origin = direction.NewValue == ScrollingDirection.Up
-                ? Anchor.TopCentre
-                : Anchor.BottomCentre;
+            hitLineContainer.Anchor = hitLineContainer.Origin = direction.NewValue == ScrollingDirection.Up
+                ? Anchor.TopLeft
+                : Anchor.BottomLeft;
         }
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
         {
-            colouredBox.Colour = ColourInfo.GradientVertical(
-                accent.NewValue,
-                accent.NewValue.Darken(0.1f)
-            );
-
-            shadow.Colour = accent.NewValue.Darken(0.5f);
+            hitLine.Colour = accent.NewValue.Lighten(0.02f);
         }
     }
 }
