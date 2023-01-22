@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class GroupBadge : Container, IHasTooltip
     {
-        public LocalisableString TooltipText { get; set; }
+        public LocalisableString TooltipText { get; private set; }
 
         public int TextSize { get; set; } = 12;
 
