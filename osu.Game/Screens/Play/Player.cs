@@ -678,7 +678,6 @@ namespace osu.Game.Screens.Play
 
             sampleRestart?.Play();
             RestartRequested?.Invoke(quickRestart);
-            failAnimationLayer.StopSample();
 
             PerformExit(false);
         }
