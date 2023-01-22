@@ -8,67 +8,40 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     internal partial class ArgonHoldNoteTailPiece : CompositeDrawable
     {
-        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
-        // private readonly Box shadow;
         private readonly Box hitLine;
-        private readonly Container hitLineContainer;
 
         public ArgonHoldNoteTailPiece()
         {
             RelativeSizeAxes = Axes.X;
-            Height = ArgonNotePiece.NOTE_HEIGHT * 2;
-
+            Height = ArgonNotePiece.CORNER_RADIUS * 2;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
             Masking = true;
 
             InternalChildren = new Drawable[]
             {
-                hitLineContainer = new Container
+                hitLine = new Box
                 {
-                    Masking = true,
-                    CornerRadius = ArgonNotePiece.CORNER_RADIUS,
-                    Height = ArgonNotePiece.CORNER_RADIUS * 2,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Children = new Drawable[]
-                    {
-                        hitLine = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
+        private void load(DrawableHitObject? drawableObject)
         {
-            direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(onDirectionChanged, true);
-
             if (drawableObject != null)
             {
                 accentColour.BindTo(drawableObject.AccentColour);
                 accentColour.BindValueChanged(onAccentChanged, true);
             }
-        }
-
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
-        {
-            hitLineContainer.Anchor = hitLineContainer.Origin = direction.NewValue == ScrollingDirection.Up
-                ? Anchor.TopLeft
-                : Anchor.BottomLeft;
         }
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
