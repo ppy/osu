@@ -42,12 +42,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             FillFlowContainer innerContainer;
 
-            AddRangeInternal(new Drawable[]
+            // Normal background color is 0.75 opacity, probationary doesn't have this cause it will make them a bit transparent
+            var bgColor = group.IsProbationary ? colourProvider?.Background6 ?? Colour4.Black : (colourProvider?.Background6 ?? Colour4.Black).Opacity(0.75f);
+
+            var groupDrawables = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider?.Background6 ?? Colour4.Black
+                    Colour = bgColor
                 },
                 innerContainer = new FillFlowContainer
                 {
@@ -68,7 +71,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         }
                     }
                 }
-            });
+            };
+
+            AddRangeInternal(groupDrawables);
+
+            // Probationary groups have an opacity of 60%
+            if (group.IsProbationary)
+            {
+                foreach (var drawable in groupDrawables)
+                {
+                    drawable.Alpha = 0.6f;
+                }
+            }
+
 
             if (group.Playmodes?.Length > 0)
             {
