@@ -78,10 +78,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             icon.Size = new Vector2(TextSize - 1);
                         })).ToList()
                 );
-            }
 
-            if (group.Playmodes?.Length > 0)
-            {
                 var badgeModesList = group.Playmodes.Select(p => rulesets.GetRuleset(p)?.Name).ToList();
 
                 string modesDisplay = string.Join(", ", badgeModesList);
