@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Play
         private const float duration = 2500;
 
         private ISample? failSample;
+        private SampleChannel? failSampleChannel;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Play
 
             failHighPassFilter.CutoffTo(300);
             failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
-            failSample?.Play();
+            failSampleChannel = failSample?.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
             track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -151,6 +152,11 @@ namespace osu.Game.Screens.Play
 
             // Will be restored by `ApplyToBackground` logic in `SongSelect`.
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
+        }
+
+        public void StopSample()
+        {
+            failSampleChannel?.Stop();
         }
 
         public void RemoveFilters(bool resetTrackFrequency = true)
