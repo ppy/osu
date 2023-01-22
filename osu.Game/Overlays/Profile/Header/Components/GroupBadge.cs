@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class GroupBadge : Container, IHasTooltip
     {
-        public LocalisableString TooltipText { get; }
+        public LocalisableString TooltipText { get; set; }
 
         public int TextSize { get; set; } = 12;
 
@@ -34,7 +34,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Masking = true;
             CornerRadius = 8;
 
+
             TooltipText = group.Name;
+
         }
 
         [BackgroundDependencyLoader]
@@ -78,6 +80,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             icon.Size = new Vector2(TextSize - 1);
                         })).ToList()
                 );
+            }
+
+            if (group.Playmodes?.Length > 0)
+            {
+                var badgeModesList = group.Playmodes.Select(p => rulesets.GetRuleset(p)?.Name).ToList();
+
+                string modesDisplay = string.Join(", ", badgeModesList);
+                this.TooltipText += $" ({modesDisplay})";
             }
         }
     }
