@@ -5,7 +5,9 @@ using Android.OS;
 using osu.Framework.Allocation;
 using osu.Framework.Android.Input;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
@@ -20,11 +22,25 @@ namespace osu.Android
 
         protected override LocalisableString Header => MouseSettingsStrings.Mouse;
 
-        private Bindable<double> handlerSensitivity = null!;
+        private Bindable<Vector2d> handlerSensitivity = null!;
 
-        private Bindable<double> localSensitivity = null!;
+        private BindableDouble localSensitivityX = new BindableDouble(1)
+        {
+            MinValue = 0.1,
+            MaxValue = 10,
+            Precision = 0.01
+        };
+
+        private BindableDouble localSensitivityY = new BindableDouble(1)
+        {
+            MinValue = 0.1,
+            MaxValue = 10,
+            Precision = 0.01
+        };
 
         private Bindable<bool> relativeMode = null!;
+
+        private Bindable<bool> separateMode = null!;
 
         public AndroidMouseSettings(AndroidMouseHandler mouseHandler)
         {
@@ -36,8 +52,10 @@ namespace osu.Android
         {
             // use local bindable to avoid changing enabled state of game host's bindable.
             handlerSensitivity = mouseHandler.Sensitivity.GetBoundCopy();
-            localSensitivity = handlerSensitivity.GetUnboundCopy();
+            localSensitivityX.Value = handlerSensitivity.Value.X;
+            localSensitivityY.Value = handlerSensitivity.Value.Y;
 
+            separateMode = osuConfig.GetBindable<bool>(OsuSetting.UseSeparateSensitivity);
             relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
 
             // High precision/pointer capture is only available on Android 8.0 and up
@@ -52,10 +70,32 @@ namespace osu.Android
                         Current = relativeMode,
                         Keywords = new[] { @"raw", @"input", @"relative", @"cursor", @"captured", @"pointer" },
                     },
-                    new MouseSettings.SensitivitySetting
+                    separateSensitivity = new SettingsCheckbox
                     {
-                        LabelText = MouseSettingsStrings.CursorSensitivity,
-                        Current = localSensitivity,
+                        LabelText = MouseSettingsStrings.SeparateSensitivity,
+                        TooltipText = MouseSettingsStrings.SeparateSensitivityTooltip,
+                        Current = separateMode,
+                        Keywords = new[] { @"sensitivity", @"mouse", @"separate", @"cursor" }
+                    },
+                    horizontalSensitivity = new MouseSettings.SensitivitySettingX
+                    {
+                        LabelText = separateMode.Value ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity,
+                        Current = localSensitivityX
+                    },
+                    verticalSensitivitySettings = new FillFlowContainer<MouseSettings.SensitivitySettingY>
+                    {
+                       Direction = FillDirection.Vertical,
+                       RelativeSizeAxes = Axes.X,
+                       AutoSizeAxes = Axes.Y,
+                       Masking = true,
+                       Children = new[]
+                       {
+                           new MouseSettings.SensitivitySettingY
+                           {
+                               LabelText = MouseSettingsStrings.CursorVerticalSensitivity,
+                               Current = localSensitivityY,
+                           }
+                       }
                     },
                 });
             }
@@ -80,18 +120,72 @@ namespace osu.Android
         {
             base.LoadComplete();
 
-            relativeMode.BindValueChanged(relative => localSensitivity.Disabled = !relative.NewValue, true);
+           relativeMode.BindValueChanged(relative =>
+            {
+                localSensitivityX.Disabled = !relative.NewValue;
+                localSensitivityY.Disabled = !relative.NewValue || !separateMode.Value;
+            }, true);
 
             handlerSensitivity.BindValueChanged(val =>
             {
-                bool disabled = localSensitivity.Disabled;
+                bool disabledX = localSensitivityX.Disabled;
+                bool disabledY = localSensitivityY.Disabled;
 
-                localSensitivity.Disabled = false;
-                localSensitivity.Value = val.NewValue;
-                localSensitivity.Disabled = disabled;
+                localSensitivityX.Disabled = false;
+                localSensitivityY.Disabled = false;
+                localSensitivityX.Value = val.NewValue.X;
+                localSensitivityY.Value = val.NewValue.Y;
+                localSensitivityX.Disabled = disabledX;
+                localSensitivityY.Disabled = disabledY;
             }, true);
 
-            localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
+            localSensitivityX.BindValueChanged(val =>
+            {
+                handlerSensitivity.Value = new Vector2d(val.NewValue, localSensitivityY.Value);
+
+                if (!separateMode.Value)
+                {
+                    bool disabled = localSensitivityY.Disabled;
+
+                    localSensitivityY.Disabled = false;
+                    localSensitivityY.Value = val.NewValue;
+                    localSensitivityY.Disabled = disabled;
+                }
+            });
+
+            localSensitivityY.BindValueChanged(val => handlerSensitivity.Value = new Vector2d(localSensitivityX.Value, val.NewValue));
+            
+            separateSensitivity.Current.BindValueChanged(separate =>
+            {
+                if (separate.NewValue)
+                    handlerSensitivity.Value = new Vector2d(localSensitivityX.Value, localSensitivityY.Value);
+                else
+                    handlerSensitivity.Value = new Vector2d(localSensitivityX.Value, localSensitivityX.Value);
+
+                localSensitivityY.Disabled = !separate.NewValue || !relativeMode.Value;
+                verticalSensitivitySettings.ClearTransforms();
+                verticalSensitivitySettings.AutoSizeDuration = transition_duration;
+                verticalSensitivitySettings.AutoSizeEasing = Easing.OutQuint;
+
+                updateScalingModeVisibility();
+                horizontalSensitivity.LabelText = separate.NewValue ? MouseSettingsStrings.CursorHorizontalSensitivity : MouseSettingsStrings.CursorSensitivity;
+            }, true);
+
+            // initial update bypasses transforms
+            updateScalingModeVisibility();
+
+            void updateScalingModeVisibility()
+            {
+                if (!separateMode.Value)
+                    verticalSensitivitySettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+
+                verticalSensitivitySettings.AutoSizeAxes = separateMode.Value ? Axes.Y : Axes.None;
+                verticalSensitivitySettings.ForEach(s =>
+                {
+                    s.TransferValueOnCommit = separateMode.Value;
+                    s.CanBeShown.Value = separateMode.Value;
+                });
+            }
         }
     }
 }
