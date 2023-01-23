@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            SaveNewBeatmap(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -286,22 +286,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void SaveExistingBeatmap(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
-        {
-            string oldMd5Hash = beatmapInfo.MD5Hash;
-
-            save(beatmapInfo, beatmapContent, beatmapSkin);
-
-            Realm.Write(r => beatmapInfo.TransferCollectionReferences(r, oldMd5Hash));
-        }
-
-        /// <summary>
-        /// Saves a new <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
-        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void SaveNewBeatmap(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
         {
             save(beatmapInfo, beatmapContent, beatmapSkin);
         }
@@ -414,7 +399,7 @@ namespace osu.Game.Beatmaps
             setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
-        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin)
+        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, bool transferCollections = true)
         {
             var setInfo = beatmapInfo.BeatmapSet;
             Debug.Assert(setInfo != null);
@@ -448,6 +433,8 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
+                string oldMd5Hash = beatmapInfo.MD5Hash;
+
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
@@ -463,6 +450,9 @@ namespace osu.Game.Beatmaps
                     var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    if (transferCollections)
+                        beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
