@@ -192,7 +192,7 @@ namespace osu.Game.Graphics
         /// Retrieves colour for a <see cref="RankingTier"/>.
         /// See https://www.figma.com/file/YHWhp9wZ089YXgB7pe6L1k/Tier-Colours
         /// </summary>
-        public ColourInfo ForRankingTiers(RankingTier tier)
+        public ColourInfo ForRankingTier(RankingTier tier)
         {
             switch (tier)
             {
