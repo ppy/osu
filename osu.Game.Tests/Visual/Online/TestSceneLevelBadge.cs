@@ -37,16 +37,15 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new FillFlowContainer<LevelBadge>
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Full,
                     Spacing = new Vector2(5),
-                    ChildrenEnumerable = levels.Select(l => new LevelBadge
+                    ChildrenEnumerable = levels.Select(level => new LevelBadge
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Size = new Vector2(60),
-                        LevelInfo = { Value = l }
+                        LevelInfo = { Value = level }
                     })
                 }
             };
