@@ -104,7 +104,12 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        colourBox = new Box { RelativeSizeAxes = Axes.Both, },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Vertical = 0.5f },
+                            Child = colourBox = new Box { RelativeSizeAxes = Axes.Both }
+                        },
 
                         new Container
                         {
