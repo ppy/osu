@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Select
                 background.BlurAmount.Value = v * BACKGROUND_BLUR;
             });
         }
+
         private void applyBackgroundBlur(ValueChangedEvent<float> v)
         {
             applyBackgroundBlur(v.NewValue);
