@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Edit
         protected virtual Vector2[] ScreenSpaceAdditionalNodes => Array.Empty<Vector2>();
 
         /// <summary>
-        /// The screen-space collection of base points that cause this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
+        /// The screen-space collection of base points on this <see cref="HitObjectSelectionBlueprint"/> that other objects can be snapped to.
         /// The first element of this collection is <see cref="ScreenSpaceSelectionPoint"/>
         /// </summary>
         public Vector2[] ScreenSpaceSnapPoints => ScreenSpaceAdditionalNodes.Prepend(ScreenSpaceSelectionPoint).ToArray();
