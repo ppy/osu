@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Select
 
         private readonly Container difficultyColourBar;
         private readonly StarCounter starCounter;
+        private readonly BufferedContainer bufferedContent;
 
         public BeatmapInfoWedgeV2()
         {
@@ -64,30 +65,35 @@ namespace osu.Game.Screens.Select
             };
             CornerRadius = corner_radius;
 
-            Children = new Drawable[]
+            // We want to buffer the wedge to avoid weird transparency overlaps between the colour bar and the background.
+            Child = bufferedContent = new BufferedContainer
             {
-                // These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
-                difficultyColourBar = new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Colour = Colour4.Transparent,
-                    Depth = float.MaxValue,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Y,
+                    // These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
+                    difficultyColourBar = new Container
+                    {
+                        Colour = Colour4.Transparent,
+                        Depth = float.MaxValue,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.Y,
 
-                    // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
-                    Width = colour_bar_width + corner_radius,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
-                starCounter = new StarCounter
-                {
-                    Colour = Colour4.Transparent,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.35f),
-                    Shear = -wedged_container_shear,
-                    X = -colour_bar_width / 2,
-                    Direction = FillDirection.Vertical
+                        // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+                        Width = colour_bar_width + corner_radius,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    },
+                    starCounter = new StarCounter
+                    {
+                        Colour = Colour4.Transparent,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(0.35f),
+                        Shear = -wedged_container_shear,
+                        X = -colour_bar_width / 2,
+                        Direction = FillDirection.Vertical
+                    }
                 }
             };
         }
@@ -184,9 +190,9 @@ namespace osu.Game.Screens.Select
                     if (loaded != loadingInfo) return;
 
                     removeOldInfo();
-                    Add(DisplayedContent = loaded);
+                    bufferedContent.Add(DisplayedContent = loaded);
 
-                    Info.StarRatingDisplay.DisplayedStars.BindValueChanged(s =>
+                    Info.DisplayedStars.BindValueChanged(s =>
                     {
                         starCounter.Current = (float)s.NewValue;
                         starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
@@ -202,12 +208,14 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText TitleLabel { get; private set; } = null!;
             public OsuSpriteText ArtistLabel { get; private set; } = null!;
 
-            public StarRatingDisplay StarRatingDisplay = null!;
+            private StarRatingDisplay starRatingDisplay = null!;
 
             private ILocalisedBindableString titleBinding = null!;
             private ILocalisedBindableString artistBinding = null!;
 
             private readonly WorkingBeatmap working;
+
+            public IBindable<double> DisplayedStars => starRatingDisplay.DisplayedStars;
 
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -250,7 +258,7 @@ namespace osu.Game.Screens.Select
                         Spacing = new Vector2(0f, 5f),
                         Children = new Drawable[]
                         {
-                            StarRatingDisplay = new StarRatingDisplay(default, animated: true)
+                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -309,13 +317,13 @@ namespace osu.Game.Screens.Select
                 starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
-                    StarRatingDisplay.Current.Value = s.NewValue ?? default;
+                    starRatingDisplay.Current.Value = s.NewValue ?? default;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
-                    if (!StarRatingDisplay.IsPresent)
-                        StarRatingDisplay.FinishTransforms(true);
+                    if (!starRatingDisplay.IsPresent)
+                        starRatingDisplay.FinishTransforms(true);
 
-                    StarRatingDisplay.FadeIn(transition_duration);
+                    starRatingDisplay.FadeIn(transition_duration);
                 });
 
                 mods.BindValueChanged(m =>
