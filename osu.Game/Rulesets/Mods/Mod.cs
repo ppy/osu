@@ -107,9 +107,6 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool RequiresConfiguration => false;
 
-        [JsonIgnore]
-        public virtual bool HidesResumeOverlay => false;
-
         /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
