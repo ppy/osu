@@ -4,7 +4,7 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -131,10 +131,15 @@ namespace osu.Game.Rulesets.Edit
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
+        /// Any points that should be used for snapping purposes in addition to <see cref="ScreenSpaceSelectionPoint"/>. Exposed via <see cref="ScreenSpaceSnapPoints"/>.
+        /// </summary>
+        protected virtual Vector2[] ScreenSpaceAdditionalNodes => Array.Empty<Vector2>();
+
+        /// <summary>
         /// The screen-space collection of base points that cause this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
         /// The first element of this collection is <see cref="ScreenSpaceSelectionPoint"/>
         /// </summary>
-        public virtual Vector2[] ScreenSpaceSnapPoints => new Vector2[] { ScreenSpaceSelectionPoint };
+        public Vector2[] ScreenSpaceSnapPoints => ScreenSpaceAdditionalNodes.Prepend(ScreenSpaceSelectionPoint).ToArray();
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="HitObjectSelectionBlueprint"/> for selections.
