@@ -15,6 +15,8 @@ M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Gen
 M:System.Threading.Tasks.Task.Wait();Don't use Task.Wait. Use Task.WaitSafely() to ensure we avoid deadlocks.
 P:System.Threading.Tasks.Task`1.Result;Don't use Task.Result. Use Task.GetResultSafely() to ensure we avoid deadlocks.
 M:System.Threading.ManualResetEventSlim.Wait();Specify a timeout to avoid waiting forever.
+M:System.Char.ToLower(System.Char);char.ToLower() changes behaviour depending on CultureInfo.CurrentCulture. Use char.ToLowerInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture.
+M:System.Char.ToUpper(System.Char);char.ToUpper() changes behaviour depending on CultureInfo.CurrentCulture. Use char.ToUpperInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture.
 M:System.String.ToLower();string.ToLower() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToLowerInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
 M:System.String.ToUpper();string.ToUpper() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToUpperInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
 M:Humanizer.InflectorExtensions.Pascalize(System.String);Humanizer's .Pascalize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToPascalCase() instead.

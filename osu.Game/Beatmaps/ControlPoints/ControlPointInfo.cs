@@ -70,14 +70,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         [JsonIgnore]
         public double BPMMaximum =>
-            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
+            60000 / (TimingPoints.MinBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
         public double BPMMinimum =>
-            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
+            60000 / (TimingPoints.MaxBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
@@ -183,9 +183,15 @@ namespace osu.Game.Beatmaps.ControlPoints
         private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
             double beatLength = timingPoint.BeatLength / beatDivisor;
-            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+            double beats = (Math.Max(time, 0) - timingPoint.Time) / beatLength;
 
-            return timingPoint.Time + beatLengths * beatLength;
+            int roundedBeats = (int)Math.Round(beats, MidpointRounding.AwayFromZero);
+            double snappedTime = timingPoint.Time + roundedBeats * beatLength;
+
+            if (snappedTime >= 0)
+                return snappedTime;
+
+            return snappedTime + beatLength;
         }
 
         /// <summary>
@@ -196,8 +202,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
-        protected T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
-            where T : ControlPoint
+        public static T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
+            where T : class, IControlPoint
         {
             return BinarySearch(list, time) ?? fallback;
         }
@@ -207,12 +213,11 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <returns>The active control point at <paramref name="time"/>.</returns>
-        protected virtual T BinarySearch<T>(IReadOnlyList<T> list, double time)
-            where T : ControlPoint
+        /// <returns>The active control point at <paramref name="time"/>. Will return <c>null</c> if there are no control points, or if the time is before the first control point.</returns>
+        public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
+            where T : class, IControlPoint
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
+            ArgumentNullException.ThrowIfNull(list);
 
             if (list.Count == 0)
                 return null;
@@ -300,7 +305,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public ControlPointInfo DeepClone()
         {
-            var controlPointInfo = (ControlPointInfo)Activator.CreateInstance(GetType());
+            var controlPointInfo = (ControlPointInfo)Activator.CreateInstance(GetType())!;
 
             foreach (var point in AllControlPoints)
                 controlPointInfo.Add(point.Time, point.DeepClone());

@@ -16,7 +16,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneIconButton : OsuTestScene
+    public partial class TestSceneIconButton : OsuTestScene
     {
         public TestSceneIconButton()
         {
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class ColouredIconButton : IconButton
+        private partial class ColouredIconButton : IconButton
         {
             public ColouredIconButton()
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class NamedIconButton : Container
+        private partial class NamedIconButton : Container
         {
             public NamedIconButton(string name, IconButton button)
             {

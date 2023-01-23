@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit;
 namespace osu.Game.Tests.Editing
 {
     [TestFixture]
-    public class TransactionalCommitComponentTest
+    public partial class TransactionalCommitComponentTest
     {
         private TestHandler handler;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Editing
             Assert.That(() => handler.EndChange(), Throws.TypeOf<InvalidOperationException>());
         }
 
-        private class TestHandler : TransactionalCommitComponent
+        private partial class TestHandler : TransactionalCommitComponent
         {
             public int StateUpdateCount { get; private set; }
 

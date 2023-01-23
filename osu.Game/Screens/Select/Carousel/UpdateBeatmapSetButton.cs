@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class UpdateBeatmapSetButton : OsuAnimatedButton
+    public partial class UpdateBeatmapSetButton : OsuAnimatedButton
     {
         private readonly BeatmapSetInfo beatmapSetInfo;
         private SpriteIcon icon = null!;
@@ -32,8 +32,11 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private LoginOverlay? loginOverlay { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public UpdateBeatmapSetButton(BeatmapSetInfo beatmapSetInfo)
         {
@@ -102,17 +105,34 @@ namespace osu.Game.Screens.Select.Carousel
                 },
             });
 
-            Action = () =>
-            {
-                if (!api.IsLoggedIn)
-                {
-                    loginOverlay?.Show();
-                    return;
-                }
+            Action = updateBeatmap;
+        }
 
-                beatmapDownloader.DownloadAsUpdate(beatmapSetInfo, preferNoVideo.Value);
-                attachExistingDownload();
-            };
+        private bool updateConfirmed;
+
+        private void updateBeatmap()
+        {
+            if (!api.IsLoggedIn)
+            {
+                loginOverlay?.Show();
+                return;
+            }
+
+            if (dialogOverlay != null && beatmapSetInfo.Status == BeatmapOnlineStatus.LocallyModified && !updateConfirmed)
+            {
+                dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>
+                {
+                    updateConfirmed = true;
+                    updateBeatmap();
+                }));
+
+                return;
+            }
+
+            updateConfirmed = false;
+
+            beatmapDownloader.DownloadAsUpdate(beatmapSetInfo, preferNoVideo.Value);
+            attachExistingDownload();
         }
 
         protected override void LoadComplete()

@@ -9,7 +9,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public abstract class WaveOverlayContainer : OsuFocusedOverlayContainer
+    public abstract partial class WaveOverlayContainer : OsuFocusedOverlayContainer
     {
         protected readonly WaveContainer Waves;
 

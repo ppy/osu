@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBlack : BackgroundScreen
+    public partial class BackgroundScreenBlack : BackgroundScreen
     {
         public BackgroundScreenBlack()
         {

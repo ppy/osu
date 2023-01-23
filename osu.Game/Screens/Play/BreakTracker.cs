@@ -13,7 +13,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakTracker : Component
+    public partial class BreakTracker : Component
     {
         private readonly ScoreProcessor scoreProcessor;
         private readonly double gameplayStartTime;

@@ -16,6 +16,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
@@ -27,7 +28,7 @@ using osuTK.Input;
 namespace osu.Game.Tournament
 {
     [Cached(typeof(TournamentGameBase))]
-    public class TournamentGameBase : OsuGameBase
+    public partial class TournamentGameBase : OsuGameBase
     {
         public const string BRACKET_FILENAME = @"bracket.json";
         private LadderInfo ladder;
@@ -42,6 +43,14 @@ namespace osu.Game.Tournament
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+        }
+
+        public override EndpointConfiguration CreateEndpoints()
+        {
+            if (UseDevelopmentServer)
+                return base.CreateEndpoints();
+
+            return new ProductionEndpointConfiguration();
         }
 
         private TournamentSpriteText initialisationText;
@@ -156,9 +165,21 @@ namespace osu.Game.Tournament
                 addedInfo |= addSeedingBeatmaps();
 
                 if (addedInfo)
-                    SaveChanges();
+                    saveChanges();
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+
+                ladder.Ruleset.BindValueChanged(r =>
+                {
+                    // Refetch player rank data on next startup as the ruleset has changed.
+                    foreach (var team in ladder.Teams)
+                    {
+                        foreach (var player in team.Players)
+                            player.Rank = null;
+                    }
+
+                    SaveChanges();
+                });
             }
             catch (Exception e)
             {
@@ -238,7 +259,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
+                                                    .Where(b => (b.Beatmap == null || b.Beatmap.OnlineID == 0) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -306,6 +327,11 @@ namespace osu.Game.Tournament
                 return;
             }
 
+            saveChanges();
+        }
+
+        private void saveChanges()
+        {
             foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
@@ -335,7 +361,7 @@ namespace osu.Game.Tournament
 
         protected override UserInputManager CreateUserInputManager() => new TournamentInputManager();
 
-        private class TournamentInputManager : UserInputManager
+        private partial class TournamentInputManager : UserInputManager
         {
             protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {

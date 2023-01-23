@@ -33,7 +33,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
+    public partial class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Gameplay
             protected internal override ISkin GetSkin() => new TestSkin("test-sample", resources);
         }
 
-        private class TestDrawableStoryboardSample : DrawableStoryboardSample
+        private partial class TestDrawableStoryboardSample : DrawableStoryboardSample
         {
             public TestDrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
                 : base(sampleInfo)

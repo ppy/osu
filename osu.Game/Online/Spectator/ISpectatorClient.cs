@@ -32,5 +32,12 @@ namespace osu.Game.Online.Spectator
         /// <param name="userId">The user.</param>
         /// <param name="data">The frame data.</param>
         Task UserSentFrames(int userId, FrameDataBundle data);
+
+        /// <summary>
+        /// Signals that a user's submitted score was fully processed.
+        /// </summary>
+        /// <param name="userId">The ID of the user who achieved the score.</param>
+        /// <param name="scoreId">The ID of the score.</param>
+        Task UserScoreProcessed(int userId, long scoreId);
     }
 }

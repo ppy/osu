@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class SupporterIcon : OsuClickableContainer
+    public partial class SupporterIcon : OsuClickableContainer
     {
         private readonly Box background;
         private readonly FillFlowContainer iconContainer;
@@ -82,10 +80,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(OsuGame? game)
         {
             background.Colour = colours.Pink;
 

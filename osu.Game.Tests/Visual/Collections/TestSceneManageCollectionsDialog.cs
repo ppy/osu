@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Collections
 {
-    public class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
+    public partial class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 

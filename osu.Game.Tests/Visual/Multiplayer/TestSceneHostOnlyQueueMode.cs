@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneHostOnlyQueueMode : QueueModeTestScene
+    public partial class TestSceneHostOnlyQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.HostOnly;
 
@@ -25,22 +25,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestFirstItemSelectedByDefault()
         {
             AddUntilStep("first item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemStillSelectedAfterChangeToSameBeatmap()
-        {
-            selectNewItem(() => InitialBeatmap);
-
-            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
-        {
-            selectNewItem(() => OtherBeatmap);
-
-            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -55,6 +39,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSettingsUpdatedWhenChangingQueueMode()
+        {
+            AddStep("change queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings
+            {
+                QueueMode = QueueMode.AllPlayers
+            }).WaitSafely());
+
+            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+        }
+
+        [Test]
+        [FlakyTest]
+        /*
+         * TearDown : System.TimeoutException : "wait for ongoing operation to complete" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
+        public void TestItemStillSelectedAfterChangeToSameBeatmap()
+        {
+            selectNewItem(() => InitialBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest] // See above
+        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
+        {
+            selectNewItem(() => OtherBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest] // See above
         public void TestOnlyLastItemChangedAfterGameplayFinished()
         {
             RunGameplay();
@@ -69,17 +90,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSettingsUpdatedWhenChangingQueueMode()
-        {
-            AddStep("change queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings
-            {
-                QueueMode = QueueMode.AllPlayers
-            }).WaitSafely());
-
-            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
-        }
-
-        [Test]
+        [FlakyTest] // See above
         public void TestAddItemsAsHost()
         {
             addItem(() => OtherBeatmap);

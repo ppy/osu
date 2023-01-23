@@ -26,7 +26,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
+    public abstract partial class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
         protected const int TOTAL_USERS = 16;
 
@@ -117,11 +117,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         BeatmapID = 0,
                         RulesetID = 0,
                         Mods = user.Mods,
-                        MaximumScoringValues = new ScoringValues
+                        MaximumStatistics = new Dictionary<HitResult, int>
                         {
-                            BaseScore = 10000,
-                            MaxCombo = 1000,
-                            CountBasicHitObjects = 1000
+                            { HitResult.Perfect, 100 }
                         }
                     };
                 }

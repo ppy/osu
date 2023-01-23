@@ -29,7 +29,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneDrawableRulesetDependencies : OsuTestScene
+    public partial class TestSceneDrawableRulesetDependencies : OsuTestScene
     {
         [Test]
         public void TestDisposalDoesNotDisposeParentStores()
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Rulesets
             AddAssert("parent shader manager not disposed", () => !shaderManager.IsDisposed);
         }
 
-        private class DrawableWithDependencies : CompositeDrawable
+        private partial class DrawableWithDependencies : CompositeDrawable
         {
             public TestTextureStore ParentTextureStore { get; private set; }
             public TestSampleStore ParentSampleStore { get; private set; }

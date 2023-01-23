@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class ZoomableScrollContainer : OsuScrollContainer
+    public partial class ZoomableScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The time to zoom into/out of a point.
@@ -99,9 +99,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             minZoom = minimum;
             maxZoom = maximum;
-            CurrentZoom = zoomTarget = initial;
-            isZoomSetUp = true;
 
+            CurrentZoom = zoomTarget = initial;
+            zoomedContentWidthCache.Invalidate();
+
+            isZoomSetUp = true;
             zoomedContent.Show();
         }
 

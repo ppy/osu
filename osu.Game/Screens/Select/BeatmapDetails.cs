@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDetails : Container
+    public partial class BeatmapDetails : Container
     {
         private const float spacing = 10;
         private const float transition_duration = 250;
@@ -141,9 +141,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection(MetadataType.Description, searchOnSongSelect),
-                                                        source = new MetadataSection(MetadataType.Source, searchOnSongSelect),
-                                                        tags = new MetadataSection(MetadataType.Tags, searchOnSongSelect),
+                                                        description = new MetadataSectionDescription(searchOnSongSelect),
+                                                        source = new MetadataSectionSource(searchOnSongSelect),
+                                                        tags = new MetadataSectionTags(searchOnSongSelect),
                                                     },
                                                 },
                                             },
@@ -187,9 +187,9 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.DifficultyName;
-            source.Text = BeatmapInfo?.Metadata.Source;
-            tags.Text = BeatmapInfo?.Metadata.Tags;
+            description.Metadata = BeatmapInfo?.DifficultyName ?? string.Empty;
+            source.Metadata = BeatmapInfo?.Metadata.Source ?? string.Empty;
+            tags.Metadata = BeatmapInfo?.Metadata.Tags ?? string.Empty;
 
             // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Select
             loading.Hide();
         }
 
-        private class DetailBox : Container
+        private partial class DetailBox : Container
         {
             private readonly Container content;
             protected override Container<Drawable> Content => content;

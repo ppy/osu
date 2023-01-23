@@ -18,7 +18,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 namespace osu.Game.Rulesets.Pippidon.UI
 {
     [Cached]
-    public class DrawablePippidonRuleset : DrawableScrollingRuleset<PippidonHitObject>
+    public partial class DrawablePippidonRuleset : DrawableScrollingRuleset<PippidonHitObject>
     {
         public DrawablePippidonRuleset(PippidonRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
