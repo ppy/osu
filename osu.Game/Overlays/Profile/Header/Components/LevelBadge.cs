@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 tier = RankingTier.Lustrous;
             }
 
-            return osuColour.ForRankingTiers(tier);
+            return osuColour.ForRankingTier(tier);
         }
     }
 }
