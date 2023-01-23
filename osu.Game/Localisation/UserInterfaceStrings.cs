@@ -110,6 +110,12 @@ namespace osu.Game.Localisation
         public static LocalisableString ModSelectHotkeyStyle => new TranslatableString(getKey(@"mod_select_hotkey_style"), @"Mod select hotkey style");
 
         /// <summary>
+        /// "Beatmap selection blur level"
+        /// </summary>
+        public static LocalisableString BeatmapSelectionBlurLevel => new TranslatableString(getKey(@"beatmap_selection_blur_level"), @"Beatmap selection blur level");
+
+
+        /// <summary>
         /// "no limit"
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");

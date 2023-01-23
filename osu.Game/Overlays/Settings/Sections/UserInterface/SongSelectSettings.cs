@@ -42,6 +42,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = UserInterfaceStrings.BeatmapSelectionBlurLevel,
+                    Current = config.GetBindable<float>(OsuSetting.BeatmapSelectionBlurLevel)
                 }
             };
         }
