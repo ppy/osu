@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
-            backgroundBlurLevel = config.GetBindable<float>(OsuSetting.BeatmapSelectionBlurLevel);
+            backgroundBlurLevel = config.GetBindable<float>(OsuSetting.BeatmapSelectionBackgoundBlurLevel);
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
