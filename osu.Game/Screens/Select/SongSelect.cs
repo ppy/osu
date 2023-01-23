@@ -127,18 +127,18 @@ namespace osu.Game.Screens.Select
 
         private Bindable<float> backgroundBlurLevel { get; set; } = new BindableFloat();
 
-        private void applyBackgroundBlur(float v)
+        private void applyBackgroundBlur(float blurLevel)
         {
             ApplyToBackground(background =>
             {
                 background.IgnoreUserSettings.Value = true;
-                background.BlurAmount.Value = v * BACKGROUND_BLUR;
+                background.BlurAmount.Value = blurLevel * BACKGROUND_BLUR;
             });
         }
 
-        private void applyBackgroundBlur(ValueChangedEvent<float> v)
+        private void applyBackgroundBlur(ValueChangedEvent<float> blurLevelValueChange)
         {
-            applyBackgroundBlur(v.NewValue);
+            applyBackgroundBlur(blurLevelValueChange.NewValue);
         }
 
         [BackgroundDependencyLoader(true)]
