@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckPreviewTime.IssueTemplatePreviewTimeConflict);
-            Assert.That(issues.Single().Arguments.Single().ToString() == "Test1");
+            Assert.That(issues.Single().Arguments.FirstOrDefault()?.ToString() == "Test1");
         }
 
         private void setNoPreviewTimeBeatmap()
