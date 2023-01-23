@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -53,7 +54,23 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Username = @"Toukai",
                         CountryCode = CountryCode.CA,
                     },
-                }
+                },
+
+                new ScoreInfo
+                {
+                    Position = 110000,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 17078279,
+                    Ruleset = new ManiaRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 4608074,
+                        Username = @"Skycries",
+                        CountryCode = CountryCode.BR,
+                    },
+                },
             };
 
             Child = new FillFlowContainer
@@ -66,7 +83,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Children = new Drawable[]
                 {
                     new LeaderboardScoreV2(scores[0], 1),
-                    new LeaderboardScoreV2(scores[1], null, true)
+                    new LeaderboardScoreV2(scores[1], null, true),
+                    new LeaderboardScoreV2(scores[2], null, true)
                 }
             };
         }
