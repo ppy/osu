@@ -13,7 +13,12 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -33,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private OsuInputManager osuInputManager = null!;
 
+        private Container mainContent = null!;
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -44,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     osuInputManager = new OsuInputManager(new OsuRuleset().RulesetInfo)
                     {
-                        Child = new Container
+                        Child = mainContent = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -54,12 +61,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreRight,
+                                    Depth = float.MinValue,
                                     X = -100,
                                 },
                                 rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreLeft,
+                                    Depth = float.MinValue,
                                     X = 100,
                                 }
                             },
@@ -116,9 +125,127 @@ namespace osu.Game.Rulesets.Osu.Tests
             endTouch(TouchSource.Touch2);
             checkPosition(TouchSource.Touch2);
 
-            // note that touch1 was never ended, but becomes active for tracking again.
+            // note that touch1 was never ended, but is no longer valid for touch input due to touch 2 occurring.
             beginTouch(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch2);
+        }
+
+        [Test]
+        public void TestStreamInput()
+        {
+            // In this scenario, the user is tapping on the first object in a stream,
+            // then using one or two fingers in empty space to continue the stream.
+
+            addHitCircleAt(TouchSource.Touch1);
+            beginTouch(TouchSource.Touch1);
+
+            // The first touch is handled as normal.
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
             checkPosition(TouchSource.Touch1);
+
+            // The second touch should release the first, and also act as a right button.
+            beginTouch(TouchSource.Touch2);
+
+            assertKeyCounter(1, 1);
+            // Importantly, this is different from the simple case because an object was interacted with
+            // in the first touch, but not the second touch.
+            checkNotPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            // Also importantly, the positional part of the second touch is ignored.
+            checkPosition(TouchSource.Touch1);
+
+            // In this scenario, a third touch should be allowed, and handled similarly to the second.
+            beginTouch(TouchSource.Touch3);
+
+            assertKeyCounter(2, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            // Position is still ignored.
+            checkPosition(TouchSource.Touch1);
+
+            endTouch(TouchSource.Touch2);
+
+            checkPressed(OsuAction.LeftButton);
+            checkNotPressed(OsuAction.RightButton);
+            // Position is still ignored.
+            checkPosition(TouchSource.Touch1);
+
+            // User continues streaming
+            beginTouch(TouchSource.Touch2);
+
+            assertKeyCounter(2, 2);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            // Position is still ignored.
+            checkPosition(TouchSource.Touch1);
+
+            // In this mode a maximum of three touches should be supported.
+            // A fourth touch should result in no changes anywhere.
+            beginTouch(TouchSource.Touch4);
+            assertKeyCounter(2, 2);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch1);
+            endTouch(TouchSource.Touch4);
+        }
+
+        [Test]
+        public void TestNonStreamOverlappingDirectTouchesWithRelease()
+        {
+            // In this scenario, the user is tapping on three circles directly while correctly releasing the first touch.
+            // All three should be recognised.
+
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+            addHitCircleAt(TouchSource.Touch3);
+
+            beginTouch(TouchSource.Touch1);
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch2);
+            assertKeyCounter(1, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
+
+            endTouch(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch3);
+            assertKeyCounter(2, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch3);
+        }
+
+        [Test]
+        public void TestNonStreamOverlappingDirectTouchesWithoutRelease()
+        {
+            // In this scenario, the user is tapping on three circles directly without releasing any touches.
+            // The first two should be recognised, but a third should not (as the user already has two fingers down).
+
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+            addHitCircleAt(TouchSource.Touch3);
+
+            beginTouch(TouchSource.Touch1);
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch2);
+            assertKeyCounter(1, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch3);
+            assertKeyCounter(1, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch3);
         }
 
         [Test]
@@ -261,6 +388,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPressed(OsuAction.RightButton);
 
             assertKeyCounter(1, 1);
+        }
+
+        private void addHitCircleAt(TouchSource source)
+        {
+            AddStep($"Add circle at {source}", () =>
+            {
+                var hitCircle = new HitCircle();
+
+                hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                mainContent.Add(new DrawableHitCircle(hitCircle)
+                {
+                    Clock = new FramedClock(new ManualClock()),
+                    Position = mainContent.ToLocalSpace(getSanePositionForSource(source)),
+                });
+            });
         }
 
         private void beginTouch(TouchSource source, Vector2? screenSpacePosition = null) =>

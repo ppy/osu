@@ -9,8 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -39,6 +41,9 @@ namespace osu.Game.Rulesets.Osu
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
+
+        public bool CheckScreenSpaceActionPressJudgeable(Vector2 screenSpacePosition) =>
+            NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.ReceivePositionalInputAt(screenSpacePosition));
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
