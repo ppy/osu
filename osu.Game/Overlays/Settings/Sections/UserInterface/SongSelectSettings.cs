@@ -45,8 +45,8 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = UserInterfaceStrings.BeatmapSelectionBlurLevel,
-                    Current = config.GetBindable<float>(OsuSetting.BeatmapSelectionBlurLevel)
+                    LabelText = UserInterfaceStrings.BeatmapSelectionBackgroundBlurLevel,
+                    Current = config.GetBindable<float>(OsuSetting.BeatmapSelectionBackgoundBlurLevel)
                 }
             };
         }
