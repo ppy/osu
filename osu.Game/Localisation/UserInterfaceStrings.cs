@@ -112,7 +112,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Song select background blur"
         /// </summary>
-        public static LocalisableString BeatmapSelectionBackgroundBlurLevel => new TranslatableString(getKey(@"beatmap_selection_background_blur_level"), @"Song select background blur");
+        public static LocalisableString SongSelectBackgroundBlurLevel => new TranslatableString(getKey(@"song_select_background_blur_level"), @"Song select background blur");
 
         /// <summary>
         /// "no limit"
