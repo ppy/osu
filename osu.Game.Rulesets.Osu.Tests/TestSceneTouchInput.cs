@@ -14,11 +14,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -70,6 +72,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                                     Origin = Anchor.CentreLeft,
                                     Depth = float.MinValue,
                                     X = 100,
+                                },
+                                new OsuCursorContainer
+                                {
+                                    Depth = float.MinValue,
                                 }
                             },
                         }
@@ -77,6 +83,40 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new TouchVisualiser(),
                 };
             });
+        }
+
+        [Test]
+        public void TestStreamInputVisual()
+        {
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch1);
+            beginTouch(TouchSource.Touch2);
+
+            endTouch(TouchSource.Touch1);
+
+            int i = 0;
+
+            AddRepeatStep("Alternate", () =>
+            {
+                TouchSource down = i % 2 == 0 ? TouchSource.Touch3 : TouchSource.Touch4;
+                TouchSource up = i % 2 == 0 ? TouchSource.Touch4 : TouchSource.Touch3;
+
+                // sometimes the user will end the previous touch before touching again, sometimes not.
+                if (RNG.NextBool())
+                {
+                    InputManager.BeginTouch(new Touch(down, getSanePositionForSource(down)));
+                    InputManager.EndTouch(new Touch(up, getSanePositionForSource(up)));
+                }
+                else
+                {
+                    InputManager.EndTouch(new Touch(up, getSanePositionForSource(up)));
+                    InputManager.BeginTouch(new Touch(down, getSanePositionForSource(down)));
+                }
+
+                i++;
+            }, 100);
         }
 
         [Test]
