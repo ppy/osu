@@ -50,6 +50,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 PreviousRandom = () => previousRandomCalled = true
             });
             footer.AddButton(new FooterButtonOptionsV2());
+            footer.AddButton(new FooterButtonFreeModsV2());
 
             InputManager.MoveMouseTo(Vector2.Zero);
 
