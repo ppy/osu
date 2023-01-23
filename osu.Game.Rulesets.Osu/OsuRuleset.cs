@@ -164,7 +164,8 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
-                        new OsuModStrictTracking()
+                        new OsuModStrictTracking(),
+                        new OsuModIncognito()
                     };
 
                 case ModType.Conversion:
@@ -172,7 +173,6 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTargetPractice(),
                         new OsuModDifficultyAdjust(),
-                        new OsuModIncognito(),
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
