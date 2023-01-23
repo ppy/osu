@@ -230,9 +230,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null
-                && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre)))
-                && Mods.All(mod => !mod.HidesResumeOverlay))
+            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -507,7 +505,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
-        public ResumeOverlay ResumeOverlay { get; protected set; }
+        public ResumeOverlay ResumeOverlay { get; set; }
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.

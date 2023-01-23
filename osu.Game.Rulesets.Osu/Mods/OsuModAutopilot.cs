@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0.1;
-        public override bool HidesResumeOverlay => true;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
         public bool PerformFail() => false;
@@ -55,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            drawableRuleset.ResumeOverlay = null;
+
             // Grab the input manager to disable the user's cursor, and for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;
