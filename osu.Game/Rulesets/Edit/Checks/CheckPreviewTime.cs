@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 if (diff.Metadata.PreviewTime != previewTime)
                 {
-                    yield return new IssueTemplatePreviewTimeConflict(this).Create(diff.DifficultyName);
+                    yield return new IssueTemplatePreviewTimeConflict(this).Create(diff.DifficultyName, previewTime, diff.Metadata.PreviewTime);
                 }
             }
         }
@@ -44,11 +44,15 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplatePreviewTimeConflict : IssueTemplate
         {
             public IssueTemplatePreviewTimeConflict(ICheck check)
-                : base(check, IssueType.Warning, "Audio preview time conflicts with {0} diff")
+                : base(check, IssueType.Warning, "Audio preview time {1} doesn't match \"{0}\"'s preview time {2}")
             {
             }
 
-            public Issue Create(string diffName) => new Issue(this, diffName);
+            public Issue Create(string diffName, int originalTime, int conflictTime) =>
+                // preview time should show (not set) when it is not set.
+                new Issue(this, diffName,
+                    originalTime != -1 ? $"({originalTime:N0})" : "(not set)",
+                    conflictTime != -1 ? $"({conflictTime:N0})" : "(not set)");
         }
 
         public class IssueTemplateHasNoPreviewTime : IssueTemplate
