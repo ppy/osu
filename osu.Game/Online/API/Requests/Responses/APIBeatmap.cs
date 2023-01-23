@@ -63,6 +63,9 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
         }
 
+        [JsonProperty(@"convert")]
+        public bool Convert { get; set; }
+
         [JsonProperty(@"count_circles")]
         public int CircleCount { get; set; }
 

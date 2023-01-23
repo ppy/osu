@@ -596,6 +596,9 @@ namespace osu.Game.Screens.Select
 
         public void FlushPendingFilterOperations()
         {
+            if (!IsLoaded)
+                return;
+
             if (PendingFilter?.Completed == false)
             {
                 applyActiveCriteria(false);

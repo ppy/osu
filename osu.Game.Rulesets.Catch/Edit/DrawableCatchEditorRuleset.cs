@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -16,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Edit
     {
         public readonly BindableDouble TimeRangeMultiplier = new BindableDouble(1);
 
-        public DrawableCatchEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        public DrawableCatchEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
