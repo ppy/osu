@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     internal partial class ArgonNotePiece : CompositeDrawable
     {
         public const float NOTE_HEIGHT = 42;
-
+        public const float NOTE_ACCENT_RATIO = 0.82f;
         public const float CORNER_RADIUS = 3.4f;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.82f,
+                    Height = NOTE_ACCENT_RATIO,
                     Masking = true,
                     CornerRadius = CORNER_RADIUS,
                     Children = new Drawable[]
