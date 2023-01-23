@@ -513,10 +513,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Check for positional snap for given blueprint.
         /// </summary>
-        /// <param name="blueprint">The blueprint to check for snapping</param>
-        /// <param name="distanceTravelled">Distance travelled since start of dragging action. </param>
-        /// <param name="originalPositions">The selection positions of blueprint before start of dragging action. </param>
-        /// <returns>Whether found object to snap to.</returns>
+        /// <param name="blueprint">The blueprint to check for snapping.</param>
+        /// <param name="distanceTravelled">Distance travelled since start of dragging action.</param>
+        /// <param name="originalPositions">The snap positions of blueprint before start of dragging action.</param>
+        /// <returns>Whether an object to snap to was found.</returns>
         private bool checkSnappingBlueprintToNearbyObjects(SelectionBlueprint<T> blueprint, Vector2 distanceTravelled, Vector2[] originalPositions)
         {
             var currentPositions = blueprint.ScreenSpaceSnapPoints;
