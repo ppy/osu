@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 windowMultiplier *= 1.4;
 
             if (overallDifficulty < 5)
-                judgements[0] = (22.4 - 6 * overallDifficulty) * windowMultiplier;
+                judgements[0] = (22.4 - 0.6 * overallDifficulty) * windowMultiplier;
             else
                 judgements[0] = (24.9 - 1.1 * overallDifficulty) * windowMultiplier;
             judgements[1] = (64 - 3 * overallDifficulty) * windowMultiplier;
