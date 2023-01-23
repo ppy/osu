@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Settings
 
         public LocalisableString TooltipText { get; set; }
 
+        public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();
+
         public BindableBool CanBeShown { get; } = new BindableBool(true);
         IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
 
@@ -30,9 +32,13 @@ namespace osu.Game.Overlays.Settings
             get
             {
                 if (TooltipText != default)
-                    return base.FilterTerms.Append(TooltipText);
+                    yield return TooltipText;
 
-                return base.FilterTerms;
+                foreach (string s in Keywords)
+                    yield return s;
+
+                foreach (LocalisableString s in base.FilterTerms)
+                    yield return s;
             }
         }
     }
