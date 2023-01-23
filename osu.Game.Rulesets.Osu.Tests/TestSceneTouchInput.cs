@@ -148,8 +148,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
-            // Importantly, this is different from the simple case because an object was interacted with
-            // in the first touch, but not the second touch.
+            // Importantly, this is different from the simple case because an object was interacted with in the first touch, but not the second touch.
+            // left button is automatically released.
             checkNotPressed(OsuAction.LeftButton);
             checkPressed(OsuAction.RightButton);
             // Also importantly, the positional part of the second touch is ignored.
@@ -188,6 +188,52 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPressed(OsuAction.RightButton);
             checkPosition(TouchSource.Touch1);
             endTouch(TouchSource.Touch4);
+        }
+
+        [Test]
+        public void TestStreamInputWithInitialTouchDown()
+        {
+            // In this scenario, the user is wanting to use stream input but we start with one finger still on the screen.
+
+            addHitCircleAt(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch1);
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+
+            // hits circle
+            beginTouch(TouchSource.Touch2);
+            assertKeyCounter(1, 1);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
+
+            endTouch(TouchSource.Touch1);
+            checkNotPressed(OsuAction.LeftButton);
+
+            // stream using other two fingers while touch2 tracks
+            beginTouch(TouchSource.Touch1);
+            assertKeyCounter(2, 1);
+            checkPressed(OsuAction.LeftButton);
+            // right button is automatically released
+            checkNotPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch3);
+            assertKeyCounter(2, 2);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
+
+            endTouch(TouchSource.Touch1);
+            checkNotPressed(OsuAction.LeftButton);
+
+            beginTouch(TouchSource.Touch1);
+            assertKeyCounter(3, 2);
+            checkPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            checkPosition(TouchSource.Touch2);
         }
 
         [Test]
