@@ -11,6 +11,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using MathNet.Numerics;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -56,7 +58,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return new ManiaPerformanceAttributes
             {
                 Difficulty = difficultyValue,
-                Total = totalValue,
+                // Total = totalValue,
+                Total = estimatedUR,
                 EstimatedUR = estimatedUR
             };
         }
@@ -81,24 +84,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (totalSuccessfulHits == 0)
                 return Double.PositiveInfinity;
 
-            double overallDifficulty = attributes.OverallDifficulty;
+            double[] judgements = new double[5];
 
-            if (attributes.Convert)
-                overallDifficulty = 10;
+            // Legacy scores have the same number of judgements and total notes 
+            bool isLegacyScore = totalHits == attributes.NoteCount + attributes.HoldNoteCount;
 
-            double windowMultiplier = 1;
+            if (isLegacyScore)
+                judgements = getLegacyJudgements(score, attributes);
+            else
+                judgements = getLazerJudgements(score, attributes);
 
-            if (score.Mods.Any(m => m is ModHardRock))
-                windowMultiplier *= 1 / 1.4;
-            else if (score.Mods.Any(m => m is ModEasy))
-                windowMultiplier *= 1.4;
-
-            // We need the size of every hit window in order to calculate deviation accurately.
-            double hMax = Math.Floor(16 * windowMultiplier);
-            double h300 = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
-            double h200 = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
-            double h100 = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
-            double h50 = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
+            double hMax = judgements[0];
+            double h300 = judgements[1];
+            double h200 = judgements[2];
+            double h100 = judgements[3];
+            double h50 = judgements[4];
 
             double root2 = Math.Sqrt(2);
 
@@ -127,6 +127,63 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
             return FindMinimum.OfScalarFunction(likelihoodGradient, 30);
+        }
+
+        double[] getLegacyJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        {
+            double[] judgements = new double[5];
+
+            double overallDifficulty = attributes.OverallDifficulty;
+
+            if (attributes.Convert)
+                overallDifficulty = 10;
+
+            double windowMultiplier = 1;
+
+            if (score.Mods.Any(m => m is ModHardRock))
+                windowMultiplier *= 1 / 1.4;
+            else if (score.Mods.Any(m => m is ModEasy))
+                windowMultiplier *= 1.4;
+
+            judgements[0] = Math.Floor(16 * windowMultiplier);
+            judgements[1] = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
+            judgements[2] = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
+            judgements[3] = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
+            judgements[4] = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
+
+            return judgements;
+        }
+
+        double[] getLazerJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        {
+            double[] judgements = new double[5];
+
+            var track = new TrackVirtual(10000);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            double clockRate = track.Rate;
+
+            double overallDifficulty = attributes.OverallDifficulty;
+
+            if (attributes.Convert)
+                overallDifficulty = 10;
+
+            double windowMultiplier = 1 / clockRate;
+
+            if (score.Mods.Any(m => m is ModHardRock))
+                windowMultiplier *= 1 / 1.4;
+            else if (score.Mods.Any(m => m is ModEasy))
+                windowMultiplier *= 1.4;
+
+            if (overallDifficulty < 5)
+                judgements[0] = (22.4 - 6 * overallDifficulty) * windowMultiplier;
+            else
+                judgements[0] = (24.9 - 1.1 * overallDifficulty) * windowMultiplier;
+            judgements[1] = (64 - 3 * overallDifficulty) * windowMultiplier;
+            judgements[2] = (97 - 3 * overallDifficulty) * windowMultiplier;
+            judgements[3] = (127 - 3 * overallDifficulty) * windowMultiplier;
+            judgements[4] = (151 - 3 * overallDifficulty) * windowMultiplier;
+
+            return judgements;
         }
  
         double erfcApprox(double x)
