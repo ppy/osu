@@ -33,7 +33,6 @@ namespace osu.Game.Tests.Visual
         private Skin metricsSkin;
         private Skin legacySkin;
         private Skin argonSkin;
-        private Skin argonProSkin;
         private Skin specialSkin;
         private Skin oldSkin;
 
@@ -41,7 +40,7 @@ namespace osu.Game.Tests.Visual
         private GameHost host { get; set; }
 
         protected SkinnableTestScene()
-            : base(2, 4)
+            : base(2, 3)
         {
         }
 
@@ -51,7 +50,6 @@ namespace osu.Game.Tests.Visual
             var dllStore = new DllResourceStore(GetType().Assembly);
 
             argonSkin = new ArgonSkin(this);
-            argonProSkin = new ArgonProSkin(this);
             trianglesSkin = new TrianglesSkin(this);
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
             legacySkin = new DefaultLegacySkin(this);
@@ -67,13 +65,12 @@ namespace osu.Game.Tests.Visual
 
             var beatmap = CreateBeatmapForSkinProvider();
 
-            Cell(0).Child = createProvider(argonProSkin, creationFunction, beatmap);
-            Cell(1).Child = createProvider(argonSkin, creationFunction, beatmap);
-            Cell(2).Child = createProvider(trianglesSkin, creationFunction, beatmap);
-            Cell(3).Child = createProvider(metricsSkin, creationFunction, beatmap);
-            Cell(4).Child = createProvider(legacySkin, creationFunction, beatmap);
-            Cell(5).Child = createProvider(specialSkin, creationFunction, beatmap);
-            Cell(6).Child = createProvider(oldSkin, creationFunction, beatmap);
+            Cell(0).Child = createProvider(argonSkin, creationFunction, beatmap);
+            Cell(1).Child = createProvider(trianglesSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(metricsSkin, creationFunction, beatmap);
+            Cell(3).Child = createProvider(legacySkin, creationFunction, beatmap);
+            Cell(4).Child = createProvider(specialSkin, creationFunction, beatmap);
+            Cell(5).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
