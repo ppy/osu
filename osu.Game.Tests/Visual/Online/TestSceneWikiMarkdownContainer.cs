@@ -123,7 +123,7 @@ needs_cleanup: true
             AddStep("Add absolute image", () =>
             {
                 markdownContainer.CurrentPath = "https://dev.ppy.sh";
-                markdownContainer.Text = "![intro](wiki/images/Client/Interface/img/intro-screen.jpg)";
+                markdownContainer.Text = "![intro](/wiki/images/Client/Interface/img/intro-screen.jpg)";
             });
         }
 
