@@ -102,6 +102,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double root2 = Math.Sqrt(2);
 
+            // The deviation estimation cannot handle SS scores, so always assume there is one extra note to keep the perfect hit probability below 100%.
+            double totalHitsP1 = totalHits + 1;
+
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -114,12 +117,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50 = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0 = erfcApprox(h50 / (d * root2));
 
-                double gradient = Math.Pow(pMax, countPerfect / totalHits)
-                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
-                * Math.Pow(p200, countGood / totalHits)
-                * Math.Pow(p100, countOk / totalHits)
-                * Math.Pow(p50, countMeh / totalHits)
-                * Math.Pow(p0, countMiss / totalHits);
+                double gradient = Math.Pow(pMax, countPerfect / totalHitsP1)
+                * Math.Pow(p300, countGreat / totalHitsP1)
+                * Math.Pow(p200, countGood / totalHitsP1)
+                * Math.Pow(p100, countOk / totalHitsP1)
+                * Math.Pow(p50, countMeh / totalHitsP1)
+                * Math.Pow(p0, countMiss / totalHitsP1);
 
                 return -gradient;
             }
@@ -150,12 +153,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50 = ((p50Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p50Tail * attributes.HoldNoteCount)) / totalHits;
                 double p0 = ((p0Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p0Tail * attributes.HoldNoteCount)) / totalHits;
 
-                double gradient = Math.Pow(pMax, countPerfect / totalHits)
-                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
-                * Math.Pow(p200, countGood / totalHits)
-                * Math.Pow(p100, countOk / totalHits)
-                * Math.Pow(p50, countMeh / totalHits)
-                * Math.Pow(p0, countMiss / totalHits);
+                double gradient = Math.Pow(pMax, countPerfect / totalHitsP1)
+                * Math.Pow(p300, countGreat / totalHitsP1)
+                * Math.Pow(p200, countGood / totalHitsP1)
+                * Math.Pow(p100, countOk / totalHitsP1)
+                * Math.Pow(p50, countMeh / totalHitsP1)
+                * Math.Pow(p0, countMiss / totalHitsP1);
 
                 return -gradient;
             }
@@ -229,7 +232,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (x <= 5)
                 return SpecialFunctions.Erfc(x);
 
-            // Approximation is most accurate with values over 5, and is much more performant than the Erfc function
+            // This approximation is very accurate with values over 5, and is much more performant than the Erfc function
             return Math.Pow(Math.E, -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
         } 
     }
