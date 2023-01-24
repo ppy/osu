@@ -464,11 +464,10 @@ namespace osu.Game.Rulesets.UI
         {
             var result = entry.Result;
             RevertResult?.Invoke(result);
+            entry.HitObjectEntry.OnRevertResult();
 
             result.TimeOffset = 0;
             result.Type = HitResult.None;
-
-            entry.HitObjectEntry.OnRevertResult();
         }
 
         #region Editor logic
