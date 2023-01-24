@@ -43,10 +43,10 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
                 },
-                new SettingsSlider<float>
+                new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.SongSelectBackgroundBlurLevel,
-                    Current = config.GetBindable<float>(OsuSetting.SongSelectBackgoundBlurLevel)
+                    Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur)
                 }
             };
         }

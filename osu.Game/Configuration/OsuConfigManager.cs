@@ -60,7 +60,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
-            SetDefault(OsuSetting.SongSelectBackgoundBlurLevel, 1f, 0, 1f, 0.01f);
+            SetDefault(OsuSetting.SongSelectBackgoundBlur, true);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
@@ -341,7 +341,7 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
-        SongSelectBackgoundBlurLevel,
+        SongSelectBackgoundBlur,
         Version,
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,
