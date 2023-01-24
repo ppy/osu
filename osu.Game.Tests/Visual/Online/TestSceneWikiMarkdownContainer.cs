@@ -270,6 +270,30 @@ Phasellus eu nunc nec ligula semper fringilla. Aliquam magna neque, placerat sed
             });
         }
 
+        [Test]
+        public void TestCodeSyntax()
+        {
+            AddStep("set content", () =>
+            {
+                markdownContainer.Text = @"
+This is a paragraph containing `inline code` synatax.
+Oh wow I do love the `WikiMarkdownContainer`, it is very cool!
+
+This is a line before the fenced code block:
+```csharp
+public class WikiMarkdownContainer : MarkdownContainer
+{
+    public WikiMarkdownContainer()
+    {
+        this.foo = bar;
+    }
+}
+```
+This is a line after the fenced code block!
+";
+            });
+        }
+
         private partial class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
