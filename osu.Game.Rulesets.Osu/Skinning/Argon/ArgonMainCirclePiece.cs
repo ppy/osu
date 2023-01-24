@@ -149,9 +149,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         var easingOutQuint = useFlash.Value ? Easing.OutQuint : Easing.Out;
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
-                        double fadeOutTime = useFlash.Value ? 800 : 240;
+                        const double fade_out_time = 800;
+                        const double flash_in_duration = 150;
 
-                        double flashInDuration = fadeOutTime / 800 * 150;
+                        double animationTime = useFlash.Value ? 1 : 0.3f;
+
+                        double fadeOutTime = animationTime * fade_out_time;
+                        double flashInDuration = animationTime * flash_in_duration;
                         const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
