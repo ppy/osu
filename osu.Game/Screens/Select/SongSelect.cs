@@ -125,13 +125,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> backgroundBlurLevel { get; set; } = new BindableBool();
+        private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
-            backgroundBlurLevel = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur);
-            backgroundBlurLevel.BindValueChanged(e =>
+            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur);
+            configBackgroundBlur.BindValueChanged(e =>
             {
                 if (this.IsCurrentScreen())
                 {
@@ -758,7 +758,7 @@ namespace osu.Game.Screens.Select
             ApplyToBackground(backgroundModeBeatmap =>
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = backgroundBlurLevel.Value ? BACKGROUND_BLUR : 0f;
+                backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             });
 
