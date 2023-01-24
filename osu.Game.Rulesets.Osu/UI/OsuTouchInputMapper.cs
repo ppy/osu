@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private readonly List<TrackedTouch> trackedTouches = new List<TrackedTouch>();
 
+        private TrackedTouch? positionTrackingTouch;
+
         private readonly OsuInputManager osuInputManager;
 
         private Bindable<bool> mouseDisabled = null!;
@@ -43,8 +45,6 @@ namespace osu.Game.Rulesets.Osu.UI
             base.OnTouchMove(e);
             handleTouchMovement(e);
         }
-
-        private TrackedTouch? positionTrackingTouch;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
