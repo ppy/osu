@@ -241,7 +241,7 @@ namespace osu.Game.Skinning
                 // So there's a thing where some users have taken it upon themselves to create skin elements of insane dimensions.
                 // To the point where GPUs cannot load the textures (along with most image editor apps).
                 // To work around this, let's look out for any stupid images and shrink them down into a usable size.
-                const int max_supported_texture_size = 16384;
+                const int max_supported_texture_size = 8192;
 
                 if (textureUpload.Height > max_supported_texture_size || textureUpload.Width > max_supported_texture_size)
                 {
