@@ -110,12 +110,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMax = 1 - erfcApprox(hMax / (d * root2));
-                double p300 = erfcApprox(hMax / (d * root2)) - erfcApprox(h300 / (d * root2));
-                double p200 = erfcApprox(h300 / (d * root2)) - erfcApprox(h200 / (d * root2));
-                double p100 = erfcApprox(h200 / (d * root2)) - erfcApprox(h100 / (d * root2));
-                double p50 = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
-                double p0 = erfcApprox(h50 / (d * root2));
+                double pMaxNote = 1 - erfcApprox(hMax / (d * root2));
+                double p300Note = erfcApprox(hMax / (d * root2)) - erfcApprox(h300 / (d * root2));
+                double p200Note = erfcApprox(h300 / (d * root2)) - erfcApprox(h200 / (d * root2));
+                double p100Note = erfcApprox(h200 / (d * root2)) - erfcApprox(h100 / (d * root2));
+                double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
+                double p0Note = erfcApprox(h50 / (d * root2));
+
+                // Temporary arbitrary value for balancing purposes.
+                double f = 0.75;
+
+                double pMaxLN = 1 - Math.Pow(erfcApprox((hMax * 1.2) / (d * root2)), f);
+                double p300LN = Math.Pow(erfcApprox((hMax * 1.2) / (d * root2)), f) - Math.Pow(erfcApprox((h300 * 1.1) / (d * root2)), f);
+                double p200LN = Math.Pow(erfcApprox((h300 * 1.1) / (d * root2)), f) - Math.Pow(erfcApprox(h200 / (d * root2)), f);
+                double p100LN = Math.Pow(erfcApprox(h200 / (d * root2)), f) - Math.Pow(erfcApprox(h100 / (d * root2)), f);
+                double p50LN = Math.Pow(erfcApprox(h100 / (d * root2)), f) - Math.Pow(erfcApprox(h50 / (d * root2)), f);
+                double p0LN = Math.Pow(erfcApprox(h50 / (d * root2)), f);
+
+                double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
+                double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
+                double p200 = ((p200Note * attributes.NoteCount) + (p200LN * attributes.HoldNoteCount)) / totalHits;
+                double p100 = ((p100Note * attributes.NoteCount) + (p100LN * attributes.HoldNoteCount)) / totalHits;
+                double p50 = ((p50Note * attributes.NoteCount) + (p50LN * attributes.HoldNoteCount)) / totalHits;
+                double p0 = ((p0Note * attributes.NoteCount) + (p0LN * attributes.HoldNoteCount)) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHitsP1)
                 * Math.Pow(p300, countGreat / totalHitsP1)
@@ -233,7 +250,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return SpecialFunctions.Erfc(x);
 
             // This approximation is very accurate with values over 5, and is much more performant than the Erfc function
-            return Math.Pow(Math.E, -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
+            return Math.Exp(-Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
         } 
     }
 }
