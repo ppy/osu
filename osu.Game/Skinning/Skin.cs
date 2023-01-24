@@ -7,9 +7,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -18,6 +21,8 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Skinning
 {
@@ -77,7 +82,7 @@ namespace osu.Game.Skinning
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, new SquishingTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
             }
             else
             {
@@ -210,5 +215,54 @@ namespace osu.Game.Skinning
         }
 
         #endregion
+
+        public class SquishingTextureLoaderStore : IResourceStore<TextureUpload>
+        {
+            private readonly IResourceStore<TextureUpload> textureStore;
+
+            public SquishingTextureLoaderStore(IResourceStore<TextureUpload> textureStore)
+            {
+                this.textureStore = textureStore;
+            }
+
+            public void Dispose()
+            {
+                textureStore.Dispose();
+            }
+
+            public TextureUpload Get(string name)
+            {
+                var textureUpload = textureStore.Get(name);
+
+                // NRT not enabled on framework side classes (IResourceStore / TextureLoaderStore), welp.
+                if (textureUpload.IsNull())
+                    return null!;
+
+                // So there's a thing where some users have taken it upon themselves to create skin elements of insane dimensions.
+                // To the point where GPUs cannot load the textures (along with most image editor apps).
+                // To work around this, let's look out for any stupid images and shrink them down into a usable size.
+                const int max_supported_texture_size = 16384;
+
+                if (textureUpload.Height > max_supported_texture_size || textureUpload.Width > max_supported_texture_size)
+                {
+                    var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+
+                    image.Mutate(i => i.Resize(new Size(
+                        Math.Min(textureUpload.Width, max_supported_texture_size),
+                        Math.Min(textureUpload.Height, max_supported_texture_size)
+                    )));
+
+                    return new TextureUpload(image);
+                }
+
+                return textureUpload;
+            }
+
+            public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => textureStore.GetAsync(name, cancellationToken);
+
+            public Stream GetStream(string name) => textureStore.GetStream(name);
+
+            public IEnumerable<string> GetAvailableResources() => textureStore.GetAvailableResources();
+        }
     }
 }
