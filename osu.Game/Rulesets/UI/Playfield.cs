@@ -22,7 +22,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Objects.Pooling;
-using osu.Game.Rulesets.Scoring;
 using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.UI
