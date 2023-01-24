@@ -28,22 +28,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestItemStillSelectedAfterChangeToSameBeatmap()
-        {
-            selectNewItem(() => InitialBeatmap);
-
-            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
-        {
-            selectNewItem(() => OtherBeatmap);
-
-            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
         public void TestNewItemCreatedAfterGameplayFinished()
         {
             RunGameplay();
@@ -52,20 +36,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("first playlist item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
             AddUntilStep("second playlist item not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
             AddUntilStep("second playlist item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
-        }
-
-        [Test]
-        public void TestOnlyLastItemChangedAfterGameplayFinished()
-        {
-            RunGameplay();
-
-            IBeatmapInfo firstBeatmap = null;
-            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.ServerAPIRoom?.Playlist[0].Beatmap);
-
-            selectNewItem(() => OtherBeatmap);
-
-            AddUntilStep("first playlist item hasn't changed", () => MultiplayerClient.ServerAPIRoom?.Playlist[0].Beatmap == firstBeatmap);
-            AddUntilStep("second playlist item changed", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Beatmap != firstBeatmap);
         }
 
         [Test]
@@ -80,6 +50,47 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * TearDown : System.TimeoutException : "wait for ongoing operation to complete" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
+        public void TestItemStillSelectedAfterChangeToSameBeatmap()
+        {
+            selectNewItem(() => InitialBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest] // See above
+        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
+        {
+            selectNewItem(() => OtherBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        [FlakyTest] // See above
+        public void TestOnlyLastItemChangedAfterGameplayFinished()
+        {
+            RunGameplay();
+
+            IBeatmapInfo firstBeatmap = null;
+            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.ServerAPIRoom?.Playlist[0].Beatmap);
+
+            selectNewItem(() => OtherBeatmap);
+
+            AddUntilStep("first playlist item hasn't changed", () => MultiplayerClient.ServerAPIRoom?.Playlist[0].Beatmap == firstBeatmap);
+            AddUntilStep("second playlist item changed", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Beatmap != firstBeatmap);
+        }
+
+        [Test]
+        [FlakyTest] // See above
         public void TestAddItemsAsHost()
         {
             addItem(() => OtherBeatmap);
