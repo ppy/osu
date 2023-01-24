@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
+        // Required to handle touches outside of the playfield when screen scaling is enabled.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override void OnTouchMove(TouchMoveEvent e)
