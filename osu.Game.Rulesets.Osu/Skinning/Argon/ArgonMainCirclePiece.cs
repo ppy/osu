@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
-        private bool useFlash;
+        private Bindable<bool> useFlash = null!;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
 
-            useFlash = config.Get<bool>(OsuSetting.HitLighting);
+            useFlash = config.GetBindable<bool>(OsuSetting.HitLighting);
         }
 
         protected override void LoadComplete()
@@ -146,12 +146,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 {
                     case ArmedState.Hit:
 
-                        var easingOutQuint = useFlash ? Easing.OutQuint : Easing.Out;
+                        var easingOutQuint = useFlash.Value ? Easing.OutQuint : Easing.Out;
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
-                        double fadeOutTime = useFlash ? 800 : 240;
+                        double fadeOutTime = useFlash.Value ? 800 : 240;
 
-                        double flashInDuration = (fadeOutTime / 800) * 150;
+                        double flashInDuration = fadeOutTime / 800 * 150;
                         const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         {
                             outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
 
-                            if (useFlash)
+                            if (useFlash.Value)
                             {
                                 outerGradient
                                     .FadeColour(Color4.White, 80)
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             }
                         }
 
-                        if (useFlash)
+                        if (useFlash.Value)
                         {
                             flash.FadeTo(1, flashInDuration, Easing.OutQuint);
                             this.FadeOut(fadeOutTime, Easing.OutQuad);
