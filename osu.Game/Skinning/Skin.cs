@@ -1,18 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -21,8 +20,6 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Skinning
 {
@@ -31,12 +28,12 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A texture store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected TextureStore? Textures { get; }
+        protected TextureStore Textures { get; }
 
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected ISampleStore? Samples { get; }
+        protected ISampleStore Samples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -46,17 +43,17 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
 
-        public abstract ISample? GetSample(ISampleInfo sampleInfo);
+        public abstract ISample GetSample(ISampleInfo sampleInfo);
 
-        public Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
+        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
 
-        public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+        public abstract Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
-        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             where TLookup : notnull
             where TValue : notnull;
 
-        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
+        private readonly RealmBackedResourceStore<SkinInfo> realmBackedStorage;
 
         /// <summary>
         /// Construct a new skin.
@@ -65,7 +62,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to game-wide resources.</param>
         /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
+        protected Skin(SkinInfo skin, IStorageResourceProvider resources, IResourceStore<byte[]> storage = null, string configurationFilename = @"skin.ini")
         {
             if (resources != null)
             {
@@ -82,7 +79,7 @@ namespace osu.Game.Skinning
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, new SquishingTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
+                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
             }
             else
             {
@@ -106,7 +103,7 @@ namespace osu.Game.Skinning
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[]? bytes = storage?.Get(filename);
+                byte[] bytes = storage?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -159,7 +156,7 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
+        public virtual Drawable GetDrawableComponent(ISkinComponentLookup lookup)
         {
             switch (lookup)
             {
@@ -216,56 +213,5 @@ namespace osu.Game.Skinning
 
         #endregion
 
-        public class SquishingTextureLoaderStore : IResourceStore<TextureUpload>
-        {
-            private readonly IResourceStore<TextureUpload> textureStore;
-
-            public SquishingTextureLoaderStore(IResourceStore<TextureUpload> textureStore)
-            {
-                this.textureStore = textureStore;
-            }
-
-            public void Dispose()
-            {
-                textureStore.Dispose();
-            }
-
-            public TextureUpload Get(string name)
-            {
-                var textureUpload = textureStore.Get(name);
-
-                // NRT not enabled on framework side classes (IResourceStore / TextureLoaderStore), welp.
-                if (textureUpload.IsNull())
-                    return null!;
-
-                // So there's a thing where some users have taken it upon themselves to create skin elements of insane dimensions.
-                // To the point where GPUs cannot load the textures (along with most image editor apps).
-                // To work around this, let's look out for any stupid images and shrink them down into a usable size.
-                const int max_supported_texture_size = 8192;
-
-                if (textureUpload.Height > max_supported_texture_size || textureUpload.Width > max_supported_texture_size)
-                {
-                    var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
-
-                    // The original texture upload will no longer be returned or used.
-                    textureUpload.Dispose();
-
-                    image.Mutate(i => i.Resize(new Size(
-                        Math.Min(textureUpload.Width, max_supported_texture_size),
-                        Math.Min(textureUpload.Height, max_supported_texture_size)
-                    )));
-
-                    return new TextureUpload(image);
-                }
-
-                return textureUpload;
-            }
-
-            public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => textureStore.GetAsync(name, cancellationToken);
-
-            public Stream GetStream(string name) => textureStore.GetStream(name);
-
-            public IEnumerable<string> GetAvailableResources() => textureStore.GetAvailableResources();
-        }
     }
 }
