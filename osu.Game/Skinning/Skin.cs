@@ -247,6 +247,9 @@ namespace osu.Game.Skinning
                 {
                     var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
 
+                    // The original texture upload will no longer be returned or used.
+                    textureUpload.Dispose();
+
                     image.Mutate(i => i.Resize(new Size(
                         Math.Min(textureUpload.Width, max_supported_texture_size),
                         Math.Min(textureUpload.Height, max_supported_texture_size)
