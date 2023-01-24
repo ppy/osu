@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
+        private bool useFlash;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -106,6 +107,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+
+            useFlash = config.Get<bool>(OsuSetting.HitLighting);
         }
 
         protected override void LoadComplete()
@@ -143,7 +146,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 {
                     case ArmedState.Hit:
 
-                        bool useFlash = config.Get<bool>(OsuSetting.HitLighting);
                         var easingOutQuint = useFlash ? Easing.OutQuint : Easing.Out;
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
