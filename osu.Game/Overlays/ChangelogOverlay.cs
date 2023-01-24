@@ -22,8 +22,6 @@ namespace osu.Game.Overlays
 {
     public partial class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
-        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
-
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
         private List<APIChangelogBuild> builds;
