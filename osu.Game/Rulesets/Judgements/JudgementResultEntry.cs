@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    internal class JudgementResultEntry : IComparable<JudgementResultEntry>
+    internal class JudgementResultEntry
     {
         public readonly double Time;
 
@@ -20,7 +19,5 @@ namespace osu.Game.Rulesets.Judgements
             HitObjectEntry = hitObjectEntry;
             Result = result;
         }
-
-        public int CompareTo(JudgementResultEntry? other) => Time.CompareTo(other?.Time);
     }
 }
