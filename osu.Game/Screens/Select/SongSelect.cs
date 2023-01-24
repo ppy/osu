@@ -127,24 +127,21 @@ namespace osu.Game.Screens.Select
 
         private Bindable<float> backgroundBlurLevel { get; set; } = new BindableFloat();
 
-        private void applyBackgroundBlur(float blurLevel)
-        {
-            ApplyToBackground(background =>
-            {
-                background.IgnoreUserSettings.Value = true;
-                background.BlurAmount.Value = blurLevel * BACKGROUND_BLUR;
-            });
-        }
-
-        private void applyBackgroundBlur(ValueChangedEvent<float> blurLevelValueChange)
-        {
-            applyBackgroundBlur(blurLevelValueChange.NewValue);
-        }
-
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
             backgroundBlurLevel = config.GetBindable<float>(OsuSetting.SongSelectBackgoundBlurLevel);
+            backgroundBlurLevel.BindValueChanged(e =>
+            {
+                if (this.IsCurrentScreen())
+                {
+                    ApplyToBackground(background =>
+                    {
+                        background.IgnoreUserSettings.Value = true;
+                        background.BlurAmount.Value = e.NewValue * BACKGROUND_BLUR;
+                    });
+                }
+            }, true);
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
@@ -568,9 +565,6 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(e);
 
-            backgroundBlurLevel.ValueChanged += applyBackgroundBlur;
-            applyBackgroundBlur(backgroundBlurLevel.Value);
-
             this.FadeInFromZero(250);
             FilterControl.Activate();
 
@@ -618,8 +612,6 @@ namespace osu.Game.Screens.Select
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            backgroundBlurLevel.ValueChanged += applyBackgroundBlur;
-            applyBackgroundBlur(backgroundBlurLevel.Value);
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             ModSelect.SelectedMods.Disabled = false;
@@ -665,8 +657,6 @@ namespace osu.Game.Screens.Select
             // Without this, it's possible for a transfer to happen while we are not the current screen.
             transferRulesetValue();
 
-            backgroundBlurLevel.ValueChanged -= applyBackgroundBlur;
-
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
 
             playExitingTransition();
@@ -675,8 +665,6 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            backgroundBlurLevel.ValueChanged -= applyBackgroundBlur;
-
             if (base.OnExiting(e))
                 return true;
 
