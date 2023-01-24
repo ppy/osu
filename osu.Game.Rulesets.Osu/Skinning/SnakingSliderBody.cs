@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         public override Vector2 PathOffset => snakedPathOffset;
 
+        public override Vector2 PathEndOffset => snakedPathEndOffset;
+
         /// <summary>
         /// The top-left position of the path when fully snaked.
         /// </summary>
@@ -52,6 +54,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// The offset of the path from <see cref="snakedPosition"/> when fully snaked.
         /// </summary>
         private Vector2 snakedPathOffset;
+
+        /// <summary>
+        /// The offset of the end of path from <see cref="snakedPosition"/> when fully snaked.
+        /// </summary>
+        private Vector2 snakedPathEndOffset;
 
         private DrawableSlider drawableSlider = null!;
 
@@ -109,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
             snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
+            snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
 
             double lastSnakedStart = SnakedStart ?? 0;
             double lastSnakedEnd = SnakedEnd ?? 0;
