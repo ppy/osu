@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Cursor;
@@ -42,11 +43,15 @@ namespace osu.Game.Overlays.Profile.Header
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
 
+        private Bindable<bool> coverExpanded = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager configManager)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            coverExpanded = configManager.GetBindable<bool>(OsuSetting.ProfileCoverExpanded);
 
             InternalChildren = new Drawable[]
             {
@@ -175,7 +180,8 @@ namespace osu.Game.Overlays.Profile.Header
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Margin = new MarginPadding { Right = 10 }
+                                    Margin = new MarginPadding { Right = 10 },
+                                    CoverExpanded = { BindTarget = coverExpanded }
                                 }
                             },
                         },
@@ -189,7 +195,7 @@ namespace osu.Game.Overlays.Profile.Header
             base.LoadComplete();
 
             User.BindValueChanged(user => updateUser(user.NewValue), true);
-            coverToggle.CoverVisible.BindValueChanged(_ => updateCoverState(), true);
+            coverExpanded.BindValueChanged(_ => updateCoverState(), true);
             FinishTransforms(true);
         }
 
@@ -213,9 +219,9 @@ namespace osu.Game.Overlays.Profile.Header
         {
             const float transition_duration = 250;
 
-            cover.ResizeHeightTo(coverToggle.CoverVisible.Value ? 250 : 0, transition_duration, Easing.OutQuint);
-            avatar.ResizeTo(new Vector2(coverToggle.CoverVisible.Value ? 120 : content_height), transition_duration, Easing.OutQuint);
-            avatar.TransformTo(nameof(avatar.CornerRadius), coverToggle.CoverVisible.Value ? 40f : 20f, transition_duration, Easing.OutQuint);
+            cover.ResizeHeightTo(coverToggle.CoverExpanded.Value ? 250 : 0, transition_duration, Easing.OutQuint);
+            avatar.ResizeTo(new Vector2(coverToggle.CoverExpanded.Value ? 120 : content_height), transition_duration, Easing.OutQuint);
+            avatar.TransformTo(nameof(avatar.CornerRadius), coverToggle.CoverExpanded.Value ? 40f : 20f, transition_duration, Easing.OutQuint);
         }
 
         private partial class ProfileCoverBackground : UserCoverBackground

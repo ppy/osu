@@ -16,9 +16,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class ToggleCoverButton : ProfileHeaderButton
     {
-        public readonly BindableBool CoverVisible = new BindableBool(true);
+        public readonly BindableBool CoverExpanded = new BindableBool(true);
 
-        public override LocalisableString TooltipText => CoverVisible.Value ? UsersStrings.ShowCoverTo0 : UsersStrings.ShowCoverTo1;
+        public override LocalisableString TooltipText => CoverExpanded.Value ? UsersStrings.ShowCoverTo0 : UsersStrings.ShowCoverTo1;
 
         private SpriteIcon icon = null!;
         private Sample? sampleOpen;
@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             Action = () =>
             {
-                CoverVisible.Toggle();
-                (CoverVisible.Value ? sampleOpen : sampleClose)?.Play();
+                CoverExpanded.Toggle();
+                (CoverExpanded.Value ? sampleOpen : sampleClose)?.Play();
             };
         }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Size = new Vector2(10.5f, 12)
             };
 
-            CoverVisible.BindValueChanged(visible => updateState(visible.NewValue), true);
+            CoverExpanded.BindValueChanged(visible => updateState(visible.NewValue), true);
         }
 
         private void updateState(bool detailsVisible) => icon.Icon = detailsVisible ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
