@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
-            MinValue = 0.01,
+            MinValue = 0.60,
             MaxValue = 0.99,
             Precision = 0.01,
             Default = 0.9,
