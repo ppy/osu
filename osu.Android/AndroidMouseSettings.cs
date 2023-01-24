@@ -13,6 +13,7 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
+using osuTK;
 
 namespace osu.Android
 {
@@ -41,6 +42,14 @@ namespace osu.Android
         private Bindable<bool> relativeMode = null!;
 
         private Bindable<bool> separateMode = null!;
+
+        private SettingsCheckbox separateSensitivity = null!;
+
+        private MouseSettings.SensitivitySettingX horizontalSensitivity = null!;
+
+        private FillFlowContainer<MouseSettings.SensitivitySettingY> verticalSensitivitySettings = null!;
+
+        private const int transition_duration = 200;
 
         public AndroidMouseSettings(AndroidMouseHandler mouseHandler)
         {
@@ -84,18 +93,18 @@ namespace osu.Android
                     },
                     verticalSensitivitySettings = new FillFlowContainer<MouseSettings.SensitivitySettingY>
                     {
-                       Direction = FillDirection.Vertical,
-                       RelativeSizeAxes = Axes.X,
-                       AutoSizeAxes = Axes.Y,
-                       Masking = true,
-                       Children = new[]
-                       {
-                           new MouseSettings.SensitivitySettingY
-                           {
-                               LabelText = MouseSettingsStrings.CursorVerticalSensitivity,
-                               Current = localSensitivityY,
-                           }
-                       }
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Masking = true,
+                        Children = new[]
+                        {
+                            new MouseSettings.SensitivitySettingY
+                            {
+                                LabelText = MouseSettingsStrings.CursorVerticalSensitivity,
+                                Current = localSensitivityY,
+                            }
+                        }
                     },
                 });
             }
@@ -120,7 +129,7 @@ namespace osu.Android
         {
             base.LoadComplete();
 
-           relativeMode.BindValueChanged(relative =>
+            relativeMode.BindValueChanged(relative =>
             {
                 localSensitivityX.Disabled = !relative.NewValue;
                 localSensitivityY.Disabled = !relative.NewValue || !separateMode.Value;
