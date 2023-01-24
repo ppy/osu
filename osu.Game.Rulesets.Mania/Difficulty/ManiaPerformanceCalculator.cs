@@ -102,8 +102,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double root2 = Math.Sqrt(2);
 
-            // Returns the likelihood of any deviation resulting in the play
-            double likelihoodGradient(double d)
+            double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
                     return double.PositiveInfinity;
@@ -125,11 +124,50 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return -gradient;
             }
 
+            double lazerLikelihoodGradient(double d)
+            {
+                if (d <= 0)
+                    return double.PositiveInfinity;
+
+                double pMaxNote = 1 - erfcApprox(hMax / (d * root2));
+                double p300Note = erfcApprox(hMax / (d * root2)) - erfcApprox(h300 / (d * root2));
+                double p200Note = erfcApprox(h300 / (d * root2)) - erfcApprox(h200 / (d * root2));
+                double p100Note = erfcApprox(h200 / (d * root2)) - erfcApprox(h100 / (d * root2));
+                double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
+                double p0Note = erfcApprox(h50 / (d * root2));
+
+                double pMaxTail = 1 - erfcApprox((hMax * 1.5) / (d * root2));
+                double p300Tail = erfcApprox((hMax * 1.5) / (d * root2)) - erfcApprox((h300 * 1.5) / (d * root2));
+                double p200Tail = erfcApprox((h300 * 1.5) / (d * root2)) - erfcApprox((h200 * 1.5) / (d * root2));
+                double p100Tail = erfcApprox((h200 * 1.5) / (d * root2)) - erfcApprox((h100 * 1.5) / (d * root2));
+                double p50Tail = erfcApprox((h100 * 1.5) / (d * root2)) - erfcApprox((h50 * 1.5) / (d * root2));
+                double p0Tail = erfcApprox((h50 * 1.5) / (d * root2));
+
+                double pMax = ((pMaxNote * (attributes.NoteCount + attributes.HoldNoteCount)) + (pMaxTail * attributes.HoldNoteCount)) / totalHits;
+                double p300 = ((p300Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p300Tail * attributes.HoldNoteCount)) / totalHits;
+                double p200 = ((p200Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p200Tail * attributes.HoldNoteCount)) / totalHits;
+                double p100 = ((p100Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p100Tail * attributes.HoldNoteCount)) / totalHits;
+                double p50 = ((p50Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p50Tail * attributes.HoldNoteCount)) / totalHits;
+                double p0 = ((p0Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p0Tail * attributes.HoldNoteCount)) / totalHits;
+
+                double gradient = Math.Pow(pMax, countPerfect / totalHits)
+                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                * Math.Pow(p200, countGood / totalHits)
+                * Math.Pow(p100, countOk / totalHits)
+                * Math.Pow(p50, countMeh / totalHits)
+                * Math.Pow(p0, countMiss / totalHits);
+
+                return -gradient;
+            }
+
             // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
-            return FindMinimum.OfScalarFunction(likelihoodGradient, 30);
+            if  (isLegacyScore)
+                return FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30);
+            else
+                return FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
         }
 
-        double[] getLegacyJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double[] getLegacyJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             double[] judgements = new double[5];
 
@@ -154,7 +192,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return judgements;
         }
 
-        double[] getLazerJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double[] getLazerJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             double[] judgements = new double[5];
 
