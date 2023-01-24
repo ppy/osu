@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = UserInterfaceStrings.BackgroundBlurLevel,
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur)
                 }
             };
