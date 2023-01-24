@@ -556,8 +556,8 @@ namespace osu.Game
                     case JoystickHandler jh:
                         return new JoystickSettings(jh);
 
-                    case TouchHandler:
-                        return new InputSection.HandlerSection(handler);
+                    case TouchHandler th:
+                        return new TouchSettings(th);
                 }
             }
 
