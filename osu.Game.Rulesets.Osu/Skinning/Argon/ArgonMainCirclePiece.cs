@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         double fadeOutTime = useFlash ? 800 : 240;
 
-                        double flashInDuration = fadeOutTime * (150 / 800.0);
+                        double flashInDuration = (fadeOutTime / 800) * 150;
                         const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
