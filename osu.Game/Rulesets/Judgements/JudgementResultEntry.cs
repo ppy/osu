@@ -7,15 +7,14 @@ namespace osu.Game.Rulesets.Judgements
 {
     internal class JudgementResultEntry
     {
-        public readonly double Time;
+        public double Time => Result.TimeAbsolute;
 
         public readonly HitObjectLifetimeEntry HitObjectEntry;
 
         public readonly JudgementResult Result;
 
-        public JudgementResultEntry(double time, HitObjectLifetimeEntry hitObjectEntry, JudgementResult result)
+        public JudgementResultEntry(HitObjectLifetimeEntry hitObjectEntry, JudgementResult result)
         {
-            Time = time;
             HitObjectEntry = hitObjectEntry;
             Result = result;
         }

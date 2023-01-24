@@ -455,7 +455,7 @@ namespace osu.Game.Rulesets.UI
         private void onNewResult(DrawableHitObject drawable, JudgementResult result)
         {
             // Not using result.TimeAbsolute because that might change and also there is a potential precision issue.
-            judgementResults.Push(new JudgementResultEntry(Time.Current, drawable.Entry.AsNonNull(), result));
+            judgementResults.Push(new JudgementResultEntry(drawable.Entry.AsNonNull(), result));
 
             NewResult?.Invoke(drawable, result);
         }
@@ -466,8 +466,7 @@ namespace osu.Game.Rulesets.UI
             RevertResult?.Invoke(result);
             entry.HitObjectEntry.OnRevertResult();
 
-            result.TimeOffset = 0;
-            result.Type = HitResult.None;
+            result.Reset();
         }
 
         #region Editor logic
