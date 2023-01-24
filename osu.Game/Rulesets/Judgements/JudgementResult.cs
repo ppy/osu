@@ -33,16 +33,19 @@ namespace osu.Game.Rulesets.Judgements
         public readonly Judgement Judgement;
 
         /// <summary>
-        /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
+        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="DrawableHitObject.MaximumJudgementOffset"/>.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>
         public double TimeOffset { get; internal set; }
 
         /// <summary>
         /// The absolute time at which this <see cref="JudgementResult"/> occurred.
-        /// Equal to the (end) time of the <see cref="HitObject"/> + <see cref="TimeOffset"/>.
+        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>
-        public double TimeAbsolute => HitObject.GetEndTime() + TimeOffset;
+        /// <remarks>
+        /// This is initially set to the end time of <see cref="HitObject"/>.
+        /// </remarks>
+        public double TimeAbsolute { get; internal set; }
 
         /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
@@ -83,6 +86,14 @@ namespace osu.Game.Rulesets.Judgements
         {
             HitObject = hitObject;
             Judgement = judgement;
+            Reset();
+        }
+
+        internal void Reset()
+        {
+            Type = HitResult.None;
+            TimeOffset = 0;
+            TimeAbsolute = HitObject.GetEndTime();
         }
 
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
