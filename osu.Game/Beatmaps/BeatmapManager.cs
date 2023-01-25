@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, false);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, transferCollections: false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
