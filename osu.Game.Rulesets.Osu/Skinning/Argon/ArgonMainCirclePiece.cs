@@ -122,10 +122,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 // Schedule the change to avoid transforms piling up.
                 Scheduler.AddOnce(() =>
                 {
-                    updateStateTransforms(drawableObject, drawableObject.State.Value);
-
                     ApplyTransformsAt(double.MinValue, true);
                     ClearTransformsAfter(double.MinValue, true);
+
+                    updateStateTransforms(drawableObject, drawableObject.State.Value);
                 });
             }, true);
 
