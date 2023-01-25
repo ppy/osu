@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Username = @"Somebody",
             Id = 1,
-            CountryCode = CountryCode.Unknown,
+            CountryCode = CountryCode.JP,
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
@@ -143,7 +143,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Available = 10,
                 Total = 50
-            }
+            },
+            SupportLevel = 2,
         };
     }
 }
