@@ -218,7 +218,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateCoverState()
         {
-            const float transition_duration = 250;
+            const float transition_duration = 500;
 
             bool expanded = coverToggle.CoverExpanded.Value;
 
