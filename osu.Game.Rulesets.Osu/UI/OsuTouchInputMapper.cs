@@ -10,6 +10,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -37,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.UI
             // This is mostly just doing the same as what is done in RulesetInputManager to match behaviour.
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
+
+        // Required to handle touches outside of the playfield when screen scaling is enabled.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
