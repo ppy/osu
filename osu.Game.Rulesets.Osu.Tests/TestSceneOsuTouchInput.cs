@@ -29,7 +29,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public partial class TestSceneTouchInput : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuTouchInput : OsuManualInputManagerTestScene
     {
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
