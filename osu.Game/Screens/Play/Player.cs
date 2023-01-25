@@ -1072,7 +1072,7 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
-            failAnimationLayer?.RemoveFilters();
+            failAnimationLayer?.Stop();
 
             if (LoadedBeatmapSuccessfully)
             {
