@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,9 +15,9 @@ namespace osu.Game.Skinning
 {
     public class MaxDimensionLimitedTextureLoaderStore : IResourceStore<TextureUpload>
     {
-        private readonly IResourceStore<TextureUpload> textureStore;
+        private readonly IResourceStore<TextureUpload>? textureStore;
 
-        public MaxDimensionLimitedTextureLoaderStore(IResourceStore<TextureUpload> textureStore)
+        public MaxDimensionLimitedTextureLoaderStore(IResourceStore<TextureUpload>? textureStore)
         {
             this.textureStore = textureStore;
         }
@@ -60,10 +58,12 @@ namespace osu.Game.Skinning
             return textureUpload;
         }
 
-        public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => textureStore?.GetAsync(name, cancellationToken);
+        // TODO: remove null-forgiving operator below after texture stores are NRT-annotated framework-side
+        public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
+            => textureStore?.GetAsync(name, cancellationToken) ?? Task.FromResult<TextureUpload>(null!);
 
-        public Stream GetStream(string name) => textureStore?.GetStream(name) ?? default;
+        public Stream? GetStream(string name) => textureStore?.GetStream(name);
 
-        public IEnumerable<string> GetAvailableResources() => textureStore?.GetAvailableResources();
+        public IEnumerable<string> GetAvailableResources() => textureStore?.GetAvailableResources() ?? Array.Empty<string>();
     }
 }
