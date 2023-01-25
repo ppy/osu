@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,12 +26,12 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A texture store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected TextureStore Textures { get; }
+        protected TextureStore? Textures { get; }
 
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected ISampleStore Samples { get; }
+        protected ISampleStore? Samples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -43,17 +41,17 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
 
-        public abstract ISample GetSample(ISampleInfo sampleInfo);
+        public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
-        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+        public Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
 
-        public abstract Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+        public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
-        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
             where TLookup : notnull
             where TValue : notnull;
 
-        private readonly RealmBackedResourceStore<SkinInfo> realmBackedStorage;
+        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
 
         /// <summary>
         /// Construct a new skin.
@@ -62,7 +60,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to game-wide resources.</param>
         /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, IStorageResourceProvider resources, IResourceStore<byte[]> storage = null, string configurationFilename = @"skin.ini")
+        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
         {
             if (resources != null)
             {
@@ -103,7 +101,7 @@ namespace osu.Game.Skinning
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[] bytes = storage?.Get(filename);
+                byte[]? bytes = storage?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -156,7 +154,7 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable GetDrawableComponent(ISkinComponentLookup lookup)
+        public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             switch (lookup)
             {
@@ -212,6 +210,5 @@ namespace osu.Game.Skinning
         }
 
         #endregion
-
     }
 }
