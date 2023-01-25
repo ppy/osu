@@ -47,15 +47,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             FillFlowContainer innerContainer;
 
-            var bgColor = colourProvider?.Background6 ?? Colour4.Black;
-
             AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     // Normal background color is 0.75 opacity, probationary doesn't have this cause they are a bit transparent already
-                    Colour = group.IsProbationary ? bgColor : bgColor.Opacity(0.75f),
+                    Colour = colourProvider?.Background6 ?? Colour4.Black,
+                    Alpha = group.IsProbationary ? 1 : 0.75f,
                 },
                 innerContainer = new FillFlowContainer
                 {
