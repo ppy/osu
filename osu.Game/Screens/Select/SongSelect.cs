@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
-            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur);
+            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
                 if (!this.IsCurrentScreen())
