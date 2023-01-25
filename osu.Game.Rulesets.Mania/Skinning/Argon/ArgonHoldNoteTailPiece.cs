@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         public ArgonHoldNoteTailPiece()
         {
             RelativeSizeAxes = Axes.X;
-
-            // multiply by two so that the hold body extends up to the height of the note head accent
             Height = ArgonNotePiece.NOTE_HEIGHT * 2;
 
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
