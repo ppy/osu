@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
         /// shape is drawn to the screen.
         /// </summary>
-        public bool Masking { get; set; } = true;
+        public bool Masking { get; set; }
 
         /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
