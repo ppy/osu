@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
+        private readonly KiaiFlash kiaiFlash;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -82,6 +83,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
+                new CircularContainer
+                {
+                    Masking = true,
+                    Size = Size,
+                    Child = kiaiFlash = new KiaiFlash
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                },
                 number = new OsuSpriteText
                 {
                     Font = OsuFont.Default.With(size: 52, weight: FontWeight.Bold),
@@ -117,6 +127,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 outerGradient.ClearTransforms(targetMember: nameof(Colour));
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
 
+                kiaiFlash.Colour = colour.NewValue;
                 outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
