@@ -30,12 +30,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                shadeContainer = new Container {
+                shadeContainer = new Container
+                {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
                     Masking = true,
-                    Children = new Drawable[] {
+                    Children = new Drawable[]
+                    {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -44,7 +46,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         },
                     },
                 },
-                hitLine = new Circle {
+                hitLine = new Circle
+                {
                     RelativeSizeAxes = Axes.X,
                     Height = ArgonNotePiece.CORNER_RADIUS * 2,
                 },
