@@ -133,15 +133,11 @@ namespace osu.Game.Screens.Select
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgoundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
-                if (this.IsCurrentScreen())
-                {
-                    ApplyToBackground(background =>
-                    {
-                        background.IgnoreUserSettings.Value = true;
-                        background.BlurAmount.Value = e.NewValue ? BACKGROUND_BLUR : 0;
-                    });
-                }
-            }, true);
+                if (!this.IsCurrentScreen())
+                    return;
+
+                ApplyToBackground(b => b.BlurAmount.Value = e.NewValue ? BACKGROUND_BLUR : 0);
+            });
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
