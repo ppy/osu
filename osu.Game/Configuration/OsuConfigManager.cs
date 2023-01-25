@@ -62,6 +62,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
+            SetDefault(OsuSetting.SongSelectBackgroundBlur, true);
+
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
@@ -341,6 +343,7 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
+        SongSelectBackgroundBlur,
         Version,
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,
