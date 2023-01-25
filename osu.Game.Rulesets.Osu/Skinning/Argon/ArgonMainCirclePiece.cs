@@ -67,21 +67,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 outerGradient = new Circle // renders the outer bright gradient
                 {
                     Size = new Vector2(OUTER_GRADIENT_SIZE),
-                    Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 innerGradient = new Circle // renders the inner bright gradient
                 {
                     Size = new Vector2(INNER_GRADIENT_SIZE),
-                    Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 innerFill = new Circle // renders the inner dark fill
                 {
                     Size = new Vector2(INNER_FILL_SIZE),
-                    Alpha = 1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -128,13 +125,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                 // Accent colour may be changed many times during a paused gameplay state.
                 // Schedule the change to avoid transforms piling up.
-                Scheduler.AddOnce(updateStateTransforms);
+                Scheduler.AddOnce(() =>
+                {
+                    ApplyTransformsAt(double.MinValue, true);
+                    ClearTransformsAfter(double.MinValue, true);
+
+                    updateStateTransforms(drawableObject, drawableObject.State.Value);
+                });
             }, true);
 
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
         }
-
-        private void updateStateTransforms() => updateStateTransforms(drawableObject, drawableObject.State.Value);
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {

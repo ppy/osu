@@ -31,12 +31,6 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float equilateral_triangle_ratio = 0.866f;
 
-        /// <summary>
-        /// How many screen-space pixels are smoothed over.
-        /// Same behavior as Sprite's EdgeSmoothness.
-        /// </summary>
-        private const float edge_smoothness = 1;
-
         private Color4 colourLight = Color4.White;
 
         public Color4 ColourLight
@@ -115,7 +109,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(IRenderer renderer, ShaderManager shaders)
         {
             texture = renderer.WhitePixel;
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
         }
 
         protected override void LoadComplete()
@@ -252,14 +246,17 @@ namespace osu.Game.Graphics.Backgrounds
 
         private class TrianglesDrawNode : DrawNode
         {
+            private float fill = 1f;
+
             protected new Triangles Source => (Triangles)base.Source;
 
             private IShader shader;
             private Texture texture;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
-            private Vector2 size;
+            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
 
+            private Vector2 size;
             private IVertexBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
@@ -290,29 +287,28 @@ namespace osu.Game.Graphics.Backgrounds
                 }
 
                 shader.Bind();
-
-                Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
+                shader.GetUniform<float>("thickness").UpdateValue(ref fill);
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * equilateral_triangle_ratio);
+                    Vector2 relativeSize = Vector2.Divide(triangleSize * particle.Scale, size);
 
-                    var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                    Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
+                    Vector2 topRight = topLeft + new Vector2(relativeSize.X, 0f);
+                    Vector2 bottomLeft = topLeft + new Vector2(0f, relativeSize.Y);
+                    Vector2 bottomRight = bottomLeft + new Vector2(relativeSize.X, 0f);
+
+                    var drawQuad = new Quad(
+                        Vector2Extensions.Transform(topLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(topRight * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomRight * size, DrawInfo.Matrix)
                     );
 
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    renderer.DrawTriangle(
-                        texture,
-                        triangle,
-                        colourInfo,
-                        null,
-                        vertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction);
                 }
 
                 shader.Unbind();
