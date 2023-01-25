@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
+
+        private Bindable<bool> configHitLighting = null!;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
@@ -93,12 +96,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+
+            configHitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
         }
 
         protected override void LoadComplete()
@@ -141,11 +146,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     case ArmedState.Hit:
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         const double fade_out_time = 800;
-
                         const double flash_in_duration = 150;
                         const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
+
+                        // When the user has hit lighting disabled, we won't be showing the bright white flash.
+                        // To make things look good, the surrounding animations are also slightly adjusted.
+                        bool showFlash = configHitLighting.Value;
 
                         // Animating with the number present is distracting.
                         // The number disappearing is hidden by the bright flash.
@@ -177,15 +185,27 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         using (BeginDelayedSequence(flash_in_duration / 12))
                         {
                             outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
-                            outerGradient
-                                .FadeColour(Color4.White, 80)
-                                .Then()
-                                .FadeOut(flash_in_duration);
+
+                            if (showFlash)
+                            {
+                                outerGradient
+                                    .FadeColour(Color4.White, 80)
+                                    .Then()
+                                    .FadeOut(flash_in_duration);
+                            }
+                            else
+                            {
+                                outerGradient
+                                    .FadeColour(Color4.White, flash_in_duration * 8)
+                                    .FadeOut(flash_in_duration * 2);
+                            }
                         }
 
-                        flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
+                        if (showFlash)
+                            flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
 
-                        this.FadeOut(fade_out_time, Easing.OutQuad);
+                        this.FadeOut(showFlash ? fade_out_time : fade_out_time / 2, Easing.OutQuad);
+
                         break;
                 }
             }
