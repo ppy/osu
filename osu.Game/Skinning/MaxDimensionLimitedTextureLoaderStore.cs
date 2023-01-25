@@ -35,6 +35,25 @@ namespace osu.Game.Skinning
             if (textureUpload == null)
                 return null!;
 
+            return limitTextureUploadSize(textureUpload);
+        }
+
+        public async Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // NRT not enabled on framework side classes (IResourceStore / TextureLoaderStore), welp.
+            if (textureStore == null)
+                return null!;
+
+            var textureUpload = await textureStore.GetAsync(name, cancellationToken).ConfigureAwait(false);
+
+            if (textureUpload == null)
+                return null!;
+
+            return await Task.Run(() => limitTextureUploadSize(textureUpload), cancellationToken).ConfigureAwait(false);
+        }
+
+        private TextureUpload limitTextureUploadSize(TextureUpload textureUpload)
+        {
             // So there's a thing where some users have taken it upon themselves to create skin elements of insane dimensions.
             // To the point where GPUs cannot load the textures (along with most image editor apps).
             // To work around this, let's look out for any stupid images and shrink them down into a usable size.
@@ -57,10 +76,6 @@ namespace osu.Game.Skinning
 
             return textureUpload;
         }
-
-        // TODO: remove null-forgiving operator below after texture stores are NRT-annotated framework-side
-        public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
-            => textureStore?.GetAsync(name, cancellationToken) ?? Task.FromResult<TextureUpload>(null!);
 
         public Stream? GetStream(string name) => textureStore?.GetStream(name);
 
