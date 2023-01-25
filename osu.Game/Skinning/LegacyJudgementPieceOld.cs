@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
+
 
 namespace osu.Game.Skinning
 {
@@ -54,6 +56,9 @@ namespace osu.Game.Skinning
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
+
+                    this.MoveTo(new Vector2(0, -5));
+                    this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
 
                     float rotation = RNG.NextSingle(-8.6f, 8.6f);
 
