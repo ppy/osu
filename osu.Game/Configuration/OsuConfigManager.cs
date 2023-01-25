@@ -58,6 +58,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
 
+            SetDefault(OsuSetting.ProfileCoverExpanded, true);
+
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, true);
@@ -378,5 +380,6 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        ProfileCoverExpanded,
     }
 }
