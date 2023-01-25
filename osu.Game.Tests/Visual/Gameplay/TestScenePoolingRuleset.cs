@@ -151,17 +151,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, 10, () => new FramedClock(clock = new ManualClock()));
 
             AddStep("fast forward to end", () => clock.CurrentTime = beatmap.HitObjects[^1].GetEndTime() + 100);
-            AddUntilStep("all judged", () => playfield.JudgedObjects.Count == 3);
+            AddUntilStep("all judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
 
             AddStep("rewind to middle", () => clock.CurrentTime = beatmap.HitObjects[1].StartTime - 100);
-            AddUntilStep("some results reverted", () => playfield.JudgedObjects.Count == 1);
+            AddUntilStep("some results reverted", () => playfield.JudgedObjects.Count, () => Is.EqualTo(1));
 
             AddStep("fast forward to end", () => clock.CurrentTime = beatmap.HitObjects[^1].GetEndTime() + 100);
-            AddUntilStep("all judged", () => playfield.JudgedObjects.Count == 3);
+            AddUntilStep("all judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
 
             AddStep("disable frame stability", () => drawableRuleset.FrameStablePlayback = false);
             AddStep("instant seek to start", () => clock.CurrentTime = beatmap.HitObjects[0].StartTime - 100);
-            AddAssert("all results reverted", () => playfield.JudgedObjects.Count == 0);
+            AddAssert("all results reverted", () => playfield.JudgedObjects.Count, () => Is.EqualTo(0));
         }
 
         [Test]
