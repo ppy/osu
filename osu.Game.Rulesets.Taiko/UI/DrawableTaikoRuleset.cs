@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
-            TimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
@@ -58,6 +57,19 @@ namespace osu.Game.Rulesets.Taiko.UI
             });
 
             KeyBindingInputManager.Add(new DrumTouchInputArea());
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
+            const float scroll_rate = 10;
+
+            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
+            float ratio = DrawHeight / 480;
+
+            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
         }
 
         protected override void UpdateAfterChildren()
