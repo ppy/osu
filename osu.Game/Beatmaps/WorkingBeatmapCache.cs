@@ -20,6 +20,7 @@ using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -268,7 +269,7 @@ namespace osu.Game.Beatmaps
 
                         Stream storyboardFileStream = null;
 
-                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename is string storyboardFilename)
+                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals($"{BeatmapSetInfo.GetDisplayString()}.osb", StringComparison.OrdinalIgnoreCase))?.Filename is string storyboardFilename)
                         {
                             string storyboardFileStorePath = BeatmapSetInfo?.GetPathForFile(storyboardFilename);
                             storyboardFileStream = GetStream(storyboardFileStorePath);
