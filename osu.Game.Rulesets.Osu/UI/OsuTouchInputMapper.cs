@@ -59,27 +59,11 @@ namespace osu.Game.Rulesets.Osu.UI
             // This case gets special handling to allow for empty-space stream tapping.
             bool isDirectCircleTouch = osuInputManager.CheckScreenSpaceActionPressJudgeable(e.ScreenSpaceTouchDownPosition);
 
-            var trackedTouch = new TrackedTouch(e.Touch.Source, shouldResultInAction ? action : null, isDirectCircleTouch);
+            var newTouch = new TrackedTouch(e.Touch.Source, shouldResultInAction ? action : null, isDirectCircleTouch);
 
-            if (isDirectCircleTouch)
-                positionTrackingTouch = trackedTouch;
-            else
-            {
-                // If no direct touch is registered, we always use the new (latest) touch for positional tracking.
-                if (positionTrackingTouch?.DirectTouch != true)
-                    positionTrackingTouch = trackedTouch;
-                else
-                {
-                    // If not a direct circle touch, consider whether to release the an original direct touch.
-                    if (positionTrackingTouch.DirectTouch && positionTrackingTouch.Action is OsuAction directTouchAction)
-                    {
-                        osuInputManager.KeyBindingContainer.TriggerReleased(directTouchAction);
-                        positionTrackingTouch.Action = null;
-                    }
-                }
-            }
+            updatePositionTracking(newTouch);
 
-            trackedTouches.Add(trackedTouch);
+            trackedTouches.Add(newTouch);
 
             // Important to update position before triggering the pressed action.
             handleTouchMovement(e);
@@ -88,6 +72,43 @@ namespace osu.Game.Rulesets.Osu.UI
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
 
             return true;
+        }
+
+        /// <summary>
+        /// Given a new touch, update the positional tracking state and any related operations.
+        /// </summary>
+        private void updatePositionTracking(TrackedTouch newTouch)
+        {
+            // If the new touch directly interacted with a circle's receptor, it always becomes the current touch for positional tracking.
+            if (newTouch.DirectTouch)
+            {
+                positionTrackingTouch = newTouch;
+                return;
+            }
+
+            // Otherwise, we only want to use the new touch for position tracking if no other touch is tracking position yet..
+            if (positionTrackingTouch == null)
+            {
+                positionTrackingTouch = newTouch;
+                return;
+            }
+
+            // ..or if the current position tracking touch was not a direct touch (this one is debatable and may be change in the future, but it's the simplest way to handle)
+            if (!positionTrackingTouch.DirectTouch)
+            {
+                positionTrackingTouch = newTouch;
+                return;
+            }
+
+            // In the case the new touch was not used for position tracking, we should also check the previous position tracking touch.
+            // If it was a direct touch and still has its action pressed, that action should be released.
+            //
+            // This is done to allow tracking with the initial touch while still having both Left/Right actions available for alternating with two more touches.
+            if (positionTrackingTouch.DirectTouch && positionTrackingTouch.Action is OsuAction directTouchAction)
+            {
+                osuInputManager.KeyBindingContainer.TriggerReleased(directTouchAction);
+                positionTrackingTouch.Action = null;
+            }
         }
 
         private void handleTouchMovement(TouchEvent touchEvent)
