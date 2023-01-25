@@ -104,9 +104,8 @@ namespace osu.Game.Skinning
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    //todo: this only applies to osu! ruleset apparently.
-                    this.MoveTo(new Vector2(0, -2));
-                    this.MoveToOffset(new Vector2(0, 20), fade_out_delay + fade_out_length, Easing.In);
+                    this.MoveTo(new Vector2(0, -5));
+                    this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
 
                     float rotation = RNG.NextSingle(-8.6f, 8.6f);
 
