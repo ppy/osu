@@ -45,6 +45,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private Bindable<bool> coverExpanded = null!;
 
+        private FillFlowContainer flow = null!;
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager configManager)
         {
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Profile.Header
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
+                                flow = new FillFlowContainer
                                 {
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding
@@ -85,7 +87,6 @@ namespace osu.Game.Overlays.Profile.Header
                                         Left = UserProfileOverlay.CONTENT_X_MARGIN,
                                         Vertical = vertical_padding
                                     },
-                                    Spacing = new Vector2(20, 0),
                                     Height = content_height + 2 * vertical_padding,
                                     RelativeSizeAxes = Axes.X,
                                     Children = new Drawable[]
@@ -219,9 +220,12 @@ namespace osu.Game.Overlays.Profile.Header
         {
             const float transition_duration = 250;
 
-            cover.ResizeHeightTo(coverToggle.CoverExpanded.Value ? 250 : 0, transition_duration, Easing.OutQuint);
-            avatar.ResizeTo(new Vector2(coverToggle.CoverExpanded.Value ? 120 : content_height), transition_duration, Easing.OutQuint);
-            avatar.TransformTo(nameof(avatar.CornerRadius), coverToggle.CoverExpanded.Value ? 40f : 20f, transition_duration, Easing.OutQuint);
+            bool expanded = coverToggle.CoverExpanded.Value;
+
+            cover.ResizeHeightTo(expanded ? 250 : 0, transition_duration, Easing.OutQuint);
+            avatar.ResizeTo(new Vector2(expanded ? 120 : content_height), transition_duration, Easing.OutQuint);
+            avatar.TransformTo(nameof(avatar.CornerRadius), expanded ? 40f : 20f, transition_duration, Easing.OutQuint);
+            flow.TransformTo(nameof(flow.Spacing), new Vector2(expanded ? 20f : 10f), transition_duration, Easing.OutQuint);
         }
 
         private partial class ProfileCoverBackground : UserCoverBackground
