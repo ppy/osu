@@ -280,9 +280,11 @@ namespace osu.Game.Beatmaps
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
         /// <summary>
-        /// Saves an existing <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>, also transferring the beatmap
-        /// hashes in any collections referencing it.
+        /// Saves an existing <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
+        /// <remarks>
+        /// This method will also update any user beatmap collection hash references to the new post-saved hash.
+        /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
