@@ -89,6 +89,7 @@ namespace osu.Game.Tests.Visual.Online
             Groups = new[]
             {
                 new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "mania" } },
                 new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } }
             },
             ProfileOrder = new[]
