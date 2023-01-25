@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -15,11 +14,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class ExpandDetailsButton : ProfileHeaderButton
+    public partial class ToggleCoverButton : ProfileHeaderButton
     {
-        public readonly BindableBool DetailsVisible = new BindableBool();
+        public readonly BindableBool CoverExpanded = new BindableBool(true);
 
-        public override LocalisableString TooltipText => DetailsVisible.Value ? CommonStrings.ButtonsCollapse : CommonStrings.ButtonsExpand;
+        public override LocalisableString TooltipText => CoverExpanded.Value ? UsersStrings.ShowCoverTo0 : UsersStrings.ShowCoverTo1;
 
         private SpriteIcon icon = null!;
         private Sample? sampleOpen;
@@ -27,12 +26,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds();
 
-        public ExpandDetailsButton()
+        public ToggleCoverButton()
         {
             Action = () =>
             {
-                DetailsVisible.Toggle();
-                (DetailsVisible.Value ? sampleOpen : sampleClose)?.Play();
+                CoverExpanded.Toggle();
+                (CoverExpanded.Value ? sampleOpen : sampleClose)?.Play();
             };
         }
 
@@ -40,19 +39,21 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load(OverlayColourProvider colourProvider, AudioManager audio)
         {
             IdleColour = colourProvider.Background2;
-            HoverColour = colourProvider.Background2.Lighten(0.2f);
+            HoverColour = colourProvider.Background1;
 
             sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
             sampleClose = audio.Samples.Get(@"UI/dropdown-close");
 
+            AutoSizeAxes = Axes.None;
+            Size = new Vector2(30);
             Child = icon = new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(20, 12)
+                Size = new Vector2(10.5f, 12)
             };
 
-            DetailsVisible.BindValueChanged(visible => updateState(visible.NewValue), true);
+            CoverExpanded.BindValueChanged(visible => updateState(visible.NewValue), true);
         }
 
         private void updateState(bool detailsVisible) => icon.Icon = detailsVisible ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
