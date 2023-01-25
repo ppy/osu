@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Background
             base.LoadComplete();
 
             AddSliderStep("Triangle scale", 0f, 10f, 1f, s => triangles.TriangleScale = s);
+            AddSliderStep("Seed", 0, 1000, 0, s => triangles.Reset(s));
         }
     }
 }
