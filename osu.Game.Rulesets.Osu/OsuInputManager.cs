@@ -43,6 +43,10 @@ namespace osu.Game.Rulesets.Osu
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public bool CheckScreenSpaceActionPressJudgeable(Vector2 screenSpacePosition) =>
+            // This is a very naive but simple approach.
+            //
+            // Based on user feedback of more nuanced scenarios (where touch doesn't behave as expected),
+            // this can be expanded to a more complex implementation, but I'd still want to keep it as simple as we can.
             NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.ReceivePositionalInputAt(screenSpacePosition));
 
         public OsuInputManager(RulesetInfo ruleset)
