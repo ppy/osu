@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
-
 namespace osu.Game.Skinning
 {
     public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
