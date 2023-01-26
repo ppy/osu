@@ -25,7 +25,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class NormalSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public OsuSliderBar()
+        public NormalSliderBar()
         {
             Height = Nub.HEIGHT;
             RangePadding = Nub.EXPANDED_SIZE / 2;
