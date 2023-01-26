@@ -15,11 +15,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public partial class PlayerSliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
+        public NormalSliderBar<T> Bar => (NormalSliderBar<T>)Control;
 
         protected override Drawable CreateControl() => new SliderBar();
 
-        protected partial class SliderBar : OsuSliderBar<T>
+        protected partial class SliderBar : NormalSliderBar<T>
         {
             public SliderBar()
             {

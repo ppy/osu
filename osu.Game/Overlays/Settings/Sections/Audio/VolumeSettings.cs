@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             protected override Drawable CreateControl()
             {
-                var sliderBar = (OsuSliderBar<double>)base.CreateControl();
+                var sliderBar = (NormalSliderBar<double>)base.CreateControl();
                 sliderBar.PlaySamplesOnAdjust = false;
                 return sliderBar;
             }

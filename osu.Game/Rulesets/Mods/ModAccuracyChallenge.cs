@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public partial class PercentSlider : OsuSliderBar<double>
+    public partial class PercentSlider : NormalSliderBar<double>
     {
         public PercentSlider()
         {
