@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class TextElement : DefaultTextSkinComponent
+    public partial class TextElement : FontAdjustableSkinComponent
     {
         [SettingSource("Text", "The text to be displayed.")]
         public Bindable<string> Text { get; } = new Bindable<string>("Circles!");

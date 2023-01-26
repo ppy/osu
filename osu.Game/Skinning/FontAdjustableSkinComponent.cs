@@ -7,12 +7,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 
-namespace osu.Game.Skinning.Components
+namespace osu.Game.Skinning
 {
     /// <summary>
     /// Skin element that contains text and have ability to control its font.
     /// </summary>
-    public abstract partial class DefaultTextSkinComponent : Container, ISkinnableDrawable
+    public abstract partial class FontAdjustableSkinComponent : Container, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
