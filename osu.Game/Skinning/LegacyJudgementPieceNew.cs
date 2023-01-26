@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
 
         private readonly ParticleExplosion? particles;
 
-        public LegacyJudgementPieceNew(HitResult result, decimal? version, Func<Drawable> createMainDrawable, Texture? particleTexture)
+        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
             if (result != HitResult.Miss)
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, version, createMainDrawable, 1.05f, true)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
