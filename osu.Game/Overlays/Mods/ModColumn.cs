@@ -267,9 +267,9 @@ namespace osu.Game.Overlays.Mods
 
             private void updateState()
             {
-                Nub.AccentColour = AccentColour;
-                Nub.GlowingAccentColour = AccentHoverColour;
-                Nub.GlowColour = AccentHoverColour.Opacity(0.2f);
+                NormalNub.AccentColour = AccentColour;
+                NormalNub.GlowingAccentColour = AccentHoverColour;
+                NormalNub.GlowColour = AccentHoverColour.Opacity(0.2f);
             }
 
             protected override void OnUserChange(bool value)

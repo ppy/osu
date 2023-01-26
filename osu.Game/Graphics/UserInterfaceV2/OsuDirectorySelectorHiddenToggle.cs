@@ -30,9 +30,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             if (overlayColourProvider != null)
                 return;
 
-            Nub.AccentColour = colours.GreySeaFoamLighter;
-            Nub.GlowingAccentColour = Color4.White;
-            Nub.GlowColour = Color4.White;
+            NormalNub.AccentColour = colours.GreySeaFoamLighter;
+            NormalNub.GlowingAccentColour = Color4.White;
+            NormalNub.GlowColour = Color4.White;
         }
     }
 }

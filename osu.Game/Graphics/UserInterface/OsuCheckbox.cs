@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected readonly Nub Nub;
+        protected readonly NormalNub NormalNub;
 
         protected readonly OsuTextFlowContainer LabelTextFlowContainer;
         private Sample sampleChecked;
@@ -61,28 +61,28 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                 },
-                Nub = new Nub(),
+                NormalNub = new NormalNub(),
                 new HoverSounds()
             };
 
             if (nubOnRight)
             {
-                Nub.Anchor = Anchor.CentreRight;
-                Nub.Origin = Anchor.CentreRight;
-                Nub.Margin = new MarginPadding { Right = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                NormalNub.Anchor = Anchor.CentreRight;
+                NormalNub.Origin = Anchor.CentreRight;
+                NormalNub.Margin = new MarginPadding { Right = nub_padding };
+                LabelTextFlowContainer.Padding = new MarginPadding { Right = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
-                Nub.Anchor = Anchor.CentreLeft;
-                Nub.Origin = Anchor.CentreLeft;
-                Nub.Margin = new MarginPadding { Left = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                NormalNub.Anchor = Anchor.CentreLeft;
+                NormalNub.Origin = Anchor.CentreLeft;
+                NormalNub.Margin = new MarginPadding { Left = nub_padding };
+                LabelTextFlowContainer.Padding = new MarginPadding { Left = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
             }
 
-            Nub.Current.BindTo(Current);
+            NormalNub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled => LabelTextFlowContainer.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
+            Current.DisabledChanged += disabled => LabelTextFlowContainer.Alpha = NormalNub.Alpha = disabled ? 0.3f : 1;
         }
 
         /// <summary>
@@ -101,13 +101,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            Nub.Glowing = true;
+            NormalNub.Glowing = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Nub.Glowing = false;
+            NormalNub.Glowing = false;
             base.OnHoverLost(e);
         }
 

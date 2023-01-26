@@ -19,7 +19,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class NormalNub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
         public const float HEIGHT = 15;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box fill;
         private readonly Container main;
 
-        public Nub()
+        public NormalNub()
         {
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
 
