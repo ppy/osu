@@ -9,7 +9,15 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class ShearedNub : Nub
     {
+        public const int HEIGHT = 30;
+        public const float EXPANDED_SIZE = 50;
+
         public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
+
+        public ShearedNub()
+        {
+            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
+        }
 
         protected override Container CreateNubContainer() =>
             new Container
