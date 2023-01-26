@@ -17,13 +17,15 @@ namespace osu.Game.Skinning
     public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
+        private readonly decimal? version;
 
         private readonly float finalScale;
         private readonly bool forceTransforms;
 
-        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
+        public LegacyJudgementPieceOld(HitResult result, decimal? version, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
             this.result = result;
+            this.version = version;
             this.finalScale = finalScale;
             this.forceTransforms = forceTransforms;
 
@@ -56,8 +58,11 @@ namespace osu.Game.Skinning
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveTo(new Vector2(0, -5));
-                    this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
+                    if (this.version > 1)
+                    {
+                        this.MoveTo(new Vector2(0, -5));
+                        this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
+                    }
 
                     float rotation = RNG.NextSingle(-8.6f, 8.6f);
 
