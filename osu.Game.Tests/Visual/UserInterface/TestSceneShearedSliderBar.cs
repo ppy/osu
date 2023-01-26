@@ -9,7 +9,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneShearedSlider : OsuTestScene
+    public partial class TestSceneShearedSliderBar : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Purple);
