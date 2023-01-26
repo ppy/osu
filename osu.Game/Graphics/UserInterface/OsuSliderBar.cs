@@ -3,9 +3,13 @@
 
 using System;
 using System.Globalization;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
@@ -13,6 +17,19 @@ namespace osu.Game.Graphics.UserInterface
     public abstract partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
+        private Sample sample = null!;
+
+        private double lastSampleTime;
+        private T lastSampleValue;
+
+        public bool PlaySamplesOnAdjust { get; set; } = true;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sample = audio.Samples.Get(@"UI/notch-tick");
+        }
+
         public virtual LocalisableString TooltipText { get; private set; }
 
         /// <summary>
@@ -34,7 +51,35 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(T value)
         {
             base.OnUserChange(value);
+
+            playSample(value);
+
             TooltipText = getTooltipText(value);
+        }
+
+        private void playSample(T value)
+        {
+            if (!PlaySamplesOnAdjust)
+                return;
+
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
+                return;
+
+            if (value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = value;
+            lastSampleTime = Clock.CurrentTime;
+
+            var channel = sample.GetChannel();
+
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
+
+            // intentionally pitched down, even when hitting max.
+            if (NormalizedValue == 0 || NormalizedValue == 1)
+                channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
         }
 
         private LocalisableString getTooltipText(T value)

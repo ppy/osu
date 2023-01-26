@@ -4,36 +4,26 @@
 #nullable disable
 
 using System;
-using System.Globalization;
 using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalSliderBar<T> : OsuSliderBar<T>, IHasAccentColour
+    public partial class NormalSliderBar<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        private Sample sample;
-        private double lastSampleTime;
-        private T lastSampleValue;
-
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
         private readonly Container nubContainer;
-
-        public bool PlaySamplesOnAdjust { get; set; } = true;
 
         private readonly HoverClickSounds hoverClickSounds;
 
@@ -118,9 +108,8 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, [CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
+        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/notch-tick");
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
             BackgroundColour = colourProvider?.Background5 ?? colours.PinkDarker.Darken(1);
         }
@@ -169,37 +158,6 @@ namespace osu.Game.Graphics.UserInterface
             Nub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
         }
 
-        protected override void OnUserChange(T value)
-        {
-            base.OnUserChange(value);
-            playSample(value);
-        }
-
-        private void playSample(T value)
-        {
-            if (!PlaySamplesOnAdjust)
-                return;
-
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
-                return;
-
-            if (value.Equals(lastSampleValue))
-                return;
-
-            lastSampleValue = value;
-            lastSampleTime = Clock.CurrentTime;
-
-            var channel = sample.GetChannel();
-
-            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
-
-            // intentionally pitched down, even when hitting max.
-            if (NormalizedValue == 0 || NormalizedValue == 1)
-                channel.Frequency.Value -= 0.5f;
-
-            channel.Play();
-        }
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -211,14 +169,5 @@ namespace osu.Game.Graphics.UserInterface
         {
             Nub.MoveToX(value, 250, Easing.OutQuint);
         }
-
-        /// <summary>
-        /// Removes all non-significant digits, keeping at most a requested number of decimal digits.
-        /// </summary>
-        /// <param name="d">The decimal to normalize.</param>
-        /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
-        /// <returns>The normalised decimal.</returns>
-        private decimal normalise(decimal d, int sd)
-            => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
     }
 }
