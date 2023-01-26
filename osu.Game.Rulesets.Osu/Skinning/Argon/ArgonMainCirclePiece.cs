@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
         private readonly FlashPiece flash;
-        private readonly KiaiFlash kiaiFlash;
+        private readonly Container kiaiContainer;
 
         private Bindable<bool> configHitLighting = null!;
 
@@ -83,11 +83,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new CircularContainer
+                kiaiContainer = new CircularContainer
                 {
                     Masking = true,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Size = Size,
-                    Child = kiaiFlash = new KiaiFlash
+                    Child = new KiaiFlash
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -129,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 outerGradient.ClearTransforms(targetMember: nameof(Colour));
                 outerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.1f));
 
-                kiaiFlash.Colour = colour.NewValue;
+                kiaiContainer.Colour = colour.NewValue;
                 outerFill.Colour = innerFill.Colour = colour.NewValue.Darken(4);
                 innerGradient.Colour = ColourInfo.GradientVertical(colour.NewValue.Darken(0.5f), colour.NewValue.Darken(0.6f));
                 flash.Colour = colour.NewValue;
@@ -190,6 +192,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         // The outer ring shrinks immediately, but accounts for its thickness so it doesn't overlap the inner
                         // gradient layers.
                         border.ResizeTo(Size * shrink_size + new Vector2(border.BorderThickness), resize_duration, Easing.OutElasticHalf);
+
+                        // Kiai flash should track the overall size but also be cleaned up quite fast, so we don't get additional
+                        // flashes after the hit animation is already in a mostly-completed state.
+                        kiaiContainer.ResizeTo(Size * shrink_size, resize_duration, Easing.OutElasticHalf);
+                        kiaiContainer.FadeOut(flash_in_duration, Easing.OutQuint);
 
                         // The outer gradient is resize with a slight delay from the border.
                         // This is to give it a bomb-like effect, with the border "triggering" its animation when getting close.
