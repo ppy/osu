@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected readonly NormalNub NormalNub;
+        protected readonly NormalNub Nub;
 
         protected readonly OsuTextFlowContainer LabelTextFlowContainer;
         private Sample sampleChecked;
@@ -61,28 +61,28 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                 },
-                NormalNub = new NormalNub(),
+                Nub = new NormalNub(),
                 new HoverSounds()
             };
 
             if (nubOnRight)
             {
-                NormalNub.Anchor = Anchor.CentreRight;
-                NormalNub.Origin = Anchor.CentreRight;
-                NormalNub.Margin = new MarginPadding { Right = nub_padding };
+                Nub.Anchor = Anchor.CentreRight;
+                Nub.Origin = Anchor.CentreRight;
+                Nub.Margin = new MarginPadding { Right = nub_padding };
                 LabelTextFlowContainer.Padding = new MarginPadding { Right = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
-                NormalNub.Anchor = Anchor.CentreLeft;
-                NormalNub.Origin = Anchor.CentreLeft;
-                NormalNub.Margin = new MarginPadding { Left = nub_padding };
+                Nub.Anchor = Anchor.CentreLeft;
+                Nub.Origin = Anchor.CentreLeft;
+                Nub.Margin = new MarginPadding { Left = nub_padding };
                 LabelTextFlowContainer.Padding = new MarginPadding { Left = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
             }
 
-            NormalNub.Current.BindTo(Current);
+            Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled => LabelTextFlowContainer.Alpha = NormalNub.Alpha = disabled ? 0.3f : 1;
+            Current.DisabledChanged += disabled => LabelTextFlowContainer.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
         /// <summary>
@@ -101,13 +101,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            NormalNub.Glowing = true;
+            Nub.Glowing = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            NormalNub.Glowing = false;
+            Nub.Glowing = false;
             base.OnHoverLost(e);
         }
 
