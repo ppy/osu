@@ -10,23 +10,30 @@ using osu.Game.Graphics;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Skin element that contains text and have ability to control its font.
+    /// A skin component that contains text and allows the user to choose its font.
     /// </summary>
     public abstract partial class FontAdjustableSkinComponent : Container, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Font", "Font to use.")]
+        [SettingSource("Font", "The font to use.")]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
+        /// <summary>
+        /// Implement to apply the user font selection to one or more components.
+        /// </summary>
         protected abstract void SetFont(FontUsage font);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Font.BindValueChanged(e =>
             {
-                FontUsage f = OsuFont.GetFont(e.NewValue, weight: e.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular);
+                // We only have bold weight for venera, so let's force that.
+                FontWeight fontWeight = e.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular;
+
+                FontUsage f = OsuFont.GetFont(e.NewValue, weight: fontWeight);
                 SetFont(f);
             }, true);
         }
