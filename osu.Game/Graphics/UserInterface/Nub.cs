@@ -22,6 +22,10 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box fill;
         private readonly Container main;
 
+        /// <summary>
+        ///  Implements the shape for the nub, allowing for any type of container to be used.
+        /// </summary>
+        /// <returns></returns>
         protected abstract Container CreateNubContainer();
 
         protected Nub()
