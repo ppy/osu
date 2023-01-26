@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -17,7 +16,6 @@ namespace osu.Game.Skinning
     public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
-        private readonly decimal? version;
 
         private readonly LegacyJudgementPieceOld? temporaryOldStyle;
 
@@ -28,7 +26,6 @@ namespace osu.Game.Skinning
         public LegacyJudgementPieceNew(HitResult result, decimal? version, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
-            this.version = version;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
@@ -56,7 +53,7 @@ namespace osu.Game.Skinning
             if (result != HitResult.Miss)
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, this.version, createMainDrawable, 1.05f, true)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, version, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
