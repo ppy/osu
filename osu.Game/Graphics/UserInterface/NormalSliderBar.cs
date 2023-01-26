@@ -14,24 +14,16 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
-using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalSliderBar<T> : OsuSliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class NormalSliderBar<T> : OsuSliderBar<T>, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        /// <summary>
-        /// Maximum number of decimal digits to be displayed in the tooltip.
-        /// </summary>
-        private const int max_decimal_digits = 5;
-
         private Sample sample;
         private double lastSampleTime;
         private T lastSampleValue;
@@ -41,16 +33,9 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Box RightBox;
         private readonly Container nubContainer;
 
-        public virtual LocalisableString TooltipText { get; private set; }
-
         public bool PlaySamplesOnAdjust { get; set; } = true;
 
         private readonly HoverClickSounds hoverClickSounds;
-
-        /// <summary>
-        /// Whether to format the tooltip as a percentage or the actual value.
-        /// </summary>
-        public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
 
@@ -150,7 +135,6 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
 
             Current.BindDisabledChanged(disabled =>
             {
@@ -189,7 +173,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
-            TooltipText = getTooltipText(value);
         }
 
         private void playSample(T value)
@@ -215,24 +198,6 @@ namespace osu.Game.Graphics.UserInterface
                 channel.Frequency.Value -= 0.5f;
 
             channel.Play();
-        }
-
-        private LocalisableString getTooltipText(T value)
-        {
-            if (CurrentNumber.IsInteger)
-                return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
-
-            double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
-
-            if (DisplayAsPercentage)
-                return floatValue.ToString("0%");
-
-            decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
-
-            // Find the number of significant digits (we could have less than 5 after normalize())
-            int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
-
-            return floatValue.ToString($"N{significantDigits}");
         }
 
         protected override void UpdateAfterChildren()
