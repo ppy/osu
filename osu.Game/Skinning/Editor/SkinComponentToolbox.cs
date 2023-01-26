@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play.HUD;
@@ -27,7 +27,7 @@ namespace osu.Game.Skinning.Editor
         private FillFlowContainer fill = null!;
 
         public SkinComponentToolbox(CompositeDrawable? target = null)
-            : base("Components")
+            : base(SkinEditorStrings.Components)
         {
             this.target = target;
         }
@@ -59,9 +59,7 @@ namespace osu.Game.Skinning.Editor
         {
             try
             {
-                var instance = (Drawable)Activator.CreateInstance(type);
-
-                Debug.Assert(instance != null);
+                Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
                 if (!((ISkinnableDrawable)instance).IsEditable) return;
 

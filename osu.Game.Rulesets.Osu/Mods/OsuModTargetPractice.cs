@@ -17,7 +17,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -196,8 +195,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> originalHitObjects)
         {
-            double startTime = originalHitObjects.First().StartTime;
-            double endTime = originalHitObjects.Last().GetEndTime();
+            double startTime = beatmap.HitObjects.First().StartTime;
+            double endTime = beatmap.GetLastObjectTime();
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                // Ignore timing points after endTime

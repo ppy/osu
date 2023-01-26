@@ -143,6 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 areaOffset.SetDefault();
                                 areaSize.SetDefault();
                             },
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsButton
                         {
@@ -150,25 +151,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Action = () =>
                             {
                                 forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
-                            }
+                            },
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.XOffset,
-                            Current = offsetX
+                            Current = offsetX,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.YOffset,
-                            Current = offsetY
+                            Current = offsetY,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.Rotation,
-                            Current = rotation
+                            Current = rotation,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new RotationPresetButtons(tabletHandler)
                         {
@@ -181,24 +186,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.AspectRatio,
-                            Current = aspectRatio
+                            Current = aspectRatio,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsCheckbox
                         {
                             LabelText = TabletSettingsStrings.LockAspectRatio,
-                            Current = aspectLock
+                            Current = aspectLock,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Width,
-                            Current = sizeX
+                            Current = sizeX,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Height,
-                            Current = sizeY
+                            Current = sizeY,
+                            CanBeShown = { BindTarget = enabled }
                         },
                     }
                 },

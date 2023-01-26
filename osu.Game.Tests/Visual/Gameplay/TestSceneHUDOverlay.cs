@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -187,11 +188,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+            ArgonSongProgress? getSongProgress() => hudOverlay.ChildrenOfType<ArgonSongProgress>().SingleOrDefault();
 
             bool seeked = false;
 
             createNew();
+
+            AddUntilStep("wait for song progress", () => getSongProgress() != null);
 
             AddStep("bind seek", () =>
             {
@@ -199,8 +202,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var progress = getSongProgress();
 
-                progress.ShowHandle = true;
-                progress.OnSeek += _ => seeked = true;
+                Debug.Assert(progress != null);
+
+                progress.Interactive.Value = true;
+                progress.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += _ => seeked = true;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);

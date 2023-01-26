@@ -11,9 +11,7 @@ using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
-using osuTK.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -23,27 +21,11 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private const float triangle_size = 100;
         private const float base_velocity = 50;
-        private const int texture_height = 128;
 
         /// <summary>
         /// sqrt(3) / 2
         /// </summary>
         private const float equilateral_triangle_ratio = 0.866f;
-
-        private readonly Bindable<Color4> colourTop = new Bindable<Color4>(Color4.White);
-        private readonly Bindable<Color4> colourBottom = new Bindable<Color4>(Color4.Black);
-
-        public Color4 ColourTop
-        {
-            get => colourTop.Value;
-            set => colourTop.Value = value;
-        }
-
-        public Color4 ColourBottom
-        {
-            get => colourBottom.Value;
-            set => colourBottom.Value = value;
-        }
 
         public float Thickness { get; set; } = 0.02f; // No need for invalidation since it's happening in Update()
 
@@ -70,9 +52,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
-        [Resolved]
-        private IRenderer renderer { get; set; } = null!;
-
         private Random? stableRandom;
 
         private IShader shader = null!;
@@ -89,40 +68,17 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(ShaderManager shaders, IRenderer renderer)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
+            texture = renderer.WhitePixel;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            colourTop.BindValueChanged(_ => updateTexture());
-            colourBottom.BindValueChanged(_ => updateTexture(), true);
-
             spawnRatio.BindValueChanged(_ => Reset(), true);
-        }
-
-        private void updateTexture()
-        {
-            var image = new Image<Rgba32>(texture_height, 1);
-
-            texture = renderer.CreateTexture(1, texture_height, true);
-
-            for (int i = 0; i < texture_height; i++)
-            {
-                float ratio = (float)i / texture_height;
-
-                image[i, 0] = new Rgba32(
-                    colourBottom.Value.R * ratio + colourTop.Value.R * (1f - ratio),
-                    colourBottom.Value.G * ratio + colourTop.Value.G * (1f - ratio),
-                    colourBottom.Value.B * ratio + colourTop.Value.B * (1f - ratio)
-                );
-            }
-
-            texture.SetData(new TextureUpload(image));
-            Invalidate(Invalidation.DrawNode);
         }
 
         protected override void Update()
@@ -227,6 +183,9 @@ namespace osu.Game.Graphics.Backgrounds
             private Texture texture = null!;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+
+            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
+
             private Vector2 size;
             private float thickness;
             private float texelSize;
@@ -246,7 +205,15 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
-                texelSize = Math.Max(1.5f / Source.ScreenSpaceDrawQuad.Size.X, 1.5f / Source.ScreenSpaceDrawQuad.Size.Y);
+
+                Quad triangleQuad = new Quad(
+                    Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),
+                    Vector2Extensions.Transform(new Vector2(triangle_size, 0f), DrawInfo.Matrix),
+                    Vector2Extensions.Transform(new Vector2(0f, triangleSize.Y), DrawInfo.Matrix),
+                    Vector2Extensions.Transform(triangleSize, DrawInfo.Matrix)
+                );
+
+                texelSize = 1.5f / triangleQuad.Height;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -256,7 +223,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Draw(renderer);
 
-                if (Source.AimCount == 0)
+                if (Source.AimCount == 0 || thickness == 0)
                     return;
 
                 if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
@@ -269,33 +236,40 @@ namespace osu.Game.Graphics.Backgrounds
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
                 shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
+                float relativeHeight = triangleSize.Y / size.Y;
+                float relativeWidth = triangleSize.X / size.X;
+
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(0.5f, equilateral_triangle_ratio);
-
-                    Vector2 topLeft = particle.Position * size + new Vector2(-offset.X, 0f);
-                    Vector2 topRight = particle.Position * size + new Vector2(offset.X, 0);
-                    Vector2 bottomLeft = particle.Position * size + new Vector2(-offset.X, offset.Y);
-                    Vector2 bottomRight = particle.Position * size + new Vector2(offset.X, offset.Y);
+                    Vector2 topLeft = particle.Position - new Vector2(relativeWidth * 0.5f, 0f);
+                    Vector2 topRight = topLeft + new Vector2(relativeWidth, 0f);
+                    Vector2 bottomLeft = topLeft + new Vector2(0f, relativeHeight);
+                    Vector2 bottomRight = bottomLeft + new Vector2(relativeWidth, 0f);
 
                     var drawQuad = new Quad(
-                        Vector2Extensions.Transform(topLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)
+                        Vector2Extensions.Transform(topLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(topRight * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(bottomRight * size, DrawInfo.Matrix)
                     );
 
-                    var tRect = new Quad(
-                        topLeft.X / size.X,
-                        topLeft.Y / size.Y * texture_height,
-                        (topRight.X - topLeft.X) / size.X,
-                        (bottomRight.Y - topRight.Y) / size.Y * texture_height
-                    ).AABBFloat;
+                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeft, topRight, bottomLeft, bottomRight));
 
-                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour, tRect, vertexBatch.AddAction, textureCoords: tRect);
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction);
                 }
 
                 shader.Unbind();
+            }
+
+            private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
+            {
+                return new ColourInfo
+                {
+                    TopLeft = source.Interpolate(quad.TopLeft),
+                    TopRight = source.Interpolate(quad.TopRight),
+                    BottomLeft = source.Interpolate(quad.BottomLeft),
+                    BottomRight = source.Interpolate(quad.BottomRight)
+                };
             }
 
             protected override void Dispose(bool isDisposing)
