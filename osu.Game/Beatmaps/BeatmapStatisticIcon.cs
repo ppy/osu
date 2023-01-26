@@ -41,5 +41,6 @@ namespace osu.Game.Beatmaps
         Size,
         Sliders,
         Spinners,
+        Streams,
     }
 }

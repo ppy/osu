@@ -44,7 +44,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
-            new SpinnerCompositionTool()
+            new SpinnerCompositionTool(),
+            new StreamCompositionTool()
         };
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();

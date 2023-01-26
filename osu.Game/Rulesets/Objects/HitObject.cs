@@ -128,7 +128,8 @@ namespace osu.Game.Rulesets.Objects
 
             CreateNestedHitObjects(cancellationToken);
 
-            if (this is IHasComboInformation hasCombo)
+            // Objects implementing IHasMultipleComboInformation handle this binding themselves
+            if (this is IHasComboInformation hasCombo && this is not IHasMultipleComboInformation)
             {
                 foreach (HitObject hitObject in nestedHitObjects)
                 {

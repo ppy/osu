@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -51,6 +52,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
+
+        private readonly IBindableList<StreamControlPoint> streamControlPoints = new BindableList<StreamControlPoint>();
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -104,9 +107,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
             });
 
-            if (item is IHasDuration)
+            switch (item)
             {
-                colouredComponents.Add(new DragArea(item)
+                case IHasStreamPath streamHitObject:
+                    streamControlPoints.BindTo(streamHitObject.StreamPath.ControlPoints);
+                    streamControlPoints.BindCollectionChanged(recreateDragComponents, true);
+
+                    break;
+
+                case IHasDuration:
+                    colouredComponents.Add(new DragArea(item)
+                    {
+                        OnDragHandled = e => OnDragHandled?.Invoke(e)
+                    });
+                    break;
+            }
+        }
+
+        private void recreateDragComponents(object o, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            colouredComponents.Clear();
+            addDragComponents(Item);
+        }
+
+        private void addDragComponents(HitObject item)
+        {
+            if (item is not IHasStreamPath streamHitObject) return;
+
+            for (int i = 1; i < streamHitObject.StreamPath.ControlPoints.Count; i++)
+            {
+                colouredComponents.Add(new DragArea(item, i)
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
@@ -122,6 +152,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 case IHasDisplayColour displayColour:
                     displayColourBindable = displayColour.DisplayColour.GetBoundCopy();
                     displayColourBindable.BindValueChanged(_ => updateColour(), true);
+                    break;
+
+                case IHasMultipleComboInformation:
+                    Item.DefaultsApplied += _ => updateColour();
+                    skin.SourceChanged += updateColour;
                     break;
 
                 case IHasComboInformation comboInfo:
@@ -156,10 +191,96 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateColour()
         {
+            if (IsSelected)
+                border.Show();
+            else
+                border.Hide();
+
             Color4 colour;
 
             switch (Item)
             {
+                case IHasStreamPath hasStreamPath and IHasMultipleComboInformation hasCombos when hasStreamPath.Duration > 0:
+                    // Build a multi-colour gradient to represent each combo colour in the stream path
+                    int i = 0;
+                    Color4? prevColour = null;
+                    double segmentStart = 0;
+                    var streamPath = hasStreamPath.StreamPath.GetStreamPath();
+
+                    var colourContainer = new Container
+                    {
+                        Depth = -1,
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Horizontal = circle_size / 2f }
+                    };
+
+                    foreach (var comboObject in hasCombos.ComboObjects)
+                    {
+                        if (i == streamPath.Count) break;
+
+                        double time = streamPath[i++].Item2;
+                        var currentColour = comboObject.GetComboColour(skin);
+
+                        if (!prevColour.HasValue)
+                        {
+                            // Add a bit of colour for the part until before the first tick
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Width = circle_size / 2f,
+                                X = -circle_size / 2f,
+                                Colour = currentColour
+                            });
+
+                            prevColour = currentColour;
+                            continue;
+                        }
+
+                        if (currentColour != prevColour.Value || i == streamPath.Count)
+                        {
+                            // Add colour of this stream segment and start a gradient about 600 ms before the next segment
+                            double segmentDuration = time - segmentStart;
+                            double split = time - Math.Min(segmentDuration, 600);
+
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.X,
+                                Width = (float)((split - segmentStart) / hasStreamPath.Duration),
+                                X = (float)(segmentStart / hasStreamPath.Duration),
+                                Colour = prevColour.Value
+                            });
+                            colourContainer.Add(new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.X,
+                                Width = (float)((time - split) / hasStreamPath.Duration),
+                                X = (float)(split / hasStreamPath.Duration),
+                                Colour = ColourInfo.GradientHorizontal(prevColour.Value, currentColour)
+                            });
+
+                            segmentStart = time;
+                        }
+
+                        prevColour = currentColour;
+                    }
+
+                    if (prevColour.HasValue)
+                    {
+                        // Add a bit of colour for the part after the last tick
+                        colourContainer.Add(new Box
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = circle_size / 2f,
+                            Anchor = Anchor.TopRight,
+                            Colour = prevColour.Value
+                        });
+                    }
+
+                    circle.Content.Child = colourContainer;
+                    colour = Color4.White;
+                    break;
+
                 case IHasDisplayColour displayColour:
                     colour = displayColour.DisplayColour.Value;
                     break;
@@ -172,11 +293,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     colour = colourProvider.Highlight1;
                     break;
             }
-
-            if (IsSelected)
-                border.Show();
-            else
-                border.Hide();
 
             if (Item is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
@@ -282,6 +398,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject? hitObject;
 
+            private readonly int? index;
+
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -300,17 +418,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragArea(HitObject? hitObject)
+            public DragArea(HitObject? hitObject, int? index = null)
             {
                 this.hitObject = hitObject;
+                this.index = index;
 
                 CornerRadius = circle_size / 2;
                 Masking = true;
                 Size = new Vector2(circle_size, 1);
-                Anchor = Anchor.CentreRight;
+                Anchor = Anchor.CentreLeft;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
+                X = 1;
 
                 InternalChildren = new Drawable[]
                 {
@@ -371,6 +491,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // Update position to stream control point time
+                if (index.HasValue && hitObject is IHasStreamPath streamHitObject)
+                    X = (float)(streamHitObject.StreamPath.ControlPoints[index.Value].Time / streamHitObject.Duration);
+            }
+
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (!index.HasValue || hitObject is not IHasStreamPath streamHitObject || !e.ShiftPressed) return base.OnScroll(e);
+
+                // Change acceleration of stream control point
+                changeHandler?.BeginChange();
+                streamHitObject.StreamPath.ControlPoints[index.Value].Acceleration += e.ScrollDelta.X * 0.5d;
+                beatmap.Update(hitObject);
+                changeHandler?.EndChange();
+                return true;
+            }
+
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
@@ -423,6 +564,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 break;
 
+                            case IHasStreamPath streamHitObject:
+                                if (!index.HasValue) return;
+
+                                var controlPoints = streamHitObject.StreamPath.ControlPoints;
+                                double prevTime = index > 0 ? controlPoints[index.Value - 1].Time : 0;
+                                double nextTime = index < controlPoints.Count - 1 ? controlPoints[index.Value + 1].Time : double.PositiveInfinity;
+                                double beatLength = beatmap.GetBeatLengthAtTime(time);
+                                double minTime = prevTime + beatLength;
+                                double maxTime = nextTime - beatLength;
+                                double clippedTime = MathHelper.Clamp(time - hitObject.StartTime, minTime, maxTime);
+
+                                if (clippedTime == controlPoints[index.Value].Time || Precision.DefinitelyBigger(clippedTime, maxTime) || Precision.DefinitelyBigger(minTime, clippedTime)) return;
+
+                                controlPoints[index.Value].Time = clippedTime;
+                                controlPoints[index.Value].BeatLength = beatmap.GetBeatLengthAtTime(clippedTime);
+                                beatmap.Update(hitObject);
+                                break;
+
                             case IHasDuration endTimeHitObject:
                                 double snappedTime = Math.Max(hitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(hitObject.StartTime), beatSnapProvider.SnapTime(time));
 
@@ -467,7 +626,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
-            protected readonly Circle Content;
+            public readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
 

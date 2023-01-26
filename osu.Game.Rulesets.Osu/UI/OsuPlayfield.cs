@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Edit.Objects;
+using osu.Game.Rulesets.Osu.Edit.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
@@ -146,6 +148,9 @@ namespace osu.Game.Rulesets.Osu.UI
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
             RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
             RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
+
+            RegisterPool<Stream, DrawableStream>(20, 100);
+            RegisterPool<StreamHitCircle, DrawableStreamHitCircle>(20, 100);
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);

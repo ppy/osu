@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -14,40 +12,45 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Streams.Components;
+using osu.Game.Rulesets.Osu.Edit.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Streams
 {
-    public partial class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class StreamPlacementBlueprint : PlacementBlueprint
     {
-        public new Slider HitObject => (Slider)base.HitObject;
+        public new Stream HitObject => (Stream)base.HitObject;
 
-        private SliderBodyPiece bodyPiece;
-        private HitCirclePiece headCirclePiece;
-        private HitCirclePiece tailCirclePiece;
-        private PathControlPointVisualiser<Slider> controlPointVisualiser;
+        private StreamPiece streamPiece = null!;
+        private PathControlPointVisualiser<Stream> controlPointVisualiser = null!;
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
 
-        private SliderPlacementState state;
+        private StreamPlacementState state;
         private PathControlPoint segmentStart;
-        private PathControlPoint cursor;
+        private PathControlPoint? cursor;
+        private StreamControlPoint streamSegmentStart;
+        private StreamControlPoint? streamCursor;
         private int currentSegmentLength;
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IDistanceSnapProvider? snapProvider { get; set; }
 
-        public SliderPlacementBlueprint()
-            : base(new Slider())
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        public StreamPlacementBlueprint()
+            : base(new Stream())
         {
             RelativeSizeAxes = Axes.Both;
 
             HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
+            HitObject.StreamPath.ControlPoints.Add(streamSegmentStart = new StreamControlPoint());
             currentSegmentLength = 1;
         }
 
@@ -56,13 +59,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             InternalChildren = new Drawable[]
             {
-                bodyPiece = new SliderBodyPiece(),
-                headCirclePiece = new HitCirclePiece(),
-                tailCirclePiece = new HitCirclePiece(),
-                controlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, false)
+                streamPiece = new StreamPiece(),
+                controlPointVisualiser = new PathControlPointVisualiser<Stream>(HitObject, false)
             };
 
-            setState(SliderPlacementState.Initial);
+            setState(StreamPlacementState.Initial);
         }
 
         protected override void LoadComplete()
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public override void UpdateTimeAndPosition(SnapResult result)
         {
@@ -80,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             switch (state)
             {
-                case SliderPlacementState.Initial:
+                case StreamPlacementState.Initial:
                     BeginPlacement();
 
                     var nearestDifficultyPoint = editorBeatmap.HitObjects
@@ -95,8 +96,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     ApplyDefaultsToHitObject();
                     break;
 
-                case SliderPlacementState.Body:
+                case StreamPlacementState.Body:
                     updateCursor();
+                    updateStreamCursor();
                     break;
             }
         }
@@ -108,11 +110,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             switch (state)
             {
-                case SliderPlacementState.Initial:
+                case StreamPlacementState.Initial:
                     beginCurve();
                     break;
 
-                case SliderPlacementState.Body:
+                case StreamPlacementState.Body:
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -123,6 +125,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     {
                         // Transform the last point into a new segment.
                         Debug.Assert(lastPoint != null);
+
+                        if (lastPoint.Type == null)
+                        {
+                            updateStreamCursor();
+                            streamSegmentStart = streamCursor!;
+                            streamCursor = null;
+                        }
 
                         segmentStart = lastPoint;
                         segmentStart.Type = PathType.Linear;
@@ -138,27 +147,41 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
+            if (state == StreamPlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            if (!e.ShiftPressed || streamCursor == null)
+                return base.OnScroll(e);
+
+            streamCursor.Acceleration += e.ScrollDelta.X * 0.5d;
+
+            return true;
+        }
+
         private void beginCurve()
         {
+            // This is always followed by the end-change in StreamSelectionBlueprint
+            changeHandler?.BeginChange();
+
             BeginPlacement(commitStart: true);
-            setState(SliderPlacementState.Body);
+            setState(StreamPlacementState.Body);
         }
 
         private void endCurve()
         {
-            updateSlider();
+            updateStream();
             EndPlacement(HitObject.Path.HasValidLength);
+            editorBeatmap.SelectedHitObjects.Add(HitObject);
         }
 
         protected override void Update()
         {
             base.Update();
-            updateSlider();
+            updateStream();
 
             // Maintain the path type in case it got defaulted to bezier at some point during the drag.
             updatePathType();
@@ -218,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         /// </summary>
         /// <param name="lastPoint">The last-placed control point. May be null, but is not null if <c>false</c> is returned.</param>
         /// <returns>Whether a new control point can be placed at the current position.</returns>
-        private bool canPlaceNewControlPoint([CanBeNull] out PathControlPoint lastPoint)
+        private bool canPlaceNewControlPoint(out PathControlPoint? lastPoint)
         {
             // We cannot rely on the ordering of drawable pieces, so find the respective drawable piece by searching for the last non-cursor control point.
             var last = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
@@ -228,21 +251,40 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return lastPiece.IsHovered != true;
         }
 
-        private void updateSlider()
+        private void updateStreamCursor()
         {
-            HitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            if (canPlaceNewControlPoint(out var lastPoint) || lastPoint!.Type == null)
+            {
+                // The cursor does not overlap a previous non-inherit control point, so a valid new segment can be added.
+                if (streamCursor == null)
+                {
+                    HitObject.StreamPath.ControlPoints.Add(streamCursor = new StreamControlPoint());
+                }
 
-            bodyPiece.UpdateFrom(HitObject);
-            headCirclePiece.UpdateFrom(HitObject.HeadCircle);
-            tailCirclePiece.UpdateFrom(HitObject.TailCircle);
+                double time = EditorClock.CurrentTime;
+                streamCursor.Time = Math.Max(time - HitObject.StartTime, streamSegmentStart.Time + editorBeatmap.GetBeatLengthAtTime(streamSegmentStart.Time));
+                streamCursor.BeatLength = editorBeatmap.GetBeatLengthAtTime(time);
+            }
+            else if (streamCursor != null)
+            {
+                // The cursor overlaps a previous non-inherit control point, so it's removed.
+                HitObject.StreamPath.ControlPoints.Remove(streamCursor);
+                streamCursor = null;
+            }
         }
 
-        private void setState(SliderPlacementState newState)
+        private void updateStream()
+        {
+            //HitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            streamPiece.UpdateFrom(HitObject);
+        }
+
+        private void setState(StreamPlacementState newState)
         {
             state = newState;
         }
 
-        private enum SliderPlacementState
+        private enum StreamPlacementState
         {
             Initial,
             Body,
