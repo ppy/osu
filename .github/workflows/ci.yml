@@ -31,7 +31,7 @@ jobs:
         run: dotnet tool restore
 
       - name: Restore Packages
-        run: dotnet restore
+        run: dotnet restore osu.Desktop.slnf
 
       - name: Restore inspectcode cache
         uses: actions/cache@v3
@@ -113,11 +113,11 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+      - name: Install .NET workloads
+        run: dotnet workload install maui-android
 
-      - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+      - name: Compile
+        run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
@@ -132,8 +132,8 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
+      - name: Install .NET Workloads
+        run: dotnet workload install maui-ios
+
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+        run: dotnet build -c Debug osu.iOS

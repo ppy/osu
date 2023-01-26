@@ -56,6 +56,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestDisplay()
+        {
+            AddRepeatStep("toggle expanded state", () =>
+            {
+                InputManager.MoveMouseTo(group.ChildrenOfType<IconButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            }, 5);
+        }
+
+        [Test]
         public void TestClickExpandButtonMultipleTimes()
         {
             AddAssert("group expanded by default", () => group.Expanded.Value);

@@ -77,7 +77,7 @@ namespace osu.Game.Skinning
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
             }
             else
             {
@@ -97,7 +97,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues(typeof(GlobalSkinComponentLookup.LookupType)))
+            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues<GlobalSkinComponentLookup.LookupType>())
             {
                 string filename = $"{skinnableTarget}.json";
 
