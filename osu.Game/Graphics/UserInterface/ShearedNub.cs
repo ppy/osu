@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -7,23 +7,18 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalNub : Nub
+    public partial class ShearedNub : Nub
     {
-        public const float HEIGHT = 15;
-
-        public const float EXPANDED_SIZE = 50;
-
-        public NormalNub()
-        {
-            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
-        }
+        public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
 
         protected override Container CreateNubContainer() =>
-            new CircularContainer
+            new Container
             {
+                Shear = SHEAR,
                 BorderColour = Colour4.White,
                 BorderThickness = BORDER_WIDTH,
                 Masking = true,
+                CornerRadius = 5,
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
