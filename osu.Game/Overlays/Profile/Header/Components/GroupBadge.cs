@@ -52,8 +52,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    // Normal background color is 0.75 opacity, probationary doesn't have this cause they are a bit transparent already
                     Colour = colourProvider?.Background6 ?? Colour4.Black,
+                    // Normal badges background opacity is 75%, probationary is full opacity as the whole badge gets a bit transparent
                     Alpha = group.IsProbationary ? 1 : 0.75f,
                 },
                 innerContainer = new FillFlowContainer
