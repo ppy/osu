@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -15,17 +13,17 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SongProgressBar : SliderBar<double>
+    public partial class DefaultSongProgressBar : SliderBar<double>
     {
-        public Action<double> OnSeek;
+        /// <summary>
+        /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
+        /// </summary>
+        public Action<double>? OnSeek { get; set; }
 
-        private readonly Box fill;
-        private readonly Container handleBase;
-        private readonly Container handleContainer;
-
-        private bool showHandle;
-
-        public bool ShowHandle
+        /// <summary>
+        /// Whether the progress bar should allow interaction, ie. to perform seek operations.
+        /// </summary>
+        public bool Interactive
         {
             get => showHandle;
             set
@@ -59,7 +57,13 @@ namespace osu.Game.Screens.Play.HUD
             set => CurrentNumber.Value = value;
         }
 
-        public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
+        private readonly Box fill;
+        private readonly Container handleBase;
+        private readonly Container handleContainer;
+
+        private bool showHandle;
+
+        public DefaultSongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
             CurrentNumber.MinValue = 0;
             CurrentNumber.MaxValue = 1;
@@ -142,7 +146,7 @@ namespace osu.Game.Screens.Play.HUD
             handleBase.X = newX;
         }
 
-        private ScheduledDelegate scheduledSeek;
+        private ScheduledDelegate? scheduledSeek;
 
         protected override void OnUserChange(double value)
         {

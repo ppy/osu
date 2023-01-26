@@ -56,6 +56,11 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public bool PauseImports { get; set; }
+
         public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
@@ -149,9 +154,12 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().GetDisplayString()}!"
-                    : $"Imported {imported.Count} {HumanisedModelName}s!";
+                if (tasks.Length > imported.Count)
+                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                else if (imported.Count > 1)
+                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                else
+                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -253,7 +261,7 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            pauseIfNecessary(cancellationToken);
 
             TModel? existing;
 
@@ -550,6 +558,23 @@ namespace osu.Game.Database
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        private void pauseIfNecessary(CancellationToken cancellationToken)
+        {
+            if (!PauseImports)
+                return;
+
+            Logger.Log($@"{GetType().Name} is being paused.");
+
+            while (PauseImports)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Thread.Sleep(500);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Logger.Log($@"{GetType().Name} is being resumed.");
+        }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)
         {

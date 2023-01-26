@@ -35,13 +35,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public void SetRotation(float currentRotation)
         {
-            // Never calculate SPM by same time of record to avoid 0 / 0 = NaN or X / 0 = Infinity result.
-            if (Precision.AlmostEquals(0, Time.Elapsed))
-                return;
-
             // If we've gone back in time, it's fine to work with a fresh set of records for now
             if (records.Count > 0 && Time.Current < records.Last().Time)
                 records.Clear();
+
+            // Never calculate SPM by same time of record to avoid 0 / 0 = NaN or X / 0 = Infinity result.
+            if (records.Count > 0 && Precision.AlmostEquals(Time.Current, records.Last().Time))
+                return;
 
             if (records.Count > 0)
             {

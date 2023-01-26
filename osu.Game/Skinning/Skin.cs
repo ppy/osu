@@ -77,7 +77,7 @@ namespace osu.Game.Skinning
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
             }
             else
             {

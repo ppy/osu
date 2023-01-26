@@ -54,6 +54,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             float lightScale = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteLightScale)?.Value
                                ?? 1;
 
+            float minimumColumnWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.MinimumColumnWidth)?.Value
+                                       ?? 1;
+
             // Create a temporary animation to retrieve the number of frames, in an effort to calculate the intended frame length.
             // This animation is discarded and re-queried with the appropriate frame length afterwards.
             var tmp = skin.GetAnimation(lightImage, true, false);
@@ -92,7 +95,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
                 d.FillMode = FillMode.Stretch;
-                // Todo: Wrap
+                d.Height = minimumColumnWidth / d.DrawWidth * 1.6f; // constant matching stable.
+                // Todo: Wrap?
             });
 
             if (bodySprite != null)
