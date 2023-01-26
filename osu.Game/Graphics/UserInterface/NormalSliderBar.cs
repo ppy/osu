@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     public partial class NormalSliderBar<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        protected readonly NormalNub NormalNub;
+        protected readonly NormalNub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
         private readonly Container nubContainer;
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = NormalNub = new NormalNub
+                    Child = Nub = new NormalNub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
@@ -142,7 +142,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override bool ShouldHandleAsRelativeDrag(MouseDownEvent e)
-            => NormalNub.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition);
+            => Nub.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition);
 
         protected override void OnDragEnd(DragEndEvent e)
         {
@@ -152,19 +152,19 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            NormalNub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
+            Nub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + NormalNub.DrawPosition.X - NormalNub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - NormalNub.DrawPosition.X - RangePadding - NormalNub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            NormalNub.MoveToX(value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
         }
     }
 }

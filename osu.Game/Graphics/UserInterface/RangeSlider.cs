@@ -141,7 +141,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
                 base.ReceivePositionalInputAt(screenSpacePos)
-                && screenSpacePos.X <= NormalNub.ScreenSpaceDrawQuad.TopRight.X;
+                && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
         }
 
         private partial class UpperBoundSlider : BoundSlider
@@ -155,7 +155,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
                 base.ReceivePositionalInputAt(screenSpacePos)
-                && screenSpacePos.X >= NormalNub.ScreenSpaceDrawQuad.TopLeft.X;
+                && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
         protected partial class BoundSlider : NormalSliderBar<double>
@@ -177,12 +177,12 @@ namespace osu.Game.Graphics.UserInterface
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                NormalNub.Width = NubWidth;
-                RangePadding = NormalNub.Width / 2;
+                Nub.Width = NubWidth;
+                RangePadding = Nub.Width / 2;
 
                 OsuSpriteText currentDisplay;
 
-                NormalNub.Add(currentDisplay = new OsuSpriteText
+                Nub.Add(currentDisplay = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -203,9 +203,9 @@ namespace osu.Game.Graphics.UserInterface
                 if (colourProvider == null) return;
 
                 AccentColour = colourProvider.Background2;
-                NormalNub.AccentColour = colourProvider.Background2;
-                NormalNub.GlowingAccentColour = colourProvider.Background1;
-                NormalNub.GlowColour = colourProvider.Background2;
+                Nub.AccentColour = colourProvider.Background2;
+                Nub.GlowingAccentColour = colourProvider.Background1;
+                Nub.GlowColour = colourProvider.Background2;
             }
         }
     }

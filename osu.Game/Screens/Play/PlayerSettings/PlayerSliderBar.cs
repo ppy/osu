@@ -30,9 +30,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             private void load(OsuColour colours)
             {
                 AccentColour = colours.Yellow;
-                NormalNub.AccentColour = colours.Yellow;
-                NormalNub.GlowingAccentColour = colours.YellowLighter;
-                NormalNub.GlowColour = colours.YellowDark;
+                Nub.AccentColour = colours.Yellow;
+                Nub.GlowingAccentColour = colours.YellowLighter;
+                Nub.GlowColour = colours.YellowDark;
             }
         }
     }
