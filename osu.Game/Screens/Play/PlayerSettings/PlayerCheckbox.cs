@@ -18,9 +18,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                NormalNub.AccentColour = colours.Yellow;
-                NormalNub.GlowingAccentColour = colours.YellowLighter;
-                NormalNub.GlowColour = colours.YellowDark;
+                Nub.AccentColour = colours.Yellow;
+                Nub.GlowingAccentColour = colours.YellowLighter;
+                Nub.GlowColour = colours.YellowDark;
             }
         }
     }
