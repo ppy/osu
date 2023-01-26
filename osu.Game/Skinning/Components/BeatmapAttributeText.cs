@@ -23,7 +23,7 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class BeatmapAttributeText : DefaultTextSkinComponent
+    public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
         [SettingSource("Attribute", "The attribute to be displayed.")]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
