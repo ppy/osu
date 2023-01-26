@@ -112,29 +112,44 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectHorizontally(OsuHitObject osuObject)
+        public static void ReflectHorizontallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
 
             if (osuObject is not Slider slider)
                 return;
 
-            FlipSliderHorizontally(slider);
+            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - nested.Position.X, nested.Position.Y);
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
+
+            modifySlider(slider, reflectNestedObject, reflectControlPoint);
         }
 
         /// <summary>
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectVertically(OsuHitObject osuObject)
+        public static void ReflectVerticallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
             if (osuObject is not Slider slider)
                 return;
 
-            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.X, slider.Y - (nested.Y - slider.Y));
-            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
+            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.Position.X, OsuPlayfield.BASE_SIZE.Y - nested.Position.Y);
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
+
+            modifySlider(slider, reflectNestedObject, reflectControlPoint);
+        }
+
+        /// <summary>
+        /// Flips the position of the <see cref="Slider"/> around its start position horizontally.
+        /// </summary>
+        /// <param name="slider">The slider to be flipped.</param>
+        public static void FlipSliderInPlaceHorizontally(Slider slider)
+        {
+            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(slider.X - (nested.X - slider.X), nested.Y);
+            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
 
             modifySlider(slider, flipNestedObject, flipControlPoint);
         }
@@ -150,17 +165,6 @@ namespace osu.Game.Rulesets.Osu.Utils
             void rotateControlPoint(PathControlPoint point) => point.Position = rotateVector(point.Position, rotation);
 
             modifySlider(slider, rotateNestedObject, rotateControlPoint);
-        }
-
-        /// <summary>
-        /// Flips the slider about its start position horizontally.
-        /// </summary>
-        public static void FlipSliderHorizontally(Slider slider)
-        {
-            void flipNestedObject(OsuHitObject nested) => nested.Position = new Vector2(slider.X - (nested.X - slider.X), nested.Y);
-            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
-
-            modifySlider(slider, flipNestedObject, flipControlPoint);
         }
 
         private static void modifySlider(Slider slider, Action<OsuHitObject> modifyNestedObject, Action<PathControlPoint> modifyControlPoint)
