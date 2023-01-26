@@ -4,41 +4,25 @@
 #nullable disable
 
 using Markdig;
-using Markdig.Extensions.AutoLinks;
-using Markdig.Extensions.CustomContainers;
-using Markdig.Extensions.EmphasisExtras;
 using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Containers.Markdown.Footnotes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
+    [Cached]
     public partial class OsuMarkdownContainer : MarkdownContainer
     {
-        /// <summary>
-        /// Allows this markdown container to parse and link footnotes.
-        /// </summary>
-        /// <seealso cref="FootnoteExtension"/>
-        protected virtual bool Footnotes => false;
-
-        /// <summary>
-        /// Allows this markdown container to make URL text clickable.
-        /// </summary>
-        /// <seealso cref="AutoLinkExtension"/>
-        protected virtual bool Autolinks => false;
-
-        /// <summary>
-        /// Allows this markdown container to parse custom containers (used for flags and infoboxes).
-        /// </summary>
-        /// <seealso cref="CustomContainerExtension"/>
-        protected virtual bool CustomContainers => false;
-
         public OsuMarkdownContainer()
         {
             LineSpacing = 21;
@@ -99,25 +83,17 @@ namespace osu.Game.Graphics.Containers.Markdown
             return new OsuMarkdownUnorderedListItem(level);
         }
 
-        // reference: https://github.com/ppy/osu-web/blob/05488a96b25b5a09f2d97c54c06dd2bae59d1dc8/app/Libraries/Markdown/OsuMarkdown.php#L301
-        protected override MarkdownPipeline CreateBuilder()
-        {
-            var pipeline = new MarkdownPipelineBuilder()
-                           .UseAutoIdentifiers()
-                           .UsePipeTables()
-                           .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
-                           .UseYamlFrontMatter();
+        protected override MarkdownFootnoteGroup CreateFootnoteGroup(FootnoteGroup footnoteGroup) => base.CreateFootnoteGroup(footnoteGroup).With(g => g.Spacing = new Vector2(5));
 
-            if (Footnotes)
-                pipeline = pipeline.UseFootnotes();
+        protected override MarkdownFootnote CreateFootnote(Footnote footnote) => new OsuMarkdownFootnote(footnote);
 
-            if (Autolinks)
-                pipeline = pipeline.UseAutoLinks();
+        protected sealed override MarkdownPipeline CreateBuilder()
+            => Options.BuildPipeline();
 
-            if (CustomContainers)
-                pipeline.UseCustomContainers();
-
-            return pipeline.Build();
-        }
+        /// <summary>
+        /// Creates a <see cref="OsuMarkdownContainerOptions"/> instance which is used to determine
+        /// which CommonMark/Markdig extensions should be enabled for this <see cref="OsuMarkdownContainer"/>.
+        /// </summary>
+        protected virtual OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions();
     }
 }

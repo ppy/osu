@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Resources.Localisation.Web;
@@ -54,6 +56,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new APIBeatmapSet
                 {
+                    Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Future genre" },
+                    Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "Future language" },
                     OnlineID = 1235,
                     Title = @"an awesome beatmap",
                     Artist = @"naru narusegawa",
@@ -237,6 +241,44 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowWithNoReload()
         {
             AddStep(@"show without reload", overlay.Show);
+        }
+
+        [TestCase(BeatmapSetLookupType.BeatmapId)]
+        [TestCase(BeatmapSetLookupType.SetId)]
+        public void TestFetchLookupType(BeatmapSetLookupType lookupType)
+        {
+            string type = string.Empty;
+
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetBeatmapSetRequest getBeatmapSet:
+                            type = getBeatmapSet.Type.ToString();
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep(@"fetch", () =>
+            {
+                switch (lookupType)
+                {
+                    case BeatmapSetLookupType.BeatmapId:
+                        overlay.FetchAndShowBeatmap(55);
+                        break;
+
+                    case BeatmapSetLookupType.SetId:
+                        overlay.FetchAndShowBeatmapSet(55);
+                        break;
+                }
+            });
+
+            AddAssert(@"type is correct", () => type == lookupType.ToString());
         }
 
         private APIBeatmapSet createManyDifficultiesBeatmapSet()

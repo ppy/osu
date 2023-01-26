@@ -16,6 +16,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
@@ -44,12 +45,20 @@ namespace osu.Game.Tournament
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
+        public override EndpointConfiguration CreateEndpoints()
+        {
+            if (UseDevelopmentServer)
+                return base.CreateEndpoints();
+
+            return new ProductionEndpointConfiguration();
+        }
+
         private TournamentSpriteText initialisationText;
 
         [BackgroundDependencyLoader]
         private void load(Storage baseStorage)
         {
-            AddInternal(initialisationText = new TournamentSpriteText
+            Add(initialisationText = new TournamentSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -156,9 +165,21 @@ namespace osu.Game.Tournament
                 addedInfo |= addSeedingBeatmaps();
 
                 if (addedInfo)
-                    SaveChanges();
+                    saveChanges();
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+
+                ladder.Ruleset.BindValueChanged(r =>
+                {
+                    // Refetch player rank data on next startup as the ruleset has changed.
+                    foreach (var team in ladder.Teams)
+                    {
+                        foreach (var player in team.Players)
+                            player.Rank = null;
+                    }
+
+                    SaveChanges();
+                });
             }
             catch (Exception e)
             {
@@ -306,6 +327,11 @@ namespace osu.Game.Tournament
                 return;
             }
 
+            saveChanges();
+        }
+
+        private void saveChanges()
+        {
             foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 

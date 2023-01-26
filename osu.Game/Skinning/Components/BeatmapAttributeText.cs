@@ -111,7 +111,7 @@ namespace osu.Game.Skinning.Components
                                             .Cast<object?>()
                                             .ToArray();
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
                 numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }

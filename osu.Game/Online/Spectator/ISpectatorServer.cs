@@ -15,8 +15,9 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Signal the start of a new play session.
         /// </summary>
+        /// <param name="scoreToken">The score submission token.</param>
         /// <param name="state">The state of gameplay.</param>
-        Task BeginPlaySession(SpectatorState state);
+        Task BeginPlaySession(long? scoreToken, SpectatorState state);
 
         /// <summary>
         /// Send a bundle of frame data for the current play session.

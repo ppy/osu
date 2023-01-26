@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -53,6 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public TimelineHitObjectBlueprint(HitObject item)
             : base(item)
@@ -165,7 +169,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 default:
-                    return;
+                    colour = colourProvider.Highlight1;
+                    break;
             }
 
             if (IsSelected)
@@ -286,7 +291,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [Resolved]
             private Timeline timeline { get; set; } = null!;
 
-            [Resolved(CanBeNull = true)]
+            [Resolved]
             private IEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
@@ -419,9 +424,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 break;
 
                             case IHasDuration endTimeHitObject:
-                                double snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                double snappedTime = Math.Max(hitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(hitObject.StartTime), beatSnapProvider.SnapTime(time));
 
-                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
+                                if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
                                 endTimeHitObject.Duration = snappedTime - hitObject.StartTime;

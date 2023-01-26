@@ -65,6 +65,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                     flowDirection = !flowDirection;
                 }
 
+                if (positionInfos[i].HitObject is Slider slider && random.NextDouble() < 0.5)
+                {
+                    OsuHitObjectGenerationUtils.FlipSliderInPlaceHorizontally(slider);
+                }
+
                 if (i == 0)
                 {
                     positionInfos[i].DistanceFromPrevious = (float)(random.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
