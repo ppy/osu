@@ -17,6 +17,7 @@ namespace osu.Game.Skinning
     public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
+        private readonly decimal? version;
 
         private readonly LegacyJudgementPieceOld? temporaryOldStyle;
 
@@ -24,9 +25,10 @@ namespace osu.Game.Skinning
 
         private readonly ParticleExplosion? particles;
 
-        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture? particleTexture)
+        public LegacyJudgementPieceNew(HitResult result, decimal? version, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
+            this.version = version;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
@@ -54,7 +56,7 @@ namespace osu.Game.Skinning
             if (result != HitResult.Miss)
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, this.version, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
@@ -100,21 +102,6 @@ namespace osu.Game.Skinning
 
             switch (result)
             {
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
-
-                    //todo: this only applies to osu! ruleset apparently.
-                    this.MoveTo(new Vector2(0, -5));
-                    this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
-
-                    float rotation = RNG.NextSingle(-8.6f, 8.6f);
-
-                    this.RotateTo(0);
-                    this.RotateTo(rotation, fade_in_length)
-                        .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
-                    break;
-
                 default:
                     mainPiece.ScaleTo(0.9f);
                     mainPiece.ScaleTo(1.05f, fade_out_delay + fade_out_length);
