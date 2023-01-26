@@ -14,7 +14,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -25,7 +24,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public partial class NormalSliderBar<T> : OsuSliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
