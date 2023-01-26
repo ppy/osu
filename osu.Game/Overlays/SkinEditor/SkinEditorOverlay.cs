@@ -14,7 +14,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     /// <summary>
     /// A container which handles loading a skin editor on user request for a specified target.

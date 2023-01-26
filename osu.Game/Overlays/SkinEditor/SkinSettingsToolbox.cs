@@ -9,7 +9,7 @@ using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     internal partial class SkinSettingsToolbox : EditorSidebarSection
     {
