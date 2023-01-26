@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,18 +18,18 @@ namespace osu.Game.Skinning.Editor
 {
     public partial class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
     {
-        private Container box;
+        private Container box = null!;
 
-        private Container outlineBox;
+        private Container outlineBox = null!;
 
-        private AnchorOriginVisualiser anchorOriginVisualiser;
+        private AnchorOriginVisualiser anchorOriginVisualiser = null!;
 
         private Drawable drawable => (Drawable)Item;
 
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public SkinBlueprint(ISkinnableDrawable component)
             : base(component)
