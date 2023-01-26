@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
@@ -17,15 +18,16 @@ namespace osu.Game.Skinning
     public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
-        private readonly decimal? version;
 
         private readonly float finalScale;
         private readonly bool forceTransforms;
 
-        public LegacyJudgementPieceOld(HitResult result, decimal? version, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
             this.result = result;
-            this.version = version;
             this.finalScale = finalScale;
             this.forceTransforms = forceTransforms;
 
@@ -58,7 +60,9 @@ namespace osu.Game.Skinning
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    if (version > 1)
+                    decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
+
+                    if (legacyVersion > 1)
                     {
                         this.MoveTo(new Vector2(0, -5));
                         this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
