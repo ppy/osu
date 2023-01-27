@@ -114,23 +114,34 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0Note = erfcApprox(h50 / (d * root2));
 
-                double pMaxHead = 1 - erfcApprox((hMax * 1.2) / (d * root2));
-                double p300Head = erfcApprox((hMax * 1.2) / (d * root2)) - erfcApprox(h300 * 1.1) / (d * root2);
-                double p200Head = erfcApprox((h300 * 1.1) / (d * root2)) - erfcApprox(h200 / (d * root2));
+                // Effective hit window for LN tails, takes a value between 1 and 2. Lower results in a lower estimated deviation.
+                double tailMultipler = 1.5;
 
-                double pMaxTail = 1 - erfcApprox((hMax * 1.5 * 1.2) / (d * root2));
-                double p300Tail = erfcApprox((hMax * 1.5 * 1.2) / (d * root2)) - erfcApprox((h300 * 1.5 * 1.1) / (d * root2));
-                double p200Tail = erfcApprox((h300 * 1.5 * 1.1) / (d * root2)) - erfcApprox((h200 * 1.5) / (d * root2));
-                double p100Tail = erfcApprox((h200 * 1.5) / (d * root2)) - erfcApprox((h100 * 1.5) / (d * root2));
-                double p50Tail = erfcApprox((h100 * 1.5) / (d * root2)) - erfcApprox((h50 * 1.5) / (d * root2));
-                double p0Tail = erfcApprox((h50 * 1.5) / (d * root2));
+                double pMaxLN = 1 - (erfcApprox((hMax * 1.2) / (d * root2)) + erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2))
+                                  - erfcApprox((hMax * 1.2) / (d * root2)) * erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2)));
 
-                double pMaxLN = pMaxHead * pMaxTail;
-                double p300LN = p300Head * p300Tail;
-                double p200LN = p200Head * p200Tail;
-                double p100LN = p100Note * p100Tail;
-                double p50LN = p50Note * p50Tail;
-                double p0LN = p0Note * p0Tail;
+                double p300LN = (erfcApprox((hMax * 1.2) / (d * root2)) + erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2))
+                              - erfcApprox((hMax * 1.2) / (d * root2)) * erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2)))
+                              - (erfcApprox((h300 * 1.1) / (d * root2)) + erfcApprox((h300 * 1.1 * tailMultipler) / (d * root2))
+                              - erfcApprox((h300 * 1.1) / (d * root2)) * erfcApprox((h300 * 1.1 * tailMultipler) / (d * root2)));
+
+                double p200LN = (erfcApprox((h300 * 1.1) / (d * root2)) + erfcApprox((h300 * 1.1 * tailMultipler) / (d * root2))
+                              - erfcApprox((h300 * 1.1) / (d * root2)) * erfcApprox((h300 * 1.1 * tailMultipler) / (d * root2)))
+                              - (erfcApprox(h200 / (d * root2)) + erfcApprox((h200 * tailMultipler) / (d * root2))
+                              - erfcApprox(h200 / (d * root2)) * erfcApprox((h200 * tailMultipler) / (d * root2)));
+
+                double p100LN = (erfcApprox(h200 / (d * root2)) + erfcApprox((h200 * tailMultipler) / (d * root2))
+                              - erfcApprox(h200 / (d * root2)) * erfcApprox((h200 * tailMultipler) / (d * root2)))
+                              - (erfcApprox(h100 / (d * root2)) + erfcApprox((h100 * tailMultipler) / (d * root2))
+                              - erfcApprox(h100 / (d * root2)) * erfcApprox((h100 * tailMultipler) / (d * root2)));
+
+                double p50LN = (erfcApprox(h100 / (d * root2)) + erfcApprox((h100 * tailMultipler) / (d * root2))
+                             - erfcApprox(h100 / (d * root2)) * erfcApprox((h100 * tailMultipler) / (d * root2)))
+                             - (erfcApprox(h50 / (d * root2)) + erfcApprox((h50 * tailMultipler) / (d * root2))
+                             - erfcApprox(h50 / (d * root2)) * erfcApprox((h50 * tailMultipler) / (d * root2)));
+
+                double p0LN = erfcApprox(h50 / (d * root2)) + erfcApprox((h50 * tailMultipler) / (d * root2))
+                            - erfcApprox(h50 / (d * root2)) * erfcApprox((h50 * tailMultipler) / (d * root2));
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
