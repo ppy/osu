@@ -113,9 +113,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0Note = erfcApprox(h50 / (d * root2));
 
-                // Effective hit window for LN tails, takes a value between 1 and 2. A lower value results in a lower estimated deviation.
+                // Effective hit window for LN tails, takes a value between 1 and 2. This is because the hit window for LN tails in stable
+                // arent static, and depend on the previous hit. A lower value results in a lower estimated deviation.
                 double tailMultipler = 1.5;
 
+                // P(A) + P(B) - P(AB) is the probability of either event A or B happening or both events happening, 
+                // and in this case it is the probability of either on an LN landing outside of the hit window. The formulas are formatted such that it is
+                // (P(A_1) + P(B_1) - P(A_1 * B_1)) - (P(A_2) + P(B_2) - P(A_2 * B_2)).
                 double pMaxLN = 1 - (erfcApprox((hMax * 1.2) / (d * root2)) + erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2))
                                   - erfcApprox((hMax * 1.2) / (d * root2)) * erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2)));
 
@@ -171,6 +175,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0Note = erfcApprox(h50 / (d * root2));
 
+                // Lazer LN tails are 1.5x the hit window, so calculate the probability of hitting them separately.
                 double pMaxTail = 1 - erfcApprox((hMax * 1.5) / (d * root2));
                 double p300Tail = erfcApprox((hMax * 1.5) / (d * root2)) - erfcApprox((h300 * 1.5) / (d * root2));
                 double p200Tail = erfcApprox((h300 * 1.5) / (d * root2)) - erfcApprox((h200 * 1.5) / (d * root2));
