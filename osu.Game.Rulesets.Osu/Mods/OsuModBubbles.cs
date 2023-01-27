@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Pooling;
@@ -22,7 +20,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -63,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Multiplying by 2 results in an initial size that is too large, hence 1.85 has been chosen
             bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.85f);
-            bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimeFadeIn * 2;
+            bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
 
             // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
@@ -125,8 +122,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Pooled Bubble drawable
 
-        //LifetimeEntry flow is necessary to allow for correct rewind behaviour, can probably be made generic later if more mods are made requiring it
-        //Todo: find solution to bubbles rewinding in "groups"
+        // LifetimeEntry flow is necessary to allow for correct rewind behaviour, can probably be made generic later if more mods are made requiring it
+        // Todo: find solution to bubbles rewinding in "groups"
         private sealed partial class BubbleContainer : PooledDrawableWithLifetimeContainer<BubbleLifeTimeEntry, BubbleObject>
         {
             protected override bool RemoveRewoundEntry => true;
@@ -166,8 +163,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private void apply(BubbleLifeTimeEntry? entry)
             {
-                if (entry == null)
-                    return;
+                if (entry == null) return;
 
                 ApplyTransformsAt(float.MinValue, true);
                 ClearTransforms(true);
@@ -180,38 +176,36 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private partial class BubbleDrawable : CompositeDrawable, IHasAccentColour
+        private partial class BubbleDrawable : CircularContainer
         {
-            public Color4 AccentColour { get; set; }
+            private readonly Circle innerCircle;
+            private readonly Box colourBox;
 
-            private Circle outerCircle = null!;
-            private Circle innerCircle = null!;
-
-            [BackgroundDependencyLoader]
-            private void load()
+            public BubbleDrawable()
             {
-                InternalChildren = new Drawable[]
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                Masking = true;
+                MaskingSmoothness = 2;
+                BorderThickness = 0;
+                BorderColour = Colour4.Transparent;
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    outerCircle = new Circle
-                    {
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        MaskingSmoothness = 2,
-                        BorderThickness = 0,
-                        BorderColour = Colour4.Transparent,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow,
-                            Radius = 3,
-                            Colour = Colour4.Black.Opacity(0.05f)
-                        }
-                    },
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 3,
+                    Colour = Colour4.Black.Opacity(0.05f)
+                };
+
+                Children = new Drawable[]
+                {
+                    colourBox = new Box { RelativeSizeAxes = Axes.Both, },
                     innerCircle = new Circle
                     {
+                        Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.5f)
+                        Size = new Vector2(0.5f),
                     }
                 };
             }
@@ -219,27 +213,24 @@ namespace osu.Game.Rulesets.Osu.Mods
             public void Animate(BubbleLifeTimeEntry entry)
             {
                 Size = entry.InitialSize;
-                this
-                    .ScaleTo(entry.MaxSize, entry.FadeTime * 6, Easing.OutSine)
+
+                this.ScaleTo(entry.MaxSize, getAnimationTime() * 0.8f, Easing.OutSine)
                     .Then()
-                    .ScaleTo(entry.MaxSize * 1.5f, entry.FadeTime, Easing.OutSine)
-                    .FadeTo(0, entry.FadeTime, Easing.OutExpo);
+                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationTime() * 0.2f, Easing.OutSine)
+                    .FadeTo(0, getAnimationTime() * 0.2f, Easing.OutExpo);
 
-                animateCircles(entry);
-            }
+                colourBox.FadeColour(entry.IsHit ? entry.Colour : Colour4.Black, getAnimationTime() * 0.1f, Easing.OutSine)
+                         .Then()
+                         .FadeColour(entry.IsHit ? entry.Colour.Darken(0.4f) : Colour4.Black, getAnimationTime() * 0.9f, Easing.OutSine);
 
-            private void animateCircles(BubbleLifeTimeEntry entry)
-            {
                 innerCircle.FadeColour(entry.IsHit ? entry.Colour.Darken(0.2f) : Colour4.Black)
-                           .FadeColour(entry.IsHit ? entry.Colour.Lighten(0.2f) : Colour4.Black, entry.FadeTime * 7);
+                           .FadeColour(entry.IsHit ? entry.Colour.Lighten(0.2f) : Colour4.Black, getAnimationTime());
 
-                innerCircle.FadeTo(0.5f, entry.FadeTime * 7, Easing.InExpo)
-                           .ScaleTo(1.1f, entry.FadeTime * 7, Easing.InSine);
+                innerCircle.FadeTo(0.5f, getAnimationTime(), Easing.InExpo)
+                           .ScaleTo(2.2f, getAnimationTime(), Easing.InSine);
 
-                outerCircle
-                    .FadeColour(entry.IsHit ? entry.Colour : Colour4.Black, entry.FadeTime, Easing.OutSine)
-                    .Delay(entry.FadeTime)
-                    .FadeColour(entry.IsHit ? entry.Colour.Darken(.4f) : Colour4.Black, entry.FadeTime * 5, Easing.OutSine);
+                // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
+                double getAnimationTime() => 2000 + 450 / (450 / entry.FadeTime);
             }
         }
 
