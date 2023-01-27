@@ -6,13 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using MathNet.Numerics;
-using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeEstimatedUR(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
-                return Double.PositiveInfinity;
+                return double.PositiveInfinity;
 
             double[] judgements = new double[5];
 
@@ -102,9 +102,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double root2 = Math.Sqrt(2);
 
-            // The deviation estimation cannot handle SS scores, so always assume there is one extra note to keep the perfect hit probability below 100%.
-            double totalHitsP1 = totalHits + 1;
-
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -117,15 +114,23 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0Note = erfcApprox(h50 / (d * root2));
 
-                // Temporary arbitrary value for balancing purposes.
-                double f = 0.75;
+                double pMaxHead = 1 - erfcApprox((hMax * 1.2) / (d * root2));
+                double p300Head = erfcApprox((hMax * 1.2) / (d * root2)) - erfcApprox(h300 * 1.1) / (d * root2);
+                double p200Head = erfcApprox((h300 * 1.1) / (d * root2)) - erfcApprox(h200 / (d * root2));
 
-                double pMaxLN = 1 - Math.Pow(erfcApprox((hMax * 1.2) / (d * root2)), f);
-                double p300LN = Math.Pow(erfcApprox((hMax * 1.2) / (d * root2)), f) - Math.Pow(erfcApprox((h300 * 1.1) / (d * root2)), f);
-                double p200LN = Math.Pow(erfcApprox((h300 * 1.1) / (d * root2)), f) - Math.Pow(erfcApprox(h200 / (d * root2)), f);
-                double p100LN = Math.Pow(erfcApprox(h200 / (d * root2)), f) - Math.Pow(erfcApprox(h100 / (d * root2)), f);
-                double p50LN = Math.Pow(erfcApprox(h100 / (d * root2)), f) - Math.Pow(erfcApprox(h50 / (d * root2)), f);
-                double p0LN = Math.Pow(erfcApprox(h50 / (d * root2)), f);
+                double pMaxTail = 1 - erfcApprox((hMax * 1.5 * 1.2) / (d * root2));
+                double p300Tail = erfcApprox((hMax * 1.5 * 1.2) / (d * root2)) - erfcApprox((h300 * 1.5 * 1.1) / (d * root2));
+                double p200Tail = erfcApprox((h300 * 1.5 * 1.1) / (d * root2)) - erfcApprox((h200 * 1.5) / (d * root2));
+                double p100Tail = erfcApprox((h200 * 1.5) / (d * root2)) - erfcApprox((h100 * 1.5) / (d * root2));
+                double p50Tail = erfcApprox((h100 * 1.5) / (d * root2)) - erfcApprox((h50 * 1.5) / (d * root2));
+                double p0Tail = erfcApprox((h50 * 1.5) / (d * root2));
+
+                double pMaxLN = pMaxHead * pMaxTail;
+                double p300LN = p300Head * p300Tail;
+                double p200LN = p200Head * p200Tail;
+                double p100LN = p100Note * p100Tail;
+                double p50LN = p50Note * p50Tail;
+                double p0LN = p0Note * p0Tail;
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
@@ -134,12 +139,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50 = ((p50Note * attributes.NoteCount) + (p50LN * attributes.HoldNoteCount)) / totalHits;
                 double p0 = ((p0Note * attributes.NoteCount) + (p0LN * attributes.HoldNoteCount)) / totalHits;
 
-                double gradient = Math.Pow(pMax, countPerfect / totalHitsP1)
-                * Math.Pow(p300, countGreat / totalHitsP1)
-                * Math.Pow(p200, countGood / totalHitsP1)
-                * Math.Pow(p100, countOk / totalHitsP1)
-                * Math.Pow(p50, countMeh / totalHitsP1)
-                * Math.Pow(p0, countMiss / totalHitsP1);
+                double gradient = Math.Pow(pMax, countPerfect / totalHits)
+                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                * Math.Pow(p200, countGood / totalHits)
+                * Math.Pow(p100, countOk / totalHits)
+                * Math.Pow(p50, countMeh / totalHits)
+                * Math.Pow(p0, countMiss / totalHits);
 
                 return -gradient;
             }
@@ -170,18 +175,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50 = ((p50Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p50Tail * attributes.HoldNoteCount)) / totalHits;
                 double p0 = ((p0Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p0Tail * attributes.HoldNoteCount)) / totalHits;
 
-                double gradient = Math.Pow(pMax, countPerfect / totalHitsP1)
-                * Math.Pow(p300, countGreat / totalHitsP1)
-                * Math.Pow(p200, countGood / totalHitsP1)
-                * Math.Pow(p100, countOk / totalHitsP1)
-                * Math.Pow(p50, countMeh / totalHitsP1)
-                * Math.Pow(p0, countMiss / totalHitsP1);
+                double gradient = Math.Pow(pMax, countPerfect / totalHits)
+                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                * Math.Pow(p200, countGood / totalHits)
+                * Math.Pow(p100, countOk / totalHits)
+                * Math.Pow(p50, countMeh / totalHits)
+                * Math.Pow(p0, countMiss / totalHits);
 
                 return -gradient;
             }
 
             // Finding the minimum of the inverse likelihood function returns the most likely deviation for a play
-            if  (isLegacyScore)
+            if (isLegacyScore)
                 return FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30);
             else
                 return FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
@@ -243,14 +248,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return judgements;
         }
- 
-        double erfcApprox(double x)
+
+        private double erfcApprox(double x)
         {
             if (x <= 5)
                 return SpecialFunctions.Erfc(x);
 
             // This approximation is very accurate with values over 5, and is much more performant than the Erfc function
             return Math.Exp(-Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
-        } 
+        }
     }
 }

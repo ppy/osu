@@ -3,9 +3,9 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
