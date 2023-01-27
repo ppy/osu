@@ -6,9 +6,11 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -17,6 +19,9 @@ namespace osu.Game.Tests.Visual.Online
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         private ProfileHeader header = null!;
 
@@ -29,7 +34,23 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBasic()
         {
-            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER));
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
+        }
+
+        [Test]
+        public void TestProfileCoverExpanded()
+        {
+            AddStep("Set cover to expanded", () => configManager.SetValue(OsuSetting.ProfileCoverExpanded, true));
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
+            AddUntilStep("Cover is expanded", () => header.ChildrenOfType<UserCoverBackground>().Single().Height, () => Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestProfileCoverCollapsed()
+        {
+            AddStep("Set cover to collapsed", () => configManager.SetValue(OsuSetting.ProfileCoverExpanded, false));
+            AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
+            AddUntilStep("Cover is collapsed", () => header.ChildrenOfType<UserCoverBackground>().Single().Height, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -41,7 +62,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = true,
-            }));
+            }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
             {
@@ -49,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
                 IsOnline = false,
-            }));
+            }, new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -71,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                     },
                 }
-            }));
+            }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show unranked user", () => header.User.Value = new UserProfileData(new APIUser
             {
@@ -87,7 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                         Data = Enumerable.Range(2345, 85).ToArray()
                     },
                 }
-            }));
+            }, new OsuRuleset().RulesetInfo));
         }
     }
 }

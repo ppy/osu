@@ -60,8 +60,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(APIUser user, PaginationParameters pagination) =>
-            new GetUserScoresRequest(user.Id, type, pagination);
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserScoresRequest(user.User.Id, type, pagination, user.Ruleset);
 
         private int drawableItemIndex;
 

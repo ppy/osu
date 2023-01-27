@@ -1064,6 +1064,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
             AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
