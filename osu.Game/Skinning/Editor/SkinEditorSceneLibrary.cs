@@ -131,7 +131,7 @@ namespace osu.Game.Skinning.Editor
                 Height = BUTTON_HEIGHT;
             }
 
-            [BackgroundDependencyLoader(true)]
+            [BackgroundDependencyLoader]
             private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
             {
                 BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
