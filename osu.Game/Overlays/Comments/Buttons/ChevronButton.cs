@@ -21,12 +21,13 @@ namespace osu.Game.Overlays.Comments.Buttons
         public ChevronButton()
         {
             Size = new Vector2(40, 22);
-            Child = icon = new SpriteIcon
+            icon = new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(12),
             };
+            Add(icon);
         }
 
         [BackgroundDependencyLoader]

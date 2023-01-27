@@ -88,14 +88,14 @@ namespace osu.Game.Screens.Edit
                 CornerRadius = 3;
                 Masking = true;
 
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     hoveredBackground = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
                     },
-                };
+                });
             }
 
             private Color4 colourHover;

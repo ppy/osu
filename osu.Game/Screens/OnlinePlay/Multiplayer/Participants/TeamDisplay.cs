@@ -47,29 +47,30 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            box = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                CornerRadius = 5,
+                Masking = true,
+                Scale = new Vector2(0, 1),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Child = new Box
+                {
+                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }
+            };
             InternalChild = clickableContent = new OsuClickableContainer
             {
                 Width = 15,
                 Alpha = 0,
                 Scale = new Vector2(0, 1),
-                RelativeSizeAxes = Axes.Y,
-                Child = box = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(0, 1),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Child = new Box
-                    {
-                        Colour = Color4.White,
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                }
+                RelativeSizeAxes = Axes.Y
             };
+            clickableContent.Add(box);
 
             if (Client.LocalUser?.Equals(user) == true)
             {

@@ -46,12 +46,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             AutoSizeAxes = Axes.None;
             Size = new Vector2(30);
-            Child = icon = new SpriteIcon
+            icon = new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(10.5f, 12)
             };
+            Add(icon);
 
             CoverExpanded.BindValueChanged(visible => updateState(visible.NewValue), true);
         }

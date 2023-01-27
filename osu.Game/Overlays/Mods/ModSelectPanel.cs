@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Mods
 
             Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 Background = new Box
                 {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Mods
                         }
                     }
                 }
-            };
+            });
 
             Action = () =>
             {

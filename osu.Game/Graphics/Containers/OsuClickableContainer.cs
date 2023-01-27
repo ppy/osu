@@ -49,6 +49,9 @@ namespace osu.Game.Graphics.Containers
         }
 
         protected override void ClearInternal(bool disposeChildren = true) =>
-            throw new InvalidOperationException($"Clearing {nameof(InternalChildren)} will cause critical failure. Use {nameof(Clear)} instead.");
+            throw new InvalidOperationException($"Clearing {nameof(InternalChildren)} will cause critical failure.");
+
+        public override void Clear(bool disposeChildren) =>
+            throw new InvalidOperationException($"Clearing {nameof(Children)} will cause critical failure.");
     }
 }

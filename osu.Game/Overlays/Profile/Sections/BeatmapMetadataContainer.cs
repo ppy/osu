@@ -31,11 +31,11 @@ namespace osu.Game.Overlays.Profile.Sections
                 beatmapSetOverlay?.FetchAndShowBeatmap(beatmapInfo.OnlineID);
             };
 
-            Child = new FillFlowContainer
+            Add(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Children = CreateText(beatmapInfo),
-            };
+            });
         }
 
         protected abstract Drawable[] CreateText(IBeatmapInfo beatmapInfo);

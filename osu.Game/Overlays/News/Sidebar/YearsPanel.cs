@@ -97,13 +97,13 @@ namespace osu.Game.Overlays.News.Sidebar
                 Width = 0.25f;
                 Height = 15;
 
-                Child = new OsuSpriteText
+                Add(new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 12, weight: isCurrent ? FontWeight.SemiBold : FontWeight.Medium),
                     Text = year.ToString()
-                };
+                });
             }
 
             [BackgroundDependencyLoader]

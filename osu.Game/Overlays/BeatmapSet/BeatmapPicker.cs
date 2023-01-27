@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Size = new Vector2(size);
                 Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     background = new Container
                     {
@@ -282,7 +282,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Size = new Vector2(size - tile_icon_padding * 2),
                         Margin = new MarginPadding { Bottom = 1 },
                     },
-                };
+                });
             }
 
             protected override bool OnHover(HoverEvent e)

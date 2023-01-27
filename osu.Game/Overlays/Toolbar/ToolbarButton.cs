@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Toolbar
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 HoverBackground = new Box
                 {
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Toolbar
                         }
                     }
                 }
-            };
+            });
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => false;

@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 RelativeSizeAxes = Axes.X;
                 Height = 15;
                 Action = Expanded.Toggle;
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     new OsuSpriteText
                     {
@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.News.Sidebar
                         Size = new Vector2(10),
                         Icon = FontAwesome.Solid.ChevronDown
                     }
-                };
+                });
             }
 
             protected override void LoadComplete()
@@ -136,12 +136,13 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Child = text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
+                text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Text = post.Title
                 };
+                Add(text);
             }
 
             [BackgroundDependencyLoader]

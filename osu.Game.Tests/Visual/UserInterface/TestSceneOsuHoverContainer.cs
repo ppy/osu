@@ -22,17 +22,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = hoverContainer = new OsuHoverTestContainer
+            hoverContainer = new OsuHoverTestContainer
             {
                 Enabled = { Value = true },
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(100),
-                Child = colourContainer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
             };
+            colourContainer = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+            hoverContainer.Add(colourContainer);
+            Add(hoverContainer);
 
             doMoveOut();
         });

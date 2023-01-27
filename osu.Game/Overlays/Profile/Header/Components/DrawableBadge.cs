@@ -29,12 +29,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures, ILinkHandler? linkHandler)
         {
-            Child = new Sprite
+            Add(new Sprite
             {
                 FillMode = FillMode.Fit,
                 RelativeSizeAxes = Axes.Both,
                 Texture = textures.Get(badge.ImageUrl),
-            };
+            });
 
             if (!string.IsNullOrEmpty(badge.Url))
                 Action = () => linkHandler?.HandleLink(badge.Url);

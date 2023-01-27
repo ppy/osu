@@ -143,10 +143,10 @@ namespace osu.Game.Overlays.Notifications
             {
                 AutoSizeAxes = Axes.Both;
 
-                Children = new[]
+                AddRange(new[]
                 {
                     text = new OsuSpriteText()
-                };
+                });
             }
 
             public LocalisableString Text

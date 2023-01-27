@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Play
 
                 sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     background = new Box
                     {
@@ -367,7 +367,7 @@ namespace osu.Game.Screens.Play
                             },
                         }
                     }
-                };
+                });
             }
 
             protected override bool OnHover(HoverEvent e)

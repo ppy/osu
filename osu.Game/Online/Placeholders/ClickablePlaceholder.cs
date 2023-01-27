@@ -19,16 +19,18 @@ namespace osu.Game.Online.Placeholders
         {
             OsuTextFlowContainer textFlow;
 
-            AddArbitraryDrawable(new OsuAnimatedButton
+            OsuAnimatedButton animatedButton = new OsuAnimatedButton
             {
                 AutoSizeAxes = Framework.Graphics.Axes.Both,
-                Child = textFlow = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
-                {
-                    AutoSizeAxes = Framework.Graphics.Axes.Both,
-                    Margin = new Framework.Graphics.MarginPadding(5)
-                },
                 Action = () => Action?.Invoke()
+            };
+            animatedButton.Add(textFlow = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
+            {
+                AutoSizeAxes = Framework.Graphics.Axes.Both,
+                Margin = new Framework.Graphics.MarginPadding(5)
             });
+
+            AddArbitraryDrawable(animatedButton);
 
             textFlow.AddIcon(icon, i =>
             {

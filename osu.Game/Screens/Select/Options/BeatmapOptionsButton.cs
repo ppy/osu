@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Options
             Width = width;
             RelativeSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 box = new Container
                 {
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Select.Options
                         },
                     },
                 },
-            };
+            });
         }
     }
 }

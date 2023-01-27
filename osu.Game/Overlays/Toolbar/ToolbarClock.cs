@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
             clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
             prefer24HourTime = config.GetBindable<bool>(OsuSetting.Prefer24HourTime);
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 hoverBackground = new Box
                 {
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                         }
                     }
                 }
-            };
+            });
         }
 
         protected override void LoadComplete()

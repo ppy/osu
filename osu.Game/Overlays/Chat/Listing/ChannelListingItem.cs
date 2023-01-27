@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Chat.Listing
             RelativeSizeAxes = Content.RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Content.AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 hoverBox = new Box
                 {
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Chat.Listing
                         },
                     },
                 },
-            };
+            });
         }
 
         protected override void LoadComplete()

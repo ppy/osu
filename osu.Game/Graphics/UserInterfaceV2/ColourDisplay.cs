@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Masking = true;
                 Action = this.ShowPopover;
 
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     fill = new Box
                     {
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Origin = Anchor.Centre,
                         Font = OsuFont.Default.With(size: 12)
                     }
-                };
+                });
             }
 
             protected override void LoadComplete()

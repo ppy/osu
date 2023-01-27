@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 box = new Box
                 {
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-            };
+            });
         }
 
         protected override void LoadComplete()

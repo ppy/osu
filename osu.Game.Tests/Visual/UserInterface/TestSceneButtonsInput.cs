@@ -31,6 +31,29 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestSceneButtonsInput()
         {
+            clickableContainer = new OsuClickableContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 40,
+                Enabled = { Value = true },
+                Masking = true,
+                CornerRadius = 20,
+            };
+            clickableContainer.AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Red
+                },
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Text = "Rounded clickable container"
+                }
+            });
+
             Add(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Y,
@@ -39,28 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    clickableContainer = new OsuClickableContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 40,
-                        Enabled = { Value = true },
-                        Masking = true,
-                        CornerRadius = 20,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Red
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = "Rounded clickable container"
-                            }
-                        }
-                    },
+                    clickableContainer,
                     settingsButton = new SettingsButton
                     {
                         Enabled = { Value = true },

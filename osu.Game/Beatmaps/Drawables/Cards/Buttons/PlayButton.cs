@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             // needed for touch input to work when card is not hovered/expanded
             AlwaysPresent = true;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 icon = new SpriteIcon
                 {
@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 {
                     Size = new Vector2(14)
                 }
-            };
+            });
 
             Action = () => Playing.Toggle();
         }

@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
         [BackgroundDependencyLoader]
         private void load(GameHost host, OverlayColourProvider colourProvider)
         {
-            Child = new TextFlowContainer(t =>
+            Add(new TextFlowContainer(t =>
             {
                 t.Font = OsuFont.GetFont(weight: FontWeight.Bold);
             })
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Text = post.Title
-            };
+            });
 
             HoverColour = colourProvider.Light1;
 

@@ -402,7 +402,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Y;
                 Width = 28;
 
-                Children = new Drawable[]
+                AddRange(new Drawable[]
                 {
                     background = new Box
                     {
@@ -418,7 +418,7 @@ namespace osu.Game.Overlays.Notifications
                         Size = new Vector2(12),
                         Colour = colourProvider.Foreground1,
                     }
-                };
+                });
             }
 
             protected override bool OnHover(HoverEvent e)

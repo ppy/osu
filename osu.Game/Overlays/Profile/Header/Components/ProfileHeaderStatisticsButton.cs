@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected ProfileHeaderStatisticsButton()
         {
-            Child = new FillFlowContainer
+            Add(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                     }
                 }
-            };
+            });
         }
 
         protected abstract IconUsage Icon { get; }

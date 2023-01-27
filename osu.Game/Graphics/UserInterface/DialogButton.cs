@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             RelativeSizeAxes = Axes.X;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 backgroundContainer = new Container
                 {
@@ -169,7 +169,7 @@ namespace osu.Game.Graphics.UserInterface
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
                     Colour = Color4.White,
                 },
-            };
+            });
 
             updateGlow();
 

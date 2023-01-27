@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Dashboard.Home
         {
             RelativeSizeAxes = Axes.X;
             Height = 60;
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Container
                 {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Dashboard.Home
                         }
                     }
                 }
-            };
+            });
 
             Action = () =>
             {

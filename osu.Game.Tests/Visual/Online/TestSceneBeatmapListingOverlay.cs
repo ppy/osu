@@ -48,7 +48,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("setup overlay", () =>
             {
-                Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
+                overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
+                Add(overlay);
                 setsForResponse.Clear();
             });
 

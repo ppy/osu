@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             [BackgroundDependencyLoader]
             private void load(GameHost host)
             {
-                Child = new DelayedLoadUnloadWrapper(() => new NewsPostBackground(post.FirstImage)
+                Add(new DelayedLoadUnloadWrapper(() => new NewsPostBackground(post.FirstImage)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                 })
                 {
                     RelativeSizeAxes = Axes.Both
-                };
+                });
 
                 TooltipText = "view in browser";
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);

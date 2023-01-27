@@ -132,6 +132,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 AutoSizeAxes = Axes.Y;
                 Width = 100;
+                circularButton = new OsuClickableContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 100,
+                    CornerRadius = 50,
+                    Masking = true,
+                    BorderThickness = 5,
+                };
+                circularButton.AddRange(new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Transparent,
+                        AlwaysPresent = true
+                    },
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(20),
+                        Icon = FontAwesome.Solid.Plus
+                    }
+                });
 
                 InternalChild = new FillFlowContainer
                 {
@@ -141,30 +165,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        circularButton = new OsuClickableContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 100,
-                            CornerRadius = 50,
-                            Masking = true,
-                            BorderThickness = 5,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Colour4.Transparent,
-                                    AlwaysPresent = true
-                                },
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(20),
-                                    Icon = FontAwesome.Solid.Plus
-                                }
-                            }
-                        },
+                        circularButton,
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,

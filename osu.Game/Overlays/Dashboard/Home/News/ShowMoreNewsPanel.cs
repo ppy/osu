@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Child = new HomePanel
+            Add(new HomePanel
             {
                 Child = text = new OsuSpriteText
                 {
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Margin = new MarginPadding { Vertical = 20 },
                     Text = CommonStrings.ButtonsSeeMore
                 }
-            };
+            });
 
             IdleColour = colourProvider.Light1;
             HoverColour = Color4.White;

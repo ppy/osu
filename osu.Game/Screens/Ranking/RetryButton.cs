@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Ranking
         {
             Size = new Vector2(50, 30);
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 background = new Box
                 {
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Ranking
                     Size = new Vector2(13),
                     Icon = FontAwesome.Solid.Redo,
                 },
-            };
+            });
 
             TooltipText = "retry";
         }

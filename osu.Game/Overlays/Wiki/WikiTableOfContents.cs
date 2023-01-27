@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Wiki
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Child = textFlow = new OsuTextFlowContainer(t =>
+                textFlow = new OsuTextFlowContainer(t =>
                 {
                     t.Font = OsuFont.GetFont(size: subtitle ? 12 : 15);
                 }).With(f =>
@@ -76,6 +76,7 @@ namespace osu.Game.Overlays.Wiki
                     f.AutoSizeAxes = Axes.Y;
                     f.Margin = new MarginPadding { Bottom = 2 };
                 });
+                Add(textFlow);
                 Padding = new MarginPadding { Left = subtitle ? 10 : 0 };
             }
 

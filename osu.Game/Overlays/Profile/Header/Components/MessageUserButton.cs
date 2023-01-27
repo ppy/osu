@@ -35,14 +35,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             Content.Alpha = 0;
 
-            Child = new SpriteIcon
+            Add(new SpriteIcon
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Icon = FontAwesome.Solid.Envelope,
                 FillMode = FillMode.Fit,
                 Size = new Vector2(50, 14)
-            };
+            });
 
             Action = () =>
             {

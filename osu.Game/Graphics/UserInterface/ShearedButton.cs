@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             Content.Masking = true;
             Content.Anchor = Content.Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 backgroundLayer = new Container
                 {
@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
-            };
+            });
 
             if (width != null)
             {

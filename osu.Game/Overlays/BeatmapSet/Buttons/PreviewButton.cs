@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             Height = 42;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 background = new Box
                 {
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Origin = Anchor.Centre,
                     Size = new Vector2(18),
                 },
-            };
+            });
 
             Action = () => playButton.TriggerClick();
             Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);

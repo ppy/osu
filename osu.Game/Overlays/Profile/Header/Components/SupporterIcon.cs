@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             AutoSizeAxes = Axes.X;
 
-            Child = content = new CircularContainer
+            content = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
@@ -77,6 +77,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 }
             };
+            Add(content);
         }
 
         [Resolved]

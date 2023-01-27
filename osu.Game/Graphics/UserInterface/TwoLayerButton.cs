@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.UserInterface
             Size = SIZE_RETRACTED;
             Shear = shear;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 c2 = new Container
                 {
@@ -155,7 +155,7 @@ namespace osu.Game.Graphics.UserInterface
                         }
                     }
                 },
-            };
+            });
         }
 
         public IconUsage Icon

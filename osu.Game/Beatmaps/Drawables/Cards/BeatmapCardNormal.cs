@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             FillFlowContainer titleBadgeArea = null!;
             GridContainer artistContainer = null!;
 
-            Child = content.With(c =>
+            Add(content.With(c =>
             {
                 c.MainContent = new Container
                 {
@@ -219,7 +219,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = new BeatmapCardDifficultyList(BeatmapSet)
                 };
                 c.Expanded.BindTarget = Expanded;
-            });
+            }));
 
             if (BeatmapSet.HasVideo)
                 leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(20) });

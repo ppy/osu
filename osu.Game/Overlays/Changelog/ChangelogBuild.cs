@@ -63,51 +63,58 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        protected virtual FillFlowContainer CreateHeader() => new FillFlowContainer
+        protected virtual FillFlowContainer CreateHeader()
         {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-            AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Vertical,
-            Margin = new MarginPadding { Top = 20 },
-            Child = new FillFlowContainer
+            OsuHoverContainer hoverContainer = new OsuHoverContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.Both,
+                Action = () => SelectBuild?.Invoke(Build),
+            };
+
+            FillFlowContainer<SpriteText> flowContainer = new FillFlowContainer<SpriteText>
+            {
+                AutoSizeAxes = Axes.Both,
+                Margin = new MarginPadding { Horizontal = 40 },
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = Build.UpdateStream.DisplayName,
+                        Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = " ",
+                        Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = Build.DisplayVersion,
+                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
+                        Colour = Build.UpdateStream.Colour,
+                    }
+                }
+            };
+            hoverContainer.Add(flowContainer);
+
+            return new FillFlowContainer
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Child = new OsuHoverContainer
+                Direction = FillDirection.Vertical,
+                Margin = new MarginPadding { Top = 20 },
+                Child = new FillFlowContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
-                    Action = () => SelectBuild?.Invoke(Build),
-                    Child = new FillFlowContainer<SpriteText>
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Margin = new MarginPadding { Horizontal = 40 },
-                        Children = new[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = Build.UpdateStream.DisplayName,
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = " ",
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 19),
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = Build.DisplayVersion,
-                                Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
-                                Colour = Build.UpdateStream.Colour,
-                            },
-                        }
-                    }
-                },
-            }
-        };
+                    Direction = FillDirection.Horizontal,
+                    Child = hoverContainer,
+                }
+            };
+        }
     }
 }

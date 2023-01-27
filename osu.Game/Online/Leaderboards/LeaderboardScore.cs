@@ -98,7 +98,7 @@ namespace osu.Game.Online.Leaderboards
 
             ClickableAvatar innerAvatar;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 new RankLabel(rank)
                 {
@@ -250,7 +250,7 @@ namespace osu.Game.Online.Leaderboards
                         },
                     },
                 },
-            };
+            });
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }

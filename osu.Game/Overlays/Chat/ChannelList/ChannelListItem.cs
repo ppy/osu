@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             Height = 30;
             RelativeSizeAxes = Axes.X;
 
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 hoverBox = new Box
                 {
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         },
                     },
                 },
-            };
+            });
 
             Action = () => OnRequestSelect?.Invoke(Channel);
         }
