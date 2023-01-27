@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
             if (lastLookup == null)
                 return;
 
-            var req = new GetBeatmapSetRequest(lastLookup.Value.id, BeatmapSetLookupType.BeatmapId);
+            var req = new GetBeatmapSetRequest(lastLookup.Value.id, lastLookup.Value.type);
             req.Success += res =>
             {
                 beatmapSet.Value = res;

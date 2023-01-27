@@ -11,6 +11,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -38,8 +39,8 @@ namespace osu.Game.Tests.Visual.Online
                 Child = section = new HistoricalSection(),
             });
 
-            AddStep("Show peppy", () => section.User.Value = new UserProfileData(new APIUser { Id = 2 }));
-            AddStep("Show WubWoofWolf", () => section.User.Value = new UserProfileData(new APIUser { Id = 39828 }));
+            AddStep("Show peppy", () => section.User.Value = new UserProfileData(new APIUser { Id = 2 }, new OsuRuleset().RulesetInfo));
+            AddStep("Show WubWoofWolf", () => section.User.Value = new UserProfileData(new APIUser { Id = 39828 }, new OsuRuleset().RulesetInfo));
         }
     }
 }
