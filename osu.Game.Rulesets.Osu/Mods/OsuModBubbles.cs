@@ -214,23 +214,29 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 Size = entry.InitialSize;
 
-                this.ScaleTo(entry.MaxSize, getAnimationTime() * 0.8f, Easing.OutSine)
+                //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
+                var colourDarker = entry.Colour.Darken(0.1f);
+
+                this.ScaleTo(entry.MaxSize, getAnimationDuration() * 0.8f, Easing.OutSine)
                     .Then()
-                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationTime() * 0.2f, Easing.OutSine)
-                    .FadeTo(0, getAnimationTime() * 0.2f, Easing.OutExpo);
+                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutSine)
+                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutExpo);
 
-                colourBox.FadeColour(entry.IsHit ? entry.Colour : Colour4.Black, getAnimationTime() * 0.1f, Easing.OutSine)
-                         .Then()
-                         .FadeColour(entry.IsHit ? entry.Colour.Darken(0.4f) : Colour4.Black, getAnimationTime() * 0.9f, Easing.OutSine);
+                innerCircle.ScaleTo(2f, getAnimationDuration() * 0.8f, Easing.OutCubic);
 
-                innerCircle.FadeColour(entry.IsHit ? entry.Colour.Darken(0.2f) : Colour4.Black)
-                           .FadeColour(entry.IsHit ? entry.Colour.Lighten(0.2f) : Colour4.Black, getAnimationTime());
+                if (!entry.IsHit)
+                {
+                    colourBox.Colour = Colour4.Black;
+                    innerCircle.Colour = Colour4.Black;
 
-                innerCircle.FadeTo(0.5f, getAnimationTime(), Easing.InExpo)
-                           .ScaleTo(2.2f, getAnimationTime(), Easing.InSine);
+                    return;
+                }
+
+                colourBox.FadeColour(colourDarker, getAnimationDuration() * 0.2f, Easing.OutQuint);
+                innerCircle.FadeColour(colourDarker);
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationTime() => 2000 + 450 / (450 / entry.FadeTime);
+                double getAnimationDuration() => 1700 + Math.Pow(entry.FadeTime, 1.15f);
             }
         }
 
