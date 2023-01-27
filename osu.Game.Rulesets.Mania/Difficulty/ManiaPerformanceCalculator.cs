@@ -58,8 +58,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return new ManiaPerformanceAttributes
             {
                 Difficulty = difficultyValue,
-                // Total = totalValue,
-                Total = estimatedUR,
+                Total = totalValue,
                 EstimatedUR = estimatedUR
             };
         }
@@ -114,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = erfcApprox(h100 / (d * root2)) - erfcApprox(h50 / (d * root2));
                 double p0Note = erfcApprox(h50 / (d * root2));
 
-                // Effective hit window for LN tails, takes a value between 1 and 2. Lower results in a lower estimated deviation.
+                // Effective hit window for LN tails, takes a value between 1 and 2. A lower value results in a lower estimated deviation.
                 double tailMultipler = 1.5;
 
                 double pMaxLN = 1 - (erfcApprox((hMax * 1.2) / (d * root2)) + erfcApprox((hMax * 1.2 * tailMultipler) / (d * root2))
