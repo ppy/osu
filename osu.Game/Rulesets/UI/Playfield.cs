@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
-        private readonly Stack<JudgementResultEntry> judgementResults;
+        private readonly Stack<HitObjectLifetimeEntry> judgedEntries;
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.UI
             entryManager.OnEntryAdded += onEntryAdded;
             entryManager.OnEntryRemoved += onEntryRemoved;
 
-            judgementResults = new Stack<JudgementResultEntry>();
+            judgedEntries = new Stack<HitObjectLifetimeEntry>();
         }
 
         [BackgroundDependencyLoader]
@@ -258,8 +258,8 @@ namespace osu.Game.Rulesets.UI
             }
 
             // When rewinding, revert future judgements in the reverse order.
-            while (judgementResults.Count > 0 && Time.Current < judgementResults.Peek().Time)
-                revertResult(judgementResults.Pop());
+            while (judgedEntries.Count > 0 && Time.Current < judgedEntries.Peek().Result.AsNonNull().TimeAbsolute)
+                revertResult(judgedEntries.Pop());
         }
 
         /// <summary>
@@ -453,17 +453,19 @@ namespace osu.Game.Rulesets.UI
 
         private void onNewResult(DrawableHitObject drawable, JudgementResult result)
         {
-            // Not using result.TimeAbsolute because that might change and also there is a potential precision issue.
-            judgementResults.Push(new JudgementResultEntry(drawable.Entry.AsNonNull(), result));
+            Debug.Assert(result != null && drawable.Entry?.Result == result);
+            judgedEntries.Push(drawable.Entry.AsNonNull());
 
             NewResult?.Invoke(drawable, result);
         }
 
-        private void revertResult(JudgementResultEntry entry)
+        private void revertResult(HitObjectLifetimeEntry entry)
         {
             var result = entry.Result;
+            Debug.Assert(result != null);
+
             RevertResult?.Invoke(result);
-            entry.HitObjectEntry.OnRevertResult();
+            entry.OnRevertResult();
 
             result.Reset();
         }
