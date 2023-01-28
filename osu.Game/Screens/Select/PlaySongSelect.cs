@@ -20,6 +20,8 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
 
+#nullable enable //???
+
 namespace osu.Game.Screens.Select
 {
     public partial class PlaySongSelect : SongSelect
@@ -40,7 +42,7 @@ namespace osu.Game.Screens.Select
         {
             BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
+            Footer?.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
         }
 
         private void openInMvis() =>

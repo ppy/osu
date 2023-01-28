@@ -35,13 +35,12 @@ using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Configuration;
 using System.Diagnostics;
-using osu.Game.Screens.Backgrounds;
-using JetBrains.Annotations;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Game.Configuration;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
+
+#nullable enable //mfosu: ???
 
 namespace osu.Game.Screens.Select
 {
@@ -397,7 +396,6 @@ namespace osu.Game.Screens.Select
         /// <param name="customStartAction">An optional custom action to perform instead of <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo? beatmapInfo = null, RulesetInfo? ruleset = null, Action? customStartAction = null)
         {
-            ResetBgBlur();
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
             {
@@ -759,7 +757,7 @@ namespace osu.Game.Screens.Select
             modSelectOverlayRegistration?.Dispose();
         }
 
-        private BeatmapSetInfo oldBeatmapSet;
+        private BeatmapSetInfo? oldBeatmapSet;
         protected bool BeatmapSetChanged = true;
 
         /// <summary>

@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
             }
 
             songSelect.CurrentScope.Value = Leaderboard.Scope;
-            songSelect.FilterMods.Value = Leaderboard.FilterMods;
+            //songSelect.FilterMods.Value = Leaderboard.FilterMods;
         }
 
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => base.CreateTabItems().Concat(new BeatmapDetailAreaTabItem[]
