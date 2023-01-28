@@ -142,10 +142,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         /// 通过给定的网易云音乐ID搜索歌曲
         /// </summary>
         /// <param name="id">歌曲ID</param>
+        /// <param name="beatmap"></param>
         /// <param name="onFinish"></param>
         /// <param name="onFail"></param>
-        /// <param name="titleThreshold">匹配阈值，在0%~100%之间</param>
-        public void SearchByNeteaseID(int id, Action<APILyricResponseRoot> onFinish, Action<string> onFail, float titleThreshold)
+        public void SearchByNeteaseID(int id, WorkingBeatmap beatmap, Action<APILyricResponseRoot> onFinish, Action<string> onFail)
         {
             //处理之前的请求
             cancellationTokenSource?.Cancel();
@@ -166,7 +166,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 }
             };
 
-            onSongSearchRequestFinish(RequestFinishMeta.From(fakeResponse, null, onFinish, onFail, titleThreshold), null);
+            var meta = RequestFinishMeta.From(fakeResponse, beatmap, onFinish, onFail, 0);
+            meta.NoRetry = true;
+
+            onSongSearchRequestFinish(meta, null);
         }
 
         /// <summary>
@@ -205,7 +208,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
             float similiarPrecentage = meta.GetSimiliarPrecentage();
 
-            Logger.Log($"Beatmap: '{meta.SourceBeatmap?.Metadata.GetTitle() ?? "???"}' <-> '{meta.GetNeteaseTitle()}' -> {similiarPrecentage} < {meta.TitleSimiliarThreshold}");
+            Logger.Log($"Beatmap: '{meta.SourceBeatmap?.Metadata.GetTitle() ?? "???"}' <-> '{meta.GetNeteaseTitle()}' -> {similiarPrecentage} <-> {meta.TitleSimiliarThreshold}");
 
             if (similiarPrecentage >= meta.TitleSimiliarThreshold)
             {

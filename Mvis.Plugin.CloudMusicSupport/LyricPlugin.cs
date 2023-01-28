@@ -180,7 +180,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void GetLyricFor(int id)
         {
             CurrentStatus.Value = Status.Working;
-            LyricProcessor.SearchByNeteaseID(id, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value);
+            LyricProcessor.SearchByNeteaseID(id, CurrentWorkingBeatmap, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private Track track = null!;

@@ -159,13 +159,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         new IconButton
                         {
                             Height = 30,
-                            Width = 1,
-                            RelativeSizeAxes = Axes.X,
+                            Width = 30,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             TooltipText = "更新定义",
                             Action = () =>
                             {
@@ -182,8 +184,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         new IconButton
                         {
                             Height = 30,
-                            Width = 1,
-                            RelativeSizeAxes = Axes.X,
+                            Width = 30,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             TooltipText = "复制谱面参考信息",
                             Action = () =>
                             {
@@ -210,11 +213,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         private string resolveBeatmapVerboseString(WorkingBeatmap working)
         {
             return $"{working.BeatmapSetInfo.OnlineID},"
-                   + $" // Title: {working.Metadata.TitleUnicode}"
-                   + $"({working.Metadata.Title})"
-                   + $" Artist: {working.Metadata.ArtistUnicode}"
-                   + $"({working.Metadata.Artist})"
-                   + $" Source: {working.Metadata.Source}";
+                   + $" // Title: '{working.Metadata.TitleUnicode}'"
+                   + $"('{working.Metadata.Title}')"
+                   + $" Artist: '{working.Metadata.ArtistUnicode}'"
+                   + $"('{working.Metadata.Artist}')"
+                   + $" Source: '{working.Metadata.Source}'";
         }
     }
 }
