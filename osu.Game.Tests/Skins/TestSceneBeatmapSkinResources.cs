@@ -35,6 +35,16 @@ namespace osu.Game.Tests.Skins
             });
         }
 
+        [Test]
+        public void TestRetrievalWithConflictingFilenames()
+        {
+            IWorkingBeatmap beatmap = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"conflicting-filenames-beatmap.osz"));
+            AddAssert("texture is non-null", () => beatmap.Skin.GetTexture(@"spinner-osu") != null);
+            AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo(@"spinner-osu")) != null);
+        }
+
         private IWorkingBeatmap importBeatmapFromArchives(string filename)
         {
             var imported = beatmaps.Import(new ImportTask(TestResources.OpenResource($@"Archives/{filename}"), filename)).GetResultSafely();
