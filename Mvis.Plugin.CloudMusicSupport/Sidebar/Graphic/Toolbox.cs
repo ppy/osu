@@ -3,6 +3,7 @@ using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Helper;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -39,6 +40,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         private LyricPlugin plugin { get; set; } = null!;
 
         private UserDefinitionHelper? udh;
+        private readonly OsuSpriteText statusText;
 
         public Toolbox()
         {
@@ -64,9 +66,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         idText = new OsuSpriteText
                         {
                             Margin = new MarginPadding { Horizontal = 15, Top = 15 },
-                            Font = OsuFont.GetFont(size: 20)
+                            Font = OsuFont.GetFont(size: 20),
+                            Alpha = 0
                         },
                         new TrackTimeIndicator(),
+                        statusText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight
+                        },
                         buttonFillFlow = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
@@ -108,9 +116,26 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [BackgroundDependencyLoader]
-        private void load(LyricConfigManager lcm, IImplementLLin llin)
+        private void load(LyricConfigManager lcm, IImplementLLin llin, LyricPlugin plugin)
         {
             udh ??= plugin.UserDefinitionHelper;
+
+            plugin.LyricProcessor.State.BindValueChanged(v =>
+            {
+                this.Schedule(() =>
+                {
+                    statusText.Text = $"{v.NewValue.GetDescription()}";
+
+                    var color = Color4.White;
+
+                    if (v.NewValue == LyricProcessor.SearchState.Success)
+                        color = Color4.GreenYellow;
+                    else if (v.NewValue == LyricProcessor.SearchState.Fail)
+                        color = Color4.Gold;
+
+                    statusText.FadeColour(color, 300, Easing.OutQuint);
+                });
+            }, true);
 
             contentFillFlow.AddRange(new Drawable[]
             {

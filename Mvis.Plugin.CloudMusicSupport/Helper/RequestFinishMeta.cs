@@ -50,7 +50,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             int distance = LevenshteinDistance.Compute(neteaseTitle, ourTitle);
             float precentage = 1 - (distance / (float)ourTitle.Length);
 
-            return precentage;
+            return Math.Abs(precentage);
         }
 
         public string GetNeteaseTitle()

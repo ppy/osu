@@ -9,7 +9,7 @@ using osu.Game.Overlays.Settings.Sections.Mf;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
-    public class TestSceneFontInfoLabel : ScreenTestScene
+    public partial class TestSceneFontInfoLabel : ScreenTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
