@@ -123,7 +123,7 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.GetLocalisableDescription().ToLower();
-                    Text.Font = OsuFont.GetFont(size: 14);
+                    Text.Font = OsuFont.GetFont(size: 18);
                     Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Margin = new MarginPadding { Bottom = bar_height };
                 }

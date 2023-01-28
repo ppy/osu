@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Profile
                                 new OsuSpriteText
                                 {
                                     Text = Title,
-                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                 },
                                 underscore = new Box
                                 {

@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = UsersStrings.ShowExtraUnranked,
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular)
             });
         }
 

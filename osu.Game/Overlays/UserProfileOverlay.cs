@@ -230,7 +230,7 @@ namespace osu.Game.Overlays
 
                 private void updateState()
                 {
-                    text.Font = OsuFont.Default.With(size: 14, weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
+                    text.Font = OsuFont.Default.With(size: 16, weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
 
                     Colour4 textColour;
 
