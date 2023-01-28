@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Performance;
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 //Needs to be done explicitly to avoid being handled by DrawableHitCircle below
                 case DrawableSliderHead:
                     addBubbleContainer(hitObject.Position, drawableOsuObject);
-                    break;
+                    return;
 
                 //Stack leniency causes placement issues if this isn't handled as such.
                 case DrawableHitCircle hitCircle:
@@ -188,7 +189,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private partial class BubbleDrawable : CircularContainer
         {
-            private readonly Circle innerCircle;
             private readonly Box colourBox;
 
             public BubbleDrawable()
@@ -196,55 +196,55 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                Masking = true;
                 MaskingSmoothness = 2;
                 BorderThickness = 0;
-                BorderColour = Colour4.Transparent;
+                BorderColour = Colour4.White;
+                Masking = true;
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 3,
                     Colour = Colour4.Black.Opacity(0.05f)
                 };
-
-                Children = new Drawable[]
-                {
-                    colourBox = new Box { RelativeSizeAxes = Axes.Both, },
-                    innerCircle = new Circle
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.5f),
-                    }
-                };
+                Child = colourBox = new Box { RelativeSizeAxes = Axes.Both, };
             }
 
             public void Animate(BubbleLifeTimeEntry entry)
             {
                 Size = entry.InitialSize;
+                BorderThickness = Width / 3.5f;
 
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
-                var colourDarker = entry.Colour.Darken(0.1f);
+                ColourInfo colourDarker = entry.Colour.Darken(0.1f);
 
+                // Main bubble scaling based on combo
                 this.ScaleTo(entry.MaxSize, getAnimationDuration() * 0.8f)
                     .Then()
+                    // Pop at the end of the bubbles life time
                     .ScaleTo(entry.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutQuint)
-                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutQuint);
-
-                innerCircle.ScaleTo(2f, getAnimationDuration() * 0.8f, Easing.OutQuint);
+                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutCirc);
 
                 if (!entry.IsHit)
                 {
-                    colourBox.Colour = Colour4.Black;
-                    innerCircle.Colour = Colour4.Black;
+                    Colour = Colour4.Black;
+                    BorderColour = Colour4.Black;
 
                     return;
                 }
 
-                colourBox.FadeColour(colourDarker, getAnimationDuration() * 0.2f, Easing.OutQuint
-                );
-                innerCircle.FadeColour(colourDarker);
+                colourBox.FadeColour(colourDarker);
+
+                this.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration() * 0.3f, Easing.OutQuint);
+
+                // Ripple effect utilises the border to reduce drawable count
+                this.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration() * 0.3f, Easing.OutQuint)
+
+                    // Avoids transparency overlap issues during the bubble "pop"
+                    .Then().Schedule(() =>
+                    {
+                        BorderThickness = 0;
+                        BorderColour = Colour4.Transparent;
+                    });
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
                 double getAnimationDuration() => 1700 + Math.Pow(entry.FadeTime, 1.07f);
