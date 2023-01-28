@@ -1,3 +1,4 @@
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -131,7 +132,7 @@ namespace osu.Game.Screens.LLin.SideBar.Tabs
 
                 Tabs.Anchor = Tabs.Origin = Anchor.CentreRight;
 
-                if (!verticalScroll.Contains(Tabs))
+                if (!verticalScroll.Children.Contains(Tabs))
                 {
                     horizonalScroll.Remove(Tabs, false);
                     verticalScroll.Add(Tabs);
@@ -153,7 +154,7 @@ namespace osu.Game.Screens.LLin.SideBar.Tabs
 
                 Tabs.Anchor = Tabs.Origin = Anchor.TopCentre;
 
-                if (!horizonalScroll.Contains(Tabs))
+                if (!horizonalScroll.Children.Contains(Tabs))
                 {
                     verticalScroll.Remove(Tabs, false);
                     horizonalScroll.Add(Tabs);
