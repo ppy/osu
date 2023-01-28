@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -77,6 +78,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyBubbleState(DrawableHitObject drawableObject)
         {
+            if (drawableObject is DrawableSlider slider)
+            {
+                slider.Body.OnSkinChanged += () => applySliderState(slider);
+                applySliderState(slider);
+            }
+
             if (drawableObject is not DrawableOsuHitObject drawableOsuObject || !drawableObject.Judged) return;
 
             OsuHitObject hitObject = drawableOsuObject.HitObject;
@@ -93,15 +100,18 @@ namespace osu.Game.Rulesets.Osu.Mods
                     addBubbleContainer(hitCircle.Position, drawableOsuObject);
                     break;
 
-                case DrawableSpinnerTick:
                 case DrawableSlider:
-                    return;
+                case DrawableSpinnerTick:
+                    break;
 
                 default:
                     addBubbleContainer(hitObject.Position, drawableOsuObject);
                     break;
             }
         }
+
+        private void applySliderState(DrawableSlider slider) =>
+            ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
 
         private void addBubbleContainer(Vector2 position, DrawableHitObject hitObject)
         {
@@ -217,12 +227,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
                 var colourDarker = entry.Colour.Darken(0.1f);
 
-                this.ScaleTo(entry.MaxSize, getAnimationDuration() * 0.8f, Easing.OutSine)
+                this.ScaleTo(entry.MaxSize, getAnimationDuration() * 0.8f)
                     .Then()
-                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutSine)
-                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutExpo);
+                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutQuint)
+                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutQuint);
 
-                innerCircle.ScaleTo(2f, getAnimationDuration() * 0.8f, Easing.OutCubic);
+                innerCircle.ScaleTo(2f, getAnimationDuration() * 0.8f, Easing.OutQuint);
 
                 if (!entry.IsHit)
                 {
@@ -232,11 +242,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
                 }
 
-                colourBox.FadeColour(colourDarker, getAnimationDuration() * 0.2f, Easing.OutQuint);
+                colourBox.FadeColour(colourDarker, getAnimationDuration() * 0.2f, Easing.OutQuint
+                );
                 innerCircle.FadeColour(colourDarker);
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationDuration() => 1700 + Math.Pow(entry.FadeTime, 1.15f);
+                double getAnimationDuration() => 1700 + Math.Pow(entry.FadeTime, 1.07f);
             }
         }
 
