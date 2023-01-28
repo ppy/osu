@@ -41,6 +41,16 @@ namespace osu.Game.Tests.Skins
         }
 
         [Test]
+        public void TestRetrievalWithConflictingFilenames()
+        {
+            ISkin skin = null!;
+
+            AddStep("import skin", () => skin = importSkinFromArchives(@"conflicting-filenames-skin.osk"));
+            AddAssert("texture is non-null", () => skin.GetTexture(@"spinner-osu") != null);
+            AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo(@"spinner-osu")) != null);
+        }
+
+        [Test]
         public void TestSampleRetrievalOrder()
         {
             Mock<IStorageResourceProvider> mockResourceProvider = null!;
