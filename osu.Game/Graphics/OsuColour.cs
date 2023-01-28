@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -184,6 +185,41 @@ namespace osu.Game.Graphics
 
                 default:
                     return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves colour for a <see cref="RankingTier"/>.
+        /// See https://www.figma.com/file/YHWhp9wZ089YXgB7pe6L1k/Tier-Colours
+        /// </summary>
+        public ColourInfo ForRankingTier(RankingTier tier)
+        {
+            switch (tier)
+            {
+                default:
+                case RankingTier.Iron:
+                    return Color4Extensions.FromHex(@"BAB3AB");
+
+                case RankingTier.Bronze:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"B88F7A"), Color4Extensions.FromHex(@"855C47"));
+
+                case RankingTier.Silver:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"E0E0EB"), Color4Extensions.FromHex(@"A3A3C2"));
+
+                case RankingTier.Gold:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"F0E4A8"), Color4Extensions.FromHex(@"E0C952"));
+
+                case RankingTier.Platinum:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"A8F0EF"), Color4Extensions.FromHex(@"52E0DF"));
+
+                case RankingTier.Rhodium:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"D9F8D3"), Color4Extensions.FromHex(@"A0CF96"));
+
+                case RankingTier.Radiant:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"97DCFF"), Color4Extensions.FromHex(@"ED82FF"));
+
+                case RankingTier.Lustrous:
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"FFE600"), Color4Extensions.FromHex(@"ED82FF"));
             }
         }
 

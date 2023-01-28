@@ -1,15 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
@@ -34,18 +29,18 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "渐入滑条",
+                    LabelText = RulesetSettingsStrings.SnakingInSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     ClassicDefault = false,
-                    LabelText = "渐出滑条",
+                    LabelText = RulesetSettingsStrings.SnakingOutSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "光标轨迹",
+                    LabelText = RulesetSettingsStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
                 new SettingsCheckbox
@@ -60,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
-                    LabelText = "游玩区域边框风格",
+                    LabelText = RulesetSettingsStrings.PlayfieldBorderStyle,
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
                 new OsuSpriteText

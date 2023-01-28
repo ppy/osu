@@ -52,6 +52,8 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
@@ -365,6 +367,13 @@ namespace osu.Game
 
             gamemodeCondition = MConfig.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode);
 
+            LocalUserPlaying.BindValueChanged(p =>
+            {
+                BeatmapManager.PauseImports = p.NewValue;
+                SkinManager.PauseImports = p.NewValue;
+                ScoreManager.PauseImports = p.NewValue;
+            }, true);
+
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
@@ -420,6 +429,14 @@ namespace osu.Game
                         SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
                     else
                         SearchBeatmapSet(argString);
+                    break;
+
+                case LinkAction.FilterBeatmapSetGenre:
+                    FilterBeatmapSetGenre((SearchGenre)link.Argument);
+                    break;
+
+                case LinkAction.FilterBeatmapSetLanguage:
+                    FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -525,6 +542,10 @@ namespace osu.Game
         /// </summary>
         /// <param name="query">The query to search for.</param>
         public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
+
+        public void FilterBeatmapSetGenre(SearchGenre genre) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithGenreFilter(genre));
+
+        public void FilterBeatmapSetLanguage(SearchLanguage language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
 
         /// <summary>
         /// Show a wiki's page as an overlay
@@ -982,10 +1003,10 @@ namespace osu.Game
             loadComponentSingleFile(mfmenu = new MfMenuOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API), Add, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
+            loadComponentSingleFile(new MessageNotifier(), Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 new UserStatistics
                 {
                     GlobalRank = 12_345,
-                    Accuracy = 0.9899,
+                    Accuracy = 98.99,
                     MaxCombo = 2_322,
                     RankedScore = 23_123_543_456,
                     TotalScore = 123_123_543_456,
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 new UserStatistics
                 {
                     GlobalRank = 1_234,
-                    Accuracy = 0.9907,
+                    Accuracy = 99.07,
                     MaxCombo = 2_352,
                     RankedScore = 23_124_231_435,
                     TotalScore = 123_124_231_435,
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 new UserStatistics
                 {
                     GlobalRank = 1_234,
-                    Accuracy = 0.9907,
+                    Accuracy = 99.07,
                     MaxCombo = 2_352,
                     RankedScore = 23_124_231_435,
                     TotalScore = 123_124_231_435,
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 new UserStatistics
                 {
                     GlobalRank = 12_345,
-                    Accuracy = 0.9899,
+                    Accuracy = 98.99,
                     MaxCombo = 2_322,
                     RankedScore = 23_123_543_456,
                     TotalScore = 123_123_543_456,
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var statistics = new UserStatistics
             {
                 GlobalRank = 12_345,
-                Accuracy = 0.9899,
+                Accuracy = 98.99,
                 MaxCombo = 2_322,
                 RankedScore = 23_123_543_456,
                 TotalScore = 123_123_543_456,
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var statistics = new UserStatistics
             {
                 GlobalRank = null,
-                Accuracy = 0.9899,
+                Accuracy = 98.99,
                 MaxCombo = 2_322,
                 RankedScore = 23_123_543_456,
                 TotalScore = 123_123_543_456,

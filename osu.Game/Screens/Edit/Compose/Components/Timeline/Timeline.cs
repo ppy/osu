@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -34,8 +35,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
-
-        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
         private EditorClock editorClock { get; set; }
@@ -92,6 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private double trackLengthForZoom;
 
+        private readonly IBindable<Track> track = new Bindable<Track>();
+
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
@@ -139,11 +140,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
 
-            Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-            }, true);
+            track.BindTo(editorClock.Track);
+            track.BindValueChanged(_ => waveform.Waveform = beatmap.Value.Waveform, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }

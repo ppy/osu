@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -66,7 +67,7 @@ namespace osu.Game.Skinning.Editor
                     {
                         new FillFlowContainer
                         {
-                            Name = "Scene library",
+                            Name = @"Scene library",
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
                             Spacing = new Vector2(padding),
@@ -76,14 +77,14 @@ namespace osu.Game.Skinning.Editor
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "可用界面",
+                                    Text = SkinEditorStrings.SceneLibrary,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding(10),
                                 },
                                 new SceneButton
                                 {
-                                    Text = "歌曲选择",
+                                    Text = SkinEditorStrings.SongSelect,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => performer?.PerformFromScreen(screen =>
@@ -96,7 +97,7 @@ namespace osu.Game.Skinning.Editor
                                 },
                                 new SceneButton
                                 {
-                                    Text = "游戏内",
+                                    Text = SkinEditorStrings.Gameplay,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => performer?.PerformFromScreen(screen =>

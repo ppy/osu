@@ -37,10 +37,10 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private Bindable<ControlPointGroup>? selectedGroup { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IBeatSyncProvider? beatSyncSource { get; set; }
 
         private Circle hoverLayer = null!;

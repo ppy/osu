@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 
@@ -14,7 +15,12 @@ namespace osu.Game.Overlays.Comments.Buttons
 
         public ShowRepliesButton(int count)
         {
-            Text = $"{count}条回复";
+            Count = count;
+        }
+
+        public int Count
+        {
+            set => Text = $"{value}条回复";
         }
 
         protected override void LoadComplete()

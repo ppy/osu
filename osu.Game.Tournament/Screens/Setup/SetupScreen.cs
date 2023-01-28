@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Setup
                 new LabelledDropdown<RulesetInfo>
                 {
                     Label = "游戏模式",
-                    Description = "决定显示哪些统计数据以及为玩家检索哪些排名",
+                    Description = "决定显示哪些统计数据以及为玩家检索哪些排名。需要重启以应用更改。",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

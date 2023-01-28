@@ -141,9 +141,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection(MetadataType.Description, searchOnSongSelect),
-                                                        source = new MetadataSection(MetadataType.Source, searchOnSongSelect),
-                                                        tags = new MetadataSection(MetadataType.Tags, searchOnSongSelect),
+                                                        description = new MetadataSectionDescription(searchOnSongSelect),
+                                                        source = new MetadataSectionSource(searchOnSongSelect),
+                                                        tags = new MetadataSectionTags(searchOnSongSelect),
                                                     },
                                                 },
                                             },
@@ -187,9 +187,9 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.DifficultyName;
-            source.Text = BeatmapInfo?.Metadata.Source;
-            tags.Text = BeatmapInfo?.Metadata.Tags;
+            description.Metadata = BeatmapInfo?.DifficultyName ?? string.Empty;
+            source.Metadata = BeatmapInfo?.Metadata.Source ?? string.Empty;
+            tags.Metadata = BeatmapInfo?.Metadata.Tags ?? string.Empty;
 
             // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)

@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
-        private PlacementBlueprint currentPlacement;
+        public PlacementBlueprint CurrentPlacement { get; private set; }
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -137,13 +137,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (currentPlacement?.HitObject is IHasComboInformation c)
+            if (CurrentPlacement?.HitObject is IHasComboInformation c)
                 c.NewCombo = NewCombo.Value == TernaryState.True;
         }
 
         private void updatePlacementSamples()
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 sampleChanged(kvp.Key, kvp.Value.Value);
@@ -151,9 +151,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void sampleChanged(string sampleName, TernaryState state)
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
-            var samples = currentPlacement.HitObject.Samples;
+            var samples = CurrentPlacement.HitObject.Samples;
 
             var existingSample = samples.FirstOrDefault(s => s.Name == sampleName);
 
@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
 
-            currentPlacement.UpdateTimeAndPosition(snapResult);
+            CurrentPlacement.UpdateTimeAndPosition(snapResult);
         }
 
         #endregion
@@ -256,9 +256,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (currentPlacement != null)
+            if (CurrentPlacement != null)
             {
-                switch (currentPlacement.PlacementActive)
+                switch (CurrentPlacement.PlacementActive)
                 {
                     case PlacementBlueprint.PlacementState.Waiting:
                         if (!Composer.CursorInPlacementArea)
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (Composer.CursorInPlacementArea)
                 ensurePlacementCreated();
 
-            if (currentPlacement != null)
+            if (CurrentPlacement != null)
                 updatePlacementPosition();
         }
 
@@ -303,13 +303,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void ensurePlacementCreated()
         {
-            if (currentPlacement != null) return;
+            if (CurrentPlacement != null) return;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
 
             if (blueprint != null)
             {
-                placementBlueprintContainer.Child = currentPlacement = blueprint;
+                placementBlueprintContainer.Child = CurrentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
                 updatePlacementPosition();
@@ -322,11 +322,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removePlacement()
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
-            currentPlacement.EndPlacement(false);
-            currentPlacement.Expire();
-            currentPlacement = null;
+            CurrentPlacement.EndPlacement(false);
+            CurrentPlacement.Expire();
+            CurrentPlacement = null;
         }
 
         private HitObjectCompositionTool currentTool;

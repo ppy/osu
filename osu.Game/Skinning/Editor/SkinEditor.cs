@@ -109,7 +109,7 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Container
                             {
-                                Name = "Menu container",
+                                Name = @"Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
                                 Height = MENU_HEIGHT,
@@ -122,14 +122,14 @@ namespace osu.Game.Skinning.Editor
                                         RelativeSizeAxes = Axes.Both,
                                         Items = new[]
                                         {
-                                            new MenuItem("文件")
+                                            new MenuItem(CommonStrings.MenuBarFile)
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("保存", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("重置为默认", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("退出", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
@@ -234,7 +234,6 @@ namespace osu.Game.Skinning.Editor
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
-
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
@@ -253,7 +252,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("皮肤编辑器", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("当前正在编辑: ", cp =>
             {
