@@ -113,20 +113,18 @@ namespace osu.Game.Screens.Select
             starCounter.Children.First().Origin = Anchor.Centre;
         }
 
-        private const double animation_duration = 800;
+        private const double animation_duration = 600;
 
         protected override void PopIn()
         {
             this.MoveToX(0, animation_duration, Easing.OutQuint);
-            this.RotateTo(0, animation_duration, Easing.OutQuint);
-            this.FadeIn(transition_duration);
+            this.FadeIn(200, Easing.In);
         }
 
         protected override void PopOut()
         {
-            this.MoveToX(-100, animation_duration, Easing.In);
-            this.RotateTo(10, animation_duration, Easing.In);
-            this.FadeOut(transition_duration * 2, Easing.In);
+            this.MoveToX(-150, animation_duration, Easing.OutQuint);
+            this.FadeOut(200, Easing.OutQuint);
         }
 
         private WorkingBeatmap? beatmap;
