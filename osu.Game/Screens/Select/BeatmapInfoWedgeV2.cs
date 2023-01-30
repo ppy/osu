@@ -152,15 +152,6 @@ namespace osu.Game.Screens.Select
 
             void perform()
             {
-                void removeOldInfo()
-                {
-                    State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
-
-                    DisplayedContent?.FadeOut(transition_duration);
-                    DisplayedContent?.Expire();
-                    DisplayedContent = null;
-                }
-
                 if (beatmap == null)
                 {
                     removeOldInfo();
@@ -198,6 +189,15 @@ namespace osu.Game.Screens.Select
                         difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                     }, true);
                 });
+            }
+
+            void removeOldInfo()
+            {
+                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                DisplayedContent?.FadeOut(transition_duration);
+                DisplayedContent?.Expire();
+                DisplayedContent = null;
             }
         }
 
