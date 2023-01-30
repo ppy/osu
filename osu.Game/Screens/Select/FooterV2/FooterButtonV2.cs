@@ -80,11 +80,10 @@ namespace osu.Game.Screens.Select.FooterV2
             Size = new Vector2(button_width, button_height);
             Masking = true;
             CornerRadius = corner_radius;
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 backgroundBox = new Box
                 {
-                    Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
                 },
 
@@ -142,6 +141,9 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             base.LoadComplete();
 
+            // We want the first colour assignment for the background to be instantaneous
+            backgroundBox.Colour = Enabled.Value ? colourProvider.Background3 : colourProvider.Background3.Darken(0.3f);
+
             Enabled.BindValueChanged(_ => updateDisplay(), true);
             OverlayState.BindValueChanged(_ => updateDisplay());
         }
@@ -155,9 +157,6 @@ namespace osu.Game.Screens.Select.FooterV2
         }
 
         protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
-
-        protected override bool OnMouseDown(MouseDownEvent e) => !Enabled.Value || base.OnMouseDown(e);
-        protected override bool OnClick(ClickEvent e) => !Enabled.Value || base.OnClick(e);
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
