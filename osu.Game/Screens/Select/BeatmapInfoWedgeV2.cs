@@ -148,9 +148,7 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
-            Scheduler.AddOnce(perform);
-
-            void perform()
+            Scheduler.AddOnce(() =>
             {
                 if (beatmap == null)
                 {
@@ -189,7 +187,7 @@ namespace osu.Game.Screens.Select
                         difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                     }, true);
                 });
-            }
+            });
 
             void removeOldInfo()
             {
