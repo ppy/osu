@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
@@ -65,11 +65,14 @@ namespace osu.Game.Skinning
                 default:
 
                     this.ScaleTo(0.6f).Then()
-                        .ScaleTo(1.1f, fade_in_length * 0.8f).Then()
-                        // this is actually correct to match stable; there were overlapping transforms.
-                        .ScaleTo(0.9f).Delay(fade_in_length * 0.2f)
-                        .ScaleTo(1.1f).ScaleTo(0.9f, fade_in_length * 0.2f).Then()
-                        .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f);
+                        .ScaleTo(1.1f, fade_in_length * 0.8f).Then() // t = 0.8
+                        .Delay(fade_in_length * 0.2f) // t = 1.0
+                        .ScaleTo(0.9f, fade_in_length * 0.2f).Then() // t = 1.2
+
+                        // stable dictates scale of 0.9->1 over time 1.0 to 1.4, but we are already at 1.2.
+                        // so we need to force the current value to be correct at 1.2 (0.95) then complete the
+                        // second half of the transform.
+                        .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
                     break;
             }
         }

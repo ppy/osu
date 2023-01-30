@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
@@ -20,6 +21,8 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
@@ -31,7 +34,7 @@ using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorBeatmapCreation : EditorTestScene
+    public partial class TestSceneEditorBeatmapCreation : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -39,6 +42,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         private Guid currentBeatmapSetID => EditorBeatmap.BeatmapInfo.BeatmapSet?.ID ?? Guid.Empty;
 
@@ -222,7 +228,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return beatmap != null
                        && beatmap.DifficultyName == secondDifficultyName
                        && set != null
-                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+                       && set.PerformRead(s =>
+                           s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
             });
         }
 
@@ -326,6 +333,56 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCopyDifficultyDoesNotChangeCollections()
+        {
+            string originalDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = originalDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+
+            string originalMd5 = string.Empty;
+            BeatmapCollection collection = null!;
+
+            AddStep("setup a collection with original beatmap", () =>
+            {
+                collection = new BeatmapCollection("test copy");
+                collection.BeatmapMD5Hashes.Add(originalMd5 = EditorBeatmap.BeatmapInfo.MD5Hash);
+
+                realm.Write(r =>
+                {
+                    r.Add(collection);
+                });
+            });
+
+            AddAssert("collection contains original beatmap", () =>
+                !string.IsNullOrEmpty(originalMd5) && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != originalDifficultyName;
+            });
+
+            AddStep("save without changes", () => Editor.Save());
+
+            AddAssert("collection still points to old beatmap", () => !collection.BeatmapMD5Hashes.Contains(EditorBeatmap.BeatmapInfo.MD5Hash)
+                                                                      && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("clean up collection", () =>
+            {
+                realm.Write(r =>
+                {
+                    r.Remove(collection);
+                });
+            });
+        }
+
+        [Test]
         public void TestCreateMultipleNewDifficultiesSucceeds()
         {
             Guid setId = Guid.Empty;
@@ -393,6 +450,53 @@ namespace osu.Game.Tests.Visual.Editing
                 // the difficulty was already created at the point of the switch.
                 // what we want to check is that both difficulties do not use the same file.
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
+            });
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyForInconvertibleRuleset()
+        {
+            Guid setId = Guid.Empty;
+
+            AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("try to create new taiko difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty";
+            });
+            AddAssert("new difficulty persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
+            });
+
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new Hit
+                {
+                    StartTime = 0
+                },
+                new Hit
+                {
+                    StartTime = 1000
+                }
+            }));
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("try to create new catch difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty (1)";
+            });
+            AddAssert("new difficulty persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 3 && s.Files.Count == 3);
             });
         }
     }

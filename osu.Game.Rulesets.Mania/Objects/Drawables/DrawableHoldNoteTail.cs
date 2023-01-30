@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// The tail of a <see cref="DrawableHoldNote"/>.
     /// </summary>
-    public class DrawableHoldNoteTail : DrawableNote
+    public partial class DrawableHoldNoteTail : DrawableNote
     {
         /// <summary>
         /// Lenience of release hit windows. This is to make cases where the hold note release
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
+        public override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

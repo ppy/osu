@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,12 +11,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultApproachCircle : SkinnableSprite
+    public partial class DefaultApproachCircle : SkinnableSprite
     {
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
         public DefaultApproachCircle()
             : base("Gameplay/osu/approachcircle")
@@ -37,9 +35,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             accentColour.BindValueChanged(colour => Colour = colour.NewValue, true);
         }
 
-        protected override Drawable CreateDefault(ISkinComponent component)
+        protected override Drawable CreateDefault(ISkinComponentLookup lookup)
         {
-            var drawable = base.CreateDefault(component);
+            var drawable = base.CreateDefault(lookup);
 
             // Although this is a non-legacy component, osu-resources currently stores approach circle as a legacy-like texture.
             // See LegacyApproachCircle for documentation as to why this is required.

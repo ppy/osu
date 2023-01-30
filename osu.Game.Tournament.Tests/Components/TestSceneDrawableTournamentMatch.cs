@@ -10,7 +10,7 @@ using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneDrawableTournamentMatch : TournamentTestScene
+    public partial class TestSceneDrawableTournamentMatch : TournamentTestScene
     {
         public TestSceneDrawableTournamentMatch()
         {

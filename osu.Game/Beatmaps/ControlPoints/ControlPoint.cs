@@ -9,17 +9,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>, IControlPoint
     {
-        /// <summary>
-        /// The time at which the control point takes effect.
-        /// </summary>
         [JsonIgnore]
         public double Time { get; set; }
 
         public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
-        public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPoint? other) => Time.CompareTo(other?.Time);
 
         public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
@@ -35,7 +32,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public ControlPoint DeepClone()
         {
-            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+            var copy = (ControlPoint)Activator.CreateInstance(GetType())!;
 
             copy.CopyFrom(this);
 

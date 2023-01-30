@@ -20,7 +20,7 @@ using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
+    public partial class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
         public string IconTexture => "Icons/Hexacons/notification";
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
@@ -92,8 +92,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
-                                        new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, NotificationsStrings.ClearAll),
+                                        new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }, NotificationsStrings.CancelAll),
                                     }
                                 }
                             }
@@ -113,9 +113,12 @@ namespace osu.Game.Overlays
 
             if (enabled)
                 // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 100);
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 250);
             else
+            {
                 processingPosts = false;
+                toastTray.FlushAllToasts();
+            }
         }
 
         protected override void LoadComplete()
@@ -210,14 +213,14 @@ namespace osu.Game.Overlays
             mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
-        private void notificationClosed()
+        private void notificationClosed() => Schedule(() =>
         {
             updateCounts();
 
             // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
             // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
             playDebouncedSample("UI/overlay-pop-out");
-        }
+        });
 
         private void playDebouncedSample(string sampleName)
         {

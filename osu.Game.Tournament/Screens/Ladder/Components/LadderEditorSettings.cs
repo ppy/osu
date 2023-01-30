@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,10 +19,8 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class LadderEditorSettings : PlayerSettingsGroup
+    public partial class LadderEditorSettings : PlayerSettingsGroup
     {
-        private const int padding = 10;
-
         private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
         private DateTextBox dateTimeBox;
@@ -89,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
+        private partial class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {
@@ -103,10 +102,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     switch (args.Action)
                     {
                         case NotifyCollectionChangedAction.Add:
+                            Debug.Assert(args.NewItems != null);
+
                             args.NewItems.Cast<TournamentRound>().ForEach(add);
                             break;
 
                         case NotifyCollectionChangedAction.Remove:
+                            Debug.Assert(args.OldItems != null);
+
                             args.OldItems.Cast<TournamentRound>().ForEach(i => Control.RemoveDropdownItem(i));
                             break;
                     }

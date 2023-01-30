@@ -13,17 +13,19 @@ using osu.Game.Configuration;
 namespace osu.Game.Graphics.Cursor
 {
     /// <summary>
-    /// A container which provides the main <see cref="Cursor.MenuCursor"/>.
+    /// A container which provides the main <see cref="MenuCursorContainer"/>.
     /// Also handles cases where a more localised cursor is provided by another component (via <see cref="IProvideCursor"/>).
     /// </summary>
-    public class GlobalCursorDisplay : Container, IProvideCursor
+    public partial class GlobalCursorDisplay : Container, IProvideCursor
     {
         /// <summary>
         /// Control whether any cursor should be displayed.
         /// </summary>
         internal bool ShowCursor = true;
 
-        public CursorContainer MenuCursor { get; }
+        CursorContainer IProvideCursor.Cursor => MenuCursor;
+
+        public MenuCursorContainer MenuCursor { get; }
 
         public bool ProvidingUserCursor => true;
 
@@ -42,8 +44,8 @@ namespace osu.Game.Graphics.Cursor
         {
             AddRangeInternal(new Drawable[]
             {
-                MenuCursor = new MenuCursor { State = { Value = Visibility.Hidden } },
-                Content = new Container { RelativeSizeAxes = Axes.Both }
+                Content = new Container { RelativeSizeAxes = Axes.Both },
+                MenuCursor = new MenuCursorContainer { State = { Value = Visibility.Hidden } }
             });
         }
 
@@ -64,7 +66,7 @@ namespace osu.Game.Graphics.Cursor
 
             if (!hasValidInput || !ShowCursor)
             {
-                currentOverrideProvider?.MenuCursor?.Hide();
+                currentOverrideProvider?.Cursor?.Hide();
                 currentOverrideProvider = null;
                 return;
             }
@@ -83,8 +85,8 @@ namespace osu.Game.Graphics.Cursor
             if (currentOverrideProvider == newOverrideProvider)
                 return;
 
-            currentOverrideProvider?.MenuCursor?.Hide();
-            newOverrideProvider.MenuCursor?.Show();
+            currentOverrideProvider?.Cursor?.Hide();
+            newOverrideProvider.Cursor?.Show();
 
             currentOverrideProvider = newOverrideProvider;
         }

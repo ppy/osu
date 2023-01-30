@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public abstract class PopupDialog : VisibilityContainer
+    public abstract partial class PopupDialog : VisibilityContainer
     {
         public const float ENTER_DURATION = 500;
         public const float EXIT_DURATION = 200;
@@ -198,6 +198,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding(5),
                                 },
                             },
                         },

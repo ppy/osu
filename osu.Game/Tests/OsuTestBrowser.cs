@@ -12,7 +12,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
 {
-    public class OsuTestBrowser : OsuGameBase
+    public partial class OsuTestBrowser : OsuGameBase
     {
         protected override void LoadComplete()
         {
@@ -22,7 +22,7 @@ namespace osu.Game.Tests
             {
                 Depth = 10,
                 RelativeSizeAxes = Axes.Both,
-            }, AddInternal);
+            }, Add);
 
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().

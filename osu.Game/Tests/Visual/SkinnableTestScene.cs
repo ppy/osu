@@ -27,10 +27,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
+    public abstract partial class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
     {
+        private TrianglesSkin trianglesSkin;
         private Skin metricsSkin;
-        private Skin defaultSkin;
+        private Skin legacySkin;
+        private Skin argonSkin;
         private Skin specialSkin;
         private Skin oldSkin;
 
@@ -47,8 +49,10 @@ namespace osu.Game.Tests.Visual
         {
             var dllStore = new DllResourceStore(GetType().Assembly);
 
+            argonSkin = new ArgonSkin(this);
+            trianglesSkin = new TrianglesSkin(this);
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
-            defaultSkin = new DefaultLegacySkin(this);
+            legacySkin = new DefaultLegacySkin(this);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
         }
@@ -61,11 +65,12 @@ namespace osu.Game.Tests.Visual
 
             var beatmap = CreateBeatmapForSkinProvider();
 
-            Cell(0).Child = createProvider(null, creationFunction, beatmap);
-            Cell(1).Child = createProvider(metricsSkin, creationFunction, beatmap);
-            Cell(2).Child = createProvider(defaultSkin, creationFunction, beatmap);
-            Cell(3).Child = createProvider(specialSkin, creationFunction, beatmap);
-            Cell(4).Child = createProvider(oldSkin, creationFunction, beatmap);
+            Cell(0).Child = createProvider(argonSkin, creationFunction, beatmap);
+            Cell(1).Child = createProvider(trianglesSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(metricsSkin, creationFunction, beatmap);
+            Cell(3).Child = createProvider(legacySkin, creationFunction, beatmap);
+            Cell(4).Child = createProvider(specialSkin, creationFunction, beatmap);
+            Cell(5).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
@@ -80,16 +85,13 @@ namespace osu.Game.Tests.Visual
             OutlineBox outlineBox;
             SkinProvidingContainer skinProvider;
 
-            ISkin provider = skin;
-
-            if (provider is LegacySkin legacyProvider)
-                provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(legacyProvider, beatmap);
+            ISkin provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(skin, beatmap) ?? skin;
 
             var children = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
-                BorderThickness = 5,
+                BorderThickness = 3,
                 Masking = true,
 
                 Children = new Drawable[]
@@ -102,7 +104,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo.Value.Name ?? "none",
+                        Text = skin.SkinInfo.Value.Name,
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
@@ -138,9 +140,17 @@ namespace osu.Game.Tests.Visual
                 {
                     c.RelativeSizeAxes = Axes.None;
                     c.AutoSizeAxes = Axes.None;
+                    c.Size = Vector2.Zero;
 
-                    c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
-                    c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
+                    if (autoSize)
+                        c.AutoSizeAxes = Axes.Both;
+                    else
+                    {
+                        c.RelativeSizeAxes = Axes.Both;
+                        c.Anchor = Anchor.Centre;
+                        c.Origin = Anchor.Centre;
+                        c.Size = new Vector2(0.97f);
+                    }
                 }
 
                 outlineBox.Alpha = autoSize ? 1 : 0;
@@ -168,7 +178,7 @@ namespace osu.Game.Tests.Visual
 
         #endregion
 
-        private class OutlineBox : CompositeDrawable
+        private partial class OutlineBox : CompositeDrawable
         {
             public OutlineBox()
             {

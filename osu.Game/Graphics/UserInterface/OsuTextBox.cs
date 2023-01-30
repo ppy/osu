@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTextBox : BasicTextBox
+    public partial class OsuTextBox : BasicTextBox
     {
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
@@ -250,13 +250,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocus(FocusEvent e)
         {
-            BorderThickness = 3;
+            if (Masking)
+                BorderThickness = 3;
+
             base.OnFocus(e);
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            BorderThickness = 0;
+            if (Masking)
+                BorderThickness = 0;
 
             base.OnFocusLost(e);
         }
@@ -277,7 +280,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             var samples = sampleMap[feedbackSampleType];
 
-            if (samples == null || samples.Length == 0)
+            if (samples.Length == 0)
                 return null;
 
             return samples[RNG.Next(0, samples.Length)]?.GetChannel();
@@ -302,7 +305,7 @@ namespace osu.Game.Graphics.UserInterface
             sampleLastPlaybackTime = Time.Current;
         });
 
-        private class OsuCaret : Caret
+        private partial class OsuCaret : Caret
         {
             private const float caret_move_time = 60;
 
@@ -349,7 +352,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private class CaretBeatSyncedContainer : BeatSyncedContainer
+            private partial class CaretBeatSyncedContainer : BeatSyncedContainer
             {
                 private bool hasSelection;
 

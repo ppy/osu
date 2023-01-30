@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsFooter : FillFlowContainer
+    public partial class SettingsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, RulesetStore rulesets)
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings
                     Text = game.Name,
                     Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
-                new BuildDisplay(game.Version, DebugUtils.IsDebugBuild)
+                new BuildDisplay(game.Version)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -78,18 +78,16 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class BuildDisplay : OsuAnimatedButton
+        private partial class BuildDisplay : OsuAnimatedButton
         {
             private readonly string version;
-            private readonly bool isDebug;
 
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public BuildDisplay(string version, bool isDebug)
+            public BuildDisplay(string version)
             {
                 this.version = version;
-                this.isDebug = isDebug;
 
                 Content.RelativeSizeAxes = Axes.Y;
                 Content.AutoSizeAxes = AutoSizeAxes = Axes.X;
@@ -99,8 +97,7 @@ namespace osu.Game.Overlays.Settings
             [BackgroundDependencyLoader(true)]
             private void load(ChangelogOverlay changelog)
             {
-                if (!isDebug)
-                    Action = () => changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
+                Action = () => changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
 
                 Add(new OsuSpriteText
                 {
@@ -110,7 +107,7 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Padding = new MarginPadding(5),
-                    Colour = isDebug ? colours.Red : Color4.White,
+                    Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                 });
             }
         }

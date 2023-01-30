@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
@@ -24,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FilterControl : Container
+    public partial class FilterControl : Container
     {
         public const float HEIGHT = 2 * side_margin + 85;
         private const float side_margin = 20;
@@ -172,12 +173,19 @@ namespace osu.Game.Screens.Select
                                 Height = 40,
                                 Children = new Drawable[]
                                 {
-                                    new DifficultyRangeFilterControl
+                                    new RangeSlider
                                     {
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
+                                        Label = "Difficulty range",
+                                        LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
+                                        UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                                         RelativeSizeAxes = Axes.Both,
                                         Width = 0.48f,
+                                        DefaultStringLowerBound = "0",
+                                        DefaultStringUpperBound = "∞",
+                                        DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit,
+                                        TooltipSuffix = "stars"
                                     },
                                     collectionDropdown = new CollectionDropdown
                                     {

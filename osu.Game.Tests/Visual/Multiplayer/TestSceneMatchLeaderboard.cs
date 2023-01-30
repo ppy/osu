@@ -15,7 +15,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchLeaderboard : OnlinePlayTestScene
+    public partial class TestSceneMatchLeaderboard : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {

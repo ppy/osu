@@ -23,10 +23,11 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container
+    public abstract partial class Notification : Container
     {
         /// <summary>
-        /// User requested close.
+        /// Notification was closed, either by user or otherwise.
+        /// Importantly, this event may be fired from a non-update thread.
         /// </summary>
         public event Action? Closed;
 
@@ -55,6 +56,8 @@ namespace osu.Game.Overlays.Notifications
 
         protected Container IconContent;
 
+        public bool WasClosed { get; private set; }
+
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -64,6 +67,8 @@ namespace osu.Game.Overlays.Notifications
         private readonly DragContainer dragContainer;
 
         public virtual bool Read { get; set; }
+
+        protected virtual bool AllowFlingDismiss => true;
 
         public new bool IsDragged => dragContainer.IsDragged;
 
@@ -226,8 +231,8 @@ namespace osu.Game.Overlays.Notifications
         protected override bool OnClick(ClickEvent e)
         {
             // Clicking with anything but left button should dismiss but not perform the activation action.
-            if (e.Button == MouseButton.Left)
-                Activated?.Invoke();
+            if (e.Button == MouseButton.Left && Activated?.Invoke() == false)
+                return true;
 
             Close(false);
             return true;
@@ -245,24 +250,26 @@ namespace osu.Game.Overlays.Notifications
             initialFlash.FadeOutFromOne(2000, Easing.OutQuart);
         }
 
-        public bool WasClosed;
-
         public virtual void Close(bool runFlingAnimation)
         {
             if (WasClosed) return;
 
             WasClosed = true;
 
-            if (runFlingAnimation && dragContainer.FlingLeft())
-                this.FadeOut(600, Easing.In);
-            else
-                this.FadeOut(100);
-
             Closed?.Invoke();
-            Expire();
+
+            Schedule(() =>
+            {
+                if (runFlingAnimation && dragContainer.FlingLeft())
+                    this.FadeOut(600, Easing.In);
+                else
+                    this.FadeOut(100);
+
+                Expire();
+            });
         }
 
-        private class DragContainer : Container
+        private partial class DragContainer : Container
         {
             private Vector2 velocity;
             private Vector2 lastPosition;
@@ -310,7 +317,7 @@ namespace osu.Game.Overlays.Notifications
 
             protected override void OnDragEnd(DragEndEvent e)
             {
-                if (Rotation < -10 || velocity.X < -0.3f)
+                if (notification.AllowFlingDismiss && (Rotation < -10 || velocity.X < -0.3f))
                     notification.Close(true);
                 else if (X > 30 || velocity.X > 0.3f)
                     notification.ForwardToOverlay?.Invoke();
@@ -374,7 +381,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        internal class CloseButton : OsuClickableContainer
+        internal partial class CloseButton : OsuClickableContainer
         {
             private SpriteIcon icon = null!;
             private Box background = null!;
@@ -429,7 +436,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public class NotificationLight : Container
+        public partial class NotificationLight : Container
         {
             private bool pulsate;
             private Container pulsateLayer = null!;

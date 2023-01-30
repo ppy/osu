@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,11 +22,11 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public readonly Func<Drawable> CreateIcon;
+        public readonly Func<Drawable>? CreateIcon;
 
-        private readonly Action action;
+        private readonly Action? action;
 
-        public RadioButton(string label, Action action, Func<Drawable> createIcon = null)
+        public RadioButton(string label, Action? action, Func<Drawable>? createIcon = null)
         {
             Label = label;
             CreateIcon = createIcon;

@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class OutlinedTextBox : OsuTextBox
+    public partial class OutlinedTextBox : OsuTextBox
     {
         private const float border_thickness = 3;
 

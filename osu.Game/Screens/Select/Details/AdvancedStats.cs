@@ -28,16 +28,18 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class AdvancedStats : Container
+    public partial class AdvancedStats : Container
     {
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private OsuGameBase game { get; set; }
 
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
+        private IBindable<RulesetInfo> gameRuleset;
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
@@ -84,7 +86,13 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ => updateStatistics());
+            // the cached ruleset bindable might be a decoupled bindable provided by SongSelect,
+            // which we can't rely on in combination with the game-wide selected mods list,
+            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
+            // therefore resulting in performing difficulty calculation with invalid states.
+            gameRuleset = game.Ruleset.GetBoundCopy();
+            gameRuleset.BindValueChanged(_ => updateStatistics());
+
             mods.BindValueChanged(modsChanged, true);
         }
 
@@ -142,7 +150,14 @@ namespace osu.Game.Screens.Select.Details
 
         private CancellationTokenSource starDifficultyCancellationSource;
 
-        private void updateStarDifficulty()
+        /// <summary>
+        /// Updates the displayed star difficulty statistics with the values provided by the currently-selected beatmap, ruleset, and selected mods.
+        /// </summary>
+        /// <remarks>
+        /// This is scheduled to avoid scenarios wherein a ruleset changes first before selected mods do,
+        /// potentially resulting in failure during difficulty calculation due to incomplete bindable state updates.
+        /// </remarks>
+        private void updateStarDifficulty() => Scheduler.AddOnce(() =>
         {
             starDifficultyCancellationSource?.Cancel();
 
@@ -151,8 +166,8 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, gameRuleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, gameRuleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
             Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {
@@ -164,7 +179,7 @@ namespace osu.Game.Screens.Select.Details
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {
@@ -173,7 +188,7 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        public class StatisticRow : Container, IHasAccentColour
+        public partial class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
             private const float name_width = 70;

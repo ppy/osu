@@ -11,7 +11,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class ExpandedContentScrollContainer : OsuScrollContainer
+    public partial class ExpandedContentScrollContainer : OsuScrollContainer
     {
         public const float HEIGHT = 200;
 
@@ -59,7 +59,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             return base.OnScroll(e);
         }
 
-        private class ExpandedContentScrollbar : OsuScrollbar
+        protected override bool OnClick(ClickEvent e) => true;
+
+        private partial class ExpandedContentScrollbar : OsuScrollbar
         {
             public ExpandedContentScrollbar(Direction scrollDir)
                 : base(scrollDir)

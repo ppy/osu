@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterAction<T> : KeyCounter
+    public partial class KeyCounterAction<T> : KeyCounter
         where T : struct
     {
         public T Action { get; }

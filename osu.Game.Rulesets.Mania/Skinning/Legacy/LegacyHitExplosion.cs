@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,13 +15,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
+    public partial class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
     {
         public const double FADE_IN_DURATION = 80;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Drawable explosion;
+        private Drawable? explosion;
 
         public LegacyHitExplosion()
         {

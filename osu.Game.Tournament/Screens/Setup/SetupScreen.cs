@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen
+    public partial class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Setup
                 new LabelledDropdown<RulesetInfo>
                 {
                     Label = "Ruleset",
-                    Description = "Decides what stats are displayed and which ranks are retrieved for players.",
+                    Description = "Decides what stats are displayed and which ranks are retrieved for players. This requires a restart to reload data for an existing bracket.",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

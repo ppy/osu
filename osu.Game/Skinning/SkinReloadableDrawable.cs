@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Pooling;
 
 namespace osu.Game.Skinning
@@ -12,17 +11,17 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A drawable which has a callback when the skin changes.
     /// </summary>
-    public abstract class SkinReloadableDrawable : PoolableDrawable
+    public abstract partial class SkinReloadableDrawable : PoolableDrawable
     {
         /// <summary>
         /// Invoked when <see cref="CurrentSkin"/> has changed.
         /// </summary>
-        public event Action OnSkinChanged;
+        public event Action? OnSkinChanged;
 
         /// <summary>
         /// The current skin source.
         /// </summary>
-        protected ISkinSource CurrentSkin { get; private set; }
+        protected ISkinSource CurrentSkin { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
@@ -60,7 +59,7 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (CurrentSkin != null)
+            if (CurrentSkin.IsNotNull())
                 CurrentSkin.SourceChanged -= onChange;
 
             OnSkinChanged = null;
