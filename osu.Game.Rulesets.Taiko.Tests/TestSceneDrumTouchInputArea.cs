@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneDrumTouchInputArea : OsuTestScene
+    public partial class TestSceneDrumTouchInputArea : OsuTestScene
     {
         private DrumTouchInputArea drumTouchInputArea = null!;
 

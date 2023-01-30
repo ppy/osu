@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
@@ -18,9 +16,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyBodyPiece : LegacyManiaColumnElement
+    public partial class LegacyBodyPiece : LegacyManiaColumnElement
     {
-        private DrawableHoldNote holdNote;
+        private DrawableHoldNote holdNote = null!;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
@@ -31,14 +29,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// </summary>
         private readonly Bindable<double?> missFadeTime = new Bindable<double?>();
 
-        [CanBeNull]
-        private Drawable bodySprite;
+        private Drawable? bodySprite;
 
-        [CanBeNull]
-        private Drawable lightContainer;
+        private Drawable? lightContainer;
 
-        [CanBeNull]
-        private Drawable light;
+        private Drawable? light;
 
         public LegacyBodyPiece()
         {
@@ -58,6 +53,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             float lightScale = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteLightScale)?.Value
                                ?? 1;
+
+            float minimumColumnWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.MinimumColumnWidth)?.Value
+                                       ?? 1;
 
             // Create a temporary animation to retrieve the number of frames, in an effort to calculate the intended frame length.
             // This animation is discarded and re-queried with the appropriate frame length afterwards.
@@ -97,7 +95,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
                 d.FillMode = FillMode.Stretch;
-                // Todo: Wrap
+                d.Height = minimumColumnWidth / d.DrawWidth * 1.6f; // constant matching stable.
+                // Todo: Wrap?
             });
 
             if (bodySprite != null)
@@ -214,7 +213,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (holdNote != null)
+            if (holdNote.IsNotNull())
                 holdNote.ApplyCustomUpdateState -= applyCustomUpdateState;
 
             lightContainer?.Expire();

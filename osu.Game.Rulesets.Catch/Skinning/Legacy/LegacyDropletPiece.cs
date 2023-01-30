@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyDropletPiece : LegacyCatchHitObjectPiece
+    public partial class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {
         public LegacyDropletPiece()
         {
@@ -19,8 +17,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             base.LoadComplete();
 
-            Texture texture = Skin.GetTexture("fruit-drop");
-            Texture overlayTexture = Skin.GetTexture("fruit-drop-overlay");
+            Texture? texture = Skin.GetTexture("fruit-drop");
+            Texture? overlayTexture = Skin.GetTexture("fruit-drop-overlay");
 
             SetTexture(texture, overlayTexture);
         }

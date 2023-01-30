@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public partial class DefaultColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         [Resolved]
         private Column column { get; set; }
+
+        private Bindable<Color4> accentColour;
 
         public DefaultColumnBackground()
         {
@@ -55,9 +57,13 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 }
             };
 
-            background.Colour = column.AccentColour.Darken(5);
-            brightColour = column.AccentColour.Opacity(0.6f);
-            dimColour = column.AccentColour.Opacity(0);
+            accentColour = column.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour =>
+            {
+                background.Colour = colour.NewValue.Darken(5);
+                brightColour = colour.NewValue.Opacity(0.6f);
+                dimColour = colour.NewValue.Opacity(0);
+            }, true);
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);

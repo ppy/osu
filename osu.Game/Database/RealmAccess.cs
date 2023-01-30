@@ -69,8 +69,9 @@ namespace osu.Game.Database
         /// 22   2022-07-31    Added ModPreset.
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
+        /// 25   2022-09-18    Remove skins to add with new naming.
         /// </summary>
-        private const int schema_version = 24;
+        private const int schema_version = 25;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -480,7 +481,7 @@ namespace osu.Game.Database
                 // server, which we don't use. May want to report upstream or revisit in the future.
                 using (var realm = getRealmInstance())
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
                 pendingAsyncWrites.Signal();
             });
@@ -557,7 +558,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));
@@ -856,19 +857,14 @@ namespace osu.Game.Database
 
                     if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
                     {
-                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
-                        {
-                            if (task.Exception != null)
-                            {
-                                // can be removed 20221027 (just for initial safety).
-                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
-                                return;
-                            }
-
-                            storage.Move("collection.db", "collection.db.migrated");
-                        });
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(_ => storage.Move("collection.db", "collection.db.migrated"));
                     }
 
+                    break;
+
+                case 25:
+                    // Remove the default skins so they can be added back by SkinManager with updated naming.
+                    migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
             }
         }

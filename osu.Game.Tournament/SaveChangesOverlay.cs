@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tournament
 {
-    internal class SaveChangesOverlay : CompositeDrawable
+    internal partial class SaveChangesOverlay : CompositeDrawable
     {
         [Resolved]
         private TournamentGame tournamentGame { get; set; } = null!;
@@ -70,7 +70,7 @@ namespace osu.Game.Tournament
 
         private async Task checkForChanges()
         {
-            string serialisedLadder = await Task.Run(() => tournamentGame.GetSerialisedLadder());
+            string serialisedLadder = await Task.Run(() => tournamentGame.GetSerialisedLadder()).ConfigureAwait(true);
 
             // If a save hasn't been triggered by the user yet, populate the initial value
             lastSerialisedLadder ??= serialisedLadder;

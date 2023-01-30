@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -21,10 +22,10 @@ using Realms;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistOverlay : VisibilityContainer
+    public partial class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
-        private const float playlist_height = 510;
+        public const float PLAYLIST_HEIGHT = 510;
 
         private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
@@ -130,7 +131,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.HoldFocus = true;
             Schedule(() => filter.Search.TakeFocus());
 
-            this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
+            this.ResizeTo(new Vector2(1, RelativeSizeAxes.HasFlagFast(Axes.Y) ? 1f : PLAYLIST_HEIGHT), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);
         }
 

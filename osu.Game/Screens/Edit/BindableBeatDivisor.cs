@@ -25,6 +25,26 @@ namespace osu.Game.Screens.Edit
             BindValueChanged(_ => ensureValidDivisor());
         }
 
+        /// <summary>
+        /// Set a divisor, updating the valid divisor range appropriately.
+        /// </summary>
+        /// <param name="divisor">The intended divisor.</param>
+        public void SetArbitraryDivisor(int divisor)
+        {
+            // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
+            if (!ValidDivisors.Value.Presets.Contains(divisor))
+            {
+                if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                else
+                    ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
+            }
+
+            Value = divisor;
+        }
+
         private void updateBindableProperties()
         {
             ensureValidDivisor();

@@ -24,7 +24,7 @@ using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class SkinSection : SettingsSection
+    public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
 
@@ -78,8 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
-                                                                         .OrderByDescending(s => s.Protected) // protected skins should be at the top.
-                                                                         .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
+                                                                         .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
 
             skinDropdown.Current.BindValueChanged(skin =>
             {
@@ -101,14 +100,19 @@ namespace osu.Game.Overlays.Settings.Sections
             if (!sender.Any())
                 return;
 
-            int protectedCount = sender.Count(s => s.Protected);
-
             // For simplicity repopulate the full list.
             // In the future we should change this to properly handle ChangeSet events.
             dropdownItems.Clear();
-            foreach (var skin in sender)
+
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
+
+            dropdownItems.Add(random_skin_info);
+
+            foreach (var skin in sender.Where(s => !s.Protected))
                 dropdownItems.Add(skin.ToLive(realm));
-            dropdownItems.Insert(protectedCount, random_skin_info);
 
             Schedule(() => skinDropdown.Items = dropdownItems);
         }
@@ -120,17 +124,17 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
+        private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
             protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
-            private class SkinDropdownControl : DropdownControl
+            private partial class SkinDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 
-        public class ExportSkinButton : SettingsButton
+        public partial class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
@@ -168,7 +172,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class DeleteSkinButton : DangerousSettingsButton
+        public partial class DeleteSkinButton : DangerousSettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }

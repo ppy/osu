@@ -20,7 +20,7 @@ using osu.Game.Screens.Edit.Setup;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneSetupScreen : EditorClockTestScene
+    public partial class TestSceneSetupScreen : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]

@@ -6,19 +6,23 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Tests.Online;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneUpdateBeatmapSetButton : OsuManualInputManagerTestScene
+    public partial class TestSceneUpdateBeatmapSetButton : OsuManualInputManagerTestScene
     {
         private BeatmapCarousel carousel = null!;
 
@@ -41,17 +45,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("create carousel", () =>
-            {
-                Child = carousel = new BeatmapCarousel
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    BeatmapSets = new List<BeatmapSetInfo>
-                    {
-                        (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo()),
-                    }
-                };
-            });
+            AddStep("create carousel", () => Child = createCarousel());
 
             AddUntilStep("wait for load", () => carousel.BeatmapSetsLoaded);
 
@@ -142,7 +136,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     if (testRequest.Progress >= 0.5f)
                     {
-                        testRequest.TriggerFailure(new Exception());
+                        testRequest.TriggerFailure(new InvalidOperationException());
                         return true;
                     }
                 }
@@ -151,6 +145,63 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("wait for button enabled", () => getUpdateButton()?.Enabled.Value == true);
+        }
+
+        [Test]
+        public void TestUpdateLocalBeatmap()
+        {
+            DialogOverlay dialogOverlay = null!;
+            UpdateBeatmapSetButton? updateButton = null;
+
+            AddStep("create carousel with dialog overlay", () =>
+            {
+                dialogOverlay = new DialogOverlay();
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[] { (typeof(IDialogOverlay), dialogOverlay), },
+                    Children = new Drawable[]
+                    {
+                        createCarousel(),
+                        dialogOverlay,
+                    },
+                };
+            });
+
+            AddStep("setup beatmap state", () =>
+            {
+                testBeatmapSetInfo.Beatmaps.First().OnlineMD5Hash = "different hash";
+                testBeatmapSetInfo.Beatmaps.First().LastOnlineUpdate = DateTimeOffset.Now;
+                testBeatmapSetInfo.Status = BeatmapOnlineStatus.LocallyModified;
+
+                carousel.UpdateBeatmapSet(testBeatmapSetInfo);
+            });
+
+            AddUntilStep("wait for update button", () => (updateButton = getUpdateButton()) != null);
+            AddStep("click button", () => updateButton.AsNonNull().TriggerClick());
+
+            AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is UpdateLocalConfirmationDialog);
+            AddStep("click confirmation", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddUntilStep("update started", () => beatmapDownloader.GetExistingDownload(testBeatmapSetInfo) != null);
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
+
+        private BeatmapCarousel createCarousel()
+        {
+            return carousel = new BeatmapCarousel
+            {
+                RelativeSizeAxes = Axes.Both,
+                BeatmapSets = new List<BeatmapSetInfo>
+                {
+                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo()),
+                }
+            };
         }
     }
 }

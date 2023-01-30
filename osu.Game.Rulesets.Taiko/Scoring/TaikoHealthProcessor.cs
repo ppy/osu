@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
     /// A <see cref="HealthProcessor"/> for the taiko ruleset.
     /// Taiko fails if the player has not half-filled their health by the end of the map.
     /// </summary>
-    public class TaikoHealthProcessor : AccumulatingHealthProcessor
+    public partial class TaikoHealthProcessor : AccumulatingHealthProcessor
     {
         /// <summary>
         /// A value used for calculating <see cref="hpMultiplier"/>.

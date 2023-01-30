@@ -24,7 +24,7 @@ using Realms;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneFilterControl : OsuManualInputManagerTestScene
+    public partial class TestSceneFilterControl : OsuManualInputManagerTestScene
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 

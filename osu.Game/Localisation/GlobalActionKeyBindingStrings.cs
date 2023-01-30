@@ -155,9 +155,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
 
         /// <summary>
-        /// "Pause gameplay"
+        /// "Pause / resume gameplay"
         /// </summary>
-        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause gameplay");
+        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause / resume gameplay");
 
         /// <summary>
         /// "Setup mode"
@@ -183,6 +183,11 @@ namespace osu.Game.Localisation
         /// "Tap for BPM"
         /// </summary>
         public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
+
+        /// <summary>
+        /// "Clone selection"
+        /// </summary>
+        public static LocalisableString EditorCloneSelection => new TranslatableString(getKey(@"editor_clone_selection"), @"Clone selection");
 
         /// <summary>
         /// "Cycle grid display mode"

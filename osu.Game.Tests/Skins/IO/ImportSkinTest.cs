@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Skins.IO
             skinManager.CurrentSkinInfo.Value.PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
                 new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
 
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Skins.IO
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
             });
 
             return Task.CompletedTask;
@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Skins.IO
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
 
-            skinManager.CurrentSkinInfo.Value = skinManager.DefaultLegacySkin.SkinInfo;
+            skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
 
             skinManager.EnsureMutableSkin();
 
@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Skins.IO
         private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import, bool batchImport = false)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
-            return await skinManager.Import(import, batchImport);
+            return await skinManager.Import(import, new ImportParameters { Batch = batchImport });
         }
     }
 }

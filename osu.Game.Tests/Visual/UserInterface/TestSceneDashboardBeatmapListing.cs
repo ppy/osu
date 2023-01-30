@@ -17,7 +17,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDashboardBeatmapListing : OsuTestScene
+    public partial class TestSceneDashboardBeatmapListing : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);

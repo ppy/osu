@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit.Setup;
 
 namespace osu.Game.Rulesets.Mania.Edit.Setup
 {
-    public class ManiaSetupSection : RulesetSetupSection
+    public partial class ManiaSetupSection : RulesetSetupSection
     {
         private LabelledSwitchButton specialStyle;
 

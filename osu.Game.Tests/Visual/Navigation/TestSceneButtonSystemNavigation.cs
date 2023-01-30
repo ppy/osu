@@ -12,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneButtonSystemNavigation : OsuGameTestScene
+    public partial class TestSceneButtonSystemNavigation : OsuGameTestScene
     {
         private ButtonSystem buttons => ((MainMenu)Game.ScreenStack.CurrentScreen).ChildrenOfType<ButtonSystem>().Single();
 

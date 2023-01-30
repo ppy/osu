@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    internal class IncompatibilityDisplayingTooltip : ModButtonTooltip
+    internal partial class IncompatibilityDisplayingTooltip : ModButtonTooltip
     {
         private readonly OsuSpriteText incompatibleText;
 

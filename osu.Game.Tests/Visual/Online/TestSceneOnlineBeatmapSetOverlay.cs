@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneOnlineBeatmapSetOverlay : OsuTestScene
+    public partial class TestSceneOnlineBeatmapSetOverlay : OsuTestScene
     {
         private readonly BeatmapSetOverlay overlay;
 

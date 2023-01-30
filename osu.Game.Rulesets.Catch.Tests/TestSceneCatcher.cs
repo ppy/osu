@@ -21,14 +21,13 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcher : OsuTestScene
+    public partial class TestSceneCatcher : OsuTestScene
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -106,17 +105,34 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestCatcherCatchWidth()
         {
             float halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
+
+            AddStep("move catcher to center", () => catcher.X = CatchPlayfield.CENTER_X);
+
+            float leftPlateBounds = CatchPlayfield.CENTER_X - halfWidth;
+            float rightPlateBounds = CatchPlayfield.CENTER_X + halfWidth;
+
             AddStep("catch fruit", () =>
             {
-                attemptCatch(new Fruit { X = -halfWidth + 1 });
-                attemptCatch(new Fruit { X = halfWidth - 1 });
+                attemptCatch(new Fruit { X = leftPlateBounds + 1 });
+                attemptCatch(new Fruit { X = rightPlateBounds - 1 });
             });
             checkPlate(2);
+
             AddStep("miss fruit", () =>
             {
-                attemptCatch(new Fruit { X = -halfWidth - 1 });
-                attemptCatch(new Fruit { X = halfWidth + 1 });
+                attemptCatch(new Fruit { X = leftPlateBounds - 1 });
+                attemptCatch(new Fruit { X = rightPlateBounds + 1 });
             });
+            checkPlate(2);
+        }
+
+        [Test]
+        public void TestFruitClampedToCatchableRegion()
+        {
+            AddStep("catch fruit left", () => attemptCatch(new Fruit { X = -CatchPlayfield.WIDTH }));
+            checkPlate(1);
+            AddStep("move catcher to right", () => catcher.X = CatchPlayfield.WIDTH);
+            AddStep("catch fruit right", () => attemptCatch(new Fruit { X = CatchPlayfield.WIDTH * 2 }));
             checkPlate(2);
         }
 
@@ -233,11 +249,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestHitLightingColour()
         {
-            var fruitColour = SkinConfiguration.DefaultComboColours[1];
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("correct hit lighting colour", () =>
-                catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == fruitColour);
+            AddAssert("correct hit lighting colour", () => catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == this.ChildrenOfType<DrawableCatchHitObject>().First().AccentColour.Value);
         }
 
         [Test]
@@ -310,7 +324,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        public class TestCatcher : Catcher
+        public partial class TestCatcher : Catcher
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 

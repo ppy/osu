@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamFlag : Container
+    public partial class DrawableTeamFlag : Container
     {
         private readonly TournamentTeam team;
 

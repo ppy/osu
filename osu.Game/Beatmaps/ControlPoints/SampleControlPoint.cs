@@ -45,7 +45,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             MinValue = 0,
             MaxValue = 100,
-            Default = 100
         };
 
         /// <summary>

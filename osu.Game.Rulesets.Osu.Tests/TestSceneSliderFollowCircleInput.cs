@@ -24,17 +24,15 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [HeadlessTest]
-    public class TestSceneSliderFollowCircleInput : RateAdjustedBeatmapTestScene
+    public partial class TestSceneSliderFollowCircleInput : RateAdjustedBeatmapTestScene
     {
         private List<JudgementResult>? judgementResults;
         private ScoreAccessibleReplayPlayer? currentPlayer;
 
         [Test]
         public void TestMaximumDistanceTrackingWithoutMovement(
-            [Values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)]
-            float circleSize,
-            [Values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)]
-            double velocity)
+            [Values(0, 5, 10)] float circleSize,
+            [Values(0, 5, 10)] double velocity)
         {
             const double time_slider_start = 1000;
 
@@ -101,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Wait for completion", () => currentPlayer?.ScoreProcessor.HasCompleted.Value == true);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

@@ -19,11 +19,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotification : Notification, IHasCompletionTarget
+    public partial class ProgressNotification : Notification, IHasCompletionTarget
     {
         private const float loading_spinner_size = 22;
 
         public Func<bool>? CancelRequested { get; set; }
+
+        protected override bool AllowFlingDismiss => false;
 
         /// <summary>
         /// The function to post completion notifications back to.
@@ -142,12 +144,11 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     attemptPostCompletion();
-                    base.Close(false);
                     break;
             }
         }
 
-        private bool completionSent;
+        private int completionSent;
 
         /// <summary>
         /// Attempt to post a completion notification.
@@ -161,11 +162,13 @@ namespace osu.Game.Overlays.Notifications
             if (CompletionTarget == null)
                 return;
 
-            if (completionSent)
+            // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
+            if (Interlocked.Exchange(ref completionSent, 1) == 1)
                 return;
 
             CompletionTarget.Invoke(CreateCompletionNotification());
-            completionSent = true;
+
+            Close(false);
         }
 
         private ProgressNotificationState state;
@@ -239,6 +242,7 @@ namespace osu.Game.Overlays.Notifications
         {
             switch (State)
             {
+                case ProgressNotificationState.Completed:
                 case ProgressNotificationState.Cancelled:
                     base.Close(runFlingAnimation);
                     break;
@@ -251,7 +255,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private class ProgressBar : Container
+        private partial class ProgressBar : Container
         {
             private readonly Box box;
 

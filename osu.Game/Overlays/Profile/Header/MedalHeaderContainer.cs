@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -14,22 +11,21 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class MedalHeaderContainer : CompositeDrawable
+    public partial class MedalHeaderContainer : CompositeDrawable
     {
-        private FillFlowContainer badgeFlowContainer;
+        private FillFlowContainer badgeFlowContainer = null!;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
-            User.ValueChanged += e => updateDisplay(e.NewValue);
+            User.ValueChanged += e => updateDisplay(e.NewValue?.User);
 
             InternalChildren = new Drawable[]
             {
@@ -45,37 +41,30 @@ namespace osu.Game.Overlays.Profile.Header
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new ColourInfo
-                        {
-                            TopLeft = Color4.Black.Opacity(0.2f),
-                            TopRight = Color4.Black.Opacity(0.2f),
-                            BottomLeft = Color4.Black.Opacity(0),
-                            BottomRight = Color4.Black.Opacity(0)
-                        }
-                    },
+                        Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.2f), Colour4.Black.Opacity(0))
+                    }
                 },
                 badgeFlowContainer = new FillFlowContainer
                 {
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Top = 5 },
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Top = 10 },
                 }
             };
         }
 
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource? cancellationTokenSource;
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
             badgeFlowContainer.Clear();
 
-            var badges = user.Badges;
+            var badges = user?.Badges;
 
             if (badges?.Length > 0)
             {

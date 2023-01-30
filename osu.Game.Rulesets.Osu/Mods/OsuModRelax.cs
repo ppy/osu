@@ -20,7 +20,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
+
+        public override Type[] IncompatibleMods =>
+            base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
             }
 
-            osuInputManager.AllowUserPresses = false;
+            osuInputManager.AllowGameplayInputs = false;
         }
 
         public void Update(Playfield playfield)

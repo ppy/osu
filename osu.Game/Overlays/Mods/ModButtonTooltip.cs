@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
+    public partial class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
     {
         private readonly OsuSpriteText descriptionText;
         private readonly Box background;

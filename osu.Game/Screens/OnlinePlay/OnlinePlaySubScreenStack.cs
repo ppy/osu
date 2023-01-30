@@ -7,7 +7,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class OnlinePlaySubScreenStack : OsuScreenStack
+    public partial class OnlinePlaySubScreenStack : OsuScreenStack
     {
         protected override void ScreenChanged(IScreen prev, IScreen next)
         {

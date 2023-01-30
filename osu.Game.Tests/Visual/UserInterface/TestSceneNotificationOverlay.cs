@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Updater;
@@ -19,7 +21,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
     {
         private NotificationOverlay notificationOverlay = null!;
 
@@ -32,6 +34,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            InputManager.MoveMouseTo(Vector2.Zero);
+
             TimeToCompleteProgress = 2000;
             progressingNotifications.Clear();
 
@@ -45,7 +49,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 displayedCount = new OsuSpriteText()
             };
 
-            notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };
+            notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"unread count: {count.NewValue}"; };
         });
 
         [Test]
@@ -103,9 +107,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("start drag", () =>
             {
-                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single());
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
                 InputManager.PressButton(MouseButton.Left);
-                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
             });
 
             AddStep("fling away", () =>
@@ -117,6 +121,45 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("was not activated", () => !activated);
             AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("unread count zero", () => notificationOverlay.UnreadCount.Value == 0);
+        }
+
+        [Test]
+        public void TestProgressNotificationCantBeFlung()
+        {
+            bool activated = false;
+            ProgressNotification notification = null!;
+
+            AddStep("post", () =>
+            {
+                activated = false;
+                notificationOverlay.Post(notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                    Activated = () => activated = true,
+                });
+
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("start drag", () =>
+            {
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<Notification>().Single().ScreenSpaceDrawQuad.Centre + new Vector2(-500, 0));
+            });
+
+            AddStep("attempt fling", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("was not closed", () => !notification.WasClosed);
+            AddUntilStep("was not cancelled", () => notification.State == ProgressNotificationState.Active);
+            AddAssert("was not activated", () => !activated);
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+
+            AddUntilStep("was completed", () => notification.State == ProgressNotificationState.Completed);
         }
 
         [Test]
@@ -229,6 +272,31 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestProgressClick()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("hover over notification", () => InputManager.MoveMouseTo(notificationOverlay.ChildrenOfType<ProgressNotification>().Single()));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("not cancelled", () => notification.State == ProgressNotificationState.Active);
+
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("cancelled", () => notification.State == ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
         public void TestCompleteProgress()
         {
             ProgressNotification notification = null!;
@@ -270,6 +338,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
 
             AddAssert("Completion toast shown", () => notificationOverlay.ToastCount == 1);
+            AddUntilStep("wait forwarded", () => notificationOverlay.ToastCount == 0);
+            AddAssert("only one unread", () => notificationOverlay.UnreadCount.Value == 1);
         }
 
         [Test]
@@ -297,7 +367,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             SimpleNotification notification = null!;
             AddStep(@"post", () => notificationOverlay.Post(notification = new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" }));
-            AddUntilStep("check is toast", () => !notification.IsInToastTray);
+            AddUntilStep("check is toast", () => notification.IsInToastTray);
             AddAssert("light is not visible", () => notification.ChildrenOfType<Notification.NotificationLight>().Single().Alpha == 0);
 
             AddUntilStep("wait for forward to overlay", () => !notification.IsInToastTray);
@@ -422,11 +492,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddRepeatStep("send barrage", sendBarrage, 10);
         }
 
+        [Test]
+        public void TestServerShuttingDownNotification()
+        {
+            AddStep("post with 5 seconds", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromSeconds(5))));
+            AddStep("post with 30 seconds", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromSeconds(30))));
+            AddStep("post with 6 hours", () => notificationOverlay.Post(new ServerShutdownNotification(TimeSpan.FromHours(6))));
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
+            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed && n.WasClosed);
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
@@ -539,12 +617,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay.Post(new SimpleNotification { Text = @"Spam incoming!!" });
         }
 
-        private class BackgroundNotification : SimpleNotification
+        private partial class BackgroundNotification : SimpleNotification
         {
             public override bool IsImportant => false;
         }
 
-        private class BackgroundProgressNotification : ProgressNotification
+        private partial class BackgroundProgressNotification : ProgressNotification
         {
             public override bool IsImportant => false;
         }

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -13,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleNotification : Notification
+    public partial class SimpleNotification : Notification
     {
         private LocalisableString text;
 
@@ -39,6 +40,12 @@ namespace osu.Game.Overlays.Notifications
                 if (iconDrawable != null)
                     iconDrawable.Icon = icon;
             }
+        }
+
+        public ColourInfo IconColour
+        {
+            get => IconContent.Colour;
+            set => IconContent.Colour = value;
         }
 
         private TextFlowContainer? textDrawable;

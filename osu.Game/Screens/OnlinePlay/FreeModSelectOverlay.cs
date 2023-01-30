@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FreeModSelectOverlay : ModSelectOverlay
+    public partial class FreeModSelectOverlay : ModSelectOverlay
     {
         protected override bool ShowTotalMultiplier => false;
 

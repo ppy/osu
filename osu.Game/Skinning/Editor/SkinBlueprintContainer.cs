@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
+    public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
         private readonly Drawable target;
 
@@ -65,17 +66,24 @@ namespace osu.Game.Skinning.Editor
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
                         AddBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
+                    Debug.Assert(e.NewItems != null);
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
 
@@ -115,6 +123,11 @@ namespace osu.Game.Skinning.Editor
             }
 
             return false;
+        }
+
+        protected override void SelectAll()
+        {
+            SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
         }
 
         /// <summary>

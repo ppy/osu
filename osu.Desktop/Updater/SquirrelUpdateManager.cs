@@ -17,7 +17,7 @@ using UpdateManager = osu.Game.Updater.UpdateManager;
 namespace osu.Desktop.Updater
 {
     [SupportedOSPlatform("windows")]
-    public class SquirrelUpdateManager : UpdateManager
+    public partial class SquirrelUpdateManager : UpdateManager
     {
         private Squirrel.UpdateManager? updateManager;
         private INotificationOverlay notificationOverlay = null!;

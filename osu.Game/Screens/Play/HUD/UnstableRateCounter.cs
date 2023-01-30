@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class UnstableRateCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class UnstableRateCounter : RollingCounter<int>, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
             scoreProcessor.JudgementReverted -= updateDisplay;
         }
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {

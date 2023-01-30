@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuHexColourPicker : HexColourPicker
+    public partial class OsuHexColourPicker : HexColourPicker
     {
         public OsuHexColourPicker()
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override TextBox CreateHexCodeTextBox() => new OsuTextBox();
         protected override ColourPreview CreateColourPreview() => new OsuColourPreview();
 
-        private class OsuColourPreview : ColourPreview
+        private partial class OsuColourPreview : ColourPreview
         {
             private readonly Box preview;
 

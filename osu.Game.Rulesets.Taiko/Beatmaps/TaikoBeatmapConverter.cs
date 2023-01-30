@@ -57,6 +57,28 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
+            if (original.BeatmapInfo.Ruleset.OnlineID == 0)
+            {
+                // Post processing step to transform standard slider velocity changes into scroll speed changes
+                double lastScrollSpeed = 1;
+
+                foreach (HitObject hitObject in original.HitObjects)
+                {
+                    double nextScrollSpeed = hitObject.DifficultyControlPoint.SliderVelocity;
+                    EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
+
+                    if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
+                    {
+                        converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                        {
+                            KiaiMode = currentEffectPoint.KiaiMode,
+                            OmitFirstBarLine = currentEffectPoint.OmitFirstBarLine,
+                            ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
+                        });
+                    }
+                }
+            }
+
             if (original.BeatmapInfo.Ruleset.OnlineID == 3)
             {
                 // Post processing step to transform mania hit objects with the same start time into strong hits

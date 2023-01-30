@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class FPSCounter : VisibilityContainer, IHasCustomTooltip
+    public partial class FPSCounter : VisibilityContainer, IHasCustomTooltip
     {
         private OsuSpriteText counterUpdateFrameTime = null!;
         private OsuSpriteText counterDrawFPS = null!;

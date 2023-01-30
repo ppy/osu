@@ -12,7 +12,7 @@ using osu.Game.Tournament.Screens.Schedule;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneScheduleScreen : TournamentTestScene
+    public partial class TestSceneScheduleScreen : TournamentTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

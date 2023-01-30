@@ -1,30 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    internal class DrawableTernaryButton : OsuButton
+    internal partial class DrawableTernaryButton : OsuButton
     {
         private Color4 defaultBackgroundColour;
-        private Color4 defaultBubbleColour;
+        private Color4 defaultIconColour;
         private Color4 selectedBackgroundColour;
-        private Color4 selectedBubbleColour;
+        private Color4 selectedIconColour;
 
-        private Drawable icon;
+        private Drawable icon = null!;
 
         public readonly TernaryButton Button;
 
@@ -38,20 +35,13 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            defaultBackgroundColour = colours.Gray3;
-            defaultBubbleColour = defaultBackgroundColour.Darken(0.5f);
-            selectedBackgroundColour = colours.BlueDark;
-            selectedBubbleColour = selectedBackgroundColour.Lighten(0.5f);
+            defaultBackgroundColour = colourProvider.Background3;
+            selectedBackgroundColour = colourProvider.Background1;
 
-            Content.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Radius = 2,
-                Offset = new Vector2(0, 1),
-                Colour = Color4.Black.Opacity(0.5f)
-            };
+            defaultIconColour = defaultBackgroundColour.Darken(0.5f);
+            selectedIconColour = selectedBackgroundColour.Lighten(0.5f);
 
             Add(icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
             {
@@ -85,17 +75,17 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             switch (Button.Bindable.Value)
             {
                 case TernaryState.Indeterminate:
-                    icon.Colour = selectedBubbleColour.Darken(0.5f);
+                    icon.Colour = selectedIconColour.Darken(0.5f);
                     BackgroundColour = selectedBackgroundColour.Darken(0.5f);
                     break;
 
                 case TernaryState.False:
-                    icon.Colour = defaultBubbleColour;
+                    icon.Colour = defaultIconColour;
                     BackgroundColour = defaultBackgroundColour;
                     break;
 
                 case TernaryState.True:
-                    icon.Colour = selectedBubbleColour;
+                    icon.Colour = selectedIconColour;
                     BackgroundColour = selectedBackgroundColour;
                     break;
             }

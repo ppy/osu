@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class OsuSpriteText : SpriteText
+    public partial class OsuSpriteText : SpriteText
     {
         public OsuSpriteText()
         {

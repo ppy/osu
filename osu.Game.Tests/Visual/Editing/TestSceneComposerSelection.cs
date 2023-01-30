@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneComposerSelection : EditorTestScene
+    public partial class TestSceneComposerSelection : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to controlpoint", () =>
             {
-                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
+                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));

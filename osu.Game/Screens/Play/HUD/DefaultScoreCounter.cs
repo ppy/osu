@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultScoreCounter : GameplayScoreCounter, ISkinnableDrawable
+    public partial class DefaultScoreCounter : GameplayScoreCounter, ISkinnableDrawable
     {
         public DefaultScoreCounter()
         {

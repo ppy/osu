@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -69,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// This value is the original <see cref="X"/> value plus the offset applied by the beatmap processing.
         /// Use <see cref="OriginalX"/> if a value not affected by the offset is desired.
         /// </remarks>
-        public float EffectiveX => OriginalX + XOffset;
+        public float EffectiveX => Math.Clamp(OriginalX + XOffset, 0, CatchPlayfield.WIDTH);
 
         public double TimePreempt { get; set; } = 1000;
 

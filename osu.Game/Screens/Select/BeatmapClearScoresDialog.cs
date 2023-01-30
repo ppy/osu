@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapClearScoresDialog : DeleteConfirmationDialog
+    public partial class BeatmapClearScoresDialog : DeleteConfirmationDialog
     {
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;

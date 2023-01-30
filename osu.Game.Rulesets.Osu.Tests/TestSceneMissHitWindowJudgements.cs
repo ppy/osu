@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneMissHitWindowJudgements : ModTestScene
+    public partial class TestSceneMissHitWindowJudgements : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

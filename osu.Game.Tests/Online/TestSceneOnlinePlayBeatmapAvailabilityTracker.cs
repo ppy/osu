@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -35,7 +34,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
+    public partial class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;
@@ -78,7 +77,7 @@ namespace osu.Game.Tests.Online
                 }
             };
 
-            beatmaps.AllowImport = new TaskCompletionSource<bool>();
+            beatmaps.AllowImport.Reset();
 
             testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
 
@@ -132,7 +131,7 @@ namespace osu.Game.Tests.Online
             AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
             AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
@@ -141,7 +140,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsSoftDeleting()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
@@ -155,7 +154,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsChecksum()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
             addAvailabilityCheckStep("initially locally available", BeatmapAvailability.LocallyAvailable);
 
@@ -202,7 +201,7 @@ namespace osu.Game.Tests.Online
 
         private class TestBeatmapManager : BeatmapManager
         {
-            public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
+            public readonly ManualResetEventSlim AllowImport = new ManualResetEventSlim();
 
             public Live<BeatmapSetInfo> CurrentImport { get; private set; }
 
@@ -227,10 +226,12 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default)
                 {
-                    testBeatmapManager.AllowImport.Task.WaitSafely();
-                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, batchImport, cancellationToken));
+                    if (!testBeatmapManager.AllowImport.Wait(TimeSpan.FromSeconds(10), cancellationToken))
+                        throw new TimeoutException("Timeout waiting for import to be allowed.");
+
+                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken));
                 }
             }
         }

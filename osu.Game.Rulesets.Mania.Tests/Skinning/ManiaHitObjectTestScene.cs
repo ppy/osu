@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// <summary>
     /// A test scene for a mania hitobject.
     /// </summary>
-    public abstract class ManiaHitObjectTestScene : ManiaSkinnableTestScene
+    public abstract partial class ManiaHitObjectTestScene : ManiaSkinnableTestScene
     {
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -61,7 +61,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                             c.Add(CreateHitObject().With(h =>
                             {
                                 h.HitObject.StartTime = Time.Current + 5000;
-                                h.AccentColour.Value = Color4.Orange;
                             }));
                         })
                     },

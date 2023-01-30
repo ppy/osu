@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectPanel : OsuClickableContainer, IHasAccentColour
+    public abstract partial class ModSelectPanel : OsuClickableContainer, IHasAccentColour
     {
         public abstract BindableBool Active { get; }
 

@@ -15,19 +15,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     {
         /// <summary>
         /// Processes and encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoDifficultyHitObjectColour"/>s,
-        /// assigning the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>,
-        /// and pre-evaluating colour difficulty of each <see cref="TaikoDifficultyHitObject"/>.
+        /// assigning the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>.
         /// </summary>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
             List<RepeatingHitPatterns> hitPatterns = encode(hitObjects);
 
-            // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
-            // assigned with the relevant encodings.
+            // Assign indexing and encoding data to all relevant objects.
             foreach (var repeatingHitPattern in hitPatterns)
             {
-                repeatingHitPattern.FirstHitObject.Colour.RepeatingHitPattern = repeatingHitPattern;
-
                 // The outermost loop is kept a ForEach loop since it doesn't need index information, and we want to
                 // keep i and j for AlternatingMonoPattern's and MonoStreak's index respectively, to keep it in line with
                 // documentation.
@@ -36,14 +32,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     AlternatingMonoPattern monoPattern = repeatingHitPattern.AlternatingMonoPatterns[i];
                     monoPattern.Parent = repeatingHitPattern;
                     monoPattern.Index = i;
-                    monoPattern.FirstHitObject.Colour.AlternatingMonoPattern = monoPattern;
 
                     for (int j = 0; j < monoPattern.MonoStreaks.Count; ++j)
                     {
                         MonoStreak monoStreak = monoPattern.MonoStreaks[j];
                         monoStreak.Parent = monoPattern;
                         monoStreak.Index = j;
-                        monoStreak.FirstHitObject.Colour.MonoStreak = monoStreak;
+
+                        foreach (var hitObject in monoStreak.HitObjects)
+                        {
+                            hitObject.Colour.RepeatingHitPattern = repeatingHitPattern;
+                            hitObject.Colour.AlternatingMonoPattern = monoPattern;
+                            hitObject.Colour.MonoStreak = monoStreak;
+                        }
                     }
                 }
             }

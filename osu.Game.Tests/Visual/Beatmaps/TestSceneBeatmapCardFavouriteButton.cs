@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardFavouriteButton : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCardFavouriteButton : OsuManualInputManagerTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -37,7 +37,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 beatmapSetInfo = CreateAPIBeatmapSet(Ruleset.Value);
                 beatmapSetInfo.HasFavourited = favourited;
             });
-            AddStep("create button", () => Child = button = new FavouriteButton(beatmapSetInfo) { Scale = new Vector2(2) });
+            AddStep("create button", () => Child = button = new FavouriteButton(beatmapSetInfo)
+            {
+                Size = new Vector2(25f, 50f),
+                Scale = new Vector2(2f),
+            });
 
             assertCorrectIcon(favourited);
             AddAssert("correct tooltip text", () => button.TooltipText == (favourited ? BeatmapsetsStrings.ShowDetailsUnfavourite : BeatmapsetsStrings.ShowDetailsFavourite));
@@ -51,7 +55,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             BeatmapFavouriteAction? lastRequestAction = null;
 
             AddStep("create beatmap set", () => beatmapSetInfo = CreateAPIBeatmapSet(Ruleset.Value));
-            AddStep("create button", () => Child = button = new FavouriteButton(beatmapSetInfo) { Scale = new Vector2(2) });
+            AddStep("create button", () => Child = button = new FavouriteButton(beatmapSetInfo)
+            {
+                Size = new Vector2(25f, 50f),
+                Scale = new Vector2(2f),
+            });
 
             assertCorrectIcon(false);
 

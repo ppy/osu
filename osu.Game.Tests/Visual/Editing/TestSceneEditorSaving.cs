@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSaving : EditorSavingTestScene
+    public partial class TestSceneEditorSaving : EditorSavingTestScene
     {
         [Test]
         public void TestCantExitWithoutSaving()
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Editing
             double lastStarRating = 0;
             double lastLength = 0;
 
-            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(500, new TimingControlPoint()));
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 600 }));
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));

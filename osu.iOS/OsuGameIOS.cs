@@ -5,6 +5,7 @@
 
 using System;
 using Foundation;
+using Microsoft.Maui.Devices;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers;
 using osu.Framework.iOS.Input;
@@ -12,11 +13,10 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.iOS
 {
-    public class OsuGameIOS : OsuGame
+    public partial class OsuGameIOS : OsuGame
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
@@ -33,7 +33,7 @@ namespace osu.iOS
         {
             switch (handler)
             {
-                case IOSMouseHandler _:
+                case IOSMouseHandler:
                     return new IOSMouseSettings();
 
                 default:

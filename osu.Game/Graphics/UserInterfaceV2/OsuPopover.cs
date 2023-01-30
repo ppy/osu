@@ -5,6 +5,7 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -14,10 +15,11 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
+    public partial class OsuPopover : Popover, IKeyBindingHandler<GlobalAction>
     {
         private const float fade_duration = 250;
         private const double scale_duration = 500;
@@ -58,6 +60,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.FadeOut(fade_duration, Easing.OutQuint);
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key == Key.Escape)
+                return false; // disable the framework-level handling of escape key for conformity (we use GlobalAction.Back).
+
+            return base.OnKeyDown(e);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -68,7 +78,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (e.Action == GlobalAction.Back)
             {
-                Hide();
+                this.HidePopover();
                 return true;
             }
 

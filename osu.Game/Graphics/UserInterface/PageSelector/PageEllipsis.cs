@@ -11,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
-    internal class PageEllipsis : CompositeDrawable
+    internal partial class PageEllipsis : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

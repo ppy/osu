@@ -13,7 +13,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuBlueprintContainer : ComposeBlueprintContainer
+    public partial class OsuBlueprintContainer : ComposeBlueprintContainer
     {
         public OsuBlueprintContainer(HitObjectComposer composer)
             : base(composer)

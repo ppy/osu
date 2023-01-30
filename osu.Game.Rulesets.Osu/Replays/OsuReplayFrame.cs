@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             Position = currentFrame.Position;
             if (currentFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
             if (currentFrame.MouseRight) Actions.Add(OsuAction.RightButton);
+            if (currentFrame.Smoke) Actions.Add(OsuAction.Smoke);
         }
 
         public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
@@ -41,6 +42,8 @@ namespace osu.Game.Rulesets.Osu.Replays
                 state |= ReplayButtonState.Left1;
             if (Actions.Contains(OsuAction.RightButton))
                 state |= ReplayButtonState.Right1;
+            if (Actions.Contains(OsuAction.Smoke))
+                state |= ReplayButtonState.Smoke;
 
             return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
         }

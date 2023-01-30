@@ -138,10 +138,10 @@ platform :ios do
   end
 
   lane :testflight_prune_dry do
-    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
+    clean_testflight_testers(days_of_inactivity:30, dry_run: true)
   end
 
   lane :testflight_prune do
-    clean_testflight_testers(days_of_inactivity: 45)
+    clean_testflight_testers(days_of_inactivity: 30)
   end
 end

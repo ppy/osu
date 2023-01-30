@@ -36,5 +36,10 @@ namespace osu.Game.Screens.Play
         /// Whether the intro should be skipped by default.
         /// </summary>
         public bool AutomaticallySkipIntro { get; set; }
+
+        /// <summary>
+        /// Whether the gameplay leaderboard should always be shown (usually in a contracted state).
+        /// </summary>
+        public bool AlwaysShowLeaderboard { get; set; }
     }
 }

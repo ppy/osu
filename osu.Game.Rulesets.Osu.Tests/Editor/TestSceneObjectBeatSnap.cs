@@ -14,7 +14,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneObjectBeatSnap : TestSceneOsuEditor
+    public partial class TestSceneObjectBeatSnap : TestSceneOsuEditor
     {
         private OsuPlayfield playfield;
 
