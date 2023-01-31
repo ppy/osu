@@ -9,8 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -39,6 +41,13 @@ namespace osu.Game.Rulesets.Osu
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
+
+        public bool CheckScreenSpaceActionPressJudgeable(Vector2 screenSpacePosition) =>
+            // This is a very naive but simple approach.
+            //
+            // Based on user feedback of more nuanced scenarios (where touch doesn't behave as expected),
+            // this can be expanded to a more complex implementation, but I'd still want to keep it as simple as we can.
+            NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.ReceivePositionalInputAt(screenSpacePosition));
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
