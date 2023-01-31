@@ -26,21 +26,26 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
             Masking = true;
 
-            InternalChildren = new Drawable[] {
-                container = new Container {
+            InternalChildren = new Drawable[]
+            {
+                container = new Container
+                {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
 
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
                     Masking = true,
 
-                    Children = new Drawable[] {
-                        new Box {
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Colour4.Black,
                             Alpha = 0.4f,
                         },
-                        new Box {
+                        new Box
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Height = 1 - ArgonNotePiece.NOTE_ACCENT_RATIO,
                             Anchor = Anchor.TopCentre,
