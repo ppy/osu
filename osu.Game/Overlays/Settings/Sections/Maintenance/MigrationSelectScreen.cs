@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 var directoryInfos = target.GetDirectories();
                 var fileInfos = target.GetFiles();
 
+                //With an empty disk (mb flash drive), this if could be false
                 if (directoryInfos.Length > 0 || fileInfos.Length > 0)
                 {
                     // Quick test for whether there's already an osu! install at the target path.
@@ -65,7 +66,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         return;
                     }
 
-                    target = target.CreateSubdirectory("osu-lazer");
+                    //Check for a root directory
+                    if (target.Parent == null)
+                        target = Directory.CreateDirectory(Path.Combine(target.FullName, "osu-lazer"));
+                    else
+                        target = target.CreateSubdirectory("osu-lazer");
                 }
             }
             catch (Exception e)
