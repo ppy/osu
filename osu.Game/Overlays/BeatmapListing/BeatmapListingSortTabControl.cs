@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -21,10 +20,12 @@ namespace osu.Game.Overlays.BeatmapListing
         private SearchCategory? lastCategory;
         private bool? lastHasQuery;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            Reset(SearchCategory.Leaderboard, false);
+            base.LoadComplete();
+
+            if (lastCategory == null && lastHasQuery == null)
+                Reset(SearchCategory.Leaderboard, false);
         }
 
         public void Reset(SearchCategory category, bool hasQuery)
