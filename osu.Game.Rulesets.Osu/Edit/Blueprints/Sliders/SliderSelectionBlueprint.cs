@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected SliderCircleOverlay TailOverlay { get; private set; }
 
         [CanBeNull]
-        protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
+        protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 if (ControlPointVisualiser == null)
                 {
-                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
+                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, true)
                     {
                         RemoveControlPointsRequested = removeControlPoints,
                         SplitControlPointsRequested = splitControlPoints
@@ -408,6 +408,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
+
+        protected override Vector2[] ScreenSpaceAdditionalNodes => new[]
+        {
+            DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset) ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation)
+        };
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
