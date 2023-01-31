@@ -86,7 +86,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double[] judgements = new double[5];
 
             // Legacy scores have the same number of judgements and total notes 
-            bool isLegacyScore = totalHits == attributes.NoteCount + attributes.HoldNoteCount;
+            bool isLegacyScore = false;
+
+            // Temporary workaround for lazer not having classic mania behaviour implemented. 
+            // Classic scores with only Notes will return incorrect values after the replay is watched.
+            if (score.Mods.Any(m => m is ModClassic) && totalHits == attributes.NoteCount + attributes.HoldNoteCount)
+                isLegacyScore = true;
 
             if (isLegacyScore)
                 judgements = getLegacyJudgements(score, attributes);
