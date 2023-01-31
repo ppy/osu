@@ -85,7 +85,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double[] judgements = new double[5];
 
-            // Legacy scores have the same number of judgements and total notes 
             bool isLegacyScore = false;
 
             // Temporary workaround for lazer not having classic mania behaviour implemented. 
