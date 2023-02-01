@@ -152,22 +152,6 @@ namespace osu.Game.Graphics.UserInterface
             segments.Sort();
         }
 
-        private ColourInfo getSegmentColour(SegmentInfo segment)
-        {
-            var segmentColour = new ColourInfo
-            {
-                TopLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 0f)),
-                TopRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 0f)),
-                BottomLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 1f)),
-                BottomRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 1f))
-            };
-
-            var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
-            segmentColour.ApplyChild(tierColour);
-
-            return segmentColour;
-        }
-
         protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
 
         protected struct SegmentInfo
@@ -215,6 +199,7 @@ namespace osu.Game.Graphics.UserInterface
             private IShader shader = null!;
             private readonly List<SegmentInfo> segments = new List<SegmentInfo>();
             private Vector2 drawSize;
+            private readonly List<Colour4> tierColours = new List<Colour4>();
 
             public SegmentedGraphDrawNode(SegmentedGraph<T> source)
                 : base(source)
@@ -228,8 +213,12 @@ namespace osu.Game.Graphics.UserInterface
                 texture = Source.texture;
                 shader = Source.shader;
                 drawSize = Source.DrawSize;
+
                 segments.Clear();
                 segments.AddRange(Source.segments.Where(s => s.Length * drawSize.X > 1));
+
+                tierColours.Clear();
+                tierColours.AddRange(Source.tierColours);
             }
 
             public override void Draw(IRenderer renderer)
@@ -252,10 +241,26 @@ namespace osu.Game.Graphics.UserInterface
                             Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)),
-                        Source.getSegmentColour(segment));
+                        getSegmentColour(segment));
                 }
 
                 shader.Unbind();
+            }
+
+            private ColourInfo getSegmentColour(SegmentInfo segment)
+            {
+                var segmentColour = new ColourInfo
+                {
+                    TopLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 0f)),
+                    TopRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 0f)),
+                    BottomLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 1f)),
+                    BottomRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 1f))
+                };
+
+                var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
+                segmentColour.ApplyChild(tierColour);
+
+                return segmentColour;
             }
         }
 
