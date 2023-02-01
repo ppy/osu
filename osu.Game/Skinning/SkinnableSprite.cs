@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.SkinEditorComponents;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; } = null!;
 
-        [SettingSource("Sprite name", "The filename of the sprite", SettingControlType = typeof(SpriteSelectorControl))]
+        [SettingSource(typeof(SkinnableSpriteStrings), nameof(SkinnableSpriteStrings.SpriteName), nameof(SkinnableSpriteStrings.SpriteNameDescription), SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
 
         [Resolved]
