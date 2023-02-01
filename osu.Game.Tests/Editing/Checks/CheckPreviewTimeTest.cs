@@ -22,26 +22,6 @@ namespace osu.Game.Tests.Editing.Checks
         public void Setup()
         {
             check = new CheckPreviewTime();
-            beatmap = new Beatmap<HitObject>
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata { PreviewTime = -1 },
-                    BeatmapSet = new BeatmapSetInfo(new List<BeatmapInfo>
-                    {
-                        new BeatmapInfo
-                        {
-                            DifficultyName = "Test1",
-                            Metadata = new BeatmapMetadata { PreviewTime = 5 },
-                        },
-                        new BeatmapInfo
-                        {
-                            DifficultyName = "Test2",
-                            Metadata = new BeatmapMetadata { PreviewTime = 10 },
-                        },
-                    })
-                }
-            };
         }
 
         [Test]
