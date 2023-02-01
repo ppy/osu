@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckPreviewTime : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Check Preview Time Consistency");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent or unset preview time");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplatePreviewTimeConflict : IssueTemplate
         {
             public IssueTemplatePreviewTimeConflict(ICheck check)
-                : base(check, IssueType.Warning, "Audio preview time {1} doesn't match \"{0}\"'s preview time {2}")
+                : base(check, IssueType.Problem, "Audio preview time {1} doesn't match \"{0}\"'s preview time. {2}")
             {
             }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateHasNoPreviewTime : IssueTemplate
         {
             public IssueTemplateHasNoPreviewTime(ICheck check)
-                : base(check, IssueType.Warning, "A preview point for this map is not set. Consider settings one from the Timing menu")
+                : base(check, IssueType.Problem, "A preview point for this map is not set. Consider settings one from the Timing menu.")
             {
             }
 
