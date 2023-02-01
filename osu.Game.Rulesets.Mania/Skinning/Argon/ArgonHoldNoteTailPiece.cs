@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 container = new Container
                 {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
 
@@ -44,14 +47,23 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             Colour = Colour4.Black,
                             Alpha = 0.4f,
                         },
-                        new Circle
+                        new Container
                         {
+                            CornerRadius = ArgonNotePiece.CORNER_RADIUS,
+                            Masking = true,
                             RelativeSizeAxes = Axes.Both,
                             Height = 1 - ArgonNotePiece.NOTE_ACCENT_RATIO,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Colour = Colour4.Black,
-                            Alpha = 0.3f,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Colour4.Black,
+                                    Alpha = 0.3f,
+                                }
+                            }
                         },
                     },
                 }
@@ -67,10 +79,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            container.Anchor = container.Origin =
-                direction.NewValue == ScrollingDirection.Down
-                    ? Anchor.BottomCentre
-                    : Anchor.TopCentre;
+            Scale = new osuTK.Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
         }
     }
 }
