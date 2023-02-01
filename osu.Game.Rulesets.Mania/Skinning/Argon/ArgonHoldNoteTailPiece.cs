@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             Colour = Colour4.Black,
                             Alpha = 0.4f,
                         },
-                        new Box
+                        new Circle
                         {
                             RelativeSizeAxes = Axes.Both,
                             Height = 1 - ArgonNotePiece.NOTE_ACCENT_RATIO,
