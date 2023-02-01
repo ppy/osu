@@ -69,15 +69,18 @@ namespace osu.Game.Skinning
                 storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
 
                 var samples = resources.AudioManager?.GetSampleStore(storage);
+
                 if (samples != null)
+                {
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
-                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
-                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
+                    // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                    // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                    samples.AddExtension(@"ogg");
+                }
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
             }
             else
             {
