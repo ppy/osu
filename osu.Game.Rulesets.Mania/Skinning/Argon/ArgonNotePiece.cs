@@ -95,6 +95,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             colouredBox.Anchor = colouredBox.Origin = direction.NewValue == ScrollingDirection.Up
                 ? Anchor.TopCentre
                 : Anchor.BottomCentre;
+
+            Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
         }
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
