@@ -84,7 +84,10 @@ namespace osu.Game.Screens.Select
 
         public bool BeatmapSetsLoaded => IsLoaded && Carousel.BeatmapSetsLoaded;
 
-        public virtual Func<BeatmapInfo, MenuItem>[] CustomMenuItems => new Func<BeatmapInfo, MenuItem>[] { b => new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(b)) };
+        public virtual MenuItem[] CreateMenuItemsForBeatmap(BeatmapInfo b) => new MenuItem[]
+        {
+            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(b))
+        };
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;

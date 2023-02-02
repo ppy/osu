@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Sprite background = null!;
 
-        private MenuItem[]? customMenuItems;
+        private MenuItem[]? mainMenuItems;
 
         private Action<BeatmapInfo>? selectRequested;
         private Action<BeatmapInfo>? hideRequested;
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                customMenuItems = songSelect.CustomMenuItems.Select(f => f.Invoke(beatmapInfo)).ToArray();
+                mainMenuItems = songSelect.CreateMenuItemsForBeatmap(beatmapInfo);
                 selectRequested = b => songSelect.FinaliseSelection(b);
             }
 
@@ -227,8 +227,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (customMenuItems != null)
-                    items.AddRange(customMenuItems);
+                if (mainMenuItems != null)
+                    items.AddRange(mainMenuItems);
 
                 if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
