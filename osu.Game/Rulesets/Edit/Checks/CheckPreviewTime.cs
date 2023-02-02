@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateHasNoPreviewTime : IssueTemplate
         {
             public IssueTemplateHasNoPreviewTime(ICheck check)
-                : base(check, IssueType.Problem, "A preview point for this map is not set. Consider settings one from the Timing menu.")
+                : base(check, IssueType.Problem, "A preview point for this map is not set. Consider setting one from the Timing menu.")
             {
             }
 
