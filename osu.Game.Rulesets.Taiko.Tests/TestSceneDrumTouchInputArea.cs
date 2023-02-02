@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.UI;
@@ -14,7 +17,16 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         private DrumTouchInputArea drumTouchInputArea = null!;
 
-        private void createDrum(TaikoTouchControlScheme forcedControlScheme)
+        private readonly Bindable<TaikoTouchControlScheme> controlScheme = new Bindable<TaikoTouchControlScheme>();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var config = (TaikoRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            config.BindWith(TaikoRulesetSetting.TouchControlScheme, controlScheme);
+        }
+
+        private void createDrum()
         {
             Child = new TaikoInputManager(new TaikoRuleset().RulesetInfo)
             {
@@ -31,7 +43,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        ForceControlScheme = forcedControlScheme
                     }
                 }
             };
@@ -40,12 +51,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [Test]
         public void TestDrum()
         {
-            AddStep("create drum (kddk)", () => createDrum(TaikoTouchControlScheme.KDDK));
+            AddStep("create drum", createDrum);
             AddStep("show drum", () => drumTouchInputArea.Show());
-            AddStep("create drum (ddkk)", () => createDrum(TaikoTouchControlScheme.DDKK));
-            AddStep("show drum", () => drumTouchInputArea.Show());
-            AddStep("create drum (kkdd)", () => createDrum(TaikoTouchControlScheme.KKDD));
-            AddStep("show drum", () => drumTouchInputArea.Show());
+
+            AddStep("change scheme (kddk)", () => controlScheme.Value = TaikoTouchControlScheme.KDDK);
+            AddStep("change scheme (kkdd)", () => controlScheme.Value = TaikoTouchControlScheme.KKDD);
+            AddStep("change scheme (ddkk)", () => controlScheme.Value = TaikoTouchControlScheme.DDKK);
         }
 
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
