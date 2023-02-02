@@ -98,8 +98,8 @@ namespace osu.Game
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
-        internal EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+        public virtual EndpointConfiguration CreateEndpoints() =>
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ExperimentalEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -160,9 +160,12 @@ namespace osu.Game
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
+        /// <summary>
+        /// The current ruleset selection for the local user.
+        /// </summary>
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         /// <summary>
         /// The current mod selection for the local user.
@@ -553,8 +556,8 @@ namespace osu.Game
                     case JoystickHandler jh:
                         return new JoystickSettings(jh);
 
-                    case TouchHandler:
-                        return new InputSection.HandlerSection(handler);
+                    case TouchHandler th:
+                        return new TouchSettings(th);
                 }
             }
 

@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,13 +26,12 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool BlockNonPositionalInput => true;
 
-        [CanBeNull]
-        private SkinEditor skinEditor;
+        private SkinEditor? skinEditor;
 
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
 
-        private OsuScreen lastTargetScreen;
+        private OsuScreen? lastTargetScreen;
 
         private Vector2 lastDrawSize;
 
@@ -81,6 +77,8 @@ namespace osu.Game.Skinning.Editor
 
                 AddInternal(editor);
 
+                Debug.Assert(lastTargetScreen != null);
+
                 SetTarget(lastTargetScreen);
             });
         }
@@ -124,15 +122,15 @@ namespace osu.Game.Skinning.Editor
             {
                 Scheduler.AddOnce(updateScreenSizing);
 
-                game?.Toolbar.Hide();
-                game?.CloseAllOverlays();
+                game.Toolbar.Hide();
+                game.CloseAllOverlays();
             }
             else
             {
                 scalingContainer.SetCustomRect(null);
 
                 if (lastTargetScreen?.HideOverlaysOnEnter != true)
-                    game?.Toolbar.Show();
+                    game.Toolbar.Show();
             }
         }
 
@@ -158,7 +156,7 @@ namespace osu.Game.Skinning.Editor
             Scheduler.AddOnce(setTarget, screen);
         }
 
-        private void setTarget(OsuScreen target)
+        private void setTarget(OsuScreen? target)
         {
             if (target == null)
                 return;

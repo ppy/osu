@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,39 +41,39 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
-        private Drawable targetScreen;
+        private Drawable targetScreen = null!;
 
-        private OsuTextFlowContainer headerText;
+        private OsuTextFlowContainer headerText = null!;
 
-        private Bindable<Skin> currentSkin;
-
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private Bindable<Skin> currentSkin = null!;
 
         [Resolved]
-        private SkinManager skins { get; set; }
+        private OsuGame? game { get; set; }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private SkinManager skins { get; set; } = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private SkinEditorOverlay skinEditorOverlay { get; set; }
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private SkinEditorOverlay? skinEditorOverlay { get; set; }
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private bool hasBegunMutating;
 
-        private Container content;
+        private Container? content;
 
-        private EditorSidebar componentsSidebar;
-        private EditorSidebar settingsSidebar;
+        private EditorSidebar componentsSidebar = null!;
+        private EditorSidebar settingsSidebar = null!;
 
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public SkinEditor()
         {
@@ -109,7 +108,7 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Container
                             {
-                                Name = "Menu container",
+                                Name = @"Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
                                 Height = MENU_HEIGHT,
@@ -122,14 +121,14 @@ namespace osu.Game.Skinning.Editor
                                         RelativeSizeAxes = Axes.Both,
                                         Items = new[]
                                         {
-                                            new MenuItem("File")
+                                            new MenuItem(CommonStrings.MenuBarFile)
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
+                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
@@ -240,6 +239,8 @@ namespace osu.Game.Skinning.Editor
 
             void loadBlueprintContainer()
             {
+                Debug.Assert(content != null);
+
                 content.Child = new SkinBlueprintContainer(targetScreen);
 
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
@@ -253,7 +254,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("Currently editing ", cp =>
             {
@@ -312,9 +313,9 @@ namespace osu.Game.Skinning.Editor
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
 
-        private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
+        private ISkinnableTarget? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget getTarget(GlobalSkinComponentLookup.LookupType target)
+        private ISkinnableTarget? getTarget(GlobalSkinComponentLookup.LookupType target)
         {
             return availableTargets.FirstOrDefault(c => c.Target == target);
         }
@@ -328,7 +329,7 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Target).Reload();
+                getTarget(t.Target)?.Reload();
             }
         }
 
@@ -343,7 +344,7 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -395,12 +396,18 @@ namespace osu.Game.Skinning.Editor
                 // This is the best we can do for now.
                 realm.Run(r => r.Refresh());
 
+                var skinnableTarget = getFirstTarget();
+
+                // Import still should happen for now, even if not placeable (as it allows a user to import skin resources that would apply to legacy gameplay skins).
+                if (skinnableTarget == null)
+                    return;
+
                 // place component
                 var sprite = new SkinnableSprite
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = getFirstTarget().ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
                 };
 
                 placeComponent(sprite, false);

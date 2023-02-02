@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -28,7 +26,7 @@ namespace osu.Game.Skinning.Editor
         private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
 
         [Resolved]
-        private SkinEditor editor { get; set; }
+        private SkinEditor editor { get; set; } = null!;
 
         public SkinBlueprintContainer(Drawable target)
         {
@@ -61,7 +59,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
