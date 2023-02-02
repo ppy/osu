@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
             }
 
-            palpableObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+            palpableObjects = palpableObjects.OrderBy(h => h.StartTime).ToList();
 
             double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.Difficulty) / 2;
 
