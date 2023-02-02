@@ -23,21 +23,15 @@ namespace osu.Game.Rulesets.Edit.Checks
             int previewTime = context.Beatmap.BeatmapInfo.Metadata.PreviewTime;
 
             if (previewTime == -1)
-            {
                 yield return new IssueTemplateHasNoPreviewTime(this).Create();
-            }
 
             foreach (var diff in diffList)
             {
                 if (diff.Equals(context.Beatmap.BeatmapInfo))
-                {
                     continue;
-                }
 
                 if (diff.Metadata.PreviewTime != previewTime)
-                {
                     yield return new IssueTemplatePreviewTimeConflict(this).Create(diff.DifficultyName, previewTime, diff.Metadata.PreviewTime);
-                }
             }
         }
 
