@@ -179,8 +179,14 @@ namespace osu.Game.Skinning
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin. Updates any drawable layouts that are out of date.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
+            bool hadChanges = false;
+
             skin.SkinInfo.PerformWrite(s =>
             {
                 // Update for safety
@@ -212,8 +218,14 @@ namespace osu.Game.Skinning
                     }
                 }
 
-                s.Hash = ComputeHash(s);
+                string newHash = ComputeHash(s);
+
+                hadChanges = newHash != s.Hash;
+
+                s.Hash = newHash;
             });
+
+            return hadChanges;
         }
     }
 }

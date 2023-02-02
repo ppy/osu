@@ -192,12 +192,16 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin. Updates any drawable layouts that are out of date.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
             if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
-            skinImporter.Save(skin);
+            return skinImporter.Save(skin);
         }
 
         /// <summary>
