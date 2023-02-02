@@ -38,15 +38,15 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplatePreviewTimeConflict : IssueTemplate
         {
             public IssueTemplatePreviewTimeConflict(ICheck check)
-                : base(check, IssueType.Problem, "Audio preview time {1} doesn't match \"{0}\"'s preview time. {2}")
+                : base(check, IssueType.Problem, "Audio preview time ({1}) doesn't match the time specified in \"{0}\" ({2})")
             {
             }
 
             public Issue Create(string diffName, int originalTime, int conflictTime) =>
                 // preview time should show (not set) when it is not set.
                 new Issue(this, diffName,
-                    originalTime != -1 ? $"({originalTime:N0})" : "(not set)",
-                    conflictTime != -1 ? $"({conflictTime:N0})" : "(not set)");
+                    originalTime != -1 ? $"{originalTime:N0} ms" : "not set",
+                    conflictTime != -1 ? $"{conflictTime:N0} ms" : "not set");
         }
 
         public class IssueTemplateHasNoPreviewTime : IssueTemplate
