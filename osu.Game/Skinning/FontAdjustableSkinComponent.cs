@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Localisation.SkinEditorComponents;
+using osu.Game.Localisation;
 
 namespace osu.Game.Skinning
 {
