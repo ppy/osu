@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK;
 
@@ -14,6 +15,8 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
+
+        private LevelBadge levelBadge = null!;
 
         public CentreHeaderContainer()
         {
@@ -62,12 +65,11 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Children = new Drawable[]
                     {
-                        new LevelBadge
+                        levelBadge = new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Size = new Vector2(40),
-                            User = { BindTarget = User }
+                            Size = new Vector2(40)
                         },
                         new Container
                         {
@@ -85,6 +87,18 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User), true);
+        }
+
+        private void updateDisplay(APIUser? user)
+        {
+            levelBadge.LevelInfo.Value = user?.Statistics?.Level;
         }
     }
 }
