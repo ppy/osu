@@ -108,6 +108,7 @@ namespace osu.Game.Skinning
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -158,6 +159,12 @@ namespace osu.Game.Skinning
                                         // origin flipped to match scale above.
                                         hitError2.Origin = Anchor.CentreLeft;
                                     }
+
+                                    if (songProgress != null)
+                                    {
+                                        songProgress.Position = new Vector2(0, -10);
+                                        songProgress.Scale = new Vector2(0.9f, 1);
+                                    }
                                 }
                             })
                             {
@@ -167,7 +174,7 @@ namespace osu.Game.Skinning
                                     new DefaultScoreCounter(),
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
-                                    new DefaultSongProgress(),
+                                    new ArgonSongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()
