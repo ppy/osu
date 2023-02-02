@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.SkinEditor
     [Cached(typeof(SkinEditor))]
     public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
-        public const double TRANSITION_DURATION = 500;
+        public const double TRANSITION_DURATION = 300;
 
         public const float MENU_HEIGHT = 40;
 
@@ -360,10 +360,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopIn()
         {
-            this
-                // align animation to happen after the majority of the ScalingContainer animation completes.
-                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
-                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
