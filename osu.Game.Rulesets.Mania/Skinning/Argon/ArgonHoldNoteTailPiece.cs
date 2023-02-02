@@ -2,14 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osuTK.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Framework.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            Scale = new osuTK.Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
+            Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
         }
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
