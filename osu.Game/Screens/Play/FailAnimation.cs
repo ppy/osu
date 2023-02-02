@@ -15,11 +15,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,7 +50,8 @@ namespace osu.Game.Screens.Play
 
         private const float duration = 2500;
 
-        private Sample? failSample;
+        private ISample? failSample;
+        private SampleChannel? failSampleChannel;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -73,10 +76,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
+        private void load(AudioManager audio, ISkinSource skin, IBindable<WorkingBeatmap> beatmap)
         {
             track = beatmap.Value.Track;
-            failSample = audio.Samples.Get(@"Gameplay/failsound");
+            failSample = skin.GetSample(new SampleInfo(@"Gameplay/failsound"));
 
             AddRangeInternal(new Drawable[]
             {
@@ -117,13 +120,13 @@ namespace osu.Game.Screens.Play
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
                 // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
-                RemoveFilters(false);
+                removeFilters(false);
                 OnComplete?.Invoke();
             });
 
             failHighPassFilter.CutoffTo(300);
             failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
-            failSample?.Play();
+            failSampleChannel = failSample?.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
             track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -151,7 +154,16 @@ namespace osu.Game.Screens.Play
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
-        public void RemoveFilters(bool resetTrackFrequency = true)
+        /// <summary>
+        /// Stops any and all persistent effects added by the ongoing fail animation.
+        /// </summary>
+        public void Stop()
+        {
+            failSampleChannel?.Stop();
+            removeFilters();
+        }
+
+        private void removeFilters(bool resetTrackFrequency = true)
         {
             filtersRemoved = true;
 
