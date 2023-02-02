@@ -47,4 +47,3 @@ namespace osu.Game.Localisation
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
-
