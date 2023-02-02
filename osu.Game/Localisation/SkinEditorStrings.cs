@@ -40,9 +40,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Settings(string arg0) => new TranslatableString(getKey(@"settings"), @"Settings ({0})", arg0);
 
         /// <summary>
-        /// "Curently editing"
+        /// "Currently editing"
         /// </summary>
-        public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), "Curently editing");
+        public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), "Currently editing");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
