@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,9 +11,9 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -22,6 +21,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
+using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Screens.Select
 {
@@ -34,12 +34,11 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowExternalScreenChange => true;
 
-        public override Func<BeatmapInfo, MenuItem>[] CustomMenuItems =>
-            new Func<BeatmapInfo, MenuItem>[]
-            {
-                b => new OsuMenuItem("Play", MenuItemType.Highlighted, () => FinaliseSelection(b)),
-                b => new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
-            };
+        public override MenuItem[] CreateMenuItemsForBeatmap(BeatmapInfo b) => new MenuItem[]
+        {
+            new OsuMenuItem("Play", MenuItemType.Highlighted, () => FinaliseSelection(b)),
+            new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
+        };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
 
