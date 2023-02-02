@@ -35,6 +35,7 @@ namespace osu.Game.Input.Bindings
         // It is used to decide the order of precedence, with the earlier items having higher precedence.
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
                                                                        .Concat(EditorKeyBindings)
+                                                                       .Concat(ReplayKeyBindings)
                                                                        .Concat(InGameKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
                                                                        .Concat(AudioControlKeyBindings)
@@ -112,12 +113,16 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
+            new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
+        };
+
+        public IEnumerable<KeyBinding> ReplayKeyBindings => new[]
+        {
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
-            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
-            new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
         };
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
