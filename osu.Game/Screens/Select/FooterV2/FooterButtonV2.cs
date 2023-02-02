@@ -120,8 +120,6 @@ namespace osu.Game.Screens.Select.FooterV2
                 },
                 new Container
                 {
-                    // The X offset has to multiplied as such to account for the fact that we only want to offset by the distance from the CenterLeft point of the container
-                    // not the whole shear width
                     Shear = -SHEAR,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,
