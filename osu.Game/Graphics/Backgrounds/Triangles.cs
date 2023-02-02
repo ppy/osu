@@ -253,6 +253,7 @@ namespace osu.Game.Graphics.Backgrounds
         private class TrianglesDrawNode : DrawNode
         {
             private float fill = 1f;
+            private float texelSize = 0f;
 
             protected new Triangles Source => (Triangles)base.Source;
 
@@ -296,6 +297,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 shader.Bind();
                 shader.GetUniform<float>("thickness").UpdateValue(ref fill);
+                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
                 foreach (TriangleParticle particle in parts)
                 {
