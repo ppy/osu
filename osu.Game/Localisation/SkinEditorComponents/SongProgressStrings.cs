@@ -7,7 +7,7 @@ namespace osu.Game.Localisation.SkinEditorComponents
 {
     public static class SongProgressStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.SongProgressStrings";
+        private const string prefix = @"osu.Game.Resources.Localisation.SongProgress";
 
         /// <summary>
         /// "Show difficulty graph"
