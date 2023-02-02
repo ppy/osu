@@ -329,7 +329,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private partial class UIScaleSlider : NormalSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }

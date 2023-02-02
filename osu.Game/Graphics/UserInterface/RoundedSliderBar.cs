@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalSliderBar<T> : OsuSliderBar<T>
+    public partial class RoundedSliderBar<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         protected readonly RoundedNub Nub;
@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public NormalSliderBar()
+        public RoundedSliderBar()
         {
             Height = RoundedNub.HEIGHT;
             RangePadding = RoundedNub.EXPANDED_SIZE / 2;
