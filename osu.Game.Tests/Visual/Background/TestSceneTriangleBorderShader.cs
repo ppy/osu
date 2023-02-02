@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Background
 {
     public partial class TestSceneTriangleBorderShader : OsuTestScene
     {
-        private readonly TriangleBorder border;
+        private readonly TestTriangle triangle;
 
         public TestSceneTriangleBorderShader()
         {
@@ -25,11 +25,11 @@ namespace osu.Game.Tests.Visual.Background
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.DarkGreen
                 },
-                border = new TriangleBorder
+                triangle = new TestTriangle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(100)
+                    Size = new Vector2(200)
                 }
             };
         }
@@ -38,12 +38,13 @@ namespace osu.Game.Tests.Visual.Background
         {
             base.LoadComplete();
 
-            AddSliderStep("Thickness", 0f, 1f, 0.02f, t => border.Thickness = t);
+            AddSliderStep("Thickness", 0f, 1f, 0.15f, t => triangle.Thickness = t);
+            AddSliderStep("Texel size", 0f, 0.1f, 0f, t => triangle.TexelSize = t);
         }
 
-        private partial class TriangleBorder : Sprite
+        private partial class TestTriangle : Sprite
         {
-            private float thickness = 0.02f;
+            private float thickness = 0.15f;
 
             public float Thickness
             {
@@ -55,6 +56,18 @@ namespace osu.Game.Tests.Visual.Background
                 }
             }
 
+            private float texelSize;
+
+            public float TexelSize
+            {
+                get => texelSize;
+                set
+                {
+                    texelSize = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders, IRenderer renderer)
             {
@@ -62,29 +75,32 @@ namespace osu.Game.Tests.Visual.Background
                 Texture = renderer.WhitePixel;
             }
 
-            protected override DrawNode CreateDrawNode() => new TriangleBorderDrawNode(this);
+            protected override DrawNode CreateDrawNode() => new TriangleDrawNode(this);
 
-            private class TriangleBorderDrawNode : SpriteDrawNode
+            private class TriangleDrawNode : SpriteDrawNode
             {
-                public new TriangleBorder Source => (TriangleBorder)base.Source;
+                public new TestTriangle Source => (TestTriangle)base.Source;
 
-                public TriangleBorderDrawNode(TriangleBorder source)
+                public TriangleDrawNode(TestTriangle source)
                     : base(source)
                 {
                 }
 
                 private float thickness;
+                private float texelSize;
 
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     thickness = Source.thickness;
+                    texelSize = Source.texelSize;
                 }
 
                 public override void Draw(IRenderer renderer)
                 {
                     TextureShader.GetUniform<float>("thickness").UpdateValue(ref thickness);
+                    TextureShader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
                     base.Draw(renderer);
                 }

@@ -303,8 +303,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            if (Samples != null)
-                Samples.Samples = null;
+            Samples?.ClearSamples();
 
             foreach (var obj in nestedHitObjects)
             {
