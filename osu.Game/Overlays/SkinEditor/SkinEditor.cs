@@ -23,12 +23,12 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Skinning;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
     public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
