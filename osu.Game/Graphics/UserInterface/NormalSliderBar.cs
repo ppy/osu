@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     public partial class NormalSliderBar<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        protected readonly NormalNub Nub;
+        protected readonly RoundedNub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
         private readonly Container nubContainer;
@@ -50,8 +50,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public NormalSliderBar()
         {
-            Height = NormalNub.HEIGHT;
-            RangePadding = NormalNub.EXPANDED_SIZE / 2;
+            Height = RoundedNub.HEIGHT;
+            RangePadding = RoundedNub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 new Container
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Nub = new NormalNub
+                    Child = Nub = new RoundedNub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,

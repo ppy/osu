@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected readonly NormalNub Nub;
+        protected readonly RoundedNub Nub;
 
         protected readonly OsuTextFlowContainer LabelTextFlowContainer;
         private Sample sampleChecked;
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                 },
-                Nub = new NormalNub(),
+                Nub = new RoundedNub(),
                 new HoverSounds()
             };
 
@@ -70,14 +70,14 @@ namespace osu.Game.Graphics.UserInterface
                 Nub.Anchor = Anchor.CentreRight;
                 Nub.Origin = Anchor.CentreRight;
                 Nub.Margin = new MarginPadding { Right = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Right = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Right = RoundedNub.EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
                 Nub.Anchor = Anchor.CentreLeft;
                 Nub.Origin = Anchor.CentreLeft;
                 Nub.Margin = new MarginPadding { Left = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Left = NormalNub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Left = RoundedNub.EXPANDED_SIZE + nub_padding * 2 };
             }
 
             Nub.Current.BindTo(Current);

@@ -7,13 +7,13 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class NormalNub : Nub
+    public partial class RoundedNub : Nub
     {
         public const float HEIGHT = 15;
 
         public const float EXPANDED_SIZE = 50;
 
-        public NormalNub()
+        public RoundedNub()
         {
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
         }
