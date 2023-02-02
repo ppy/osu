@@ -8,16 +8,17 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
