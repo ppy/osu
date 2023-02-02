@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -11,9 +12,9 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -21,7 +22,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
-using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Screens.Select
 {
@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Select
 
         public override MenuItem[] CreateMenuItemsForBeatmap(BeatmapInfo b) => new MenuItem[]
         {
-            new OsuMenuItem("Play", MenuItemType.Highlighted, () => FinaliseSelection(b)),
-            new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => Edit(b))
+            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(b)),
+            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(b))
         };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
         }
 
         protected void PresentScore(ScoreInfo score) =>
