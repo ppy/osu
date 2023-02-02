@@ -3,7 +3,7 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation.SkinEditorComponents
+namespace osu.Game.Localisation
 {
     public static class BeatmapAttributeTextStrings
     {

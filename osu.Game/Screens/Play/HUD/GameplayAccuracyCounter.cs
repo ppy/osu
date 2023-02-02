@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation.SkinEditorComponents;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD

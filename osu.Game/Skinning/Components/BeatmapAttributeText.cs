@@ -18,7 +18,6 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
-using osu.Game.Localisation.SkinEditorComponents;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Skinning.Components

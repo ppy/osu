@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Localisation.SkinEditorComponents;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
