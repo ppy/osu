@@ -77,19 +77,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                leftCentre = new DrumSegment(TaikoAction.LeftCentre)
-                                {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomRight,
-                                    X = -2,
-                                    Scale = new Vector2(centre_region),
-                                },
                                 rightRim = new DrumSegment(TaikoAction.RightCentre)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
+                                },
+                                leftCentre = new DrumSegment(TaikoAction.LeftCentre)
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = -2,
+                                    Scale = new Vector2(centre_region),
                                 },
                                 rightCentre = new DrumSegment(TaikoAction.RightRim)
                                 {
