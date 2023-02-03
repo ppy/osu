@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private const int corner_radius = 10;
         private const int transition_length = 500;
 
-        //Accounts for corner radius margin on bottom, would be 12
+        // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
         public const float SHEAR_WIDTH = 13.5f;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Select.FooterV2
                     RelativeSizeAxes = Axes.Both
                 },
 
-                //For elements that should not be sheared.
+                // For elements that should not be sheared.
                 new Container
                 {
                     Anchor = Anchor.CentreLeft,
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select.FooterV2
                             AutoSizeAxes = Axes.Both,
                             Child = text = new OsuSpriteText
                             {
-                                //figma design says the size is 16, but due to the issues with font sizes 19 matches better
+                                // figma design says the size is 16, but due to the issues with font sizes 19 matches better
                                 Font = OsuFont.TorusAlternate.With(size: 19),
                                 AlwaysPresent = true
                             }
