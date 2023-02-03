@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
@@ -84,15 +83,25 @@ namespace osu.Game.Screens.Select
                         Width = colour_bar_width + corner_radius,
                         Child = new Box { RelativeSizeAxes = Axes.Both }
                     },
-                    starCounter = new StarCounter
+                    new Container
                     {
-                        Colour = Colour4.Transparent,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(0.35f),
+                        // Applying the shear to this container and nesting the starCounter inside avoids
+                        // the deformation that occurs if the shear is applied to the starCounter whilst rotated
                         Shear = -wedged_container_shear,
                         X = -colour_bar_width / 2,
-                        Direction = FillDirection.Vertical
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = colour_bar_width,
+                        Child = starCounter = new StarCounter
+                        {
+                            Rotation = (float)(Math.Atan(shear_width / wedge_height) * (180 / Math.PI)),
+                            Colour = Colour4.Transparent,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(0.35f),
+                            Direction = FillDirection.Vertical
+                        }
                     }
                 }
             };
@@ -102,15 +111,6 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             ruleset.BindValueChanged(_ => updateDisplay());
-
-            float starAngle = (float)(Math.Atan(shear_width / wedge_height) * (180 / Math.PI));
-
-            // Applying the rotation directly to the StarCounter distorts the stars, hence it is applied to the child container
-            starCounter.Children.First().Rotation = starAngle;
-
-            // Makes sure the stars center themselves properly in the colour bar
-            starCounter.Children.First().Anchor = Anchor.Centre;
-            starCounter.Children.First().Origin = Anchor.Centre;
         }
 
         private const double animation_duration = 600;
