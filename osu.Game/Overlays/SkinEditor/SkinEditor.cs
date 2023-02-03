@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.SkinEditor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
@@ -256,13 +256,13 @@ namespace osu.Game.Overlays.SkinEditor
 
             headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
-            headerText.AddText("Currently editing ", cp =>
+            headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
 
-            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            headerText.AddText($" {currentSkin.Value.SkinInfo}", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
@@ -333,7 +333,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        public void Save()
+        public void Save(bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -343,8 +343,9 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
 
-            skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
+            // In the case the save was user triggered, always show the save message to make them feel confident.
+            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
