@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Select
             CornerRadius = corner_radius;
 
             // We want to buffer the wedge to avoid weird transparency overlaps between the colour bar and the background.
-            Child = bufferedContent = new BufferedContainer
+            Child = bufferedContent = new BufferedContainer(pixelSnapping: true)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
