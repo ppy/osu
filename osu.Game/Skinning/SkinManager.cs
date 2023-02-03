@@ -193,7 +193,7 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Save a skin. Updates any drawable layouts that are out of date.
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
         /// </summary>
         /// <returns>Whether any change actually occurred.</returns>
         public bool Save(Skin skin)
