@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework;
@@ -14,6 +15,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -24,6 +27,7 @@ namespace osu.Game.Tests.Visual.Navigation
         private HeadlessGameHost ipcSenderHost = null!;
 
         private OsuSchemeLinkIPCChannel osuSchemeLinkIPCSender = null!;
+        private ArchiveImportIPCChannel archiveImportIPCSender = null!;
 
         private const int requested_beatmap_set_id = 1;
 
@@ -57,10 +61,11 @@ namespace osu.Game.Tests.Visual.Navigation
                     return false;
                 };
             });
-            AddStep("create IPC sender channel", () =>
+            AddStep("create IPC sender channels", () =>
             {
                 ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { BindIPC = true });
                 osuSchemeLinkIPCSender = new OsuSchemeLinkIPCChannel(ipcSenderHost);
+                archiveImportIPCSender = new ArchiveImportIPCChannel(ipcSenderHost);
             });
         }
 
@@ -72,11 +77,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("beatmap overlay showing content", () => Game.ChildrenOfType<BeatmapSetOverlay>().FirstOrDefault()?.Header.BeatmapSet.Value.OnlineID == requested_beatmap_set_id);
         }
 
+        [Test]
+        public void TestArchiveImportLinkIPCChannel()
+        {
+            string? beatmapFilepath = null;
+
+            AddStep("import beatmap via IPC", () => archiveImportIPCSender.ImportAsync(beatmapFilepath = TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            AddUntilStep("import complete notification was presented", () => Game.Notifications.ChildrenOfType<ProgressCompletionNotification>().Count(), () => Is.EqualTo(1));
+            AddAssert("original file deleted", () => File.Exists(beatmapFilepath), () => Is.False);
+        }
+
         public override void TearDownSteps()
         {
-            AddStep("dispose IPC sender", () =>
+            AddStep("dispose IPC senders", () =>
             {
                 osuSchemeLinkIPCSender.Dispose();
+                archiveImportIPCSender.Dispose();
                 ipcSenderHost.Dispose();
             });
             base.TearDownSteps();
@@ -85,6 +101,7 @@ namespace osu.Game.Tests.Visual.Navigation
         private partial class IpcGame : TestOsuGame
         {
             private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+            private ArchiveImportIPCChannel? archiveImportIPCChannel;
 
             public IpcGame(Storage storage, IAPIProvider api, string[]? args = null)
                 : base(storage, api, args)
@@ -95,12 +112,14 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 base.LoadComplete();
                 osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+                archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
                 osuSchemeLinkIPCChannel?.Dispose();
+                archiveImportIPCChannel?.Dispose();
             }
         }
     }
