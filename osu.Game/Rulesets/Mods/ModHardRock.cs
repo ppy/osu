@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "HR";
         public override IconUsage? Icon => OsuIcon.ModHardRock;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => "Everything just got a bit harder...";
+        public override LocalisableString Description => DifficultyIncreaseStrings.HardRockDescription;
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
 
         public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)

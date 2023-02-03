@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "SD";
         public override IconUsage? Icon => OsuIcon.ModSuddenDeath;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => "Miss and fail.";
+        public override LocalisableString Description => DifficultyIncreaseStrings.SuddenDeathDescription;
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModPerfect)).ToArray();

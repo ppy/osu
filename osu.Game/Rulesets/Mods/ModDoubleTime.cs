@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -15,9 +16,9 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DT";
         public override IconUsage? Icon => OsuIcon.ModDoubleTime;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => "Zoooooooooom...";
+        public override LocalisableString Description => DifficultyIncreaseStrings.DoubleTimeDescription;
 
-        [SettingSource("Speed increase", "The actual increase to apply")]
+        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.DoubleTimeSpeedChange), nameof(DifficultyIncreaseStrings.DoubleTimeSpeedChangeDescription))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
         {
             MinValue = 1.01,

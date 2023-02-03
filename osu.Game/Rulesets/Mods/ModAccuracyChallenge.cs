@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AC";
 
-        public override LocalisableString Description => "Fail if your accuracy drops too low!";
+        public override LocalisableString Description => DifficultyIncreaseStrings.AccuracyChallengeDescription;
 
         public override ModType Type => ModType.DifficultyIncrease;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
-        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
+        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.AccuracyChallengeMinAcc), nameof(DifficultyIncreaseStrings.AccuracyChallengeMinAccDescription), SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,

@@ -5,6 +5,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Daycore";
         public override string Acronym => "DC";
         public override IconUsage? Icon => null;
-        public override LocalisableString Description => "Whoaaaaa...";
+        public override LocalisableString Description => DifficultyReductionStrings.DaycoreDescription;
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);

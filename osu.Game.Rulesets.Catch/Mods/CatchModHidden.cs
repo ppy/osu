@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHidden : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
     {
-        public override LocalisableString Description => @"Play with fading fruits.";
+        public override LocalisableString Description => DifficultyIncreaseStrings.CatchHiddenDescription;
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         private const double fade_out_offset_multiplier = 0.6;

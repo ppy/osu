@@ -17,7 +17,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun."
         /// </summary>
-        public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"), @"Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.");
+        public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"),
+            @"Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.");
 
         /// <summary>
         /// "Mod Customisation"
@@ -33,6 +34,41 @@ namespace osu.Game.Localisation
         /// "Add preset"
         /// </summary>
         public static LocalisableString AddPreset => new TranslatableString(getKey(@"add_preset"), @"Add preset");
+
+        /// <summary>
+        /// "Difficulty Reduction"
+        /// </summary>
+        public static LocalisableString DifficultyReduction => new TranslatableString(getKey(@"difficulty_reduction"), "Difficulty Reduction");
+
+        /// <summary>
+        /// "Difficulty Increase"
+        /// </summary>
+        public static LocalisableString DifficultyIncrease => new TranslatableString(getKey(@"difficulty_increase"), "Difficulty Increase");
+
+        /// <summary>
+        /// "Conversion"
+        /// </summary>
+        public static LocalisableString Conversion => new TranslatableString(getKey(@"conversion"), "Conversion");
+
+        /// <summary>
+        /// "Automation"
+        /// </summary>
+        public static LocalisableString Automation => new TranslatableString(getKey(@"automation"), "Automation");
+
+        /// <summary>
+        /// "Fun"
+        /// </summary>
+        public static LocalisableString Fun => new TranslatableString(getKey(@"fun"), "Fun");
+
+        /// <summary>
+        /// "Incompatible with:"
+        /// </summary>
+        public static LocalisableString IncompatibleWith => new TranslatableString(getKey(@"incompatible_with"), "Incompatible with:");
+
+        /// <summary>
+        /// "Compatible with all mods"
+        /// </summary>
+        public static LocalisableString CompatibleWithAll => new TranslatableString(getKey(@"compatible_with_all"), "Compatible with all mods");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

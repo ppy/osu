@@ -6,12 +6,13 @@ using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHidden : ManiaModPlayfieldCover
     {
-        public override LocalisableString Description => @"Keys fade out before you hit them!";
+        public override LocalisableString Description => DifficultyIncreaseStrings.ManiaHiddenDescription;
         public override double ScoreMultiplier => 1;
 
         public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)

@@ -7,13 +7,14 @@ using Humanizer;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModEasyWithExtraLives : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
     {
-        [SettingSource("Extra Lives", "Number of extra lives")]
+        [SettingSource(typeof(DifficultyReductionStrings), nameof(DifficultyReductionStrings.EasyRetries), nameof(DifficultyReductionStrings.EasyRetriesDescription))]
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,

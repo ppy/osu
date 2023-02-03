@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     Margin = new MarginPadding { Top = 5 },
                     Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                    Text = "Incompatible with:"
+                    Text = ModSelectOverlayStrings.IncompatibleWith
                 },
                 new ModDisplay
                 {
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.Mods
             var allMods = ruleset.Value.CreateInstance().AllMods;
 
             incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).Select(m => m.CreateInstance()).ToList();
-            incompatibleText.Text = incompatibleMods.Value.Any() ? "Incompatible with:" : "Compatible with all mods";
+            incompatibleText.Text = incompatibleMods.Value.Any() ? ModSelectOverlayStrings.IncompatibleWith : ModSelectOverlayStrings.CompatibleWithAll;
         }
     }
 }

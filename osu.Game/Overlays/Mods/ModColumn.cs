@@ -7,9 +7,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Mods
             ModType = modType;
             this.allowIncompatibleSelection = allowIncompatibleSelection;
 
-            HeaderText = ModType.Humanize(LetterCasing.Title);
+            HeaderText = ModType.GetLocalisableDescription();
 
             if (allowIncompatibleSelection)
             {
