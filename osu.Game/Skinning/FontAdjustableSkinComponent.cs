@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource(typeof(FontAdjustableSkinComponentStrings), nameof(FontAdjustableSkinComponentStrings.Font), nameof(FontAdjustableSkinComponentStrings.FontDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         /// <summary>
