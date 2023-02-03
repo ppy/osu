@@ -10,7 +10,6 @@ using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Select.FooterV2;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -51,15 +50,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             footer.AddButton(new FooterButtonOptionsV2());
 
-            InputManager.MoveMouseTo(Vector2.Zero);
-
             overlay.Hide();
         });
 
         [Test]
         public void TestState()
         {
-            AddRepeatStep("toggle options state", () => this.ChildrenOfType<FooterButtonV2>().Last().Enabled.Toggle(), 20);
+            AddToggleStep("set options enabled state", state => this.ChildrenOfType<FooterButtonV2>().Last().Enabled.Value = state);
         }
 
         [Test]

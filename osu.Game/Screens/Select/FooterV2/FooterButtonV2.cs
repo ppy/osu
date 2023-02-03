@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
@@ -148,10 +149,26 @@ namespace osu.Game.Screens.Select.FooterV2
 
         public GlobalAction? Hotkey;
 
+        private bool handlingMouse;
+
         protected override bool OnHover(HoverEvent e)
         {
             updateDisplay();
             return true;
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            handlingMouse = true;
+            updateDisplay();
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            handlingMouse = false;
+            updateDisplay();
+            base.OnMouseUp(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
@@ -168,25 +185,27 @@ namespace osu.Game.Screens.Select.FooterV2
 
         private void updateDisplay()
         {
+            Color4 backgroundColour = colourProvider.Background3;
+
             if (!Enabled.Value)
             {
-                backgroundBox.FadeColour(colourProvider.Background3.Darken(0.3f), transition_length, Easing.OutQuint);
-                return;
+                backgroundColour = colourProvider.Background3.Darken(0.4f);
             }
-
-            if (OverlayState.Value == Visibility.Visible)
+            else
             {
-                backgroundBox.FadeColour(buttonAccentColour.Darken(0.5f), transition_length, Easing.OutQuint);
-                return;
+                if (OverlayState.Value == Visibility.Visible)
+                    backgroundColour = buttonAccentColour.Darken(0.5f);
+
+                if (IsHovered)
+                {
+                    backgroundColour = backgroundColour.Lighten(0.3f);
+
+                    if (handlingMouse)
+                        backgroundColour = backgroundColour.Lighten(0.3f);
+                }
             }
 
-            if (IsHovered)
-            {
-                backgroundBox.FadeColour(colourProvider.Background3.Lighten(0.3f), transition_length, Easing.OutQuint);
-                return;
-            }
-
-            backgroundBox.FadeColour(colourProvider.Background3, transition_length, Easing.OutQuint);
+            backgroundBox.FadeColour(backgroundColour, transition_length, Easing.OutQuint);
         }
     }
 }
