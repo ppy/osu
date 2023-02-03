@@ -9,7 +9,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -23,21 +25,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
 
-        [SettingSource("Judgement count", "The number of displayed judgements")]
+        [SettingSource(typeof(ColourHitErrorMeterStrings), nameof(ColourHitErrorMeterStrings.JudgementCount), nameof(ColourHitErrorMeterStrings.JudgementCountDescription))]
         public BindableNumber<int> JudgementCount { get; } = new BindableNumber<int>(20)
         {
             MinValue = 1,
             MaxValue = 50,
         };
 
-        [SettingSource("Judgement spacing", "The space between each displayed judgement")]
+        [SettingSource(typeof(ColourHitErrorMeterStrings), nameof(ColourHitErrorMeterStrings.JudgementSpacing), nameof(ColourHitErrorMeterStrings.JudgementSpacingDescription))]
         public BindableNumber<float> JudgementSpacing { get; } = new BindableNumber<float>(2)
         {
             MinValue = 0,
             MaxValue = 10,
         };
 
-        [SettingSource("Judgement shape", "The shape of each displayed judgement")]
+        [SettingSource(typeof(ColourHitErrorMeterStrings), nameof(ColourHitErrorMeterStrings.JudgementShape), nameof(ColourHitErrorMeterStrings.JudgementShapeDescription))]
         public Bindable<ShapeStyle> JudgementShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
@@ -192,7 +194,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public enum ShapeStyle
         {
+            [LocalisableDescription(typeof(ColourHitErrorMeterStrings), nameof(ColourHitErrorMeterStrings.ShapeStyleCircle))]
             Circle,
+
+            [LocalisableDescription(typeof(ColourHitErrorMeterStrings), nameof(ColourHitErrorMeterStrings.ShapeStyleSquare))]
             Square
         }
     }
