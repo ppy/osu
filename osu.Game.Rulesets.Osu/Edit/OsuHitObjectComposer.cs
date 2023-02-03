@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (!snapPositions.Any())
                     continue;
-                
+
                 var closestSnapPosition = snapPositions.MinBy(p => Vector2.Distance(p, screenSpacePosition));
 
                 if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
