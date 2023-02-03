@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
@@ -26,7 +22,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinEditorSceneLibrary : CompositeDrawable
     {
@@ -36,14 +32,14 @@ namespace osu.Game.Skinning.Editor
 
         private const float padding = 10;
 
-        [Resolved(canBeNull: true)]
-        private IPerformFromScreenRunner performer { get; set; }
+        [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; }
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         public SkinEditorSceneLibrary()
         {
@@ -107,7 +103,12 @@ namespace osu.Game.Skinning.Editor
 
                                         var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
-                                        if (!ModUtils.CheckCompatibleSet(mods.Value.Append(replayGeneratingMod), out var invalid))
+                                        IReadOnlyList<Mod> usableMods = mods.Value;
+
+                                        if (replayGeneratingMod != null)
+                                            usableMods = usableMods.Append(replayGeneratingMod).ToArray();
+
+                                        if (!ModUtils.CheckCompatibleSet(usableMods, out var invalid))
                                             mods.Value = mods.Value.Except(invalid).ToArray();
 
                                         if (replayGeneratingMod != null)
@@ -129,8 +130,8 @@ namespace osu.Game.Skinning.Editor
                 Height = BUTTON_HEIGHT;
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
             {
                 BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
                 Content.CornerRadius = 5;
