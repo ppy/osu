@@ -256,13 +256,13 @@ namespace osu.Game.Overlays.SkinEditor
 
             headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
-            headerText.AddText("Currently editing ", cp =>
+            headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
 
-            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            headerText.AddText($" {currentSkin.Value.SkinInfo}", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
