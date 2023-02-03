@@ -5,25 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// Tracks changes to the <see cref="Editor"/>.
     /// </summary>
-    public partial class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
+    public abstract partial class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
     {
         public readonly Bindable<bool> CanUndo = new Bindable<bool>();
         public readonly Bindable<bool> CanRedo = new Bindable<bool>();
 
         public event Action? OnStateChange;
 
-        private readonly LegacyEditorBeatmapPatcher patcher;
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
         private int currentState = -1;
@@ -40,28 +36,9 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        private readonly EditorBeatmap editorBeatmap;
         private bool isRestoring;
 
         public const int MAX_SAVED_STATES = 50;
-
-        /// <summary>
-        /// Creates a new <see cref="EditorChangeHandler"/>.
-        /// </summary>
-        /// <param name="editorBeatmap">The <see cref="EditorBeatmap"/> to track the <see cref="HitObject"/>s of.</param>
-        public EditorChangeHandler(EditorBeatmap editorBeatmap)
-        {
-            this.editorBeatmap = editorBeatmap;
-
-            editorBeatmap.TransactionBegan += BeginChange;
-            editorBeatmap.TransactionEnded += EndChange;
-            editorBeatmap.SaveStateTriggered += SaveState;
-
-            patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
-
-            // Initial state.
-            SaveState();
-        }
 
         protected override void UpdateState()
         {
@@ -70,9 +47,7 @@ namespace osu.Game.Screens.Edit
 
             using (var stream = new MemoryStream())
             {
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
-
+                WriteCurrentStateToStream(stream);
                 byte[] newState = stream.ToArray();
 
                 // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
@@ -111,7 +86,8 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = true;
 
-            patcher.Patch(savedStates[currentState], savedStates[newState]);
+            ApplyStateChange(savedStates[currentState], savedStates[newState]);
+
             currentState = newState;
 
             isRestoring = false;
@@ -119,6 +95,10 @@ namespace osu.Game.Screens.Edit
             OnStateChange?.Invoke();
             updateBindables();
         }
+
+        protected abstract void WriteCurrentStateToStream(MemoryStream stream);
+
+        protected abstract void ApplyStateChange(byte[] previousState, byte[] newState);
 
         private void updateBindables()
         {
