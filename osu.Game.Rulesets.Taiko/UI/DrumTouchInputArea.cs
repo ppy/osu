@@ -71,27 +71,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new DrumSegment(TaikoAction.LeftRim)
+                                leftRim = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new DrumSegment(TaikoAction.RightCentre)
+                                rightRim = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new DrumSegment(TaikoAction.LeftCentre)
+                                leftCentre = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new DrumSegment(TaikoAction.RightRim)
+                                rightCentre = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -192,9 +192,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             trackedActions.Remove(source);
         }
 
-        private bool validMouse(MouseButtonEvent e) =>
-            leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
-
         private TaikoAction getTaikoActionFromPosition(Vector2 inputPosition)
         {
             bool centreHit = leftCentre.Contains(inputPosition) || rightCentre.Contains(inputPosition);
@@ -242,10 +239,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public DrumSegment(TaikoAction action)
+            public DrumSegment()
             {
-                Action = action;
-
                 RelativeSizeAxes = Axes.Both;
 
                 FillMode = FillMode.Fit;
@@ -305,7 +300,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 if (!IsLoaded)
                     return;
 
-                var colour = getColourFromTaikoAction(action);
+                var colour = getColourFromTaikoAction(Action);
 
                 circle.Colour = colour.Multiply(1.4f).Darken(2.8f);
                 overlay.Colour = colour;
