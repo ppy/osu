@@ -11,12 +11,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinComponentToolbox : EditorSidebarSection
     {
@@ -40,7 +40,7 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2)
+                Spacing = new Vector2(EditorSidebar.PADDING)
             };
 
             reloadComponents();
