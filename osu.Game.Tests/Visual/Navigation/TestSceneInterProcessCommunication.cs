@@ -23,10 +23,11 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private HeadlessGameHost ipcSenderHost = null!;
 
-        private OsuSchemeLinkIPCChannel osuSchemeLinkIPCReceiver = null!;
         private OsuSchemeLinkIPCChannel osuSchemeLinkIPCSender = null!;
 
         private const int requested_beatmap_set_id = 1;
+
+        protected override TestOsuGame CreateTestGame() => new IpcGame(LocalStorage, API);
 
         [Resolved]
         private GameHost gameHost { get; set; } = null!;
@@ -56,7 +57,6 @@ namespace osu.Game.Tests.Visual.Navigation
                     return false;
                 };
             });
-            AddStep("create IPC receiver channel", () => osuSchemeLinkIPCReceiver = new OsuSchemeLinkIPCChannel(gameHost, Game));
             AddStep("create IPC sender channel", () =>
             {
                 ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { BindIPC = true });
@@ -74,13 +74,34 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public override void TearDownSteps()
         {
-            AddStep("dispose IPC receiver", () => osuSchemeLinkIPCReceiver.Dispose());
             AddStep("dispose IPC sender", () =>
             {
                 osuSchemeLinkIPCSender.Dispose();
                 ipcSenderHost.Dispose();
             });
             base.TearDownSteps();
+        }
+
+        private partial class IpcGame : TestOsuGame
+        {
+            private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+
+            public IpcGame(Storage storage, IAPIProvider api, string[]? args = null)
+                : base(storage, api, args)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                osuSchemeLinkIPCChannel?.Dispose();
+            }
         }
     }
 }
