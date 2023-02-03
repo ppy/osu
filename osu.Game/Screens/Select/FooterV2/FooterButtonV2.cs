@@ -140,11 +140,10 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             base.LoadComplete();
 
-            // We want the first colour assignment for the background to be instantaneous
-            backgroundBox.Colour = Enabled.Value ? colourProvider.Background3 : colourProvider.Background3.Darken(0.3f);
-
-            Enabled.BindValueChanged(_ => updateDisplay(), true);
             OverlayState.BindValueChanged(_ => updateDisplay());
+            Enabled.BindValueChanged(_ => updateDisplay(), true);
+
+            FinishTransforms(true);
         }
 
         public GlobalAction? Hotkey;
