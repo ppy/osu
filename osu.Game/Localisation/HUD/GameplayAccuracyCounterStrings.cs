@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class GameplayAccuracyCounterStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.GameplayAccuracyCounter";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.GameplayAccuracyCounter";
 
         /// <summary>
         /// "Accuracy display mode"

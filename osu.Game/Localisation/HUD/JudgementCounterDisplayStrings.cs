@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class JudgementCounterDisplayStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.JudgementCounterDisplay";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.JudgementCounterDisplay";
 
         /// <summary>
         /// "Display mode"

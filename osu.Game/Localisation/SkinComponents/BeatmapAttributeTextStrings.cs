@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.SkinComponents
 {
     public static class BeatmapAttributeTextStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.BeatmapAttributeText";
+        private const string prefix = @"osu.Game.Resources.Localisation.SkinComponents.BeatmapAttributeText";
 
         /// <summary>
         /// "Attribute"

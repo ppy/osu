@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class SongProgressStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.SongProgress";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.SongProgress";
 
         /// <summary>
         /// "Show difficulty graph"

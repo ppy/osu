@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class BarHitErrorMeterStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.BarHitErrorMeter";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.BarHitErrorMeter";
 
         /// <summary>
         /// "Judgement line thickness"

@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class ColourHitErrorMeterStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.ColourHitError";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.ColourHitError";
 
         /// <summary>
         /// "Judgement count"
