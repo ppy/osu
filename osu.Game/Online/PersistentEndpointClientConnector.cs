@@ -65,11 +65,11 @@ namespace osu.Game.Online
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    await disconnect(true);
+                    await disconnect(true).ConfigureAwait(true);
                     break;
 
                 case APIState.Online:
-                    await connect();
+                    await connect().ConfigureAwait(true);
                     break;
             }
         }
@@ -147,7 +147,7 @@ namespace osu.Game.Online
         {
             bool hasBeenCancelled = cancellationToken.IsCancellationRequested;
 
-            await disconnect(true);
+            await disconnect(true).ConfigureAwait(false);
 
             if (ex != null)
                 await handleErrorAndDelay(ex, CancellationToken.None).ConfigureAwait(false);

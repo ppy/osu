@@ -208,8 +208,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void Apply([NotNull] HitObject hitObject)
         {
-            if (hitObject == null)
-                throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
+            ArgumentNullException.ThrowIfNull(hitObject);
 
             Apply(new SyntheticHitObjectEntry(hitObject));
         }
@@ -304,8 +303,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            if (Samples != null)
-                Samples.Samples = null;
+            Samples?.ClearSamples();
 
             foreach (var obj in nestedHitObjects)
             {
