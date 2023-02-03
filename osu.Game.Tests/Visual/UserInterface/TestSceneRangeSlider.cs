@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 LowerBound = customStart,
                 UpperBound = customEnd,
                 TooltipSuffix = "suffix",
-                NubWidth = RoundedNub.HEIGHT * 2,
+                NubWidth = Nub.HEIGHT * 2,
                 DefaultStringLowerBound = "Start",
                 DefaultStringUpperBound = "End",
                 MinRange = 10

@@ -163,7 +163,7 @@ namespace osu.Game.Graphics.UserInterface
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;
             public string? TooltipSuffix;
-            public float NubWidth { get; set; } = RoundedNub.HEIGHT;
+            public float NubWidth { get; set; } = Nub.HEIGHT;
 
             public override LocalisableString TooltipText =>
                 (Current.IsDefault ? DefaultTooltip : Current.Value.ToString($@"0.## {TooltipSuffix}")) ?? Current.Value.ToString($@"0.## {TooltipSuffix}");

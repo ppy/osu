@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     public partial class RoundedSliderBar<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        protected readonly RoundedNub Nub;
+        protected readonly Nub Nub;
         protected readonly Box LeftBox;
         protected readonly Box RightBox;
         private readonly Container nubContainer;
@@ -50,8 +50,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public RoundedSliderBar()
         {
-            Height = RoundedNub.HEIGHT;
-            RangePadding = RoundedNub.EXPANDED_SIZE / 2;
+            Height = Nub.HEIGHT;
+            RangePadding = Nub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 new Container
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Nub = new RoundedNub
+                    Child = Nub = new Nub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
