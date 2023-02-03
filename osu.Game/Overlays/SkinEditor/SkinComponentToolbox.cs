@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.SkinEditor
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2)
+                Spacing = new Vector2(EditorSidebar.PADDING)
             };
 
             reloadComponents();
