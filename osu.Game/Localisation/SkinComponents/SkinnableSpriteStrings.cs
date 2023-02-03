@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.SkinComponents
 {
     public static class SkinnableSpriteStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.SkinnableSprite";
+        private const string prefix = @"osu.Game.Resources.Localisation.SkinComponents.SkinnableSprite";
 
         /// <summary>
         /// "Sprite name"

@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Localisation;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays.Settings;
 using osuTK;
 

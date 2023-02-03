@@ -7,7 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 

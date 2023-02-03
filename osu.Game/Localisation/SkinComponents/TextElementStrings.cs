@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.SkinComponents
 {
     public static class TextElementStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.TextElement";
+        private const string prefix = @"osu.Game.Resources.Localisation.SkinComponents.TextElement";
 
         /// <summary>
         /// "Text"
