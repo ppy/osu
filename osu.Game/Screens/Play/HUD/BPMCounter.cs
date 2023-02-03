@@ -26,6 +26,9 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private IGameplayClock gameplayClock { get; set; } = null!;
 
+        [Resolved]
+        private Player player { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
@@ -38,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
 
             //We don't want it going to 0 when we pause. so we block the updates
-            if (gameplayClock.IsPaused.Value) return;
+            if (gameplayClock.IsPaused.Value || player.GameplayState.HasFailed) return;
 
             // We want to check Rate every update to cover windup/down
             Current.Value = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(gameplayClock.CurrentTime).BPM * gameplayClock.Rate;
