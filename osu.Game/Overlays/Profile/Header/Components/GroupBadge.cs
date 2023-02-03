@@ -54,6 +54,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider?.Background6 ?? Colour4.Black,
                     // Normal badges background opacity is 75%, probationary is full opacity as the whole badge gets a bit transparent
+                    // Goal is to match osu-web so this is the most accurate it can be, its a bit scuffed but it is what it is
+                    // Source: https://github.com/ppy/osu-web/blob/master/resources/css/bem/user-group-badge.less#L50
                     Alpha = group.IsProbationary ? 1 : 0.75f,
                 },
                 innerContainer = new FillFlowContainer
