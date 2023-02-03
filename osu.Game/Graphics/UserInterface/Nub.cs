@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,33 +13,45 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
-        protected const float BORDER_WIDTH = 3;
+        public const float HEIGHT = 15;
+
+        public const float EXPANDED_SIZE = 50;
+
+        private const float border_width = 3;
 
         private readonly Box fill;
         private readonly Container main;
 
-        /// <summary>
-        ///  Implements the shape for the nub, allowing for any type of container to be used.
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Container CreateNubContainer();
-
-        protected Nub()
+        public Nub()
         {
-            InternalChild = main = CreateNubContainer();
+            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
 
-            main.Add(fill = new Box
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0,
-                AlwaysPresent = true,
-            });
+                main = new CircularContainer
+                {
+                    BorderColour = Color4.White,
+                    BorderThickness = border_width,
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Children = new Drawable[]
+                    {
+                        fill = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                        },
+                    }
+                },
+            };
         }
 
         [BackgroundDependencyLoader(true)]
@@ -159,7 +173,7 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
-                main.TransformTo(nameof(BorderThickness), BORDER_WIDTH, duration, Easing.OutQuint);
+                main.TransformTo(nameof(BorderThickness), border_width, duration, Easing.OutQuint);
             }
         }
     }
