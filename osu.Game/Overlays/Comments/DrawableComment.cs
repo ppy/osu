@@ -460,7 +460,8 @@ namespace osu.Game.Overlays.Comments
                         Comment.RepliesCount += comments.Length;
                         showRepliesButton.Count = Comment.RepliesCount;
                         Replies.AddRange(comments);
-                    }
+                    },
+                    OnCancel = toggleReply
                 });
             }
             else
