@@ -34,10 +34,10 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowExternalScreenChange => true;
 
-        public override MenuItem[] CreateMenuItemsForBeatmap(BeatmapInfo b) => new MenuItem[]
+        public override MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
         {
-            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(b)),
-            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(b))
+            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(beatmap)),
+            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(beatmap))
         };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();

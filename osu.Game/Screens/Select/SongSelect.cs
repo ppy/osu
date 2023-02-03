@@ -84,9 +84,15 @@ namespace osu.Game.Screens.Select
 
         public bool BeatmapSetsLoaded => IsLoaded && Carousel.BeatmapSetsLoaded;
 
-        public virtual MenuItem[] CreateMenuItemsForBeatmap(BeatmapInfo b) => new MenuItem[]
+        /// <summary>
+        /// Creates any "action" menu items for the provided beatmap (ie. "Select", "Play", "Edit").
+        /// These will always be placed at the top of the context menu, with common items added below them.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create items for.</param>
+        /// <returns>The menu items.</returns>
+        public virtual MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
         {
-            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(b))
+            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(beatmap))
         };
 
         [Resolved]
