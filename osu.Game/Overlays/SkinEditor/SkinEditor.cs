@@ -24,6 +24,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.OSD;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
@@ -31,7 +32,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
-    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>, IEditorChangeHandler
     {
         public const double TRANSITION_DURATION = 300;
 
@@ -71,6 +72,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         private EditorSidebar componentsSidebar = null!;
         private EditorSidebar settingsSidebar = null!;
+
+        private SkinEditorChangeHandler? changeHandler;
+
+        private EditorMenuItem undoMenuItem = null!;
+        private EditorMenuItem redoMenuItem = null!;
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -130,6 +136,14 @@ namespace osu.Game.Overlays.SkinEditor
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
+                                            },
+                                            new MenuItem(CommonStrings.MenuBarEdit)
+                                            {
+                                                Items = new[]
+                                                {
+                                                    undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
+                                                    redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
+                                                }
                                             },
                                         }
                                     },
@@ -210,6 +224,14 @@ namespace osu.Game.Overlays.SkinEditor
         {
             switch (e.Action)
             {
+                case PlatformAction.Undo:
+                    Undo();
+                    return true;
+
+                case PlatformAction.Redo:
+                    Redo();
+                    return true;
+
                 case PlatformAction.Save:
                     if (e.Repeat)
                         return false;
@@ -229,6 +251,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             this.targetScreen = targetScreen;
 
+            changeHandler?.Dispose();
+
             SelectedComponents.Clear();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
@@ -240,6 +264,10 @@ namespace osu.Game.Overlays.SkinEditor
             void loadBlueprintContainer()
             {
                 Debug.Assert(content != null);
+
+                changeHandler = new SkinEditorChangeHandler(targetScreen);
+                changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+                changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
                 content.Child = new SkinBlueprintContainer(targetScreen);
 
@@ -301,6 +329,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedComponents.Clear();
             SelectedComponents.Add(component);
+
+            changeHandler?.SaveState();
         }
 
         private void populateSettings()
@@ -332,6 +362,10 @@ namespace osu.Game.Overlays.SkinEditor
                 getTarget(t.Target)?.Reload();
             }
         }
+
+        protected void Undo() => changeHandler?.RestoreState(-1);
+
+        protected void Redo() => changeHandler?.RestoreState(1);
 
         public void Save()
         {
@@ -371,6 +405,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+
+            changeHandler?.SaveState();
         }
 
         #region Drag & drop import handling
@@ -435,5 +471,19 @@ namespace osu.Game.Overlays.SkinEditor
             {
             }
         }
+
+        #region Delegation of IEditorChangeHandler
+
+        public event Action? OnStateChange
+        {
+            add => changeHandler!.OnStateChange += value;
+            remove => changeHandler!.OnStateChange -= value;
+        }
+
+        public void BeginChange() => changeHandler?.BeginChange();
+        public void EndChange() => changeHandler?.EndChange();
+        public void SaveState() => changeHandler?.SaveState();
+
+        #endregion
     }
 }
