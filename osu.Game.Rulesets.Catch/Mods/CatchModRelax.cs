@@ -6,6 +6,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public partial class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override LocalisableString Description => @"Use the mouse to control the catcher.";
+        public override LocalisableString Description => AutomationStrings.CatchRelaxDescription;
 
         private DrawableCatchRuleset drawableRuleset = null!;
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AP";
         public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
-        public override LocalisableString Description => @"Automatic cursor movement - just follow the rhythm.";
+        public override LocalisableString Description => AutomationStrings.OsuAutopilotDescription;
         public override double ScoreMultiplier => 0.1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 

@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModRelax : ModRelax
     {
-        public override LocalisableString Description => @"No ninja-like spinners, demanding drumrolls or unexpected katu's.";
+        public override LocalisableString Description => AutomationStrings.TaikoRelaxDescription;
     }
 }
