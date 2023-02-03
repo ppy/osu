@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Graphics.UserInterface
     public abstract partial class HoverSampleDebounceComponent : CompositeDrawable
     {
         private Bindable<double?> lastPlaybackTime;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)
