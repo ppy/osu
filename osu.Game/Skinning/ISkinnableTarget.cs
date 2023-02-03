@@ -37,6 +37,11 @@ namespace osu.Game.Skinning
         void Reload();
 
         /// <summary>
+        /// Reload this target from the provided skinnable information.
+        /// </summary>
+        public void Reload(SkinnableInfo[] skinnableInfo);
+
+        /// <summary>
         /// Add a new skinnable component to this target.
         /// </summary>
         /// <param name="drawable">The component to add.</param>
