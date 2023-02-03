@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.SkinEditor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
@@ -333,7 +333,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        public void Save()
+        public void Save(bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -343,8 +343,9 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
 
-            skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
+            // In the case the save was user triggered, always show the save message to make them feel confident.
+            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
