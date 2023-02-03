@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
@@ -23,7 +22,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinEditorSceneLibrary : CompositeDrawable
     {

@@ -435,7 +435,8 @@ namespace osu.Game.Screens.Play
                         HoldToQuit =
                         {
                             Action = () => PerformExit(true),
-                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
+                            ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         KeyCounter =
                         {
