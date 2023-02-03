@@ -14,7 +14,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     /// <summary>
     /// A container which handles loading a skin editor on user request for a specified target.
@@ -147,7 +147,7 @@ namespace osu.Game.Skinning.Editor
 
             if (skinEditor == null) return;
 
-            skinEditor.Save();
+            skinEditor.Save(userTriggered: false);
 
             // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
             updateComponentVisibility();

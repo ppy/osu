@@ -23,17 +23,17 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Skinning;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
     public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
-        public const double TRANSITION_DURATION = 500;
+        public const double TRANSITION_DURATION = 300;
 
         public const float MENU_HEIGHT = 40;
 
@@ -125,7 +125,7 @@ namespace osu.Game.Skinning.Editor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
@@ -256,13 +256,13 @@ namespace osu.Game.Skinning.Editor
 
             headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
-            headerText.AddText("Currently editing ", cp =>
+            headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
 
-            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            headerText.AddText($" {currentSkin.Value.SkinInfo}", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
@@ -333,7 +333,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        public void Save()
+        public void Save(bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -343,8 +343,9 @@ namespace osu.Game.Skinning.Editor
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
 
-            skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
+            // In the case the save was user triggered, always show the save message to make them feel confident.
+            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -359,10 +360,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
-            this
-                // align animation to happen after the majority of the ScalingContainer animation completes.
-                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
-                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
