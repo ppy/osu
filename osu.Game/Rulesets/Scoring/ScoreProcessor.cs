@@ -40,6 +40,18 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
+        /// The minimum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the minimum hit result.
+        /// </summary>
+        public readonly BindableDouble MinimumAccuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The maximum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the maximum hit result.
+        /// </summary>
+        public readonly BindableDouble MaximumAccuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
@@ -85,7 +97,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double ClassicScoreMultiplier => 36;
 
-        private readonly Ruleset ruleset;
+        /// <summary>
+        /// The ruleset this score processor is valid for.
+        /// </summary>
+        public readonly Ruleset Ruleset;
+
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -133,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor(Ruleset ruleset)
         {
-            this.ruleset = ruleset;
+            Ruleset = ruleset;
 
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
@@ -264,6 +280,10 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
+            MinimumAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
+            MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
+                ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
+                : 1;
             TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
@@ -275,8 +295,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public double ComputeAccuracy(ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
             extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
@@ -296,8 +316,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
@@ -407,6 +427,8 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.HitEvents = hitEvents;
+            score.Statistics.Clear();
+            score.MaximumStatistics.Clear();
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
@@ -534,7 +556,7 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            maxResult = maxBasicResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
+                            maxResult = maxBasicResult ??= Ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
                             break;
                     }
 

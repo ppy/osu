@@ -12,11 +12,11 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osu.Game.Skinning.Editor;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Click gameplay scene button", () =>
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text.ToString() == "Gameplay"));
                 InputManager.Click(MouseButton.Left);
             });
 

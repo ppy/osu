@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             Time = time;
         }
 
-        public int CompareTo(ControlPointGroup other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPointGroup? other) => Time.CompareTo(other?.Time);
 
         public void Add(ControlPoint point)
         {

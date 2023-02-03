@@ -11,12 +11,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -24,10 +23,8 @@ using osu.Game.Resources.Localisation.Web;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class BeatmapAttributeText : Container, ISkinnableDrawable
+    public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        public bool UsesFixedAnchor { get; set; }
-
         [SettingSource("Attribute", "The attribute to be displayed.")]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
@@ -67,7 +64,6 @@ namespace osu.Game.Skinning.Components
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Font = OsuFont.Default.With(size: 40)
                 }
             };
         }
@@ -115,13 +111,15 @@ namespace osu.Game.Skinning.Components
                                             .Cast<object?>()
                                             .ToArray();
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
                 numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }
 
             text.Text = LocalisableString.Format(numberedTemplate, args);
         }
+
+        protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 
     public enum BeatmapAttribute
