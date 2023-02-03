@@ -189,11 +189,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 var snapPositions = b.ScreenSpaceSnapPoints;
 
-                var filteredSnapPositions = snapPositions.Cast<Vector2?>().FirstOrDefault(p => Vector2.Distance(p.Value, screenSpacePosition) < snapRadius);
+                if (!snapPositions.Any())
+                    continue;
+                    
+                var closestSnapPosition = snapPositions.MinBy(p => Vector2.Distance(p, screenSpacePosition));
 
-                if (filteredSnapPositions.HasValue)
+                if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
-                    var snap = filteredSnapPositions.Value;
+                    var snap = closestSnapPosition;
 
                     // only return distance portion, since time is not really valid
                     snapResult = new SnapResult(snap, null, playfield);
