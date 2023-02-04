@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override LocalisableString Description => DifficultyIncreaseStrings.NightcoreDescription;
+        public override LocalisableString Description => DoubleTimeModStrings.NightcoreDescription;
     }
 
     public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>

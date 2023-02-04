@@ -21,10 +21,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.OsuHiddenOnlyFade), nameof(DifficultyIncreaseStrings.OsuHiddenOnlyFadeDescription))]
+        [SettingSource(typeof(HiddenModStrings), nameof(HiddenModStrings.OnlyFadeApproachCircles), nameof(HiddenModStrings.OnlyFadeApproachCirclesDescription))]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
-        public override LocalisableString Description => DifficultyIncreaseStrings.OsuHiddenDescription;
+        public override LocalisableString Description => HiddenModStrings.OsuHiddenDescription;
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn) };

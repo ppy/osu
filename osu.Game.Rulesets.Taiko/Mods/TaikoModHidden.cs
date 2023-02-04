@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
-        public override LocalisableString Description => DifficultyIncreaseStrings.TaikoHiddenDescription;
+        public override LocalisableString Description => HiddenModStrings.TaikoHiddenDescription;
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.PlayfieldCoverCoverage), nameof(DifficultyIncreaseStrings.PlayfieldCoverCoverageDescription))]
+        [SettingSource(typeof(HiddenModStrings), nameof(HiddenModStrings.PlayfieldCoverage), nameof(HiddenModStrings.PlayfieldCoverageDescription))]
         public abstract BindableNumber<float> Coverage { get; }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)

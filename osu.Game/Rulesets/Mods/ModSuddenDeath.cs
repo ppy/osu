@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "SD";
         public override IconUsage? Icon => OsuIcon.ModSuddenDeath;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => DifficultyIncreaseStrings.SuddenDeathDescription;
+        public override LocalisableString Description => FailConditionModsStrings.SuddenDeathDescription;
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModPerfect)).ToArray();

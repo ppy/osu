@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.FailConditionRestart), nameof(DifficultyIncreaseStrings.FailConditionRestartDescription))]
+        [SettingSource(typeof(FailConditionModsStrings), nameof(FailConditionModsStrings.Restart), nameof(FailConditionModsStrings.RestartDescription))]
         public BindableBool Restart { get; } = new BindableBool();
 
         public virtual bool PerformFail() => true;

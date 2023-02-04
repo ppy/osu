@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AC";
 
-        public override LocalisableString Description => DifficultyIncreaseStrings.AccuracyChallengeDescription;
+        public override LocalisableString Description => AccuracyChallengeModStrings.Description;
 
         public override ModType Type => ModType.DifficultyIncrease;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.AccuracyChallengeMinAcc), nameof(DifficultyIncreaseStrings.AccuracyChallengeMinAccDescription), SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
+        [SettingSource(typeof(AccuracyChallengeModStrings), nameof(AccuracyChallengeModStrings.MinAcc), nameof(AccuracyChallengeModStrings.MinAccDescription), SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHidden : ManiaModPlayfieldCover
     {
-        public override LocalisableString Description => DifficultyIncreaseStrings.ManiaHiddenDescription;
+        public override LocalisableString Description => HiddenModStrings.ManiaHiddenDescription;
         public override double ScoreMultiplier => 1;
 
         public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)

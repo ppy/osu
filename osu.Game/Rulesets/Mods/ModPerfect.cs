@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1;
-        public override LocalisableString Description => DifficultyIncreaseStrings.PerfectDescription;
+        public override LocalisableString Description => FailConditionModsStrings.PerfectDescription;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModSuddenDeath), typeof(ModAccuracyChallenge) }).ToArray();
 

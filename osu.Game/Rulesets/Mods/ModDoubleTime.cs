@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DT";
         public override IconUsage? Icon => OsuIcon.ModDoubleTime;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => DifficultyIncreaseStrings.DoubleTimeDescription;
+        public override LocalisableString Description => DoubleTimeModStrings.DoubleTimeDescription;
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.DoubleTimeSpeedChange), nameof(DifficultyIncreaseStrings.DoubleTimeSpeedChangeDescription))]
+        [SettingSource(typeof(DoubleTimeModStrings), nameof(DoubleTimeModStrings.SpeedChange), nameof(DoubleTimeModStrings.SpeedChangeDescription))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
         {
             MinValue = 1.01,

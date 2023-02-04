@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "FL";
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => DifficultyIncreaseStrings.FlashlightDescription;
+        public override LocalisableString Description => FlashlightModStrings.Description;
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.FlashlightSizeMultiplier), nameof(DifficultyIncreaseStrings.FlashlightSizeMultiplierDescription))]
+        [SettingSource(typeof(FlashlightModStrings), nameof(FlashlightModStrings.SizeMultiplier), nameof(FlashlightModStrings.SizeMultiplierDescription))]
         public abstract BindableFloat SizeMultiplier { get; }
 
-        [SettingSource(typeof(DifficultyIncreaseStrings), nameof(DifficultyIncreaseStrings.FlashlightComboBasedSize), nameof(DifficultyIncreaseStrings.FlashlightComboBasedSizeDescription))]
+        [SettingSource(typeof(FlashlightModStrings), nameof(FlashlightModStrings.ComboBasedSize), nameof(FlashlightModStrings.ComboBasedSizeDescription))]
         public abstract BindableBool ComboBasedSize { get; }
 
         /// <summary>

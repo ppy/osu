@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Fade In";
         public override string Acronym => "FI";
-        public override LocalisableString Description => DifficultyIncreaseStrings.FadeInDescription;
+        public override LocalisableString Description => HiddenModStrings.ManiaFadeInDescription;
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModHidden)).ToArray();
