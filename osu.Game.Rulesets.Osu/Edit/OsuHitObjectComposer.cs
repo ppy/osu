@@ -196,10 +196,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
-                    var snap = closestSnapPosition;
-
                     // only return distance portion, since time is not really valid
-                    snapResult = new SnapResult(snap, null, playfield);
+                    snapResult = new SnapResult(closestSnapPosition, null, playfield);
                     return true;
                 }
             }
