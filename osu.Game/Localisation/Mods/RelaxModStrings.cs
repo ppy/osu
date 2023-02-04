@@ -23,7 +23,7 @@ namespace osu.Game.Localisation.Mods
         /// <summary>
         /// "Use the mouse to control the catcher."
         /// </summary>
-        public static LocalisableString CatchDescription => new TranslatableString(getKey(@"catch_relax_description"), "Use the mouse to control the catcher.");
+        public static LocalisableString CatchDescription => new TranslatableString(getKey(@"catch_description"), "Use the mouse to control the catcher.");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

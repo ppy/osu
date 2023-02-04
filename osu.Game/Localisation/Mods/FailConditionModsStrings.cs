@@ -29,6 +29,22 @@ namespace osu.Game.Localisation.Mods
         /// </summary>
         public static LocalisableString PerfectDescription => new TranslatableString(getKey(@"perfect_description"), "SS or quit.");
 
+        /// <summary>
+        /// "Fail if your accuracy drops too low!"
+        /// </summary>
+        public static LocalisableString AccuracyChallengeDescription => new TranslatableString(getKey(@"accuracy_challenge_description"), "Fail if your accuracy drops too low!");
+
+        /// <summary>
+        /// "Minimum accuracy"
+        /// </summary>
+        public static LocalisableString MinAcc => new TranslatableString(getKey(@"min_acc"), "Minimum accuracy");
+
+        /// <summary>
+        /// "Trigger a failure if your accuracy foes below this value."
+        /// </summary>
+        public static LocalisableString MinAccDescription =>
+            new TranslatableString(getKey(@"min_acc_description"), "Trigger a failure if your accuracy foes below this value.");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
