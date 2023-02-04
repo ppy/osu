@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Edit
 
         public CreateNewDifficultyDialog(CreateNewDifficulty createNewDifficulty)
         {
-            HeaderText = "Would you like to create a blank difficulty?";
+            HeaderText = EditorDialogsStrings.NewDifficultyDialogHeader;
 
             Icon = FontAwesome.Regular.Clone;
 
@@ -28,17 +27,17 @@ namespace osu.Game.Screens.Edit
             {
                 new PopupDialogOkButton
                 {
-                    Text = "Yeah, let's start from scratch!",
+                    Text = EditorDialogsStrings.CreateNew,
                     Action = () => createNewDifficulty.Invoke(false)
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = "No, create an exact copy of this difficulty",
+                    Text = EditorDialogsStrings.CreateCopy,
                     Action = () => createNewDifficulty.Invoke(true)
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = "I changed my mind, I want to keep editing this difficulty",
+                    Text = EditorDialogsStrings.KeepEditing,
                     Action = () => { }
                 }
             };

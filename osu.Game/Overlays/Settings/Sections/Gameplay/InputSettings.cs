@@ -35,6 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
+                    Keywords = new[] { @"touchscreen" },
                     Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
                 },
             };

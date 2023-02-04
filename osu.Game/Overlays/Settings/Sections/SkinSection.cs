@@ -17,9 +17,9 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
-using osu.Game.Skinning.Editor;
 using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
