@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModEasy : ModEasyWithExtraLives
     {
-        public override LocalisableString Description => DifficultyReductionStrings.ManiaEasyDescription;
+        public override LocalisableString Description => EasyModStrings.ManiaDescription;
     }
 }

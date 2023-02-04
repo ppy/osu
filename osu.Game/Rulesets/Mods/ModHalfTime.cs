@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "HT";
         public override IconUsage? Icon => OsuIcon.ModHalftime;
         public override ModType Type => ModType.DifficultyReduction;
-        public override LocalisableString Description => DifficultyReductionStrings.HalfTimeDescription;
+        public override LocalisableString Description => HalfTimeModStrings.HalfTimeDescription;
 
-        [SettingSource(typeof(DifficultyReductionStrings), nameof(DifficultyReductionStrings.HalfTimeSpeedChange), nameof(DifficultyReductionStrings.HalfTimeSpeedChangeDescription))]
+        [SettingSource(typeof(HalfTimeModStrings), nameof(HalfTimeModStrings.SpeedChange), nameof(HalfTimeModStrings.SpeedChangeDescription))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,

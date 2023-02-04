@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModEasy : ModEasyWithExtraLives
     {
-        public override LocalisableString Description => DifficultyReductionStrings.OsuEasyDescription;
+        public override LocalisableString Description => EasyModStrings.OsuDescription;
     }
 }

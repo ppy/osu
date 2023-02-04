@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModEasy : ModEasy
     {
-        public override LocalisableString Description => DifficultyReductionStrings.TaikoEasyDescription;
+        public override LocalisableString Description => EasyModStrings.TaikoDescription;
 
         /// <summary>
         /// Multiplier factor added to the scrolling speed.

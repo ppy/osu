@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModEasyWithExtraLives : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
     {
-        [SettingSource(typeof(DifficultyReductionStrings), nameof(DifficultyReductionStrings.EasyRetries), nameof(DifficultyReductionStrings.EasyRetriesDescription))]
+        [SettingSource(typeof(EasyModStrings), nameof(EasyModStrings.Retries), nameof(EasyModStrings.RetriesDescription))]
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,

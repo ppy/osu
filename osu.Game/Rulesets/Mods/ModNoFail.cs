@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NF";
         public override IconUsage? Icon => OsuIcon.ModNoFail;
         public override ModType Type => ModType.DifficultyReduction;
-        public override LocalisableString Description => DifficultyReductionStrings.NoFailDescription;
+        public override LocalisableString Description => NoFailModStrings.Description;
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModAutoplay) };
     }

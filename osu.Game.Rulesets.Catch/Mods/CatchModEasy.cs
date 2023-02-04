@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModEasy : ModEasyWithExtraLives
     {
-        public override LocalisableString Description => DifficultyReductionStrings.CatchEasyDescription;
+        public override LocalisableString Description => EasyModStrings.CatchDescription;
     }
 }
