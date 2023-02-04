@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override LocalisableString Description => "Let track speed adapt to you.";
+        public override LocalisableString Description => TimeWarpModsStrings.AdaptiveSpeedDescription;
 
         public override ModType Type => ModType.Fun;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
-        [SettingSource("Initial rate", "The starting speed of the track")]
+        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.InitialRate), nameof(TimeWarpModsStrings.InitialRateDescription))]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01
         };
 
-        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.AdjustPitch), nameof(TimeWarpModsStrings.AdjustPitchDescription))]
         public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         /// <summary>

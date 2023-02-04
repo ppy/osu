@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         protected float CurrentRotation { get; private set; }
 
-        [SettingSource("Roll speed", "Rotations per minute")]
+        [SettingSource(typeof(BarrelRollModStrings), nameof(BarrelRollModStrings.SpinSpeed), nameof(BarrelRollModStrings.SpinSpeedDescription))]
         public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(0.5)
         {
             MinValue = 0.02,
@@ -30,12 +31,12 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("Direction", "The direction of rotation")]
+        [SettingSource(typeof(BarrelRollModStrings), nameof(BarrelRollModStrings.Direction), nameof(BarrelRollModStrings.DirectionDescription))]
         public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>();
 
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
-        public override LocalisableString Description => "The whole playfield is on a wheel!";
+        public override LocalisableString Description => BarrelRollModStrings.Description;
         public override double ScoreMultiplier => 1;
 
         public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";

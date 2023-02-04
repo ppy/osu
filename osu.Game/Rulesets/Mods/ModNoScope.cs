@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -37,8 +38,9 @@ namespace osu.Game.Rulesets.Mods
         protected float ComboBasedAlpha;
 
         [SettingSource(
-            "Hidden at combo",
-            "The combo count at which the cursor becomes completely hidden",
+            typeof(NoScopeModStrings),
+            nameof(NoScopeModStrings.HiddenComboCount),
+            nameof(NoScopeModStrings.HiddenComboCountDescription),
             SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
         )]
         public abstract BindableInt HiddenComboCount { get; }

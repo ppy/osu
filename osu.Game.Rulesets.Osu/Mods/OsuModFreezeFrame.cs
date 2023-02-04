@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => "Burn the notes into your memory.";
+        public override LocalisableString Description => FreezeFrameModStrings.Description;
 
         //Alters the transforms of the approach circles, breaking the effects of these mods.
         public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent) };

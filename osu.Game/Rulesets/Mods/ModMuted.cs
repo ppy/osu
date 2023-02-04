@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Muted";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override LocalisableString Description => "Can you still feel the rhythm without music?";
+        public override LocalisableString Description => MutedModStrings.Description;
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -35,20 +36,20 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly BindableNumber<int> currentCombo = new BindableInt();
 
-        [SettingSource("Start muted", "Increase volume as combo builds.")]
+        [SettingSource(typeof(MutedModStrings), nameof(MutedModStrings.InverseMuting), nameof(MutedModStrings.InverseMutingDescription))]
         public BindableBool InverseMuting { get; } = new BindableBool();
 
-        [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
+        [SettingSource(typeof(MutedModStrings), nameof(MutedModStrings.EnableMetronome), nameof(MutedModStrings.EnableMetronomeDescription))]
         public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
-        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
+        [SettingSource(typeof(MutedModStrings), nameof(MutedModStrings.MuteComboCount), nameof(MutedModStrings.MuteComboCountDescription), SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
         public BindableInt MuteComboCount { get; } = new BindableInt(100)
         {
             MinValue = 0,
             MaxValue = 500,
         };
 
-        [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
+        [SettingSource(typeof(MutedModStrings), nameof(MutedModStrings.AffectsHitSounds), nameof(MutedModStrings.AffectsHitSoundsDescription))]
         public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
 
         protected ModMuted()
