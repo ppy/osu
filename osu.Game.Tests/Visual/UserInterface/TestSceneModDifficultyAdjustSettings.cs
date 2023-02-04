@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void resetToDefault(string name)
         {
             AddStep($"Reset {name} to default", () =>
-                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
+                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText.ToString() == name)
                     .Current.SetDefault());
         }
 
@@ -260,21 +260,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void setSliderValue(string name, float value)
         {
             AddStep($"Set {name} slider to {value}", () =>
-                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
+                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText.ToString() == name)
                     .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = value);
         }
 
         private void checkBindableAtValue(string name, float? expectedValue)
         {
             AddAssert($"Bindable {name} is {(expectedValue?.ToString() ?? "null")}", () =>
-                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
+                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText.ToString() == name)
                     .Current.Value == expectedValue);
         }
 
         private void checkSliderAtValue(string name, float expectedValue)
         {
             AddAssert($"Slider {name} at {expectedValue}", () =>
-                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
+                this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText.ToString() == name)
                     .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value == expectedValue);
         }
 
