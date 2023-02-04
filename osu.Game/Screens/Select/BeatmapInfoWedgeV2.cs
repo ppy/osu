@@ -142,8 +142,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override bool IsPresent => base.IsPresent || DisplayedContent == null; // Visibility is updated in the LoadComponentAsync callback
-
         private Container? loadingInfo;
 
         private void updateDisplay()
@@ -316,7 +314,7 @@ namespace osu.Game.Screens.Select
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
-                    if (!starRatingDisplay.IsPresent)
+                    if (starRatingDisplay.Alpha > 0)
                         starRatingDisplay.FinishTransforms(true);
 
                     starRatingDisplay.FadeIn(transition_duration);
