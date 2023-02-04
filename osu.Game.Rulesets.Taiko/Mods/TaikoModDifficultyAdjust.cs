@@ -4,13 +4,14 @@
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Scroll Speed", "Adjust a beatmap's set scroll speed", LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.ScrollSpeed), nameof(DifficultyAdjustModStrings.ScrollSpeedDescription), LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable ScrollSpeed { get; } = new DifficultyBindable
         {
             Precision = 0.05f,

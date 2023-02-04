@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.History;
 
-        public override LocalisableString Description => "Feeling nostalgic?";
+        public override LocalisableString Description => ClassicModStrings.Description;
 
         public override ModType Type => ModType.Conversion;
     }

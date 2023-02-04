@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Difficulty Adjust";
 
-        public override LocalisableString Description => @"Override a beatmap's difficulty settings.";
+        public override LocalisableString Description => DifficultyAdjustModStrings.DifficultyAdjustDescription;
 
         public override string Acronym => "DA";
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected const int LAST_SETTING_ORDER = 2;
 
-        [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.DrainRate), nameof(DifficultyAdjustModStrings.DrainRateDescription), FIRST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable DrainRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             ReadCurrentFromDifficulty = diff => diff.DrainRate,
         };
 
-        [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.OverallDifficulty), nameof(DifficultyAdjustModStrings.OverallDifficultyDescription), LAST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable OverallDifficulty { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Mods
             ReadCurrentFromDifficulty = diff => diff.OverallDifficulty,
         };
 
-        [SettingSource("Extended Limits", "Adjust difficulty beyond sane limits.")]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.ExtendedLimits), nameof(DifficultyAdjustModStrings.ExtendedLimitsDescription))]
         public BindableBool ExtendedLimits { get; } = new BindableBool();
 
         protected ModDifficultyAdjust()

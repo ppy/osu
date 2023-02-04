@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,16 +20,16 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModStrictTracking)).ToArray();
 
-        [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
+        [SettingSource(typeof(ClassicModStrings), nameof(ClassicModStrings.NoSliderHeadAccuracy), nameof(ClassicModStrings.NoSliderHeadAccuracyDescription))]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
-        [SettingSource("No slider head movement", "Pins slider heads at their starting position, regardless of time.")]
+        [SettingSource(typeof(ClassicModStrings), nameof(ClassicModStrings.NoSliderHeadMovement), nameof(ClassicModStrings.NoSliderHeadMovementDescription))]
         public Bindable<bool> NoSliderHeadMovement { get; } = new BindableBool(true);
 
-        [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
+        [SettingSource(typeof(ClassicModStrings), nameof(ClassicModStrings.ClassicNoteLock), nameof(ClassicModStrings.ClassicNoteLockDescription))]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
-        [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
+        [SettingSource(typeof(ClassicModStrings), nameof(ClassicModStrings.AlwaysPlayTailSample), nameof(ClassicModStrings.AlwaysPlayTailSampleDescription))]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
 
         public void ApplyToHitObject(HitObject hitObject)

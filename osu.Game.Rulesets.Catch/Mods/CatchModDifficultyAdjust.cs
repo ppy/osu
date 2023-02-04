@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDifficultyAdjust : ModDifficultyAdjust, IApplicableToBeatmapProcessor
     {
-        [SettingSource("Circle Size", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.CircleSize), nameof(DifficultyAdjustModStrings.CircleSizeDescription), FIRST_SETTING_ORDER - 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable CircleSize { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             ReadCurrentFromDifficulty = diff => diff.CircleSize,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.ApproachRate), nameof(DifficultyAdjustModStrings.ApproachRateDescription), LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,
         };
 
-        [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
+        [SettingSource(typeof(DifficultyAdjustModStrings), nameof(DifficultyAdjustModStrings.HardRockOffsets), nameof(DifficultyAdjustModStrings.HardRockOffsetsDescription))]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
 
         public override string SettingDescription

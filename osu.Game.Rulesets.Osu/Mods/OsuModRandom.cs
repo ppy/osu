@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -24,11 +25,11 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override LocalisableString Description => "It never gets boring!";
+        public override LocalisableString Description => RandomModStrings.OsuDescription;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
 
-        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
+        [SettingSource(typeof(RandomModStrings), nameof(RandomModStrings.OsuAngleSharpness), nameof(RandomModStrings.OsuAngleSharpnessDescription), SettingControlType = typeof(SettingsSlider<float>))]
         public BindableFloat AngleSharpness { get; } = new BindableFloat(7)
         {
             MinValue = 1,
