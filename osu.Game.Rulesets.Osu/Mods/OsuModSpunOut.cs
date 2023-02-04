@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "SO";
         public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
-        public override LocalisableString Description => AutomationStrings.OsuSpunOutDescription;
+        public override LocalisableString Description => SpunOutModStrings.SpunOutDescription;
         public override double ScoreMultiplier => 0.9;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTargetPractice) };
 

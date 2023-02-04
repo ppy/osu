@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public partial class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override LocalisableString Description => AutomationStrings.CatchRelaxDescription;
+        public override LocalisableString Description => RelaxModStrings.CatchDescription;
 
         private DrawableCatchRuleset drawableRuleset = null!;
 

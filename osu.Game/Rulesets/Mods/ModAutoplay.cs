@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "AT";
         public override IconUsage? Icon => OsuIcon.ModAuto;
         public override ModType Type => ModType.Automation;
-        public override LocalisableString Description => AutomationStrings.AutoplayDescription;
+        public override LocalisableString Description => AutoplayModStrings.Description;
         public override double ScoreMultiplier => 1;
 
         public bool PerformFail() => false;

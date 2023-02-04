@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModRelax : ModRelax
     {
-        public override LocalisableString Description => AutomationStrings.TaikoRelaxDescription;
+        public override LocalisableString Description => RelaxModStrings.TaikoDescription;
     }
 }
