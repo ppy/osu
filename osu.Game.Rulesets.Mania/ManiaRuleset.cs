@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
-        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new ManiaHealthProcessor(drainStartTime, 0.5);
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new ManiaHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
@@ -245,6 +245,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
+                        new ModAccuracyChallenge(),
                     };
 
                 case ModType.Conversion:

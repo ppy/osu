@@ -49,6 +49,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
@@ -59,7 +60,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Skinning.Editor;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -306,6 +306,13 @@ namespace osu.Game
 
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
+
+            LocalUserPlaying.BindValueChanged(p =>
+            {
+                BeatmapManager.PauseImports = p.NewValue;
+                SkinManager.PauseImports = p.NewValue;
+                ScoreManager.PauseImports = p.NewValue;
+            }, true);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
@@ -926,9 +933,9 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API), Add, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
+            loadComponentSingleFile(new MessageNotifier(), Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
