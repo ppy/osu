@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "SI";
         public override IconUsage? Icon => FontAwesome.Solid.Undo;
         public override ModType Type => ModType.Fun;
-        public override LocalisableString Description => SpinInModStrings.Description;
+        public override LocalisableString Description => FunModsStrings.SpinInDescription;
         public override double ScoreMultiplier => 1;
 
         // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,

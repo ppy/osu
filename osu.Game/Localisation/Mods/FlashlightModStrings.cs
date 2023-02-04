@@ -12,7 +12,7 @@ namespace osu.Game.Localisation.Mods
         /// <summary>
         /// "Restricted view area."
         /// </summary>
-        public static LocalisableString Description => new TranslatableString(getKey(@"descriptionn"), @"Restricted view area.");
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"Restricted view area.");
 
         /// <summary>
         /// "Flashlight size"

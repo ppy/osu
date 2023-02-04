@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Name => "Floating Fruits";
         public override string Acronym => "FF";
-        public override LocalisableString Description => FloatingFruitsModStrings.Description;
+        public override LocalisableString Description => FunModsStrings.FloatingFruitsDescription;
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Cloud;
 

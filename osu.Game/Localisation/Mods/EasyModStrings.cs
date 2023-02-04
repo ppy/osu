@@ -13,7 +13,7 @@ namespace osu.Game.Localisation.Mods
         /// "Larger circles, more forgiving HP drain, less accuracy required, and three lives!"
         /// </summary>
         public static LocalisableString OsuDescription =>
-            new TranslatableString(getKey(@"osu_desctiption"), "Larger circles, more forgiving HP drain, less accuracy required, and three lives!");
+            new TranslatableString(getKey(@"osu_description"), "Larger circles, more forgiving HP drain, less accuracy required, and three lives!");
 
         /// <summary>
         /// "Beats move slower, and less accuracy required!"

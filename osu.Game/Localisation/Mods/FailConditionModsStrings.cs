@@ -17,7 +17,7 @@ namespace osu.Game.Localisation.Mods
         /// <summary>
         /// "Automatically restarts when failed."
         /// </summary>
-        public static LocalisableString RestartDescription => new TranslatableString(getKey(@"description"), "Automatically restarts when failed.");
+        public static LocalisableString RestartDescription => new TranslatableString(getKey(@"restart_description"), "Automatically restarts when failed.");
 
         /// <summary>
         /// "Miss and fail."

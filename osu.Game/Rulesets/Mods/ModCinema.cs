@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Cinema";
         public override string Acronym => "CN";
         public override IconUsage? Icon => OsuIcon.ModCinema;
-        public override LocalisableString Description => CinemaModStrings.Description;
+        public override LocalisableString Description => AutomationModsStrings.CinemaDescription;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModAutoplay)).ToArray();
 

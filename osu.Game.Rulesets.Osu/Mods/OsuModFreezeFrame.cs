@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => FreezeFrameModStrings.Description;
+        public override LocalisableString Description => FunModsStrings.FreezeFrameDescription;
 
         //Alters the transforms of the approach circles, breaking the effects of these mods.
         public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent) };

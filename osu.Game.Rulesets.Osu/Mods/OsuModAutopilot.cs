@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AP";
         public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
-        public override LocalisableString Description => AutopilotModStrings.Description;
+        public override LocalisableString Description => AutomationModsStrings.AutopilotDescription;
         public override double ScoreMultiplier => 0.1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
