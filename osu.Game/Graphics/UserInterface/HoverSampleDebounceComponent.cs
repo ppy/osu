@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private Bindable<double?> lastPlaybackTime;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) == true;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)
