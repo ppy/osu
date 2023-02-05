@@ -521,7 +521,7 @@ namespace osu.Game.Overlays.Comments
 
             showRepliesButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
             loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
-            repliesButtonContainer.FadeTo(showRepliesButton.IsPresent || loadRepliesButton.IsPresent ? 1 : 0);
+            repliesButtonContainer.FadeTo(repliesButtonContainer.Any(child => child.Alpha > 0) ? 1 : 0);
 
             showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
 
