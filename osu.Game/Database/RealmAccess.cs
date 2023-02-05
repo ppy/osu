@@ -72,7 +72,7 @@ namespace osu.Game.Database
         /// 25   2022-09-18    Remove skins to add with new naming.
         /// 26   2023-02-05    Added OriginalBeatmapHash to ScoreInfo.
         /// </summary>
-        private const int schema_version = 25;
+        private const int schema_version = 26;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
