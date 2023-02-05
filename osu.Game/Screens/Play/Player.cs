@@ -613,6 +613,8 @@ namespace osu.Game.Screens.Play
             // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             resultsDisplayDelegate?.Cancel();
 
+            beginScoreImport();
+
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
             // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
@@ -735,13 +737,8 @@ namespace osu.Game.Screens.Play
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
             ValidForResume = false;
 
-            // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
-            DrawableRuleset.SetRecordTarget(null);
-
             if (!Configuration.ShowResults)
                 return;
-
-            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
@@ -754,6 +751,56 @@ namespace osu.Game.Screens.Play
             }
 
             progressToResults(true);
+        }
+
+        /// <summary>
+        /// Queue the results screen for display.
+        /// </summary>
+        /// <remarks>
+        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>. This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
+        /// </remarks>
+        /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
+        private void progressToResults(bool withDelay)
+        {
+            resultsDisplayDelegate?.Cancel();
+
+            double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
+
+            resultsDisplayDelegate = new ScheduledDelegate(() =>
+            {
+                if (prepareScoreForDisplayTask == null)
+                {
+                    beginScoreImport();
+                    return;
+                }
+
+                if (!prepareScoreForDisplayTask.IsCompleted)
+                    // If the asynchronous preparation has not completed, keep repeating this delegate.
+                    return;
+
+                resultsDisplayDelegate?.Cancel();
+
+                if (!this.IsCurrentScreen())
+                    // This player instance may already be in the process of exiting.
+                    return;
+
+                this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
+            }, Time.Current + delay, 50);
+
+            Scheduler.Add(resultsDisplayDelegate);
+        }
+
+        private void beginScoreImport()
+        {
+            // We do not want to import the score in cases where we don't show results
+            bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
+            if (!canShowResults)
+                return;
+
+            // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
+            DrawableRuleset.SetRecordTarget(null);
+
+            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
         }
 
         /// <summary>
@@ -783,37 +830,6 @@ namespace osu.Game.Screens.Play
             }
 
             return scoreCopy.ScoreInfo;
-        }
-
-        /// <summary>
-        /// Queue the results screen for display.
-        /// </summary>
-        /// <remarks>
-        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>. This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
-        /// </remarks>
-        /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
-        private void progressToResults(bool withDelay)
-        {
-            resultsDisplayDelegate?.Cancel();
-
-            double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
-
-            resultsDisplayDelegate = new ScheduledDelegate(() =>
-            {
-                if (prepareScoreForDisplayTask?.IsCompleted != true)
-                    // If the asynchronous preparation has not completed, keep repeating this delegate.
-                    return;
-
-                resultsDisplayDelegate?.Cancel();
-
-                if (!this.IsCurrentScreen())
-                    // This player instance may already be in the process of exiting.
-                    return;
-
-                this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
-            }, Time.Current + delay, 50);
-
-            Scheduler.Add(resultsDisplayDelegate);
         }
 
         protected override bool OnScroll(ScrollEvent e)
