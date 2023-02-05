@@ -5,6 +5,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -92,7 +93,14 @@ namespace osu.Game.Users
 
         public class Spectating : UserActivity
         {
-            public override string Status => @"Spectating a game";
+            private readonly APIUser user;
+
+            public Spectating(APIUser user)
+            {
+                this.user = user;
+            }
+
+            public override string Status => @$"Spectating {user.Username}";
         }
 
         public class SearchingForLobby : UserActivity
