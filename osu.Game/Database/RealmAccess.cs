@@ -70,6 +70,7 @@ namespace osu.Game.Database
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
+        /// 26   2023-02-05    Added OriginalBeatmapHash to ScoreInfo.
         /// </summary>
         private const int schema_version = 25;
 
@@ -865,6 +866,20 @@ namespace osu.Game.Database
                 case 25:
                     // Remove the default skins so they can be added back by SkinManager with updated naming.
                     migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
+                    break;
+                case 26:
+                    // Adding origin beatmap hash property to ensure the score corresponds to the version of beatmap it should
+                    // See: https://github.com/ppy/osu/issues/22062
+                    string ScoreInfoName = getMappedOrOriginalName(typeof(ScoreInfo));
+
+                    var oldScoreInfos = migration.OldRealm.DynamicApi.All(ScoreInfoName);
+                    var newScoreInfos = migration.NewRealm.All<ScoreInfo>();
+
+                    for (int i = 0; i < newScoreInfos.Count(); i++)
+                    {
+                        newScoreInfos.ElementAt(i).OriginalBeatmapHash = oldScoreInfos.ElementAt(i).BeatmapInfo.Hash;
+                    }
+
                     break;
             }
         }
