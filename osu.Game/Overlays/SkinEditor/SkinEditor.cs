@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,17 +23,17 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Skinning;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
     public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
-        public const double TRANSITION_DURATION = 500;
+        public const double TRANSITION_DURATION = 300;
 
         public const float MENU_HEIGHT = 40;
 
@@ -42,39 +41,39 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
-        private Drawable targetScreen;
+        private Drawable targetScreen = null!;
 
-        private OsuTextFlowContainer headerText;
+        private OsuTextFlowContainer headerText = null!;
 
-        private Bindable<Skin> currentSkin;
-
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private Bindable<Skin> currentSkin = null!;
 
         [Resolved]
-        private SkinManager skins { get; set; }
+        private OsuGame? game { get; set; }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private SkinManager skins { get; set; } = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private SkinEditorOverlay skinEditorOverlay { get; set; }
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private SkinEditorOverlay? skinEditorOverlay { get; set; }
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private bool hasBegunMutating;
 
-        private Container content;
+        private Container? content;
 
-        private EditorSidebar componentsSidebar;
-        private EditorSidebar settingsSidebar;
+        private EditorSidebar componentsSidebar = null!;
+        private EditorSidebar settingsSidebar = null!;
 
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public SkinEditor()
         {
@@ -126,7 +125,7 @@ namespace osu.Game.Skinning.Editor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, Save),
+                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
@@ -234,11 +233,14 @@ namespace osu.Game.Skinning.Editor
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
+
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
             void loadBlueprintContainer()
             {
+                Debug.Assert(content != null);
+
                 content.Child = new SkinBlueprintContainer(targetScreen);
 
                 componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
@@ -254,13 +256,13 @@ namespace osu.Game.Skinning.Editor
 
             headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
-            headerText.AddText("当前正在编辑: ", cp =>
+            headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 15);
                 cp.Colour = colours.Yellow;
             });
 
-            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            headerText.AddText($" {currentSkin.Value.SkinInfo}", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
@@ -311,9 +313,9 @@ namespace osu.Game.Skinning.Editor
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
 
-        private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
+        private ISkinnableTarget? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget getTarget(GlobalSkinComponentLookup.LookupType target)
+        private ISkinnableTarget? getTarget(GlobalSkinComponentLookup.LookupType target)
         {
             return availableTargets.FirstOrDefault(c => c.Target == target);
         }
@@ -327,11 +329,11 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Target).Reload();
+                getTarget(t.Target)?.Reload();
             }
         }
 
-        public void Save()
+        public void Save(bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -341,8 +343,9 @@ namespace osu.Game.Skinning.Editor
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
 
-            skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
+            // In the case the save was user triggered, always show the save message to make them feel confident.
+            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -357,10 +360,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
-            this
-                // align animation to happen after the majority of the ScalingContainer animation completes.
-                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
-                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -394,12 +394,18 @@ namespace osu.Game.Skinning.Editor
                 // This is the best we can do for now.
                 realm.Run(r => r.Refresh());
 
+                var skinnableTarget = getFirstTarget();
+
+                // Import still should happen for now, even if not placeable (as it allows a user to import skin resources that would apply to legacy gameplay skins).
+                if (skinnableTarget == null)
+                    return;
+
                 // place component
                 var sprite = new SkinnableSprite
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = getFirstTarget().ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
                 };
 
                 placeComponent(sprite, false);

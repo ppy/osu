@@ -164,10 +164,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         const float shrink_size = 0.8f;
 
-                        // When the user has hit lighting disabled, we won't be showing the bright white flash.
-                        // To make things look good, the surrounding animations are also slightly adjusted.
-                        bool showFlash = configHitLighting.Value;
-
                         // Animating with the number present is distracting.
                         // The number disappearing is hidden by the bright flash.
                         number.FadeOut(flash_in_duration / 2);
@@ -204,25 +200,28 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         {
                             outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
 
-                            if (showFlash)
-                            {
-                                outerGradient
-                                    .FadeColour(Color4.White, 80)
-                                    .Then()
-                                    .FadeOut(flash_in_duration);
-                            }
-                            else
-                            {
-                                outerGradient
-                                    .FadeColour(Color4.White, flash_in_duration * 8)
-                                    .FadeOut(flash_in_duration * 2);
-                            }
+                            outerGradient
+                                .FadeColour(Color4.White, 80)
+                                .Then()
+                                .FadeOut(flash_in_duration);
                         }
 
-                        if (showFlash)
+                        if (configHitLighting.Value)
+                        {
+                            flash.HitLighting = true;
                             flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
 
-                        this.FadeOut(showFlash ? fade_out_time : fade_out_time / 2, Easing.OutQuad);
+                            this.FadeOut(fade_out_time, Easing.OutQuad);
+                        }
+                        else
+                        {
+                            flash.HitLighting = false;
+                            flash.FadeTo(1, flash_in_duration, Easing.OutQuint)
+                                 .Then()
+                                 .FadeOut(flash_in_duration, Easing.OutQuint);
+
+                            this.FadeOut(fade_out_time * 0.8f, Easing.OutQuad);
+                        }
 
                         break;
                 }
@@ -254,6 +253,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 Child.AlwaysPresent = true;
             }
 
+            public bool HitLighting { get; set; }
+
             protected override void Update()
             {
                 base.Update();
@@ -262,7 +263,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 {
                     Type = EdgeEffectType.Glow,
                     Colour = Colour,
-                    Radius = OsuHitObject.OBJECT_RADIUS * 1.2f,
+                    Radius = OsuHitObject.OBJECT_RADIUS * (HitLighting ? 1.2f : 0.6f),
                 };
             }
         }

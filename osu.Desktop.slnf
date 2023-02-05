@@ -2,6 +2,14 @@
   "solution": {
     "path": "osu.sln",
     "projects": [
+      "M.DBus\\M.DBus.csproj",
+      "M.Resources\\M.Resources.csproj",
+      "Mvis.Plugin.BottomBar\\Mvis.Plugin.BottomBar.csproj",
+      "Mvis.Plugin.CloudMusicSupport\\Mvis.Plugin.CloudMusicSupport.csproj",
+      "Mvis.Plugin.CollectionSupport\\Mvis.Plugin.CollectionSupport.csproj",
+      "Mvis.Plugin.SandboxToPanel\\Mvis.Plugin.SandboxToPanel.csproj",
+      "Mvis.Plugin.StoryboardSupport\\Mvis.Plugin.StoryboardSupport.csproj",
+      "Mvis.Plugin.Yasp\\Mvis.Plugin.Yasp.csproj",
       "osu.Desktop\\osu.Desktop.csproj",
       "osu.Game.Benchmarks\\osu.Game.Benchmarks.csproj",
       "osu.Game.Rulesets.Catch.Tests\\osu.Game.Rulesets.Catch.Tests.csproj",
@@ -16,26 +24,16 @@
       "osu.Game.Tournament.Tests\\osu.Game.Tournament.Tests.csproj",
       "osu.Game.Tournament\\osu.Game.Tournament.csproj",
       "osu.Game\\osu.Game.csproj",
-      "M.Resources\\M.Resources.csproj",
-      "M.DBus\\M.DBus.csproj",
-      "Mvis.Plugin.StoryboardSupport\\Mvis.Plugin.StoryboardSupport.csproj",
-      "Mvis.Plugin.CollectionSupport\\Mvis.Plugin.CollectionSupport.csproj",
-      "Mvis.Plugin.Yasp\\Mvis.Plugin.Yasp.csproj",
-      "Mvis.Plugin.CloudMusicSupport\\Mvis.Plugin.CloudMusicSupport.csproj",
-      "Mvis.Plugin.SandboxToPanel\\Mvis.Plugin.SandboxToPanel.csproj",
-      "Mvis.Plugin.BottomBar\\Mvis.Plugin.BottomBar.csproj",
-      "Mvis.Plugin.Example\\Mvis.Plugin.Example.csproj",
-      "M.AccelPlugin.Example\\M.AccelPlugin.Example.csproj",
-      "..\\osu-framework\\osu.Framework\\osu.Framework.csproj",
-      "..\\osu-framework\\osu.Framework.NativeLibs\\osu.Framework.NativeLibs.csproj",
-      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",
       "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform.Tests\\osu.Game.Rulesets.EmptyFreeform.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
+      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",
       "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling\\osu.Game.Rulesets.EmptyScrolling.csproj",
+      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
       "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling.Tests\\osu.Game.Rulesets.EmptyScrolling.Tests.csproj",
+      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling\\osu.Game.Rulesets.EmptyScrolling.csproj",
+      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
       "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj"
+      "..\\osu-framework\\osu.Framework.NativeLibs\\osu.Framework.NativeLibs.csproj",
+      "..\\osu-framework\\osu.Framework\\osu.Framework.csproj"
     ]
   }
 }
