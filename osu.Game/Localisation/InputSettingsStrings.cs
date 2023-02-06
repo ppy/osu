@@ -35,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString InGameSection => new TranslatableString(getKey(@"in_game_section"), @"In Game");
 
         /// <summary>
+        /// "Replay"
+        /// </summary>
+        public static LocalisableString ReplaySection => new TranslatableString(getKey(@"replay_section"), @"Replay");
+
+        /// <summary>
         /// "Audio"
         /// </summary>
         public static LocalisableString AudioSection => new TranslatableString(getKey(@"audio_section"), @"Audio");
