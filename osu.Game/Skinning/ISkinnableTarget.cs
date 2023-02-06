@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Reload this target from the provided skinnable information.
         /// </summary>
-        public void Reload(SkinnableInfo[] skinnableInfo);
+        void Reload(SkinnableInfo[] skinnableInfo);
 
         /// <summary>
         /// Add a new skinnable component to this target.
@@ -51,6 +51,6 @@ namespace osu.Game.Skinning
         /// Remove an existing skinnable component from this target.
         /// </summary>
         /// <param name="component">The component to remove.</param>
-        public void Remove(ISkinnableDrawable component);
+        void Remove(ISkinnableDrawable component);
     }
 }
