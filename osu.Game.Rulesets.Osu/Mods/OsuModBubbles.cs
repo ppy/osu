@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        // Makes the slider border coloured on all skins
         private void applySliderState(DrawableSlider slider) =>
             ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
 
