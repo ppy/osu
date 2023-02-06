@@ -456,12 +456,6 @@ namespace osu.Game.Beatmaps
                     if (transferCollections)
                         beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
-                    //Unlinking all scores from this beatmap
-                    r.All<ScoreInfo>().Where(s => s.BeatmapInfoID == beatmapInfo.ID).ForEach(s => s.BeatmapInfo = new BeatmapInfo());
-
-                    //Linking all the previos scores
-                    r.All<ScoreInfo>().Where(s => s.OriginalBeatmapHash == beatmapInfo.Hash).ForEach(s => s.BeatmapInfo = beatmapInfo);
-
                     ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
             }
