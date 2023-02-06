@@ -3,7 +3,7 @@
 
 using osu.Game.Beatmaps;
 
-namespace Mvis.Plugin.CloudMusicSupport.Helper
+namespace osu.Game.Screens.LLin.Misc
 {
     public static class BeatmapMetataExtension
     {

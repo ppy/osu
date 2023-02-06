@@ -1,26 +1,19 @@
+using System;
 using M.Resources.Localisation.LLin;
 using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Yasp.Config;
+using Mvis.Plugin.Yasp.Panels;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
-using osuTK;
-using osuTK.Graphics;
 
 namespace Mvis.Plugin.Yasp
 {
@@ -38,19 +31,26 @@ namespace Mvis.Plugin.Yasp
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
+            var config = (YaspConfigManager)pluginConfigManager;
+
             return new SettingsEntry[]
             {
                 new NumberSettingsEntry<float>
                 {
                     Icon = FontAwesome.Solid.ExpandArrowsAlt,
                     Name = YaspStrings.Scale,
-                    Bindable = ((YaspConfigManager)pluginConfigManager).GetBindable<float>(YaspSettings.Scale),
+                    Bindable = config.GetBindable<float>(YaspSettings.Scale),
                     DisplayAsPercentage = true,
                 },
                 new BooleanSettingsEntry
                 {
                     Name = LLinGenericStrings.EnablePlugin,
-                    Bindable = ((YaspConfigManager)pluginConfigManager).GetBindable<bool>(YaspSettings.EnablePlugin)
+                    Bindable = config.GetBindable<bool>(YaspSettings.EnablePlugin)
+                },
+                new EnumSettingsEntry<PanelType>
+                {
+                    Name = "面板样式",
+                    Bindable = config.GetBindable<PanelType>(YaspSettings.PanelType)
                 }
             };
         }
@@ -69,86 +69,58 @@ namespace Mvis.Plugin.Yasp
                 PluginFlags.CanUnload
             });
 
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Both;
         }
+
+        private readonly Bindable<PanelType> panelType = new Bindable<PanelType>();
 
         private WorkingBeatmap? currentWorkingBeatmap;
 
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
         /// </summary>
-        protected override Drawable CreateContent() => new FillFlowContainer
+        protected override Drawable CreateContent()
         {
-            Height = 90,
-            AutoSizeAxes = Axes.X,
-            Spacing = new Vector2(10),
-            Direction = FillDirection.Horizontal,
-            Margin = new MarginPadding(20),
-            Children = new Drawable[]
+            Drawable target;
+
+            switch (panelType.Value)
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 3
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 90,
-                    Masking = true,
-                    CornerRadius = 5f,
-                    Child = new BeatmapCover.Cover(currentWorkingBeatmap)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    }
-                },
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                            Text = new RomanisableString(currentWorkingBeatmap?.Metadata.TitleUnicode, currentWorkingBeatmap?.Metadata.Title)
-                        },
-                        new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 25),
-                            Text = new RomanisableString(currentWorkingBeatmap?.Metadata.ArtistUnicode, currentWorkingBeatmap?.Metadata.Artist)
-                        },
-                        new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 25),
-                            Text = currentWorkingBeatmap?.Metadata.Source ?? "???"
-                        }
-                    }
-                }
+                case PanelType.Classic:
+                    target = new ClassicPanel();
+                    break;
+
+                case PanelType.SongCover:
+                    target = new NsiPanel();
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"未知的PanelType: {panelType.Value}");
             }
-        }.WithEffect(new BlurEffect
-        {
-            Colour = Color4.Black.Opacity(0.7f),
-            DrawOriginal = true
-        });
+
+            return target;
+        }
 
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.OnContentLoaded(Drawable)"/>
         /// </summary>
         protected override bool OnContentLoaded(Drawable content)
         {
-            content.MoveToX(10).FadeOut();
-            currentContent?.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint).Expire();
-            content.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
+            currentContent?.Hide();
+            currentContent?.Expire();
+
             currentContent = content;
+
+            if (!Enabled.Value) return true;
+
+            content.Show();
+            refresh();
+
             return true;
         }
 
         public override bool Disable()
         {
-            this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
+            currentContent?.Hide();
             return base.Disable();
         }
 
@@ -156,24 +128,22 @@ namespace Mvis.Plugin.Yasp
         {
             bool result = base.Enable();
 
-            this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
-            LLin?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            currentContent?.Show();
+            LLin!.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             return result;
         }
-
-        private Bindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             var config = (YaspConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
+            config.BindWith(YaspSettings.EnablePlugin, Enabled);
+            config.BindWith(YaspSettings.PanelType, panelType);
 
-            config.BindWith(YaspSettings.EnablePlugin, Value);
-            config.BindWith<float>(YaspSettings.Scale, scaleBindable);
-            scaleBindable.BindValueChanged(v =>
+            panelType.BindValueChanged(v =>
             {
-                this.ScaleTo(v.NewValue, 300, Easing.OutQuint);
+                Load();
             }, true);
         }
 
@@ -183,10 +153,15 @@ namespace Mvis.Plugin.Yasp
             return true;
         }
 
-        private void refresh() => Load();
+        private void refresh()
+        {
+            if (currentContent is IPanel panel)
+                panel.Refresh(currentWorkingBeatmap!);
+        }
 
         private void onBeatmapChanged(WorkingBeatmap working)
         {
+            Logger.Log($"CHANGE! {working} :: {currentWorkingBeatmap}");
             if (Disabled.Value) return;
 
             if (currentWorkingBeatmap != working)

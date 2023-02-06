@@ -52,7 +52,7 @@ namespace Mvis.Plugin.Sandbox
 
             var config = (SandboxRulesetConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
-            config.BindWith(SandboxRulesetSetting.EnableRulesetPanel, Value);
+            config.BindWith(SandboxRulesetSetting.EnableRulesetPanel, Enabled);
             config.BindWith(SandboxRulesetSetting.IdleAlpha, idleAlpha);
 
             if (LLin != null)
@@ -60,7 +60,7 @@ namespace Mvis.Plugin.Sandbox
                 LLin.OnIdle += () => idleAlpha.TriggerChange();
                 LLin.OnActive += () =>
                 {
-                    if (Value.Value)
+                    if (Enabled.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);
 
                     CurrentBeatmap.Disabled = false;
@@ -71,7 +71,7 @@ namespace Mvis.Plugin.Sandbox
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
         {
-            if ((LLin?.InterfacesHidden ?? true) && Value.Value)
+            if ((LLin?.InterfacesHidden ?? true) && Enabled.Value)
             {
                 this.FadeTo(v.NewValue, 750, Easing.OutQuint);
                 if (v.NewValue == 0) CurrentBeatmap.Disabled = true;
@@ -97,7 +97,8 @@ namespace Mvis.Plugin.Sandbox
                 new NumberSettingsEntry<float>
                 {
                     Name = StpStrings.AlphaOnIdle,
-                    Bindable = config.GetBindable<float>(SandboxRulesetSetting.IdleAlpha)
+                    Bindable = config.GetBindable<float>(SandboxRulesetSetting.IdleAlpha),
+                    DisplayAsPercentage = true
                 },
                 new BooleanSettingsEntry
                 {
@@ -268,7 +269,7 @@ namespace Mvis.Plugin.Sandbox
                 //MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
             }
 
-            Value.UnbindAll();
+            Enabled.UnbindAll();
             Disable();
 
             //bug: 直接调用Expire会导致面板直接消失

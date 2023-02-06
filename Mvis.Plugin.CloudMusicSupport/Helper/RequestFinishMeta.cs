@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {

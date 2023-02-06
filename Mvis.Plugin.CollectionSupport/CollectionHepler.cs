@@ -104,7 +104,7 @@ namespace Mvis.Plugin.CollectionSupport
         private void load()
         {
             var config = (CollectionHelperConfigManager)DependenciesContainer.Get<LLinPluginManager>().GetConfigManager(this);
-            config.BindWith(CollectionSettings.EnablePlugin, Value);
+            config.BindWith(CollectionSettings.EnablePlugin, Enabled);
             b.BindValueChanged(v =>
             {
                 updateCurrentPosition();

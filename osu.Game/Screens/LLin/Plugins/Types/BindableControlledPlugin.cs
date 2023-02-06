@@ -10,7 +10,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         [Resolved]
         private LLinPluginManager manager { get; set; }
 
-        protected BindableBool Value = new BindableBool();
+        protected BindableBool Enabled = new BindableBool();
         private bool playerExiting;
 
         [BackgroundDependencyLoader]
@@ -22,13 +22,13 @@ namespace osu.Game.Screens.LLin.Plugins.Types
 
         protected override void LoadComplete()
         {
-            Value.BindValueChanged(OnValueChanged, true);
+            Enabled.BindValueChanged(OnValueChanged, true);
             base.LoadComplete();
         }
 
         protected virtual void OnValueChanged(ValueChangedEvent<bool> v)
         {
-            if (Value.Value && !playerExiting)
+            if (Enabled.Value && !playerExiting)
                 manager.ActivePlugin(this);
             else
                 manager.DisablePlugin(this);
@@ -36,19 +36,19 @@ namespace osu.Game.Screens.LLin.Plugins.Types
 
         public override bool Disable()
         {
-            Value.Value = false;
+            Enabled.Value = false;
             return base.Disable();
         }
 
         public override bool Enable()
         {
-            Value.Value = true;
+            Enabled.Value = true;
             return base.Enable();
         }
 
         public override void UnLoad()
         {
-            Value.UnbindAll();
+            Enabled.UnbindAll();
             base.UnLoad();
         }
     }

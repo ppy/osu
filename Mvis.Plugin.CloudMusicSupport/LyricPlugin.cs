@@ -232,7 +232,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
-            config.BindWith(LyricSettings.EnablePlugin, Value);
+            config.BindWith(LyricSettings.EnablePlugin, Enabled);
             config.BindWith(LyricSettings.SaveLrcWhenFetchFinish, autoSave);
             config.BindWith(LyricSettings.TitleSimilarThreshold, TitleSimilarThreshold);
 

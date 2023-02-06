@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.LLin.Misc;
 using Component = osu.Framework.Graphics.Component;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
