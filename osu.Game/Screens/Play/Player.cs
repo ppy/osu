@@ -613,6 +613,7 @@ namespace osu.Game.Screens.Play
             // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             resultsDisplayDelegate?.Cancel();
 
+            // import current score if possible.
             beginScoreImport();
 
             // The actual exit is performed if
@@ -770,7 +771,11 @@ namespace osu.Game.Screens.Play
             {
                 if (prepareScoreForDisplayTask == null)
                 {
-                    beginScoreImport();
+                    // Try importing score since the task hasn't been invoked yet.
+                    if (!beginScoreImport())
+                        // If the task hasn't started, the score will never be imported.
+                        resultsDisplayDelegate?.Cancel();
+
                     return;
                 }
 
@@ -790,17 +795,25 @@ namespace osu.Game.Screens.Play
             Scheduler.Add(resultsDisplayDelegate);
         }
 
-        private void beginScoreImport()
+        /// <summary>
+        /// Ends replay recording and runs <see cref="prepareAndImportScore"/> only when results can be shown
+        /// </summary>
+        /// <returns>
+        /// Whether the task has been invoked
+        /// </returns>
+        private bool beginScoreImport()
         {
-            // We do not want to import the score in cases where we don't show results
-            bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
-            if (!canShowResults)
-                return;
-
             // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
             DrawableRuleset.SetRecordTarget(null);
 
+            // We do not want to import the score in cases where we don't show results
+            bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
+            if (!canShowResults)
+                return false;
+
             prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
+
+            return true;
         }
 
         /// <summary>
