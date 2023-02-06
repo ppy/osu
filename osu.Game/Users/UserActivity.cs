@@ -5,7 +5,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -91,16 +90,17 @@ namespace osu.Game.Users
             public override string Status => @"Editing a beatmap";
         }
 
-        public class Spectating : UserActivity
+        public class Watching : UserActivity
         {
-            private readonly APIUser user;
+            protected virtual string Verb => @"Watching";
 
-            public Spectating(APIUser user)
-            {
-                this.user = user;
-            }
+            public override string Status => @$"{Verb} a game";
+        }
 
-            public override string Status => @$"Spectating {user.Username}";
+        public class Spectating : Watching
+        {
+            protected override string Verb => @"Spectating";
+            public override string Status => @$"{Verb} a game";
         }
 
         public class SearchingForLobby : UserActivity
