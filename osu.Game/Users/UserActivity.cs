@@ -100,7 +100,6 @@ namespace osu.Game.Users
         public class Spectating : Watching
         {
             protected override string Verb => @"Spectating";
-            public override string Status => @$"{Verb} a game";
         }
 
         public class SearchingForLobby : UserActivity
