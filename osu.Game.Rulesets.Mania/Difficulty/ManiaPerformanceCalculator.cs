@@ -110,12 +110,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMaxNote = normalCdf(hMax, d);
-                double p300Note = normalCdf(h300, d) - normalCdf(hMax, d);
-                double p200Note = normalCdf(h200, d) - normalCdf(h300, d);
-                double p100Note = normalCdf(h100, d) - normalCdf(h200, d);
-                double p50Note = normalCdf(h50, d) - normalCdf(h100, d);
-                double p0Note = 1 - normalCdf(h50, d);
+                double pMaxNote = hitProb(hMax, d);
+                double p300Note = hitProb(h300, d) - hitProb(hMax, d);
+                double p200Note = hitProb(h200, d) - hitProb(h300, d);
+                double p100Note = hitProb(h100, d) - hitProb(h200, d);
+                double p50Note = hitProb(h50, d) - hitProb(h100, d);
+                double p0Note = 1 - hitProb(h50, d);
 
                 // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
                 // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
@@ -123,21 +123,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLN = normalCdf(hMax * 1.2, d) * normalCdf(hMax * 1.2 * tailMultipler, d);
+                double pMaxLN = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
 
-                double p300LN = normalCdf(h300 * 1.1, d) * normalCdf(h300 * 1.1 * tailMultipler, d)
-                              - normalCdf(hMax * 1.2, d) * normalCdf(hMax * 1.2 * tailMultipler, d);
+                double p300LN = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d)
+                              - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
 
-                double p200LN = normalCdf(h200, d) * normalCdf(h200 * tailMultipler, d)
-                              - normalCdf(h300 * 1.1, d) * normalCdf(h300 * 1.1 * tailMultipler, d);
+                double p200LN = hitProb(h200, d) * hitProb(h200 * tailMultipler, d)
+                              - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d);
 
-                double p100LN = normalCdf(h100, d) * normalCdf(h100 * tailMultipler, d)
-                              - normalCdf(h200, d) * normalCdf(h200 * tailMultipler, d);
+                double p100LN = hitProb(h100, d) * hitProb(h100 * tailMultipler, d)
+                              - hitProb(h200, d) * hitProb(h200 * tailMultipler, d);
 
-                double p50LN = normalCdf(h50, d) * normalCdf(h50 * tailMultipler, d)
-                             - normalCdf(h100, d) * normalCdf(h100 * tailMultipler, d);
+                double p50LN = hitProb(h50, d) * hitProb(h50 * tailMultipler, d)
+                             - hitProb(h100, d) * hitProb(h100 * tailMultipler, d);
 
-                double p0LN = 1 - normalCdf(h50, d) * normalCdf(h50 * tailMultipler, d);
+                double p0LN = 1 - hitProb(h50, d) * hitProb(h50 * tailMultipler, d);
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
@@ -161,20 +161,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMaxNote = normalCdf(hMax, d);
-                double p300Note = normalCdf(h300, d) - normalCdf(hMax, d);
-                double p200Note = normalCdf(h200, d) - normalCdf(h300, d);
-                double p100Note = normalCdf(h100, d) - normalCdf(h200, d);
-                double p50Note = normalCdf(h50, d) - normalCdf(h100, d);
-                double p0Note = 1 - normalCdf(h50, d);
+                double pMaxNote = hitProb(hMax, d);
+                double p300Note = hitProb(h300, d) - hitProb(hMax, d);
+                double p200Note = hitProb(h200, d) - hitProb(h300, d);
+                double p100Note = hitProb(h100, d) - hitProb(h200, d);
+                double p50Note = hitProb(h50, d) - hitProb(h100, d);
+                double p0Note = 1 - hitProb(h50, d);
 
                 // Lazer LN tails are 1.5x the hit window, so calculate the probability of hitting them separately.
-                double pMaxTail = normalCdf(hMax * 1.5, d);
-                double p300Tail = normalCdf(h300 * 1.5, d) - normalCdf(hMax * 1.5, d);
-                double p200Tail = normalCdf(h200 * 1.5, d) - normalCdf(h300 * 1.5, d);
-                double p100Tail = normalCdf(h100 * 1.5, d) - normalCdf(h200 * 1.5, d);
-                double p50Tail = normalCdf(h50 * 1.5, d) - normalCdf(h100 * 1.5, d);
-                double p0Tail = 1 - normalCdf(h50 * 1.5, d);
+                double pMaxTail = hitProb(hMax * 1.5, d);
+                double p300Tail = hitProb(h300 * 1.5, d) - hitProb(hMax * 1.5, d);
+                double p200Tail = hitProb(h200 * 1.5, d) - hitProb(h300 * 1.5, d);
+                double p100Tail = hitProb(h100 * 1.5, d) - hitProb(h200 * 1.5, d);
+                double p50Tail = hitProb(h50 * 1.5, d) - hitProb(h100 * 1.5, d);
+                double p0Tail = 1 - hitProb(h50 * 1.5, d);
 
                 double pMax = ((pMaxNote * (attributes.NoteCount + attributes.HoldNoteCount)) + (pMaxTail * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p300Tail * attributes.HoldNoteCount)) / totalHits;
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return judgements;
         }
 
-        private double normalCdf(double x, double deviation)
+        private double hitProb(double x, double deviation)
         {
             return erfApprox(x / (deviation * Math.Sqrt(2)));
         }
