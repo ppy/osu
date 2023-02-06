@@ -9,11 +9,6 @@ namespace osu.Game.Localisation.Mods
     {
         private const string prefix = @"osu.Game.Resources.Localisation.Mods.SpunOutMod";
 
-        /// <summary>
-        /// "Spinners will be automatically completed."
-        /// </summary>
-        public static LocalisableString SpunOutDescription => new TranslatableString(getKey(@"spun_out_description"), "Spinners will be automatically completed.");
-
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
