@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Wind Up";
         public override string Acronym => "WU";
-        public override LocalisableString Description => TimeWarpModsStrings.WindUpDescription;
+        public override LocalisableString Description => TimeRampModsStrings.WindUpDescription;
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;
 
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1)

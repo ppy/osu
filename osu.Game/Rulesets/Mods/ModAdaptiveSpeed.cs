@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override LocalisableString Description => TimeWarpModsStrings.AdaptiveSpeedDescription;
+        public override LocalisableString Description => TimeRampModsStrings.AdaptiveSpeedDescription;
 
         public override ModType Type => ModType.Fun;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
-        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.InitialRate), nameof(TimeWarpModsStrings.InitialRateDescription))]
+        [SettingSource(typeof(TimeRampModsStrings), nameof(TimeRampModsStrings.InitialRate), nameof(TimeRampModsStrings.InitialRateDescription))]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01
         };
 
-        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.AdjustPitch), nameof(TimeWarpModsStrings.AdjustPitchDescription))]
+        [SettingSource(typeof(TimeRampModsStrings), nameof(TimeRampModsStrings.AdjustPitch), nameof(TimeRampModsStrings.AdjustPitchDescription))]
         public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
         /// <summary>

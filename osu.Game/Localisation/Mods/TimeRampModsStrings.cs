@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation.Mods
 {
-    public static class TimeWarpModsStrings
+    public static class TimeRampModsStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Mods.TimeWarpMods";
+        private const string prefix = @"osu.Game.Resources.Localisation.Mods.TimeRampMods";
 
         /// <summary>
         /// "Initial rate"

@@ -21,13 +21,13 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 0.5;
 
-        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.InitialRate), nameof(TimeWarpModsStrings.InitialRateDescription))]
+        [SettingSource(typeof(TimeRampModsStrings), nameof(TimeRampModsStrings.InitialRate), nameof(TimeRampModsStrings.InitialRateDescription))]
         public abstract BindableNumber<double> InitialRate { get; }
 
-        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.FinalRate), nameof(TimeWarpModsStrings.FinalRateDescription))]
+        [SettingSource(typeof(TimeRampModsStrings), nameof(TimeRampModsStrings.FinalRate), nameof(TimeRampModsStrings.FinalRateDescription))]
         public abstract BindableNumber<double> FinalRate { get; }
 
-        [SettingSource(typeof(TimeWarpModsStrings), nameof(TimeWarpModsStrings.AdjustPitch), nameof(TimeWarpModsStrings.AdjustPitchDescription))]
+        [SettingSource(typeof(TimeRampModsStrings), nameof(TimeRampModsStrings.AdjustPitch), nameof(TimeRampModsStrings.AdjustPitchDescription))]
         public abstract BindableBool AdjustPitch { get; }
 
         public override bool ValidForMultiplayerAsFreeMod => false;
