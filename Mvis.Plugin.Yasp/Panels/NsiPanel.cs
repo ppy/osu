@@ -142,15 +142,12 @@ namespace Mvis.Plugin.Yasp.Panels
                     {
                         var prevBackground = beatmapBackground;
 
-                        newCover.X = -1;
+                        newCover.X = -0.1f;
 
                         coverAnimContainer.Add(newCover);
 
-                        prevBackground?.MoveToX(-1, 600, Easing.OutQuint);
-                        newCover.MoveToX(0, 600, Easing.OutQuint);
-
-                        if (prevBackground != null)
-                            this.Delay(301).Schedule(() => coverAnimContainer.Remove(prevBackground, true));
+                        prevBackground?.MoveToX(-0.1f, 450, Easing.OutQuint).FadeOut(450, Easing.OutQuint).Expire();
+                        newCover.MoveToX(0, 450, Easing.OutQuint).FadeInFromZero(450, Easing.OutQuint);
 
                         beatmapBackground = newCover;
                     });
