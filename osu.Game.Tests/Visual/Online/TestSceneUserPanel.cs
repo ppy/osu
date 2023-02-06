@@ -107,6 +107,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set online status", () => status.Value = new UserStatusOnline());
 
             AddStep("idle", () => activity.Value = null);
+            AddStep("watching", () => activity.Value = new UserActivity.Watching());
             AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
             AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
             AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
