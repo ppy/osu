@@ -110,34 +110,34 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMaxNote = erfApprox(hMax / (d * root2));
-                double p300Note = erfApprox(h300 / (d * root2)) - erfApprox(hMax / (d * root2));
-                double p200Note = erfApprox(h200 / (d * root2)) - erfApprox(h300 / (d * root2));
-                double p100Note = erfApprox(h100 / (d * root2)) - erfApprox(h200 / (d * root2));
-                double p50Note = erfApprox(h50 / (d * root2)) - erfApprox(h100 / (d * root2));
-                double p0Note = 1 - erfApprox(h50 / (d * root2));
+                double pMaxNote = normalCdf(hMax, d);
+                double p300Note = normalCdf(h300, d) - normalCdf(hMax, d);
+                double p200Note = normalCdf(h200, d) - normalCdf(h300, d);
+                double p100Note = normalCdf(h100, d) - normalCdf(h200, d);
+                double p50Note = normalCdf(h50, d) - normalCdf(h100, d);
+                double p0Note = 1 - normalCdf(h50, d);
 
-                // Effective hit window for LN tails, takes a value between 1 and 2. This is because the hit window for LN tails in stable
+                // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
                 // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
                 double tailMultipler = 1.5;
 
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLN = erfApprox((hMax * 1.2) / (d * root2)) * erfApprox((hMax * 1.2 * tailMultipler) / (d * root2));
+                double pMaxLN = normalCdf(hMax * 1.2, d) * normalCdf(hMax * 1.2 * tailMultipler, d);
 
-                double p300LN = erfApprox((h300 * 1.1) / (d * root2)) * erfApprox((h300 * 1.1 * tailMultipler) / (d * root2))
-                              - erfApprox((hMax * 1.2) / (d * root2)) * erfApprox((hMax * 1.2 * tailMultipler) / (d * root2));
+                double p300LN = normalCdf(h300 * 1.1, d) * normalCdf(h300 * 1.1 * tailMultipler, d)
+                              - normalCdf(hMax * 1.2, d) * normalCdf(hMax * 1.2 * tailMultipler, d);
 
-                double p200LN = erfApprox(h200 / (d * root2)) * erfApprox((h200 * tailMultipler) / (d * root2))
-                              - erfApprox((h300 * 1.1) / (d * root2)) * erfApprox((h300 * 1.1 * tailMultipler) / (d * root2));
+                double p200LN = normalCdf(h200, d) * normalCdf(h200 * tailMultipler, d)
+                              - normalCdf(h300 * 1.1, d) * normalCdf(h300 * 1.1 * tailMultipler, d);
 
-                double p100LN = erfApprox(h100 / (d * root2)) * erfApprox((h100 * tailMultipler) / (d * root2))
-                              - erfApprox(h200 / (d * root2)) * erfApprox((h200 * tailMultipler) / (d * root2));
+                double p100LN = normalCdf(h100, d) * normalCdf(h100 * tailMultipler, d)
+                              - normalCdf(h200, d) * normalCdf(h200 * tailMultipler, d);
 
-                double p50LN = erfApprox(h50 / (d * root2)) * erfApprox((h50 * tailMultipler) / (d * root2))
-                             - erfApprox(h100 / (d * root2)) * erfApprox((h100 * tailMultipler) / (d * root2));
+                double p50LN = normalCdf(h50, d) * normalCdf(h50 * tailMultipler, d)
+                             - normalCdf(h100, d) * normalCdf(h100 * tailMultipler, d);
 
-                double p0LN = 1 - erfApprox(h50 / (d * root2)) * erfApprox((h50 * tailMultipler) / (d * root2));
+                double p0LN = 1 - normalCdf(h50, d) * normalCdf(h50 * tailMultipler, d);
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
@@ -161,20 +161,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return double.PositiveInfinity;
 
-                double pMaxNote = erfApprox(hMax / (d * root2));
-                double p300Note = erfApprox(h300 / (d * root2)) - erfApprox(hMax / (d * root2));
-                double p200Note = erfApprox(h200 / (d * root2)) - erfApprox(h300 / (d * root2));
-                double p100Note = erfApprox(h100 / (d * root2)) - erfApprox(h200 / (d * root2));
-                double p50Note = erfApprox(h50 / (d * root2)) - erfApprox(h100 / (d * root2));
-                double p0Note = 1 - erfApprox(h50 / (d * root2));
+                double pMaxNote = normalCdf(hMax, d);
+                double p300Note = normalCdf(h300, d) - normalCdf(hMax, d);
+                double p200Note = normalCdf(h200, d) - normalCdf(h300, d);
+                double p100Note = normalCdf(h100, d) - normalCdf(h200, d);
+                double p50Note = normalCdf(h50, d) - normalCdf(h100, d);
+                double p0Note = 1 - normalCdf(h50, d);
 
                 // Lazer LN tails are 1.5x the hit window, so calculate the probability of hitting them separately.
-                double pMaxTail = erfApprox((hMax * 1.5) / (d * root2));
-                double p300Tail = erfApprox((h300 * 1.5) / (d * root2)) - erfApprox((hMax * 1.5) / (d * root2));
-                double p200Tail = erfApprox((h200 * 1.5) / (d * root2)) - erfApprox((h300 * 1.5) / (d * root2));
-                double p100Tail = erfApprox((h100 * 1.5) / (d * root2)) - erfApprox((h200 * 1.5) / (d * root2));
-                double p50Tail = erfApprox((h50 * 1.5) / (d * root2)) - erfApprox((h100 * 1.5) / (d * root2));
-                double p0Tail = 1 - erfApprox((h50 * 1.5) / (d * root2));
+                double pMaxTail = normalCdf(hMax * 1.5, d);
+                double p300Tail = normalCdf(h300 * 1.5, d) - normalCdf(hMax * 1.5, d);
+                double p200Tail = normalCdf(h200 * 1.5, d) - normalCdf(h300 * 1.5, d);
+                double p100Tail = normalCdf(h100 * 1.5, d) - normalCdf(h200 * 1.5, d);
+                double p50Tail = normalCdf(h50 * 1.5, d) - normalCdf(h100 * 1.5, d);
+                double p0Tail = 1 - normalCdf(h50 * 1.5, d);
 
                 double pMax = ((pMaxNote * (attributes.NoteCount + attributes.HoldNoteCount)) + (pMaxTail * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p300Tail * attributes.HoldNoteCount)) / totalHits;
@@ -255,6 +255,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             judgements[4] = (151 - 3 * overallDifficulty) * windowMultiplier;
 
             return judgements;
+        }
+
+        private double normalCdf(double x, double deviation)
+        {
+            return erfApprox(x / (deviation * Math.Sqrt(2)));
         }
 
         private double erfApprox(double x)
