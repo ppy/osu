@@ -614,7 +614,7 @@ namespace osu.Game.Screens.Play
             resultsDisplayDelegate?.Cancel();
 
             // import current score if possible.
-            beginScoreImport();
+            attemptScoreImport();
 
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
@@ -772,8 +772,8 @@ namespace osu.Game.Screens.Play
                 if (prepareScoreForDisplayTask == null)
                 {
                     // Try importing score since the task hasn't been invoked yet.
-                    if (!beginScoreImport())
-                        // If the task hasn't started, the score will never be imported.
+                    if (!attemptScoreImport())
+                        // If attempt failed, trying again is unnecessary
                         resultsDisplayDelegate?.Cancel();
 
                     return;
@@ -796,12 +796,12 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Ends replay recording and runs <see cref="prepareAndImportScore"/> only when results can be shown
+        /// Attempts to run <see cref="prepareAndImportScore"/>
         /// </summary>
         /// <returns>
-        /// Whether the task has been invoked
+        /// Whether the attempt was successful
         /// </returns>
-        private bool beginScoreImport()
+        private bool attemptScoreImport()
         {
             // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
             DrawableRuleset.SetRecordTarget(null);
