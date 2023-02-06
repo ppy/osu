@@ -192,12 +192,16 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
             if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
-            skinImporter.Save(skin);
+            return skinImporter.Save(skin);
         }
 
         /// <summary>
