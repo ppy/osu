@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -15,24 +14,19 @@ namespace osu.Game.Users
 {
     public abstract class UserActivity
     {
-        public abstract string Status { get; }
-
-        /// <summary>
-        /// This property is used when the <see cref="DiscordRichPresenceMode"/> is <see cref="DiscordRichPresenceMode.Limited"/>
-        /// </summary>
-        public virtual string LimitedStatus => Status;
+        public abstract string GetStatus(bool hideIdentifiableInformation = false);
 
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
         public class Modding : UserActivity
         {
-            public override string Status => "Modding a map";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Modding a map";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
         }
 
         public class ChoosingBeatmap : UserActivity
         {
-            public override string Status => "Choosing a beatmap";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Choosing a beatmap";
         }
 
         public abstract class InGame : UserActivity
@@ -47,7 +41,7 @@ namespace osu.Game.Users
                 Ruleset = ruleset;
             }
 
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
+            public override string GetStatus(bool hideIdentifiableInformation = false) => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class InMultiplayerGame : InGame
@@ -57,7 +51,7 @@ namespace osu.Game.Users
             {
             }
 
-            public override string Status => $@"{base.Status} with others";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => $@"{base.GetStatus(hideIdentifiableInformation)} with others";
         }
 
         public class SpectatingMultiplayerGame : InGame
@@ -67,7 +61,7 @@ namespace osu.Game.Users
             {
             }
 
-            public override string Status => $"Watching others {base.Status.ToLowerInvariant()}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => $"Watching others {base.GetStatus(hideIdentifiableInformation).ToLowerInvariant()}";
         }
 
         public class InPlaylistGame : InGame
@@ -95,7 +89,7 @@ namespace osu.Game.Users
                 BeatmapInfo = info;
             }
 
-            public override string Status => @"Editing a beatmap";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Editing a beatmap";
         }
 
         public class Watching : UserActivity
@@ -111,12 +105,12 @@ namespace osu.Game.Users
                 this.score = score;
             }
 
-            public override string Status => $@"Watching {Username}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Watching a game" : $@"Watching {Username}";
         }
 
         public class Spectating : Watching
         {
-            public override string Status => $@"Spectating {Username}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Spectating a game" : $@"Spectating {Username}";
 
             public Spectating(ScoreInfo score)
                 : base(score)
@@ -126,12 +120,12 @@ namespace osu.Game.Users
 
         public class SearchingForLobby : UserActivity
         {
-            public override string Status => @"Looking for a lobby";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Looking for a lobby";
         }
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a lobby";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"In a lobby";
 
             public readonly Room Room;
 

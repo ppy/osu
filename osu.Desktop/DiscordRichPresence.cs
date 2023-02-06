@@ -98,7 +98,7 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = truncate(privacyMode.Value == DiscordRichPresenceMode.Limited ? activity.Value.LimitedStatus : activity.Value.Status);
+                presence.State = truncate(activity.Value.GetStatus(privacyMode.Value == DiscordRichPresenceMode.Limited));
                 presence.Details = truncate(getDetails(activity.Value));
 
                 if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
