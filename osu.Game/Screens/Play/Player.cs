@@ -1076,7 +1076,7 @@ namespace osu.Game.Screens.Play
 
             // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
             failAnimationLayer?.Stop();
-            PauseOverlay.StopAllSamples();
+            PauseOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully)
             {
