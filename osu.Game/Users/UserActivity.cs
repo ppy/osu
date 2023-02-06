@@ -102,8 +102,7 @@ namespace osu.Game.Users
         {
             private readonly ScoreInfo score;
 
-            private string username => score.User.Username;
-            private string playingVerb => score.BeatmapInfo.Ruleset.CreateInstance().PlayingVerb;
+            protected string Username => score.User.Username;
 
             public BeatmapInfo BeatmapInfo => score.BeatmapInfo;
 
@@ -112,15 +111,12 @@ namespace osu.Game.Users
                 this.score = score;
             }
 
-            protected virtual string Verb => @"Watching";
-
-            public override string Status => @$"{Verb} {username} {playingVerb.ToLowerInvariant()}";
-            public override string LimitedStatus => $@"{Verb} a game";
+            public override string Status => $@"Watching {Username}";
         }
 
         public class Spectating : Watching
         {
-            protected override string Verb => @"Spectating";
+            public override string Status => $@"Spectating {Username}";
 
             public Spectating(ScoreInfo score)
                 : base(score)
