@@ -19,13 +19,13 @@ using osuTK;
 namespace Mvis.Plugin.Sandbox
 {
     [Cached]
-    public partial class SandboxPanel : BindableControlledPlugin
+    public partial class SandboxPlugin : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
         public override int Version => 10;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
-        public SandboxPanel()
+        public SandboxPlugin()
         {
             Name = "Sandbox";
             Description = "可能是最好的osu!音乐可视化";

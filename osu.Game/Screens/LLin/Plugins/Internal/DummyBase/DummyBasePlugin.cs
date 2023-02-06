@@ -1,5 +1,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins.Config;
@@ -86,9 +87,10 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                 },
                 new BooleanSettingsEntry
                 {
-                    Name = "自动启用垂直同步",
+                    Name = "节能模式",
                     Bindable = config.GetBindable<bool>(MSetting.MvisAutoVSync),
-                    Description = "启用后，将在进入播放器时自动启用垂直同步，并在退出时恢复帧数限制"
+                    Description = "启用后，将在进入播放器时自动启用垂直同步和单线程，并在退出时恢复进入前的状态",
+                    Icon = FontAwesome.Solid.Leaf
                 },
                 new BooleanSettingsEntry
                 {
