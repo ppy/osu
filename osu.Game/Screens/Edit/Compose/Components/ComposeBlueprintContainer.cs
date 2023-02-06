@@ -91,6 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.DrawableObject = drawableObject;
         }
 
+        private bool nudgeMovementActive;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.ControlPressed)
@@ -98,19 +100,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Left:
-                        moveSelection(new Vector2(-1, 0));
+                        nudgeSelection(new Vector2(-1, 0));
                         return true;
 
                     case Key.Right:
-                        moveSelection(new Vector2(1, 0));
+                        nudgeSelection(new Vector2(1, 0));
                         return true;
 
                     case Key.Up:
-                        moveSelection(new Vector2(0, -1));
+                        nudgeSelection(new Vector2(0, -1));
                         return true;
 
                     case Key.Down:
-                        moveSelection(new Vector2(0, 1));
+                        nudgeSelection(new Vector2(0, 1));
                         return true;
                 }
             }
@@ -118,12 +120,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (nudgeMovementActive && !e.ControlPressed)
+            {
+                Beatmap.EndChange();
+                nudgeMovementActive = false;
+            }
+        }
+
         /// <summary>
         /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
         /// </summary>
         /// <param name="delta"></param>
-        private void moveSelection(Vector2 delta)
+        private void nudgeSelection(Vector2 delta)
         {
+            if (!nudgeMovementActive)
+            {
+                nudgeMovementActive = true;
+                Beatmap.BeginChange();
+            }
+
             var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
 
             if (firstBlueprint == null)
