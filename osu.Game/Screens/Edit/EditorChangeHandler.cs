@@ -96,8 +96,18 @@ namespace osu.Game.Screens.Edit
             updateBindables();
         }
 
+        /// <summary>
+        /// Write a serialised copy of the currently tracked state to the provided stream.
+        /// This will be stored as a state which can be restored in the future.
+        /// </summary>
+        /// <param name="stream">The stream which the state should be written to.</param>
         protected abstract void WriteCurrentStateToStream(MemoryStream stream);
 
+        /// <summary>
+        /// Given a previous and new state, apply any changes required to bring the current state in line with the new state.
+        /// </summary>
+        /// <param name="previousState">The previous (current before this call) serialised state.</param>
+        /// <param name="newState">The new state to be applied.</param>
         protected abstract void ApplyStateChange(byte[] previousState, byte[] newState);
 
         private void updateBindables()
