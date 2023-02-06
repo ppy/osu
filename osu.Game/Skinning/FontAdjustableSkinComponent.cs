@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Skinning
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Skinning
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Font", "The font to use.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         /// <summary>

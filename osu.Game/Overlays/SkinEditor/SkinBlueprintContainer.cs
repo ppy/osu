@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -10,16 +8,21 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Screens;
-using osu.Framework.Testing;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
@@ -28,7 +31,7 @@ namespace osu.Game.Skinning.Editor
         private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
 
         [Resolved]
-        private SkinEditor editor { get; set; }
+        private SkinEditor editor { get; set; } = null!;
 
         public SkinBlueprintContainer(Drawable target)
         {
@@ -46,9 +49,7 @@ namespace osu.Game.Skinning.Editor
 
             if (targetContainers.Length == 0)
             {
-                string targetScreen = target.ChildrenOfType<Screen>().LastOrDefault()?.GetType().Name ?? "this screen";
-
-                AddInternal(new ScreenWhiteBox.UnderConstructionMessage(targetScreen, "doesn't support skin customisation just yet."));
+                AddInternal(new NonSkinnableScreenPlaceholder());
                 return;
             }
 
@@ -61,7 +62,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -158,6 +159,66 @@ namespace osu.Game.Skinning.Editor
 
             foreach (var list in targetComponents)
                 list.UnbindAll();
+        }
+
+        public partial class NonSkinnableScreenPlaceholder : CompositeDrawable
+        {
+            [Resolved]
+            private SkinEditorOverlay? skinEditorOverlay { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colourProvider.Dark6,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.95f,
+                    },
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0, 5),
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            new SpriteIcon
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Icon = FontAwesome.Solid.ExclamationCircle,
+                                Size = new Vector2(24),
+                                Y = -5,
+                            },
+                            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 18))
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                TextAnchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Text = "Please navigate to a skinnable screen using the scene library",
+                            },
+                            new RoundedButton
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Width = 200,
+                                Margin = new MarginPadding { Top = 20 },
+                                Action = () => skinEditorOverlay?.Hide(),
+                                Text = "Return to game"
+                            }
+                        }
+                    },
+                };
+            }
         }
     }
 }

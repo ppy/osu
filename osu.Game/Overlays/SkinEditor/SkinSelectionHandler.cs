@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +14,15 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Skinning.Editor
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
         [Resolved]
-        private SkinEditor skinEditor { get; set; }
+        private SkinEditor skinEditor { get; set; } = null!;
 
         public override bool HandleRotation(float angle)
         {
