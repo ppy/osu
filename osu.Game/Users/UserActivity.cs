@@ -4,9 +4,11 @@
 #nullable disable
 
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
@@ -14,6 +16,12 @@ namespace osu.Game.Users
     public abstract class UserActivity
     {
         public abstract string Status { get; }
+
+        /// <summary>
+        /// This property is used when the <see cref="DiscordRichPresenceMode"/> is <see cref="DiscordRichPresenceMode.Limited"/>
+        /// </summary>
+        public virtual string LimitedStatus => Status;
+
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
         public class Modding : UserActivity
@@ -92,14 +100,32 @@ namespace osu.Game.Users
 
         public class Watching : UserActivity
         {
+            private readonly ScoreInfo score;
+
+            private string username => score.User.Username;
+            private string playingVerb => score.BeatmapInfo.Ruleset.CreateInstance().PlayingVerb;
+
+            public BeatmapInfo BeatmapInfo => score.BeatmapInfo;
+
+            public Watching(ScoreInfo score)
+            {
+                this.score = score;
+            }
+
             protected virtual string Verb => @"Watching";
 
-            public override string Status => @$"{Verb} a game";
+            public override string Status => @$"{Verb} {username} {playingVerb.ToLowerInvariant()}";
+            public override string LimitedStatus => $@"{Verb} a game";
         }
 
         public class Spectating : Watching
         {
             protected override string Verb => @"Spectating";
+
+            public Spectating(ScoreInfo score)
+                : base(score)
+            {
+            }
         }
 
         public class SearchingForLobby : UserActivity
