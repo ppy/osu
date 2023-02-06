@@ -29,15 +29,15 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Bubbles";
 
-        public override string Acronym => "BB";
+        public override string Acronym => "BU";
 
-        public override LocalisableString Description => "Dont let their popping distract you!";
+        public override LocalisableString Description => "Don't let their popping distract you!";
 
         public override double ScoreMultiplier => 1;
 
         public override ModType Type => ModType.Fun;
 
-        // Compatibility with these seems potentially feasible in the future, blocked for now because they dont work as one would expect
+        // Compatibility with these seems potentially feasible in the future, blocked for now because they don't work as one would expect
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
         private PlayfieldAdjustmentContainer adjustmentContainer = null!;
@@ -87,26 +87,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (drawableObject is not DrawableOsuHitObject drawableOsuObject || !drawableObject.Judged) return;
 
-            OsuHitObject hitObject = drawableOsuObject.HitObject;
-
             switch (drawableOsuObject)
             {
-                //Needs to be done explicitly to avoid being handled by DrawableHitCircle below
-                case DrawableSliderHead:
-                    addBubbleContainer(hitObject.Position, drawableOsuObject);
-                    return;
-
-                //Stack leniency causes placement issues if this isn't handled as such.
-                case DrawableHitCircle hitCircle:
-                    addBubbleContainer(hitCircle.Position, drawableOsuObject);
-                    break;
-
                 case DrawableSlider:
                 case DrawableSpinnerTick:
                     break;
 
                 default:
-                    addBubbleContainer(hitObject.Position, drawableOsuObject);
+                    addBubbleForObject(drawableOsuObject);
                     break;
             }
         }
@@ -114,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void applySliderState(DrawableSlider slider) =>
             ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
 
-        private void addBubbleContainer(Vector2 position, DrawableHitObject hitObject)
+        private void addBubbleForObject(DrawableOsuHitObject hitObject)
         {
             bubbleContainer.Add
             (
@@ -122,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     LifetimeStart = bubbleContainer.Time.Current,
                     Colour = hitObject.AccentColour.Value,
-                    Position = position,
+                    Position = hitObject.HitObject.Position,
                     InitialSize = new Vector2(bubbleRadius),
                     MaxSize = maxSize,
                     FadeTime = bubbleFade,
