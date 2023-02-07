@@ -466,7 +466,7 @@ namespace osu.Game.Overlays.Comments
             }
             else
             {
-                replyEditorContainer.Clear(true);
+                replyEditorContainer.ForEach(e => e.Expire());
                 replyEditorContainer.Hide();
             }
         }
