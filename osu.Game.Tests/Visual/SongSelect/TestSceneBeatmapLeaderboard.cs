@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     User = new APIUser
                     {
                         Id = 6602580,
@@ -227,7 +227,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddSeconds(-30),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -245,7 +245,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddSeconds(-70),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -264,7 +264,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddMinutes(-40),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -283,7 +283,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -302,7 +302,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-25),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -321,7 +321,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-50),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -340,7 +340,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-72),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -359,7 +359,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddMonths(-3),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -378,7 +378,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddYears(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
-                    OriginalBeatmapHash = beatmapInfo.Hash,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser

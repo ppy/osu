@@ -70,7 +70,7 @@ namespace osu.Game.Database
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
-        /// 26   2023-02-05    Added OriginalBeatmapHash to ScoreInfo.
+        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// </summary>
         private const int schema_version = 26;
 
@@ -878,7 +878,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newScoreInfos.Count(); i++)
                     {
-                        newScoreInfos.ElementAt(i).OriginalBeatmapHash = oldScoreInfos.ElementAt(i).BeatmapInfo.Hash;
+                        newScoreInfos.ElementAt(i).BeatmapHash = oldScoreInfos.ElementAt(i).BeatmapInfo.Hash;
                     }
 
                     break;
