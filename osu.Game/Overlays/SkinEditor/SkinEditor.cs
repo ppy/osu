@@ -481,8 +481,16 @@ namespace osu.Game.Overlays.SkinEditor
             remove => throw new NotImplementedException();
         }
 
-        public void BeginChange() => changeHandler?.BeginChange();
-        public void EndChange() => changeHandler?.EndChange();
+        private IEditorChangeHandler? beginChangeHandler;
+
+        public void BeginChange()
+        {
+            // Change handler may change between begin and end, which can cause unbalanced operations.
+            // Let's track the one that was used when beginning the change so we can call EndChange on it specifically.
+            (beginChangeHandler = changeHandler)?.BeginChange();
+        }
+
+        public void EndChange() => beginChangeHandler?.EndChange();
         public void SaveState() => changeHandler?.SaveState();
 
         #endregion
