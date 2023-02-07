@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
-using Android.Provider;
 using Android.Views;
 using osu.Framework.Android;
 using osu.Game.Database;
@@ -131,28 +129,14 @@ namespace osu.Android
 
             await Task.WhenAll(uris.Select(async uri =>
             {
-                // there are more performant overloads of this method, but this one is the most backwards-compatible
-                // (dates back to API 1).
-                var cursor = ContentResolver?.Query(uri, null, null, null, null);
+                var task = await AndroidImportTask.Create(ContentResolver!, uri).ConfigureAwait(false);
 
-                if (cursor == null)
-                    return;
-
-                cursor.MoveToFirst();
-
-                int filenameColumn = cursor.GetColumnIndex(IOpenableColumns.DisplayName);
-                string filename = cursor.GetString(filenameColumn);
-
-                // SharpCompress requires archive streams to be seekable, which the stream opened by
-                // OpenInputStream() seems to not necessarily be.
-                // copy to an arbitrary-access memory stream to be able to proceed with the import.
-                var copy = new MemoryStream();
-                using (var stream = ContentResolver.OpenInputStream(uri))
-                    await stream.CopyToAsync(copy).ConfigureAwait(false);
-
-                lock (tasks)
+                if (task != null)
                 {
-                    tasks.Add(new ImportTask(copy, filename));
+                    lock (tasks)
+                    {
+                        tasks.Add(task);
+                    }
                 }
             })).ConfigureAwait(false);
 
