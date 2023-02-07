@@ -867,12 +867,13 @@ namespace osu.Game.Database
                     // Remove the default skins so they can be added back by SkinManager with updated naming.
                     migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
+
                 case 26:
                     // Adding origin beatmap hash property to ensure the score corresponds to the version of beatmap it should
                     // See: https://github.com/ppy/osu/issues/22062
-                    string ScoreInfoName = getMappedOrOriginalName(typeof(ScoreInfo));
+                    string scoreInfoName = getMappedOrOriginalName(typeof(ScoreInfo));
 
-                    var oldScoreInfos = migration.OldRealm.DynamicApi.All(ScoreInfoName);
+                    var oldScoreInfos = migration.OldRealm.DynamicApi.All(scoreInfoName);
                     var newScoreInfos = migration.NewRealm.All<ScoreInfo>();
 
                     for (int i = 0; i < newScoreInfos.Count(); i++)
