@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit
         {
             get
             {
+                ensureStateSaved();
+
                 using (var stream = new MemoryStream(savedStates[currentState]))
                     return stream.ComputeSHA2Hash();
             }
@@ -39,6 +41,19 @@ namespace osu.Game.Screens.Edit
         private bool isRestoring;
 
         public const int MAX_SAVED_STATES = 50;
+
+        public override void BeginChange()
+        {
+            ensureStateSaved();
+
+            base.BeginChange();
+        }
+
+        private void ensureStateSaved()
+        {
+            if (savedStates.Count == 0)
+                SaveState();
+        }
 
         protected override void UpdateState()
         {
