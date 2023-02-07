@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Extensions;
@@ -17,9 +18,10 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinEditorChangeHandler : EditorChangeHandler
     {
-        private readonly Drawable targetScreen;
+        private readonly ISkinnableTarget? firstTarget;
 
-        private ISkinnableTarget? firstTarget => targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault();
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly BindableList<ISkinnableDrawable>? components;
 
         public SkinEditorChangeHandler(Drawable targetScreen)
         {
@@ -27,10 +29,13 @@ namespace osu.Game.Overlays.SkinEditor
             // In the future we'll want this to cover all changes, even to skin's `InstantiationInfo`.
             // We'll also need to consider cases where multiple targets are on screen at the same time.
 
-            this.targetScreen = targetScreen;
+            firstTarget = targetScreen?.ChildrenOfType<ISkinnableTarget>().FirstOrDefault();
 
-            // Save initial state.
-            SaveState();
+            if (firstTarget == null)
+                return;
+
+            components = new BindableList<ISkinnableDrawable> { BindTarget = firstTarget.Components };
+            components.BindCollectionChanged((_, _) => SaveState());
         }
 
         protected override void WriteCurrentStateToStream(MemoryStream stream)

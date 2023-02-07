@@ -329,8 +329,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedComponents.Clear();
             SelectedComponents.Add(component);
-
-            changeHandler?.SaveState();
         }
 
         private void populateSettings()
@@ -406,8 +404,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
-
-            changeHandler?.SaveState();
         }
 
         #region Drag & drop import handling
