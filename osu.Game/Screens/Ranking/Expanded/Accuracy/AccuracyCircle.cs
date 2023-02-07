@@ -74,6 +74,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private const double virtual_ss_percentage = 0.01;
 
         /// <summary>
+        /// The width of a <see cref="RankNotch"/> in terms of accuracy.
+        /// </summary>
+        public const double NOTCH_WIDTH_PERCENTAGE = 0.002;
+
+        /// <summary>
         /// The easing for the circle filling transforms.
         /// </summary>
         public static readonly Easing ACCURACY_TRANSFORM_EASING = Easing.OutPow10;
@@ -263,7 +268,34 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             using (BeginDelayedSequence(ACCURACY_TRANSFORM_DELAY))
             {
-                double targetAccuracy = score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH ? 1 : Math.Min(1 - virtual_ss_percentage, score.Accuracy);
+                double targetAccuracy = score.Accuracy;
+
+                // Ensure the gauge overshoots or undershoots a bit so it doesn't land in the gaps of the inner graded circle (caused by `RankNotch`es),
+                // to prevent ambiguity on what grade it's pointing at.
+                double[] notchPercentages = { 0.7, 0.8, 0.9, 0.95 };
+
+                foreach (double p in notchPercentages)
+                {
+                    if (targetAccuracy > p - NOTCH_WIDTH_PERCENTAGE / 2 && targetAccuracy < p + NOTCH_WIDTH_PERCENTAGE / 2)
+                    {
+                        int tippingDirection = targetAccuracy - p >= 0 ? 1 : -1; // We "round up" here to match rank criteria
+                        targetAccuracy = p + tippingDirection * (NOTCH_WIDTH_PERCENTAGE / 2);
+                        break;
+                    }
+                }
+
+                // The final gap between 99.999...% (S) and 100% (SS) is exaggerated by `virtual_ss_percentage`. We don't want to land there either.
+                if (score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH)
+                    targetAccuracy = 1;
+                else
+                    targetAccuracy = Math.Min(1 - virtual_ss_percentage - NOTCH_WIDTH_PERCENTAGE / 2, targetAccuracy);
+
+                // The accuracy circle gauge visually fills up a bit too much.
+                // This wouldn't normally matter but we want it to align properly with the inner graded circle in the above cases.
+                const double visual_alignment_offset = 0.001;
+
+                if (targetAccuracy < 1 && targetAccuracy >= visual_alignment_offset)
+                    targetAccuracy -= visual_alignment_offset;
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 

@@ -24,11 +24,20 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneAccuracyCircle : OsuTestScene
     {
+        [TestCase(0, ScoreRank.D)]
         [TestCase(0.2, ScoreRank.D)]
         [TestCase(0.5, ScoreRank.D)]
+        [TestCase(0.699, ScoreRank.D)]
+        [TestCase(0.7, ScoreRank.C)]
         [TestCase(0.75, ScoreRank.C)]
+        [TestCase(0.799, ScoreRank.C)]
+        [TestCase(0.80, ScoreRank.B)]
         [TestCase(0.85, ScoreRank.B)]
+        [TestCase(0.899, ScoreRank.B)]
+        [TestCase(0.9, ScoreRank.A)]
         [TestCase(0.925, ScoreRank.A)]
+        [TestCase(0.949, ScoreRank.A)]
+        [TestCase(0.95, ScoreRank.S)]
         [TestCase(0.975, ScoreRank.S)]
         [TestCase(0.9999, ScoreRank.S)]
         [TestCase(1, ScoreRank.X)]
