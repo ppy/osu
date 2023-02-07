@@ -67,9 +67,9 @@ namespace osu.Game.Scoring
         public string MaximumStatisticsJson { get; set; } = string.Empty;
 
         /// <summary>
-        /// Hash of the beatmap where it scored
+        /// The beatmap's <see cref="BeatmapInfo.Hash"> at the point in time when the score was set.
         /// </summary>
-        public string OriginalBeatmapHash { get; set; } = string.Empty;
+        public string BeatmapHash { get; set; } = string.Empty;
 
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
