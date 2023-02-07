@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Signal the beginning of a change.
         /// </summary>
-        public void BeginChange()
+        public virtual void BeginChange()
         {
             if (bulkChangesStarted++ == 0)
                 TransactionBegan?.Invoke();

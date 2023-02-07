@@ -26,9 +26,6 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.SaveStateTriggered += SaveState;
 
             patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
-
-            // Initial state.
-            SaveState();
         }
 
         protected override void WriteCurrentStateToStream(MemoryStream stream)
