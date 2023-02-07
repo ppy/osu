@@ -477,8 +477,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         public event Action? OnStateChange
         {
-            add => changeHandler!.OnStateChange += value;
-            remove => changeHandler!.OnStateChange -= value;
+            add => throw new NotImplementedException();
+            remove => throw new NotImplementedException();
         }
 
         public void BeginChange() => changeHandler?.BeginChange();
