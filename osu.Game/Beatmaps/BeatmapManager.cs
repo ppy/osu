@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -26,7 +25,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
 
