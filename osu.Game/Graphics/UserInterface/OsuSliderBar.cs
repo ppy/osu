@@ -17,18 +17,12 @@ namespace osu.Game.Graphics.UserInterface
     public abstract partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        private Sample sample = null!;
-
-        private double lastSampleTime;
-        private T lastSampleValue;
-
         public bool PlaySamplesOnAdjust { get; set; } = true;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sample = audio.Samples.Get(@"UI/notch-tick");
-        }
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; set; }
 
         public virtual LocalisableString TooltipText { get; private set; }
 
@@ -37,10 +31,16 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         private const int max_decimal_digits = 5;
 
-        /// <summary>
-        /// Whether to format the tooltip as a percentage or the actual value.
-        /// </summary>
-        public bool DisplayAsPercentage { get; set; }
+        private Sample sample = null!;
+
+        private double lastSampleTime;
+        private T lastSampleValue;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sample = audio.Samples.Get(@"UI/notch-tick");
+        }
 
         protected override void LoadComplete()
         {
