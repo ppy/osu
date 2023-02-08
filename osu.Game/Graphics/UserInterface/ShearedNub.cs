@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,44 +11,46 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
+    public partial class ShearedNub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
-        public const float HEIGHT = 15;
+        protected const float BORDER_WIDTH = 3;
 
+        public const int HEIGHT = 30;
         public const float EXPANDED_SIZE = 50;
 
-        private const float border_width = 3;
+        public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
 
         private readonly Box fill;
         private readonly Container main;
 
-        public Nub()
+        /// <summary>
+        ///  Implements the shape for the nub, allowing for any type of container to be used.
+        /// </summary>
+        /// <returns></returns>
+        public ShearedNub()
         {
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
-
-            InternalChildren = new[]
+            InternalChild = main = new Container
             {
-                main = new CircularContainer
+                Shear = SHEAR,
+                BorderColour = Colour4.White,
+                BorderThickness = BORDER_WIDTH,
+                Masking = true,
+                CornerRadius = 5,
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Child = fill = new Box
                 {
-                    BorderColour = Color4.White,
-                    BorderThickness = border_width,
-                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Children = new Drawable[]
-                    {
-                        fill = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true,
-                        },
-                    }
-                },
+                    Alpha = 0,
+                    AlwaysPresent = true,
+                }
             };
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
-            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
+            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.4f) ?? colours.PinkLighter;
             GlowColour = colourProvider?.Highlight1 ?? colours.PinkLighter;
 
             main.EdgeEffect = new EdgeEffectParameters
@@ -84,11 +84,14 @@ namespace osu.Game.Graphics.UserInterface
             get => glowing;
             set
             {
+                if (glowing == value)
+                    return;
+
                 glowing = value;
 
                 if (value)
                 {
-                    main.FadeColour(GlowingAccentColour.Lighten(0.5f), 40, Easing.OutQuint)
+                    main.FadeColour(GlowingAccentColour.Lighten(0.1f), 40, Easing.OutQuint)
                         .Then()
                         .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
 
@@ -173,7 +176,7 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
-                main.TransformTo(nameof(BorderThickness), border_width, duration, Easing.OutQuint);
+                main.TransformTo(nameof(BorderThickness), BORDER_WIDTH, duration, Easing.OutQuint);
             }
         }
     }
