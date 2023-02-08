@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 foreach (double p in notchPercentages)
                 {
-                    if (targetAccuracy > p - NOTCH_WIDTH_PERCENTAGE / 2 && targetAccuracy < p + NOTCH_WIDTH_PERCENTAGE / 2)
+                    if (Precision.AlmostEquals(p, targetAccuracy, NOTCH_WIDTH_PERCENTAGE / 2))
                     {
                         int tippingDirection = targetAccuracy - p >= 0 ? 1 : -1; // We "round up" here to match rank criteria
                         targetAccuracy = p + tippingDirection * (NOTCH_WIDTH_PERCENTAGE / 2);
