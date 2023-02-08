@@ -84,16 +84,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
 
             importMoreScores(() => beatmapInfo);
-            checkCount(10);
+            checkDisplayedCount(10);
 
             importMoreScores(() => beatmapInfo);
-            checkCount(20);
+            checkDisplayedCount(20);
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
 
             AddStep(@"Perform initial save to guarantee stable hash", () =>
             {
@@ -124,7 +124,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             importMoreScores(() => beatmapInfo);
-            checkCount(10);
+
+            checkDisplayedCount(10);
+            checkStoredCount(10);
 
             AddStep(@"Save with changes", () =>
             {
@@ -134,11 +136,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("Hash changed", () => beatmapInfo.Hash, () => Is.Not.EqualTo(originalHash));
-            checkCount(0);
+            checkDisplayedCount(0);
+            checkStoredCount(10);
 
             importMoreScores(() => beatmapInfo);
             importMoreScores(() => beatmapInfo);
-            checkCount(20);
+            checkDisplayedCount(20);
+            checkStoredCount(30);
 
             AddStep(@"Revert changes", () =>
             {
@@ -148,10 +152,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("Hash restored", () => beatmapInfo.Hash, () => Is.EqualTo(originalHash));
-            checkCount(10);
+            checkDisplayedCount(10);
+            checkStoredCount(30);
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
+            checkStoredCount(0);
         }
 
         [Test]
@@ -234,8 +240,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Clear all scores", () => scoreManager.Delete());
         }
 
-        private void checkCount(int expected) =>
+        private void checkDisplayedCount(int expected) =>
             AddUntilStep($"{expected} scores displayed", () => leaderboard.ChildrenOfType<LeaderboardScore>().Count(), () => Is.EqualTo(expected));
+
+        private void checkStoredCount(int expected) =>
+            AddUntilStep($"Total scores stored is {expected}", () => Realm.Run(r => r.All<ScoreInfo>().Count(s => !s.DeletePending)), () => Is.EqualTo(expected));
 
         private static ScoreInfo[] generateSampleScores(BeatmapInfo beatmapInfo)
         {
