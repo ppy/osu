@@ -869,7 +869,7 @@ namespace osu.Game.Database
                     break;
 
                 case 26:
-                    // Adding origin beatmap hash property to ensure the score corresponds to the version of beatmap it should
+                    // Add ScoreInfo.BeatmapHash property to ensure the score corresponds to the version of beatmap it should
                     // See: https://github.com/ppy/osu/issues/22062
                     string scoreInfoName = getMappedOrOriginalName(typeof(ScoreInfo));
 
