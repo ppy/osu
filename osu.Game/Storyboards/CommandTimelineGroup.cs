@@ -85,9 +85,6 @@ namespace osu.Game.Storyboards
         public virtual double EndTime => CommandsEndTime;
 
         [JsonIgnore]
-        public double Duration => EndTime - StartTime;
-
-        [JsonIgnore]
         public bool HasCommands
         {
             get
