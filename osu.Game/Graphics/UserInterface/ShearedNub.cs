@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
-            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
+            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.4f) ?? colours.PinkLighter;
             GlowColour = colourProvider?.Highlight1 ?? colours.PinkLighter;
 
             main.EdgeEffect = new EdgeEffectParameters
@@ -84,11 +84,14 @@ namespace osu.Game.Graphics.UserInterface
             get => glowing;
             set
             {
+                if (glowing == value)
+                    return;
+
                 glowing = value;
 
                 if (value)
                 {
-                    main.FadeColour(GlowingAccentColour.Lighten(0.5f), 40, Easing.OutQuint)
+                    main.FadeColour(GlowingAccentColour.Lighten(0.1f), 40, Easing.OutQuint)
                         .Then()
                         .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
 
