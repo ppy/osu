@@ -8,13 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -41,13 +39,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
         private PlayfieldAdjustmentContainer adjustmentContainer = null!;
-        private BubbleContainer bubbleContainer = null!;
+        private Container bubbleContainer = null!;
 
         private readonly Bindable<int> currentCombo = new BindableInt();
 
         private float maxSize;
         private float bubbleRadius;
         private double bubbleFade;
+
+        private readonly DrawablePool<BubbleDrawable> bubblePool = new DrawablePool<BubbleDrawable>(100);
+
+        private DrawableOsuHitObject lastJudgedHitobject = null!;
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
@@ -56,6 +58,63 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
                 maxSize = Math.Min(1.75f, (float)(1.25 + 0.005 * combo.NewValue)), true);
+
+            scoreProcessor.NewJudgement += result =>
+            {
+                if (result.HitObject is not OsuHitObject osuHitObject) return;
+
+                DrawableOsuHitObject drawableOsuHitObject = lastJudgedHitobject;
+
+                switch (result.HitObject)
+                {
+                    case Slider:
+                    case SpinnerTick:
+                        break;
+
+                    default:
+                        addBubble();
+                        break;
+                }
+
+                void addBubble()
+                {
+                    BubbleDrawable bubble = bubblePool.Get();
+                    bubble.Info = new BubbleInfo
+                    {
+                        InitialSize = new Vector2(bubbleRadius),
+                        MaxSize = maxSize,
+                        Position = getPosition(),
+                        FadeTime = bubbleFade,
+                        Colour = drawableOsuHitObject.AccentColour.Value,
+                        IsHit = drawableOsuHitObject.IsHit,
+                    };
+                    bubbleContainer.Add(bubble);
+                }
+
+                Vector2 getPosition()
+                {
+                    switch (drawableOsuHitObject)
+                    {
+                        // SliderHeads are derived from HitCircles,
+                        // so we must handle them before to avoid them using the wrong positioning logic
+                        case DrawableSliderHead:
+                            return osuHitObject.Position;
+
+                        // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
+                        case DrawableHitCircle:
+                            return drawableOsuHitObject.Position;
+
+                        default:
+                            return osuHitObject.Position;
+                    }
+                }
+            };
+
+            scoreProcessor.JudgementReverted += _ =>
+            {
+                bubbleContainer.LastOrDefault()?.FinishTransforms();
+                bubbleContainer.LastOrDefault()?.Expire();
+            };
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -69,178 +128,116 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             adjustmentContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
-            adjustmentContainer.Add(bubbleContainer = new BubbleContainer());
+            adjustmentContainer.Add(bubbleContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
             drawableRuleset.KeyBindingInputManager.Add(adjustmentContainer);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
-
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
 
         private void applyBubbleState(DrawableHitObject drawableObject)
         {
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)drawableObject;
+
             if (drawableObject is DrawableSlider slider)
             {
                 slider.Body.OnSkinChanged += () => applySliderState(slider);
                 applySliderState(slider);
             }
 
-            if (drawableObject is not DrawableOsuHitObject drawableOsuObject || !drawableObject.Judged) return;
+            if (osuHitObject == lastJudgedHitobject || !osuHitObject.Judged) return;
 
-            switch (drawableOsuObject)
+            switch (osuHitObject)
             {
                 case DrawableSlider:
                 case DrawableSpinnerTick:
                     break;
 
                 default:
-                    addBubbleForObject(drawableOsuObject);
+                    lastJudgedHitobject = osuHitObject;
                     break;
             }
         }
 
-        // Makes the slider border coloured on all skins
+        // Makes the slider border coloured on all skins (for aesthetics)
         private void applySliderState(DrawableSlider slider) =>
             ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
 
-        private void addBubbleForObject(DrawableOsuHitObject hitObject)
-        {
-            bubbleContainer.Add
-            (
-                new BubbleLifeTimeEntry
-                {
-                    LifetimeStart = bubbleContainer.Time.Current,
-                    Colour = hitObject.AccentColour.Value,
-                    Position = hitObject.HitObject.Position,
-                    InitialSize = new Vector2(bubbleRadius),
-                    MaxSize = maxSize,
-                    FadeTime = bubbleFade,
-                    IsHit = hitObject.IsHit
-                }
-            );
-        }
-
         #region Pooled Bubble drawable
 
-        // LifetimeEntry flow is necessary to allow for correct rewind behaviour, can probably be made generic later if more mods are made requiring it
-        // Todo: find solution to bubbles rewinding in "groups"
-        private sealed partial class BubbleContainer : PooledDrawableWithLifetimeContainer<BubbleLifeTimeEntry, BubbleObject>
-        {
-            protected override bool RemoveRewoundEntry => true;
-
-            private readonly DrawablePool<BubbleObject> pool;
-
-            public BubbleContainer()
-            {
-                RelativeSizeAxes = Axes.Both;
-                AddInternal(pool = new DrawablePool<BubbleObject>(10, 1000));
-            }
-
-            protected override BubbleObject GetDrawable(BubbleLifeTimeEntry entry) => pool.Get(d => d.Apply(entry));
-        }
-
-        private sealed partial class BubbleObject : PoolableDrawableWithLifetime<BubbleLifeTimeEntry>
-        {
-            private readonly BubbleDrawable bubbleDrawable;
-
-            public BubbleObject()
-            {
-                InternalChild = bubbleDrawable = new BubbleDrawable();
-            }
-
-            protected override void OnApply(BubbleLifeTimeEntry entry)
-            {
-                base.OnApply(entry);
-                if (IsLoaded)
-                    apply(entry);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                apply(Entry);
-            }
-
-            private void apply(BubbleLifeTimeEntry? entry)
-            {
-                if (entry == null) return;
-
-                ApplyTransformsAt(float.MinValue, true);
-                ClearTransforms(true);
-
-                Position = entry.Position;
-
-                bubbleDrawable.Animate(entry);
-
-                LifetimeEnd = bubbleDrawable.LatestTransformEndTime;
-            }
-        }
-
-        private partial class BubbleDrawable : CircularContainer
+        private partial class BubbleDrawable : PoolableDrawable
         {
             private readonly Box colourBox;
+            private readonly CircularContainer content;
+
+            public BubbleInfo Info { get; set; }
 
             public BubbleDrawable()
             {
-                Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-
-                MaskingSmoothness = 2;
-                BorderThickness = 0;
-                BorderColour = Colour4.White;
-                Masking = true;
-                EdgeEffect = new EdgeEffectParameters
+                InternalChild = content = new CircularContainer
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 3,
-                    Colour = Colour4.Black.Opacity(0.05f)
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    MaskingSmoothness = 2,
+                    BorderThickness = 0,
+                    BorderColour = Colour4.White,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 3,
+                        Colour = Colour4.Black.Opacity(0.05f),
+                    },
+                    Child = colourBox = new Box { RelativeSizeAxes = Axes.Both, }
                 };
-                Child = colourBox = new Box { RelativeSizeAxes = Axes.Both, };
             }
 
-            public void Animate(BubbleLifeTimeEntry entry)
+            protected override void PrepareForUse()
             {
-                Size = entry.InitialSize;
-                BorderThickness = Width / 3.5f;
+                Alpha = 1;
+                Colour = Colour4.White;
+                Scale = new Vector2(1);
+                Position = Info.Position;
+                Size = Info.InitialSize;
+                content.BorderThickness = Info.InitialSize.X / 3.5f;
+                content.BorderColour = Colour4.White;
 
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
-                ColourInfo colourDarker = entry.Colour.Darken(0.1f);
+                ColourInfo colourDarker = Info.Colour.Darken(0.1f);
 
                 // Main bubble scaling based on combo
-                this.ScaleTo(entry.MaxSize, getAnimationDuration() * 0.8f)
+                this.ScaleTo(Info.MaxSize, getAnimationDuration() * 0.8f)
                     .Then()
                     // Pop at the end of the bubbles life time
-                    .ScaleTo(entry.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutQuint)
-                    .FadeTo(0, getAnimationDuration() * 0.2f, Easing.OutCirc);
+                    .ScaleTo(Info.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutQuint)
+                    .FadeOutFromOne(getAnimationDuration() * 0.2f, Easing.OutCirc).Expire();
 
-                if (!entry.IsHit)
+                if (Info.IsHit)
                 {
-                    Colour = Colour4.Black;
-                    BorderColour = Colour4.Black;
+                    colourBox.FadeColour(colourDarker);
+
+                    content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration() * 0.3f, Easing.OutQuint);
+                    // Ripple effect utilises the border to reduce drawable count
+                    content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration() * 0.3f, Easing.OutQuint)
+                           // Avoids transparency overlap issues during the bubble "pop"
+                           .Then().Schedule(() => content.BorderThickness = 0);
 
                     return;
                 }
 
-                colourBox.FadeColour(colourDarker);
-
-                this.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration() * 0.3f, Easing.OutQuint);
-
-                // Ripple effect utilises the border to reduce drawable count
-                this.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration() * 0.3f, Easing.OutQuint)
-
-                    // Avoids transparency overlap issues during the bubble "pop"
-                    .Then().Schedule(() =>
-                    {
-                        BorderThickness = 0;
-                        BorderColour = Colour4.Transparent;
-                    });
+                Colour = Colour4.Black;
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationDuration() => 1700 + Math.Pow(entry.FadeTime, 1.07f);
+                double getAnimationDuration() => 1700 + Math.Pow(Info.FadeTime, 1.07f);
             }
         }
 
-        private class BubbleLifeTimeEntry : LifetimeEntry
+        private struct BubbleInfo
         {
             public Vector2 InitialSize { get; set; }
 
