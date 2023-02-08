@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Edit
 
             if (canSave)
             {
-                changeHandler = new EditorChangeHandler(editorBeatmap);
+                changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
