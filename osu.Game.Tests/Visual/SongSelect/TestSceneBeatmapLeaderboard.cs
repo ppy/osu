@@ -97,6 +97,37 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestLocalScoresDisplayOnBeatmapEdit()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
+
+            AddStep(@"Set beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                leaderboard.BeatmapInfo = beatmapInfo;
+            });
+
+            clearScores();
+            checkCount(0);
+
+            loadMoreScores(() => beatmapInfo);
+            checkCount(10);
+
+            beatmapEdit(() => beatmapInfo);
+            checkCount(0);
+
+            loadMoreScores(() => beatmapInfo);
+            checkCount(10);
+
+            clearScores();
+            checkCount(0);
+        }
+
+        [Test]
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
@@ -121,6 +152,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
             AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
             AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
+        }
+
+        private void beatmapEdit(Func<BeatmapInfo> beatmapInfo)
+        {
+            AddStep(@"Update beatmap via BeatmapManager", () =>
+            {
+                BeatmapInfo info = beatmapInfo();
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(info).Beatmap;
+
+                beatmap.Difficulty.ApproachRate = 11;
+                beatmap.Difficulty.DrainRate = 11;
+                beatmap.Difficulty.OverallDifficulty = 11;
+
+                beatmapManager.Save(info, beatmap);
+            });
         }
 
         private void showPersonalBestWithNullPosition()
