@@ -23,11 +23,8 @@ using Realms;
 namespace osu.Game.Scoring
 {
     /// <summary>
-    /// Store information about the score
+    /// A realm model containing metadata for a single score.
     /// </summary>
-    /// <remarks>
-    /// Warning: If you work on importing/adding score please ensure you provide both <c>BeatmapInfo</c> and <c>BeatmapHash</c>
-    /// </remarks>
     [ExcludeFromDynamicCompile]
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
@@ -35,7 +32,18 @@ namespace osu.Game.Scoring
         [PrimaryKey]
         public Guid ID { get; set; }
 
+        /// <summary>
+        /// The <see cref="BeatmapInfo"/> this score was made against.
+        /// </summary>
+        /// <remarks>
+        /// When setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
+        /// </remarks>
         public BeatmapInfo BeatmapInfo { get; set; } = null!;
+
+        /// <summary>
+        /// The <see cref="BeatmapInfo.Hash"/> at the point in time when the score was set.
+        /// </summary>
+        public string BeatmapHash { get; set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
@@ -71,11 +79,6 @@ namespace osu.Game.Scoring
 
         [MapTo("MaximumStatistics")]
         public string MaximumStatisticsJson { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The <see cref="Beatmaps.BeatmapInfo"/>.Hash at the point in time when the score was set.
-        /// </summary>
-        public string BeatmapHash { get; set; } = string.Empty;
 
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
