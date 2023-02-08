@@ -27,7 +27,7 @@ namespace osu.Game.Scoring
     /// Store information about the score
     /// </summary> 
     /// <remarks>
-    /// If you work on inporting/adding score please ensure you provide both <c>BeatmapInfo</c> and <c>BeatmapHash</c>
+    /// Warning: If you work on importing/adding score please ensure you provide both <c>BeatmapInfo</c> and <c>BeatmapHash</c>
     /// </remarks>
     [ExcludeFromDynamicCompile]
     [MapTo("Score")]
