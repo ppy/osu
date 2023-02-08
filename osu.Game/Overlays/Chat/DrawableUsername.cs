@@ -169,6 +169,14 @@ namespace osu.Game.Overlays.Chat
                     }));
                 }
 
+                if (currentChannel?.Value != null)
+                {
+                    items.Add(new OsuMenuItem(ChatStrings.ReportUser, MenuItemType.Destructive, () =>
+                    {
+                        currentChannel.Value.TextBoxMessage.Value += $"!report {user.Username} for ";
+                    }));
+                }
+
                 return items.ToArray();
             }
         }
