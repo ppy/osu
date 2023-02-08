@@ -24,8 +24,6 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
 
-#nullable enable //???
-
 namespace osu.Game.Screens.Select
 {
     public partial class PlaySongSelect : SongSelect
@@ -51,10 +49,14 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+
+            Footer?.AddButton(new FooterButtonOpenInMvis
+            {
+                Action = openInMvis
+            }, null);
         }
 
-        private void openInMvis() =>
-            this.Push(new LLinScreen());
+        private void openInMvis() => this.Push(new LLinScreen());
 
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));

@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.Mf.Sections
                                     Title = "为什么加载谱面封面/音频预览的时间会那么长?",
                                     Child = new OsuSpriteText
                                     {
-                                        Text = "这与您的系统和当前的网络环境等一系列因素有关，"
-                                               + "也可能是您一次性发送了过多的资源请求。请多等待一会，您也可以尝试重新进入谱面列表/信息界面。",
+                                        Text = "这与你的系统和当前的网络环境等一系列因素有关，"
+                                               + "也可能是一次性发送了过多的资源请求。请多等待一会，或者尝试重新进入谱面列表/信息界面。",
                                         RelativeSizeAxes = Axes.X,
                                     }
                                 },
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                     Child = new OsuSpriteText
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Text = "主界面 > 游玩 > 最 高 机 密 > 文件导入 (请确保设置中'启用Mf自定义UI'选项开启)"
+                                        Text = "设置 > 调试 > 导入文件"
                                     }
                                 },
                                 new MfMenuDropDownTextBoxContainer

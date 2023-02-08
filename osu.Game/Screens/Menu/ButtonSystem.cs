@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Menu
         public Action OnPlaylists;
 
         public Action OnBeatmapListing;
-        public Action OnImportButton;
-        public Action OnReleaseNoteButton;
+
+        public Action OnLLin;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -85,13 +85,11 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonArea buttonArea;
 
         private readonly MainMenuButton backButton;
-        private readonly MainMenuButton backButtonCustom;
 
         private readonly Bindable<bool> optui = new Bindable<bool>();
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsP2C = new List<MainMenuButton>();
-        private readonly List<MainMenuButton> buttonsCustom = new List<MainMenuButton>();
 
         private Sample sampleBack;
 
@@ -117,10 +115,6 @@ namespace osu.Game.Screens.Menu
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                backButtonCustom = new MainMenuButton(@"返回", @"button-back-select", OsuIcon.LeftCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Play, -WEDGE_WIDTH)
-                {
-                    VisibleState = ButtonSystemState.Custom,
-                },
                 logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
             });
 
@@ -139,11 +133,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MConfigManager config)
         {
-            buttonsCustom.Add(new MainMenuButton(@"文件导入", @"button-solo-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
-            buttonsCustom.Add(new MainMenuButton(@"有关后续更新", @"button-solo-select", FontAwesome.Solid.StickyNote, new Color4(0, 86, 73, 255), () => OnReleaseNoteButton?.Invoke()));
-            buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
-
-            buttonsP2C.Add(new MainMenuButton("最 高 机 密", "button-generic-select", FontAwesome.Solid.Question, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
+            buttonsP2C.Add(new MainMenuButton("LLin播放器", "button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnLLin?.Invoke()));
             buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
@@ -160,7 +150,6 @@ namespace osu.Game.Screens.Menu
             if (host.CanExit)
                 buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
 
-            buttonArea.AddRange(buttonsCustom);
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsP2C);
             buttonArea.AddRange(buttonsTopLevel);
@@ -198,8 +187,6 @@ namespace osu.Game.Screens.Menu
 
                 case false:
                     buttonsP2C.ForEach(b => b.FadeOut(250));
-                    if (state == ButtonSystemState.Custom)
-                        backButtonCustom.TriggerClick();
                     break;
             }
         }
@@ -313,10 +300,6 @@ namespace osu.Game.Screens.Menu
                     backButton.TriggerClick();
                     return true;
 
-                case ButtonSystemState.Custom:
-                    backButtonCustom.TriggerClick();
-                    return true;
-
                 default:
                     return false;
             }
@@ -339,10 +322,6 @@ namespace osu.Game.Screens.Menu
 
                 case ButtonSystemState.Play:
                     buttonsPlay.First().TriggerClick();
-                    return false;
-
-                case ButtonSystemState.Custom:
-                    buttonsCustom.First().TriggerClick();
                     return false;
             }
         }
@@ -450,7 +429,6 @@ namespace osu.Game.Screens.Menu
         Initial,
         TopLevel,
         Play,
-        EnteringMode,
-        Custom
+        EnteringMode
     }
 }
