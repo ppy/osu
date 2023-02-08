@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.SkinEditor
             // In the future we'll want this to cover all changes, even to skin's `InstantiationInfo`.
             // We'll also need to consider cases where multiple targets are on screen at the same time.
 
-            firstTarget = targetScreen?.ChildrenOfType<ISkinnableTarget>().FirstOrDefault();
+            firstTarget = targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault();
 
             if (firstTarget == null)
                 return;
