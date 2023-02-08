@@ -22,10 +22,9 @@ using Realms;
 
 namespace osu.Game.Scoring
 {
-
     /// <summary>
     /// Store information about the score
-    /// </summary> 
+    /// </summary>
     /// <remarks>
     /// Warning: If you work on importing/adding score please ensure you provide both <c>BeatmapInfo</c> and <c>BeatmapHash</c>
     /// </remarks>
