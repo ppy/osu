@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
-                                        Label = "Difficulty range",
+                                        Label = "难度区间",
                                         LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                                         UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                                         RelativeSizeAxes = Axes.Both,
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Select
                                         DefaultStringLowerBound = "0",
                                         DefaultStringUpperBound = "∞",
                                         DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit,
-                                        TooltipSuffix = "stars"
+                                        TooltipSuffix = "星"
                                     },
                                     collectionDropdown = new CollectionDropdown
                                     {

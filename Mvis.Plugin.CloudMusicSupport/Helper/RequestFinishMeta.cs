@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.CloudMusicSupport.Helper
 {
@@ -45,12 +46,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             string neteaseTitle = GetNeteaseTitle();
             string ourTitle = SourceBeatmap?.Metadata.GetTitle() ?? string.Empty;
 
+            string source = neteaseTitle.Length > ourTitle.Length ? neteaseTitle : ourTitle;
+            string target = neteaseTitle.Length > ourTitle.Length ? ourTitle : neteaseTitle;
+
             if (string.IsNullOrEmpty(neteaseTitle) || string.IsNullOrEmpty(ourTitle)) return 0;
 
-            int distance = LevenshteinDistance.Compute(neteaseTitle, ourTitle);
-            float precentage = 1 - (distance / (float)ourTitle.Length);
+            int distance = LevenshteinDistance.Compute(source, target);
+            float precentage = 1 - (distance / (float)source.Length);
 
-            return precentage;
+            return Math.Abs(precentage);
         }
 
         public string GetNeteaseTitle()

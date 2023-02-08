@@ -324,7 +324,7 @@ namespace osu.Game.Screens.LLin.Plugins
             providers.AddRange(new LLinPluginProvider[]
             {
                 dbpp = new DummyBasePluginProvider(config, this),
-                dapp = new DummyAudioPluginProvider(config, this)
+                dapp = new DummyAudioPluginProvider(config, this),
             });
 
             AddPlugin(dbpp.CreatePlugin);

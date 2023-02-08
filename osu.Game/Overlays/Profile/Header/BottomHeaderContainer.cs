@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -25,15 +23,15 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        private LinkFlowContainer topLinkContainer;
-        private LinkFlowContainer bottomLinkContainer;
+        private LinkFlowContainer topLinkContainer = null!;
+        private LinkFlowContainer bottomLinkContainer = null!;
 
         private Color4 iconColour;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public BottomHeaderContainer()
         {
@@ -61,12 +59,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -75,10 +73,10 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();
@@ -89,7 +87,7 @@ namespace osu.Game.Overlays.Profile.Header
                 topLinkContainer.AddText(UsersStrings.ShowFirstMembers);
             else
             {
-                topLinkContainer.AddText("Joined ");
+                topLinkContainer.AddText("加入于 ");
                 topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
             }
 
@@ -102,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
             else if (user.LastVisit.HasValue)
             {
-                topLinkContainer.AddText("Last seen ");
+                topLinkContainer.AddText("上次在线 ");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
 
                 addSpacer(topLinkContainer);
@@ -110,7 +108,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user.PlayStyles?.Length > 0)
             {
-                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText("用 ");
 
                 LocalisableString playStylesString = user.PlayStyles[0].GetLocalisableDescription();
 
@@ -122,16 +120,18 @@ namespace osu.Game.Overlays.Profile.Header
 
                 topLinkContainer.AddText(playStylesString, embolden);
 
+                topLinkContainer.AddText(" 游玩");
+
                 addSpacer(topLinkContainer);
             }
 
-            topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddText("发表了 ");
+            topLinkContainer.AddLink($"{user.PostCount}篇帖子", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             addSpacer(topLinkContainer);
 
-            topLinkContainer.AddText("Posted ");
-            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
+            topLinkContainer.AddText("发表了 ");
+            topLinkContainer.AddLink($"{user.CommentsCount}条评论", $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
-        private bool tryAddInfo(IconUsage icon, string content, string link = null)
+        private bool tryAddInfo(IconUsage icon, string content, string? link = null)
         {
             if (string.IsNullOrEmpty(content)) return false;
 

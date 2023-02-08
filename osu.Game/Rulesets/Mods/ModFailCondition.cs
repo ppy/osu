@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        [SettingSource("Restart on fail", "Automatically restarts when failed.")]
+        [SettingSource("失败时重开", "失败后将重开本局")]
         public BindableBool Restart { get; } = new BindableBool();
 
         public virtual bool PerformFail() => true;

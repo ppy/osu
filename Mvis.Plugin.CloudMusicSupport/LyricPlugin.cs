@@ -150,7 +150,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         /// </summary>
         protected override Drawable CreateContent() => lrcLine;
 
-        private readonly LyricProcessor processor = new LyricProcessor();
+        public readonly LyricProcessor LyricProcessor = new LyricProcessor();
 
         private List<Lyric>? cachedLyrics;
 
@@ -180,7 +180,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void GetLyricFor(int id)
         {
             CurrentStatus.Value = Status.Working;
-            processor.SearchByNeteaseID(id, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value);
+            LyricProcessor.SearchByNeteaseID(id, CurrentWorkingBeatmap, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private Track track = null!;
@@ -232,11 +232,11 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
-            config.BindWith(LyricSettings.EnablePlugin, Value);
+            config.BindWith(LyricSettings.EnablePlugin, Enabled);
             config.BindWith(LyricSettings.SaveLrcWhenFetchFinish, autoSave);
             config.BindWith(LyricSettings.TitleSimilarThreshold, TitleSimilarThreshold);
 
-            AddInternal(processor);
+            AddInternal(LyricProcessor);
             AddInternal(UserDefinitionHelper);
 
             PluginManager!.RegisterDBusObject(dbusObject);
@@ -263,7 +263,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void WriteLyricToDisk(WorkingBeatmap? currentBeatmap = null)
         {
             currentBeatmap ??= CurrentWorkingBeatmap;
-            processor.WriteLrcToFile(currentResponseRoot, currentBeatmap);
+            LyricProcessor.WriteLrcToFile(currentResponseRoot, currentBeatmap);
         }
 
         public void RefreshLyric(bool noLocalFile = false)
@@ -285,7 +285,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             else if (UserDefinitionHelper.OnlineIDHaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out neid))
                 GetLyricFor(neid);
             else
-                processor.Search(SearchOption.From(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value));
+                LyricProcessor.Search(SearchOption.From(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail, TitleSimilarThreshold.Value));
         }
 
         private double targetTime => track.CurrentTime + Offset.Value;

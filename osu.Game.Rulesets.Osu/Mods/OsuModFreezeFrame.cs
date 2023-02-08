@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFreezeFrame : Mod, IApplicableToDrawableHitObject, IApplicableToBeatmap
     {
-        public override string Name => "Freeze Frame";
+        public override string Name => "冻结";
 
         public override string Acronym => "FR";
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => "Burn the notes into your memory.";
+        public override LocalisableString Description => "将这些物件刻进你的DNA中";
 
         //Alters the transforms of the approach circles, breaking the effects of these mods.
         public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent) };

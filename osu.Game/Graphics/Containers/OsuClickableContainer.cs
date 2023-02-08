@@ -44,8 +44,11 @@ namespace osu.Game.Graphics.Containers
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 
-            AddInternal(content);
-            Add(CreateHoverSounds(sampleSet));
+            AddRangeInternal(new Drawable[]
+            {
+                content,
+                CreateHoverSounds(sampleSet)
+            });
         }
 
         protected override void ClearInternal(bool disposeChildren = true) =>

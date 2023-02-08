@@ -10,6 +10,11 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using M.DBus;
 using Microsoft.Win32;
+using Mvis.Plugin.BottomBar;
+using Mvis.Plugin.CloudMusicSupport;
+using Mvis.Plugin.CollectionSupport;
+using Mvis.Plugin.StoryboardSupport;
+using Mvis.Plugin.Yasp;
 using osu.Desktop.DBus;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
@@ -37,6 +42,7 @@ namespace osu.Desktop
     internal partial class OsuGameDesktop : OsuGame
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+        private ArchiveImportIPCChannel? archiveImportIPCChannel;
 
         private DBusManagerContainer? dBusManagerContainer;
 
@@ -48,6 +54,18 @@ namespace osu.Desktop
                 HashOverriden = true;
                 VersionHash = hashOverride;
             }
+
+            //workaround: 不预载会让PluginStore在AppDomain里扫不到插件...
+            preloadPluginProviders();
+        }
+
+        private void preloadPluginProviders()
+        {
+            new YaspProvider();
+            new LyricPluginProvider();
+            new BottomBarProvider();
+            new CollectionHelperProvider();
+            new StoryboardPluginProvider();
         }
 
         public override StableStorage? GetStorageForStableInstall()
@@ -153,6 +171,8 @@ namespace osu.Desktop
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+
+            archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
 
             MConfig.BindWith(MSetting.AllowWindowFadeEffect, allowWindowFade);
 
@@ -285,6 +305,7 @@ namespace osu.Desktop
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
+            archiveImportIPCChannel?.Dispose();
         }
 
         private class SDL2BatteryInfo : BatteryInfo

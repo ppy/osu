@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Edit
         private readonly Dictionary<float, TernaryStateRadioMenuItem> menuItemLookup = new Dictionary<float, TernaryStateRadioMenuItem>();
 
         public WaveformOpacityMenuItem(Bindable<float> waveformOpacity)
-            : base("波形图不透明度")
+            : base(EditorStrings.WaveformOpacity)
         {
             Items = new[]
             {

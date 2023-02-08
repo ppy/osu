@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Screens.LLin.Plugins.Config;
@@ -18,6 +19,8 @@ namespace Mvis.Plugin.Yasp.Config
         {
             SetDefault(YaspSettings.Scale, 1, 0, 5f);
             SetDefault(YaspSettings.EnablePlugin, true);
+            SetDefault(YaspSettings.PanelType, PanelType.Classic);
+
             base.InitialiseDefaults();
         }
 
@@ -28,6 +31,17 @@ namespace Mvis.Plugin.Yasp.Config
     public enum YaspSettings
     {
         Scale,
-        EnablePlugin
+        EnablePlugin,
+
+        PanelType
+    }
+
+    public enum PanelType
+    {
+        [Description("经典")]
+        Classic,
+
+        [Description("封面")]
+        SongCover
     }
 }

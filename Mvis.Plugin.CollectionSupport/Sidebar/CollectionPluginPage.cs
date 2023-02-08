@@ -97,7 +97,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 }
             };
 
-            collectionHelper.CurrentCollection.ValueChanged += triggerRefresh;
+            //collectionHelper.CurrentCollection.ValueChanged += triggerRefresh;
         }
 
         protected override void LoadComplete()

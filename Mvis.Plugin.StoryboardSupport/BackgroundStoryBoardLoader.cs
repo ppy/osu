@@ -72,7 +72,7 @@ namespace Mvis.Plugin.StoryboardSupport
         private void load()
         {
             var config = (SbLoaderConfigManager)DependenciesContainer.Get<LLinPluginManager>().GetConfigManager(this);
-            config.BindWith(SbLoaderSettings.EnableStoryboard, Value);
+            config.BindWith(SbLoaderSettings.EnableStoryboard, Enabled);
 
             if (LLin != null)
             {
@@ -177,7 +177,7 @@ namespace Mvis.Plugin.StoryboardSupport
             if (LLin != null)
                 LLin.OnSeek += Seek;
 
-            Value.TriggerChange();
+            Enabled.TriggerChange();
 
             if (prevProxy != null)
             {

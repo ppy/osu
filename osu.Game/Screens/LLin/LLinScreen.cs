@@ -19,6 +19,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -617,7 +618,10 @@ namespace osu.Game.Screens.LLin
         private Bindable<string> currentFunctionbarSetting = null!;
 
         private FrameSync previousFrameSync;
+        private ExecutionMode previousExecutionMode;
+
         private readonly Bindable<FrameSync> frameSyncMode = new Bindable<FrameSync>();
+        private readonly Bindable<ExecutionMode> gameExecutionMode = new Bindable<ExecutionMode>();
 
         #endregion
 
@@ -660,7 +664,7 @@ namespace osu.Game.Screens.LLin
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, IdleTracker idleTracker, FrameworkConfigManager fcm)
+        private void load(MConfigManager config, IdleTracker idleTracker, FrameworkConfigManager fcm, OsuConfigManager osuConfig)
         {
             inputManager = GetContainingInputManager();
 
@@ -681,17 +685,6 @@ namespace osu.Game.Screens.LLin
                         return true;
                     },
                     Description = LLinBaseStrings.Exit,
-                    Type = FunctionType.Base
-                },
-                new FakeButton
-                {
-                    Icon = FontAwesome.Regular.QuestionCircle,
-                    Action = () =>
-                    {
-                        game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/");
-                        return true;
-                    },
-                    Description = LLinBaseStrings.Manual,
                     Type = FunctionType.Base
                 },
                 prevButton = new FakeButton
@@ -833,6 +826,7 @@ namespace osu.Game.Screens.LLin
             currentFunctionbarSetting = config.GetBindable<string>(MSetting.MvisCurrentFunctionBar);
 
             fcm.BindWith(FrameworkSetting.FrameSync, frameSyncMode);
+            fcm.BindWith(FrameworkSetting.ExecutionMode, gameExecutionMode);
 
             //加载插件
             foreach (var pl in pluginManager.GetAllPlugins(true))
@@ -931,13 +925,18 @@ namespace osu.Game.Screens.LLin
 
             //VSync
             previousFrameSync = frameSyncMode.Value;
+            previousExecutionMode = gameExecutionMode.Value;
 
             if (autoVsync.Value)
+            {
                 frameSyncMode.Value = FrameSync.VSync;
+                gameExecutionMode.Value = ExecutionMode.SingleThread;
+            }
 
             autoVsync.BindValueChanged(v =>
             {
                 frameSyncMode.Value = v.NewValue ? FrameSync.VSync : previousFrameSync;
+                gameExecutionMode.Value = v.NewValue ? ExecutionMode.SingleThread : previousExecutionMode;
             });
 
             //设置键位
@@ -1029,6 +1028,7 @@ namespace osu.Game.Screens.LLin
             if (autoVsync.Value)
             {
                 frameSyncMode.Value = previousFrameSync;
+                gameExecutionMode.Value = previousExecutionMode;
             }
 
             return base.OnExiting(e);

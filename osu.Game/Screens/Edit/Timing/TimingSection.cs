@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,8 +11,8 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class TimingSection : Section<TimingControlPoint>
     {
-        private LabelledTimeSignature timeSignature;
-        private BPMTextBox bpmTextEntry;
+        private LabelledTimeSignature timeSignature = null!;
+        private BPMTextBox bpmTextEntry = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -45,7 +43,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private bool isRebinding;
 
-        protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint> point)
+        protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint?> point)
         {
             if (point.NewValue != null)
             {

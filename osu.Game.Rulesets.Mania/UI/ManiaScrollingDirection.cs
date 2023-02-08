@@ -1,18 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public enum ManiaScrollingDirection
     {
-        [Description("从下往上")]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.ScrollingDirectionUp))]
         Up = ScrollingDirection.Up,
-        [Description("从上往下")]
+
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.ScrollingDirectionDown))]
         Down = ScrollingDirection.Down
     }
 }

@@ -1,27 +1,30 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsSeparatorPiece : SettingsPieceBasePanel
     {
+        public SettingsSeparatorPiece()
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Icon = new IconUsage();
 
-            AddInternal(new SpriteIcon
-            {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Size = new Vector2(20),
-                Icon = FontAwesome.Solid.ArrowRight,
-                Margin = new MarginPadding(10),
-            });
+            RelativeSizeAxes = Axes.X;
+            Width = 1;
+
+            SpriteText.Anchor = SpriteText.Origin = SpriteIcon.Anchor = SpriteIcon.Origin = Anchor.BottomRight;
+            FillFlow.Direction = FillDirection.Horizontal;
+
+            SpriteIcon.Hide();
         }
 
         protected override void OnColorChanged()

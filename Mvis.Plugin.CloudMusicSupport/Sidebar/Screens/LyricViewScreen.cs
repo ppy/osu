@@ -31,7 +31,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         public override IconButton[] Entries => new[]
         {
-            saveButton,
+            //saveButton,
             new IconButton
             {
                 Icon = FontAwesome.Solid.Undo,

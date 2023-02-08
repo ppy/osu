@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
@@ -13,7 +12,7 @@ namespace osu.Game.Screens.Edit
     {
         public PromptForSaveDialog(Action exit, Action saveAndExit, Action cancel)
         {
-            HeaderText = "你要保存你的更改吗?";
+            HeaderText = EditorDialogsStrings.SaveDialogHeader;
 
             Icon = FontAwesome.Regular.Save;
 
@@ -21,17 +20,17 @@ namespace osu.Game.Screens.Edit
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"是的，保存。",
+                    Text = EditorDialogsStrings.Save,
                     Action = saveAndExit
                 },
                 new PopupDialogDangerousButton
                 {
-                    Text = @"忘了这事吧，不保存。",
+                    Text = EditorDialogsStrings.ForgetAllChanges,
                     Action = exit
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"我点错了，继续编辑。",
+                    Text = EditorDialogsStrings.ContinueEditing,
                     Action = cancel
                 },
             };

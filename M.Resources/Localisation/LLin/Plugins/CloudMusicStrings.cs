@@ -48,6 +48,8 @@ namespace M.Resources.Localisation.LLin.Plugins
 
         public static LocalisableString Save => new TranslatableString(getKey(@"save"), @"保存");
 
+        public static LocalisableString Reset => new TranslatableString(getKey(@"reset"), @"重置");
+
         public static LocalisableString Delete => new TranslatableString(getKey(@"delete"), @"删除");
 
         public static LocalisableString SeekToNext => new TranslatableString(getKey(@"seek_next"), @"前往下一拍");

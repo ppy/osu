@@ -1,4 +1,7 @@
+#nullable disable
+
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,14 +18,17 @@ namespace osu.Game.Screens.LLin.Misc
     {
         private readonly WorkingBeatmap b;
 
-        private Drawable? cover;
+        [CanBeNull]
+        private Drawable cover;
 
-        private CancellationTokenSource? changeCoverTask;
+        [CanBeNull]
+        private CancellationTokenSource changeCoverTask;
 
         public bool BackgroundBox = true;
 
         public bool UseBufferedBackground;
         public float TimeBeforeWrapperLoad = 500;
+        public bool NoFadeIn;
 
         public BeatmapCover(WorkingBeatmap beatmap)
         {
@@ -75,7 +81,7 @@ namespace osu.Game.Screens.LLin.Misc
                         Alpha = 0
                     };
 
-                    c.OnLoadComplete += d => d.FadeIn(300);
+                    c.OnLoadComplete += d => d.FadeIn(NoFadeIn ? 0 : 300);
 
                     return c;
                 }, TimeBeforeWrapperLoad)
@@ -108,16 +114,16 @@ namespace osu.Game.Screens.LLin.Misc
                     cover = newCover;
                     AddInternal(cover);
 
-                    Schedule(() => cover?.FadeIn(300));
+                    Schedule(() => cover?.FadeIn(NoFadeIn ? 0 : 300));
                 }, changeCoverTask.Token);
             }
         }
 
         public partial class Cover : Sprite
         {
-            private readonly WorkingBeatmap? b;
+            private readonly WorkingBeatmap b;
 
-            public Cover(WorkingBeatmap? beatmap = null)
+            public Cover(WorkingBeatmap beatmap = null)
             {
                 RelativeSizeAxes = Axes.Both;
                 FillMode = FillMode.Fill;

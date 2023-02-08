@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -7,10 +6,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.LLin;
@@ -52,8 +49,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
         protected readonly OsuSpriteText SpriteText = new OsuSpriteText
         {
             Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            Font = OsuFont.GetFont(Typeface.Custom)
+            Origin = Anchor.Centre
         };
 
         protected SpriteIcon SpriteIcon = new SpriteIcon
@@ -155,33 +151,11 @@ namespace Mvis.Plugin.BottomBar.Buttons
             });
         }
 
-        [CanBeNull]
-        private Drawable ripple;
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             var mouseSpace = ToLocalSpace(e.ScreenSpaceMousePosition);
 
-            //workaround: 因为o!f的奇妙遮罩实现，内侧Masking为True的Drawable会无视其父级Drawable的Masking
-            //导致了圆圈会超出按钮的bug
-            ripple ??= new RippleSprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                Height = Width,
-                Colour = Color4.White.Opacity(0.5f),
-                Scale = new Vector2(0),
-                Alpha = 0,
-                X = mouseSpace.X - Width / 2,
-                Y = mouseSpace.Y - Height / 2
-            };
-
-            if (ripple.Parent != content)
-                content.Add(ripple);
-
             content.ScaleTo(0.9f, 2000, Easing.OutQuint);
-            ripple.ScaleTo(1.2f, 3000, Easing.OutCirc).FadeIn(3000, Easing.OutCirc);
             return base.OnMouseDown(e);
         }
 
@@ -189,11 +163,6 @@ namespace Mvis.Plugin.BottomBar.Buttons
         {
             content.ScaleTo(1f, 1000, Easing.OutElastic);
             flashBox.FadeOut(1000, Easing.OutQuint);
-
-            ripple?.FadeOut(1000, Easing.OutQuint)
-                  .ScaleTo(1.2 - ripple.Scale.X < 0.2 ? 1.5f : 1.2f, 500, Easing.OutCirc).Expire();
-
-            ripple = null;
 
             base.OnMouseUp(e);
         }
@@ -208,7 +177,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         protected override bool OnHover(HoverEvent e)
         {
-            flashBox.FadeTo(0.1f, 300);
+            flashBox.FadeTo(0.2f, 300);
             return base.OnHover(e);
         }
 
@@ -220,18 +189,9 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         protected virtual void OnClickAnimation()
         {
-            flashBox?.FadeTo(0.2f).Then().FadeTo(IsHovered ? 0.1f : 0f, 300);
+            flashBox?.FadeTo(0.35f).Then().FadeTo(IsHovered ? 0.1f : 0f, 300);
         }
 
         public void DoFlash() => OnClickAnimation();
-
-        private partial class RippleSprite : Sprite
-        {
-            [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textureStore)
-            {
-                Texture = textureStore.Get("circle");
-            }
-        }
     }
 }

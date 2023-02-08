@@ -11,10 +11,10 @@ using osu.Game.Graphics.Mf;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
-    public class TestSceneFontInfoTooltip : ScreenTestScene
+    public partial class TestSceneFontInfoTooltip : ScreenTestScene
     {
-        private DependencyContainer dependencies;
-        private FontInfoTooltip indicator;
+        private DependencyContainer? dependencies;
+        private FontInfoTooltip? indicator;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));

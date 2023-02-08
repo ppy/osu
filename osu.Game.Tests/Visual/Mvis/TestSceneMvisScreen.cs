@@ -18,7 +18,7 @@ using osu.Game.Screens.LLin.Plugins;
 namespace osu.Game.Tests.Visual.Mvis
 {
     [TestFixture]
-    public class TestSceneMvisScreen : ScreenTestScene
+    public partial class TestSceneMvisScreen : ScreenTestScene
     {
         [Cached]
         private MusicController musicController = new MusicController();
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Mvis
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
         }
 
-        private class MvisTestsPlugin : LLinPlugin
+        private partial class MvisTestsPlugin : LLinPlugin
         {
             private OsuSpriteText songTitle = null!;
             private OsuSpriteText songArtist = null!;
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Mvis
             }
         }
 
-        private class LocalInputManager : UserInputManager
+        private partial class LocalInputManager : UserInputManager
         {
         }
     }

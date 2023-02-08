@@ -187,27 +187,18 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (b.IsSelected)
                     continue;
 
-                var hitObject = (OsuHitObject)b.Item;
+                var snapPositions = b.ScreenSpaceSnapPoints;
 
-                Vector2? snap = checkSnap(hitObject.Position);
-                if (snap == null && hitObject.Position != hitObject.EndPosition)
-                    snap = checkSnap(hitObject.EndPosition);
+                if (!snapPositions.Any())
+                    continue;
 
-                if (snap != null)
+                var closestSnapPosition = snapPositions.MinBy(p => Vector2.Distance(p, screenSpacePosition));
+
+                if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
                     // only return distance portion, since time is not really valid
-                    snapResult = new SnapResult(snap.Value, null, playfield);
+                    snapResult = new SnapResult(closestSnapPosition, null, playfield);
                     return true;
-                }
-
-                Vector2? checkSnap(Vector2 checkPos)
-                {
-                    Vector2 checkScreenPos = playfield.GamefieldToScreenSpace(checkPos);
-
-                    if (Vector2.Distance(checkScreenPos, screenSpacePosition) < snapRadius)
-                        return checkScreenPos;
-
-                    return null;
                 }
             }
 

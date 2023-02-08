@@ -4,10 +4,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -25,10 +30,16 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen? playerLoader;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
+
+        public override MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
+        {
+            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(beatmap)),
+            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(beatmap))
+        };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
 
@@ -37,13 +48,15 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
+            Footer?.AddButton(new FooterButtonOpenInMvis
+            {
+                Action = openInMvis
+            }, null);
         }
 
-        private void openInMvis() =>
-            this.Push(new LLinScreen());
+        private void openInMvis() => this.Push(new LLinScreen());
 
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
@@ -95,7 +108,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "当前模式不支持自动播放!"
+                        Text = NotificationsStrings.NoAutoplayMod
                     });
                     return false;
                 }

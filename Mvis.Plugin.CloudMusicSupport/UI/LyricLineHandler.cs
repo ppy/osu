@@ -25,6 +25,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
 
         private readonly Container lyricContainer = new Container
         {
+            //Shear = new Vector2(0.25f, 0) * 0.7f,
+
             AutoSizeAxes = Axes.Both,
             Anchor = Anchor.BottomCentre,
             Origin = Anchor.BottomCentre,
@@ -105,6 +107,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Alpha = 0;
+
+            //Padding = new MarginPadding { Right = 50 - 15, Bottom = 50 - 20 - 5 };
 
             InternalChild = outlineEffectContainer = new Container
             {

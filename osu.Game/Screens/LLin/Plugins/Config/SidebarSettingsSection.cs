@@ -40,8 +40,6 @@ namespace osu.Game.Screens.LLin.Plugins.Config
             Title = plugin.Name;
 
             Alpha = 0.02f;
-
-            Name = $"{plugin}的section";
         }
 
         [BackgroundDependencyLoader]

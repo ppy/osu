@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
@@ -30,18 +31,18 @@ namespace osu.Game.Rulesets.Mania
             {
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
-                    LabelText = "下落方向",
+                    LabelText = RulesetSettingsStrings.ScrollingDirection,
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
                 new SettingsSlider<double, ManiaScrollSlider>
                 {
-                    LabelText = "下落速度",
+                    LabelText = RulesetSettingsStrings.ScrollSpeed,
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "基于Timing的note颜色",
+                    LabelText = RulesetSettingsStrings.TimingBasedColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
             };
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Mania
 
         private partial class ManiaScrollSlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => $"{Current.Value}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)})";
+            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip(Current.Value, (int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value));
         }
     }
 }

@@ -3,14 +3,17 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapListing;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -34,7 +37,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
-            MetadataSection source, tags, genre, language;
+            MetadataSectionNominators nominators;
+            MetadataSection source, tags;
+            MetadataSectionGenre genre;
+            MetadataSectionLanguage language;
             OsuSpriteText notRankedPlaceholder;
 
             RelativeSizeAxes = Axes.X;
@@ -59,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection(MetadataType.Description),
+                                Child = new MetadataSectionDescription(),
                             },
                         },
                         new Container
@@ -76,12 +82,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    source = new MetadataSection(MetadataType.Source),
-                                    genre = new MetadataSection(MetadataType.Genre) { Width = 0.5f },
-                                    language = new MetadataSection(MetadataType.Language) { Width = 0.5f },
-                                    tags = new MetadataSection(MetadataType.Tags),
+                                    nominators = new MetadataSectionNominators(),
+                                    source = new MetadataSectionSource(),
+                                    genre = new MetadataSectionGenre { Width = 0.5f },
+                                    language = new MetadataSectionLanguage { Width = 0.5f },
+                                    tags = new MetadataSectionTags(),
                                 },
                             },
                         },
@@ -118,10 +125,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.ValueChanged += b =>
             {
-                source.Text = b.NewValue?.Source ?? string.Empty;
-                tags.Text = b.NewValue?.Tags ?? string.Empty;
-                genre.Text = b.NewValue?.Genre.Name ?? string.Empty;
-                language.Text = b.NewValue?.Language.Name ?? string.Empty;
+                nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNomination>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
+                source.Metadata = b.NewValue?.Source ?? string.Empty;
+                tags.Metadata = b.NewValue?.Tags ?? string.Empty;
+                genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
+                language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = (int)SearchLanguage.Unspecified };
                 bool setHasLeaderboard = b.NewValue?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;

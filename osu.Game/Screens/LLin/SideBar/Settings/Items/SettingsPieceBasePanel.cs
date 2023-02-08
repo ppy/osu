@@ -22,12 +22,12 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 {
     public partial class SettingsPieceBasePanel : CompositeDrawable
     {
-        private readonly OsuSpriteText text = new OsuSpriteText
+        protected readonly OsuSpriteText SpriteText = new OsuSpriteText
         {
             Font = OsuFont.GetFont(size: 20)
         };
 
-        private readonly SpriteIcon spriteIcon = new SpriteIcon
+        protected readonly SpriteIcon SpriteIcon = new SpriteIcon
         {
             Size = new Vector2(25)
         };
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             set
             {
                 description = value;
-                text.Text = value;
+                SpriteText.Text = value;
             }
         }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             set
             {
                 icon = value;
-                spriteIcon.Icon = value;
+                SpriteIcon.Icon = value;
                 haveIconSet = true;
             }
         }
@@ -109,8 +109,8 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
-                        spriteIcon,
-                        text,
+                        SpriteIcon,
+                        SpriteText,
                     }
                 },
                 flashBox = new Box
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 
             colourProvider.HueColour.BindValueChanged(_ => OnColorChanged(), true);
 
-            if (!haveIconSet) spriteIcon.Icon = DefaultIcon;
+            if (!haveIconSet) SpriteIcon.Icon = DefaultIcon;
 
             sampleOnClick = audio.Samples.Get("UI/default-select");
         }
