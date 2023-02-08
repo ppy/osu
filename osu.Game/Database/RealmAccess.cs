@@ -869,17 +869,11 @@ namespace osu.Game.Database
                     break;
 
                 case 26:
-                    // Add ScoreInfo.BeatmapHash property to ensure the score corresponds to the version of beatmap it should
-                    // See: https://github.com/ppy/osu/issues/22062
-                    string scoreInfoName = getMappedOrOriginalName(typeof(ScoreInfo));
+                    // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
+                    var scores = migration.NewRealm.All<ScoreInfo>();
 
-                    var oldScoreInfos = migration.OldRealm.DynamicApi.All(scoreInfoName);
-                    var newScoreInfos = migration.NewRealm.All<ScoreInfo>();
-
-                    for (int i = 0; i < newScoreInfos.Count(); i++)
-                    {
-                        newScoreInfos.ElementAt(i).BeatmapHash = oldScoreInfos.ElementAt(i).BeatmapInfo.Hash;
-                    }
+                    foreach (var score in scores)
+                        score.BeatmapHash = score.BeatmapInfo.Hash;
 
                     break;
             }
