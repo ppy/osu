@@ -41,7 +41,7 @@ namespace osu.Game.Scoring
         public BeatmapInfo BeatmapInfo { get; set; } = null!;
 
         /// <summary>
-        /// The <see cref="BeatmapInfo.Hash"/> at the point in time when the score was set.
+        /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
         public string BeatmapHash { get; set; } = string.Empty;
 
