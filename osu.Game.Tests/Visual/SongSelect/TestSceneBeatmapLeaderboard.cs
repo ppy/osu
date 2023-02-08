@@ -86,10 +86,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             clearScores();
             checkCount(0);
 
-            loadMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
             checkCount(10);
 
-            loadMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
             checkCount(20);
 
             clearScores();
@@ -114,13 +114,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             clearScores();
             checkCount(0);
 
-            loadMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
             checkCount(10);
 
-            beatmapEdit(() => beatmapInfo);
+            AddStep(@"Save beatmap with changes", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+
+                beatmap.Difficulty.ApproachRate = 11;
+                beatmap.Difficulty.DrainRate = 11;
+                beatmap.Difficulty.OverallDifficulty = 11;
+
+                beatmapManager.Save(beatmapInfo, beatmap);
+            });
+
             checkCount(0);
 
-            loadMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
             checkCount(10);
 
             clearScores();
@@ -152,21 +162,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
             AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
             AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
-        }
-
-        private void beatmapEdit(Func<BeatmapInfo> beatmapInfo)
-        {
-            AddStep(@"Update beatmap via BeatmapManager", () =>
-            {
-                BeatmapInfo info = beatmapInfo();
-                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(info).Beatmap;
-
-                beatmap.Difficulty.ApproachRate = 11;
-                beatmap.Difficulty.DrainRate = 11;
-                beatmap.Difficulty.OverallDifficulty = 11;
-
-                beatmapManager.Save(info, beatmap);
-            });
         }
 
         private void showPersonalBestWithNullPosition()
@@ -208,9 +203,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private void loadMoreScores(Func<BeatmapInfo> beatmapInfo)
+        private void importMoreScores(Func<BeatmapInfo> beatmapInfo)
         {
-            AddStep(@"Load new scores via manager", () =>
+            AddStep(@"Import new scores", () =>
             {
                 foreach (var score in generateSampleScores(beatmapInfo()))
                     scoreManager.Import(score);
@@ -223,7 +218,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         private void checkCount(int expected) =>
-            AddUntilStep("Correct count displayed", () => leaderboard.ChildrenOfType<LeaderboardScore>().Count() == expected);
+            AddUntilStep($"{expected} scores displayed", () => leaderboard.ChildrenOfType<LeaderboardScore>().Count(), () => Is.EqualTo(expected));
 
         private static ScoreInfo[] generateSampleScores(BeatmapInfo beatmapInfo)
         {
