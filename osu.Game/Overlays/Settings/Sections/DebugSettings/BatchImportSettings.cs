@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class BatchImportSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => @"Batch Import";
+        protected override LocalisableString Header => @"批量导入";
 
         private SettingsButton importBeatmapsButton = null!;
         private SettingsButton importCollectionsButton = null!;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 importBeatmapsButton = new SettingsButton
                 {
-                    Text = @"Import beatmaps from stable",
+                    Text = @"从Stable中导入谱面",
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 importSkinsButton = new SettingsButton
                 {
-                    Text = @"Import skins from stable",
+                    Text = @"从Stable中导入皮肤",
                     Action = () =>
                     {
                         importSkinsButton.Enabled.Value = false;
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 importCollectionsButton = new SettingsButton
                 {
-                    Text = @"Import collections from stable",
+                    Text = @"从Stable中导入收藏夹",
                     Action = () =>
                     {
                         importCollectionsButton.Enabled.Value = false;
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 importScoresButton = new SettingsButton
                 {
-                    Text = @"Import scores from stable",
+                    Text = @"从Stable中导入成绩",
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;

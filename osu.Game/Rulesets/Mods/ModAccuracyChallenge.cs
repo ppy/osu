@@ -17,11 +17,11 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ModAccuracyChallenge : ModFailCondition, IApplicableToScoreProcessor
     {
-        public override string Name => "Accuracy Challenge";
+        public override string Name => "精准挑战";
 
         public override string Acronym => "AC";
 
-        public override LocalisableString Description => "Fail if your accuracy drops too low!";
+        public override LocalisableString Description => "准确率过低时原地去世！";
 
         public override ModType Type => ModType.DifficultyIncrease;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
-        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
+        [SettingSource("最低准确率", "准确率低于此数值时将触发失败", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
