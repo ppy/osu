@@ -22,6 +22,13 @@ using Realms;
 
 namespace osu.Game.Scoring
 {
+
+    /// <summary>
+    /// Store information about the score
+    /// </summary> 
+    /// <remarks>
+    /// If you work on inporting/adding score please ensure you provide both <c>BeatmapInfo</c> and <c>BeatmapHash</c>
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
