@@ -100,10 +100,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestLocalScoresDisplayOnBeatmapEdit()
         {
             BeatmapInfo beatmapInfo = null!;
+            string originalHash = string.Empty;
 
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
 
-            AddStep(@"Set beatmap", () =>
+            AddStep(@"Import beatmap", () =>
             {
                 beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
@@ -114,23 +115,39 @@ namespace osu.Game.Tests.Visual.SongSelect
             clearScores();
             checkCount(0);
 
+            AddStep(@"Perform initial save to guarantee stable hash", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+                beatmapManager.Save(beatmapInfo, beatmap);
+
+                originalHash = beatmapInfo.Hash;
+            });
+
             importMoreScores(() => beatmapInfo);
             checkCount(10);
 
-            AddStep(@"Save beatmap with changes", () =>
+            AddStep(@"Save with changes", () =>
             {
                 IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
-
-                beatmap.Difficulty.ApproachRate = 11;
-                beatmap.Difficulty.DrainRate = 11;
-                beatmap.Difficulty.OverallDifficulty = 11;
-
+                beatmap.Difficulty.ApproachRate = 12;
                 beatmapManager.Save(beatmapInfo, beatmap);
             });
 
+            AddAssert("Hash changed", () => beatmapInfo.Hash, () => Is.Not.EqualTo(originalHash));
             checkCount(0);
 
             importMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
+            checkCount(20);
+
+            AddStep(@"Revert changes", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+                beatmap.Difficulty.ApproachRate = 8;
+                beatmapManager.Save(beatmapInfo, beatmap);
+            });
+
+            AddAssert("Hash restored", () => beatmapInfo.Hash, () => Is.EqualTo(originalHash));
             checkCount(10);
 
             clearScores();
