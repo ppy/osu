@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -28,17 +29,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// </summary>
     public partial class AccuracyCircle : CompositeDrawable
     {
-        private const double accuracy_x = 1;
-
-        private const double accuracy_s = 0.95;
-
-        private const double accuracy_a = 0.9;
-
-        private const double accuracy_b = 0.8;
-
-        private const double accuracy_c = 0.7;
-
-        private const double accuracy_d = 0;
+        private static readonly double accuracy_x = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.X);
+        private static readonly double accuracy_s = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.S);
+        private static readonly double accuracy_a = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.A);
+        private static readonly double accuracy_b = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.B);
+        private static readonly double accuracy_c = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.C);
+        private static readonly double accuracy_d = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.D);
 
         /// <summary>
         /// Duration for the transforms causing this component to appear.
