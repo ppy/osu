@@ -258,8 +258,16 @@ namespace osu.Game.Rulesets.UI
             }
 
             // When rewinding, revert future judgements in the reverse order.
-            while (judgedEntries.Count > 0 && Time.Current < judgedEntries.Peek().Result.AsNonNull().TimeAbsolute)
+            while (judgedEntries.Count > 0)
+            {
+                var result = judgedEntries.Peek().Result;
+                Debug.Assert(result?.RawTime != null);
+
+                if (Time.Current >= result.RawTime.Value)
+                    break;
+
                 revertResult(judgedEntries.Pop());
+            }
         }
 
         /// <summary>
@@ -453,7 +461,7 @@ namespace osu.Game.Rulesets.UI
 
         private void onNewResult(DrawableHitObject drawable, JudgementResult result)
         {
-            Debug.Assert(result != null && drawable.Entry?.Result == result);
+            Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null);
             judgedEntries.Push(drawable.Entry.AsNonNull());
 
             NewResult?.Invoke(drawable, result);
