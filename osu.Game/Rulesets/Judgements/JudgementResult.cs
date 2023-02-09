@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Judgements
         public readonly Judgement Judgement;
 
         /// <summary>
-        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="DrawableHitObject.MaximumJudgementOffset"/>.
+        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="HitObject.MaximumJudgementOffset"/>.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>
         public double TimeOffset { get; internal set; }
