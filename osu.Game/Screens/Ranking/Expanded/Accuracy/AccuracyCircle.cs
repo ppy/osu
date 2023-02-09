@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// The width of a <see cref="RankNotch"/> in terms of accuracy.
         /// </summary>
-        public const double NOTCH_WIDTH_PERCENTAGE = 0.002;
+        public const double NOTCH_WIDTH_PERCENTAGE = 1.0 / 360;
 
         /// <summary>
         /// The easing for the circle filling transforms.
