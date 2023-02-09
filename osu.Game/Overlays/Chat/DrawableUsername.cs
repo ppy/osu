@@ -152,6 +152,8 @@ namespace osu.Game.Overlays.Chat
             {
                 if (user.Equals(APIUser.SYSTEM_USER))
                     return Array.Empty<MenuItem>();
+                
+                string username = user.Username.Replace(" ", "_");
 
                 List<MenuItem> items = new List<MenuItem>
                 {
@@ -165,7 +167,7 @@ namespace osu.Game.Overlays.Chat
                 {
                     items.Add(new OsuMenuItem(ChatStrings.MentionUser, MenuItemType.Standard, () =>
                     {
-                        currentChannel.Value.TextBoxMessage.Value += $"@{user.Username} ";
+                        currentChannel.Value.TextBoxMessage.Value += $"@{username} ";
                     }));
                 };
 
@@ -173,7 +175,7 @@ namespace osu.Game.Overlays.Chat
                 {
                     items.Add(new OsuMenuItem(ChatStrings.ReportUser, MenuItemType.Destructive, () =>
                     {
-                        currentChannel.Value.TextBoxMessage.Value += $"!report {user.Username} ";
+                        currentChannel.Value.TextBoxMessage.Value += $"!report {username} ";
                     }));
                 };
                 

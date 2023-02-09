@@ -25,7 +25,7 @@ namespace osu.Game.Localisation
         public static LocalisableString MentionUser => new TranslatableString(getKey(@"mention_user"), @"Mention");
 
         /// <summary>
-        /// "Report User"
+        /// "Report"
         /// </summary>
 
         public static LocalisableString ReportUser => new TranslatableString(getKey(@"report_user"), @"Report");
