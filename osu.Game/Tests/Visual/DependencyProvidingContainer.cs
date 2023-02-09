@@ -20,8 +20,7 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// The dependencies provided to the children.
         /// </summary>
-        // TODO: should be an init-only property when C# 9
-        public (Type, object)[] CachedDependencies { get; set; } = Array.Empty<(Type, object)>();
+        public (Type, object)[] CachedDependencies { get; init; } = Array.Empty<(Type, object)>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
