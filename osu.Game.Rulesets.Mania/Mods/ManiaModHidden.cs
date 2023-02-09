@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
 
-        public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)
+        public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.3f)
         {
             Precision = 0.1f,
             MinValue = 0.2f,
