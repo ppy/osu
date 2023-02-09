@@ -200,10 +200,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // always fade out at the circle's start time (to match user expectations).
             ApproachCircle.FadeOut(50);
-
-            double mehWindow = HitObject.HitWindows.WindowFor(HitResult.Meh);
-            double lateMissFadeTime = mehWindow / 4 + 15;
-            this.Delay(mehWindow - lateMissFadeTime).FadeOut(lateMissFadeTime);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
