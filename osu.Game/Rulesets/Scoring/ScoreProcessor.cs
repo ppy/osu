@@ -605,7 +605,7 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// Given a <see cref="ScoreRank"/>, return the cutoff accuracy (0..1).
-        /// Accuracy must be great or equal to the cutoff to qualify for the provided rank.
+        /// Accuracy must be greater than or equal to the cutoff to qualify for the provided rank.
         /// </summary>
         public static double AccuracyCutoffFromRank(ScoreRank rank)
         {
