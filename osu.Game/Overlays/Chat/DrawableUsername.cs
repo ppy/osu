@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Chat
                     {
                         currentChannel.Value.TextBoxMessage.Value += $"@{username} ";
                     }));
-                };
+                }
 
                 if (currentChannel?.Value != null && (!user.Equals(api.LocalUser.Value)))
                 {
@@ -177,9 +177,8 @@ namespace osu.Game.Overlays.Chat
                     {
                         currentChannel.Value.TextBoxMessage.Value += $"!report {username} ";
                     }));
-                };
+                }
                 
-
                 return items.ToArray();
             }
         }
