@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldMaxAspect = { BindTarget = LockPlayfieldMaxAspect }
+            LockPlayfieldAspectRange = { BindTarget = LockPlayfieldMaxAspect }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
