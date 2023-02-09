@@ -14,14 +14,17 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Scoring;
+using System.Collections.Generic;
+using osu.Framework.Timing;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
     {
-        private const float COMBO_TO_REACH_MAX_COVERAGE = 400;
+        private const float combo_to_reach_max_coverage = 500;
 
-        private PlayfieldCoveringWrapper CoveringWrapper = null!;
+        private List<PlayfieldCoveringWrapper> coveringWrappers = null!;
+        private IFrameBasedClock clock = null!;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             Combo.BindTo(scoreProcessor.Combo);
 
-            // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
+            // Default value of ScoreProcessor's Rank in Hidden/Fadein Mod should be SS+
             scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
@@ -49,22 +52,33 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
 
+            if (ComboBasedCoverage.Value)
+            {
+                coveringWrappers = new List<PlayfieldCoveringWrapper>();
+                clock = maniaPlayfield.Clock;
+            }
+
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
-                if (ComboBasedCoverage.Value)
-                    Combo.ValueChanged += _ => UpdateCoverage();
 
                 hocParent.Remove(hoc, false);
 
-                CoveringWrapper = new PlayfieldCoveringWrapper(hoc).With(c =>
+                PlayfieldCoveringWrapper coveringWrapper = new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
                     c.Coverage = Coverage.Value;
                 });
-                hocParent.Add(CoveringWrapper);
+
+                hocParent.Add(coveringWrapper);
+
+                if (ComboBasedCoverage.Value)
+                {
+                    Combo.ValueChanged += _ => updateCoverage();
+                    coveringWrappers.Add(coveringWrapper);
+                }
             }
         }
 
@@ -76,14 +90,20 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
         }
 
-        private void UpdateCoverage()
+        private void updateCoverage()
         {
-            CoveringWrapper.Coverage = GetComboBasedCoverage();
+            float coverage = getComboBasedCoverageAmount();
+            foreach (PlayfieldCoveringWrapper wrapper in coveringWrappers)
+                wrapper.Coverage = coverage;
         }
 
-        private float GetComboBasedCoverage()
+        private float getComboBasedCoverageAmount()
         {
-            return Coverage.Value + (Coverage.MaxValue - Coverage.Value) * Math.Min(1.0f, Combo.Value / COMBO_TO_REACH_MAX_COVERAGE);
+            float targetCoverage = Coverage.Value + (Coverage.MaxValue - Coverage.Value) * Math.Min(1.0f, Combo.Value / combo_to_reach_max_coverage);
+            if (Coverage.Value > targetCoverage)
+                return Coverage.Value - 2 * (float)clock.ElapsedFrameTime;
+            else
+                return targetCoverage;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 0.1f,
             MinValue = 0.2f,
             MaxValue = 0.8f,
-            Default = 0.5f,
+            Default = 0.3f,
         };
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();
