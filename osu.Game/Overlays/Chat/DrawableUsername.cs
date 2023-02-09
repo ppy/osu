@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Chat
                 if (!user.Equals(api.LocalUser.Value))
                     items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
-                if (currentChannel?.Value != null)
+                if (currentChannel?.Value != null && (!user.Equals(api.LocalUser.Value)))
                 {
                     items.Add(new OsuMenuItem(ChatStrings.MentionUser, MenuItemType.Standard, () =>
                     {
