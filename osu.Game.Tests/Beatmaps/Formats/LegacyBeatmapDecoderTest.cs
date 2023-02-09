@@ -261,6 +261,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.EffectPointAt(2500).KiaiMode, Is.False);
                 Assert.That(controlPoints.EffectPointAt(3500).KiaiMode, Is.True);
 
+                Assert.That(controlPoints.EffectPointAt(500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.EffectPointAt(1500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.EffectPointAt(2500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.EffectPointAt(3500).OmitFirstBarLine, Is.True);
+
                 Assert.That(controlPoints.SamplePointAt(500).SampleBank, Is.EqualTo("drum"));
                 Assert.That(controlPoints.SamplePointAt(1500).SampleBank, Is.EqualTo("drum"));
                 Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo("normal"));
