@@ -200,6 +200,14 @@ namespace osu.Game.Rulesets.Objects
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
 
+        /// <summary>
+        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="HitObject"/> can be judged.
+        /// <para>
+        /// Defaults to the miss window.
+        /// </para>
+        /// </summary>
+        public virtual double MaximumJudgementOffset => HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+
         public IList<HitSampleInfo> CreateSlidingSamples()
         {
             var slidingSamples = new List<HitSampleInfo>();
