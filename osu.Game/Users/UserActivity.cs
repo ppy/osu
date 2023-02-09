@@ -105,12 +105,12 @@ namespace osu.Game.Users
                 this.score = score;
             }
 
-            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Watching a game" : $@"Watching {Username}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Watching a replay" : $@"Watching {Username}'s replay";
         }
 
         public class Spectating : Watching
         {
-            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Spectating a game" : $@"Spectating {Username}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Spectating a user" : $@"Spectating {Username}";
 
             public Spectating(ScoreInfo score)
                 : base(score)
