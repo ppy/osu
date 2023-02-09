@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             // Default value of ScoreProcessor's Rank in Hidden Mod should be SS+
             scoreProcessor.Rank.Value = ScoreRank.XH;
