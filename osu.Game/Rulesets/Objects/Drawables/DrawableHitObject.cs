@@ -661,7 +661,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            Result.TimeOffset = Math.Min(HitObject.MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
+            Result.RawTime = Time.Current;
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using JetBrains.Annotations;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -33,19 +34,30 @@ namespace osu.Game.Rulesets.Judgements
         public readonly Judgement Judgement;
 
         /// <summary>
-        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="HitObject.MaximumJudgementOffset"/>.
-        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
-        /// </summary>
-        public double TimeOffset { get; internal set; }
-
-        /// <summary>
-        /// The absolute time at which this <see cref="JudgementResult"/> occurred.
+        /// The time at which this <see cref="JudgementResult"/> occurred.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>
         /// <remarks>
-        /// This is initially set to the end time of <see cref="HitObject"/>.
+        /// This is used instead of <see cref="TimeAbsolute"/> to check whether this <see cref="JudgementResult"/> should be reverted.
         /// </remarks>
-        public double TimeAbsolute { get; internal set; }
+        internal double? RawTime { get; set; }
+
+        /// <summary>
+        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="osu.Game.Rulesets.Objects.HitObject.MaximumJudgementOffset"/>.
+        /// </summary>
+        public double TimeOffset
+        {
+            get => RawTime != null ? Math.Min(RawTime.Value - HitObject.GetEndTime(), HitObject.MaximumJudgementOffset) : 0;
+            internal set => RawTime = HitObject.GetEndTime() + value;
+        }
+
+        /// <summary>
+        /// The absolute time at which this <see cref="JudgementResult"/> occurred, clamped by the end time of <see cref="HitObject"/> plus <see cref="osu.Game.Rulesets.Objects.HitObject.MaximumJudgementOffset"/>.
+        /// </summary>
+        /// <remarks>
+        /// The end time of <see cref="HitObject"/> is returned if this result is not populated yet.
+        /// </remarks>
+        public double TimeAbsolute => RawTime != null ? Math.Min(RawTime.Value, HitObject.GetEndTime() + HitObject.MaximumJudgementOffset) : HitObject.GetEndTime();
 
         /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
@@ -92,8 +104,7 @@ namespace osu.Game.Rulesets.Judgements
         internal void Reset()
         {
             Type = HitResult.None;
-            TimeOffset = 0;
-            TimeAbsolute = HitObject.GetEndTime();
+            RawTime = null;
         }
 
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
