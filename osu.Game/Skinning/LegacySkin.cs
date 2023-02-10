@@ -189,6 +189,16 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
 
+                case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
+
+                    if (existing.NoteBodyStyle != null)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(existing.NoteBodyStyle.Value));
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.Stretch));
+
+                    return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.RepeatBottom));
+
                 case LegacyManiaSkinConfigurationLookups.NoteImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.ColumnIndex}"));

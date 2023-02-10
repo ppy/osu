@@ -43,6 +43,8 @@ namespace osu.Game.Skinning
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
 
+        public LegacyNoteBodyStyle? NoteBodyStyle;
+
         public LegacyManiaSkinConfiguration(int keys)
         {
             Keys = keys;
