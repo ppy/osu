@@ -114,6 +114,11 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
+                    case "NoteBodyStyle":
+                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                            currentConfig.NoteBodyStyle = style;
+                        break;
+
                     case "WidthForNoteHeightScale":
                         currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
