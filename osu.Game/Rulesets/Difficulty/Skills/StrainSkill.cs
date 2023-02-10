@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentSectionEnd;
 
-        private readonly List<double> strainPeaks = new List<double>();
+        private readonly CompressedZeroList strainPeaks = new CompressedZeroList();
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
