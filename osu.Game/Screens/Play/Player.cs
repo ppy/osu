@@ -309,6 +309,8 @@ namespace osu.Game.Screens.Play
                 });
             }
 
+            dependencies.CacheAs(DrawableRuleset.FrameStableClock);
+
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
@@ -433,7 +435,8 @@ namespace osu.Game.Screens.Play
                         HoldToQuit =
                         {
                             Action = () => PerformExit(true),
-                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
+                            ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         KeyCounter =
                         {
@@ -1070,7 +1073,10 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
-            failAnimationLayer?.RemoveFilters();
+
+            // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
+            failAnimationLayer?.Stop();
+            PauseOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully)
             {
@@ -1159,7 +1165,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
         /// <returns>The <see cref="ResultsScreen"/>.</returns>
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true)
+        {
+            ShowUserStatistics = true
+        };
 
         private void fadeOut(bool instant = false)
         {

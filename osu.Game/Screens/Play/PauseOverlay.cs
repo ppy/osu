@@ -8,8 +8,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private SkinnableSound pauseLoop;
 
-        protected override Action BackAction => () => InternalButtons.Children.First().TriggerClick();
+        protected override Action BackAction => () => InternalButtons.First().TriggerClick();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -42,6 +44,14 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        public void StopAllSamples()
+        {
+            if (!IsLoaded)
+                return;
+
+            pauseLoop.Stop();
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -55,6 +65,18 @@ namespace osu.Game.Screens.Play
             base.PopOut();
 
             pauseLoop.VolumeTo(0, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.PauseGameplay:
+                    InternalButtons.First().TriggerClick();
+                    return true;
+            }
+
+            return base.OnPressed(e);
         }
     }
 }

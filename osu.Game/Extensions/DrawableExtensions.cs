@@ -66,10 +66,16 @@ namespace osu.Game.Extensions
 
                 foreach (var (_, property) in component.GetSettingsSourceProperties())
                 {
-                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
-                        continue;
+                    var bindable = ((IBindable)property.GetValue(component)!);
 
-                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
+                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
+                    {
+                        // TODO: We probably want to restore default if not included in serialisation information.
+                        // This is not simple to do as SetDefault() is only found in the typed Bindable<T> interface right now.
+                        continue;
+                    }
+
+                    skinnable.CopyAdjustedSetting(bindable, settingValue);
                 }
             }
 

@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -45,8 +46,10 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
@@ -57,7 +60,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Skinning.Editor;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -305,6 +307,13 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
+            LocalUserPlaying.BindValueChanged(p =>
+            {
+                BeatmapManager.PauseImports = p.NewValue;
+                SkinManager.PauseImports = p.NewValue;
+                ScoreManager.PauseImports = p.NewValue;
+            }, true);
+
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
@@ -332,7 +341,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
-            string argString = link.Argument.ToString();
+            string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
             {
@@ -352,7 +361,18 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(argString);
+                    if (link.Argument is RomanisableString romanisable)
+                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
+                    else
+                        SearchBeatmapSet(argString);
+                    break;
+
+                case LinkAction.FilterBeatmapSetGenre:
+                    FilterBeatmapSetGenre((SearchGenre)link.Argument);
+                    break;
+
+                case LinkAction.FilterBeatmapSetLanguage:
+                    FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -406,6 +426,16 @@ namespace osu.Game
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
 
+            if (!url.CheckIsValidUrl())
+            {
+                Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                });
+
+                return;
+            }
+
             externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
 
@@ -448,6 +478,10 @@ namespace osu.Game
         /// </summary>
         /// <param name="query">The query to search for.</param>
         public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
+
+        public void FilterBeatmapSetGenre(SearchGenre genre) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithGenreFilter(genre));
+
+        public void FilterBeatmapSetLanguage(SearchLanguage language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
 
         /// <summary>
         /// Show a wiki's page as an overlay
@@ -616,14 +650,14 @@ namespace osu.Game
             }, validScreens: validScreens);
         }
 
-        public override Task Import(params ImportTask[] imports)
+        public override Task Import(ImportTask[] imports, ImportParameters parameters = default)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
 
             // ReSharper disable once AsyncVoidLambda
             // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
             // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
-            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
+            var importTask = new Task(async () => await base.Import(imports, parameters).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -712,7 +746,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            var languages = Enum.GetValues(typeof(Language)).OfType<Language>();
+            var languages = Enum.GetValues<Language>();
 
             var mappings = languages.Select(language =>
             {
@@ -899,9 +933,9 @@ namespace osu.Game
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API), Add, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
+            loadComponentSingleFile(new MessageNotifier(), Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
@@ -1029,7 +1063,7 @@ namespace osu.Game
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database) return;
+                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
                 const int short_term_display_limit = 3;
 
@@ -1043,7 +1077,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {

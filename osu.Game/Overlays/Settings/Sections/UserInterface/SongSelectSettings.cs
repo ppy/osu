@@ -42,6 +42,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
+                    Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
+                    ClassicDefault = false,
                 }
             };
         }

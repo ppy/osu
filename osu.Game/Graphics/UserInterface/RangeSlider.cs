@@ -158,7 +158,7 @@ namespace osu.Game.Graphics.UserInterface
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
-        protected partial class BoundSlider : OsuSliderBar<double>
+        protected partial class BoundSlider : RoundedSliderBar<double>
         {
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;
@@ -197,7 +197,7 @@ namespace osu.Game.Graphics.UserInterface
                 }, true);
             }
 
-            [BackgroundDependencyLoader]
+            [BackgroundDependencyLoader(true)]
             private void load(OverlayColourProvider? colourProvider)
             {
                 if (colourProvider == null) return;
