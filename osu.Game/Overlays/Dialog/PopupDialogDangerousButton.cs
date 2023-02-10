@@ -95,6 +95,16 @@ namespace osu.Game.Overlays.Dialog
                 }
             }
 
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+
+                if (!e.HasAnyButtonPressed) return;
+
+                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                AbortConfirm();
+            }
+
             private void progressChanged(ValueChangedEvent<double> progress)
             {
                 if (progress.NewValue < progress.OldValue) return;

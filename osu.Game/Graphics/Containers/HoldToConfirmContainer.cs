@@ -102,7 +102,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected void AbortConfirm()
         {
-            if (!AllowMultipleFires && Fired) return;
+            if (!confirming || (!AllowMultipleFires && Fired)) return;
 
             confirming = false;
             Fired = false;
