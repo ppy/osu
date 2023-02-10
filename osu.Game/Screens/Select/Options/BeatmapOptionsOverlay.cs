@@ -68,23 +68,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="action">Binding the button does.</param>
         public void AddButton(LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
         {
-            buttonsContainer.Add(createButton(firstLine, secondLine, icon, colour, action));
-        }
-
-        /// <param name="position">The position to insert the button at. Uses process priority, so lower values get processed first, and higher values get processed last.</param>
-        /// <param name="firstLine">Text in the first line.</param>
-        /// <param name="secondLine">Text in the second line.</param>
-        /// <param name="colour">Colour of the button.</param>
-        /// <param name="icon">Icon of the button.</param>
-        /// <param name="action">Binding the button does.</param>
-        public void InsertButton(int position, LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
-        {
-            buttonsContainer.Insert(position, createButton(firstLine, secondLine, icon, colour, action));
-        }
-
-        private BeatmapOptionsButton createButton(LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
-        {
-            return new BeatmapOptionsButton
+            var button = new BeatmapOptionsButton
             {
                 FirstLineText = firstLine,
                 SecondLineText = secondLine,
@@ -96,6 +80,8 @@ namespace osu.Game.Screens.Select.Options
                     action?.Invoke();
                 },
             };
+
+            buttonsContainer.Add(button);
         }
 
         protected override void PopIn()
