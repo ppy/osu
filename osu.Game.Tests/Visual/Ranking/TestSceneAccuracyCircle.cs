@@ -24,17 +24,26 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneAccuracyCircle : OsuTestScene
     {
-        [TestCase(0.2, ScoreRank.D)]
-        [TestCase(0.5, ScoreRank.D)]
-        [TestCase(0.75, ScoreRank.C)]
-        [TestCase(0.85, ScoreRank.B)]
-        [TestCase(0.925, ScoreRank.A)]
-        [TestCase(0.975, ScoreRank.S)]
-        [TestCase(0.9999, ScoreRank.S)]
-        [TestCase(1, ScoreRank.X)]
-        public void TestRank(double accuracy, ScoreRank rank)
+        [TestCase(0)]
+        [TestCase(0.2)]
+        [TestCase(0.5)]
+        [TestCase(0.6999)]
+        [TestCase(0.7)]
+        [TestCase(0.75)]
+        [TestCase(0.7999)]
+        [TestCase(0.8)]
+        [TestCase(0.85)]
+        [TestCase(0.8999)]
+        [TestCase(0.9)]
+        [TestCase(0.925)]
+        [TestCase(0.9499)]
+        [TestCase(0.95)]
+        [TestCase(0.975)]
+        [TestCase(0.9999)]
+        [TestCase(1)]
+        public void TestRank(double accuracy)
         {
-            var score = createScore(accuracy, rank);
+            var score = createScore(accuracy, ScoreProcessor.RankFromAccuracy(accuracy));
 
             addCircleStep(score);
         }
