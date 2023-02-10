@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
@@ -34,16 +32,16 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public bool ShowUsernameTooltip { get; set; }
 
-        private readonly APIUser user;
+        private readonly APIUser? user;
 
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         /// <summary>
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        public ClickableAvatar(APIUser user = null)
+        public ClickableAvatar(APIUser? user = null)
         {
             this.user = user;
 
