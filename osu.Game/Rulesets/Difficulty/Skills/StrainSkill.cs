@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -57,6 +58,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 saveCurrentPeak();
                 startNewSectionFrom(currentSectionEnd, current);
                 currentSectionEnd += SectionLength;
+
+                // If the current peak is 0 it can't decay any further so we can leave early
+                if (Precision.AlmostEquals(currentSectionPeak, 0) && current.StartTime > currentSectionEnd)
+                {
+                    double remainingTime = current.StartTime - currentSectionEnd;
+                    double remainingIterations = Math.Ceiling(remainingTime / SectionLength);
+                    currentSectionEnd += remainingIterations * SectionLength;
+                }
             }
 
             currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
