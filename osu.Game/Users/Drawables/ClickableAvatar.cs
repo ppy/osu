@@ -19,7 +19,7 @@ namespace osu.Game.Users.Drawables
 
         public override LocalisableString TooltipText
         {
-            get => Enabled.Value ? tooltip : default;
+            get => Enabled.Value ? tooltip : string.Empty;
             set => tooltip = value;
         }
 
