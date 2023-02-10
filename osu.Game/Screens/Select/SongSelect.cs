@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Select
         private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
 
         [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay beatmapOverlay { get; set; }
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
