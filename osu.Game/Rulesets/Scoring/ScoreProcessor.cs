@@ -581,26 +581,18 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static ScoreRank RankFromAccuracy(double accuracy)
         {
-            switch (accuracy)
-            {
-                case accuracy_cutoff_x:
-                    return ScoreRank.X;
+            if (accuracy == accuracy_cutoff_x)
+                return ScoreRank.X;
+            if (accuracy >= accuracy_cutoff_s)
+                return ScoreRank.S;
+            if (accuracy >= accuracy_cutoff_a)
+                return ScoreRank.A;
+            if (accuracy >= accuracy_cutoff_b)
+                return ScoreRank.B;
+            if (accuracy >= accuracy_cutoff_c)
+                return ScoreRank.C;
 
-                case >= accuracy_cutoff_s:
-                    return ScoreRank.S;
-
-                case >= accuracy_cutoff_a:
-                    return ScoreRank.A;
-
-                case >= accuracy_cutoff_b:
-                    return ScoreRank.B;
-
-                case >= accuracy_cutoff_c:
-                    return ScoreRank.C;
-
-                default:
-                    return ScoreRank.D;
-            }
+            return ScoreRank.D;
         }
 
         /// <summary>
