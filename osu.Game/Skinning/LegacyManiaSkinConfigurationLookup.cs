@@ -54,6 +54,7 @@ namespace osu.Game.Skinning
         HoldNoteBodyImage,
         HoldNoteLightImage,
         HoldNoteLightScale,
+        WidthForNoteHeightScale,
         ExplosionImage,
         ExplosionScale,
         ColumnLineColour,

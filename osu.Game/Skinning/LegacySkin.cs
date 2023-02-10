@@ -138,6 +138,10 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
 
+                case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
+
                 case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value]));

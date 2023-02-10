@@ -29,6 +29,8 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
 
+        public float WidthForNoteHeightScale;
+
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
