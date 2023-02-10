@@ -23,7 +23,7 @@ namespace osu.Game.Users.Drawables
 
                 return ShowUsernameTooltip ? (user?.Username ?? string.Empty) : default_tooltip_text;
             }
-            set => throw new InvalidOperationException();
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
