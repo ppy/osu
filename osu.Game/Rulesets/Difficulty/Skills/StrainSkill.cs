@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     double remainingTime = current.StartTime - currentSectionEnd;
                     double remainingIterations = Math.Ceiling(remainingTime / SectionLength);
                     currentSectionEnd += remainingIterations * SectionLength;
+                    strainPeaks.AddZeros((int)remainingIterations);
                 }
             }
 

@@ -37,13 +37,28 @@ namespace osu.Game.Utils
         public void Add(double value)
         {
             if (Precision.DefinitelyBigger(value, 0))
+            {
                 items.Add(new NonZero(value));
-            else if (items.LastOrDefault() is Zeros zeros)
-                zeros.Add();
+                Count += 1;
+            }
             else
-                items.Add(new Zeros());
+            {
+                AddZeros(1);
+            }
+        }
 
-            Count += 1;
+        /// <summary>
+        /// Adds a given amount of zeros to the <see cref="CompressedZeroList"/>.
+        /// </summary>
+        /// <param name="count">The amount of zeros to be added to the list.</param>
+        public void AddZeros(int count)
+        {
+            if (items.LastOrDefault() is Zeros zeros)
+                zeros.Add(count);
+            else
+                items.Add(new Zeros(count));
+
+            Count += count;
         }
 
         /// <summary>
@@ -91,14 +106,14 @@ namespace osu.Game.Utils
     {
         public int Count { get; private set; }
 
-        public Zeros()
+        public Zeros(int count)
         {
-            Count = 1;
+            Count = count;
         }
 
-        public void Add()
+        public void Add(int count)
         {
-            Count += 1;
+            Count += count;
         }
     }
 }
