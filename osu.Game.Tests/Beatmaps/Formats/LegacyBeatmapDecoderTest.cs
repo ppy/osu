@@ -261,11 +261,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.EffectPointAt(2500).KiaiMode, Is.False);
                 Assert.That(controlPoints.EffectPointAt(3500).KiaiMode, Is.True);
 
-                Assert.That(controlPoints.EffectPointAt(500).OmitFirstBarLine, Is.False);
-                Assert.That(controlPoints.EffectPointAt(1500).OmitFirstBarLine, Is.False);
-                Assert.That(controlPoints.EffectPointAt(2500).OmitFirstBarLine, Is.True);
-                Assert.That(controlPoints.EffectPointAt(3500).OmitFirstBarLine, Is.True);
-
                 Assert.That(controlPoints.SamplePointAt(500).SampleBank, Is.EqualTo("drum"));
                 Assert.That(controlPoints.SamplePointAt(1500).SampleBank, Is.EqualTo("drum"));
                 Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo("normal"));
@@ -275,6 +270,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500).Within(0.1));
+            }
+        }
+
+        [Test]
+        public void TestDecodeOmitBarLineEffect()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("omit-barline-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.EffectPoints.Count, Is.EqualTo(5));
+
+                Assert.That(controlPoints.EffectPointAt(500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.EffectPointAt(1500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.EffectPointAt(2500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.EffectPointAt(3500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.EffectPointAt(4500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.EffectPointAt(5500).OmitFirstBarLine, Is.True);
             }
         }
 
