@@ -14,7 +14,7 @@ osu file format v14
 2000,500,4,2,0,100,1,0
 2000,-50,4,3,0,100,0,8
 
-// Inherited: none, Uninherited: none
+// Inherited: none, uninherited: none
 3000,-50,4,3,0,100,0,0
 3000,500,4,2,0,100,1,0
 
