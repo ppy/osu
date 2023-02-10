@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
-        [TestCase(0.3f)]
+        [TestCase(0.5f)]
         [TestCase(0.1f)]
         [TestCase(0.7f)]
         public void TestCoverage(float coverage) => CreateModTest(new ModTestData { Mod = new ManiaModFadeIn { Coverage = { Value = coverage } }, PassCondition = () => true });
