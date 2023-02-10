@@ -14,6 +14,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Cached]
         public readonly Bindable<ControlPointGroup> SelectedGroup = new Bindable<ControlPointGroup>();
 
+        [Resolved]
+        private EditorClock? editorClock { get; set; }
+
         public TimingScreen()
             : base(EditorScreenMode.Timing)
         {
@@ -36,5 +39,19 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             }
         };
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (editorClock != null)
+            {
+                // When entering the timing screen, let's choose to closest valid timing point.
+                // This will emulate the osu-stable behaviour where a metronome and timing information
+                // are presented on entering the screen.
+                var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
+                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(nearestTimingPoint.Time);
+            }
+        }
     }
 }
