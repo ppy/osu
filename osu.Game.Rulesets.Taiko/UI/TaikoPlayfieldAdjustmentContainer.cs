@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
 
-        private const float default_aspect = 16f / 9f;
-        private const float minimum_aspect = 5f / 4f;
+        public const float MAXIMUM_ASPECT = 16f / 9f;
+        public const float MINIMUM_ASPECT = 5f / 4f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
 
@@ -31,10 +31,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 float currentAspect = Parent.ChildSize.X / Parent.ChildSize.Y;
 
-                if (currentAspect > default_aspect)
-                    height *= currentAspect / default_aspect;
-                else if (currentAspect < minimum_aspect)
-                    height *= currentAspect / minimum_aspect;
+                if (currentAspect > MAXIMUM_ASPECT)
+                    height *= currentAspect / MAXIMUM_ASPECT;
+                else if (currentAspect < MINIMUM_ASPECT)
+                    height *= currentAspect / MINIMUM_ASPECT;
             }
 
             Height = height;
