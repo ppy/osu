@@ -19,7 +19,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Options;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
@@ -45,9 +44,9 @@ namespace osu.Game.Screens.Select
 
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
-        protected override void AddOptionButtons(BeatmapOptionsOverlay beatmapOptions, OsuColour colours)
+        protected override void AddOptionButtons(OsuColour colours)
         {
-            beatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
         }
 
         protected void PresentScore(ScoreInfo score) =>
