@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (bodySprite != null)
                 {
                     bodySprite.Origin = Anchor.BottomCentre;
-                    bodySprite.Scale = new Vector2(1, -1);
+                    bodySprite.Scale = new Vector2(bodySprite.Scale.X, Math.Abs(bodySprite.Scale.Y) * -1);
                 }
 
                 if (light != null)
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (bodySprite != null)
                 {
                     bodySprite.Origin = Anchor.TopCentre;
-                    bodySprite.Scale = Vector2.One;
+                    bodySprite.Scale = new Vector2(bodySprite.Scale.X, Math.Abs(bodySprite.Scale.Y));
                 }
 
                 if (light != null)
