@@ -94,8 +94,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 d.Anchor = Anchor.TopCentre;
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
-                d.FillMode = FillMode.Stretch;
-                d.Height = minimumColumnWidth / d.DrawWidth * 1.6f; // constant matching stable.
                 // Todo: Wrap?
             });
 
