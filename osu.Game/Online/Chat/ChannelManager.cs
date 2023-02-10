@@ -583,7 +583,8 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel));
+                if (sendLeaveRequest)
+                    api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
         }
