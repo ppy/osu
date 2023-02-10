@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,7 +15,13 @@ namespace osu.Game.Users.Drawables
     {
         private const string default_tooltip_text = "view profile";
 
-        public override LocalisableString TooltipText { get; set; } = default_tooltip_text;
+        private LocalisableString tooltip = default_tooltip_text;
+
+        public override LocalisableString TooltipText
+        {
+            get => Enabled.Value ? tooltip : default;
+            set => tooltip = value;
+        }
 
         /// <summary>
         /// By default, the tooltip will show "view profile" as avatars are usually displayed next to a username.
@@ -52,6 +59,14 @@ namespace osu.Game.Users.Drawables
         {
             if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
                 game?.ShowUser(user);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!Enabled.Value)
+                return false;
+
+            return base.OnClick(e);
         }
     }
 }
