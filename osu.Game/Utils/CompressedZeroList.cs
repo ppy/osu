@@ -18,7 +18,7 @@ namespace osu.Game.Utils
         /// </summary>
         public int Count { get; private set; }
 
-        private List<Number> items;
+        private readonly List<Number> items;
 
         /// <summary>
         /// Constructs a new <see cref="CompressedZeroList"/>
@@ -72,7 +72,9 @@ namespace osu.Game.Utils
                 {
                     case NonZero nonZero:
                         yield return nonZero.Value;
+
                         break;
+
                     case Zeros zeros:
                         for (int i = 0; i < zeros.Count; i++)
                             yield return 0.0;
