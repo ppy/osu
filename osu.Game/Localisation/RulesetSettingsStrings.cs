@@ -50,29 +50,29 @@ namespace osu.Game.Localisation
         public static LocalisableString BorderFull => new TranslatableString(getKey(@"full_borders"), @"Full");
 
         /// <summary>
-        /// "Scrolling direction"
+        /// "滚动方向"
         /// </summary>
-        public static LocalisableString ScrollingDirection => new TranslatableString(getKey(@"scrolling_direction"), @"Scrolling direction");
+        public static LocalisableString ScrollingDirection => new TranslatableString(getKey(@"llin_scrolling_direction"), @"滚动方向");
 
         /// <summary>
-        /// "Up"
+        /// "从下往上"
         /// </summary>
-        public static LocalisableString ScrollingDirectionUp => new TranslatableString(getKey(@"scrolling_up"), @"Up");
+        public static LocalisableString ScrollingDirectionUp => new TranslatableString(getKey(@"llin_scrolling_up"), @"从下往上");
 
         /// <summary>
-        /// "Down"
+        /// "从上往下"
         /// </summary>
-        public static LocalisableString ScrollingDirectionDown => new TranslatableString(getKey(@"scrolling_down"), @"Down");
+        public static LocalisableString ScrollingDirectionDown => new TranslatableString(getKey(@"llin_scrolling_down"), @"从上往下");
 
         /// <summary>
-        /// "Scroll speed"
+        /// "滚动速度"
         /// </summary>
-        public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll speed");
+        public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"llin_scroll_speed"), @"滚动速度");
 
         /// <summary>
-        /// "Timing-based note colouring"
+        /// "基于Timing的Note颜色"
         /// </summary>
-        public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
+        public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"llin_Timing_based_colouring"), @"基于Timing的Note颜色");
 
         /// <summary>
         /// "{0}ms (speed {1})"
