@@ -74,6 +74,12 @@ namespace osu.Game.Overlays.Dialog
                 Progress.BindValueChanged(progressChanged);
             }
 
+            protected override void AbortConfirm()
+            {
+                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                base.AbortConfirm();
+            }
+
             protected override void Confirm()
             {
                 lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
@@ -92,7 +98,6 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (!e.HasAnyButtonPressed)
                 {
-                    lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                     AbortConfirm();
                     mouseDown = false;
                 }
@@ -112,7 +117,6 @@ namespace osu.Game.Overlays.Dialog
 
                 if (!mouseDown) return;
 
-                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                 AbortConfirm();
             }
 
