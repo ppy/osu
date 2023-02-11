@@ -100,7 +100,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Abort any ongoing confirmation. Should be called when the container's interaction is no longer valid (ie. the user releases a key).
         /// </summary>
-        protected void AbortConfirm()
+        protected virtual void AbortConfirm()
         {
             if (!confirming || (!AllowMultipleFires && Fired)) return;
 
