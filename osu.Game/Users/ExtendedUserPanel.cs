@@ -106,7 +106,7 @@ namespace osu.Game.Users
                 // Set status message based on activity (if we have one) and status is not offline
                 if (activity != null && !(status is UserStatusOffline))
                 {
-                    statusMessage.Text = activity.Status;
+                    statusMessage.Text = activity.GetStatus();
                     statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
                     return;
                 }

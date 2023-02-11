@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
 
@@ -107,7 +109,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set online status", () => status.Value = new UserStatusOnline());
 
             AddStep("idle", () => activity.Value = null);
-            AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
+            AddStep("watching", () => activity.Value = new UserActivity.Watching(createScore(@"nats")));
+            AddStep("spectating", () => activity.Value = new UserActivity.Spectating(createScore(@"mrekk")));
             AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
             AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
             AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
@@ -131,6 +134,14 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));
+
+        private ScoreInfo createScore(string name) => new ScoreInfo(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+        {
+            User = new APIUser
+            {
+                Username = name,
+            }
+        };
 
         private partial class TestUserListPanel : UserListPanel
         {
