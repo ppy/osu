@@ -505,27 +505,22 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var prevPoint = beatmap.ControlPointInfo.EffectPointAt(pendingControlPointsTime);
 
-                        // If this point is the default point, or does not share our points time, that means that the ControlPointInfo.Add() call
-                        // for the pendingPoint below did not actually add a point.
+                        // If the previous point is the default point, or does not share the current points time,
+                        // that means that the ControlPointInfo.Add() call for the pendingPoint below did not actually add a point.
                         //
-                        // This can happen if the point is deemed redundant due to it not changing effects.
-                        // If this happens, we need to manually re-add an effect point with OmitFirstBarLine now set to true, inheriting the rest of the settings
-                        // from the previous effect point
+                        // This can happen if the previous point is deemed redundant due to it not changing effects.
+                        // If this happens, we need to manually re-add an effect point with OmitFirstBarLine now set to true,
+                        // inheriting the rest of the settings from the previous effect point.
 
-                        if (prevPoint.OmitFirstBarLine == false)
+                        if (prevPoint.Equals(EffectControlPoint.DEFAULT) || prevPoint.Time != pendingControlPointsTime)
                         {
-                            if (prevPoint.Equals(EffectControlPoint.DEFAULT) || prevPoint.Time != pendingControlPointsTime)
-                            {
-                                beatmap.ControlPointInfo.Add(pendingControlPointsTime, new EffectControlPoint
-                                {
-                                    KiaiMode = prevPoint.KiaiMode,
-                                    OmitFirstBarLine = true,
-                                    ScrollSpeed = prevPoint.ScrollSpeed,
-                                });
-                            }
-                            else
-                                prevPoint.OmitFirstBarLine = true;
+                            var newPoint = (EffectControlPoint)prevPoint.DeepClone();
+
+                            newPoint.OmitFirstBarLine = true;
+                            beatmap.ControlPointInfo.Add(pendingControlPointsTime, newPoint);
                         }
+                        else
+                            prevPoint.OmitFirstBarLine = true;
                     }
 
                     continue;
