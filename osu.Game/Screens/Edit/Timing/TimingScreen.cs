@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (editorClock != null)
             {
-                // When entering the timing screen, let's choose to closest valid timing point.
+                // When entering the timing screen, let's choose the closest valid timing point.
                 // This will emulate the osu-stable behaviour where a metronome and timing information
                 // are presented on entering the screen.
                 var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
