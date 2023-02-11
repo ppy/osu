@@ -39,22 +39,25 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             Add(infoWedge = new TestBeatmapInfoWedgeV2
             {
+                State = { Value = Visibility.Visible },
                 Width = 0.6f,
                 RelativeSizeAxes = Axes.X,
                 Margin = new MarginPadding { Top = 20 }
             });
-
-            AddStep("show", () => infoWedge.Show());
-
-            selectBeatmap(Beatmap.Value.Beatmap);
-
-            AddWaitStep("wait for select", 3);
 
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
             {
                 foreach (var hasCurrentValue in infoWedge.Info.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
                     hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
             });
+        }
+
+        [Test]
+        public void TestRulesetChange()
+        {
+            selectBeatmap(Beatmap.Value.Beatmap);
+
+            AddWaitStep("wait for select", 3);
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
@@ -74,6 +77,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestWedgeVisibility()
         {
+            // Mostly just in case someone runs this test before others,
+            // leading to the shadow being very hard to see if it is black
             AddStep("Make shadow red for test visibility", () =>
             {
                 infoWedge.EdgeEffect = new EdgeEffectParameters
