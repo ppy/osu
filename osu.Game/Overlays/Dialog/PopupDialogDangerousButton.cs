@@ -57,6 +57,7 @@ namespace osu.Game.Overlays.Dialog
             private Sample confirmSample;
             private double lastTickPlaybackTime;
             private AudioFilter lowPassFilter = null!;
+            private bool mouseDown;
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
@@ -83,6 +84,7 @@ namespace osu.Game.Overlays.Dialog
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 BeginConfirm();
+                mouseDown = true;
                 return true;
             }
 
@@ -92,14 +94,23 @@ namespace osu.Game.Overlays.Dialog
                 {
                     lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                     AbortConfirm();
+                    mouseDown = false;
                 }
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                if (mouseDown)
+                    BeginConfirm();
+
+                return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
 
-                if (!e.HasAnyButtonPressed) return;
+                if (!mouseDown) return;
 
                 lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                 AbortConfirm();
