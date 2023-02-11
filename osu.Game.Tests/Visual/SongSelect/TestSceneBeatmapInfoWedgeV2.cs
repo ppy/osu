@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -49,12 +50,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddWaitStep("wait for select", 3);
 
-            AddStep("hide", () => { infoWedge.Hide(); });
-
-            AddWaitStep("wait for hide", 3);
-
-            AddStep("show", () => { infoWedge.Show(); });
-
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
             {
                 foreach (var hasCurrentValue in infoWedge.Info.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
@@ -74,6 +69,26 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testBeatmapLabels(instance);
             }
+        }
+
+        [Test]
+        public void TestWedgeVisibility()
+        {
+            AddStep("Make shadow red for test visibility", () =>
+            {
+                infoWedge.EdgeEffect = new EdgeEffectParameters
+                {
+                    Colour = Colour4.Red,
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 5,
+                };
+            });
+            AddStep("hide", () => { infoWedge.Hide(); });
+            AddWaitStep("wait for hide", 3);
+            AddAssert("check visibility", () => infoWedge.Alpha == 0);
+            AddStep("show", () => { infoWedge.Show(); });
+            AddWaitStep("wait for show", 1);
+            AddAssert("check visibility", () => infoWedge.Alpha > 0);
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
