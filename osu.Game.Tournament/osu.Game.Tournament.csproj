@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" />
   </ItemGroup>
 </Project>
