@@ -80,6 +80,16 @@ namespace osu.Game.Users
             }
         }
 
+        public class TestingBeatmap : InGame
+        {
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Testing a beatmap";
+
+            public TestingBeatmap(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
         public class EditingBeatmap : UserActivity
         {
             public IBeatmapInfo BeatmapInfo { get; }
