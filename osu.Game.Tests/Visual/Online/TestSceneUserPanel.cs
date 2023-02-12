@@ -118,6 +118,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
             AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(null));
             AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap());
+            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(null, null));
         }
 
         [Test]
