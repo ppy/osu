@@ -18,10 +18,15 @@ namespace osu.Game.Users
 
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
-        public class ModdingBeatmap : UserActivity
+        public class ModdingBeatmap : EditingBeatmap
         {
             public override string GetStatus(bool hideIdentifiableInformation = false) => "Modding a beatmap";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
+
+            public ModdingBeatmap(IBeatmapInfo info)
+                : base(info)
+            {
+            }
         }
 
         public class ChoosingBeatmap : UserActivity

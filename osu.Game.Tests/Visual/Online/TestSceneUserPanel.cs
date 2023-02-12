@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
             AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(null));
-            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap());
+            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(null));
             AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(null, null));
         }
 
