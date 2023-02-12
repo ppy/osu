@@ -18,9 +18,9 @@ namespace osu.Game.Users
 
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
-        public class Modding : UserActivity
+        public class ModdingBeatmap : UserActivity
         {
-            public override string GetStatus(bool hideIdentifiableInformation = false) => "Modding a map";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Modding a beatmap";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
         }
 
@@ -80,11 +80,11 @@ namespace osu.Game.Users
             }
         }
 
-        public class Editing : UserActivity
+        public class EditingBeatmap : UserActivity
         {
             public IBeatmapInfo BeatmapInfo { get; }
 
-            public Editing(IBeatmapInfo info)
+            public EditingBeatmap(IBeatmapInfo info)
             {
                 BeatmapInfo = info;
             }
@@ -92,7 +92,7 @@ namespace osu.Game.Users
             public override string GetStatus(bool hideIdentifiableInformation = false) => @"Editing a beatmap";
         }
 
-        public class Watching : UserActivity
+        public class WatchingReplay : UserActivity
         {
             private readonly ScoreInfo score;
 
@@ -100,7 +100,7 @@ namespace osu.Game.Users
 
             public BeatmapInfo BeatmapInfo => score.BeatmapInfo;
 
-            public Watching(ScoreInfo score)
+            public WatchingReplay(ScoreInfo score)
             {
                 this.score = score;
             }
@@ -108,11 +108,11 @@ namespace osu.Game.Users
             public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Watching a replay" : $@"Watching {Username}'s replay";
         }
 
-        public class Spectating : Watching
+        public class SpectatingUser : WatchingReplay
         {
             public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Spectating a user" : $@"Spectating {Username}";
 
-            public Spectating(ScoreInfo score)
+            public SpectatingUser(ScoreInfo score)
                 : base(score)
             {
             }

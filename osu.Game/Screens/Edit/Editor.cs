@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity => new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
