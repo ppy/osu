@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
 
         private readonly bool replayIsFailedScore;
 
-        protected override UserActivity InitialActivity => new UserActivity.Watching(Score.ScoreInfo);
+        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
