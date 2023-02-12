@@ -233,11 +233,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
 
-            double overallDifficulty = attributes.OverallDifficulty;
-
-            if (attributes.Convert)
-                overallDifficulty = 10;
-
             double windowMultiplier = 1 / clockRate;
 
             if (score.Mods.Any(m => m is ModHardRock))
@@ -245,14 +240,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             else if (score.Mods.Any(m => m is ModEasy))
                 windowMultiplier *= 1.4;
 
-            if (overallDifficulty < 5)
-                judgements[0] = (22.4 - 0.6 * overallDifficulty) * windowMultiplier;
+            if (attributes.OverallDifficulty < 5)
+                judgements[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
             else
-                judgements[0] = (24.9 - 1.1 * overallDifficulty) * windowMultiplier;
-            judgements[1] = (64 - 3 * overallDifficulty) * windowMultiplier;
-            judgements[2] = (97 - 3 * overallDifficulty) * windowMultiplier;
-            judgements[3] = (127 - 3 * overallDifficulty) * windowMultiplier;
-            judgements[4] = (151 - 3 * overallDifficulty) * windowMultiplier;
+                judgements[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
+            judgements[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            judgements[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            judgements[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            judgements[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
 
             return judgements;
         }
