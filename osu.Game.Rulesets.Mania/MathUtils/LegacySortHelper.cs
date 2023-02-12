@@ -98,12 +98,12 @@ namespace osu.Game.Rulesets.Mania.MathUtils
 
             int n = hi - lo + 1;
 
-            for (int i = n / 2; i >= 1; i--)
+            for (int i = n / 2; i >= 1; i = i - 1)
             {
                 downHeap(keys, i, n, lo, comparer);
             }
 
-            for (int i = n; i > 1; i--)
+            for (int i = n; i > 1; i = i - 1)
             {
                 swap(keys, lo, lo + i - 1);
                 downHeap(keys, 1, i - 1, lo, comparer);

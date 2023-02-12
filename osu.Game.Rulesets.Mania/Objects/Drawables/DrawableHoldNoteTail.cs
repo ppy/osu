@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Origin = Anchor.TopCentre;
         }
 
-        public void UpdateResult() => UpdateResult(true);
+        public void UpdateResult() => base.UpdateResult(true);
 
         public override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
 
