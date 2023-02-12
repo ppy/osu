@@ -38,8 +38,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         // Compatibility with these seems potentially feasible in the future, blocked for now because they don't work as one would expect
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
-        private PlayfieldAdjustmentContainer adjustmentContainer = null!;
-        private Container bubbleContainer = null!;
+        private PlayfieldAdjustmentContainer bubbleContainer = null!;
 
         private readonly Bindable<int> currentCombo = new BindableInt();
 
@@ -119,20 +118,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // Multiplying by 2 results in an initial size that is too large, hence 1.85 has been chosen
-            bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.85f);
+            // Multiplying by 2 results in an initial size that is too large, hence 1.90 has been chosen
+            // Also avoids the HitObject bleeding around the edges of the bubble drawable at minimum size
+            bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
             bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
 
             // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
 
-            adjustmentContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
+            bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
-            adjustmentContainer.Add(bubbleContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
-            drawableRuleset.KeyBindingInputManager.Add(adjustmentContainer);
+            drawableRuleset.KeyBindingInputManager.Add(bubbleContainer);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
