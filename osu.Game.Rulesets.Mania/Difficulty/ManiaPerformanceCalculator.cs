@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2); // Star rating to pp curve
 
-            difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUR), 1.6) - 0.2, 0);
+            difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUR), 1.6) - 0.2, 0); // UR to multiplier curve, see https://www.desmos.com/calculator/xt58vzt2y4
 
             return difficultyValue;
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             bool isLegacyScore = false;
 
-            // Temporary workaround for lazer not having classic mania behaviour implemented. 
+            // Temporary workaround for lazer not having classic mania behaviour implemented.
             // Classic scores with only Notes will return incorrect values after the replay is watched.
             if (score.Mods.Any(m => m is ModClassic) && totalHits == attributes.NoteCount + attributes.HoldNoteCount)
                 isLegacyScore = true;
@@ -105,6 +105,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double root2 = Math.Sqrt(2);
 
+            // https://www.desmos.com/calculator/akinrfls4r
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -156,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return -gradient;
             }
 
+            // https://www.desmos.com/calculator/piqxqmnuks
             double lazerLikelihoodGradient(double d)
             {
                 if (d <= 0)
