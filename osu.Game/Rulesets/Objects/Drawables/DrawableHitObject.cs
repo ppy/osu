@@ -663,15 +663,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
 
         /// <summary>
-        /// Whether the location of the hit should be snapped to the hit target before animating.
-        /// </summary>
-        /// <remarks>
-        /// This is how osu-stable worked, but notably is not how TnT works.
-        /// It results in less visual feedback on hit accuracy.
-        /// </remarks>
-        public bool SnapJudgementLocation { get; set; }
-
-        /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
