@@ -9,11 +9,11 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterMouse : KeyCounter.InputTrigger
+    public partial class KeyCounterMouseTrigger : KeyCounter.InputTrigger
     {
         public MouseButton Button { get; }
 
-        public KeyCounterMouse(MouseButton button)
+        public KeyCounterMouseTrigger(MouseButton button)
             : base(getStringRepresentation(button))
         {
             Button = button;

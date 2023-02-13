@@ -31,10 +31,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Position = new Vector2(0, -50),
                     Children = new[]
                     {
-                        testCounter = new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
-                        new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
-                        new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Left)),
-                        new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Right)),
+                        testCounter = new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                        new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                        new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
+                        new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
                     },
                 },
                 argonKc = new ArgonKeyCounterDisplay
@@ -44,10 +44,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Position = new Vector2(0, 50),
                     Children = new[]
                     {
-                        new ArgonKeyCounter(new KeyCounterKeyboard(Key.X)),
-                        new ArgonKeyCounter(new KeyCounterKeyboard(Key.X)),
-                        new ArgonKeyCounter(new KeyCounterMouse(MouseButton.Left)),
-                        new ArgonKeyCounter(new KeyCounterMouse(MouseButton.Right)),
+                        new ArgonKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                        new ArgonKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                        new ArgonKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
+                        new ArgonKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
                     },
                 }
             };
@@ -55,11 +55,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboard(key)));
-                argonKc.Add(argonKc.CreateKeyCounter(new KeyCounterKeyboard(key)));
+                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
+                argonKc.Add(argonKc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First().Trigger).Key;
+            Key testKey = ((KeyCounterKeyboardTrigger)kc.Children.First().Trigger).Key;
 
             void addPressKeyStep()
             {
