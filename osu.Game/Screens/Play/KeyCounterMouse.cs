@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterMouse : KeyCounter
+    public partial class KeyCounterMouse : KeyCounter.Trigger
     {
         public MouseButton Button { get; }
 
@@ -39,17 +39,16 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button == Button)
-            {
-                IsLit = true;
-                Increment();
-            }
+                Lit();
 
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == Button) IsLit = false;
+            if (e.Button == Button)
+                Unlit();
+
             base.OnMouseUp(e);
         }
     }
