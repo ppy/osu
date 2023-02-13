@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterAction<T> : KeyCounter
+    public partial class KeyCounterAction<T> : KeyCounter.Trigger
         where T : struct
     {
         public T Action { get; }
@@ -23,9 +23,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return false;
 
-            IsLit = true;
-            if (forwards)
-                Increment();
+            Lit(forwards);
             return false;
         }
 
@@ -34,9 +32,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return;
 
-            IsLit = false;
-            if (!forwards)
-                Decrement();
+            Unlit(forwards);
         }
     }
 }

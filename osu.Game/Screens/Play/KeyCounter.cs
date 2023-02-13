@@ -1,57 +1,37 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play
 {
     public abstract partial class KeyCounter : Container
     {
-        private Sprite buttonSprite;
-        private Sprite glowSprite;
-        private Container textLayer;
-        private SpriteText countSpriteText;
+        public readonly Trigger CounterTrigger;
 
-        public bool IsCounting { get; set; } = true;
-        private int countPresses;
+        protected Bindable<bool> IsCountingBindable = new BindableBool(true);
+
+        protected Bindable<int> PressesCount = new BindableInt
+        {
+            MinValue = 0
+        };
+
+        public bool IsCounting
+        {
+            get => IsCountingBindable.Value;
+            set => IsCountingBindable.Value = value;
+        }
 
         public int CountPresses
         {
-            get => countPresses;
-            private set
-            {
-                if (countPresses != value)
-                {
-                    countPresses = value;
-                    countSpriteText.Text = value.ToString(@"#,0");
-                }
-            }
+            get => PressesCount.Value;
+            private set => PressesCount.Value = value;
         }
 
-        private bool isLit;
-
-        public bool IsLit
-        {
-            get => isLit;
-            protected set
-            {
-                if (isLit != value)
-                {
-                    isLit = value;
-                    updateGlowSprite(value);
-                }
-            }
-        }
+        protected Bindable<bool> IsLit = new BindableBool();
 
         public void Increment()
         {
@@ -69,82 +49,51 @@ namespace osu.Game.Screens.Play
             CountPresses--;
         }
 
-        //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
-        public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
-        public Color4 KeyUpTextColor { get; set; } = Color4.White;
-        public double FadeTime { get; set; }
-
-        protected KeyCounter(string name)
+        protected override void LoadComplete()
         {
-            Name = name;
+            Add(CounterTrigger);
+            base.LoadComplete();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(TextureStore textures)
+        protected override bool Handle(UIEvent e) => CounterTrigger.TriggerEvent(e);
+
+        protected KeyCounter(Trigger trigger)
         {
-            Children = new Drawable[]
-            {
-                buttonSprite = new Sprite
-                {
-                    Texture = textures.Get(@"KeyCounter/key-up"),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                glowSprite = new Sprite
-                {
-                    Texture = textures.Get(@"KeyCounter/key-glow"),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0
-                },
-                textLayer = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = Name,
-                            Font = OsuFont.Numeric.With(size: 12),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Both,
-                            Position = new Vector2(0, -0.25f),
-                            Colour = KeyUpTextColor
-                        },
-                        countSpriteText = new OsuSpriteText
-                        {
-                            Text = CountPresses.ToString(@"#,0"),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Both,
-                            Position = new Vector2(0, 0.25f),
-                            Colour = KeyUpTextColor
-                        }
-                    }
-                }
-            };
-            // Set this manually because an element with Alpha=0 won't take it size to AutoSizeContainer,
-            // so the size can be changing between buttonSprite and glowSprite.
-            Height = buttonSprite.DrawHeight;
-            Width = buttonSprite.DrawWidth;
+            CounterTrigger = trigger;
+            trigger.Target = this;
+            Name = trigger.Name;
         }
 
-        private void updateGlowSprite(bool show)
+        public abstract partial class Trigger : Component
         {
-            if (show)
+            private KeyCounter? target;
+
+            public KeyCounter Target
             {
-                double remainingFadeTime = FadeTime * (1 - glowSprite.Alpha);
-                glowSprite.FadeIn(remainingFadeTime, Easing.OutQuint);
-                textLayer.FadeColour(KeyDownTextColor, remainingFadeTime, Easing.OutQuint);
+                set => target = value;
             }
-            else
+
+            protected Trigger(string name)
             {
-                double remainingFadeTime = 8 * FadeTime * glowSprite.Alpha;
-                glowSprite.FadeOut(remainingFadeTime, Easing.OutQuint);
-                textLayer.FadeColour(KeyUpTextColor, remainingFadeTime, Easing.OutQuint);
+                Name = name;
+            }
+
+            protected void Lit(bool increment = true)
+            {
+                if (target == null) return;
+
+                target.IsLit.Value = true;
+                if (increment)
+                    target.Increment();
+            }
+
+            protected void Unlit(bool preserve = true)
+            {
+                if (target == null) return;
+
+                target.IsLit.Value = false;
+                if (!preserve)
+                    target.Decrement();
             }
         }
     }

@@ -8,7 +8,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterKeyboard : KeyCounter
+    public partial class KeyCounterKeyboard : KeyCounter.Trigger
     {
         public Key Key { get; }
 
@@ -21,17 +21,16 @@ namespace osu.Game.Screens.Play
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key == Key)
-            {
-                IsLit = true;
-                Increment();
-            }
+                Lit();
 
             return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (e.Key == Key) IsLit = false;
+            if (e.Key == Key)
+                Unlit();
+
             base.OnKeyUp(e);
         }
     }
