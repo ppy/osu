@@ -24,6 +24,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private DummyOverlay overlay = null!;
 
+        [Cached]
+        private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
