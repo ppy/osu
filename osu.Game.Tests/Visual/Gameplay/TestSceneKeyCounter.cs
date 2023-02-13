@@ -25,20 +25,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Anchor = Anchor.Centre,
                 Children = new[]
                 {
-                    testCounter = new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
-                    new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
-                    new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Left)),
-                    new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Right)),
+                    testCounter = new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                    new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
+                    new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
+                    new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
                 },
             };
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboard(key)));
+                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First().Trigger).Key;
+            Key testKey = ((KeyCounterKeyboardTrigger)kc.Children.First().Trigger).Key;
 
             void addPressKeyStep()
             {

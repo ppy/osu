@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
                                                    .OrderBy(action => action)
-                                                   .Select(action => keyCounter.CreateKeyCounter(new KeyCounterAction<T>(action))));
+                                                   .Select(action => keyCounter.CreateKeyCounter(new KeyCounterActionTrigger<T>(action))));
         }
 
         private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
@@ -176,14 +176,14 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.Where(c => c.Trigger is KeyCounterAction<T>)
-                                                                      .Select(c => (KeyCounterAction<T>)c.Trigger)
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.Where(c => c.Trigger is KeyCounterActionTrigger<T>)
+                                                                      .Select(c => (KeyCounterActionTrigger<T>)c.Trigger)
                                                                       .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
                 foreach (var c
-                         in Target.Children.Where(c => c.Trigger is KeyCounterAction<T>).Select(c => (KeyCounterAction<T>)c.Trigger))
+                         in Target.Children.Where(c => c.Trigger is KeyCounterActionTrigger<T>).Select(c => (KeyCounterActionTrigger<T>)c.Trigger))
                     c.OnReleased(e.Action, Clock.Rate >= 0);
             }
         }
