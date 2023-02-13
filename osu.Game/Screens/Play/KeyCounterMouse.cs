@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button == Button)
-                Lit();
+                Light();
 
             return base.OnMouseDown(e);
         }
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (e.Button == Button)
-                Unlit();
+                Unlight();
 
             base.OnMouseUp(e);
         }
