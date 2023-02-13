@@ -59,12 +59,6 @@ namespace osu.Game.Skinning
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
         }
 
-        private float? minimumColumnWidth;
-
-        public float MinimumColumnWidth
-        {
-            get => minimumColumnWidth ?? ColumnWidth.Min();
-            set => minimumColumnWidth = value;
-        }
+        public float MinimumColumnWidth => ColumnWidth.Min();
     }
 }
