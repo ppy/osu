@@ -21,7 +21,9 @@ namespace osu.Game.Screens.Play
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key == Key)
-                Lit();
+            {
+                Light();
+            }
 
             return base.OnKeyDown(e);
         }
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Play
         protected override void OnKeyUp(KeyUpEvent e)
         {
             if (e.Key == Key)
-                Unlit();
+                Unlight();
 
             base.OnKeyUp(e);
         }
