@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -19,7 +17,7 @@ namespace osu.Game.Screens.Play
     {
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
-        protected FillFlowContainer<KeyCounter> KeyFlow;
+        protected FillFlowContainer<KeyCounter> KeyFlow = new FillFlowContainer<KeyCounter>();
 
         protected override Container<KeyCounter> Content => KeyFlow;
 
@@ -29,13 +27,25 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
+            // In turn this can cause the display to be masked off screen and never become visible again.
+            Size = KeyFlow.Size;
+        }
+
         public override void Add(KeyCounter key)
         {
-            ArgumentNullException.ThrowIfNull(key);
+            if (!CheckType(key))
+                throw new ArgumentException($"{key.GetType()} is not a supported {nameof(KeyCounter)}.", nameof(key));
 
             base.Add(key);
             key.IsCounting = IsCounting;
         }
+
+        protected virtual bool CheckType(KeyCounter key) => true;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -71,7 +81,7 @@ namespace osu.Game.Screens.Play
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
 
-        private Receptor receptor;
+        private Receptor? receptor;
 
         public void SetReceptor(Receptor receptor)
         {
