@@ -44,6 +44,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public Skin DefaultClassicSkin { get; }
 
+        public Action<IEnumerable<Live<SkinInfo>>> PresentSkinsImport { get; set; }
+
         private readonly AudioManager audio;
 
         private readonly Scheduler scheduler;
@@ -87,15 +89,7 @@ namespace osu.Game.Skinning
             skinImporter = new SkinImporter(storage, realm, this)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj),
-                PresentImport = skins =>
-                {
-                    switch (skins.Count())
-                    {
-                        case 1:
-                            CurrentSkinInfo.Value = skins.Last();
-                            break;
-                    }
-                },
+                PresentImport = skins => PresentSkinsImport?.Invoke(skins),
             };
 
             var defaultSkins = new[]
