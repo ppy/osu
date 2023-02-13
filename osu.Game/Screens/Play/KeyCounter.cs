@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play
                 Name = name;
             }
 
-            protected void Lit(bool increment = true)
+            protected void Light(bool increment = true)
             {
                 if (target == null) return;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
                     target.Increment();
             }
 
-            protected void Unlit(bool preserve = true)
+            protected void Unlight(bool preserve = true)
             {
                 if (target == null) return;
 
