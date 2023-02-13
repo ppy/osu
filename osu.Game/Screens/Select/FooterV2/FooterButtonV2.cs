@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Select.FooterV2
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / button_height, 0);
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Colour4 buttonAccentColour;
 
@@ -74,7 +74,8 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 Type = EdgeEffectType.Shadow,
                 Radius = 5,
-                Colour = Colour4.Black.Opacity(0.5f)
+                // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                Colour = Colour4.Black.Opacity(0.25f)
             };
             Shear = SHEAR;
             Size = new Vector2(button_width, button_height);
