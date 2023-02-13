@@ -75,9 +75,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             Playing.BindValueChanged(updateState, true);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (Playing.Value && previewTrack != null && previewTrack.TrackLoaded)
                 progress.Value = previewTrack.CurrentTime / previewTrack.Length;
