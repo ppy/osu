@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play
 {
@@ -67,8 +66,6 @@ namespace osu.Game.Screens.Play
 
             CountPresses--;
         }
-
-        protected override bool Handle(UIEvent e) => Trigger.TriggerEvent(e);
 
         public abstract partial class InputTrigger : Component
         {
