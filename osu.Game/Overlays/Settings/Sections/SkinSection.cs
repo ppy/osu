@@ -107,10 +107,10 @@ namespace osu.Game.Overlays.Settings.Sections
                     break;
 
                 case > 1:
-                    if (settings?.State.Value == Visibility.Hidden)
-                        settings?.ToggleVisibility();
+                    if (settings.State.Value == Visibility.Hidden)
+                        settings.ToggleVisibility();
 
-                    settings?.SectionsContainer.ScrollTo(this);
+                    settings.SectionsContainer.ScrollTo(this);
                     break;
             }
         }
