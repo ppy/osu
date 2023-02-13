@@ -14,6 +14,10 @@ namespace osu.Game.Screens.Play
 
         protected Bindable<bool> IsCountingBindable = new BindableBool(true);
 
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
         protected Bindable<int> PressesCount = new BindableInt
         {
             MinValue = 0
@@ -29,6 +33,21 @@ namespace osu.Game.Screens.Play
         {
             get => PressesCount.Value;
             private set => PressesCount.Value = value;
+        }
+
+        protected KeyCounter(Trigger trigger)
+        {
+            InternalChildren = new Drawable[]
+            {
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                CounterTrigger = trigger,
+            };
+
+            CounterTrigger.Target = this;
+            Name = trigger.Name;
         }
 
         protected Bindable<bool> IsLit = new BindableBool();
@@ -49,20 +68,7 @@ namespace osu.Game.Screens.Play
             CountPresses--;
         }
 
-        protected override void LoadComplete()
-        {
-            Add(CounterTrigger);
-            base.LoadComplete();
-        }
-
         protected override bool Handle(UIEvent e) => CounterTrigger.TriggerEvent(e);
-
-        protected KeyCounter(Trigger trigger)
-        {
-            CounterTrigger = trigger;
-            trigger.Target = this;
-            Name = trigger.Name;
-        }
 
         public abstract partial class Trigger : Component
         {
