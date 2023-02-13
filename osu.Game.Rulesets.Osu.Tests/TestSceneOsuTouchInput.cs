@@ -59,14 +59,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                leftKeyCounter = new DefaultKeyCounter(new TestActionKeyCounter(OsuAction.LeftButton))
+                                leftKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.LeftButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreRight,
                                     Depth = float.MinValue,
                                     X = -100,
                                 },
-                                rightKeyCounter = new DefaultKeyCounter(new TestActionKeyCounter(OsuAction.RightButton))
+                                rightKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.RightButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreLeft,
@@ -579,11 +579,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
         private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
-        public partial class TestActionKeyCounter : KeyCounter.InputTrigger, IKeyBindingHandler<OsuAction>
+        public partial class TestActionKeyCounterTrigger : KeyCounter.InputTrigger, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 
-            public TestActionKeyCounter(OsuAction action)
+            public TestActionKeyCounterTrigger(OsuAction action)
                 : base(action.ToString())
             {
                 Action = action;

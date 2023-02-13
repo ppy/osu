@@ -8,11 +8,11 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterKeyboard : KeyCounter.InputTrigger
+    public partial class KeyCounterKeyboardTrigger : KeyCounter.InputTrigger
     {
         public Key Key { get; }
 
-        public KeyCounterKeyboard(Key key)
+        public KeyCounterKeyboardTrigger(Key key)
             : base(key.ToString())
         {
             Key = key;
