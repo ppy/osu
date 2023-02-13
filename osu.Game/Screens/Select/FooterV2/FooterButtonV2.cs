@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select.FooterV2
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Radius = 5,
+                Radius = 4,
                 // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
                 Colour = Colour4.Black.Opacity(0.25f),
                 Offset = new Vector2(0, 2),
