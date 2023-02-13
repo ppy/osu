@@ -49,6 +49,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
@@ -60,6 +61,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -502,6 +504,23 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
+        /// Present ether a skin select if one skin was imported or navigate to the skin selection menu if multiple skins were imported immediately.
+        /// </summary>
+        /// <param name="importedSkins">List of imported skins</param>
+        public void PresentSkins(IEnumerable<Live<SkinInfo>> importedSkins)
+        {
+            int importedSkinsCount = importedSkins.Count();
+
+            if (importedSkinsCount == 1)
+                SkinManager.CurrentSkinInfo.Value = importedSkins.Single();
+            else if (importedSkinsCount > 1)
+            {
+                Settings.Show();
+                Settings.SectionsContainer.ScrollTo(Settings.SectionsContainer.Single(container => container is SkinSection));
+            }
+        }
+
+        /// <summary>
         /// Present a beatmap at song select immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -777,6 +796,7 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
+            SkinManager.PresentImport = PresentSkins;
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);

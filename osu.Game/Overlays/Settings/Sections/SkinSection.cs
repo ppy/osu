@@ -10,7 +10,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -92,27 +91,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     skins.SelectRandomSkin();
                 }
             });
-
-            skins.PresentSkinsImport += presentSkinsImport;
-        }
-
-        private void presentSkinsImport(IEnumerable<Live<SkinInfo>> importedSkins)
-        {
-            SettingsOverlay settings = this.FindClosestParent<SettingsOverlay>();
-
-            switch (importedSkins.Count())
-            {
-                case 1:
-                    skins.CurrentSkinInfo.Value = importedSkins.Last();
-                    break;
-
-                case > 1:
-                    if (settings.State.Value == Visibility.Hidden)
-                        settings.ToggleVisibility();
-
-                    settings.SectionsContainer.ScrollTo(this);
-                    break;
-            }
         }
 
         private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
