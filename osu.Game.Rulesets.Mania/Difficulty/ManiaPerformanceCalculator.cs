@@ -111,25 +111,25 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
                 // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
-                const double tailMultipler = 1.5;
+                const double tail_multipler = 1.5;
 
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
+                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multipler, d);
 
-                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d)
-                              - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
+                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multipler, d)
+                              - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multipler, d);
 
-                double p200Ln = hitProb(h200, d) * hitProb(h200 * tailMultipler, d)
-                              - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d);
+                double p200Ln = hitProb(h200, d) * hitProb(h200 * tail_multipler, d)
+                              - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multipler, d);
 
-                double p100Ln = hitProb(h100, d) * hitProb(h100 * tailMultipler, d)
-                              - hitProb(h200, d) * hitProb(h200 * tailMultipler, d);
+                double p100Ln = hitProb(h100, d) * hitProb(h100 * tail_multipler, d)
+                              - hitProb(h200, d) * hitProb(h200 * tail_multipler, d);
 
-                double p50Ln = hitProb(h50, d) * hitProb(h50 * tailMultipler, d)
-                             - hitProb(h100, d) * hitProb(h100 * tailMultipler, d);
+                double p50Ln = hitProb(h50, d) * hitProb(h50 * tail_multipler, d)
+                             - hitProb(h100, d) * hitProb(h100 * tail_multipler, d);
 
-                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tailMultipler, d);
+                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tail_multipler, d);
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLn * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300Ln * attributes.HoldNoteCount)) / totalHits;
