@@ -50,9 +50,6 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [Resolved]
-        private SettingsOverlay settings { get; set; }
-
         private IDisposable realmSubscription;
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -101,6 +98,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void presentSkinsImport(IEnumerable<Live<SkinInfo>> importedSkins)
         {
+            SettingsOverlay settings = this.FindClosestParent<SettingsOverlay>();
+
             switch (importedSkins.Count())
             {
                 case 1:
