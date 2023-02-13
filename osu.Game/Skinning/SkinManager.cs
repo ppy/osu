@@ -44,11 +44,6 @@ namespace osu.Game.Skinning
         /// </summary>
         public Skin DefaultClassicSkin { get; }
 
-        /// <summary>
-        /// Presents imported skin(s) to a user
-        /// </summary>
-        public Action<IEnumerable<Live<SkinInfo>>> PresentSkinsImport { get; set; }
-
         private readonly AudioManager audio;
 
         private readonly Scheduler scheduler;
@@ -92,7 +87,6 @@ namespace osu.Game.Skinning
             skinImporter = new SkinImporter(storage, realm, this)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj),
-                PresentImport = skins => PresentSkinsImport?.Invoke(skins),
             };
 
             var defaultSkins = new[]
