@@ -44,6 +44,9 @@ namespace osu.Game.Skinning
         /// </summary>
         public Skin DefaultClassicSkin { get; }
 
+        /// <summary>
+        /// Presents imported skin(s) to a user
+        /// </summary>
         public Action<IEnumerable<Live<SkinInfo>>> PresentSkinsImport { get; set; }
 
         private readonly AudioManager audio;
