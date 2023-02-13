@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Select.FooterV2
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private FillFlowContainer<FooterButtonV2> buttons = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -57,28 +58,16 @@ namespace osu.Game.Screens.Select.FooterV2
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colour.B5
+                    Colour = colourProvider.Background5
                 },
-                new FillFlowContainer
+                buttons = new FillFlowContainer<FooterButtonV2>
                 {
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 10),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 10),
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(padding, 0),
-                    Children = new Drawable[]
-                    {
-                        buttons = new FillFlowContainer<FooterButtonV2>
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
-                            AutoSizeAxes = Axes.Both
-                        }
-                    }
+                    Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
+                    AutoSizeAxes = Axes.Both
                 }
             };
         }
