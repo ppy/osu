@@ -12,18 +12,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterDisplay : Container<KeyCounter>
+    public abstract partial class KeyCounterDisplay : Container<KeyCounter>
     {
-        private const int duration = 100;
-        private const double key_fade_time = 80;
+        protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
-        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
-
-        protected readonly FillFlowContainer<KeyCounter> KeyFlow;
+        protected FillFlowContainer<KeyCounter> KeyFlow;
 
         protected override Container<KeyCounter> Content => KeyFlow;
 
@@ -33,48 +29,26 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
 
-        public KeyCounterDisplay()
-        {
-            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
-            {
-                Direction = FillDirection.Horizontal,
-                AutoSizeAxes = Axes.Both,
-                Alpha = 0,
-            };
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
-            // In turn this can cause the display to be masked off screen and never become visible again.
-            Size = KeyFlow.Size;
-        }
-
         public override void Add(KeyCounter key)
         {
             ArgumentNullException.ThrowIfNull(key);
 
             base.Add(key);
             key.IsCounting = IsCounting;
-            key.FadeTime = key_fade_time;
-            key.KeyDownTextColor = KeyDownTextColor;
-            key.KeyUpTextColor = KeyUpTextColor;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
+            config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            AlwaysVisible.BindValueChanged(_ => updateVisibility());
-            configVisibility.BindValueChanged(_ => updateVisibility(), true);
+            AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
+            ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
         }
 
         private bool isCounting = true;
@@ -92,41 +66,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private Color4 keyDownTextColor = Color4.DarkGray;
-
-        public Color4 KeyDownTextColor
-        {
-            get => keyDownTextColor;
-            set
-            {
-                if (value != keyDownTextColor)
-                {
-                    keyDownTextColor = value;
-                    foreach (var child in Children)
-                        child.KeyDownTextColor = value;
-                }
-            }
-        }
-
-        private Color4 keyUpTextColor = Color4.White;
-
-        public Color4 KeyUpTextColor
-        {
-            get => keyUpTextColor;
-            set
-            {
-                if (value != keyUpTextColor)
-                {
-                    keyUpTextColor = value;
-                    foreach (var child in Children)
-                        child.KeyUpTextColor = value;
-                }
-            }
-        }
-
-        private void updateVisibility() =>
-            // Isolate changing visibility of the key counters from fading this component.
-            KeyFlow.FadeTo(AlwaysVisible.Value || configVisibility.Value ? 1 : 0, duration);
+        protected abstract void UpdateVisibility();
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
@@ -140,6 +80,8 @@ namespace osu.Game.Screens.Play
 
             this.receptor = receptor;
         }
+
+        public virtual KeyCounter CreateKeyCounter(KeyCounter.Trigger trigger) => new DefaultKeyCounter(trigger);
 
         public partial class Receptor : Drawable
         {

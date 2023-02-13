@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private TestActionKeyCounter leftKeyCounter = null!;
+        private DefaultKeyCounter leftKeyCounter = null!;
 
-        private TestActionKeyCounter rightKeyCounter = null!;
+        private DefaultKeyCounter rightKeyCounter = null!;
 
         private OsuInputManager osuInputManager = null!;
 
@@ -59,14 +59,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                leftKeyCounter = new TestActionKeyCounter(OsuAction.LeftButton)
+                                leftKeyCounter = new DefaultKeyCounter(new TestActionKeyCounter(OsuAction.LeftButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreRight,
                                     Depth = float.MinValue,
                                     X = -100,
                                 },
-                                rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton)
+                                rightKeyCounter = new DefaultKeyCounter(new TestActionKeyCounter(OsuAction.RightButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreLeft,
@@ -579,7 +579,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
         private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
-        public partial class TestActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
+        public partial class TestActionKeyCounter : KeyCounter.Trigger, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 
@@ -593,8 +593,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (e.Action == Action)
                 {
-                    IsLit = true;
-                    Increment();
+                    Lit();
                 }
 
                 return false;
@@ -602,7 +601,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
-                if (e.Action == Action) IsLit = false;
+                if (e.Action == Action)
+                    Unlit();
             }
         }
 
