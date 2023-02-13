@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class KeyCounterAction<T> : KeyCounter.Trigger
+    public partial class KeyCounterAction<T> : KeyCounter.InputTrigger
         where T : struct
     {
         public T Action { get; }

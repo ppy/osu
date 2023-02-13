@@ -176,14 +176,14 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.Where(c => c.CounterTrigger is KeyCounterAction<T>)
-                                                                      .Select(c => (KeyCounterAction<T>)c.CounterTrigger)
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.Where(c => c.Trigger is KeyCounterAction<T>)
+                                                                      .Select(c => (KeyCounterAction<T>)c.Trigger)
                                                                       .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
                 foreach (var c
-                         in Target.Children.Where(c => c.CounterTrigger is KeyCounterAction<T>).Select(c => (KeyCounterAction<T>)c.CounterTrigger))
+                         in Target.Children.Where(c => c.Trigger is KeyCounterAction<T>).Select(c => (KeyCounterAction<T>)c.Trigger))
                     c.OnReleased(e.Action, Clock.Rate >= 0);
             }
         }

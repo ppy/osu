@@ -579,7 +579,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
         private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
-        public partial class TestActionKeyCounter : KeyCounter.Trigger, IKeyBindingHandler<OsuAction>
+        public partial class TestActionKeyCounter : KeyCounter.InputTrigger, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 
