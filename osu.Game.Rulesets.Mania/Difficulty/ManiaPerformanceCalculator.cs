@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             if (estimatedUr == null)
                 return 0;
-            
+
             difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUr.Value), 1.6) - 0.2, 0); // UR to multiplier curve, see https://www.desmos.com/calculator/xt58vzt2y4
 
             return difficultyValue;
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             bool isLegacyScore = score.Mods.Any(m => m is ModClassic) && totalHits == attributes.NoteCount + attributes.HoldNoteCount;
 
-            double[] judgements = isLegacyScore ? judgements = getLegacyJudgements(score, attributes) : judgements = getLazerJudgements(score, attributes);
+            double[] judgements = isLegacyScore ? getLegacyJudgements(score, attributes) : getLazerJudgements(score, attributes);
 
             double hMax = judgements[0];
             double h300 = judgements[1];
@@ -111,25 +111,25 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
                 // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
-                const double tail_multipler = 1.5;
+                const double tail_multiplier = 1.5;
 
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multipler, d);
+                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multiplier, d);
 
-                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multipler, d)
-                              - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multipler, d);
+                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multiplier, d)
+                                - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multiplier, d);
 
-                double p200Ln = hitProb(h200, d) * hitProb(h200 * tail_multipler, d)
-                              - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multipler, d);
+                double p200Ln = hitProb(h200, d) * hitProb(h200 * tail_multiplier, d)
+                                - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multiplier, d);
 
-                double p100Ln = hitProb(h100, d) * hitProb(h100 * tail_multipler, d)
-                              - hitProb(h200, d) * hitProb(h200 * tail_multipler, d);
+                double p100Ln = hitProb(h100, d) * hitProb(h100 * tail_multiplier, d)
+                                - hitProb(h200, d) * hitProb(h200 * tail_multiplier, d);
 
-                double p50Ln = hitProb(h50, d) * hitProb(h50 * tail_multipler, d)
-                             - hitProb(h100, d) * hitProb(h100 * tail_multipler, d);
+                double p50Ln = hitProb(h50, d) * hitProb(h50 * tail_multiplier, d)
+                               - hitProb(h100, d) * hitProb(h100 * tail_multiplier, d);
 
-                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tail_multipler, d);
+                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tail_multiplier, d);
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLn * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300Ln * attributes.HoldNoteCount)) / totalHits;
@@ -139,11 +139,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p0 = ((p0Note * attributes.NoteCount) + (p0Ln * attributes.HoldNoteCount)) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
-                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
-                * Math.Pow(p200, countGood / totalHits)
-                * Math.Pow(p100, countOk / totalHits)
-                * Math.Pow(p50, countMeh / totalHits)
-                * Math.Pow(p0, countMiss / totalHits);
+                                  * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                                  * Math.Pow(p200, countGood / totalHits)
+                                  * Math.Pow(p100, countOk / totalHits)
+                                  * Math.Pow(p50, countMeh / totalHits)
+                                  * Math.Pow(p0, countMiss / totalHits);
 
                 return -gradient;
             }
@@ -177,20 +177,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p0 = ((p0Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p0Tail * attributes.HoldNoteCount)) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
-                * Math.Pow(p300, (countGreat + 0.5) / totalHits)
-                * Math.Pow(p200, countGood / totalHits)
-                * Math.Pow(p100, countOk / totalHits)
-                * Math.Pow(p50, countMeh / totalHits)
-                * Math.Pow(p0, countMiss / totalHits);
+                                  * Math.Pow(p300, (countGreat + 0.5) / totalHits)
+                                  * Math.Pow(p200, countGood / totalHits)
+                                  * Math.Pow(p100, countOk / totalHits)
+                                  * Math.Pow(p50, countMeh / totalHits)
+                                  * Math.Pow(p0, countMiss / totalHits);
 
                 return -gradient;
             }
 
             // Finding the minimum of the function returns the most likely deviation for the hit results.
-            if (isLegacyScore)
-                return FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30);
-            else
-                return FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
+            return isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
         }
 
         private double[] getLegacyJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
