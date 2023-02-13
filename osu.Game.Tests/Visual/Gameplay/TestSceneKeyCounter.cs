@@ -17,28 +17,28 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         public TestSceneKeyCounter()
         {
-            KeyCounterKeyboard testCounter;
+            DefaultKeyCounter testCounter;
 
-            KeyCounterDisplay kc = new KeyCounterDisplay
+            KeyCounterDisplay kc = new DefaultKeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Children = new KeyCounter[]
+                Children = new[]
                 {
-                    testCounter = new KeyCounterKeyboard(Key.X),
-                    new KeyCounterKeyboard(Key.X),
-                    new KeyCounterMouse(MouseButton.Left),
-                    new KeyCounterMouse(MouseButton.Right),
+                    testCounter = new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
+                    new DefaultKeyCounter(new KeyCounterKeyboard(Key.X)),
+                    new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Left)),
+                    new DefaultKeyCounter(new KeyCounterMouse(MouseButton.Right)),
                 },
             };
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(new KeyCounterKeyboard(key));
+                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboard(key)));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
+            Key testKey = ((KeyCounterKeyboard)kc.Children.First().CounterTrigger).Key;
 
             void addPressKeyStep()
             {
