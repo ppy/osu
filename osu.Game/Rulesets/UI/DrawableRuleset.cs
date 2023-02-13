@@ -196,6 +196,8 @@ namespace osu.Game.Rulesets.UI
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
+                UseResumeOverlay = true;
+
                 AddInternal(CreateInputManager()
                     .WithChild(CreatePlayfieldAdjustmentContainer()
                         .WithChild(ResumeOverlay)));
@@ -230,7 +232,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -506,6 +508,12 @@ namespace osu.Game.Rulesets.UI
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
         public ResumeOverlay ResumeOverlay { get; set; }
+
+        /// <summary>
+        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// </summary>
+        /// <remarks>Defaults to <c>true</c> if a ruleset returns a non-null overlay via <see cref="CreateResumeOverlay"/>.</remarks>
+        public bool UseResumeOverlay { get; set; }
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.

@@ -54,14 +54,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.ResumeOverlay = null;
-
             // Grab the input manager to disable the user's cursor, and for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;
 
             // Generate the replay frames the cursor should follow
             replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, drawableRuleset.Mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
+
+            drawableRuleset.UseResumeOverlay = false;
         }
     }
 }
