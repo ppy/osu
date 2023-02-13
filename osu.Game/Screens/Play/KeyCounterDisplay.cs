@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public virtual KeyCounter CreateKeyCounter(KeyCounter.Trigger trigger) => new DefaultKeyCounter(trigger);
+        public virtual KeyCounter CreateKeyCounter(KeyCounter.InputTrigger trigger) => new DefaultKeyCounter(trigger);
 
         public partial class Receptor : Drawable
         {

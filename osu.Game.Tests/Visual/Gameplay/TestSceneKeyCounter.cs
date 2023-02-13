@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboard(key)));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First().CounterTrigger).Key;
+            Key testKey = ((KeyCounterKeyboard)kc.Children.First().Trigger).Key;
 
             void addPressKeyStep()
             {
