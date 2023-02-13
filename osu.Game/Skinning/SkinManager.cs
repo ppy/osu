@@ -87,6 +87,15 @@ namespace osu.Game.Skinning
             skinImporter = new SkinImporter(storage, realm, this)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj),
+                PresentImport = skins =>
+                {
+                    switch (skins.Count())
+                    {
+                        case 1:
+                            CurrentSkinInfo.Value = skins.Last();
+                            break;
+                    }
+                },
             };
 
             var defaultSkins = new[]
