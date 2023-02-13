@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double estimatedUR;
+        private double? estimatedUr;
 
         public ManiaPerformanceCalculator()
             : base(new ManiaRuleset())
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUR = computeEstimatedUR(score, maniaAttributes) * 10;
+            estimatedUr = computeEstimatedUr(score, maniaAttributes) * 10;
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 Difficulty = difficultyValue,
                 Total = totalValue,
-                EstimatedUR = estimatedUR
+                EstimatedUr = estimatedUr
             };
         }
 
@@ -67,7 +67,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2); // Star rating to pp curve
 
-            difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUR), 1.6) - 0.2, 0); // UR to multiplier curve, see https://www.desmos.com/calculator/xt58vzt2y4
+            if (estimatedUr == null)
+                return 0;
+            
+            difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUr.Value), 1.6) - 0.2, 0); // UR to multiplier curve, see https://www.desmos.com/calculator/xt58vzt2y4
 
             return difficultyValue;
         }
@@ -78,24 +81,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Accuracy used to weight judgements independently from the score's actual accuracy.
         /// </summary>
-        private double computeEstimatedUR(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double? computeEstimatedUr(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
-                return double.PositiveInfinity;
+                return null;
 
-            double[] judgements = new double[5];
+            bool isLegacyScore = score.Mods.Any(m => m is ModClassic) && totalHits == attributes.NoteCount + attributes.HoldNoteCount;
 
-            bool isLegacyScore = false;
-
-            // Temporary workaround for lazer not having classic mania behaviour implemented.
-            // Classic scores with only Notes will return incorrect values after the replay is watched.
-            if (score.Mods.Any(m => m is ModClassic) && totalHits == attributes.NoteCount + attributes.HoldNoteCount)
-                isLegacyScore = true;
-
-            if (isLegacyScore)
-                judgements = getLegacyJudgements(score, attributes);
-            else
-                judgements = getLazerJudgements(score, attributes);
+            double[] judgements = isLegacyScore ? judgements = getLegacyJudgements(score, attributes) : judgements = getLazerJudgements(score, attributes);
 
             double hMax = judgements[0];
             double h300 = judgements[1];
@@ -103,13 +96,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double h100 = judgements[3];
             double h50 = judgements[4];
 
-            double root2 = Math.Sqrt(2);
-
             // https://www.desmos.com/calculator/akinrfls4r
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
-                    return double.PositiveInfinity;
+                    return 0;
 
                 double pMaxNote = hitProb(hMax, d);
                 double p300Note = hitProb(h300, d) - hitProb(hMax, d);
@@ -120,32 +111,32 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
                 // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
-                double tailMultipler = 1.5;
+                const double tailMultipler = 1.5;
 
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLN = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
+                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
 
-                double p300LN = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d)
+                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d)
                               - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tailMultipler, d);
 
-                double p200LN = hitProb(h200, d) * hitProb(h200 * tailMultipler, d)
+                double p200Ln = hitProb(h200, d) * hitProb(h200 * tailMultipler, d)
                               - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tailMultipler, d);
 
-                double p100LN = hitProb(h100, d) * hitProb(h100 * tailMultipler, d)
+                double p100Ln = hitProb(h100, d) * hitProb(h100 * tailMultipler, d)
                               - hitProb(h200, d) * hitProb(h200 * tailMultipler, d);
 
-                double p50LN = hitProb(h50, d) * hitProb(h50 * tailMultipler, d)
+                double p50Ln = hitProb(h50, d) * hitProb(h50 * tailMultipler, d)
                              - hitProb(h100, d) * hitProb(h100 * tailMultipler, d);
 
-                double p0LN = 1 - hitProb(h50, d) * hitProb(h50 * tailMultipler, d);
+                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tailMultipler, d);
 
-                double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLN * attributes.HoldNoteCount)) / totalHits;
-                double p300 = ((p300Note * attributes.NoteCount) + (p300LN * attributes.HoldNoteCount)) / totalHits;
-                double p200 = ((p200Note * attributes.NoteCount) + (p200LN * attributes.HoldNoteCount)) / totalHits;
-                double p100 = ((p100Note * attributes.NoteCount) + (p100LN * attributes.HoldNoteCount)) / totalHits;
-                double p50 = ((p50Note * attributes.NoteCount) + (p50LN * attributes.HoldNoteCount)) / totalHits;
-                double p0 = ((p0Note * attributes.NoteCount) + (p0LN * attributes.HoldNoteCount)) / totalHits;
+                double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLn * attributes.HoldNoteCount)) / totalHits;
+                double p300 = ((p300Note * attributes.NoteCount) + (p300Ln * attributes.HoldNoteCount)) / totalHits;
+                double p200 = ((p200Note * attributes.NoteCount) + (p200Ln * attributes.HoldNoteCount)) / totalHits;
+                double p100 = ((p100Note * attributes.NoteCount) + (p100Ln * attributes.HoldNoteCount)) / totalHits;
+                double p50 = ((p50Note * attributes.NoteCount) + (p50Ln * attributes.HoldNoteCount)) / totalHits;
+                double p0 = ((p0Note * attributes.NoteCount) + (p0Ln * attributes.HoldNoteCount)) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
                 * Math.Pow(p300, (countGreat + 0.5) / totalHits)
