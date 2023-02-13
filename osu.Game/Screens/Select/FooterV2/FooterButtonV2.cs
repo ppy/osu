@@ -74,8 +74,7 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 Type = EdgeEffectType.Shadow,
                 Radius = 5,
-                Roundness = 10,
-                Colour = Colour4.Black.Opacity(0.25f)
+                Colour = Colour4.Black.Opacity(0.5f)
             };
             Shear = SHEAR;
             Size = new Vector2(button_width, button_height);
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.Select.FooterV2
                     Shear = -SHEAR,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,
-                    Y = -10,
+                    Y = -corner_radius,
                     Size = new Vector2(120, 6),
                     Masking = true,
                     CornerRadius = 3,
