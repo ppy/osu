@@ -157,7 +157,16 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity
+        {
+            get
+            {
+                if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
+                    return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+
+                return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
+            }
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
