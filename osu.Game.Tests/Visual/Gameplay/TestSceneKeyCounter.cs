@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 argonKc.Add(argonKc.CreateKeyCounter(new KeyCounterKeyboard(key)));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First().CounterTrigger).Key;
+            Key testKey = ((KeyCounterKeyboard)kc.Children.First().Trigger).Key;
 
             void addPressKeyStep()
             {

@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play
 {
     public abstract partial class KeyCounter : Container
     {
-        public readonly Trigger CounterTrigger;
+        public readonly InputTrigger Trigger;
 
         protected Bindable<bool> IsCountingBindable = new BindableBool(true);
 
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
             private set => PressesCount.Value = value;
         }
 
-        protected KeyCounter(Trigger trigger)
+        protected KeyCounter(InputTrigger trigger)
         {
             InternalChildren = new Drawable[]
             {
@@ -43,10 +43,10 @@ namespace osu.Game.Screens.Play
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                CounterTrigger = trigger,
+                Trigger = trigger,
             };
 
-            CounterTrigger.Target = this;
+            Trigger.Target = this;
             Name = trigger.Name;
         }
 
@@ -68,9 +68,9 @@ namespace osu.Game.Screens.Play
             CountPresses--;
         }
 
-        protected override bool Handle(UIEvent e) => CounterTrigger.TriggerEvent(e);
+        protected override bool Handle(UIEvent e) => Trigger.TriggerEvent(e);
 
-        public abstract partial class Trigger : Component
+        public abstract partial class InputTrigger : Component
         {
             private KeyCounter? target;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
                 set => target = value;
             }
 
-            protected Trigger(string name)
+            protected InputTrigger(string name)
             {
                 Name = name;
             }

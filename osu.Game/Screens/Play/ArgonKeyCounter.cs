@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play
         private const float scale_factor = 1.5f;
         private const float figma_count_font_size = 14;
 
-        public ArgonKeyCounter(Trigger trigger)
+        public ArgonKeyCounter(InputTrigger trigger)
             : base(trigger)
         {
         }

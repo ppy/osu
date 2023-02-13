@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
         public double FadeTime { get; set; }
 
-        public DefaultKeyCounter(Trigger trigger)
+        public DefaultKeyCounter(InputTrigger trigger)
             : base(trigger)
         {
         }

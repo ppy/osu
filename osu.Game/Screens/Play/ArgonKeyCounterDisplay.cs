@@ -37,6 +37,6 @@ namespace osu.Game.Screens.Play
         protected override void UpdateVisibility()
             => KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
 
-        public override KeyCounter CreateKeyCounter(KeyCounter.Trigger trigger) => new ArgonKeyCounter(trigger);
+        public override KeyCounter CreateKeyCounter(KeyCounter.InputTrigger trigger) => new ArgonKeyCounter(trigger);
     }
 }
