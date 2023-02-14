@@ -29,7 +29,6 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -50,7 +49,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
@@ -505,21 +503,10 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
-        /// Present ether a skin select if one skin was imported or navigate to the skin selection menu if multiple skins were imported immediately.
+        /// Present a skin select immediately.
         /// </summary>
-        /// <param name="importedSkins">List of imported skins</param>
-        public void PresentSkins(IEnumerable<Live<SkinInfo>> importedSkins)
-        {
-            int importedSkinsCount = importedSkins.Count();
-
-            if (importedSkinsCount == 1)
-                SkinManager.CurrentSkinInfo.Value = importedSkins.Single();
-            else if (importedSkinsCount > 1)
-            {
-                Settings.Show();
-                Settings.SectionsContainer.ScrollTo(Settings.SectionsContainer.ChildrenOfType<SkinSection>().Single());
-            }
-        }
+        /// <param name="importedSkin">Skin to select</param>
+        public void PresentSkin(Live<SkinInfo> importedSkin) => SkinManager.CurrentSkinInfo.Value = importedSkin;
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -797,7 +784,7 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
-            SkinManager.PresentImport = PresentSkins;
+            SkinManager.PresentImport = items => PresentSkin(items.First());
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
