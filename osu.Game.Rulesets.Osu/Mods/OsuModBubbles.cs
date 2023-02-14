@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -25,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public partial class OsuModBubbles : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToScoreProcessor
+    public partial class OsuModBubbles : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject, IApplicableToScoreProcessor
     {
         public override string Name => "Bubbles";
 
@@ -50,8 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly DrawablePool<BubbleDrawable> bubblePool = new DrawablePool<BubbleDrawable>(100);
 
-        private DrawableOsuHitObject? lastJudgedHitObject;
-
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -60,15 +56,41 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentCombo.BindValueChanged(combo =>
                 maxSize = Math.Min(1.75f, (float)(1.25 + 0.005 * combo.NewValue)), true);
 
-            scoreProcessor.NewJudgement += result =>
+            scoreProcessor.JudgementReverted += _ =>
             {
-                if (result.HitObject is not OsuHitObject osuHitObject || lastJudgedHitObject.IsNull()) return;
+                bubbleContainer.LastOrDefault()?.ClearTransforms();
+                bubbleContainer.LastOrDefault()?.Expire();
+            };
+        }
 
-                Debug.Assert(result.HitObject == lastJudgedHitObject.HitObject);
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            // Multiplying by 2 results in an initial size that is too large, hence 1.90 has been chosen
+            // Also avoids the HitObject bleeding around the edges of the bubble drawable at minimum size
+            bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
+            bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
 
-                DrawableOsuHitObject drawableOsuHitObject = lastJudgedHitObject;
+            // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
+            drawableRuleset.Playfield.DisplayJudgements.Value = false;
 
-                switch (result.HitObject)
+            bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
+
+            drawableRuleset.Overlays.Add(bubbleContainer);
+        }
+
+        public void ApplyToDrawableHitObject(DrawableHitObject drawableObject)
+        {
+            if (drawableObject is DrawableSlider slider)
+            {
+                applySliderState(slider);
+                slider.Body.OnSkinChanged += () => applySliderState(slider);
+            }
+
+            drawableObject.OnNewResult += (drawable, _) =>
+            {
+                if (drawable is not DrawableOsuHitObject drawableOsuHitObject) return;
+
+                switch (drawableOsuHitObject.HitObject)
                 {
                     case Slider:
                     case SpinnerTick:
@@ -101,56 +123,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // SliderHeads are derived from HitCircles,
                         // so we must handle them before to avoid them using the wrong positioning logic
                         case DrawableSliderHead:
-                            return osuHitObject.Position;
+                            return drawableOsuHitObject.HitObject.Position;
 
                         // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
                         case DrawableHitCircle:
                             return drawableOsuHitObject.Position;
 
                         default:
-                            return osuHitObject.Position;
+                            return drawableOsuHitObject.HitObject.Position;
                     }
                 }
             };
-
-            scoreProcessor.JudgementReverted += _ =>
-            {
-                bubbleContainer.LastOrDefault()?.FinishTransforms();
-                bubbleContainer.LastOrDefault()?.Expire();
-            };
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            // Multiplying by 2 results in an initial size that is too large, hence 1.90 has been chosen
-            // Also avoids the HitObject bleeding around the edges of the bubble drawable at minimum size
-            bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
-            bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
-
-            // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
-
-            bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
-
-            drawableRuleset.Overlays.Add(bubbleContainer);
-        }
-
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
-
-        private void applyBubbleState(DrawableHitObject drawableObject)
-        {
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)drawableObject;
-
-            if (drawableObject is DrawableSlider slider)
-            {
-                slider.Body.OnSkinChanged += () => applySliderState(slider);
-                applySliderState(slider);
-            }
-
-            if (osuHitObject == lastJudgedHitObject || !osuHitObject.Judged) return;
-
-            lastJudgedHitObject = osuHitObject;
         }
 
         // Makes the slider border coloured on all skins (for aesthetics)
