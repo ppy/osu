@@ -194,13 +194,16 @@ namespace osu.Game.Rulesets.UI
 
             Audio = audioContainer;
 
-            if ((ResumeOverlay = CreateResumeOverlay()) != null)
+            if (UseResumeOverlay)
             {
-                UseResumeOverlay = true;
-
-                AddInternal(CreateInputManager()
-                    .WithChild(CreatePlayfieldAdjustmentContainer()
-                        .WithChild(ResumeOverlay)));
+                if ((ResumeOverlay = CreateResumeOverlay()) == null)
+                    UseResumeOverlay = false;
+                else
+                {
+                    AddInternal(CreateInputManager()
+                        .WithChild(CreatePlayfieldAdjustmentContainer()
+                            .WithChild(ResumeOverlay)));
+                }
             }
 
             applyRulesetMods(Mods, config);
@@ -512,8 +515,8 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
         /// </summary>
-        /// <remarks>Defaults to <c>true</c> if a ruleset returns a non-null overlay via <see cref="CreateResumeOverlay"/>.</remarks>
-        public bool UseResumeOverlay { get; set; }
+        /// <remarks>Defaults to <c>true</c>, but will become <c>false</c> if the ruleset fails to return a non-null overlay via <see cref="CreateResumeOverlay"/>.</remarks>
+        public bool UseResumeOverlay { get; set; } = true;
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
