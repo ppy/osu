@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = prepareAndImportScore,
+                    SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
                     OnRetry = () => Restart(),
                     OnQuit = () => PerformExit(true),
                 },
@@ -614,7 +614,7 @@ namespace osu.Game.Screens.Play
             resultsDisplayDelegate?.Cancel();
 
             // import current score if possible.
-            attemptScoreImport();
+            prepareAndImportScoreAsync();
 
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
@@ -772,10 +772,7 @@ namespace osu.Game.Screens.Play
                 if (prepareScoreForDisplayTask == null)
                 {
                     // Try importing score since the task hasn't been invoked yet.
-                    if (!attemptScoreImport())
-                        // If attempt failed, trying again is unnecessary
-                        resultsDisplayDelegate?.Cancel();
-
+                    prepareAndImportScoreAsync();
                     return;
                 }
 
@@ -784,6 +781,12 @@ namespace osu.Game.Screens.Play
                     return;
 
                 resultsDisplayDelegate?.Cancel();
+
+                if (prepareScoreForDisplayTask.GetResultSafely() == null)
+                {
+                    // If score import did not occur, we do not want to show the results screen.
+                    return;
+                }
 
                 if (!this.IsCurrentScreen())
                     // This player instance may already be in the process of exiting.
@@ -796,53 +799,48 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Attempts to run <see cref="prepareAndImportScore"/>
+        /// Asynchronously run score preparation operations (database import, online submission etc.).
         /// </summary>
-        /// <returns>
-        /// Whether the attempt was successful
-        /// </returns>
-        private bool attemptScoreImport()
+        /// <param name="forceImport">Whether the score should be imported even if non-passing (or the current configuration doesn't allow for it).</param>
+        /// <returns>The final score.</returns>
+        [ItemCanBeNull]
+        private Task<ScoreInfo> prepareAndImportScoreAsync(bool forceImport = false)
         {
             // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
             DrawableRuleset.SetRecordTarget(null);
 
+            if (prepareScoreForDisplayTask != null)
+                return prepareScoreForDisplayTask;
+
             // We do not want to import the score in cases where we don't show results
             bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
-            if (!canShowResults)
-                return false;
+            if (!canShowResults && !forceImport)
+                return Task.FromResult<ScoreInfo>(null);
 
-            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Asynchronously run score preparation operations (database import, online submission etc.).
-        /// </summary>
-        /// <returns>The final score.</returns>
-        private async Task<ScoreInfo> prepareAndImportScore()
-        {
-            var scoreCopy = Score.DeepClone();
-
-            try
+            return prepareScoreForDisplayTask = Task.Run(async () =>
             {
-                await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score preparation failed!");
-            }
+                var scoreCopy = Score.DeepClone();
 
-            try
-            {
-                await ImportScore(scoreCopy).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score import failed!");
-            }
+                try
+                {
+                    await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, @"Score preparation failed!");
+                }
 
-            return scoreCopy.ScoreInfo;
+                try
+                {
+                    await ImportScore(scoreCopy).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, @"Score import failed!");
+                }
+
+                return scoreCopy.ScoreInfo;
+            });
         }
 
         protected override bool OnScroll(ScrollEvent e)
