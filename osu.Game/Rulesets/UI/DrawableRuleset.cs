@@ -184,11 +184,13 @@ namespace osu.Game.Rulesets.UI
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = KeyBindingInputManager
-                            .WithChild(CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield)
-                            ),
+                            .WithChildren(new Drawable[]
+                            {
+                                CreatePlayfieldAdjustmentContainer()
+                                    .WithChild(Playfield),
+                                Overlays
+                            }),
                     },
-                    Overlays,
                 }
             };
 
