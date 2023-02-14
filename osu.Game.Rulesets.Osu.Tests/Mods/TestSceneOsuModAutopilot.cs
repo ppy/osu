@@ -3,26 +3,23 @@
 
 using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Tests.Visual;
 using osuTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public partial class TestSceneInstantResume : TestSceneOsuPlayer
+    public partial class TestSceneOsuModAutopilot : OsuModTestScene
     {
-        protected override bool HasCustomSteps => true;
-
-        protected override TestPlayer CreatePlayer(Ruleset ruleset)
-        {
-            SelectedMods.Value = new[] { new OsuModAutopilot() };
-            return new TestPlayer();
-        }
-
         [Test]
         public void TestInstantResume()
         {
-            CreateTest();
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModAutopilot(),
+                PassCondition = () => true,
+                Autoplay = false,
+            });
 
+            AddUntilStep("wait for gameplay start", () => Player.LocalUserPlaying.Value);
             AddStep("press pause", () => InputManager.PressKey(Key.Escape));
             AddUntilStep("wait until paused", () => Player.GameplayClockContainer.IsPaused.Value);
             AddStep("release pause", () => InputManager.ReleaseKey(Key.Escape));
