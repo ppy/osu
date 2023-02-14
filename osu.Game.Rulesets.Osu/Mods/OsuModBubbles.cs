@@ -55,12 +55,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
                 maxSize = Math.Min(1.75f, (float)(1.25 + 0.005 * combo.NewValue)), true);
-
-            scoreProcessor.JudgementReverted += _ =>
-            {
-                bubbleContainer.LastOrDefault()?.ClearTransforms();
-                bubbleContainer.LastOrDefault()?.Expire();
-            };
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -133,6 +127,16 @@ namespace osu.Game.Rulesets.Osu.Mods
                             return drawableOsuHitObject.HitObject.Position;
                     }
                 }
+            };
+
+            drawableObject.OnRevertResult += (drawable, _) =>
+            {
+                if (drawable.HitObject is SpinnerTick or Slider) return;
+
+                BubbleDrawable? lastBubble = bubbleContainer.OfType<BubbleDrawable>().LastOrDefault();
+
+                lastBubble?.ClearTransforms();
+                lastBubble?.Expire();
             };
         }
 
