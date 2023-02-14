@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, 10000 / sprite.DrawHeight);
+                        bodySprite.Scale = new Vector2(1, 32800 / sprite.DrawHeight);
                     }
 
                     break;
