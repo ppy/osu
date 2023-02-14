@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd += SectionLength;
 
                 // If the current peak is 0 it can't decay any further so we can leave early
-                if (Precision.AlmostEquals(currentSectionPeak, 0, 1E-10) && current.StartTime > currentSectionEnd)
+                if (Precision.AlmostEquals(currentSectionPeak, 0, CompactList.ACCEPTABLE_DIFFERENCE) && current.StartTime > currentSectionEnd)
                 {
                     double remainingTime = current.StartTime - currentSectionEnd;
                     double remainingIterations = Math.Ceiling(remainingTime / SectionLength);

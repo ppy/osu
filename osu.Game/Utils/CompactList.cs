@@ -13,6 +13,13 @@ namespace osu.Game.Utils
     /// </summary>
     public class CompactList : IEnumerable<double>
     {
+        // As this type is used for storing strains during difficulty calculation,
+        // distinguishing even the smallest values properly is crucial to ensure the same
+        // results as using a simple List which was used prior to this optimization.
+        // Even machine epsilon (2.22E-16) has been observed to cause inaccuracies (/b/100843 + EZ)
+        // so the acceptable difference has to be even smaller to discern one double from another.
+        public const double ACCEPTABLE_DIFFERENCE = 1E-16;
+
         /// <summary>
         /// The total number of items in the list.
         /// </summary>
@@ -37,7 +44,7 @@ namespace osu.Game.Utils
         /// <param name="count">The amount of times <paramref name="value"/> is added to the list.</param>
         public void Add(double value, int count = 1)
         {
-            if (items.LastOrDefault() is Number number && Precision.AlmostEquals(number.Value, value, 1E-10))
+            if (items.LastOrDefault() is Number number && Precision.AlmostEquals(number.Value, value, ACCEPTABLE_DIFFERENCE))
                 number.Count += count;
             else if (count > 0)
                 items.Add(new Number(value, count));
