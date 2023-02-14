@@ -15,10 +15,13 @@ namespace osu.Game.Screens.Play
         private Circle inputIndicator = null!;
         private OsuSpriteText countText = null!;
 
-        private const float figma_line_height = 3;
-        private const float figma_name_font_size = 10;
+        // These values were taken from Figma
+        private const float line_height = 3;
+        private const float name_font_size = 10;
+        private const float count_font_size = 14;
+
+        // Make things look bigger without using Scale
         private const float scale_factor = 1.5f;
-        private const float figma_count_font_size = 14;
 
         public ArgonKeyCounter(InputTrigger trigger)
             : base(trigger)
@@ -35,7 +38,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
-                    Height = figma_line_height * scale_factor,
+                    Height = line_height * scale_factor,
                     Alpha = 0.5f
                 },
                 new OsuSpriteText
@@ -43,7 +46,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(0, -13) * scale_factor,
-                    Font = OsuFont.Torus.With(size: figma_name_font_size * scale_factor, weight: FontWeight.Bold),
+                    Font = OsuFont.Torus.With(size: name_font_size * scale_factor, weight: FontWeight.Bold),
                     Colour = colours.Blue0,
                     Text = Name
                 },
@@ -51,10 +54,13 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Font = OsuFont.Torus.With(size: figma_count_font_size * scale_factor, weight: FontWeight.Bold),
+                    Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
                     Text = "0"
                 },
             };
+
+            // Values from Figma didn't match visually
+            // So these were just eyeballed
             Height = 30 * scale_factor;
             Width = 35 * scale_factor;
         }
