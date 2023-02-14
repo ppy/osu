@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    new OsuSliderBar<float>
+                    new RoundedSliderBar<float>
                     {
                         RelativeSizeAxes = Axes.X,
                         Current = currentNumber,
