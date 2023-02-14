@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentSectionEnd;
 
-        private readonly CompressedZeroList strainPeaks = new CompressedZeroList();
+        private readonly CompactList strainPeaks = new CompactList();
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     double remainingTime = current.StartTime - currentSectionEnd;
                     double remainingIterations = Math.Ceiling(remainingTime / SectionLength);
                     currentSectionEnd += remainingIterations * SectionLength;
-                    strainPeaks.AddZeros((int)remainingIterations);
+                    strainPeaks.Add(0.0, (int)remainingIterations);
                 }
             }
 

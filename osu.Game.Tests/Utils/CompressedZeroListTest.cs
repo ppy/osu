@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Utils
         [Test]
         public void TestEmpty()
         {
-            CompressedZeroList list = new CompressedZeroList();
+            CompactList list = new CompactList();
 
             Assert.IsFalse(list.Any());
         }
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Utils
         [Test]
         public void TestZeros()
         {
-            CompressedZeroList list = new CompressedZeroList
+            CompactList list = new CompactList
             {
                 0.0
             };
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Utils
         public void TestNonZeros()
         {
 #pragma warning disable IDE0028 // Simplify collection initialization
-            CompressedZeroList list = new CompressedZeroList
+            CompactList list = new CompactList
             {
                 1.0
             };
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Utils
         [Test]
         public void TestMixed()
         {
-            CompressedZeroList list = new CompressedZeroList();
+            CompactList list = new CompactList();
 
             list.AddZeros(2);
             list.Add(1.0);
