@@ -505,8 +505,19 @@ namespace osu.Game
         /// <summary>
         /// Present a skin select immediately.
         /// </summary>
-        /// <param name="importedSkin">The skin to select.</param>
-        public void PresentSkin(Live<SkinInfo> importedSkin) => SkinManager.CurrentSkinInfo.Value = importedSkin;
+        /// <param name="skin">The skin to select.</param>
+        public void PresentSkin(SkinInfo skin)
+        {
+            var databasedSkin = SkinManager.Query(s => s.ID == skin.ID);
+
+            if (databasedSkin == null)
+            {
+                Logger.Log("The requested skin could not be loaded.", LoggingTarget.Information);
+                return;
+            }
+
+            SkinManager.CurrentSkinInfo.Value = databasedSkin;
+        }
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -784,7 +795,7 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
-            SkinManager.PresentImport = items => PresentSkin(items.First());
+            SkinManager.PresentImport = items => PresentSkin(items.First().Value);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
