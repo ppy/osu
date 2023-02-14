@@ -510,10 +510,15 @@ namespace osu.Game.Beatmaps.Formats
                         // This can happen if the previous point is deemed redundant due to it not changing effects.
                         // If this happens, we need to manually re-add an effect point with OmitFirstBarLine now set to true,
                         // inheriting the rest of the settings from the previous effect point.
-                        if (!prevPoint.Equals(EffectControlPoint.DEFAULT) && prevPoint.Time == pendingControlPointsTime)
-                            prevPoint.OmitFirstBarLine = true;
+                        if (prevPoint.Equals(EffectControlPoint.DEFAULT) || prevPoint.Time != pendingControlPointsTime)
+                        {
+                            var newPoint = (EffectControlPoint)prevPoint.DeepClone();
+
+                            newPoint.OmitFirstBarLine = true;
+                            beatmap.ControlPointInfo.Add(pendingControlPointsTime, newPoint);
+                        }
                         else
-                            beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingPoint);
+                            prevPoint.OmitFirstBarLine = true;
                     }
 
                     continue;
