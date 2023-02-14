@@ -29,6 +29,7 @@ namespace osu.Desktop
     internal partial class OsuGameDesktop : OsuGame
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+        private ArchiveImportIPCChannel? archiveImportIPCChannel;
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -123,6 +124,7 @@ namespace osu.Desktop
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+            archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
@@ -181,6 +183,7 @@ namespace osu.Desktop
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
+            archiveImportIPCChannel?.Dispose();
         }
 
         private class SDL2BatteryInfo : BatteryInfo
