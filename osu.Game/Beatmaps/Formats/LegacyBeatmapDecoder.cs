@@ -493,34 +493,27 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (pendingControlPointTypes.Contains(type))
                 {
-                    // In stable, OmitFirstBarLine could only be set on timing points (ie. uninherited points).
+                    // In stable, OmitFirstBarLine could only be set on timing points (ie. non-inherited points).
                     // From this perspective, it seems odd that we have the OmitFirstBarLine setting in EffectControlPoint as this breaks that assumption.
                     //
                     // To make sure legacy beatmaps are handled correctly, we therefore need to make sure to respect the earliest OmitFirstBarLine setting
                     // for the current point in time (aka the one read first from the file).
                     //
                     // The easiest way to handle this is to transfer any non-false values from the current flush group to the actual ControlPointInfo instance.
-
                     if ((pendingPoint as EffectControlPoint)?.OmitFirstBarLine == true)
                     {
                         var prevPoint = beatmap.ControlPointInfo.EffectPointAt(pendingControlPointsTime);
 
                         // If the previous point is the default point, or does not share the current points time,
-                        // that means that the ControlPointInfo.Add() call for the pendingPoint below did not actually add a point.
+                        // that means that the ControlPointInfo.Add() call for the previous pendingPoints below did not actually add a point of this type.
                         //
                         // This can happen if the previous point is deemed redundant due to it not changing effects.
                         // If this happens, we need to manually re-add an effect point with OmitFirstBarLine now set to true,
                         // inheriting the rest of the settings from the previous effect point.
-
-                        if (prevPoint.Equals(EffectControlPoint.DEFAULT) || prevPoint.Time != pendingControlPointsTime)
-                        {
-                            var newPoint = (EffectControlPoint)prevPoint.DeepClone();
-
-                            newPoint.OmitFirstBarLine = true;
-                            beatmap.ControlPointInfo.Add(pendingControlPointsTime, newPoint);
-                        }
-                        else
+                        if (!prevPoint.Equals(EffectControlPoint.DEFAULT) && prevPoint.Time == pendingControlPointsTime)
                             prevPoint.OmitFirstBarLine = true;
+                        else
+                            beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingPoint);
                     }
 
                     continue;
