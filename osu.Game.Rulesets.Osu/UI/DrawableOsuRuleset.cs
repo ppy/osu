@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public OsuInputManager InputManager { get; private set; }
+        public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
-        protected override PassThroughInputManager CreateInputManager() => InputManager = new OsuInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
