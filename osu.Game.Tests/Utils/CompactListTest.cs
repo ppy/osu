@@ -52,16 +52,16 @@ namespace osu.Game.Tests.Utils
         {
             CompactList list = new CompactList
             {
-                { 0.0, 2 },
                 1.0,
+                1.0 + 1e-14,
                 { 0.0, 2 },
                 2.0,
-                2.0 + 1e-15,
+                2.0 + 1e-17,
                 3.0
             };
 
-            Assert.AreEqual(list.Count, 8);
-            Assert.AreEqual(list.ToList(), new List<double> { 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 2.0, 3.0 });
+            Assert.AreEqual(list.Count, 7);
+            Assert.AreEqual(list.ToList(), new List<double> { 1.0, 1.0 + 1e-14, 0.0, 0.0, 2.0, 2.0, 3.0 });
         }
     }
 }
