@@ -505,7 +505,7 @@ namespace osu.Game
         /// <summary>
         /// Present a skin select immediately.
         /// </summary>
-        /// <param name="importedSkin">Skin to select</param>
+        /// <param name="importedSkin">The skin to select.</param>
         public void PresentSkin(Live<SkinInfo> importedSkin) => SkinManager.CurrentSkinInfo.Value = importedSkin;
 
         /// <summary>
