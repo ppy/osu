@@ -29,6 +29,7 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -516,7 +517,7 @@ namespace osu.Game
             else if (importedSkinsCount > 1)
             {
                 Settings.Show();
-                Settings.SectionsContainer.ScrollTo(Settings.SectionsContainer.Single(container => container is SkinSection));
+                Settings.SectionsContainer.ScrollTo(Settings.SectionsContainer.ChildrenOfType<SkinSection>().Single());
             }
         }
 
