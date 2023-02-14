@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
-            osuInputManager = ((DrawableOsuRuleset)drawableRuleset).InputManager;
+            osuInputManager = ((DrawableOsuRuleset)drawableRuleset).KeyBindingInputManager;
         }
 
         public void ApplyToPlayer(Player player)
