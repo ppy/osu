@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly DrawablePool<BubbleDrawable> bubblePool = new DrawablePool<BubbleDrawable>(100);
 
-        private DrawableOsuHitObject lastJudgedHitobject = null!;
+        private DrawableOsuHitObject? lastJudgedHitObject;
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
@@ -60,9 +62,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             scoreProcessor.NewJudgement += result =>
             {
-                if (result.HitObject is not OsuHitObject osuHitObject) return;
+                if (result.HitObject is not OsuHitObject osuHitObject || lastJudgedHitObject.IsNull()) return;
 
-                DrawableOsuHitObject drawableOsuHitObject = lastJudgedHitobject;
+                Debug.Assert(result.HitObject == lastJudgedHitObject.HitObject);
+
+                DrawableOsuHitObject drawableOsuHitObject = lastJudgedHitObject;
 
                 switch (result.HitObject)
                 {
@@ -144,18 +148,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 applySliderState(slider);
             }
 
-            if (osuHitObject == lastJudgedHitobject || !osuHitObject.Judged) return;
+            if (osuHitObject == lastJudgedHitObject || !osuHitObject.Judged) return;
 
-            switch (osuHitObject)
-            {
-                case DrawableSlider:
-                case DrawableSpinnerTick:
-                    break;
-
-                default:
-                    lastJudgedHitobject = osuHitObject;
-                    break;
-            }
+            lastJudgedHitObject = osuHitObject;
         }
 
         // Makes the slider border coloured on all skins (for aesthetics)
