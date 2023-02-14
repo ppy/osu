@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken, SkinManager skinSource)
         {
             var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
@@ -314,7 +314,7 @@ namespace osu.Game.Screens.Play
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value, skinSource));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Play
             }
         };
 
-        private Drawable createOverlayComponents(IWorkingBeatmap working)
+        private Drawable createOverlayComponents(IWorkingBeatmap working, SkinManager skinSource)
         {
             var container = new Container
             {
@@ -430,7 +430,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, skinSource.CurrentSkin.Value, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
                         {
@@ -438,7 +438,7 @@ namespace osu.Game.Screens.Play
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                             ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
-                        KeyCounter =
+                        BottomRightKeyCounter =
                         {
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                             IsCounting = false
@@ -465,6 +465,8 @@ namespace osu.Game.Screens.Play
                 },
             };
 
+            skinSource.CurrentSkin.BindValueChanged(e => HUDOverlay.Skin = e.NewValue, true);
+
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
             {
                 skipIntroOverlay.Expire();
@@ -481,7 +483,7 @@ namespace osu.Game.Screens.Play
         {
             updateGameplayState();
             updatePauseOnFocusLostState();
-            HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
+            HUDOverlay.BottomRightKeyCounter.IsCounting = !isBreakTime.NewValue;
         }
 
         private void updateGameplayState()

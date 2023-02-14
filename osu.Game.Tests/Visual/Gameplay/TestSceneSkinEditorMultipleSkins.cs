@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -32,6 +33,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(IGameplayClock))]
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
+        [Resolved]
+        private SkinManager skinSource { get; set; }
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -46,14 +50,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
-                    var hudOverlay = new HUDOverlay(drawableRuleset, mods)
+                    var hudOverlay = new HUDOverlay(drawableRuleset, mods, skinSource)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     };
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(hudOverlay.KeyCounter.CreateKeyCounter(new KeyCounterKeyboardTrigger(Key.Space)));
+                    hudOverlay.BottomRightKeyCounter.Add(hudOverlay.BottomRightKeyCounter.CreateKeyCounter(new KeyCounterKeyboardTrigger(Key.Space)));
                     scoreProcessor.Combo.Value = 1;
 
                     return new Container

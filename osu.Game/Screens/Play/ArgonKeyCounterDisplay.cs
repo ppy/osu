@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
             KeyFlow.AutoSizeAxes = Axes.Both;
             KeyFlow.Spacing = new Vector2(2);
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 KeyFlow
             };
