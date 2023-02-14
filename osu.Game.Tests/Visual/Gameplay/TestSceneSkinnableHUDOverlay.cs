@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -40,14 +39,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(IGameplayClock))]
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
-        [Resolved]
-        private SkinManager skinSource { get; set; }
-
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.BottomRightKeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.BottomRightKeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable hideTarget => hudOverlay.KeyCounter;
+        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -87,12 +83,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create overlay", () =>
             {
-                SetContents(skin =>
+                SetContents(_ =>
                 {
-                    hudOverlay = new HUDOverlay(null, Array.Empty<Mod>(), skin);
+                    hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.BottomRightKeyCounter.Add(hudOverlay.BottomRightKeyCounter.CreateKeyCounter(new KeyCounterKeyboardTrigger(Key.Space)));
+                    hudOverlay.KeyCounter.Add(hudOverlay.KeyCounter.CreateKeyCounter(new KeyCounterKeyboardTrigger(Key.Space)));
 
                     action?.Invoke(hudOverlay);
 
