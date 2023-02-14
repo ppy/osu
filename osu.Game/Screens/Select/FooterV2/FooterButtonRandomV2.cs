@@ -17,8 +17,8 @@ namespace osu.Game.Screens.Select.FooterV2
 {
     public partial class FooterButtonRandomV2 : FooterButtonV2
     {
-        public Action NextRandom { get; set; } = null!;
-        public Action PreviousRandom { get; set; } = null!;
+        public Action? NextRandom { get; set; }
+        public Action? PreviousRandom { get; set; }
 
         private Container persistentText = null!;
         private OsuSpriteText randomSpriteText = null!;
@@ -83,11 +83,11 @@ namespace osu.Game.Screens.Select.FooterV2
 
                     persistentText.FadeInFromZero(fade_time, Easing.In);
 
-                    PreviousRandom.Invoke();
+                    PreviousRandom?.Invoke();
                 }
                 else
                 {
-                    NextRandom.Invoke();
+                    NextRandom?.Invoke();
                 }
             };
         }
