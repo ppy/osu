@@ -69,8 +69,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var bindable = (IBindable)property.GetValue(component)!;
 
-                if (!bindable.IsDefault)
-                    Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
+                Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
 
             if (component is Container<Drawable> container)

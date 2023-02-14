@@ -8,13 +8,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
     public partial class TextElement : FontAdjustableSkinComponent
     {
-        [SettingSource("Text", "The text to be displayed.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextElementText), nameof(SkinnableComponentStrings.TextElementTextDescription))]
         public Bindable<string> Text { get; } = new Bindable<string>("Circles!");
 
         private readonly OsuSpriteText text;

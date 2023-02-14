@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.SkinEditor
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2)
+                Spacing = new Vector2(EditorSidebar.PADDING)
             };
 
             reloadComponents();
@@ -148,9 +148,9 @@ namespace osu.Game.Overlays.SkinEditor
                 component.Origin = Anchor.Centre;
             }
 
-            protected override void Update()
+            protected override void UpdateAfterChildren()
             {
-                base.Update();
+                base.UpdateAfterChildren();
 
                 if (component.DrawSize != Vector2.Zero)
                 {

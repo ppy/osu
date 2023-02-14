@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (skinEditor == null) return;
 
-            skinEditor.Save();
+            skinEditor.Save(userTriggered: false);
 
             // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
             updateComponentVisibility();
