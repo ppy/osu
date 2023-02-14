@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
-            drawableRuleset.KeyBindingInputManager.Add(bubbleContainer);
+            drawableRuleset.Overlays.Add(bubbleContainer);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyBubbleState(hitObject);
