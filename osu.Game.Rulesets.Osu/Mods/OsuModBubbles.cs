@@ -187,26 +187,26 @@ namespace osu.Game.Rulesets.Osu.Mods
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
                 ColourInfo colourDarker = Info.Colour.Darken(0.1f);
 
+                // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
+                double getAnimationDuration = 1700 + Math.Pow(Info.FadeTime, 1.07f);
+
                 // Main bubble scaling based on combo
-                this.ScaleTo(Info.MaxSize, getAnimationDuration() * 0.8f)
+                this.ScaleTo(Info.MaxSize, getAnimationDuration * 0.8f)
                     .Then()
                     // Pop at the end of the bubbles life time
-                    .ScaleTo(Info.MaxSize * 1.5f, getAnimationDuration() * 0.2f, Easing.OutQuint)
-                    .FadeOutFromOne(getAnimationDuration() * 0.2f, Easing.OutCirc).Expire();
+                    .ScaleTo(Info.MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
+                    .FadeOutFromOne(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
 
                 if (Info.IsHit)
                 {
                     colourBox.FadeColour(colourDarker);
 
-                    content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration() * 0.3f, Easing.OutQuint);
+                    content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration * 0.3f, Easing.OutQuint);
                     // Ripple effect utilises the border to reduce drawable count
-                    content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration() * 0.3f, Easing.OutQuint)
+                    content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
                            // Avoids transparency overlap issues during the bubble "pop"
                            .Then().Schedule(() => content.BorderThickness = 0);
                 }
-
-                // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationDuration() => 1700 + Math.Pow(Info.FadeTime, 1.07f);
             }
         }
 
