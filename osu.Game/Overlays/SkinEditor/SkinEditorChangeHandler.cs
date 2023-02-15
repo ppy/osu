@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Extensions;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 
 namespace osu.Game.Overlays.SkinEditor

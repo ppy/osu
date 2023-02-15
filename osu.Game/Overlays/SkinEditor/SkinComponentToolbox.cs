@@ -10,9 +10,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
