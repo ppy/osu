@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -174,8 +175,9 @@ namespace osu.Game.Skinning
                     foreach (var i in skinnableInfo)
                         components.Add(i.CreateInstance());
 
-                    return new SkinnableTargetComponentsContainer
+                    return new Container
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Children = components,
                     };
             }
