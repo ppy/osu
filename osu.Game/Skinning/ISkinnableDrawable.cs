@@ -13,8 +13,10 @@ namespace osu.Game.Skinning
     /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
     /// </summary>
     /// <remarks>
-    /// Attaching this interface to any <see cref="IDrawable"/> will make it serialisable to skin settings.
-    /// Adding <see cref="SettingSourceAttribute"/> annotated bindables will also serialise these settings alongside each instance.
+    /// Attaching this interface to any <see cref="IDrawable"/> will make it serialisable to user skins (see <see cref="SkinImporter.Save"/>).
+    /// Adding <see cref="SettingSourceAttribute"/> annotated bindables will also allow serialising settings automatically.
+    ///
+    /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="Extensions.DrawableExtensions.CreateSerialisedInfo"/>.
     /// </remarks>
     public interface ISkinnableDrawable : IDrawable
     {

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (firstTarget == null)
                 return;
 
-            var skinnableInfos = firstTarget.CreateSkinnableInfo().ToArray();
+            var skinnableInfos = firstTarget.CreateSerialisedInfo().ToArray();
             string json = JsonConvert.SerializeObject(skinnableInfos, new JsonSerializerSettings { Formatting = Formatting.Indented });
             stream.Write(Encoding.UTF8.GetBytes(json));
         }
@@ -52,12 +52,12 @@ namespace osu.Game.Overlays.SkinEditor
             if (firstTarget == null)
                 return;
 
-            var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableDrawableInfo>>(Encoding.UTF8.GetString(newState));
+            var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(Encoding.UTF8.GetString(newState));
 
             if (deserializedContent == null)
                 return;
 
-            SkinnableDrawableInfo[] skinnableInfo = deserializedContent.ToArray();
+            SerialisedDrawableInfo[] skinnableInfo = deserializedContent.ToArray();
             Drawable[] targetComponents = firstTarget.Components.OfType<Drawable>().ToArray();
 
             if (!skinnableInfo.Select(s => s.Type).SequenceEqual(targetComponents.Select(d => d.GetType())))
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.SkinEditor
                 int i = 0;
 
                 foreach (var drawable in targetComponents)
-                    drawable.ApplySkinnableInfo(skinnableInfo[i++]);
+                    drawable.ApplySerialisedInfo(skinnableInfo[i++]);
             }
         }
     }

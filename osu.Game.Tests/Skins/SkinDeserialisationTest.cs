@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Skins
                 }
             }
 
-            var editableTypes = SkinnableDrawableInfo.GetAllAvailableDrawables().Where(t => (Activator.CreateInstance(t) as ISkinnableDrawable)?.IsEditable == true);
+            var editableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables().Where(t => (Activator.CreateInstance(t) as ISkinnableDrawable)?.IsEditable == true);
 
             Assert.That(instantiatedTypes, Is.EquivalentTo(editableTypes));
         }

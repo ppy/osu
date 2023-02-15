@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (actualComponentsContainer == null)
                 return false;
 
-            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+            var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
             var expectedComponentsContainer = expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target)) as Container;
             if (expectedComponentsContainer == null)
@@ -84,13 +84,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
+            var expectedInfo = expectedComponentsContainer.CreateSerialisedInfo();
             Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
 
-        private static bool almostEqual(SkinnableDrawableInfo drawableInfo, SkinnableDrawableInfo? other) =>
+        private static bool almostEqual(SerialisedDrawableInfo drawableInfo, SerialisedDrawableInfo? other) =>
             other != null
             && drawableInfo.Type == other.Type
             && drawableInfo.Anchor == other.Anchor
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             && Precision.AlmostEquals(drawableInfo.Position, other.Position, 1)
             && Precision.AlmostEquals(drawableInfo.Scale, other.Scale)
             && Precision.AlmostEquals(drawableInfo.Rotation, other.Rotation)
-            && drawableInfo.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableDrawableInfo>(almostEqual));
+            && drawableInfo.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SerialisedDrawableInfo>(almostEqual));
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);

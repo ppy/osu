@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Skinning;
 using osuTK;
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SkinnableDrawableInfo.GetAllAvailableDrawables(target?.Ruleset);
+            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables();
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }

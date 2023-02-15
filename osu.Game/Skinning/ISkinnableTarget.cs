@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
 {
@@ -26,10 +25,10 @@ namespace osu.Game.Skinning
         IBindableList<ISkinnableDrawable> Components { get; }
 
         /// <summary>
-        /// Serialise all children as <see cref="SkinnableInfo"/>.
+        /// Serialise all children as <see cref="SerialisedDrawableInfo"/>.
         /// </summary>
         /// <returns>The serialised content.</returns>
-        IEnumerable<SkinnableDrawableInfo> CreateSkinnableInfo() => Components.Select(d => ((Drawable)d).CreateSkinnableInfo());
+        IEnumerable<SerialisedDrawableInfo> CreateSerialisedInfo() => Components.Select(d => ((Drawable)d).CreateSerialisedInfo());
 
         /// <summary>
         /// Reload this target from the current skin.
@@ -39,7 +38,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Reload this target from the provided skinnable information.
         /// </summary>
-        void Reload(SkinnableDrawableInfo[] skinnableInfo);
+        void Reload(SerialisedDrawableInfo[] skinnableInfo);
 
         /// <summary>
         /// Add a new skinnable component to this target.
