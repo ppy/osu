@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Fade out hit circles earlier", "Make hit circles fade out into a miss, rather than after it.")]
         public Bindable<bool> FadeHitCircleEarly { get; } = new Bindable<bool>(true);
 
+        private bool hiddenModActive;
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             switch (hitObject)
@@ -56,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
+
+            hiddenModActive = drawableRuleset.Mods.OfType<ModHidden>().Any();
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject obj)
@@ -64,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableSliderHead head:
                     head.TrackFollowCircle = !NoSliderHeadMovement.Value;
-                    if (FadeHitCircleEarly.Value)
+                    if (FadeHitCircleEarly.Value && !hiddenModActive)
                         applyEarlyFading(head);
                     break;
 
@@ -73,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableHitCircle circle:
-                    if (FadeHitCircleEarly.Value)
+                    if (FadeHitCircleEarly.Value && !hiddenModActive)
                         applyEarlyFading(circle);
                     break;
             }
@@ -85,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 using (o.BeginAbsoluteSequence(o.StateUpdateTime))
                 {
-                    double mehWindow = o.HitObject.HitWindows.WindowFor(HitResult.Meh);
-                    double lateMissFadeTime = mehWindow / 4 + 15;
-                    o.Delay(mehWindow - lateMissFadeTime).FadeOut(lateMissFadeTime);
+                    double okWindow = o.HitObject.HitWindows.WindowFor(HitResult.Ok);
+                    double lateMissFadeTime = o.HitObject.HitWindows.WindowFor(HitResult.Meh) - okWindow;
+                    o.Delay(okWindow).FadeOut(lateMissFadeTime);
                 }
             };
         }
