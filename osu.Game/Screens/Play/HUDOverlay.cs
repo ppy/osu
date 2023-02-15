@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool holdingForHUD = new BindableBool();
 
-        private readonly SkinnableTargetContainer mainComponents;
+        private readonly SkinComponentsContainer mainComponents;
 
         /// <summary>
         /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
@@ -390,7 +390,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private partial class MainComponentsContainer : SkinnableTargetContainer
+        private partial class MainComponentsContainer : SkinComponentsContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
@@ -398,7 +398,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public MainComponentsContainer()
-                : base(GlobalSkinComponentLookup.LookupType.MainHUDComponents)
+                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents))
             {
                 RelativeSizeAxes = Axes.Both;
             }

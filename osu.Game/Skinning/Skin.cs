@@ -37,9 +37,9 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public IDictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]>();
+        private readonly Dictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]> drawableComponentInfo = new Dictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -100,7 +100,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues<GlobalSkinComponentLookup.LookupType>())
+            foreach (SkinComponentsContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinComponentsContainerLookup.TargetArea>())
             {
                 string filename = $"{skinnableTarget}.json";
 
@@ -143,18 +143,18 @@ namespace osu.Game.Skinning
         /// Remove all stored customisations for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to reset.</param>
-        public void ResetDrawableTarget(SkinnableTargetContainer targetContainer)
+        public void ResetDrawableTarget(SkinComponentsContainer targetContainer)
         {
-            DrawableComponentInfo.Remove(targetContainer.Target);
+            DrawableComponentInfo.Remove(targetContainer.Lookup.Target);
         }
 
         /// <summary>
         /// Update serialised information for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
-        public void UpdateDrawableTarget(SkinnableTargetContainer targetContainer)
+        public void UpdateDrawableTarget(SkinComponentsContainer targetContainer)
         {
-            DrawableComponentInfo[targetContainer.Target] = ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray();
+            DrawableComponentInfo[targetContainer.Lookup.Target] = ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray();
         }
 
         public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
@@ -165,8 +165,8 @@ namespace osu.Game.Skinning
                 case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false);
 
-                case GlobalSkinComponentLookup target:
-                    if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
+                case SkinComponentsContainerLookup componentLookup:
+                    if (!DrawableComponentInfo.TryGetValue(componentLookup.Target, out var skinnableInfo))
                         return null;
 
                     var components = new List<Drawable>();

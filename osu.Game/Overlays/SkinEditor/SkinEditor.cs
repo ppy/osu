@@ -339,25 +339,25 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<SkinnableTargetContainer> availableTargets => targetScreen.ChildrenOfType<SkinnableTargetContainer>();
+        private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
 
         private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISerialisableDrawableContainer? getTarget(GlobalSkinComponentLookup.LookupType target)
+        private ISerialisableDrawableContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
         {
-            return availableTargets.FirstOrDefault(c => c.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
         }
 
         private void revert()
         {
-            SkinnableTargetContainer[] targetContainers = availableTargets.ToArray();
+            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Target)?.Reload();
+                getTarget(t.Lookup.Target)?.Reload();
             }
         }
 
@@ -370,7 +370,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (!hasBegunMutating)
                 return;
 
-            SkinnableTargetContainer[] targetContainers = availableTargets.ToArray();
+            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);

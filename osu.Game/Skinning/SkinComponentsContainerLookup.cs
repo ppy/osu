@@ -3,16 +3,16 @@
 
 namespace osu.Game.Skinning
 {
-    public class GlobalSkinComponentLookup : ISkinComponentLookup
+    public class SkinComponentsContainerLookup : ISkinComponentLookup
     {
-        public readonly LookupType Lookup;
+        public readonly TargetArea Target;
 
-        public GlobalSkinComponentLookup(LookupType lookup)
+        public SkinComponentsContainerLookup(TargetArea target)
         {
-            Lookup = lookup;
+            Target = target;
         }
 
-        public enum LookupType
+        public enum TargetArea
         {
             MainHUDComponents,
             SongSelect
