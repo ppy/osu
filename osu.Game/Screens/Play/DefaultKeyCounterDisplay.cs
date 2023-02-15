@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,13 +42,14 @@ namespace osu.Game.Screens.Play
         public override void Add(KeyCounter key)
         {
             base.Add(key);
-            if (key is not DefaultKeyCounter defaultKey)
-                throw new ArgumentException($"{key.GetType()} is not a supported {nameof(KeyCounter)}.", nameof(key));
+            DefaultKeyCounter defaultKey = (DefaultKeyCounter)key;
 
             defaultKey.FadeTime = key_fade_time;
             defaultKey.KeyDownTextColor = KeyDownTextColor;
             defaultKey.KeyUpTextColor = KeyUpTextColor;
         }
+
+        protected override bool CheckType(KeyCounter key) => key is DefaultKeyCounter;
 
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
