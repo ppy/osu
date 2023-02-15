@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -22,7 +21,7 @@ namespace osu.Game.Skinning
     /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
     /// </summary>
     [Serializable]
-    public sealed class SkinnableDrawableInfo
+    public sealed class SerialisedDrawableInfo
     {
         public Type Type { get; set; }
 
@@ -41,10 +40,10 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
 
-        public List<SkinnableDrawableInfo> Children { get; } = new List<SkinnableDrawableInfo>();
+        public List<SerialisedDrawableInfo> Children { get; } = new List<SerialisedDrawableInfo>();
 
         [JsonConstructor]
-        public SkinnableDrawableInfo()
+        public SerialisedDrawableInfo()
         {
         }
 
@@ -52,7 +51,7 @@ namespace osu.Game.Skinning
         /// Construct a new instance populating all attributes from the provided drawable.
         /// </summary>
         /// <param name="component">The drawable which attributes should be sourced from.</param>
-        public SkinnableDrawableInfo(Drawable component)
+        public SerialisedDrawableInfo(Drawable component)
         {
             Type = component.GetType();
 
@@ -75,7 +74,7 @@ namespace osu.Game.Skinning
             if (component is Container<Drawable> container)
             {
                 foreach (var child in container.OfType<ISkinnableDrawable>().OfType<Drawable>())
-                    Children.Add(child.CreateSkinnableInfo());
+                    Children.Add(child.CreateSerialisedInfo());
             }
         }
 
@@ -88,7 +87,7 @@ namespace osu.Game.Skinning
             try
             {
                 Drawable d = (Drawable)Activator.CreateInstance(Type)!;
-                d.ApplySkinnableInfo(this);
+                d.ApplySerialisedInfo(this);
                 return d;
             }
             catch (Exception e)

@@ -18,7 +18,6 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
@@ -38,9 +37,9 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public IDictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
+        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SerialisedDrawableInfo[]>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -120,7 +119,7 @@ namespace osu.Game.Skinning
                     jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
                     jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
 
-                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
+                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(jsonContent);
 
                     if (deserializedContent == null)
                         continue;
@@ -155,7 +154,7 @@ namespace osu.Game.Skinning
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
         public void UpdateDrawableTarget(ISkinnableTarget targetContainer)
         {
-            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
+            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSerialisedInfo().ToArray();
         }
 
         public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
