@@ -59,7 +59,7 @@ namespace osu.Game.Extensions
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;
 
-            if (component is ISkinnableDrawable skinnable)
+            if (component is ISerialisableDrawable skinnable)
             {
                 skinnable.UsesFixedAnchor = drawableInfo.UsesFixedAnchor;
 
