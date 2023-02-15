@@ -2,39 +2,28 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which groups the components of a <see cref="SkinnableTargetContainer"/> into a single object.
-    /// Optionally also applies a default layout to the components.
+    /// A container which can be used to specify default skin components layouts.
+    /// Handles applying a default layout to the components.
     /// </summary>
-    [Serializable]
-    public partial class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
+    public partial class DefaultSkinComponentsContainer : Container
     {
-        public bool IsEditable => false;
-
-        public bool UsesFixedAnchor { get; set; }
-
         private readonly Action<Container>? applyDefaults;
 
         /// <summary>
         /// Construct a wrapper with defaults that should be applied once.
         /// </summary>
         /// <param name="applyDefaults">A function to apply the default layout.</param>
-        public SkinnableTargetComponentsContainer(Action<Container> applyDefaults)
-            : this()
-        {
-            this.applyDefaults = applyDefaults;
-        }
-
-        [JsonConstructor]
-        public SkinnableTargetComponentsContainer()
+        public DefaultSkinComponentsContainer(Action<Container> applyDefaults)
         {
             RelativeSizeAxes = Axes.Both;
+
+            this.applyDefaults = applyDefaults;
         }
 
         protected override void LoadComplete()
