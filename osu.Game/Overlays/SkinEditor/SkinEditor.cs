@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -48,6 +49,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         private Bindable<Skin> currentSkin = null!;
 
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
+
         [Resolved]
         private OsuGame? game { get; set; }
 
@@ -77,6 +81,15 @@ namespace osu.Game.Overlays.SkinEditor
 
         private EditorMenuItem undoMenuItem = null!;
         private EditorMenuItem redoMenuItem = null!;
+
+        private EditorMenuItem cutMenuItem = null!;
+        private EditorMenuItem copyMenuItem = null!;
+        private EditorMenuItem cloneMenuItem = null!;
+        private EditorMenuItem pasteMenuItem = null!;
+
+        private readonly BindableWithCurrent<bool> canCut = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canCopy = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canPaste = new BindableWithCurrent<bool>();
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -143,6 +156,11 @@ namespace osu.Game.Overlays.SkinEditor
                                                 {
                                                     undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
                                                     redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
+                                                    new EditorMenuItemSpacer(),
+                                                    cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
+                                                    copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
+                                                    pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
+                                                    cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
                                                 }
                                             },
                                         }
@@ -201,6 +219,21 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.LoadComplete();
 
+            canCut.Current.BindValueChanged(cut => cutMenuItem.Action.Disabled = !cut.NewValue, true);
+            canCopy.Current.BindValueChanged(copy =>
+            {
+                copyMenuItem.Action.Disabled = !copy.NewValue;
+                cloneMenuItem.Action.Disabled = !copy.NewValue;
+            }, true);
+            canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
+
+            SelectedComponents.BindCollectionChanged((_, _) =>
+            {
+                canCopy.Value = canCut.Value = SelectedComponents.Any();
+            }, true);
+
+            Clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
+
             Show();
 
             game?.RegisterImportHandler(this);
@@ -224,6 +257,18 @@ namespace osu.Game.Overlays.SkinEditor
         {
             switch (e.Action)
             {
+                case PlatformAction.Cut:
+                    Cut();
+                    return true;
+
+                case PlatformAction.Copy:
+                    Copy();
+                    return true;
+
+                case PlatformAction.Paste:
+                    Paste();
+                    return true;
+
                 case PlatformAction.Undo:
                     Undo();
                     return true;
@@ -359,6 +404,50 @@ namespace osu.Game.Overlays.SkinEditor
                 // add back default components
                 getTarget(t.Lookup.Target)?.Reload();
             }
+        }
+
+        protected void Cut()
+        {
+            Copy();
+            DeleteItems(SelectedComponents.ToArray());
+        }
+
+        protected void Copy()
+        {
+            Clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+        }
+
+        protected void Clone()
+        {
+            // Avoid attempting to clone if copying is not available (as it may result in pasting something unexpected).
+            if (!canCopy.Value)
+                return;
+
+            // This is an initial implementation just to get an idea of how people used this function.
+            // There are a couple of differences from osu!stable's implementation which will require more work to match:
+            // - The "clipboard" is not populated during the duplication process.
+            // - The duplicated hitobjects are inserted after the original pattern (add one beat_length and then quantize using beat snap).
+            // - The duplicated hitobjects are selected (but this is also applied for all paste operations so should be changed there).
+            Copy();
+            Paste();
+        }
+
+        protected void Paste()
+        {
+            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(Clipboard.Content.Value);
+
+            if (drawableInfo == null)
+                return;
+
+            var instances = drawableInfo.Select(d => d.CreateInstance())
+                                        .OfType<ISerialisableDrawable>()
+                                        .ToArray();
+
+            foreach (var i in instances)
+                placeComponent(i);
+
+            SelectedComponents.Clear();
+            SelectedComponents.AddRange(instances);
         }
 
         protected void Undo() => changeHandler?.RestoreState(-1);
