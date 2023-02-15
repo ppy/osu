@@ -197,16 +197,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                     .ScaleTo(Info.MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
                     .FadeOutFromOne(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
 
-                if (Info.IsHit)
-                {
-                    colourBox.FadeColour(colourDarker);
+                if (!Info.IsHit) return;
 
-                    content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration * 0.3f, Easing.OutQuint);
-                    // Ripple effect utilises the border to reduce drawable count
-                    content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
-                           // Avoids transparency overlap issues during the bubble "pop"
-                           .Then().Schedule(() => content.BorderThickness = 0);
-                }
+                colourBox.FadeColour(colourDarker);
+
+                content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration * 0.3f, Easing.OutQuint);
+                // Ripple effect utilises the border to reduce drawable count
+                content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
+                       // Avoids transparency overlap issues during the bubble "pop"
+                       .Then().Schedule(() => content.BorderThickness = 0);
             }
         }
 
