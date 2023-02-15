@@ -52,12 +52,12 @@ namespace osu.Game.Overlays.SkinEditor
             if (firstTarget == null)
                 return;
 
-            var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(Encoding.UTF8.GetString(newState));
+            var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableDrawableInfo>>(Encoding.UTF8.GetString(newState));
 
             if (deserializedContent == null)
                 return;
 
-            SkinnableInfo[] skinnableInfo = deserializedContent.ToArray();
+            SkinnableDrawableInfo[] skinnableInfo = deserializedContent.ToArray();
             Drawable[] targetComponents = firstTarget.Components.OfType<Drawable>().ToArray();
 
             if (!skinnableInfo.Select(s => s.Type).SequenceEqual(targetComponents.Select(d => d.GetType())))

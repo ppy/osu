@@ -22,7 +22,7 @@ namespace osu.Game.Skinning
     /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
     /// </summary>
     [Serializable]
-    public class SkinnableInfo
+    public sealed class SkinnableDrawableInfo
     {
         public Type Type { get; set; }
 
@@ -41,10 +41,10 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
 
-        public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
+        public List<SkinnableDrawableInfo> Children { get; } = new List<SkinnableDrawableInfo>();
 
         [JsonConstructor]
-        public SkinnableInfo()
+        public SkinnableDrawableInfo()
         {
         }
 
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
         /// Construct a new instance populating all attributes from the provided drawable.
         /// </summary>
         /// <param name="component">The drawable which attributes should be sourced from.</param>
-        public SkinnableInfo(Drawable component)
+        public SkinnableDrawableInfo(Drawable component)
         {
             Type = component.GetType();
 

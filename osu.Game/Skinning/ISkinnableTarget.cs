@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
         /// Serialise all children as <see cref="SkinnableInfo"/>.
         /// </summary>
         /// <returns>The serialised content.</returns>
-        IEnumerable<SkinnableInfo> CreateSkinnableInfo() => Components.Select(d => ((Drawable)d).CreateSkinnableInfo());
+        IEnumerable<SkinnableDrawableInfo> CreateSkinnableInfo() => Components.Select(d => ((Drawable)d).CreateSkinnableInfo());
 
         /// <summary>
         /// Reload this target from the current skin.
@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Reload this target from the provided skinnable information.
         /// </summary>
-        void Reload(SkinnableInfo[] skinnableInfo);
+        void Reload(SkinnableDrawableInfo[] skinnableInfo);
 
         /// <summary>
         /// Add a new skinnable component to this target.
