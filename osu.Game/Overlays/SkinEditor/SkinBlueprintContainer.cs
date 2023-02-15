@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedItems.BindTo(editor.SelectedComponents);
 
             // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<ISkinnableTarget>().ToArray();
+            var targetContainers = target.ChildrenOfType<ISerialisableDrawableContainer>().ToArray();
 
             if (targetContainers.Length == 0)
             {

@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinEditorChangeHandler : EditorChangeHandler
     {
-        private readonly ISkinnableTarget? firstTarget;
+        private readonly ISerialisableDrawableContainer? firstTarget;
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly BindableList<ISerialisableDrawable>? components;
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.SkinEditor
             // In the future we'll want this to cover all changes, even to skin's `InstantiationInfo`.
             // We'll also need to consider cases where multiple targets are on screen at the same time.
 
-            firstTarget = targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault();
+            firstTarget = targetScreen.ChildrenOfType<ISerialisableDrawableContainer>().FirstOrDefault();
 
             if (firstTarget == null)
                 return;

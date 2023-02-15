@@ -12,7 +12,7 @@ using osu.Game.Skinning.Serialisation;
 
 namespace osu.Game.Skinning
 {
-    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
+    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
         private Container? content;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Skinning
                 ComponentsLoaded = true;
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
         public void Add(ISerialisableDrawable component)
@@ -91,7 +91,7 @@ namespace osu.Game.Skinning
             components.Add(component);
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
         public void Remove(ISerialisableDrawable component)
