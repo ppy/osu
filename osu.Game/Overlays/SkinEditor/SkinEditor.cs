@@ -49,9 +49,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         private Bindable<Skin> currentSkin = null!;
 
-        [Cached]
-        public readonly EditorClipboard Clipboard = new EditorClipboard();
-
         [Resolved]
         private OsuGame? game { get; set; }
 
@@ -63,6 +60,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private EditorClipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private SkinEditorOverlay? skinEditorOverlay { get; set; }
@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.SkinEditor
                 canCopy.Value = canCut.Value = SelectedComponents.Any();
             }, true);
 
-            Clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
+            clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
 
             Show();
 
@@ -414,7 +414,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Copy()
         {
-            Clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+            clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
         }
 
         protected void Clone()
