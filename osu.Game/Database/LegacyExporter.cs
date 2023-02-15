@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Utils;
@@ -61,7 +62,10 @@ namespace osu.Game.Database
         {
             string itemFilename = GetFilename(item).GetValidFilename();
 
-            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
+            IEnumerable<string> existingExports =
+                exportStorage
+                    .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
+                    .Concat(exportStorage.GetDirectories(string.Empty));
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             using (var stream = exportStorage.CreateFileSafely(filename))
