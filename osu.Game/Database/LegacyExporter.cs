@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Platform;
@@ -19,6 +20,14 @@ namespace osu.Game.Database
         where TModel : class, IHasNamedFiles
     {
         /// <summary>
+        /// Max length of filename (including extension)
+        /// </summary>
+        /// <remarks>
+        /// This constant is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
+        /// </remarks>
+        private const int max_path = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
+
+        /// <summary>
         /// The file extension for exports (including the leading '.').
         /// </summary>
         protected abstract string FileExtension { get; }
@@ -33,7 +42,16 @@ namespace osu.Game.Database
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
-        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
+        protected virtual string GetFilename(TModel item)
+        {
+            string fileName = item.GetDisplayString();
+
+            int fileNameLength = fileName.Length - FileExtension.Length;
+            if (fileNameLength > max_path)
+                fileName = fileName.Remove(max_path - FileExtension.Length); //Truncating the name to fit the path limit
+
+            return fileName;
+        }
 
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
