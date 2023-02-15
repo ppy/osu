@@ -434,7 +434,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Paste()
         {
-            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(Clipboard.Content.Value);
+            changeHandler?.BeginChange();
+
+            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);
 
             if (drawableInfo == null)
                 return;
@@ -448,6 +450,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedComponents.Clear();
             SelectedComponents.AddRange(instances);
+
+            changeHandler?.EndChange();
         }
 
         protected void Undo() => changeHandler?.RestoreState(-1);
@@ -491,8 +495,12 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void DeleteItems(ISerialisableDrawable[] items)
         {
+            changeHandler?.BeginChange();
+
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+
+            changeHandler?.EndChange();
         }
 
         #region Drag & drop import handling
