@@ -11,11 +11,20 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
-    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
+    /// <summary>
+    /// A container which holds many skinnable components, with functionality to add, remove and reload layouts.
+    /// Used to allow user customisation of skin layouts.
+    /// </summary>
+    /// <remarks>
+    /// This is currently used as a means of serialising skin layouts to files.
+    /// Currently, one json file in a skin will represent one <see cref="SkinComponentsContainer"/>, containing
+    /// the output of <see cref="ISerialisableDrawableContainer.CreateSerialisedInfo"/>.
+    /// </remarks>
+    public partial class SkinComponentsContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
         private Container? content;
 
-        public GlobalSkinComponentLookup.LookupType Target { get; }
+        public SkinComponentsContainerLookup Lookup { get; }
 
         public IBindableList<ISerialisableDrawable> Components => components;
 
@@ -27,9 +36,9 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType target)
+        public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
         {
-            Target = target;
+            Lookup = lookup;
         }
 
         public void Reload(SerialisedDrawableInfo[] skinnableInfo)
@@ -46,7 +55,7 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as Container);
+        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);
 
         public void Reload(Container? componentsContainer)
         {
