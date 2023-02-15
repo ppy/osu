@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     /// Attaching this interface to any <see cref="IDrawable"/> will make it serialisable to user skins (see <see cref="SkinImporter.Save"/>).
     /// Adding <see cref="SettingSourceAttribute"/> annotated bindables will also allow serialising settings automatically.
     ///
-    /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="osu.Game.Extensions.DrawableExtensions.CreateSerialisedInfo"/>.
+    /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="SerialisableDrawableExtensions.CreateSerialisedInfo"/>.
     /// </remarks>
     public interface ISerialisableDrawable : IDrawable
     {

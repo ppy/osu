@@ -8,7 +8,6 @@ using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Skinning.Serialisation;
 
 namespace osu.Game.Skinning
 {
