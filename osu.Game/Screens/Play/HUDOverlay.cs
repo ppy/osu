@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
+using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Localisation;
@@ -58,6 +59,9 @@ namespace osu.Game.Screens.Play
 
         [Cached]
         private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+
+        [Cached]
+        private readonly JudgementTally tally;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -104,6 +108,8 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
+                //Needs to be initialized before skinnable drawables.
+                tally = new JudgementTally(),
                 mainComponents = new MainComponentsContainer
                 {
                     AlwaysPresent = true,
