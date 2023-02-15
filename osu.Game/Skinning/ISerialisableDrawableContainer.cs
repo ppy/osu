@@ -16,11 +16,6 @@ namespace osu.Game.Skinning
     public interface ISerialisableDrawableContainer : IDrawable
     {
         /// <summary>
-        /// The definition of this target.
-        /// </summary>
-        GlobalSkinComponentLookup.LookupType Target { get; }
-
-        /// <summary>
         /// A bindable list of components which are being tracked by this skinnable target.
         /// </summary>
         IBindableList<ISerialisableDrawable> Components { get; }
