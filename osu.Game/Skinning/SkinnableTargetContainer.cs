@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
             Target = target;
         }
 
-        public void Reload(SkinnableInfo[] skinnableInfo)
+        public void Reload(SkinnableDrawableInfo[] skinnableInfo)
         {
             var drawables = new List<Drawable>();
 

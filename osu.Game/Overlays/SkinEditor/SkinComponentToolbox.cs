@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SkinnableInfo.GetAllAvailableDrawables();
+            var skinnableTypes = SkinnableDrawableInfo.GetAllAvailableDrawables(target?.Ruleset);
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }

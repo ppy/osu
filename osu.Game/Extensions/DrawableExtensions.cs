@@ -48,26 +48,26 @@ namespace osu.Game.Extensions
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
             drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
 
-        public static SkinnableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableInfo(component);
+        public static SkinnableDrawableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableDrawableInfo(component);
 
-        public static void ApplySkinnableInfo(this Drawable component, SkinnableInfo info)
+        public static void ApplySkinnableInfo(this Drawable component, SkinnableDrawableInfo drawableInfo)
         {
             // todo: can probably make this better via deserialisation directly using a common interface.
-            component.Position = info.Position;
-            component.Rotation = info.Rotation;
-            component.Scale = info.Scale;
-            component.Anchor = info.Anchor;
-            component.Origin = info.Origin;
+            component.Position = drawableInfo.Position;
+            component.Rotation = drawableInfo.Rotation;
+            component.Scale = drawableInfo.Scale;
+            component.Anchor = drawableInfo.Anchor;
+            component.Origin = drawableInfo.Origin;
 
             if (component is ISkinnableDrawable skinnable)
             {
-                skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
+                skinnable.UsesFixedAnchor = drawableInfo.UsesFixedAnchor;
 
                 foreach (var (_, property) in component.GetSettingsSourceProperties())
                 {
                     var bindable = ((IBindable)property.GetValue(component)!);
 
-                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
+                    if (!drawableInfo.Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
                     {
                         // TODO: We probably want to restore default if not included in serialisation information.
                         // This is not simple to do as SetDefault() is only found in the typed Bindable<T> interface right now.
@@ -80,7 +80,7 @@ namespace osu.Game.Extensions
 
             if (component is Container container)
             {
-                foreach (var child in info.Children)
+                foreach (var child in drawableInfo.Children)
                     container.Add(child.CreateInstance());
             }
         }

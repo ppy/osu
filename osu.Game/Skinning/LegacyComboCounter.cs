@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
         private readonly Container counterContainer;
 
         /// <summary>
-        /// Hides the combo counter internally without affecting its <see cref="SkinnableInfo"/>.
+        /// Hides the combo counter internally without affecting its <see cref="SkinnableDrawableInfo"/>.
         /// </summary>
         /// <remarks>
         /// This is used for rulesets that provide their own combo counter and don't want this HUD one to be visible,
