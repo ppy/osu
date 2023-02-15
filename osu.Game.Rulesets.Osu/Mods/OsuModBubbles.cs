@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -98,34 +101,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 void addBubble()
                 {
                     BubbleDrawable bubble = bubblePool.Get();
-                    bubble.Info = new BubbleInfo
-                    {
-                        InitialSize = new Vector2(bubbleRadius),
-                        MaxSize = maxSize,
-                        Position = getPosition(),
-                        FadeTime = bubbleFade,
-                        Colour = drawableOsuHitObject.AccentColour.Value,
-                        IsHit = drawableOsuHitObject.IsHit,
-                    };
+
+                    bubble.DrawableOsuHitObject = drawableOsuHitObject;
+                    bubble.InitialSize = new Vector2(bubbleRadius);
+                    bubble.FadeTime = bubbleFade;
+                    bubble.MaxSize = maxSize;
+
                     bubbleContainer.Add(bubble);
-                }
-
-                Vector2 getPosition()
-                {
-                    switch (drawableOsuHitObject)
-                    {
-                        // SliderHeads are derived from HitCircles,
-                        // so we must handle them before to avoid them using the wrong positioning logic
-                        case DrawableSliderHead:
-                            return drawableOsuHitObject.HitObject.Position;
-
-                        // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
-                        case DrawableHitCircle:
-                            return drawableOsuHitObject.Position;
-
-                        default:
-                            return drawableOsuHitObject.HitObject.Position;
-                    }
                 }
             };
 
@@ -148,10 +130,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private partial class BubbleDrawable : PoolableDrawable
         {
+            public DrawableOsuHitObject? DrawableOsuHitObject { get; set; }
+
+            public Vector2 InitialSize { get; set; }
+            public double FadeTime { get; set; }
+            public float MaxSize { get; set; }
+
             private readonly Box colourBox;
             private readonly CircularContainer content;
-
-            public BubbleInfo Info { get; set; }
 
             public BubbleDrawable()
             {
@@ -177,27 +163,30 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override void PrepareForUse()
             {
-                Colour = Info.IsHit ? Colour4.White : Colour4.Black;
+                Debug.Assert(DrawableOsuHitObject.IsNotNull());
+
+                Colour = DrawableOsuHitObject.IsHit ? Colour4.White : Colour4.Black;
+                Alpha = 1;
                 Scale = new Vector2(1);
-                Position = Info.Position;
-                Size = Info.InitialSize;
-                content.BorderThickness = Info.InitialSize.X / 3.5f;
+                Position = getPosition();
+                Size = InitialSize;
+                content.BorderThickness = InitialSize.X / 3.5f;
                 content.BorderColour = Colour4.White;
 
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
-                ColourInfo colourDarker = Info.Colour.Darken(0.1f);
+                ColourInfo colourDarker = DrawableOsuHitObject.AccentColour.Value.Darken(0.1f);
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationDuration = 1700 + Math.Pow(Info.FadeTime, 1.07f);
+                double getAnimationDuration = 1700 + Math.Pow(FadeTime, 1.07f);
 
                 // Main bubble scaling based on combo
-                this.ScaleTo(Info.MaxSize, getAnimationDuration * 0.8f)
+                this.ScaleTo(MaxSize, getAnimationDuration * 0.8f)
                     .Then()
                     // Pop at the end of the bubbles life time
-                    .ScaleTo(Info.MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
-                    .FadeOutFromOne(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
+                    .ScaleTo(MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
+                    .FadeOut(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
 
-                if (!Info.IsHit) return;
+                if (!DrawableOsuHitObject.IsHit) return;
 
                 colourBox.FadeColour(colourDarker);
 
@@ -206,24 +195,25 @@ namespace osu.Game.Rulesets.Osu.Mods
                 content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
                        // Avoids transparency overlap issues during the bubble "pop"
                        .Then().Schedule(() => content.BorderThickness = 0);
+
+                Vector2 getPosition()
+                {
+                    switch (DrawableOsuHitObject)
+                    {
+                        // SliderHeads are derived from HitCircles,
+                        // so we must handle them before to avoid them using the wrong positioning logic
+                        case DrawableSliderHead:
+                            return DrawableOsuHitObject.HitObject.Position;
+
+                        // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
+                        case DrawableHitCircle:
+                            return DrawableOsuHitObject.Position;
+
+                        default:
+                            return DrawableOsuHitObject.HitObject.Position;
+                    }
+                }
             }
-        }
-
-        private struct BubbleInfo
-        {
-            public Vector2 InitialSize { get; set; }
-
-            public float MaxSize { get; set; }
-
-            public Vector2 Position { get; set; }
-
-            public Colour4 Colour { get; set; }
-
-            // FadeTime is based on the approach rate of the beatmap.
-            public double FadeTime { get; set; }
-
-            // Whether the corresponding HitObject was hit
-            public bool IsHit { get; set; }
         }
 
         #endregion
