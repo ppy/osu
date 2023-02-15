@@ -58,14 +58,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected bool AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType target, ISkin expectedSource)
         {
             var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+                                                  .ChildrenOfType<Container>().SingleOrDefault();
 
             if (actualComponentsContainer == null)
                 return false;
 
             var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target));
+            var expectedComponentsContainer = (DefaultSkinComponentsContainer)expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target));
             if (expectedComponentsContainer == null)
                 return false;
 
