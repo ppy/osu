@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
@@ -89,7 +90,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.OnUpdate += _ =>
                 {
                     double currentTime = Player.GameplayClockContainer.CurrentTime;
-                    alwaysGoingForward &= currentTime >= lastTime - 500;
+                    bool goingForward = currentTime >= lastTime - 500;
+
+                    alwaysGoingForward &= goingForward;
+
+                    if (!goingForward)
+                        Logger.Log($"Backwards time occurred ({currentTime:N1} -> {lastTime:N1})");
+
                     lastTime = currentTime;
                 };
             });

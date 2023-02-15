@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnFree();
 
-            spinningSample.Samples = null;
+            spinningSample.ClearSamples();
         }
 
         protected override void LoadSamples()

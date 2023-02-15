@@ -268,7 +268,10 @@ namespace osu.Game.Beatmaps
 
                         Stream storyboardFileStream = null;
 
-                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename is string storyboardFilename)
+                        string mainStoryboardFilename = getMainStoryboardFilename(BeatmapSetInfo.Metadata);
+
+                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals(mainStoryboardFilename, StringComparison.OrdinalIgnoreCase))?.Filename is string
+                            storyboardFilename)
                         {
                             string storyboardFileStorePath = BeatmapSetInfo?.GetPathForFile(storyboardFilename);
                             storyboardFileStream = GetStream(storyboardFileStorePath);
@@ -312,6 +315,33 @@ namespace osu.Game.Beatmaps
             }
 
             public override Stream GetStream(string storagePath) => resources.Files.GetStream(storagePath);
+
+            private string getMainStoryboardFilename(IBeatmapMetadataInfo metadata)
+            {
+                // Matches stable implementation, because it's probably simpler than trying to do anything else.
+                // This may need to be reconsidered after we begin storing storyboards in the new editor.
+                return windowsFilenameStrip(
+                    (metadata.Artist.Length > 0 ? metadata.Artist + @" - " + metadata.Title : Path.GetFileNameWithoutExtension(metadata.AudioFile))
+                    + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
+                    + @".osb");
+
+                string windowsFilenameStrip(string entry)
+                {
+                    // Inlined from Path.GetInvalidFilenameChars() to ensure the windows characters are used (to match stable).
+                    char[] invalidCharacters =
+                    {
+                        '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',
+                        '\x08', '\x09', '\x0A', '\x0B', '\x0C', '\x0D', '\x0E', '\x0F', '\x10', '\x11', '\x12',
+                        '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1A', '\x1B', '\x1C', '\x1D',
+                        '\x1E', '\x1F', '\x22', '\x3C', '\x3E', '\x7C', ':', '*', '?', '\\', '/'
+                    };
+
+                    foreach (char c in invalidCharacters)
+                        entry = entry.Replace(c.ToString(), string.Empty);
+
+                    return entry;
+                }
+            }
         }
     }
 }

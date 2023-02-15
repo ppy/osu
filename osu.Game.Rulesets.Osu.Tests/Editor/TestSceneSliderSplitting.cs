@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
         private Slider? slider;
-        private PathControlPointVisualiser? visualiser;
+        private PathControlPointVisualiser<Slider>? visualiser;
 
         private const double split_gap = 100;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);

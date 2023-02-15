@@ -104,6 +104,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
+            scoreRetrievalRequest?.Cancel();
+            scoreRetrievalRequest = null;
+
             var fetchBeatmapInfo = BeatmapInfo;
 
             if (fetchBeatmapInfo == null)
@@ -151,8 +154,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 requestMods = new Mod[] { new ModNoMod() };
             else if (filterMods)
                 requestMods = mods.Value;
-
-            scoreRetrievalRequest?.Cancel();
 
             var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
             newRequest.Success += response => Schedule(() =>

@@ -52,6 +52,15 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Deletes the file that is encapsulated by this <see cref="ImportTask"/>.
+        /// </summary>
+        public virtual void DeleteFile()
+        {
+            if (File.Exists(Path))
+                File.Delete(Path);
+        }
+
+        /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a stream.
         /// </summary>
         /// <param name="stream">A seekable stream containing the archive content.</param>

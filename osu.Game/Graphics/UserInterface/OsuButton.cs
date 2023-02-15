@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             if (hoverSounds.HasValue)
-                Add(new HoverClickSounds(hoverSounds.Value) { Enabled = { BindTarget = Enabled } });
+                AddInternal(new HoverClickSounds(hoverSounds.Value) { Enabled = { BindTarget = Enabled } });
         }
 
         [BackgroundDependencyLoader]
