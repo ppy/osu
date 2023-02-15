@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Extensions;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 

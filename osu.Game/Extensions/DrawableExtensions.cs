@@ -1,11 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Extensions
@@ -47,42 +43,5 @@ namespace osu.Game.Extensions
         /// <returns>The delta vector in Parent's coordinates.</returns>
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
             drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
-
-        public static SerialisedDrawableInfo CreateSerialisedInfo(this Drawable component) => new SerialisedDrawableInfo(component);
-
-        public static void ApplySerialisedInfo(this Drawable component, SerialisedDrawableInfo drawableInfo)
-        {
-            // todo: can probably make this better via deserialisation directly using a common interface.
-            component.Position = drawableInfo.Position;
-            component.Rotation = drawableInfo.Rotation;
-            component.Scale = drawableInfo.Scale;
-            component.Anchor = drawableInfo.Anchor;
-            component.Origin = drawableInfo.Origin;
-
-            if (component is ISerialisableDrawable skinnable)
-            {
-                skinnable.UsesFixedAnchor = drawableInfo.UsesFixedAnchor;
-
-                foreach (var (_, property) in component.GetSettingsSourceProperties())
-                {
-                    var bindable = ((IBindable)property.GetValue(component)!);
-
-                    if (!drawableInfo.Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
-                    {
-                        // TODO: We probably want to restore default if not included in serialisation information.
-                        // This is not simple to do as SetDefault() is only found in the typed Bindable<T> interface right now.
-                        continue;
-                    }
-
-                    skinnable.CopyAdjustedSetting(bindable, settingValue);
-                }
-            }
-
-            if (component is Container container)
-            {
-                foreach (var child in drawableInfo.Children)
-                    container.Add(child.CreateInstance());
-            }
-        }
     }
 }
