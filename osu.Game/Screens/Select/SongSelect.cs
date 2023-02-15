@@ -767,6 +767,8 @@ namespace osu.Game.Screens.Select
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
+                backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.4f;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             });
 
