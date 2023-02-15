@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -77,12 +76,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawableObject)
         {
-            if (drawableObject is DrawableSlider slider)
-            {
-                applySliderState(slider);
-                slider.Body.OnSkinChanged += () => applySliderState(slider);
-            }
-
             drawableObject.OnNewResult += (drawable, _) =>
             {
                 if (drawable is not DrawableOsuHitObject drawableOsuHitObject) return;
@@ -121,10 +114,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 lastBubble?.Expire();
             };
         }
-
-        // Makes the slider border coloured on all skins (for aesthetics)
-        private void applySliderState(DrawableSlider slider) =>
-            ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
 
         #region Pooled Bubble drawable
 
