@@ -177,8 +177,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override void PrepareForUse()
             {
-                Alpha = 1;
-                Colour = Colour4.White;
+                Colour = Info.IsHit ? Colour4.White : Colour4.Black;
                 Scale = new Vector2(1);
                 Position = Info.Position;
                 Size = Info.InitialSize;
@@ -204,11 +203,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration() * 0.3f, Easing.OutQuint)
                            // Avoids transparency overlap issues during the bubble "pop"
                            .Then().Schedule(() => content.BorderThickness = 0);
-
-                    return;
                 }
-
-                Colour = Colour4.Black;
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
                 double getAnimationDuration() => 1700 + Math.Pow(Info.FadeTime, 1.07f);
