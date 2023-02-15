@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestEditActivity()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.Editing(new BeatmapInfo()));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.EditingBeatmap(new BeatmapInfo()));
 
             AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 

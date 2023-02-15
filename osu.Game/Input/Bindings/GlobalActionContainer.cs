@@ -35,8 +35,8 @@ namespace osu.Game.Input.Bindings
         // It is used to decide the order of precedence, with the earlier items having higher precedence.
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
                                                                        .Concat(EditorKeyBindings)
-                                                                       .Concat(ReplayKeyBindings)
                                                                        .Concat(InGameKeyBindings)
+                                                                       .Concat(ReplayKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
                                                                        .Concat(AudioControlKeyBindings)
                                                                        // Overlay bindings may conflict with more local cases like the editor so they are checked last.
