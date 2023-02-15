@@ -209,9 +209,8 @@ namespace osu.Game.Rulesets.Taiko
                 HitResult.Great,
                 HitResult.Ok,
 
-                HitResult.SmallTickHit,
-
                 HitResult.SmallBonus,
+                HitResult.LargeBonus,
             };
         }
 
@@ -220,6 +219,9 @@ namespace osu.Game.Rulesets.Taiko
             switch (result)
             {
                 case HitResult.SmallBonus:
+                    return "drum tick";
+
+                case HitResult.LargeBonus:
                     return "bonus";
             }
 
