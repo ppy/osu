@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -12,7 +10,7 @@ using osu.Game.Screens.Edit;
 namespace osu.Game.Tests.Editing
 {
     [TestFixture]
-    public class EditorChangeHandlerTest
+    public class BeatmapEditorChangeHandlerTest
     {
         private int stateChangedFired;
 
@@ -23,17 +21,22 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
-        public void TestSaveRestoreState()
+        public void TestSaveRestoreStateUsingTransaction()
         {
             var (handler, beatmap) = createChangeHandler();
 
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.False);
 
-            addArbitraryChange(beatmap);
-            handler.SaveState();
+            handler.BeginChange();
 
+            // Initial state will be saved on BeginChange
             Assert.That(stateChangedFired, Is.EqualTo(1));
+
+            addArbitraryChange(beatmap);
+            handler.EndChange();
+
+            Assert.That(stateChangedFired, Is.EqualTo(2));
 
             Assert.That(handler.CanUndo.Value, Is.True);
             Assert.That(handler.CanRedo.Value, Is.False);
@@ -43,7 +46,35 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.True);
 
+            Assert.That(stateChangedFired, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestSaveRestoreState()
+        {
+            var (handler, beatmap) = createChangeHandler();
+
+            Assert.That(handler.CanUndo.Value, Is.False);
+            Assert.That(handler.CanRedo.Value, Is.False);
+
+            // Save initial state
+            handler.SaveState();
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
+            addArbitraryChange(beatmap);
+            handler.SaveState();
+
             Assert.That(stateChangedFired, Is.EqualTo(2));
+
+            Assert.That(handler.CanUndo.Value, Is.True);
+            Assert.That(handler.CanRedo.Value, Is.False);
+
+            handler.RestoreState(-1);
+
+            Assert.That(handler.CanUndo.Value, Is.False);
+            Assert.That(handler.CanRedo.Value, Is.True);
+
+            Assert.That(stateChangedFired, Is.EqualTo(3));
         }
 
         [Test]
@@ -54,6 +85,10 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.False);
 
+            // Save initial state
+            handler.SaveState();
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
             string originalHash = handler.CurrentStateHash;
 
             addArbitraryChange(beatmap);
@@ -61,7 +96,7 @@ namespace osu.Game.Tests.Editing
 
             Assert.That(handler.CanUndo.Value, Is.True);
             Assert.That(handler.CanRedo.Value, Is.False);
-            Assert.That(stateChangedFired, Is.EqualTo(1));
+            Assert.That(stateChangedFired, Is.EqualTo(2));
 
             string hash = handler.CurrentStateHash;
 
@@ -69,7 +104,7 @@ namespace osu.Game.Tests.Editing
             handler.RestoreState(-1);
 
             Assert.That(originalHash, Is.EqualTo(handler.CurrentStateHash));
-            Assert.That(stateChangedFired, Is.EqualTo(2));
+            Assert.That(stateChangedFired, Is.EqualTo(3));
 
             addArbitraryChange(beatmap);
             handler.SaveState();
@@ -84,12 +119,16 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.False);
 
+            // Save initial state
+            handler.SaveState();
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
             addArbitraryChange(beatmap);
             handler.SaveState();
 
             Assert.That(handler.CanUndo.Value, Is.True);
             Assert.That(handler.CanRedo.Value, Is.False);
-            Assert.That(stateChangedFired, Is.EqualTo(1));
+            Assert.That(stateChangedFired, Is.EqualTo(2));
 
             string hash = handler.CurrentStateHash;
 
@@ -97,7 +136,7 @@ namespace osu.Game.Tests.Editing
             handler.SaveState();
 
             Assert.That(hash, Is.EqualTo(handler.CurrentStateHash));
-            Assert.That(stateChangedFired, Is.EqualTo(1));
+            Assert.That(stateChangedFired, Is.EqualTo(2));
 
             handler.RestoreState(-1);
 
@@ -106,7 +145,7 @@ namespace osu.Game.Tests.Editing
             // we should only be able to restore once even though we saved twice.
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.True);
-            Assert.That(stateChangedFired, Is.EqualTo(2));
+            Assert.That(stateChangedFired, Is.EqualTo(3));
         }
 
         [Test]
@@ -114,11 +153,15 @@ namespace osu.Game.Tests.Editing
         {
             var (handler, beatmap) = createChangeHandler();
 
+            // Save initial state
+            handler.SaveState();
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
             Assert.That(handler.CanUndo.Value, Is.False);
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES; i++)
             {
-                Assert.That(stateChangedFired, Is.EqualTo(i));
+                Assert.That(stateChangedFired, Is.EqualTo(i + 1));
 
                 addArbitraryChange(beatmap);
                 handler.SaveState();
@@ -169,7 +212,7 @@ namespace osu.Game.Tests.Editing
                 },
             });
 
-            var changeHandler = new EditorChangeHandler(beatmap);
+            var changeHandler = new BeatmapEditorChangeHandler(beatmap);
 
             changeHandler.OnStateChange += () => stateChangedFired++;
             return (changeHandler, beatmap);
