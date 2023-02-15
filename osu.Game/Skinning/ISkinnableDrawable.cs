@@ -10,13 +10,13 @@ using osu.Game.Configuration;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
+    /// A drawable which can be serialised to a skin, placed and customised via the skin layout editor.
     /// </summary>
     /// <remarks>
     /// Attaching this interface to any <see cref="IDrawable"/> will make it serialisable to user skins (see <see cref="SkinImporter.Save"/>).
     /// Adding <see cref="SettingSourceAttribute"/> annotated bindables will also allow serialising settings automatically.
     ///
-    /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="Extensions.DrawableExtensions.CreateSerialisedInfo"/>.
+    /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="osu.Game.Extensions.DrawableExtensions.CreateSerialisedInfo"/>.
     /// </remarks>
     public interface ISkinnableDrawable : IDrawable
     {

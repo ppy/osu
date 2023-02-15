@@ -9,7 +9,8 @@ using osu.Framework.Graphics.Pooling;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A drawable which has a callback when the skin changes.
+    /// A poolable drawable implementation which has a pre-wired callback (see <see cref="SkinChanged"/>) that fires
+    /// once on load and again on any subsequent skin change.
     /// </summary>
     public abstract partial class SkinReloadableDrawable : PoolableDrawable
     {

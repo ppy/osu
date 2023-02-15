@@ -18,7 +18,8 @@ using osuTK;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
+    /// Serialised backing data for <see cref="ISkinnableDrawable"/>s.
+    /// Used for json serialisation in user skins.
     /// </summary>
     [Serializable]
     public sealed class SerialisedDrawableInfo
