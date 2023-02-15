@@ -18,9 +18,13 @@ using osuTK;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Serialised backing data for <see cref="ISkinnableDrawable"/>s.
+    /// Serialised backing data for <see cref="ISerialisableDrawable"/>s.
     /// Used for json serialisation in user skins.
     /// </summary>
+    /// <remarks>
+    /// Can be created using <see cref="SerialisableDrawableExtensions.CreateSerialisedInfo"/>.
+    /// Can also be applied to an existing drawable using <see cref="SerialisableDrawableExtensions.ApplySerialisedInfo"/>.
+    /// </remarks>
     [Serializable]
     public sealed class SerialisedDrawableInfo
     {
@@ -36,7 +40,7 @@ namespace osu.Game.Skinning
 
         public Anchor Origin { get; set; }
 
-        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        /// <inheritdoc cref="ISerialisableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
@@ -62,7 +66,7 @@ namespace osu.Game.Skinning
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            if (component is ISkinnableDrawable skinnable)
+            if (component is ISerialisableDrawable skinnable)
                 UsesFixedAnchor = skinnable.UsesFixedAnchor;
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
@@ -74,7 +78,7 @@ namespace osu.Game.Skinning
 
             if (component is Container<Drawable> container)
             {
-                foreach (var child in container.OfType<ISkinnableDrawable>().OfType<Drawable>())
+                foreach (var child in container.OfType<ISerialisableDrawable>().OfType<Drawable>())
                     Children.Add(child.CreateSerialisedInfo());
             }
         }
@@ -102,7 +106,7 @@ namespace osu.Game.Skinning
         {
             return typeof(OsuGame).Assembly.GetTypes()
                                   .Where(t => !t.IsInterface && !t.IsAbstract)
-                                  .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                  .Where(t => typeof(ISerialisableDrawable).IsAssignableFrom(t))
                                   .OrderBy(t => t.Name)
                                   .ToArray();
         }

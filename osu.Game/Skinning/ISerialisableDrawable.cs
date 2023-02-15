@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
     ///
     /// Serialisation is done via <see cref="SerialisedDrawableInfo"/> using <see cref="osu.Game.Extensions.DrawableExtensions.CreateSerialisedInfo"/>.
     /// </remarks>
-    public interface ISkinnableDrawable : IDrawable
+    public interface ISerialisableDrawable : IDrawable
     {
         /// <summary>
         /// Whether this component should be editable by an end user.
@@ -26,8 +26,8 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
-        /// In the context of the skin layout editor, whether this <see cref="ISkinnableDrawable"/> has a permanent anchor defined.
-        /// If <see langword="false"/>, this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
+        /// In the context of the skin layout editor, whether this <see cref="ISerialisableDrawable"/> has a permanent anchor defined.
+        /// If <see langword="false"/>, this <see cref="ISerialisableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
         /// If <see langword="true"/>, a fixed anchor point has been defined.
         /// </summary>
         bool UsesFixedAnchor { get; set; }

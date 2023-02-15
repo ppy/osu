@@ -19,7 +19,7 @@ namespace osu.Game.Skinning.Components
     /// Intended to be a test bed for skinning. May be removed at some point in the future.
     /// </summary>
     [UsedImplicitly]
-    public partial class BigBlackBox : CompositeDrawable, ISkinnableDrawable
+    public partial class BigBlackBox : CompositeDrawable, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

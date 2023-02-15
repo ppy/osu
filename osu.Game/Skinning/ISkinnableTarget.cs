@@ -10,7 +10,7 @@ using osu.Game.Extensions;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a container which can house <see cref="ISkinnableDrawable"/>s.
+    /// Denotes a container which can house <see cref="ISerialisableDrawable"/>s.
     /// </summary>
     public interface ISkinnableTarget : IDrawable
     {
@@ -22,7 +22,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A bindable list of components which are being tracked by this skinnable target.
         /// </summary>
-        IBindableList<ISkinnableDrawable> Components { get; }
+        IBindableList<ISerialisableDrawable> Components { get; }
 
         /// <summary>
         /// Serialise all children as <see cref="SerialisedDrawableInfo"/>.
@@ -44,12 +44,12 @@ namespace osu.Game.Skinning
         /// Add a new skinnable component to this target.
         /// </summary>
         /// <param name="drawable">The component to add.</param>
-        void Add(ISkinnableDrawable drawable);
+        void Add(ISerialisableDrawable drawable);
 
         /// <summary>
         /// Remove an existing skinnable component from this target.
         /// </summary>
         /// <param name="component">The component to remove.</param>
-        void Remove(ISkinnableDrawable component);
+        void Remove(ISerialisableDrawable component);
     }
 }

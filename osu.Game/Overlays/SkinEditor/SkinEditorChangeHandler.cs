@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly ISkinnableTarget? firstTarget;
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        private readonly BindableList<ISkinnableDrawable>? components;
+        private readonly BindableList<ISerialisableDrawable>? components;
 
         public SkinEditorChangeHandler(Drawable targetScreen)
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (firstTarget == null)
                 return;
 
-            components = new BindableList<ISkinnableDrawable> { BindTarget = firstTarget.Components };
+            components = new BindableList<ISerialisableDrawable> { BindTarget = firstTarget.Components };
             components.BindCollectionChanged((_, _) => SaveState());
         }
 

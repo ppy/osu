@@ -18,9 +18,9 @@ namespace osu.Game.Skinning
 
         public GlobalSkinComponentLookup.LookupType Target { get; }
 
-        public IBindableList<ISkinnableDrawable> Components => components;
+        public IBindableList<ISerialisableDrawable> Components => components;
 
-        private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
+        private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks; // ensure that components are loaded even if the target container is hidden (ie. due to user toggle).
 
@@ -68,7 +68,7 @@ namespace osu.Game.Skinning
                 LoadComponentAsync(content, wrapper =>
                 {
                     AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
+                    components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                     ComponentsLoaded = true;
                 }, (cancellationSource = new CancellationTokenSource()).Token);
             }
@@ -79,7 +79,7 @@ namespace osu.Game.Skinning
         /// <inheritdoc cref="ISkinnableTarget"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Add(ISkinnableDrawable component)
+        public void Add(ISerialisableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");
@@ -94,7 +94,7 @@ namespace osu.Game.Skinning
         /// <inheritdoc cref="ISkinnableTarget"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Remove(ISkinnableDrawable component)
+        public void Remove(ISerialisableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to remove a new component from a target container which is not supported by the current skin.");
