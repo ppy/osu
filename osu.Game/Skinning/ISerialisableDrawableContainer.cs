@@ -10,9 +10,10 @@ using osu.Game.Extensions;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a container which can house <see cref="ISerialisableDrawable"/>s.
+    /// A container which can house <see cref="ISerialisableDrawable"/>s.
+    /// Contains functionality for new drawables to be added, removed, and reloaded from provided <see cref="SerialisedDrawableInfo"/>.
     /// </summary>
-    public interface ISkinnableTarget : IDrawable
+    public interface ISerialisableDrawableContainer : IDrawable
     {
         /// <summary>
         /// The definition of this target.
