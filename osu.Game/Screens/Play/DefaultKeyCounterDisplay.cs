@@ -24,12 +24,11 @@ namespace osu.Game.Screens.Play
 
         public DefaultKeyCounterDisplay()
         {
-            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
-            {
-                Direction = FillDirection.Horizontal,
-                AutoSizeAxes = Axes.Both,
-                Alpha = 0,
-            };
+            KeyFlow.Direction = FillDirection.Horizontal;
+            KeyFlow.AutoSizeAxes = Axes.Both;
+            KeyFlow.Alpha = 0;
+
+            InternalChild = KeyFlow;
         }
 
         protected override void Update()
