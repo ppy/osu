@@ -444,7 +444,7 @@ namespace osu.Game.Overlays.SkinEditor
                                         .ToArray();
 
             foreach (var i in instances)
-                placeComponent(i);
+                placeComponent(i, false);
 
             SelectedComponents.Clear();
             SelectedComponents.AddRange(instances);
