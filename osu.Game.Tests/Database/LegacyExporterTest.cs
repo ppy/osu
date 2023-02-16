@@ -44,10 +44,9 @@ namespace osu.Game.Tests.Database
             Assert.That(item.FileName.Length < TestLegacyExporter.GetMaxPath(), Is.True);
 
             //Export multiple times
-            string expectedFileName;
             for (int i = 0; i < 10; i++)
             {
-                expectedFileName = i == 0 ? filename : $"{filename} ({i})";
+                string expectedFileName = i == 0 ? filename : $"{filename} ({i})";
                 exportItemAndAssert(item, exportStorage, expectedFileName);
             }
         }
