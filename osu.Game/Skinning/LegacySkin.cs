@@ -347,7 +347,7 @@ namespace osu.Game.Skinning
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                            var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
+                            return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
@@ -387,8 +387,6 @@ namespace osu.Game.Skinning
                                     new BarHitErrorMeter(),
                                 }
                             };
-
-                            return skinnableTargetWrapper;
                     }
 
                     return null;
