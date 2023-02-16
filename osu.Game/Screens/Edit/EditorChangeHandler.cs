@@ -1,31 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// Tracks changes to the <see cref="Editor"/>.
     /// </summary>
-    public partial class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
+    public abstract partial class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
     {
         public readonly Bindable<bool> CanUndo = new Bindable<bool>();
         public readonly Bindable<bool> CanRedo = new Bindable<bool>();
 
-        public event Action OnStateChange;
+        public event Action? OnStateChange;
 
-        private readonly LegacyEditorBeatmapPatcher patcher;
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
         private int currentState = -1;
@@ -37,32 +31,28 @@ namespace osu.Game.Screens.Edit
         {
             get
             {
+                ensureStateSaved();
+
                 using (var stream = new MemoryStream(savedStates[currentState]))
                     return stream.ComputeSHA2Hash();
             }
         }
 
-        private readonly EditorBeatmap editorBeatmap;
         private bool isRestoring;
 
         public const int MAX_SAVED_STATES = 50;
 
-        /// <summary>
-        /// Creates a new <see cref="EditorChangeHandler"/>.
-        /// </summary>
-        /// <param name="editorBeatmap">The <see cref="EditorBeatmap"/> to track the <see cref="HitObject"/>s of.</param>
-        public EditorChangeHandler(EditorBeatmap editorBeatmap)
+        public override void BeginChange()
         {
-            this.editorBeatmap = editorBeatmap;
+            ensureStateSaved();
 
-            editorBeatmap.TransactionBegan += BeginChange;
-            editorBeatmap.TransactionEnded += EndChange;
-            editorBeatmap.SaveStateTriggered += SaveState;
+            base.BeginChange();
+        }
 
-            patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
-
-            // Initial state.
-            SaveState();
+        private void ensureStateSaved()
+        {
+            if (savedStates.Count == 0)
+                SaveState();
         }
 
         protected override void UpdateState()
@@ -72,9 +62,7 @@ namespace osu.Game.Screens.Edit
 
             using (var stream = new MemoryStream())
             {
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
-
+                WriteCurrentStateToStream(stream);
                 byte[] newState = stream.ToArray();
 
                 // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
@@ -113,7 +101,8 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = true;
 
-            patcher.Patch(savedStates[currentState], savedStates[newState]);
+            ApplyStateChange(savedStates[currentState], savedStates[newState]);
+
             currentState = newState;
 
             isRestoring = false;
@@ -121,6 +110,20 @@ namespace osu.Game.Screens.Edit
             OnStateChange?.Invoke();
             updateBindables();
         }
+
+        /// <summary>
+        /// Write a serialised copy of the currently tracked state to the provided stream.
+        /// This will be stored as a state which can be restored in the future.
+        /// </summary>
+        /// <param name="stream">The stream which the state should be written to.</param>
+        protected abstract void WriteCurrentStateToStream(MemoryStream stream);
+
+        /// <summary>
+        /// Given a previous and new state, apply any changes required to bring the current state in line with the new state.
+        /// </summary>
+        /// <param name="previousState">The previous (current before this call) serialised state.</param>
+        /// <param name="newState">The new state to be applied.</param>
+        protected abstract void ApplyStateChange(byte[] previousState, byte[] newState);
 
         private void updateBindables()
         {

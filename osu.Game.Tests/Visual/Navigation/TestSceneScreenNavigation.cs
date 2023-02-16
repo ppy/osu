@@ -564,6 +564,18 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestBeatmapListingLinkSearchOnInitialOpen()
+        {
+            BeatmapListingOverlay getBeatmapListingOverlay() => Game.ChildrenOfType<BeatmapListingOverlay>().FirstOrDefault();
+
+            AddStep("open beatmap overlay with test query", () => Game.SearchBeatmapSet("test"));
+
+            AddUntilStep("wait for beatmap overlay to load", () => getBeatmapListingOverlay()?.State.Value == Visibility.Visible);
+
+            AddAssert("beatmap overlay sorted by relevance", () => getBeatmapListingOverlay().ChildrenOfType<BeatmapListingSortTabControl>().Single().Current.Value == SortCriteria.Relevance);
+        }
+
+        [Test]
         public void TestMainOverlaysClosesNotificationOverlay()
         {
             ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();

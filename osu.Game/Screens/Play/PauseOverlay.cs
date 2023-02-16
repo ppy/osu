@@ -44,6 +44,14 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        public void StopAllSamples()
+        {
+            if (!IsLoaded)
+                return;
+
+            pauseLoop.Stop();
+        }
+
         protected override void PopIn()
         {
             base.PopIn();

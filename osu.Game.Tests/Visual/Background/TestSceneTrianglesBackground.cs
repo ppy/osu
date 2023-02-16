@@ -5,6 +5,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Framework.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -25,7 +26,10 @@ namespace osu.Game.Tests.Visual.Background
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColourLight = Color4.White,
-                    ColourDark = Color4.Gray
+                    ColourDark = Color4.Gray,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(0.9f)
                 }
             };
         }
@@ -35,6 +39,8 @@ namespace osu.Game.Tests.Visual.Background
             base.LoadComplete();
 
             AddSliderStep("Triangle scale", 0f, 10f, 1f, s => triangles.TriangleScale = s);
+            AddSliderStep("Seed", 0, 1000, 0, s => triangles.Reset(s));
+            AddToggleStep("Masking", m => triangles.Masking = m);
         }
     }
 }

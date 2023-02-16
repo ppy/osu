@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 
-    public partial class MuteComboSlider : OsuSliderBar<int>
+    public partial class MuteComboSlider : RoundedSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }
