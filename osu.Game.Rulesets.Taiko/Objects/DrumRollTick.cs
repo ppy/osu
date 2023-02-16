@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
+        public override double MaximumJudgementOffset => HitWindow;
+
         protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
 
         public class StrongNestedHit : StrongNestedHitObject

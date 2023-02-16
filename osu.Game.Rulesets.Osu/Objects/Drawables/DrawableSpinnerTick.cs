@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
         }
 
-        public override double MaximumJudgementOffset => DrawableSpinner.HitObject.Duration;
-
         /// <summary>
         /// Apply a judgement result.
         /// </summary>
