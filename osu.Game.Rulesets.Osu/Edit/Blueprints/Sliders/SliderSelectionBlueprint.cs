@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected SliderCircleOverlay TailOverlay { get; private set; }
 
         [CanBeNull]
-        protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
+        protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 if (ControlPointVisualiser == null)
                 {
-                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
+                    AddInternal(ControlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, true)
                     {
                         RemoveControlPointsRequested = removeControlPoints,
                         SplitControlPointsRequested = splitControlPoints
