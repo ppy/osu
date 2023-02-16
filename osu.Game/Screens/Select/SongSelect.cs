@@ -765,14 +765,18 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            ApplyToBackground(backgroundModeBeatmap =>
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
             {
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.IgnoreUserSettings.Value = true;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-                applyBlurToBackground(backgroundModeBeatmap);
-            });
+                    applyBlurToBackground(backgroundModeBeatmap);
+                });
+            }
 
             beatmapInfoWedge.Beatmap = beatmap;
 
