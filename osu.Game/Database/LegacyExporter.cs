@@ -26,7 +26,7 @@ namespace osu.Game.Database
         /// <remarks>
         /// This constant is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
         /// </remarks>
-        private const int max_path = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
+        protected const int MAX_PATH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
 
         /// <summary>
         /// The file extension for exports (including the leading '.').
@@ -60,11 +60,11 @@ namespace osu.Game.Database
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
-            if (filename.Length > max_path)
+            if (filename.Length > MAX_PATH)
             {
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
 
-                filenameWithoutExtension = filenameWithoutExtension.Remove(max_path - FileExtension.Length); //Truncating the name to fit the path limit
+                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_PATH - FileExtension.Length); //Truncating the name to fit the path limit
                 filename = $"{filenameWithoutExtension}{FileExtension}";
             }
 
