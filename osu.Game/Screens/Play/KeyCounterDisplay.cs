@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
     {
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
-        protected FillFlowContainer<KeyCounter> KeyFlow = new FillFlowContainer<KeyCounter>();
+        protected readonly FillFlowContainer<KeyCounter> KeyFlow = new FillFlowContainer<KeyCounter>();
 
         protected override Container<KeyCounter> Content => KeyFlow;
 
