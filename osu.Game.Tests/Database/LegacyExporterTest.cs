@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Database
             var item = new TestPathInfo(filename);
 
             Assert.That(item.FileName.Length < TestLegacyExporter.GetMaxPath(), Is.True);
-            exportItemWithLongNameAndAssert(item, exportStorage, filename);
+            exportItemAndAssert(item, exportStorage, filename);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Database
             for (int i = 0; i < 10; i++)
             {
                 expectedFileName = i == 0 ? filename : $"{filename} ({i})";
-                exportItemWithLongNameAndAssert(item, exportStorage, expectedFileName);
+                exportItemAndAssert(item, exportStorage, expectedFileName);
             }
         }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Database
             var item = new TestPathInfo(fullname);
 
             Assert.That(item.FileName.Length > TestLegacyExporter.GetMaxPath(), Is.True);
-            exportItemWithLongNameAndAssert(item, exportStorage, expectedName);
+            exportItemAndAssert(item, exportStorage, expectedName);
         }
 
         [Test]
@@ -84,10 +84,10 @@ namespace osu.Game.Tests.Database
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
-                exportItemWithLongNameAndAssert(item, exportStorage, expectedName);
+                exportItemAndAssert(item, exportStorage, expectedName);
         }
 
-        private void exportItemWithLongNameAndAssert(IHasNamedFiles item, Storage? exportStorage, string expectedName)
+        private void exportItemAndAssert(IHasNamedFiles item, Storage? exportStorage, string expectedName)
         {
             Assert.DoesNotThrow(() => legacyExporter?.Export(item));
             Assert.That(exportStorage?.Exists($"{expectedName}{legacyExporter?.GetExtension()}"), Is.True);
