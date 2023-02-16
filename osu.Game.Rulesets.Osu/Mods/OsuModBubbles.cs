@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private readonly Bindable<int> currentCombo = new BindableInt();
 
         private float maxSize;
-        private float bubbleRadius;
+        private float bubbleSize;
         private double bubbleFade;
 
         private readonly DrawablePool<BubbleDrawable> bubblePool = new DrawablePool<BubbleDrawable>(100);
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Multiplying by 2 results in an initial size that is too large, hence 1.90 has been chosen
             // Also avoids the HitObject bleeding around the edges of the bubble drawable at minimum size
-            bubbleRadius = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
+            bubbleSize = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
             bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
 
             // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     BubbleDrawable bubble = bubblePool.Get();
 
                     bubble.DrawableOsuHitObject = drawableOsuHitObject;
-                    bubble.InitialSize = new Vector2(bubbleRadius);
+                    bubble.InitialSize = new Vector2(bubbleSize);
                     bubble.FadeTime = bubbleFade;
                     bubble.MaxSize = maxSize;
 
@@ -122,8 +122,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             public DrawableOsuHitObject? DrawableOsuHitObject { get; set; }
 
             public Vector2 InitialSize { get; set; }
-            public double FadeTime { get; set; }
+
             public float MaxSize { get; set; }
+
+            public double FadeTime { get; set; }
 
             private readonly Box colourBox;
             private readonly CircularContainer content;
@@ -155,12 +157,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Debug.Assert(DrawableOsuHitObject.IsNotNull());
 
                 Colour = DrawableOsuHitObject.IsHit ? Colour4.White : Colour4.Black;
-                Alpha = 1;
                 Scale = new Vector2(1);
-                Position = getPosition();
+                Position = getPosition(DrawableOsuHitObject);
                 Size = InitialSize;
-                content.BorderThickness = InitialSize.X / 3.5f;
-                content.BorderColour = Colour4.White;
 
                 //We want to fade to a darker colour to avoid colours such as white hiding the "ripple" effect.
                 ColourInfo colourDarker = DrawableOsuHitObject.AccentColour.Value.Darken(0.1f);
@@ -169,13 +168,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double getAnimationDuration = 1700 + Math.Pow(FadeTime, 1.07f);
 
                 // Main bubble scaling based on combo
-                this.ScaleTo(MaxSize, getAnimationDuration * 0.8f)
+                this.FadeTo(1)
+                    .ScaleTo(MaxSize, getAnimationDuration * 0.8f)
                     .Then()
                     // Pop at the end of the bubbles life time
                     .ScaleTo(MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
                     .FadeOut(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
 
                 if (!DrawableOsuHitObject.IsHit) return;
+
+                content.BorderThickness = InitialSize.X / 3.5f;
+                content.BorderColour = Colour4.White;
 
                 colourBox.FadeColour(colourDarker);
 
@@ -184,23 +187,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                 content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
                        // Avoids transparency overlap issues during the bubble "pop"
                        .Then().Schedule(() => content.BorderThickness = 0);
+            }
 
-                Vector2 getPosition()
+            private Vector2 getPosition(DrawableOsuHitObject drawableOsuHitObject)
+            {
+                switch (drawableOsuHitObject)
                 {
-                    switch (DrawableOsuHitObject)
-                    {
-                        // SliderHeads are derived from HitCircles,
-                        // so we must handle them before to avoid them using the wrong positioning logic
-                        case DrawableSliderHead:
-                            return DrawableOsuHitObject.HitObject.Position;
+                    // SliderHeads are derived from HitCircles,
+                    // so we must handle them before to avoid them using the wrong positioning logic
+                    case DrawableSliderHead:
+                        return drawableOsuHitObject.HitObject.Position;
 
-                        // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
-                        case DrawableHitCircle:
-                            return DrawableOsuHitObject.Position;
+                    // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
+                    case DrawableHitCircle:
+                        return drawableOsuHitObject.Position;
 
-                        default:
-                            return DrawableOsuHitObject.HitObject.Position;
-                    }
+                    default:
+                        return drawableOsuHitObject.HitObject.Position;
                 }
             }
         }
