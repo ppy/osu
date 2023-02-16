@@ -45,9 +45,9 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup targetComponent)
+            if (lookup is SkinComponentsContainerLookup containerLookup)
             {
-                switch (targetComponent.Target)
+                switch (containerLookup.Target)
                 {
                     case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.

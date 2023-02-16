@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup componentLookup)
+            if (lookup is SkinComponentsContainerLookup containerLookup)
             {
-                switch (componentLookup.Target)
+                switch (containerLookup.Target)
                 {
                     case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
                         var components = base.GetDrawableComponent(lookup) as Container;
