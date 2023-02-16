@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return false;
 
-            LightUp(forwards);
+            Activate(forwards);
             return false;
         }
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return;
 
-            Unlight(forwards);
+            Deactivate(forwards);
         }
     }
 }
