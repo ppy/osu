@@ -194,16 +194,11 @@ namespace osu.Game.Rulesets.UI
 
             Audio = audioContainer;
 
-            if (UseResumeOverlay)
+            if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
-                if ((ResumeOverlay = CreateResumeOverlay()) == null)
-                    UseResumeOverlay = false;
-                else
-                {
-                    AddInternal(CreateInputManager()
-                        .WithChild(CreatePlayfieldAdjustmentContainer()
-                            .WithChild(ResumeOverlay)));
-                }
+                AddInternal(CreateInputManager()
+                    .WithChild(CreatePlayfieldAdjustmentContainer()
+                        .WithChild(ResumeOverlay)));
             }
 
             applyRulesetMods(Mods, config);
@@ -515,7 +510,10 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
         /// </summary>
-        /// <remarks>Defaults to <c>true</c>, but will become <c>false</c> if the ruleset fails to return a non-null overlay via <see cref="CreateResumeOverlay"/>.</remarks>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// Even if <c>true</c>, will not have any effect if the ruleset does not have a resume overlay (see <see cref="CreateResumeOverlay"/>).
+        /// </remarks>
         public bool UseResumeOverlay { get; set; } = true;
 
         /// <summary>
@@ -542,6 +540,11 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        /// <summary>
+        /// Create an optional resume overlay, which is displayed when a player requests to resume gameplay during non-break time.
+        /// This can be used to force the player to return their hands / cursor to the position they left off, to avoid players
+        /// using pauses as a means of adjusting their inputs (aka "pause buffering").
+        /// </summary>
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
