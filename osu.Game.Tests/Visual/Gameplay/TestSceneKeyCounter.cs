@@ -46,12 +46,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 1);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 2);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
             AddStep("Disable counting", () => testCounter.IsCounting = false);
             addPressKeyStep();
-            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses == 2);
+            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
             Add(kc);
         }

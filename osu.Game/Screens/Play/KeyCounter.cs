@@ -12,28 +12,18 @@ namespace osu.Game.Screens.Play
     {
         public readonly InputTrigger Trigger;
 
-        protected Bindable<bool> IsCountingBindable = new BindableBool(true);
-
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
-        protected Bindable<int> PressesCount = new BindableInt
+        private readonly Bindable<int> countPresses = new BindableInt
         {
             MinValue = 0
         };
 
-        public bool IsCounting
-        {
-            get => IsCountingBindable.Value;
-            set => IsCountingBindable.Value = value;
-        }
+        public bool IsCounting { get; set; } = true;
 
-        public int CountPresses
-        {
-            get => PressesCount.Value;
-            private set => PressesCount.Value = value;
-        }
+        public IBindable<int> CountPresses => countPresses;
 
         protected KeyCounter(InputTrigger trigger)
         {
@@ -59,7 +49,7 @@ namespace osu.Game.Screens.Play
             if (!IsCounting)
                 return;
 
-            CountPresses++;
+            countPresses.Value++;
         }
 
         public void Decrement()
@@ -67,7 +57,7 @@ namespace osu.Game.Screens.Play
             if (!IsCounting)
                 return;
 
-            CountPresses--;
+            countPresses.Value--;
         }
 
         protected virtual void LightUp(bool increment = true)

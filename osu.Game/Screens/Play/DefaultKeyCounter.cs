@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
                         },
                         countSpriteText = new OsuSpriteText
                         {
-                            Text = CountPresses.ToString(@"#,0"),
+                            Text = CountPresses.Value.ToString(@"#,0"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play
             Width = buttonSprite.DrawWidth;
 
             IsLit.BindValueChanged(e => updateGlowSprite(e.NewValue), true);
-            PressesCount.BindValueChanged(e => countSpriteText.Text = e.NewValue.ToString(@"#,0"), true);
+            CountPresses.BindValueChanged(e => countSpriteText.Text = e.NewValue.ToString(@"#,0"), true);
         }
 
         private void updateGlowSprite(bool show)

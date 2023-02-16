@@ -69,10 +69,10 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for gameplay", () => player?.IsBreakTime.Value == false);
 
             AddStep("press 'z'", () => InputManager.Key(Key.Z));
-            AddAssert("key counter didn't increase", () => keyCounter.CountPresses == 0);
+            AddAssert("key counter didn't increase", () => keyCounter.CountPresses.Value == 0);
 
             AddStep("press 's'", () => InputManager.Key(Key.S));
-            AddAssert("key counter did increase", () => keyCounter.CountPresses == 1);
+            AddAssert("key counter did increase", () => keyCounter.CountPresses.Value == 1);
         }
 
         private KeyBindingsSubsection osuBindingSubsection => keyBindingPanel
