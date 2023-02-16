@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void ExportFileWithNormalName()
+        public void ExportFileWithNormalNameTest()
         {
             var exportStorage = storage?.GetStorageForDirectory(@"exports");
 
@@ -30,23 +30,65 @@ namespace osu.Game.Tests.Database
             var item = new TestPathInfo(filename);
 
             Assert.That(item.FileName.Length < TestLegacyExporter.GetMaxPath(), Is.True);
-            Assert.DoesNotThrow(() => legacyExporter?.Export(item));
-            Assert.That(exportStorage?.Exists($"{filename}{legacyExporter?.GetExtension()}"), Is.True);
+            exportItemWithLongNameAndAssert(item, exportStorage, filename);
         }
 
         [Test]
-        public void ExportFileWithSuperLongName()
+        public void ExportFileWithNormalNameMultipleTimesTest()
+        {
+            var exportStorage = storage?.GetStorageForDirectory(@"exports");
+
+            const string filename = "normal file name";
+            var item = new TestPathInfo(filename);
+
+            Assert.That(item.FileName.Length < TestLegacyExporter.GetMaxPath(), Is.True);
+
+            //Export multiple times
+            string expectedFileName;
+            for (int i = 0; i < 10; i++)
+            {
+                expectedFileName = i == 0 ? filename : $"{filename} ({i})";
+                exportItemWithLongNameAndAssert(item, exportStorage, expectedFileName);
+            }
+        }
+
+        [Test]
+        public void ExportFileWithSuperLongNameTest()
         {
             var exportStorage = storage?.GetStorageForDirectory(@"exports");
 
             const string fullname = "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
 
-            int capacity = TestLegacyExporter.GetMaxPath() - (legacyExporter?.GetExtension().Length ?? 0);
-            string expectedName = fullname.Remove(capacity);
+            int expectedLength = TestLegacyExporter.GetMaxPath() - (legacyExporter?.GetExtension().Length ?? 0);
+            string expectedName = fullname.Remove(expectedLength);
 
             var item = new TestPathInfo(fullname);
 
             Assert.That(item.FileName.Length > TestLegacyExporter.GetMaxPath(), Is.True);
+            exportItemWithLongNameAndAssert(item, exportStorage, expectedName);
+        }
+
+        [Test]
+        public void ExportFileWithSuperLongNameMultipleTimesTest()
+        {
+            var exportStorage = storage?.GetStorageForDirectory(@"exports");
+
+            const string fullname = "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
+
+            int expectedLength = TestLegacyExporter.GetMaxPath() - (legacyExporter?.GetExtension().Length ?? 0);
+            string expectedName = fullname.Remove(expectedLength);
+
+            var item = new TestPathInfo(fullname);
+
+            Assert.That(item.FileName.Length > TestLegacyExporter.GetMaxPath(), Is.True);
+
+            //Export multiple times
+            for (int i = 0; i < 10; i++)
+                exportItemWithLongNameAndAssert(item, exportStorage, expectedName);
+        }
+
+        private void exportItemWithLongNameAndAssert(IHasNamedFiles item, Storage? exportStorage, string expectedName)
+        {
             Assert.DoesNotThrow(() => legacyExporter?.Export(item));
             Assert.That(exportStorage?.Exists($"{expectedName}{legacyExporter?.GetExtension()}"), Is.True);
         }
