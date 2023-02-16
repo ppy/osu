@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -26,6 +27,7 @@ using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Play
 {
@@ -100,6 +102,8 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
+            SkinComponentsContainer rulesetComponents;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -110,10 +114,8 @@ namespace osu.Game.Screens.Play
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 tally = new JudgementTally(),
-                mainComponents = new MainComponentsContainer
-                {
-                    AlwaysPresent = true,
-                },
+                mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
+                rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset) { AlwaysPresent = true, },
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -155,7 +157,7 @@ namespace osu.Game.Screens.Play
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
             };
 
-            hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, KeyCounter, topRightElements };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -390,15 +392,15 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private partial class MainComponentsContainer : SkinComponentsContainer
+        private partial class HUDComponentsContainer : SkinComponentsContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
             [Resolved]
             private OsuConfigManager config { get; set; }
 
-            public MainComponentsContainer()
-                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents))
+            public HUDComponentsContainer([CanBeNull] Ruleset ruleset = null)
+                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;
             }
