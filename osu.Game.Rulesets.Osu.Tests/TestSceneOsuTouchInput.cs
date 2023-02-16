@@ -593,7 +593,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (e.Action == Action)
                 {
-                    LightUp();
+                    Activate();
                 }
 
                 return false;
@@ -602,7 +602,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
                 if (e.Action == Action)
-                    Unlight();
+                    Deactivate();
             }
         }
 

@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Play
                 Trigger = trigger,
             };
 
-            Trigger.OnLightUp += LightUp;
-            Trigger.OnUnlight += Unlight;
+            Trigger.OnActivate += Activate;
+            Trigger.OnDeactivate += Deactivate;
 
             Name = trigger.Name;
         }
@@ -60,14 +60,14 @@ namespace osu.Game.Screens.Play
             countPresses.Value--;
         }
 
-        protected virtual void LightUp(bool increment = true)
+        protected virtual void Activate(bool increment = true)
         {
             IsLit.Value = true;
             if (increment)
                 Increment();
         }
 
-        protected virtual void Unlight(bool preserve = true)
+        protected virtual void Deactivate(bool preserve = true)
         {
             IsLit.Value = false;
             if (!preserve)
@@ -77,23 +77,23 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Trigger.OnLightUp -= LightUp;
-            Trigger.OnUnlight -= Unlight;
+            Trigger.OnActivate -= Activate;
+            Trigger.OnDeactivate -= Deactivate;
         }
 
         public abstract partial class InputTrigger : Component
         {
-            public event Action<bool>? OnLightUp;
-            public event Action<bool>? OnUnlight;
+            public event Action<bool>? OnActivate;
+            public event Action<bool>? OnDeactivate;
 
             protected InputTrigger(string name)
             {
                 Name = name;
             }
 
-            protected void LightUp(bool increment = true) => OnLightUp?.Invoke(increment);
+            protected void Activate(bool forwardPlayback = true) => OnActivate?.Invoke(forwardPlayback);
 
-            protected void Unlight(bool preserve = true) => OnUnlight?.Invoke(preserve);
+            protected void Deactivate(bool forwardPlayback = true) => OnDeactivate?.Invoke(forwardPlayback);
         }
     }
 }
