@@ -505,7 +505,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
-        public ResumeOverlay ResumeOverlay { get; set; }
+        public ResumeOverlay ResumeOverlay { get; protected set; }
 
         /// <summary>
         /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
