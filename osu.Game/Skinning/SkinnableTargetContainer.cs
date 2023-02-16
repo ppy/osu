@@ -2,16 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
     public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
-        private SkinnableTargetComponentsContainer? content;
+        private Container? content;
 
         public GlobalSkinComponentLookup.LookupType Target { get; }
 
@@ -30,16 +33,32 @@ namespace osu.Game.Skinning
             Target = target;
         }
 
-        /// <summary>
-        /// Reload all components in this container from the current skin.
-        /// </summary>
-        public void Reload()
+        public void Reload(SkinnableInfo[] skinnableInfo)
+        {
+            var drawables = new List<Drawable>();
+
+            foreach (var i in skinnableInfo)
+                drawables.Add(i.CreateInstance());
+
+            Reload(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = drawables,
+            });
+        }
+
+        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as Container);
+
+        public void Reload(Container? componentsContainer)
         {
             ClearInternal();
             components.Clear();
             ComponentsLoaded = false;
 
-            content = CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer;
+            if (componentsContainer == null)
+                return;
+
+            content = componentsContainer;
 
             cancellationSource?.Cancel();
             cancellationSource = null;

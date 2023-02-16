@@ -374,7 +374,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void OnFree()
         {
-            slidingSample.Samples = null;
+            slidingSample.ClearSamples();
             base.OnFree();
         }
     }

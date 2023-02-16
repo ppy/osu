@@ -47,7 +47,11 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
-                new MedalHeaderContainer
+                new BannerHeaderContainer
+                {
+                    User = { BindTarget = User },
+                },
+                new BadgeHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },

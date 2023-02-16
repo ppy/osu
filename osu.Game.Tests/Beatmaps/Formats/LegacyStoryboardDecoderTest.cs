@@ -214,7 +214,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(oneTime.EndTime, Is.EqualTo(4000 + loop_duration));
 
                 StoryboardSprite manyTimes = background.Elements.OfType<StoryboardSprite>().Single(s => s.Path == "many-times.png");
-                Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + 40 * loop_duration));
+                // It is intentional that we don't consider the loop count (40) as part of the end time calculation to match stable's handling.
+                // If we were to include the loop count, storyboards which loop for stupid long loop counts would continue playing the outro forever.
+                Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + loop_duration));
             }
         }
     }
