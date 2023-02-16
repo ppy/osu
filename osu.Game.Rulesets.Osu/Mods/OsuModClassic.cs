@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Fade out hit circles earlier", "Make hit circles fade out into a miss, rather than after it.")]
         public Bindable<bool> FadeHitCircleEarly { get; } = new Bindable<bool>(true);
 
-        private bool hiddenModActive;
+        private bool usingHiddenFading;
 
         public void ApplyToHitObject(HitObject hitObject)
         {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
 
-            hiddenModActive = drawableRuleset.Mods.OfType<ModHidden>().Any();
+            usingHiddenFading = !drawableRuleset.Mods.OfType<OsuModHidden>().FirstOrDefault()?.OnlyFadeApproachCircles.Value ?? false;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject obj)
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableSliderHead head:
                     head.TrackFollowCircle = !NoSliderHeadMovement.Value;
-                    if (FadeHitCircleEarly.Value && !hiddenModActive)
+                    if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(head);
                     break;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableHitCircle circle:
-                    if (FadeHitCircleEarly.Value && !hiddenModActive)
+                    if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(circle);
                     break;
             }
