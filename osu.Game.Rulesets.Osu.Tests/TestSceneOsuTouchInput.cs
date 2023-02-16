@@ -593,7 +593,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (e.Action == Action)
                 {
-                    Light();
+                    LightUp();
                 }
 
                 return false;

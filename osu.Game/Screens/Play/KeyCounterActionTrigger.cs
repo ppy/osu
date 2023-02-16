@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return false;
 
-            Light(forwards);
+            LightUp(forwards);
             return false;
         }
 
