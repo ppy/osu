@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -28,10 +27,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
     {
-        private ISkin currentBeatmapSkin;
+        private ISkin currentBeatmapSkin = null!;
 
         [Resolved]
-        private SkinManager skinManager { get; set; }
+        private SkinManager skinManager { get; set; } = null!;
 
         protected override bool HasCustomSteps => true;
 
@@ -57,15 +56,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType target, ISkin expectedSource)
         {
-            var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+            var targetContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target);
+            var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
                 return false;
 
             var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target));
+            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target)) as Container;
             if (expectedComponentsContainer == null)
                 return false;
 
@@ -92,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             return almostEqual(actualInfo, expectedInfo);
         }
 
-        private static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
+        private static bool almostEqual(SkinnableInfo info, SkinnableInfo? other) =>
             other != null
             && info.Type == other.Type
             && info.Anchor == other.Anchor
@@ -102,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             && Precision.AlmostEquals(info.Rotation, other.Rotation)
             && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);
 
         protected override Ruleset CreatePlayerRuleset() => new TestOsuRuleset();
@@ -111,7 +110,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             private readonly ISkin beatmapSkin;
 
-            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
+            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
                 : base(beatmap, storyboard, referenceClock, audio)
             {
                 this.beatmapSkin = beatmapSkin;
