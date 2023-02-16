@@ -109,6 +109,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestCorrectHitObject()
         {
             waitForAliveObjectIndex(null);
+            checkValidObjectIndex(0);
 
             seekBeforeIndex(0);
             waitForAliveObjectIndex(0);
