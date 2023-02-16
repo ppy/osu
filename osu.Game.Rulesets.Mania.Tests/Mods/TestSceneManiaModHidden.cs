@@ -17,6 +17,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestCoverage(float coverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { Coverage = { Value = coverage } }, PassCondition = () => true });
 
         [Test]
-        public void TestComboBasedCoverage([Values] bool coverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { ComboBasedCoverage = { Value = coverage } }, PassCondition = () => true });
+        public void TestComboBasedCoverage([Values] bool comboBased) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { ComboBasedCoverage = { Value = comboBased } }, PassCondition = () => true });
     }
 }
