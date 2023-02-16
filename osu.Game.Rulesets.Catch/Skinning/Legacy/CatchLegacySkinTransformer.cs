@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 switch (targetComponent.Lookup)
                 {
                     case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
-                        var components = base.GetDrawableComponent(lookup) as SkinnableTargetComponentsContainer;
+                        var components = base.GetDrawableComponent(lookup) as Container;
 
                         if (providesComboCounter && components != null)
                         {
