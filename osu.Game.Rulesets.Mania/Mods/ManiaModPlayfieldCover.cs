@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
@@ -21,7 +20,10 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
     {
-        private const float combo_to_reach_max_coverage = 500;
+        private const float combo_to_reach_max_coverage = 480;
+
+        private float currentCoverage;
+        private float coverageRange;
 
         private List<PlayfieldCoveringWrapper> coveringWrappers = null!;
         private IFrameBasedClock clock = null!;
@@ -38,24 +40,26 @@ namespace osu.Game.Rulesets.Mania.Mods
         [SettingSource("Change coverage based on combo", "Increase the coverage as combo increases.")]
         public BindableBool ComboBasedCoverage => new BindableBool(true);
 
-        protected readonly BindableInt Combo = new BindableInt();
+        private readonly BindableInt combo = new BindableInt();
 
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            Combo.BindTo(scoreProcessor.Combo);
+            combo.BindTo(scoreProcessor.Combo);
 
-            // Default value of ScoreProcessor's Rank in Hidden/Fadein Mod should be SS+
-            scoreProcessor.Rank.Value = ScoreRank.XH;
+            base.ApplyToScoreProcessor(scoreProcessor);
         }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
+            coveringWrappers = new List<PlayfieldCoveringWrapper>();
+            clock = maniaPlayfield.Clock;
+            currentCoverage = Coverage.Value;
+            coverageRange = Coverage.MaxValue - Coverage.Value;
 
             if (ComboBasedCoverage.Value)
             {
-                coveringWrappers = new List<PlayfieldCoveringWrapper>();
-                clock = maniaPlayfield.Clock;
+                maniaPlayfield.OnUpdate += _ => updateCoverage();
             }
 
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
@@ -73,12 +77,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 });
 
                 hocParent.Add(coveringWrapper);
-
-                if (ComboBasedCoverage.Value)
-                {
-                    Combo.ValueChanged += _ => updateCoverage();
-                    coveringWrappers.Add(coveringWrapper);
-                }
+                coveringWrappers.Add(coveringWrapper);
             }
         }
 
@@ -92,16 +91,21 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private void updateCoverage()
         {
-            float coverage = getComboBasedCoverageAmount();
-            foreach (PlayfieldCoveringWrapper wrapper in coveringWrappers)
-                wrapper.Coverage = coverage;
+            float targetCoverage = getComboBasedCoverageAmount();
+
+            if (targetCoverage != currentCoverage)
+            {
+                currentCoverage = targetCoverage;
+                foreach (PlayfieldCoveringWrapper wrapper in coveringWrappers)
+                    wrapper.Coverage = currentCoverage;
+            }
         }
 
         private float getComboBasedCoverageAmount()
         {
-            float targetCoverage = Coverage.Value + (Coverage.MaxValue - Coverage.Value) * Math.Min(1.0f, Combo.Value / combo_to_reach_max_coverage);
-            if (Coverage.Value > targetCoverage)
-                return Coverage.Value - 2 * (float)clock.ElapsedFrameTime;
+            float targetCoverage = Coverage.Value + coverageRange * Math.Min(1.0f, combo.Value / combo_to_reach_max_coverage);
+            if (currentCoverage > targetCoverage)
+                return currentCoverage - coverageRange * (float)clock.ElapsedFrameTime / 500;
             else
                 return targetCoverage;
         }
