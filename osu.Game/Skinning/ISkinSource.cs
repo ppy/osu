@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// An abstract skin implementation which generally provides access to more than one skins (with fallback logic).
+    /// An abstract skin implementation, whose primary purpose is to properly handle component fallback across multiple layers of skins (e.g.: beatmap skin, user skin, default skin).
     /// </summary>
     /// <remarks>
     /// Common usage is to do an initial lookup via <see cref="FindProvider"/>, and use the returned <see cref="ISkin"/>
