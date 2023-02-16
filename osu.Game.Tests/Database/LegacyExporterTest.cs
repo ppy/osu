@@ -2,9 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
 using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -29,7 +26,7 @@ namespace osu.Game.Tests.Database
         {
             var exportStorage = storage?.GetStorageForDirectory(@"exports");
 
-            string filename = "normal file name";
+            const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
             Assert.That(item.FileName.Length < TestLegacyExporter.GetMaxPath(), Is.True);
@@ -42,7 +39,7 @@ namespace osu.Game.Tests.Database
         {
             var exportStorage = storage?.GetStorageForDirectory(@"exports");
 
-            string fullname = "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
+            const string fullname = "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
 
             int capacity = TestLegacyExporter.GetMaxPath() - (legacyExporter?.GetExtension().Length ?? 0);
             string expectedName = fullname.Remove(capacity);
@@ -62,7 +59,7 @@ namespace osu.Game.Tests.Database
 
         private class TestPathInfo : IHasNamedFiles
         {
-            public string FileName { get; set; } = string.Empty;
+            public string FileName { get; set; }
 
             public TestPathInfo(string fileName) => FileName = fileName;
 
@@ -73,7 +70,10 @@ namespace osu.Game.Tests.Database
 
         private class TestLegacyExporter : LegacyExporter<IHasNamedFiles>
         {
-            public TestLegacyExporter(Storage storage) : base(storage) { }
+            public TestLegacyExporter(Storage storage)
+                : base(storage)
+            {
+            }
 
             public static int GetMaxPath() => MAX_PATH;
 
