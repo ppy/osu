@@ -66,10 +66,10 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            if (componentsContainer == null)
-                return;
-
-            content = componentsContainer;
+            content = componentsContainer ?? new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             cancellationSource?.Cancel();
             cancellationSource = null;
