@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -45,7 +46,9 @@ namespace osu.Game.Screens.Play
                 Trigger = trigger,
             };
 
-            Trigger.Target = this;
+            Trigger.OnLightUp += LightUp;
+            Trigger.OnUnlight += Unlight;
+
             Name = trigger.Name;
         }
 
@@ -67,37 +70,40 @@ namespace osu.Game.Screens.Play
             CountPresses--;
         }
 
+        protected virtual void LightUp(bool increment = true)
+        {
+            IsLit.Value = true;
+            if (increment)
+                Increment();
+        }
+
+        protected virtual void Unlight(bool preserve = true)
+        {
+            IsLit.Value = false;
+            if (!preserve)
+                Decrement();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Trigger.OnLightUp -= LightUp;
+            Trigger.OnUnlight -= Unlight;
+        }
+
         public abstract partial class InputTrigger : Component
         {
-            private KeyCounter? target;
-
-            public KeyCounter Target
-            {
-                set => target = value;
-            }
+            public event Action<bool>? OnLightUp;
+            public event Action<bool>? OnUnlight;
 
             protected InputTrigger(string name)
             {
                 Name = name;
             }
 
-            protected void Light(bool increment = true)
-            {
-                if (target == null) return;
+            protected void LightUp(bool increment = true) => OnLightUp?.Invoke(increment);
 
-                target.IsLit.Value = true;
-                if (increment)
-                    target.Increment();
-            }
-
-            protected void Unlight(bool preserve = true)
-            {
-                if (target == null) return;
-
-                target.IsLit.Value = false;
-                if (!preserve)
-                    target.Decrement();
-            }
+            protected void Unlight(bool preserve = true) => OnUnlight?.Invoke(preserve);
         }
     }
 }

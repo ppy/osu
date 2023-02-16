@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
         {
             if (e.Key == Key)
             {
-                Light();
+                LightUp();
             }
 
             return base.OnKeyDown(e);

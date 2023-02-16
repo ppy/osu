@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button == Button)
-                Light();
+                LightUp();
 
             return base.OnMouseDown(e);
         }
