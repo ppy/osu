@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Audio;
@@ -20,10 +18,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneGameplaySampleTriggerSource : PlayerTestScene
     {
-        private TestGameplaySampleTriggerSource sampleTriggerSource;
+        private TestGameplaySampleTriggerSource sampleTriggerSource = null!;
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
-        private Beatmap beatmap;
+        private Beatmap beatmap = null!;
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -80,7 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCorrectHitObject()
         {
-            HitObjectLifetimeEntry nextObjectEntry = null;
+            HitObjectLifetimeEntry? nextObjectEntry = null;
 
             AddAssert("no alive objects", () => getNextAliveObject() == null);
 
@@ -103,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("hit first hitobject", () =>
             {
                 InputManager.Click(MouseButton.Left);
-                return nextObjectEntry.Result?.HasResult == true;
+                return nextObjectEntry?.Result?.HasResult == true;
             });
 
             AddAssert("check correct object after hit", () => sampleTriggerSource.GetMostValidObject() == beatmap.HitObjects[1]);
@@ -115,7 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("check correct object after none alive", () => sampleTriggerSource.GetMostValidObject() == beatmap.HitObjects[3]);
         }
 
-        private DrawableHitObject getNextAliveObject() =>
+        private DrawableHitObject? getNextAliveObject() =>
             Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
 
         [Test]
