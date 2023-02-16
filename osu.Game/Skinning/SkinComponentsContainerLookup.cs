@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets;
+
 namespace osu.Game.Skinning
 {
     /// <summary>
@@ -13,9 +15,14 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly TargetArea Target;
 
-        public SkinComponentsContainerLookup(TargetArea target)
+        public readonly Ruleset? Ruleset;
+
+        public string GetSerialisableIdentifier() => Ruleset?.ShortName ?? "global";
+
+        public SkinComponentsContainerLookup(TargetArea target, Ruleset? ruleset = null)
         {
             Target = target;
+            Ruleset = ruleset;
         }
 
         /// <summary>
