@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double lazerLikelihoodGradient(double d)
             {
                 if (d <= 0)
-                    return double.PositiveInfinity;
+                    return 0;
 
                 double pMaxNote = hitProb(hMax, d);
                 double p300Note = hitProb(h300, d) - hitProb(hMax, d);
@@ -244,16 +244,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double hitProb(double x, double deviation)
         {
-            return erfApprox(x / (deviation * Math.Sqrt(2)));
-        }
-
-        private double erfApprox(double x)
-        {
-            if (x <= 5)
-                return SpecialFunctions.Erf(x);
-
-            // This approximation is very accurate with values over 5, and is much more performant than the Erf function
-            return 1 - Math.Exp(-Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)));
+            return SpecialFunctions.Erf(x / (deviation * Math.Sqrt(2)));
         }
     }
 }
