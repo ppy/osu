@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Database
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
-            Assert.That(item.Filename.Length < TestLegacyExporter.GetMaxPath(), Is.True);
+            Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.GetMaxPathLength()));
             exportItemAndAssert(item, exportStorage, filename);
         }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Database
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
-            Assert.That(item.Filename.Length < TestLegacyExporter.GetMaxPath(), Is.True);
+            Assert.That(item.Filename.Length < TestLegacyExporter.GetMaxPathLength(), Is.True);
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
@@ -60,12 +60,12 @@ namespace osu.Game.Tests.Database
             const string fullname =
                 "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
 
-            int expectedLength = TestLegacyExporter.GetMaxPath() - (legacyExporter.GetExtension().Length);
+            int expectedLength = TestLegacyExporter.GetMaxPathLength() - (legacyExporter.GetExtension().Length);
             string expectedName = fullname.Remove(expectedLength);
 
             var item = new TestPathInfo(fullname);
 
-            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPath(), Is.True);
+            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPathLength(), Is.True);
             exportItemAndAssert(item, exportStorage, expectedName);
         }
 
@@ -77,12 +77,12 @@ namespace osu.Game.Tests.Database
             const string fullname =
                 "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
 
-            int expectedLength = TestLegacyExporter.GetMaxPath() - (legacyExporter.GetExtension().Length);
+            int expectedLength = TestLegacyExporter.GetMaxPathLength() - (legacyExporter.GetExtension().Length);
             string expectedName = fullname.Remove(expectedLength);
 
             var item = new TestPathInfo(fullname);
 
-            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPath(), Is.True);
+            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPathLength(), Is.True);
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Database
             {
             }
 
-            public static int GetMaxPath() => MAX_PATH;
+            public static int GetMaxPathLength() => MAX_FILENAME_LENGTH;
 
             public string GetExtension() => FileExtension;
 
