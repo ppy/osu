@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +26,7 @@ namespace osu.Game.Skinning
     [Serializable]
     public sealed class SerialisedDrawableInfo
     {
-        public Type Type { get; set; }
+        public Type Type { get; set; } = null!;
 
         public Vector2 Position { get; set; }
 
@@ -66,8 +64,8 @@ namespace osu.Game.Skinning
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            if (component is ISerialisableDrawable skinnable)
-                UsesFixedAnchor = skinnable.UsesFixedAnchor;
+            if (component is ISerialisableDrawable serialisableDrawable)
+                UsesFixedAnchor = serialisableDrawable.UsesFixedAnchor;
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
             {
