@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Play
             defaultKey.KeyUpTextColor = KeyUpTextColor;
         }
 
-        protected override bool CheckType(KeyCounter key) => key is DefaultKeyCounter;
-
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
             KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
