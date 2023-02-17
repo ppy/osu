@@ -34,11 +34,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
-        [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
-        public abstract BindableNumber<float> Coverage { get; }
+        [SettingSource("Minimum Coverage", "The minimum proportion of playfield height that notes will be hidden for.")]
+        public abstract BindableNumber<float> MinCoverage { get; }
 
-        [SettingSource("Change coverage based on combo", "Increase the coverage as combo increases.")]
-        public BindableBool ComboBasedCoverage => new BindableBool(true);
+        [SettingSource("Maximum Coverage", "The maximum proportion of playfield height that notes will be hidden for.")]
+        public abstract BindableNumber<float> MaxCoverage { get; }
 
         private readonly BindableInt combo = new BindableInt();
 
@@ -54,10 +54,10 @@ namespace osu.Game.Rulesets.Mania.Mods
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
             coveringWrappers = new List<PlayfieldCoveringWrapper>();
             clock = maniaPlayfield.Clock;
-            currentCoverage = Coverage.Value;
-            coverageRange = Coverage.MaxValue - Coverage.Value;
+            currentCoverage = MinCoverage.Value;
+            coverageRange = Math.Max(0, MaxCoverage.Value - MinCoverage.Value);
 
-            if (ComboBasedCoverage.Value)
+            if (coverageRange > 0)
             {
                 maniaPlayfield.OnUpdate += _ => updateCoverage();
             }
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
-                    c.Coverage = Coverage.Value;
+                    c.Coverage = MinCoverage.Value;
                 });
 
                 hocParent.Add(coveringWrapper);
@@ -103,8 +103,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private float getComboBasedCoverageAmount()
         {
-            float targetCoverage = Coverage.Value + coverageRange * Math.Min(1.0f, combo.Value / combo_to_reach_max_coverage);
-            if (currentCoverage > targetCoverage)
+            float targetCoverage = MinCoverage.Value + coverageRange * Math.Min(1.0f, combo.Value / combo_to_reach_max_coverage);
+            if (currentCoverage > targetCoverage && clock.ElapsedFrameTime > 0)
                 return currentCoverage - coverageRange * (float)clock.ElapsedFrameTime / 500;
             else
                 return targetCoverage;

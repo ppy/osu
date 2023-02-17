@@ -11,12 +11,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
-        [TestCase(0.3f)]
-        [TestCase(0.2f)]
-        [TestCase(0.8f)]
-        public void TestCoverage(float coverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { Coverage = { Value = coverage } }, PassCondition = () => true });
-
-        [Test]
-        public void TestComboBasedCoverage([Values] bool comboBased) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { ComboBasedCoverage = { Value = comboBased } }, PassCondition = () => true });
+        [TestCase(0.3f, 0.6f)]
+        [TestCase(0.2f, 0.2f)]
+        [TestCase(0.8f, 0.8f)]
+        [TestCase(0.2f, 0.8f)]
+        public void TestCoverage(float minCoverage, float maxCoverage) => CreateModTest(new ModTestData { Mod = new ManiaModHidden { MinCoverage = { Value = minCoverage }, MaxCoverage = { Value = maxCoverage } }, PassCondition = () => true });
     }
 }
