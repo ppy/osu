@@ -64,8 +64,8 @@ namespace osu.Game.Skinning
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            if (component is ISerialisableDrawable skinnable)
-                UsesFixedAnchor = skinnable.UsesFixedAnchor;
+            if (component is ISerialisableDrawable serialisableDrawable)
+                UsesFixedAnchor = serialisableDrawable.UsesFixedAnchor;
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
             {
