@@ -221,6 +221,8 @@ namespace osu.Game.Overlays.SkinEditor
             }, true);
 
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
+
+            selectedTarget.BindValueChanged(targetChanged, true);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -274,10 +276,6 @@ namespace osu.Game.Overlays.SkinEditor
 
                 content.Child = new SkinBlueprintContainer(targetScreen);
 
-                selectedTarget.Default = getFirstTarget()?.Lookup;
-                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
-                    selectedTarget.Value = getFirstTarget()?.Lookup;
-
                 componentsSidebar.Children = new[]
                 {
                     new EditorSidebarSection("Current working layer")
@@ -291,12 +289,39 @@ namespace osu.Game.Overlays.SkinEditor
                             }
                         }
                     },
-                    new SkinComponentToolbox(getFirstTarget())
-                    {
-                        RequestPlacement = placeComponent
-                    }
                 };
+
+                selectedTarget.Default = getFirstTarget()?.Lookup;
+
+                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
+                    selectedTarget.Value = getFirstTarget()?.Lookup;
+                else
+                    selectedTarget.TriggerChange();
             }
+        }
+
+        private void targetChanged(ValueChangedEvent<SkinComponentsContainerLookup?> target)
+        {
+            foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
+                toolbox.Expire();
+
+            if (target.NewValue == null)
+                return;
+
+            // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
+            if (target.NewValue.Ruleset != null)
+            {
+                componentsSidebar.Add(new SkinComponentToolbox(getTarget(target.NewValue))
+                {
+                    RequestPlacement = placeComponent
+                });
+            }
+
+            // Remove the ruleset from the lookup to get base components.
+            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            {
+                RequestPlacement = placeComponent
+            });
         }
 
         private void skinChanged()
@@ -331,7 +356,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
         {
-            var targetContainer = getFirstTarget();
+            var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer == null)
                 return;
@@ -364,9 +389,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
+        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
         {
-            return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
         }
 
         private void revert()
@@ -378,7 +403,7 @@ namespace osu.Game.Overlays.SkinEditor
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Lookup.Target)?.Reload();
+                getTarget(t.Lookup)?.Reload();
             }
         }
 

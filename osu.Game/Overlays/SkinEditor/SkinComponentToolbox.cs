@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -21,12 +22,12 @@ namespace osu.Game.Overlays.SkinEditor
     {
         public Action<Type>? RequestPlacement;
 
-        private readonly CompositeDrawable? target;
+        private readonly SkinComponentsContainer? target;
 
         private FillFlowContainer fill = null!;
 
-        public SkinComponentToolbox(CompositeDrawable? target = null)
-            : base(SkinEditorStrings.Components)
+        public SkinComponentToolbox(SkinComponentsContainer? target = null)
+            : base(target?.Lookup.Ruleset == null ? SkinEditorStrings.Components : LocalisableString.Interpolate($"{SkinEditorStrings.Components} ({target.Lookup.Ruleset.Name})"))
         {
             this.target = target;
         }
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables();
+            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables(target?.Lookup.Ruleset);
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }
