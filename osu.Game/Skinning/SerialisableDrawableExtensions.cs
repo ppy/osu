@@ -22,9 +22,9 @@ namespace osu.Game.Skinning
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;
 
-            if (component is ISerialisableDrawable skinnable)
+            if (component is ISerialisableDrawable serialisableDrawable)
             {
-                skinnable.UsesFixedAnchor = drawableInfo.UsesFixedAnchor;
+                serialisableDrawable.UsesFixedAnchor = drawableInfo.UsesFixedAnchor;
 
                 foreach (var (_, property) in component.GetSettingsSourceProperties())
                 {
@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
                         continue;
                     }
 
-                    skinnable.CopyAdjustedSetting(bindable, settingValue);
+                    serialisableDrawable.CopyAdjustedSetting(bindable, settingValue);
                 }
             }
 

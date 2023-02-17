@@ -90,8 +90,8 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
-                case SkinComponentsContainerLookup componentLookup:
-                    switch (componentLookup.Target)
+                case SkinComponentsContainerLookup containerLookup:
+                    switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>

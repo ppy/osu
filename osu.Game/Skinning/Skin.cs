@@ -165,8 +165,8 @@ namespace osu.Game.Skinning
                 case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false);
 
-                case SkinComponentsContainerLookup componentLookup:
-                    if (!DrawableComponentInfo.TryGetValue(componentLookup.Target, out var skinnableInfo))
+                case SkinComponentsContainerLookup containerLookup:
+                    if (!DrawableComponentInfo.TryGetValue(containerLookup.Target, out var skinnableInfo))
                         return null;
 
                     var components = new List<Drawable>();
