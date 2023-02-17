@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableOsuJudgement : DrawableJudgement
     {
-        protected SkinnableLighting Lighting { get; private set; }
+        internal SkinnableLighting Lighting { get; private set; }
 
         [Resolved]
         private OsuConfigManager config { get; set; }

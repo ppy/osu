@@ -109,7 +109,7 @@ namespace osu.Game.Skinning
         {
             return (ruleset?.CreateInstance().GetType() ?? typeof(OsuGame))
                    .Assembly.GetTypes()
-                   .Where(t => !t.IsInterface && !t.IsAbstract)
+                   .Where(t => !t.IsInterface && !t.IsAbstract && t.IsPublic)
                    .Where(t => typeof(ISerialisableDrawable).IsAssignableFrom(t))
                    .OrderBy(t => t.Name)
                    .ToArray();
