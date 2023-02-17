@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Database
         private TestLegacyExporter legacyExporter = null!;
         private TemporaryNativeStorage storage = null!;
 
+        private const string short_filename = "normal file name";
+
         private const string long_filename =
             "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
 
@@ -29,25 +31,24 @@ namespace osu.Game.Tests.Database
         [Test]
         public void ExportFileWithNormalNameTest()
         {
-            const string filename = "normal file name";
-            var item = new TestPathInfo(filename);
+            var item = new TestPathInfo(short_filename);
 
             Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
-            exportItemAndAssert(item, filename);
+
+            exportItemAndAssert(item, short_filename);
         }
 
         [Test]
         public void ExportFileWithNormalNameMultipleTimesTest()
         {
-            const string filename = "normal file name";
-            var item = new TestPathInfo(filename);
+            var item = new TestPathInfo(short_filename);
 
-            Assert.That(item.Filename.Length < TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
+            Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
             {
-                string expectedFileName = i == 0 ? filename : $"{filename} ({i})";
+                string expectedFileName = i == 0 ? short_filename : $"{short_filename} ({i})";
                 exportItemAndAssert(item, expectedFileName);
             }
         }
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Database
 
             var item = new TestPathInfo(long_filename);
 
-            Assert.That(item.Filename.Length > TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
+            Assert.That(item.Filename.Length, Is.GreaterThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
             exportItemAndAssert(item, expectedName);
         }
 
@@ -72,7 +73,7 @@ namespace osu.Game.Tests.Database
 
             var item = new TestPathInfo(long_filename);
 
-            Assert.That(item.Filename.Length > TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
+            Assert.That(item.Filename.Length, Is.GreaterThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
