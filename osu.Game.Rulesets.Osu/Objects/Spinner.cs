@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
                 AddNested(i < SpinsRequired
-                    ? new SpinnerTick { StartTime = startTime }
-                    : new SpinnerBonusTick { StartTime = startTime });
+                    ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
+                    : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration });
             }
         }
 
