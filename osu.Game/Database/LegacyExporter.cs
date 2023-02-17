@@ -66,7 +66,7 @@ namespace osu.Game.Database
             {
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
 
-                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_FILENAME_LENGTH - FileExtension.Length); //Truncating the name to fit the path limit
+                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
                 filename = $"{filenameWithoutExtension}{FileExtension}";
             }
 
