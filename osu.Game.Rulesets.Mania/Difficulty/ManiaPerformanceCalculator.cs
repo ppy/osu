@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
@@ -109,27 +110,24 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = hitProb(h50, d) - hitProb(h100, d);
                 double p0Note = 1 - hitProb(h50, d);
 
-                // Effective hit window for LN tails. Should be a value between 1 and 2. This is because the hit window for LN tails in stable
-                // arent static, and depend on how far from 0ms offset the hit on the head was. A lower value results in a lower estimated deviation.
-                const double tail_multiplier = 1.5;
-
                 // Since long notes only give a specific judgement if both both hits end up within a certain hit window,
                 // multiply the probability of hitting in the head hit window by the probability of hitting in the tail hit window.
-                double pMaxLn = hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multiplier, d);
+                // Since legacy LN tails take the absolute error of both hit judgements on an LN, we need to use a folded normal distribution to calculate it.
+                double pMaxLn = hitProb(hMax * 1.2, d) * hitProbLn(hMax * 2.4, d);
 
-                double p300Ln = hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multiplier, d)
-                                - hitProb(hMax * 1.2, d) * hitProb(hMax * 1.2 * tail_multiplier, d);
+                double p300Ln = hitProb(h300 * 1.1, d) * hitProbLn(h300 * 2.2, d)
+                                - hitProb(hMax * 1.2, d) * hitProbLn(hMax * 2.4, d);
 
-                double p200Ln = hitProb(h200, d) * hitProb(h200 * tail_multiplier, d)
-                                - hitProb(h300 * 1.1, d) * hitProb(h300 * 1.1 * tail_multiplier, d);
+                double p200Ln = hitProb(h200, d) * hitProbLn(h200 * 2, d)
+                                - hitProb(h300 * 1.1, d) * hitProbLn(h300 * 2.2, d);
 
-                double p100Ln = hitProb(h100, d) * hitProb(h100 * tail_multiplier, d)
-                                - hitProb(h200, d) * hitProb(h200 * tail_multiplier, d);
+                double p100Ln = hitProb(h100, d) * hitProbLn(h100 * 2, d)
+                                - hitProb(h200, d) * hitProbLn(h200 * 2, d);
 
-                double p50Ln = hitProb(h50, d) * hitProb(h50 * tail_multiplier, d)
-                               - hitProb(h100, d) * hitProb(h100 * tail_multiplier, d);
+                double p50Ln = hitProb(h50, d) * hitProbLn(h50 * 2, d)
+                               - hitProb(h100, d) * hitProbLn(h100 * 2, d);
 
-                double p0Ln = 1 - hitProb(h50, d) * hitProb(h50 * tail_multiplier, d);
+                double p0Ln = 1 - hitProb(h50, d) * hitProbLn(h50 * 2, d);
 
                 double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLn * attributes.HoldNoteCount)) / totalHits;
                 double p300 = ((p300Note * attributes.NoteCount) + (p300Ln * attributes.HoldNoteCount)) / totalHits;
@@ -245,6 +243,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double hitProb(double x, double deviation)
         {
             return SpecialFunctions.Erf(x / (deviation * Math.Sqrt(2)));
+        }
+
+        private double hitProbLn(double x, double deviation)
+        {
+            return Math.Pow(2 * Normal.CDF(0, deviation * Math.Sqrt(2), x) - 1, 2);
         }
     }
 }
