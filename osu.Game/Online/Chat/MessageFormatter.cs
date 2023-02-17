@@ -71,7 +71,7 @@ namespace osu.Game.Online.Chat
             {
                 int index = m.Index - captureOffset;
 
-                string? displayText = string.Format(display,
+                string displayText = string.Format(display,
                     m.Groups[0],
                     m.Groups["text"].Value,
                     m.Groups["url"].Value).Trim();
@@ -109,7 +109,7 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 int index = m.Index;
-                string? linkText = m.Groups["link"].Value;
+                string linkText = m.Groups["link"].Value;
                 int indexLength = linkText.Length;
 
                 var details = GetLinkDetails(linkText);
@@ -125,7 +125,7 @@ namespace osu.Game.Online.Chat
 
         public static LinkDetails GetLinkDetails(string url)
         {
-            string[]? args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
@@ -341,6 +341,8 @@ namespace osu.Game.Online.Chat
         OpenWiki,
         Custom,
         OpenChangelog,
+        FilterBeatmapSetGenre,
+        FilterBeatmapSetLanguage,
     }
 
     public class Link : IComparable<Link>
@@ -362,6 +364,6 @@ namespace osu.Game.Online.Chat
 
         public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
 
-        public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
+        public int CompareTo(Link? otherLink) => Index > otherLink?.Index ? 1 : -1;
     }
 }

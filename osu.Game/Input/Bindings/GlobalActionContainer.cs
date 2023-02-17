@@ -36,6 +36,7 @@ namespace osu.Game.Input.Bindings
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
                                                                        .Concat(EditorKeyBindings)
                                                                        .Concat(InGameKeyBindings)
+                                                                       .Concat(ReplayKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
                                                                        .Concat(AudioControlKeyBindings)
                                                                        // Overlay bindings may conflict with more local cases like the editor so they are checked last.
@@ -112,11 +113,16 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
-            new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
-            new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
-            new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
             new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
+        };
+
+        public IEnumerable<KeyBinding> ReplayKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
+            new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
         };
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]

@@ -18,6 +18,14 @@ namespace osu.Game.Database
         {
         }
 
+        protected override string GetFilename(ScoreInfo score)
+        {
+            string scoreString = score.GetDisplayString();
+            string filename = $"{scoreString} ({score.Date.LocalDateTime:yyyy-MM-dd_HH-mm})";
+
+            return filename;
+        }
+
         protected override string FileExtension => ".osr";
 
         protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification notification, CancellationToken cancellationToken = default)
