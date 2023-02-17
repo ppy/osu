@@ -15,6 +15,9 @@ namespace osu.Game.Tests.Database
         private TestLegacyExporter legacyExporter = null!;
         private TemporaryNativeStorage storage = null!;
 
+        private const string long_filename =
+            "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
+
         [SetUp]
         public void SetUp()
         {
@@ -30,7 +33,7 @@ namespace osu.Game.Tests.Database
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
-            Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.GetMaxPathLength()));
+            Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
             exportItemAndAssert(item, exportStorage, filename);
         }
 
@@ -42,7 +45,7 @@ namespace osu.Game.Tests.Database
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
-            Assert.That(item.Filename.Length < TestLegacyExporter.GetMaxPathLength(), Is.True);
+            Assert.That(item.Filename.Length < TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
@@ -57,15 +60,12 @@ namespace osu.Game.Tests.Database
         {
             var exportStorage = storage.GetStorageForDirectory(@"exports");
 
-            const string fullname =
-                "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
+            int expectedLength = TestLegacyExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
+            string expectedName = long_filename.Remove(expectedLength);
 
-            int expectedLength = TestLegacyExporter.GetMaxPathLength() - (legacyExporter.GetExtension().Length);
-            string expectedName = fullname.Remove(expectedLength);
+            var item = new TestPathInfo(long_filename);
 
-            var item = new TestPathInfo(fullname);
-
-            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPathLength(), Is.True);
+            Assert.That(item.Filename.Length > TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
             exportItemAndAssert(item, exportStorage, expectedName);
         }
 
@@ -74,15 +74,12 @@ namespace osu.Game.Tests.Database
         {
             var exportStorage = storage.GetStorageForDirectory(@"exports");
 
-            const string fullname =
-                "some file with super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name super long name";
+            int expectedLength = TestLegacyExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
+            string expectedName = long_filename.Remove(expectedLength);
 
-            int expectedLength = TestLegacyExporter.GetMaxPathLength() - (legacyExporter.GetExtension().Length);
-            string expectedName = fullname.Remove(expectedLength);
+            var item = new TestPathInfo(long_filename);
 
-            var item = new TestPathInfo(fullname);
-
-            Assert.That(item.Filename.Length > TestLegacyExporter.GetMaxPathLength(), Is.True);
+            Assert.That(item.Filename.Length > TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
@@ -122,8 +119,6 @@ namespace osu.Game.Tests.Database
                 : base(storage)
             {
             }
-
-            public static int GetMaxPathLength() => MAX_FILENAME_LENGTH;
 
             public string GetExtension() => FileExtension;
 
