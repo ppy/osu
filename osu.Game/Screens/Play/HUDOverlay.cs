@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
                 //Needs to be initialized before skinnable drawables.
                 tally = new JudgementTally(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
-                rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset) { AlwaysPresent = true, },
+                rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, },
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -399,7 +399,7 @@ namespace osu.Game.Screens.Play
             [Resolved]
             private OsuConfigManager config { get; set; }
 
-            public HUDComponentsContainer([CanBeNull] Ruleset ruleset = null)
+            public HUDComponentsContainer([CanBeNull] RulesetInfo ruleset = null)
                 : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;

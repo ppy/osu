@@ -15,11 +15,11 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly TargetArea Target;
 
-        public readonly Ruleset? Ruleset;
+        public readonly RulesetInfo? Ruleset;
 
         public string GetSerialisableIdentifier() => Ruleset?.ShortName ?? "global";
 
-        public SkinComponentsContainerLookup(TargetArea target, Ruleset? ruleset = null)
+        public SkinComponentsContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
         {
             Target = target;
             Ruleset = ruleset;
