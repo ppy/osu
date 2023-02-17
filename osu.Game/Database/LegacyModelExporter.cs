@@ -32,10 +32,10 @@ namespace osu.Game.Database
 
         protected Storage UserFileStorage;
         private readonly Storage exportStorage;
+        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
         private readonly RealmAccess realmAccess;
 
-        private string filename = string.Empty;
         public Action<Notification>? PostNotification { get; set; }
 
         /// <summary>
@@ -62,9 +62,12 @@ namespace osu.Game.Database
         /// <returns></returns>
         public async Task ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
-            string itemFilename = model.GetDisplayString().GetValidFilename();
-            IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
-            filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
+            string itemFilename = GetFilename(model).GetValidFilename();
+            IEnumerable<string> existingExports =
+                exportStorage
+                    .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
+                    .Concat(exportStorage.GetDirectories(string.Empty));
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             bool success;
 
             ProgressNotification notification = new ProgressNotification
