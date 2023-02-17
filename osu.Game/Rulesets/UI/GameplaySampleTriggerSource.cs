@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.UI
                                                    .Where(e => e.Result?.HasResult != true).MinBy(e => e.HitObject.StartTime);
 
                 if (fallbackObject != null)
-                    return fallbackObject.HitObject;
+                    return getEarliestNestedObject(fallbackObject.HitObject);
 
-                // In the case there are no unjudged objects, the last hit object should be used instead.
+                // In the case there are no non-judged objects, the last hit object should be used instead.
                 fallbackObject ??= hitObjectContainer.Entries.LastOrDefault();
             }
 
