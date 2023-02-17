@@ -29,14 +29,9 @@ namespace osu.Game.Screens.Play
 
         public override void Add(KeyCounter key)
         {
-            if (!CheckType(key))
-                throw new ArgumentException($"{key.GetType()} is not a supported {nameof(KeyCounter)}.", nameof(key));
-
             base.Add(key);
             key.IsCounting = IsCounting;
         }
-
-        protected virtual bool CheckType(KeyCounter key) => true;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
