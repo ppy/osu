@@ -5,12 +5,15 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -29,35 +32,36 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         public SkinBlueprint(ISerialisableDrawable component)
             : base(component)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
                 box = new Container
                 {
+                    Padding = new MarginPadding(-SkinSelectionHandler.INFLATE_SIZE),
                     Children = new Drawable[]
                     {
                         outlineBox = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            BorderThickness = 3,
-                            BorderColour = Color4.White,
+                            CornerRadius = 3,
+                            BorderThickness = SelectionBox.BORDER_RADIUS / 2,
+                            BorderColour = ColourInfo.GradientVertical(colours.Pink4.Darken(0.4f), colours.Pink4),
                             Children = new Drawable[]
                             {
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0f,
+                                    Blending = BlendingParameters.Additive,
+                                    Alpha = 0.2f,
+                                    Colour = ColourInfo.GradientVertical(colours.Pink2, colours.Pink4),
                                     AlwaysPresent = true,
                                 },
                             }
@@ -100,9 +104,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateSelectedState()
         {
-            outlineBox.FadeColour(colours.Pink.Opacity(IsSelected ? 1 : 0.5f), 200, Easing.OutQuint);
-            outlineBox.Child.FadeTo(IsSelected ? 0.2f : 0, 200, Easing.OutQuint);
-
             anchorOriginVisualiser.FadeTo(IsSelected ? 1 : 0, 200, Easing.OutQuint);
         }
 
@@ -134,38 +135,46 @@ namespace osu.Game.Overlays.SkinEditor
     {
         private readonly Drawable drawable;
 
-        private readonly Box originBox;
+        private Drawable originBox = null!;
 
-        private readonly Box anchorBox;
-        private readonly Box anchorLine;
+        private Drawable anchorBox = null!;
+        private Drawable anchorLine = null!;
 
         public AnchorOriginVisualiser(Drawable drawable)
         {
             this.drawable = drawable;
+        }
 
-            InternalChildren = new Drawable[]
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Color4 anchorColour = colours.Red1;
+            Color4 originColour = colours.Red3;
+
+            InternalChildren = new[]
             {
-                anchorLine = new Box
+                anchorLine = new Circle
                 {
-                    Height = 2,
+                    Height = 3f,
                     Origin = Anchor.CentreLeft,
-                    Colour = Color4.Yellow,
-                    EdgeSmoothness = Vector2.One
+                    Colour = ColourInfo.GradientHorizontal(originColour.Opacity(0.5f), originColour),
                 },
-                originBox = new Box
+                originBox = new Circle
                 {
-                    Colour = Color4.Red,
+                    Colour = originColour,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(5),
+                    Size = new Vector2(7),
                 },
-                anchorBox = new Box
+                anchorBox = new Circle
                 {
-                    Colour = Color4.Red,
+                    Colour = anchorColour,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(5),
+                    Size = new Vector2(10),
                 },
             };
         }
+
+        private Vector2? anchorPosition;
 
         protected override void Update()
         {
@@ -174,8 +183,18 @@ namespace osu.Game.Overlays.SkinEditor
             if (drawable.Parent == null)
                 return;
 
+            var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+
+            anchorPosition ??= newAnchor;
+
+            anchorPosition =
+                new Vector2(
+                    (float)Interpolation.DampContinuously(anchorPosition.Value.X, newAnchor.X, 25, Clock.ElapsedFrameTime),
+                    (float)Interpolation.DampContinuously(anchorPosition.Value.Y, newAnchor.Y, 25, Clock.ElapsedFrameTime)
+                );
+
             originBox.Position = drawable.ToSpaceOfOtherDrawable(drawable.OriginPosition, this);
-            anchorBox.Position = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            anchorBox.Position = anchorPosition.Value;
 
             var point1 = ToLocalSpace(anchorBox.ScreenSpaceDrawQuad.Centre);
             var point2 = ToLocalSpace(originBox.ScreenSpaceDrawQuad.Centre);
