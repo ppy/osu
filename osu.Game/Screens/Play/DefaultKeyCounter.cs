@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
             Height = buttonSprite.DrawHeight;
             Width = buttonSprite.DrawWidth;
 
-            IsLit.BindValueChanged(e => updateGlowSprite(e.NewValue), true);
+            IsActive.BindValueChanged(e => updateGlowSprite(e.NewValue), true);
             CountPresses.BindValueChanged(e => countSpriteText.Text = e.NewValue.ToString(@"#,0"), true);
         }
 

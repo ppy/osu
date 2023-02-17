@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
             Name = trigger.Name;
         }
 
-        protected Bindable<bool> IsLit = new BindableBool();
+        protected Bindable<bool> IsActive = new BindableBool();
 
         public void Increment()
         {
@@ -62,14 +62,14 @@ namespace osu.Game.Screens.Play
 
         protected virtual void Activate(bool increment = true)
         {
-            IsLit.Value = true;
+            IsActive.Value = true;
             if (increment)
                 Increment();
         }
 
         protected virtual void Deactivate(bool preserve = true)
         {
-            IsLit.Value = false;
+            IsActive.Value = false;
             if (!preserve)
                 Decrement();
         }
