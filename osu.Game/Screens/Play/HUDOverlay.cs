@@ -102,20 +102,22 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
-            SkinComponentsContainer rulesetComponents;
+            Drawable rulesetComponents;
 
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 tally = new JudgementTally(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
-                rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, },
+                rulesetComponents = drawableRuleset != null
+                    ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
+                    : Empty(),
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
