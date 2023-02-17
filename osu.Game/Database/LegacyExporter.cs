@@ -28,7 +28,7 @@ namespace osu.Game.Database
         ///
         /// This actual usable length is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
         /// </remarks>
-        protected const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
+        public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
 
         /// <summary>
         /// The file extension for exports (including the leading '.').
