@@ -7,13 +7,14 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
     public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
-        private SkinnableTargetComponentsContainer? content;
+        private Container? content;
 
         public GlobalSkinComponentLookup.LookupType Target { get; }
 
@@ -39,15 +40,16 @@ namespace osu.Game.Skinning
             foreach (var i in skinnableInfo)
                 drawables.Add(i.CreateInstance());
 
-            Reload(new SkinnableTargetComponentsContainer
+            Reload(new Container
             {
+                RelativeSizeAxes = Axes.Both,
                 Children = drawables,
             });
         }
 
-        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer);
+        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as Container);
 
-        public void Reload(SkinnableTargetComponentsContainer? componentsContainer)
+        public void Reload(Container? componentsContainer)
         {
             ClearInternal();
             components.Clear();
