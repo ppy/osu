@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -32,33 +33,52 @@ namespace osu.Game.Database
         protected Storage UserFileStorage;
         private readonly Storage exportStorage;
 
-        protected RealmAccess RealmAccess;
+        private readonly RealmAccess realmAccess;
 
         private string filename = string.Empty;
         public Action<Notification>? PostNotification { get; set; }
 
+        /// <summary>
+        /// Construct exporter.
+        /// Create a new exporter for each export, otherwise it will cause confusing notifications.
+        /// </summary>
+        /// <param name="storage">Storage for storing exported files. Basically it is used to provide export stream</param>
+        /// <param name="realm">The RealmAccess used to provide the exported file.</param>
         protected LegacyModelExporter(Storage storage, RealmAccess realm)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
-            RealmAccess = realm;
+            realmAccess = realm;
         }
 
         /// <summary>
         /// Export the model to default folder.
         /// </summary>
         /// <param name="model">The model should export.</param>
+        /// <param name="cancellationToken">
+        /// The Cancellation token that can cancel the exporting.
+        /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
+        /// </param>
         /// <returns></returns>
-        public async Task ExportAsync(TModel model)
+        public async Task ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
             string itemFilename = model.GetDisplayString().GetValidFilename();
             IEnumerable<string> existingExports = exportStorage.GetFiles("", $"{itemFilename}*{FileExtension}");
             filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             bool success;
 
+            ProgressNotification notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Exporting...",
+                CompletionText = "Export completed"
+            };
+            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
+            PostNotification?.Invoke(notification);
+
             using (var stream = exportStorage.CreateFileSafely(filename))
             {
-                success = await ExportToStreamAsync(model, stream);
+                success = await ExportToStreamAsync(model, stream, notification, cancellationToken ?? notification.CancellationToken);
             }
 
             if (!success)
@@ -72,44 +92,34 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
         /// <param name="stream">The stream to export.</param>
+        /// <param name="notification">The notification will displayed to the user</param>
+        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
         /// <returns>Whether the export was successful</returns>
-        public async Task<bool> ExportToStreamAsync(TModel model, Stream stream)
+        public async Task<bool> ExportToStreamAsync(TModel model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
         {
-            ProgressNotification notification = new ProgressNotification
-            {
-                State = ProgressNotificationState.Active,
-                Text = "Exporting...",
-                CompletionText = "Export completed"
-            };
-            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
-            PostNotification?.Invoke(notification);
+            ProgressNotification notify = notification ?? new ProgressNotification();
 
             Guid id = model.ID;
             return await Task.Run(() =>
             {
-                RealmAccess.Run(r =>
+                realmAccess.Run(r =>
                 {
                     TModel refetchModel = r.Find<TModel>(id);
-                    ExportToStream(refetchModel, stream, notification);
+                    ExportToStream(refetchModel, stream, notify, cancellationToken);
                 });
-            }, notification.CancellationToken).ContinueWith(t =>
+            }, cancellationToken).ContinueWith(t =>
             {
-                if (t.IsCanceled)
-                {
-                    return false;
-                }
-
                 if (t.IsFaulted)
                 {
-                    notification.State = ProgressNotificationState.Cancelled;
+                    notify.State = ProgressNotificationState.Cancelled;
                     Logger.Error(t.Exception, "An error occurred while exporting");
                     return false;
                 }
 
-                notification.CompletionText = "Export Complete, Click to open the folder";
-                notification.State = ProgressNotificationState.Completed;
+                notify.CompletionText = "Export Complete, Click to open the folder";
+                notify.State = ProgressNotificationState.Completed;
                 return true;
-            });
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -119,7 +129,8 @@ namespace osu.Game.Database
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
         /// <param name="notification">The notification will displayed to the user</param>
-        protected abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification);
+        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
+        protected abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification, CancellationToken cancellationToken = default);
     }
 
     public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
@@ -130,15 +141,17 @@ namespace osu.Game.Database
         {
         }
 
-        protected override void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification) => exportZipArchive(model, outputStream, notification);
+        protected override void ExportToStream(TModel model, Stream outputStream, ProgressNotification notification, CancellationToken cancellationToken = default)
+            => exportZipArchive(model, outputStream, notification, cancellationToken);
 
         /// <summary>
         /// Exports an item to Stream as a legacy (.zip based) package.
         /// </summary>
-        /// <param name="model">The item to export.</param>
+        /// <param name="model">The model will be exported.</param>
         /// <param name="outputStream">The output stream to export to.</param>
         /// <param name="notification">The notification will displayed to the user</param>
-        private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification)
+        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
+        private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification, CancellationToken cancellationToken = default)
         {
             using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
 
@@ -147,7 +160,7 @@ namespace osu.Game.Database
 
             foreach (var file in model.Files)
             {
-                notification.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
                 using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                 {
