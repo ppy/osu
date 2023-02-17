@@ -25,7 +25,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Filename limit for most OSs is 255, this actual usable length is smaller because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path.
+        /// The filename limit for most OSs is 255. This actual usable length is smaller because <see cref="Storage.CreateFileSafely(string)"/> adds an additional "_<see cref="Guid"/>" to the end of the path.
         /// </para>
         /// <para>
         /// For more information see:
