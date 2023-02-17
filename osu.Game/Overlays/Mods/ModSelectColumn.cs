@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     RelativeSizeAxes = Axes.X,
-                                    Width = 1.1f,
+                                    Width = 1.03f, // Makes sure the sheared area is fully covered
                                     Height = header_height,
                                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Velocity = 0.7f,
