@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Database
 
             public string GetExtension() => FileExtension;
 
-            protected override string FileExtension => ".ots";
+            protected override string FileExtension => ".test";
         }
     }
 }
