@@ -258,8 +258,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.Dispose();
 
-            SelectedComponents.Clear();
-
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
 
@@ -268,29 +266,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             void loadBlueprintContainer()
             {
-                Debug.Assert(content != null);
-
-                changeHandler = new SkinEditorChangeHandler(targetScreen);
-                changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-                changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
-
-                content.Child = new SkinBlueprintContainer(targetScreen);
-
-                componentsSidebar.Children = new[]
-                {
-                    new EditorSidebarSection("Current working layer")
-                    {
-                        Children = new Drawable[]
-                        {
-                            new SettingsDropdown<SkinComponentsContainerLookup?>
-                            {
-                                Items = availableTargets.Select(t => t.Lookup),
-                                Current = selectedTarget,
-                            }
-                        }
-                    },
-                };
-
                 selectedTarget.Default = getFirstTarget()?.Lookup;
 
                 if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
@@ -308,10 +283,40 @@ namespace osu.Game.Overlays.SkinEditor
             if (target.NewValue == null)
                 return;
 
+            Debug.Assert(content != null);
+
+            SelectedComponents.Clear();
+
+            var skinComponentsContainer = getTarget(target.NewValue);
+
+            if (skinComponentsContainer == null)
+                return;
+
+            changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+            content.Child = new SkinBlueprintContainer(skinComponentsContainer);
+
+            componentsSidebar.Children = new[]
+            {
+                new EditorSidebarSection("Current working layer")
+                {
+                    Children = new Drawable[]
+                    {
+                        new SettingsDropdown<SkinComponentsContainerLookup?>
+                        {
+                            Items = availableTargets.Select(t => t.Lookup),
+                            Current = selectedTarget,
+                        }
+                    }
+                },
+            };
+
             // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
             if (target.NewValue.Ruleset != null)
             {
-                componentsSidebar.Add(new SkinComponentToolbox(getTarget(target.NewValue))
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
                 {
                     RequestPlacement = placeComponent
                 });
