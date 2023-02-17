@@ -78,7 +78,7 @@ namespace osu.Game.Database
 
             using (var stream = exportStorage.CreateFileSafely(filename))
             {
-                success = await ExportToStreamAsync(model, stream, notification, cancellationToken ?? notification.CancellationToken);
+                success = await ExportToStreamAsync(model, stream, notification, cancellationToken ?? notification.CancellationToken).ConfigureAwait(false);
             }
 
             if (!success)
@@ -119,7 +119,7 @@ namespace osu.Game.Database
                 notify.CompletionText = "Export Complete, Click to open the folder";
                 notify.State = ProgressNotificationState.Completed;
                 return true;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
