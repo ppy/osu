@@ -10,6 +10,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Tests.Database
 {
+    [TestFixture]
     public class LegacyExporterTest
     {
         private TestLegacyExporter legacyExporter = null!;
