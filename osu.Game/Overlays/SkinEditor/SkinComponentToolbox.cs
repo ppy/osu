@@ -122,6 +122,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             protected override bool OnHover(HoverEvent e)
             {
+                expandContractAction?.Cancel();
                 expandContractAction = Scheduler.AddDelayed(() =>
                 {
                     this.ResizeHeightTo(expanded_size, animation_duration, Easing.OutQuint);
