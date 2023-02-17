@@ -24,6 +24,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.OSD;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -65,6 +66,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
 
         private bool hasBegunMutating;
 
@@ -271,9 +274,27 @@ namespace osu.Game.Overlays.SkinEditor
 
                 content.Child = new SkinBlueprintContainer(targetScreen);
 
-                componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
+                selectedTarget.Default = getFirstTarget()?.Lookup;
+                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
+                    selectedTarget.Value = getFirstTarget()?.Lookup;
+
+                componentsSidebar.Children = new[]
                 {
-                    RequestPlacement = placeComponent
+                    new EditorSidebarSection("Current working layer")
+                    {
+                        Children = new Drawable[]
+                        {
+                            new SettingsDropdown<SkinComponentsContainerLookup?>
+                            {
+                                Items = availableTargets.Select(t => t.Lookup),
+                                Current = selectedTarget,
+                            }
+                        }
+                    },
+                    new SkinComponentToolbox(getFirstTarget())
+                    {
+                        RequestPlacement = placeComponent
+                    }
                 };
             }
         }
@@ -341,9 +362,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
 
-        private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISerialisableDrawableContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
+        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
         {
             return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
         }
