@@ -29,20 +29,16 @@ namespace osu.Game.Tests.Database
         [Test]
         public void ExportFileWithNormalNameTest()
         {
-            var exportStorage = storage.GetStorageForDirectory(@"exports");
-
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
             Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
-            exportItemAndAssert(item, exportStorage, filename);
+            exportItemAndAssert(item, filename);
         }
 
         [Test]
         public void ExportFileWithNormalNameMultipleTimesTest()
         {
-            var exportStorage = storage.GetStorageForDirectory(@"exports");
-
             const string filename = "normal file name";
             var item = new TestPathInfo(filename);
 
@@ -52,29 +48,25 @@ namespace osu.Game.Tests.Database
             for (int i = 0; i < 10; i++)
             {
                 string expectedFileName = i == 0 ? filename : $"{filename} ({i})";
-                exportItemAndAssert(item, exportStorage, expectedFileName);
+                exportItemAndAssert(item, expectedFileName);
             }
         }
 
         [Test]
         public void ExportFileWithSuperLongNameTest()
         {
-            var exportStorage = storage.GetStorageForDirectory(@"exports");
-
             int expectedLength = TestLegacyExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
             string expectedName = long_filename.Remove(expectedLength);
 
             var item = new TestPathInfo(long_filename);
 
             Assert.That(item.Filename.Length > TestLegacyExporter.MAX_FILENAME_LENGTH, Is.True);
-            exportItemAndAssert(item, exportStorage, expectedName);
+            exportItemAndAssert(item, expectedName);
         }
 
         [Test]
         public void ExportFileWithSuperLongNameMultipleTimesTest()
         {
-            var exportStorage = storage.GetStorageForDirectory(@"exports");
-
             int expectedLength = TestLegacyExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
             string expectedName = long_filename.Remove(expectedLength);
 
@@ -84,13 +76,13 @@ namespace osu.Game.Tests.Database
 
             //Export multiple times
             for (int i = 0; i < 10; i++)
-                exportItemAndAssert(item, exportStorage, expectedName);
+                exportItemAndAssert(item, expectedName);
         }
 
-        private void exportItemAndAssert(IHasNamedFiles item, Storage exportStorage, string expectedName)
+        private void exportItemAndAssert(IHasNamedFiles item, string expectedName)
         {
             Assert.DoesNotThrow(() => legacyExporter.Export(item));
-            Assert.That(exportStorage.Exists($"{expectedName}{legacyExporter.GetExtension()}"), Is.True);
+            Assert.That(storage.Exists($"exports/{expectedName}{legacyExporter.GetExtension()}"), Is.True);
         }
 
         [TearDown]
