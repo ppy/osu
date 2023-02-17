@@ -21,12 +21,14 @@ namespace osu.Game.Database
         where TModel : class, IHasNamedFiles
     {
         /// <summary>
-        /// Max length of filename (including extension)
+        /// Max length of filename (including extension).
         /// </summary>
         /// <remarks>
-        /// This constant is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
+        /// TODO: WHY? DOCUMENTATION PER PLATFORM LINKS HERE.
+        ///
+        /// This actual usable length is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
         /// </remarks>
-        protected const int MAX_PATH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
+        protected const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
 
         /// <summary>
         /// The file extension for exports (including the leading '.').
@@ -60,11 +62,11 @@ namespace osu.Game.Database
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
-            if (filename.Length > MAX_PATH)
+            if (filename.Length > MAX_FILENAME_LENGTH)
             {
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
 
-                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_PATH - FileExtension.Length); //Truncating the name to fit the path limit
+                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_FILENAME_LENGTH - FileExtension.Length); //Truncating the name to fit the path limit
                 filename = $"{filenameWithoutExtension}{FileExtension}";
             }
 
