@@ -32,6 +32,18 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
+        private Quad drawableQuad;
+
+        public override Quad ScreenSpaceDrawQuad => drawableQuad;
+        public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
+
+        public override bool Contains(Vector2 screenSpacePos) => drawableQuad.Contains(screenSpacePos);
+
+        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
+
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) =>
+            drawableQuad.Contains(screenSpacePos);
+
         public SkinBlueprint(ISerialisableDrawable component)
             : base(component)
         {
@@ -44,7 +56,6 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 box = new Container
                 {
-                    Padding = new MarginPadding(-SkinSelectionHandler.INFLATE_SIZE),
                     Children = new Drawable[]
                     {
                         outlineBox = new Container
@@ -107,28 +118,21 @@ namespace osu.Game.Overlays.SkinEditor
             anchorOriginVisualiser.FadeTo(IsSelected ? 1 : 0, 200, Easing.OutQuint);
         }
 
-        private Quad drawableQuad;
-
-        public override Quad ScreenSpaceDrawQuad => drawableQuad;
-
         protected override void Update()
         {
             base.Update();
 
-            drawableQuad = drawable.ScreenSpaceDrawQuad;
-            var quad = ToLocalSpace(drawable.ScreenSpaceDrawQuad);
+            drawableQuad = drawable.ToScreenSpace(
+                drawable.DrawRectangle
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
 
-            box.Position = drawable.ToSpaceOfOtherDrawable(Vector2.Zero, this);
-            box.Size = quad.Size;
+            var localSpaceQuad = ToLocalSpace(drawableQuad);
+
+            box.Position = localSpaceQuad.TopLeft;
+            box.Size = localSpaceQuad.Size;
             box.Rotation = drawable.Rotation;
             box.Scale = new Vector2(MathF.Sign(drawable.Scale.X), MathF.Sign(drawable.Scale.Y));
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);
-
-        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
-
-        public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
     }
 
     internal partial class AnchorOriginVisualiser : CompositeDrawable
