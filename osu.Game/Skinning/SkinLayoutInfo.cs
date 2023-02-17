@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Rulesets;
 
@@ -17,6 +18,8 @@ namespace osu.Game.Skinning
     public class SkinLayoutInfo
     {
         private const string global_identifier = "global";
+
+        public IEnumerable<SerialisedDrawableInfo> AllDrawables => DrawableInfo.Values.SelectMany(v => v);
 
         [JsonProperty]
         public Dictionary<string, SerialisedDrawableInfo[]> DrawableInfo { get; set; } = new Dictionary<string, SerialisedDrawableInfo[]>();
