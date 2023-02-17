@@ -562,8 +562,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertKeyCounter(int left, int right)
         {
-            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses, () => Is.EqualTo(left));
-            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses, () => Is.EqualTo(right));
+            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses.Value, () => Is.EqualTo(left));
+            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses.Value, () => Is.EqualTo(right));
         }
 
         private void releaseAllTouches()
