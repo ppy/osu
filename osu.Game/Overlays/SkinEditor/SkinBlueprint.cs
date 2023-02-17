@@ -24,8 +24,6 @@ namespace osu.Game.Overlays.SkinEditor
     {
         private Container box = null!;
 
-        private Container outlineBox = null!;
-
         private AnchorOriginVisualiser anchorOriginVisualiser = null!;
 
         private Drawable drawable => (Drawable)Item;
@@ -58,7 +56,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        outlineBox = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
