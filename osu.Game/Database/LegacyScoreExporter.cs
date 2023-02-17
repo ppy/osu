@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays.Notifications;
@@ -19,7 +20,7 @@ namespace osu.Game.Database
 
         protected override string FileExtension => ".osr";
 
-        protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification notification)
+        protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification notification, CancellationToken cancellationToken = default)
         {
             var file = model.Files.SingleOrDefault();
             if (file == null)
