@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +11,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
+    /// Serialised backing data for <see cref="ISerialisableDrawable"/>s.
+    /// Used for json serialisation in user skins.
     /// </summary>
+    /// <remarks>
+    /// Can be created using <see cref="SerialisableDrawableExtensions.CreateSerialisedInfo"/>.
+    /// Can also be applied to an existing drawable using <see cref="SerialisableDrawableExtensions.ApplySerialisedInfo"/>.
+    /// </remarks>
     [Serializable]
-    public class SkinnableInfo
+    public sealed class SerialisedDrawableInfo
     {
-        public Type Type { get; set; }
+        public Type Type { get; set; } = null!;
 
         public Vector2 Position { get; set; }
 
@@ -36,15 +38,15 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Origin { get; set; }
 
-        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        /// <inheritdoc cref="ISerialisableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
 
-        public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
+        public List<SerialisedDrawableInfo> Children { get; } = new List<SerialisedDrawableInfo>();
 
         [JsonConstructor]
-        public SkinnableInfo()
+        public SerialisedDrawableInfo()
         {
         }
 
@@ -52,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Construct a new instance populating all attributes from the provided drawable.
         /// </summary>
         /// <param name="component">The drawable which attributes should be sourced from.</param>
-        public SkinnableInfo(Drawable component)
+        public SerialisedDrawableInfo(Drawable component)
         {
             Type = component.GetType();
 
@@ -62,8 +64,8 @@ namespace osu.Game.Screens.Play.HUD
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            if (component is ISkinnableDrawable skinnable)
-                UsesFixedAnchor = skinnable.UsesFixedAnchor;
+            if (component is ISerialisableDrawable serialisableDrawable)
+                UsesFixedAnchor = serialisableDrawable.UsesFixedAnchor;
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
             {
@@ -74,8 +76,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (component is Container<Drawable> container)
             {
-                foreach (var child in container.OfType<ISkinnableDrawable>().OfType<Drawable>())
-                    Children.Add(child.CreateSkinnableInfo());
+                foreach (var child in container.OfType<ISerialisableDrawable>().OfType<Drawable>())
+                    Children.Add(child.CreateSerialisedInfo());
             }
         }
 
@@ -88,7 +90,7 @@ namespace osu.Game.Screens.Play.HUD
             try
             {
                 Drawable d = (Drawable)Activator.CreateInstance(Type)!;
-                d.ApplySkinnableInfo(this);
+                d.ApplySerialisedInfo(this);
                 return d;
             }
             catch (Exception e)
@@ -102,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             return typeof(OsuGame).Assembly.GetTypes()
                                   .Where(t => !t.IsInterface && !t.IsAbstract)
-                                  .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                  .Where(t => typeof(ISerialisableDrawable).IsAssignableFrom(t))
                                   .OrderBy(t => t.Name)
                                   .ToArray();
         }

@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -50,7 +49,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SkinnableInfo.GetAllAvailableDrawables();
+            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables();
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }
@@ -61,7 +60,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
-                if (!((ISkinnableDrawable)instance).IsEditable) return;
+                if (!((ISerialisableDrawable)instance).IsEditable) return;
 
                 fill.Add(new ToolboxComponentButton(instance, target)
                 {
