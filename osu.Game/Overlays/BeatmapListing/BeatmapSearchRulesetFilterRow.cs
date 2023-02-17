@@ -6,6 +6,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Extensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 
@@ -28,7 +29,13 @@ namespace osu.Game.Overlays.BeatmapListing
                 AddTabItem(new RulesetFilterTabItemAny());
 
                 foreach (var r in rulesets.AvailableRulesets)
+                {
+                    // Don't display non-legacy rulesets
+                    if (!r.IsLegacyRuleset())
+                        continue;
+
                     AddItem(r);
+                }
             }
         }
 

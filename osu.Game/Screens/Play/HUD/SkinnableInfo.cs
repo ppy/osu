@@ -67,10 +67,9 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var (_, property) in component.GetSettingsSourceProperties())
             {
-                var bindable = (IBindable)property.GetValue(component);
+                var bindable = (IBindable)property.GetValue(component)!;
 
-                if (!bindable.IsDefault)
-                    Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
+                Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
 
             if (component is Container<Drawable> container)
@@ -88,7 +87,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             try
             {
-                Drawable d = (Drawable)Activator.CreateInstance(Type);
+                Drawable d = (Drawable)Activator.CreateInstance(Type)!;
                 d.ApplySkinnableInfo(this);
                 return d;
             }

@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 
@@ -38,20 +39,30 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = new FillFlowContainer
+                    Child = new OsuContextMenuContainer
                     {
-                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        AutoSizeAxes = Axes.Y,
+                        Child = new PopoverContainer
                         {
-                            Header.With(h => h.Depth = float.MinValue),
-                            content = new PopoverContainer
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    Header.With(h => h.Depth = float.MinValue),
+                                    content = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
+                                    }
+                                }
                             }
-                        }
+                        },
                     }
                 },
                 Loading = new LoadingLayer(true)

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -36,11 +37,11 @@ namespace osu.Game.Online.Notifications.WebSocket
         public override async Task ConnectAsync(CancellationToken cancellationToken)
         {
             await socket.ConnectAsync(new Uri(endpoint), cancellationToken).ConfigureAwait(false);
-            await sendMessage(new StartChatRequest(), CancellationToken.None);
+            await sendMessage(new StartChatRequest(), CancellationToken.None).ConfigureAwait(false);
 
             runReadLoop(cancellationToken);
 
-            await base.ConnectAsync(cancellationToken);
+            await base.ConnectAsync(cancellationToken).ConfigureAwait(false);
         }
 
         private void runReadLoop(CancellationToken cancellationToken) => Task.Run(async () =>
@@ -52,7 +53,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             {
                 try
                 {
-                    WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, cancellationToken);
+                    WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
 
                     switch (result.MessageType)
                     {
@@ -72,7 +73,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                                     break;
                                 }
 
-                                await onMessageReceivedAsync(message);
+                                await onMessageReceivedAsync(message).ConfigureAwait(false);
                             }
 
                             break;
@@ -81,12 +82,12 @@ namespace osu.Game.Online.Notifications.WebSocket
                             throw new NotImplementedException("Binary message type not supported.");
 
                         case WebSocketMessageType.Close:
-                            throw new Exception("Connection closed by remote host.");
+                            throw new WebException("Connection closed by remote host.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    await InvokeClosed(ex);
+                    await InvokeClosed(ex).ConfigureAwait(false);
                     return;
                 }
             }
@@ -109,7 +110,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             if (socket.State != WebSocketState.Open)
                 return;
 
-            await socket.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), WebSocketMessageType.Text, true, cancellationToken);
+            await socket.SendAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), WebSocketMessageType.Text, true, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task onMessageReceivedAsync(SocketMessage message)
@@ -141,7 +142,7 @@ namespace osu.Game.Online.Notifications.WebSocket
                     Debug.Assert(messageData != null);
 
                     foreach (var msg in messageData.Messages)
-                        HandleChannelJoined(await getChannel(msg.ChannelId));
+                        HandleChannelJoined(await getChannel(msg.ChannelId).ConfigureAwait(false));
 
                     HandleMessages(messageData.Messages);
                     break;
@@ -150,7 +151,7 @@ namespace osu.Game.Online.Notifications.WebSocket
 
         private async Task<Channel> getChannel(long channelId)
         {
-            if (channelsMap.TryGetValue(channelId, out Channel channel))
+            if (channelsMap.TryGetValue(channelId, out Channel? channel))
                 return channel;
 
             var tsc = new TaskCompletionSource<Channel>();
@@ -166,13 +167,13 @@ namespace osu.Game.Online.Notifications.WebSocket
 
             API.Queue(req);
 
-            return await tsc.Task;
+            return await tsc.Task.ConfigureAwait(false);
         }
 
         public override async ValueTask DisposeAsync()
         {
-            await base.DisposeAsync();
-            await closeAsync();
+            await base.DisposeAsync().ConfigureAwait(false);
+            await closeAsync().ConfigureAwait(false);
             socket.Dispose();
         }
     }

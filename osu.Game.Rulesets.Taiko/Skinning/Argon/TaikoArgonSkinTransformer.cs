@@ -19,6 +19,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             switch (component)
             {
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
+                    // This should eventually be moved to a skin setting, when supported.
+                    if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
+                        return Drawable.Empty();
+
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case TaikoSkinComponentLookup taikoComponent:

@@ -55,11 +55,6 @@ namespace osu.Game.Localisation
         public static LocalisableString RestartAndReOpenRequiredForCompletion => new TranslatableString(getKey(@"restart_and_re_open_required_for_completion"), @"To complete this operation, osu! will close. Please open it again to use the new data location.");
 
         /// <summary>
-        /// "Import beatmaps from stable"
-        /// </summary>
-        public static LocalisableString ImportBeatmapsFromStable => new TranslatableString(getKey(@"import_beatmaps_from_stable"), @"Import beatmaps from stable");
-
-        /// <summary>
         /// "Delete ALL beatmaps"
         /// </summary>
         public static LocalisableString DeleteAllBeatmaps => new TranslatableString(getKey(@"delete_all_beatmaps"), @"Delete ALL beatmaps");
@@ -70,29 +65,14 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteAllBeatmapVideos => new TranslatableString(getKey(@"delete_all_beatmap_videos"), @"Delete ALL beatmap videos");
 
         /// <summary>
-        /// "Import scores from stable"
-        /// </summary>
-        public static LocalisableString ImportScoresFromStable => new TranslatableString(getKey(@"import_scores_from_stable"), @"Import scores from stable");
-
-        /// <summary>
         /// "Delete ALL scores"
         /// </summary>
         public static LocalisableString DeleteAllScores => new TranslatableString(getKey(@"delete_all_scores"), @"Delete ALL scores");
 
         /// <summary>
-        /// "Import skins from stable"
-        /// </summary>
-        public static LocalisableString ImportSkinsFromStable => new TranslatableString(getKey(@"import_skins_from_stable"), @"Import skins from stable");
-
-        /// <summary>
         /// "Delete ALL skins"
         /// </summary>
         public static LocalisableString DeleteAllSkins => new TranslatableString(getKey(@"delete_all_skins"), @"Delete ALL skins");
-
-        /// <summary>
-        /// "Import collections from stable"
-        /// </summary>
-        public static LocalisableString ImportCollectionsFromStable => new TranslatableString(getKey(@"import_collections_from_stable"), @"Import collections from stable");
 
         /// <summary>
         /// "Delete ALL collections"

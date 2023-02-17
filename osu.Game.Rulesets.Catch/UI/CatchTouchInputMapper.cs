@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -106,39 +105,15 @@ namespace osu.Game.Rulesets.Catch.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return updateAction(e.Button, getTouchCatchActionFromInput(e.ScreenSpaceMousePosition));
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             return updateAction(e.Touch.Source, getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position));
-        }
-
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            Show();
-
-            TouchCatchAction? action = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
-
-            // multiple mouse buttons may be pressed and handling the same action.
-            foreach (MouseButton button in e.PressedButtons)
-                updateAction(button, action);
-
-            return false;
         }
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
             updateAction(e.Touch.Source, getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position));
             base.OnTouchMove(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            updateAction(e.Button, null);
-            base.OnMouseUp(e);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)

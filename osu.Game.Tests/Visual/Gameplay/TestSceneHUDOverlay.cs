@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar? getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().SingleOrDefault();
+            ArgonSongProgress? getSongProgress() => hudOverlay.ChildrenOfType<ArgonSongProgress>().SingleOrDefault();
 
             bool seeked = false;
 
@@ -204,8 +204,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Debug.Assert(progress != null);
 
-                progress.ShowHandle = true;
-                progress.OnSeek += _ => seeked = true;
+                progress.Interactive.Value = true;
+                progress.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += _ => seeked = true;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);

@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
             InstantiationInfo = typeof(ArgonSkin).GetInvariantInstantiationInfo()
         };
 
-        private readonly IStorageResourceProvider resources;
+        protected readonly IStorageResourceProvider Resources;
 
         public ArgonSkin(IStorageResourceProvider resources)
             : this(CreateInfo(), resources)
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
-            this.resources = resources;
+            Resources = resources;
 
             Configuration.CustomComboColours = new List<Color4>
             {
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup) ?? resources.AudioManager?.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? Resources.AudioManager?.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
@@ -94,7 +94,7 @@ namespace osu.Game.Skinning
                     switch (globalLookup.Lookup)
                     {
                         case GlobalSkinComponentLookup.LookupType.SongSelect:
-                            var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
+                            var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
                             });
@@ -102,12 +102,13 @@ namespace osu.Game.Skinning
                             return songSelectComponents;
 
                         case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                            var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -158,6 +159,12 @@ namespace osu.Game.Skinning
                                         // origin flipped to match scale above.
                                         hitError2.Origin = Anchor.CentreLeft;
                                     }
+
+                                    if (songProgress != null)
+                                    {
+                                        songProgress.Position = new Vector2(0, -10);
+                                        songProgress.Scale = new Vector2(0.9f, 1);
+                                    }
                                 }
                             })
                             {
@@ -167,7 +174,7 @@ namespace osu.Game.Skinning
                                     new DefaultScoreCounter(),
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
-                                    new DefaultSongProgress(),
+                                    new ArgonSongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()

@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Setup
             return Task.CompletedTask;
         }
 
-        Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
         protected override void Dispose(bool isDisposing)
         {

@@ -75,10 +75,7 @@ namespace osu.Game.Rulesets
                                                   return false;
 
                                               return args.Name.Contains(name, StringComparison.Ordinal);
-                                          })
-                                          // Pick the greatest assembly version.
-                                          .OrderByDescending(a => a.GetName().Version)
-                                          .FirstOrDefault();
+                                          }).MaxBy(a => a.GetName().Version);
 
             if (domainAssembly != null)
                 return domainAssembly;
@@ -114,7 +111,10 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
+                // On net6-android (Debug), StartupDirectory can be different from where assemblies are placed.
+                // Search sub-directories too.
+
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll", SearchOption.AllDirectories);
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets
 
         private void loadRulesetFromFile(string file)
         {
-            string? filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (LoadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(assembly.GetName().Name.Split('.').Last(), e);
+                LogFailedLoad(assembly.GetName().Name!.Split('.').Last(), e);
             }
         }
 

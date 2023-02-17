@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Edit.Timing
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
                                                 },
-                                                new WaveformComparisonDisplay(),
+                                                new WaveformComparisonDisplay()
                                             }
                                         },
                                     }

@@ -18,6 +18,11 @@ namespace osu.Game.Database
     public class ModelManager<TModel> : IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public virtual bool PauseImports { get; set; }
+
         protected RealmAccess Realm { get; }
 
         private readonly RealmFileStore realmFileStore;

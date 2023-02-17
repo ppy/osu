@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 foreach (var condition in FailConditions.GetInvocationList())
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result });
+                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
                     if (conditionResult)
                         return true;
                 }

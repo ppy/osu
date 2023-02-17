@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (positionInfos[i].HitObject is Slider slider && random.NextDouble() < 0.5)
                 {
-                    OsuHitObjectGenerationUtils.FlipSliderHorizontally(slider);
+                    OsuHitObjectGenerationUtils.FlipSliderInPlaceHorizontally(slider);
                 }
 
                 if (i == 0)

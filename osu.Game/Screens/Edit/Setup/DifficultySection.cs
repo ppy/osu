@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,10 +15,10 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal partial class DifficultySection : SetupSection
     {
-        private LabelledSliderBar<float> circleSizeSlider;
-        private LabelledSliderBar<float> healthDrainSlider;
-        private LabelledSliderBar<float> approachRateSlider;
-        private LabelledSliderBar<float> overallDifficultySlider;
+        private LabelledSliderBar<float> circleSizeSlider = null!;
+        private LabelledSliderBar<float> healthDrainSlider = null!;
+        private LabelledSliderBar<float> approachRateSlider = null!;
+        private LabelledSliderBar<float> overallDifficultySlider = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 

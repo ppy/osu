@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework;
@@ -38,10 +36,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly DifficultiesContainer Difficulties;
 
-        public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
-        private APIBeatmapSet beatmapSet;
+        public readonly Bindable<APIBeatmap?> Beatmap = new Bindable<APIBeatmap?>();
+        private APIBeatmapSet? beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             get => beatmapSet;
             set
@@ -142,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -168,10 +166,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet != null)
             {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Concat(BeatmapSet.Converts ?? Array.Empty<APIBeatmap>())
                                                             .Where(b => b.Ruleset.MatchesOnlineID(ruleset.Value))
-                                                            .OrderBy(b => b.StarRating)
-                                                            .Select(b => new DifficultySelectorButton(b)
+                                                            .OrderBy(b => !b.Convert)
+                                                            .ThenBy(b => b.StarRating)
+                                                            .Select(b => new DifficultySelectorButton(b, b.Convert ? new RulesetInfo { OnlineID = 0 } : null)
                                                             {
                                                                 State = DifficultySelectorState.NotSelected,
                                                                 OnHovered = beatmap =>
@@ -199,9 +198,9 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(IBeatmapInfo beatmapInfo)
+        private void showBeatmap(IBeatmapInfo? beatmapInfo)
         {
-            version.Text = beatmapInfo?.DifficultyName;
+            version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
         }
 
         private void updateDifficultyButtons()
@@ -211,7 +210,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public partial class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
-            public Action OnLostHover;
+            public Action? OnLostHover;
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
@@ -232,9 +231,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public readonly APIBeatmap Beatmap;
 
-            public Action<APIBeatmap> OnHovered;
-            public Action<APIBeatmap> OnClicked;
-            public event Action<DifficultySelectorState> StateChanged;
+            public Action<APIBeatmap>? OnHovered;
+            public Action<APIBeatmap>? OnClicked;
+            public event Action<DifficultySelectorState>? StateChanged;
 
             private DifficultySelectorState state;
 
@@ -255,7 +254,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public DifficultySelectorButton(APIBeatmap beatmapInfo)
+            public DifficultySelectorButton(APIBeatmap beatmapInfo, IRulesetInfo? ruleset)
             {
                 Beatmap = beatmapInfo;
                 Size = new Vector2(size);
@@ -274,7 +273,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo)
+                    icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
                         ShowTooltip = false,
                         Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
         }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private Player? player { get; set; }
 
         protected override void LoadComplete()
