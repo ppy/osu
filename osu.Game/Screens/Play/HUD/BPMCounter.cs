@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class BPMCounter : RollingCounter<double>, ISkinnableDrawable
+    public partial class BPMCounter : RollingCounter<double>, ISerialisableDrawable
     {
         protected override double RollingDuration => 750;
 

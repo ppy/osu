@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public partial class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
+    public partial class LegacyAccuracyCounter : GameplayAccuracyCounter, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
