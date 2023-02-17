@@ -24,9 +24,18 @@ namespace osu.Game.Database
         /// Max length of filename (including extension).
         /// </summary>
         /// <remarks>
-        /// TODO: WHY? DOCUMENTATION PER PLATFORM LINKS HERE.
-        ///
-        /// This actual usable length is smaller 256 because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path
+        /// <para>
+        /// Filename limit for most OSs is 255, this actual usable length is smaller because <see cref="Storage.CreateFileSafely(string)"/> adds additional "_<see cref="Guid"/>" to the end of the path.
+        /// </para>
+        /// <para>
+        /// For more information see:
+        /// <br>
+        /// <see href="https://www.ibm.com/docs/en/spectrum-protect/8.1.9?topic=parameters-file-specification-syntax">File specification syntax</see>
+        /// </br>
+        /// <br>
+        /// <seealso href="https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits">File systems limitations</seealso>
+        /// </br>
+        /// </para>
         /// </remarks>
         public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
 
