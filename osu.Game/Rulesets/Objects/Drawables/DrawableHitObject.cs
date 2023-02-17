@@ -651,18 +651,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> can be judged.
-        /// The time offset of <see cref="Result"/> will be clamped to this value during <see cref="ApplyResult"/>.
-        /// <para>
-        /// Defaults to the miss window of <see cref="HitObject"/>.
-        /// </para>
-        /// </summary>
-        /// <remarks>
-        /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
-        /// </remarks>
-        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
-
-        /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
@@ -683,7 +671,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
+            Result.TimeOffset = Math.Min(HitObject.MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
