@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays.SkinEditor
         private Container outlineBox = null!;
 
         private AnchorOriginVisualiser anchorOriginVisualiser = null!;
+
+        private OsuSpriteText label = null!;
 
         private Drawable drawable => (Drawable)Item;
 
@@ -62,7 +65,7 @@ namespace osu.Game.Overlays.SkinEditor
                                 },
                             }
                         },
-                        new OsuSpriteText
+                        label = new OsuSpriteText
                         {
                             Text = Item.GetType().Name,
                             Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
@@ -86,6 +89,18 @@ namespace osu.Game.Overlays.SkinEditor
             this.FadeInFromZero(200, Easing.OutQuint);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateSelectedState();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateSelectedState();
+            base.OnHoverLost(e);
+        }
+
         protected override void OnSelected()
         {
             // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
@@ -104,6 +119,7 @@ namespace osu.Game.Overlays.SkinEditor
             outlineBox.Child.FadeTo(IsSelected ? 0.2f : 0, 200, Easing.OutQuint);
 
             anchorOriginVisualiser.FadeTo(IsSelected ? 1 : 0, 200, Easing.OutQuint);
+            label.FadeTo(IsSelected || IsHovered ? 1 : 0, 200, Easing.OutQuint);
         }
 
         private Quad drawableQuad;
