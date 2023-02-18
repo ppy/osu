@@ -35,13 +35,13 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification notification, CancellationToken cancellationToken = default)
         {
-            using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
-
-            float i = 0;
-            bool fileMissing = false;
-
             try
             {
+                var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
+
+                float i = 0;
+                bool fileMissing = false;
+
                 foreach (var file in model.Files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
