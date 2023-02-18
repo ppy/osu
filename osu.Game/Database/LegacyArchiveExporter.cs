@@ -74,7 +74,7 @@ namespace osu.Game.Database
             }
             catch (ObjectDisposedException)
             {
-                // outputStream may close before writing when request cancel
+                // outputStream may close before writing when request cancel.
                 if (cancellationToken.IsCancellationRequested)
                     return;
 

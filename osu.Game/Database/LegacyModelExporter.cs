@@ -35,7 +35,7 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
-        // Store the model being exported.
+        // Store the model being exporting.
         private readonly List<TModel> exportingModels = new List<TModel>();
 
         /// <summary>
@@ -62,6 +62,7 @@ namespace osu.Game.Database
         /// <returns></returns>
         public async Task ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
+            // check if the model is being exporting already
             if (!exportingModels.Contains(model))
             {
                 exportingModels.Add(model);
@@ -105,6 +106,7 @@ namespace osu.Game.Database
             }
             finally
             {
+                // cleanup if export is failed or canceled.
                 if (!success)
                 {
                     exportStorage.Delete(filename);
