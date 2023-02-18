@@ -69,7 +69,7 @@ namespace osu.Game.Database
             }
             else
             {
-                PostNotification?.Invoke(new SimpleErrorNotification()
+                PostNotification?.Invoke(new SimpleErrorNotification
                 {
                     Text = "File is being exported"
                 });
