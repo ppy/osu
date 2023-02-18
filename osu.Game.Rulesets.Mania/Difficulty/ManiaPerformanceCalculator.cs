@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double h100 = judgements[3];
             double h50 = judgements[4];
 
-            // https://www.desmos.com/calculator/akinrfls4r
+            // https://www.desmos.com/calculator/tybjpjfjlz
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -129,12 +129,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 double p0Ln = 1 - hitProb(h50, d) * hitProbLn(h50 * 2, d);
 
-                double pMax = ((pMaxNote * attributes.NoteCount) + (pMaxLn * attributes.HoldNoteCount)) / totalHits;
-                double p300 = ((p300Note * attributes.NoteCount) + (p300Ln * attributes.HoldNoteCount)) / totalHits;
-                double p200 = ((p200Note * attributes.NoteCount) + (p200Ln * attributes.HoldNoteCount)) / totalHits;
-                double p100 = ((p100Note * attributes.NoteCount) + (p100Ln * attributes.HoldNoteCount)) / totalHits;
-                double p50 = ((p50Note * attributes.NoteCount) + (p50Ln * attributes.HoldNoteCount)) / totalHits;
-                double p0 = ((p0Note * attributes.NoteCount) + (p0Ln * attributes.HoldNoteCount)) / totalHits;
+                double pMax = (pMaxNote * attributes.NoteCount + pMaxLn * attributes.HoldNoteCount) / totalHits;
+                double p300 = (p300Note * attributes.NoteCount + p300Ln * attributes.HoldNoteCount) / totalHits;
+                double p200 = (p200Note * attributes.NoteCount + p200Ln * attributes.HoldNoteCount) / totalHits;
+                double p100 = (p100Note * attributes.NoteCount + p100Ln * attributes.HoldNoteCount) / totalHits;
+                double p50 = (p50Note * attributes.NoteCount + p50Ln * attributes.HoldNoteCount) / totalHits;
+                double p0 = (p0Note * attributes.NoteCount + p0Ln * attributes.HoldNoteCount) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
                                   * Math.Pow(p300, (countGreat + 0.5) / totalHits)
@@ -167,12 +167,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Tail = hitProb(h50 * 1.5, d) - hitProb(h100 * 1.5, d);
                 double p0Tail = 1 - hitProb(h50 * 1.5, d);
 
-                double pMax = ((pMaxNote * (attributes.NoteCount + attributes.HoldNoteCount)) + (pMaxTail * attributes.HoldNoteCount)) / totalHits;
-                double p300 = ((p300Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p300Tail * attributes.HoldNoteCount)) / totalHits;
-                double p200 = ((p200Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p200Tail * attributes.HoldNoteCount)) / totalHits;
-                double p100 = ((p100Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p100Tail * attributes.HoldNoteCount)) / totalHits;
-                double p50 = ((p50Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p50Tail * attributes.HoldNoteCount)) / totalHits;
-                double p0 = ((p0Note * (attributes.NoteCount + attributes.HoldNoteCount)) + (p0Tail * attributes.HoldNoteCount)) / totalHits;
+                double pMax = (pMaxNote * (attributes.NoteCount + attributes.HoldNoteCount) + pMaxTail * attributes.HoldNoteCount) / totalHits;
+                double p300 = (p300Note * (attributes.NoteCount + attributes.HoldNoteCount) + p300Tail * attributes.HoldNoteCount) / totalHits;
+                double p200 = (p200Note * (attributes.NoteCount + attributes.HoldNoteCount) + p200Tail * attributes.HoldNoteCount) / totalHits;
+                double p100 = (p100Note * (attributes.NoteCount + attributes.HoldNoteCount) + p100Tail * attributes.HoldNoteCount) / totalHits;
+                double p50 = (p50Note * (attributes.NoteCount + attributes.HoldNoteCount) + p50Tail * attributes.HoldNoteCount) / totalHits;
+                double p0 = (p0Note * (attributes.NoteCount + attributes.HoldNoteCount) + p0Tail * attributes.HoldNoteCount) / totalHits;
 
                 double gradient = Math.Pow(pMax, countPerfect / totalHits)
                                   * Math.Pow(p300, (countGreat + 0.5) / totalHits)
