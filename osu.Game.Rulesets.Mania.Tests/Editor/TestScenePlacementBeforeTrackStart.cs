@@ -3,8 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using osuTK.Input;
 
@@ -13,6 +16,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     public partial class TestScenePlacementBeforeTrackStart : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [Test]
         public void TestPlacement()
@@ -25,6 +31,37 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             });
             AddStep("Click", () => InputManager.Click(MouseButton.Left));
             AddAssert("No notes placed", () => EditorBeatmap.HitObjects.All(x => x.StartTime >= 0));
+        }
+
+        [Test]
+        public void TestSeekOnNotePlacement()
+        {
+            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
+            AddStep("Change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitobject, true));
+            seekSetup();
+            AddUntilStep("Wait for seeking to end", () => !EditorClock.IsSeeking);
+            AddAssert("Seeked to object", () =>
+            {
+                return EditorClock.CurrentTimeAccurate == 2287.1875;
+            });
+        }
+
+        [Test]
+        public void TestNoSeekOnNotePlacement()
+        {
+            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
+            AddStep("Change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitobject, false));
+            seekSetup();
+            AddAssert("Not seeking", () => !EditorClock.IsSeeking);
+            AddAssert("Not seeked to object", () => EditorClock.CurrentTime == 1935);
+        }
+
+        private void seekSetup()
+        {
+            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
+            AddStep("Select note", () => InputManager.Key(Key.Number2));
+            AddStep("Place note", () => InputManager.MoveMouseTo(this.ChildrenOfType<DrawableHoldNoteHead>().First(x => x.HitObject.StartTime == 2170)));
+            AddStep("Click", () => InputManager.Click(MouseButton.Left));
         }
     }
 }
