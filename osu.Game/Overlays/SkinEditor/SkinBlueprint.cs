@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public partial class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
+    public partial class SkinBlueprint : SelectionBlueprint<ISerialisableDrawable>
     {
         private Container box = null!;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public SkinBlueprint(ISkinnableDrawable component)
+        public SkinBlueprint(ISerialisableDrawable component)
             : base(component)
         {
         }
