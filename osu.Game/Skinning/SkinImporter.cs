@@ -108,7 +108,7 @@ namespace osu.Game.Skinning
             // By this point, the metadata in SkinInfo will be correct.
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
-            if (skinIniSourcedName != item.Name)
+            if (!item.Name.Contains(skinIniSourcedName))
                 updateSkinIniMetadata(item, realm);
         }
 
