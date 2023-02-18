@@ -37,7 +37,7 @@ namespace osu.Game.Database
         {
             try
             {
-                var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
+                using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
 
                 float i = 0;
                 bool fileMissing = false;
