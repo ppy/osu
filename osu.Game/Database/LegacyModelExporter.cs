@@ -35,6 +35,9 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
+        // Store the model being exported.
+        private readonly List<TModel> exportingModels = new List<TModel>();
+
         /// <summary>
         /// Construct exporter.
         /// Create a new exporter for each export, otherwise it will cause confusing notifications.
@@ -59,13 +62,26 @@ namespace osu.Game.Database
         /// <returns></returns>
         public async Task ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
+            if (!exportingModels.Contains(model))
+            {
+                exportingModels.Add(model);
+            }
+            else
+            {
+                PostNotification?.Invoke(new SimpleErrorNotification()
+                {
+                    Text = "File is being exported"
+                });
+                return;
+            }
+
             string itemFilename = GetFilename(model).GetValidFilename();
             IEnumerable<string> existingExports =
                 exportStorage
                     .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
                     .Concat(exportStorage.GetDirectories(string.Empty));
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-            bool success;
+            bool success = false;
 
             ProgressNotification notification = new ProgressNotification
             {
@@ -87,10 +103,14 @@ namespace osu.Game.Database
             {
                 success = false;
             }
-
-            if (!success)
+            finally
             {
-                exportStorage.Delete(filename);
+                if (!success)
+                {
+                    exportStorage.Delete(filename);
+                }
+
+                exportingModels.Remove(model);
             }
         }
 
