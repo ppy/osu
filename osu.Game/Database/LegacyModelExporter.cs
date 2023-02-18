@@ -76,9 +76,16 @@ namespace osu.Game.Database
             notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
             PostNotification?.Invoke(notification);
 
-            using (var stream = exportStorage.CreateFileSafely(filename))
+            try
             {
-                success = await ExportToStreamAsync(model, stream, notification, cancellationToken ?? notification.CancellationToken).ConfigureAwait(false);
+                using (var stream = exportStorage.CreateFileSafely(filename))
+                {
+                    success = await ExportToStreamAsync(model, stream, notification, cancellationToken ?? notification.CancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                success = false;
             }
 
             if (!success)
