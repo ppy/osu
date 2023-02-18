@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -39,34 +40,45 @@ namespace osu.Game.Database
             float i = 0;
             bool fileMissing = false;
 
-            foreach (var file in model.Files)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
+                foreach (var file in model.Files)
                 {
-                    // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
-                    if (stream == null)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                     {
-                        // Only pop up once to prevent spam.
-                        if (!fileMissing)
+                        // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
+                        if (stream == null)
                         {
-                            PostNotification?.Invoke(new SimpleErrorNotification
+                            // Only pop up once to prevent spam.
+                            if (!fileMissing)
                             {
-                                Text = "Some of your files are missing, they will not be included in the archive"
-                            });
-                            fileMissing = true;
+                                PostNotification?.Invoke(new SimpleErrorNotification
+                                {
+                                    Text = "Some of your files are missing, they will not be included in the archive"
+                                });
+                                fileMissing = true;
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(file.Filename, stream);
                         }
                     }
-                    else
-                    {
-                        writer.Write(file.Filename, stream);
-                    }
-                }
 
-                i++;
-                notification.Progress = i / model.Files.Count();
-                notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                    i++;
+                    notification.Progress = i / model.Files.Count();
+                    notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // outputStream may close before writing when request cancel
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                throw;
             }
         }
     }
