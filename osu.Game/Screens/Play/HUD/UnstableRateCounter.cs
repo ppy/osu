@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class UnstableRateCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class UnstableRateCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

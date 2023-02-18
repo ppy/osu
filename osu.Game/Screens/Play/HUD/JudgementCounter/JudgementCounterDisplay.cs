@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
-    public partial class JudgementCounterDisplay : CompositeDrawable, ISkinnableDrawable
+    public partial class JudgementCounterDisplay : CompositeDrawable, ISerialisableDrawable
     {
         public const int TRANSFORM_DURATION = 250;
 
