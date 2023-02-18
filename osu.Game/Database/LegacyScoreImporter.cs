@@ -20,7 +20,7 @@ namespace osu.Game.Database
                 return Enumerable.Empty<string>();
 
             return storage.GetFiles(ImportFromStablePath)
-                          .Where(p => Importer.HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
+                          .Where(p => Importer.HandledExtensions.Any(ext => Path.GetExtension(p).Equals(ext, StringComparison.OrdinalIgnoreCase)))
                           .Select(path => storage.GetFullPath(path));
         }
 
