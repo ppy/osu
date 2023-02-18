@@ -13,13 +13,11 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -38,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
-            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType.MainHUDComponents, skinManager.CurrentSkin.Value));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -54,17 +52,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea target, ISkin expectedSource)
         {
-            var targetContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target);
+            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>().First(s => s.Lookup.Target == target);
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
                 return false;
 
-            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+            var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
-            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target)) as Container;
+            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new SkinComponentsContainerLookup(target)) as Container;
             if (expectedComponentsContainer == null)
                 return false;
 
@@ -85,21 +83,21 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
+            var expectedInfo = expectedComponentsContainer.CreateSerialisedInfo();
             Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
 
-        private static bool almostEqual(SkinnableInfo info, SkinnableInfo? other) =>
+        private static bool almostEqual(SerialisedDrawableInfo drawableInfo, SerialisedDrawableInfo? other) =>
             other != null
-            && info.Type == other.Type
-            && info.Anchor == other.Anchor
-            && info.Origin == other.Origin
-            && Precision.AlmostEquals(info.Position, other.Position, 1)
-            && Precision.AlmostEquals(info.Scale, other.Scale)
-            && Precision.AlmostEquals(info.Rotation, other.Rotation)
-            && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
+            && drawableInfo.Type == other.Type
+            && drawableInfo.Anchor == other.Anchor
+            && drawableInfo.Origin == other.Origin
+            && Precision.AlmostEquals(drawableInfo.Position, other.Position, 1)
+            && Precision.AlmostEquals(drawableInfo.Scale, other.Scale)
+            && Precision.AlmostEquals(drawableInfo.Rotation, other.Rotation)
+            && drawableInfo.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SerialisedDrawableInfo>(almostEqual));
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);

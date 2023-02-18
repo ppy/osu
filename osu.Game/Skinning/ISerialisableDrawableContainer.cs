@@ -5,31 +5,25 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Extensions;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a container which can house <see cref="ISkinnableDrawable"/>s.
+    /// A container which can house <see cref="ISerialisableDrawable"/>s.
+    /// Contains functionality for new drawables to be added, removed, and reloaded from provided <see cref="SerialisedDrawableInfo"/>.
     /// </summary>
-    public interface ISkinnableTarget : IDrawable
+    public interface ISerialisableDrawableContainer : IDrawable
     {
-        /// <summary>
-        /// The definition of this target.
-        /// </summary>
-        GlobalSkinComponentLookup.LookupType Target { get; }
-
         /// <summary>
         /// A bindable list of components which are being tracked by this skinnable target.
         /// </summary>
-        IBindableList<ISkinnableDrawable> Components { get; }
+        IBindableList<ISerialisableDrawable> Components { get; }
 
         /// <summary>
-        /// Serialise all children as <see cref="SkinnableInfo"/>.
+        /// Serialise all children as <see cref="SerialisedDrawableInfo"/>.
         /// </summary>
         /// <returns>The serialised content.</returns>
-        IEnumerable<SkinnableInfo> CreateSkinnableInfo() => Components.Select(d => ((Drawable)d).CreateSkinnableInfo());
+        IEnumerable<SerialisedDrawableInfo> CreateSerialisedInfo() => Components.Select(d => ((Drawable)d).CreateSerialisedInfo());
 
         /// <summary>
         /// Reload this target from the current skin.
@@ -39,18 +33,18 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Reload this target from the provided skinnable information.
         /// </summary>
-        void Reload(SkinnableInfo[] skinnableInfo);
+        void Reload(SerialisedDrawableInfo[] skinnableInfo);
 
         /// <summary>
         /// Add a new skinnable component to this target.
         /// </summary>
         /// <param name="drawable">The component to add.</param>
-        void Add(ISkinnableDrawable drawable);
+        void Add(ISerialisableDrawable drawable);
 
         /// <summary>
         /// Remove an existing skinnable component from this target.
         /// </summary>
         /// <param name="component">The component to remove.</param>
-        void Remove(ISkinnableDrawable component);
+        void Remove(ISerialisableDrawable component);
     }
 }
