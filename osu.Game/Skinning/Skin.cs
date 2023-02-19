@@ -11,13 +11,13 @@ using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
@@ -37,9 +37,9 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
+        public IDictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]> DrawableComponentInfo => drawableComponentInfo;
 
-        private readonly Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]> drawableComponentInfo = new Dictionary<GlobalSkinComponentLookup.LookupType, SkinnableInfo[]>();
+        private readonly Dictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]> drawableComponentInfo = new Dictionary<SkinComponentsContainerLookup.TargetArea, SerialisedDrawableInfo[]>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -100,7 +100,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            foreach (GlobalSkinComponentLookup.LookupType skinnableTarget in Enum.GetValues<GlobalSkinComponentLookup.LookupType>())
+            foreach (SkinComponentsContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinComponentsContainerLookup.TargetArea>())
             {
                 string filename = $"{skinnableTarget}.json";
 
@@ -119,7 +119,7 @@ namespace osu.Game.Skinning
                     jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
                     jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
 
-                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
+                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(jsonContent);
 
                     if (deserializedContent == null)
                         continue;
@@ -143,18 +143,18 @@ namespace osu.Game.Skinning
         /// Remove all stored customisations for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to reset.</param>
-        public void ResetDrawableTarget(ISkinnableTarget targetContainer)
+        public void ResetDrawableTarget(SkinComponentsContainer targetContainer)
         {
-            DrawableComponentInfo.Remove(targetContainer.Target);
+            DrawableComponentInfo.Remove(targetContainer.Lookup.Target);
         }
 
         /// <summary>
         /// Update serialised information for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
-        public void UpdateDrawableTarget(ISkinnableTarget targetContainer)
+        public void UpdateDrawableTarget(SkinComponentsContainer targetContainer)
         {
-            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
+            DrawableComponentInfo[targetContainer.Lookup.Target] = ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray();
         }
 
         public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
@@ -165,8 +165,8 @@ namespace osu.Game.Skinning
                 case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false);
 
-                case GlobalSkinComponentLookup target:
-                    if (!DrawableComponentInfo.TryGetValue(target.Lookup, out var skinnableInfo))
+                case SkinComponentsContainerLookup containerLookup:
+                    if (!DrawableComponentInfo.TryGetValue(containerLookup.Target, out var skinnableInfo))
                         return null;
 
                     var components = new List<Drawable>();
@@ -174,8 +174,9 @@ namespace osu.Game.Skinning
                     foreach (var i in skinnableInfo)
                         components.Add(i.CreateInstance());
 
-                    return new SkinnableTargetComponentsContainer
+                    return new Container
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Children = components,
                     };
             }
