@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             double? initialTime = null;
 
             AddStep("store initial time", () => initialTime = EditorClock.CurrentTime);
-            AddStep("change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitObject, true));
+            AddStep("change seek setting to true", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, true));
             placeObject();
             AddUntilStep("wait for seek to complete", () => !EditorClock.IsSeeking);
             AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime));
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             double? initialTime = null;
 
             AddStep("store initial time", () => initialTime = EditorClock.CurrentTime);
-            AddStep("change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitObject, false));
+            AddStep("change seek setting to false", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, false));
             placeObject();
             AddAssert("not seeking", () => !EditorClock.IsSeeking);
             AddAssert("time is unchanged", () => EditorClock.CurrentTime, () => Is.EqualTo(initialTime));
