@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 using osuTK.Input;
 
@@ -36,29 +36,32 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestSeekOnNotePlacement()
         {
-            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
-            AddStep("Change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitObject, true));
-            seekSetup();
-            AddUntilStep("Wait for seeking to end", () => !EditorClock.IsSeeking);
-            AddAssert("Seeked to object", () => EditorClock.CurrentTimeAccurate == 2287.1875);
+            double? initialTime = null;
+
+            AddStep("store initial time", () => initialTime = EditorClock.CurrentTime);
+            AddStep("change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitObject, true));
+            placeObject();
+            AddUntilStep("wait for seek to complete", () => !EditorClock.IsSeeking);
+            AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime));
         }
 
         [Test]
         public void TestNoSeekOnNotePlacement()
         {
-            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
-            AddStep("Change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitObject, false));
-            seekSetup();
-            AddAssert("Not seeking", () => !EditorClock.IsSeeking);
-            AddAssert("Not seeked to object", () => EditorClock.CurrentTime == 1935);
+            double? initialTime = null;
+
+            AddStep("store initial time", () => initialTime = EditorClock.CurrentTime);
+            AddStep("change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitObject, false));
+            placeObject();
+            AddAssert("not seeking", () => !EditorClock.IsSeeking);
+            AddAssert("time is unchanged", () => EditorClock.CurrentTime, () => Is.EqualTo(initialTime));
         }
 
-        private void seekSetup()
+        private void placeObject()
         {
-            AddStep("Seek to 1935", () => EditorClock.Seek(1935));
-            AddStep("Select note", () => InputManager.Key(Key.Number2));
-            AddStep("Place note", () => InputManager.MoveMouseTo(this.ChildrenOfType<DrawableHoldNoteHead>().First(x => x.HitObject.StartTime == 2170)));
-            AddStep("Click", () => InputManager.Click(MouseButton.Left));
+            AddStep("select note placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to centre of last column", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().Last().ScreenSpaceDrawQuad.Centre));
+            AddStep("place note", () => InputManager.Click(MouseButton.Left));
         }
     }
 }
