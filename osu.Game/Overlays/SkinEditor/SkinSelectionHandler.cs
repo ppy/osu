@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public partial class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
+    public partial class SkinSelectionHandler : SelectionHandler<ISerialisableDrawable>
     {
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.SkinEditor
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<ISerialisableDrawable> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
@@ -178,10 +178,10 @@ namespace osu.Game.Overlays.SkinEditor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items) =>
+        protected override void DeleteItems(IEnumerable<ISerialisableDrawable> items) =>
             skinEditor.DeleteItems(items.ToArray());
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISerialisableDrawable>> selection)
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
@@ -209,7 +209,7 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISkinnableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISerialisableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
