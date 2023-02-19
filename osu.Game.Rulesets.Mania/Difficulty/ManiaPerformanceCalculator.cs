@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// </summary>
         private double? computeEstimatedUr(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
-            if (totalSuccessfulJudgements == 0)
+            if (totalSuccessfulJudgements == 0 || attributes.NoteCount + attributes.HoldNoteCount == 0)
                 return null;
 
             bool isLegacyScore = score.Mods.Any(m => m is ModClassic) && totalJudgements == attributes.NoteCount + attributes.HoldNoteCount;
