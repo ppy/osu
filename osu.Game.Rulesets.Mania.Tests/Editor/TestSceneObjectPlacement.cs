@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public partial class TestScenePlacementBeforeTrackStart : EditorTestScene
+    public partial class TestSceneObjectPlacement : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
 
