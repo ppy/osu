@@ -36,6 +36,32 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestHitCircleClassicAndFullHiddenMods()
+        {
+            AddStep("Create hit circle", () =>
+            {
+                SelectedMods.Value = new Mod[] { new OsuModHidden(), new OsuModClassic() };
+                createCircle();
+            });
+
+            AddUntilStep("Wait until circle is missed", () => alphaAtMiss.IsNotNull());
+            AddAssert("Transparent when missed", () => alphaAtMiss == 0);
+        }
+
+        [Test]
+        public void TestHitCircleClassicAndApproachCircleOnlyHiddenMods()
+        {
+            AddStep("Create hit circle", () =>
+            {
+                SelectedMods.Value = new Mod[] { new OsuModHidden { OnlyFadeApproachCircles = { Value = true } }, new OsuModClassic() };
+                createCircle();
+            });
+
+            AddUntilStep("Wait until circle is missed", () => alphaAtMiss.IsNotNull());
+            AddAssert("Transparent when missed", () => alphaAtMiss == 0);
+        }
+
+        [Test]
         public void TestHitCircleNoMod()
         {
             AddStep("Create hit circle", () =>
