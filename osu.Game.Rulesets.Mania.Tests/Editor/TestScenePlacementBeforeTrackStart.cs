@@ -37,20 +37,17 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public void TestSeekOnNotePlacement()
         {
             AddStep("Seek to 1935", () => EditorClock.Seek(1935));
-            AddStep("Change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitobject, true));
+            AddStep("Change seek setting to true", () => config.SetValue(OsuSetting.EditorSeekToHitObject, true));
             seekSetup();
             AddUntilStep("Wait for seeking to end", () => !EditorClock.IsSeeking);
-            AddAssert("Seeked to object", () =>
-            {
-                return EditorClock.CurrentTimeAccurate == 2287.1875;
-            });
+            AddAssert("Seeked to object", () => EditorClock.CurrentTimeAccurate == 2287.1875);
         }
 
         [Test]
         public void TestNoSeekOnNotePlacement()
         {
             AddStep("Seek to 1935", () => EditorClock.Seek(1935));
-            AddStep("Change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitobject, false));
+            AddStep("Change seek setting to false", () => config.SetValue(OsuSetting.EditorSeekToHitObject, false));
             seekSetup();
             AddAssert("Not seeking", () => !EditorClock.IsSeeking);
             AddAssert("Not seeked to object", () => EditorClock.CurrentTime == 1935);
