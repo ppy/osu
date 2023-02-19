@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
-        private Bindable<bool> editorSeekToHitObject;
+        private Bindable<bool> editorAutoSeekOnPlacement;
 
         public Editor(EditorLoader loader = null)
         {
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Edit
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
-            editorSeekToHitObject = config.GetBindable<bool>(OsuSetting.EditorSeekToHitObject);
+            editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -332,9 +332,9 @@ namespace osu.Game.Screens.Edit
                                             {
                                                 State = { BindTarget = editorHitMarkers },
                                             },
-                                            new ToggleMenuItem(EditorStrings.SeekToHitObject)
+                                            new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
                                             {
-                                                State = { BindTarget = editorSeekToHitObject },
+                                                State = { BindTarget = editorAutoSeekOnPlacement },
                                             }
                                         }
                                     },
