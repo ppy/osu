@@ -7,19 +7,31 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Play.HUD;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
-    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
+    /// <summary>
+    /// A container which holds many skinnable components, with functionality to add, remove and reload layouts.
+    /// Used to allow user customisation of skin layouts.
+    /// </summary>
+    /// <remarks>
+    /// This is currently used as a means of serialising skin layouts to files.
+    /// Currently, one json file in a skin will represent one <see cref="SkinComponentsContainer"/>, containing
+    /// the output of <see cref="ISerialisableDrawableContainer.CreateSerialisedInfo"/>.
+    /// </remarks>
+    public partial class SkinComponentsContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
-        private SkinnableTargetComponentsContainer? content;
+        private Container? content;
 
-        public GlobalSkinComponentLookup.LookupType Target { get; }
+        /// <summary>
+        /// The lookup criteria which will be used to retrieve components from the active skin.
+        /// </summary>
+        public SkinComponentsContainerLookup Lookup { get; }
 
-        public IBindableList<ISkinnableDrawable> Components => components;
+        public IBindableList<ISerialisableDrawable> Components => components;
 
-        private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
+        private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks; // ensure that components are loaded even if the target container is hidden (ie. due to user toggle).
 
@@ -27,27 +39,28 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType target)
+        public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
         {
-            Target = target;
+            Lookup = lookup;
         }
 
-        public void Reload(SkinnableInfo[] skinnableInfo)
+        public void Reload(SerialisedDrawableInfo[] skinnableInfo)
         {
             var drawables = new List<Drawable>();
 
             foreach (var i in skinnableInfo)
                 drawables.Add(i.CreateInstance());
 
-            Reload(new SkinnableTargetComponentsContainer
+            Reload(new Container
             {
+                RelativeSizeAxes = Axes.Both,
                 Children = drawables,
             });
         }
 
-        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer);
+        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);
 
-        public void Reload(SkinnableTargetComponentsContainer? componentsContainer)
+        public void Reload(Container? componentsContainer)
         {
             ClearInternal();
             components.Clear();
@@ -66,7 +79,7 @@ namespace osu.Game.Skinning
                 LoadComponentAsync(content, wrapper =>
                 {
                     AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
+                    components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                     ComponentsLoaded = true;
                 }, (cancellationSource = new CancellationTokenSource()).Token);
             }
@@ -74,10 +87,10 @@ namespace osu.Game.Skinning
                 ComponentsLoaded = true;
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Add(ISkinnableDrawable component)
+        public void Add(ISerialisableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");
@@ -89,10 +102,10 @@ namespace osu.Game.Skinning
             components.Add(component);
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Remove(ISkinnableDrawable component)
+        public void Remove(ISerialisableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to remove a new component from a target container which is not supported by the current skin.");
