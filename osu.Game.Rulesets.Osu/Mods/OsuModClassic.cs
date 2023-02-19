@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
 
-            usingHiddenFading = (drawableRuleset.Mods.OfType<OsuModHidden>().SingleOrDefault()?.OnlyFadeApproachCircles.Value ?? true) != true;
+            usingHiddenFading = drawableRuleset.Mods.OfType<OsuModHidden>().SingleOrDefault()?.OnlyFadeApproachCircles.Value == false;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject obj)
