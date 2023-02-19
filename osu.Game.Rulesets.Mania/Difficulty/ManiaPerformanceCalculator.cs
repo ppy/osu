@@ -89,13 +89,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             bool isLegacyScore = score.Mods.Any(m => m is ModClassic) && totalJudgements == attributes.NoteCount + attributes.HoldNoteCount;
 
-            double[] judgements = isLegacyScore ? getLegacyJudgements(score, attributes) : getLazerJudgements(score, attributes);
+            double[] hitWindows = isLegacyScore ? getLegacyHitWindows(score, attributes) : getLazerHitWindows(score, attributes);
 
-            double hMax = judgements[0];
-            double h300 = judgements[1];
-            double h200 = judgements[2];
-            double h100 = judgements[3];
-            double h50 = judgements[4];
+            double hMax = hitWindows[0];
+            double h300 = hitWindows[1];
+            double h200 = hitWindows[2];
+            double h100 = hitWindows[3];
+            double h50 = hitWindows[4];
 
             // https://www.desmos.com/calculator/tybjpjfjlz
             double legacyLikelihoodGradient(double d)
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 10) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 10);
         }
 
-        private double[] getLegacyJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double[] getLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             double[] judgements = new double[5];
 
@@ -225,9 +225,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return judgements;
         }
 
-        private double[] getLazerJudgements(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double[] getLazerHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
-            double[] judgements = new double[5];
+            double[] hitWindows = new double[5];
 
             var track = new TrackVirtual(10000);
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
@@ -241,15 +241,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 windowMultiplier *= 1.4;
 
             if (attributes.OverallDifficulty < 5)
-                judgements[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
+                hitWindows[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
             else
-                judgements[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
-            judgements[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            judgements[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            judgements[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            judgements[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+                hitWindows[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
+            hitWindows[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            hitWindows[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            hitWindows[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            hitWindows[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
 
-            return judgements;
+            return hitWindows;
         }
 
         private double logPcNote(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
