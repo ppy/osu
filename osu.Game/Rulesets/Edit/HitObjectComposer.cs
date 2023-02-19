@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Edit
         private FillFlowContainer togglesCollection;
 
         private IBindable<bool> hasTiming;
-        protected Bindable<bool> SeekToHitobject { get; private set; }
+        private Bindable<bool> seekToHitObject;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
-            SeekToHitobject = config.GetBindable<bool>(OsuSetting.EditorSeekToHitobject);
+            seekToHitObject = config.GetBindable<bool>(OsuSetting.EditorSeekToHitObject);
 
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -369,8 +369,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                // conditionally seek based on setting
-                if (!SeekToHitobject.Value) return;
+                if (!seekToHitObject.Value) return;
 
                 if (EditorClock.CurrentTime < hitObject.StartTime)
                     EditorClock.SeekSmoothlyTo(hitObject.StartTime);
