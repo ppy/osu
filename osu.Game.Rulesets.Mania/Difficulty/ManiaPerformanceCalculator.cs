@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUr = computeEstimatedUr(score, maniaAttributes) * 10;
+            estimatedUr = computeEstimatedUr(score, maniaAttributes);
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -97,12 +97,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double h100 = hitWindows[3];
             double h50 = hitWindows[4];
 
+            double nJudgements = Math.Log(totalJudgements);
+            double nNoteCount = Math.Log(attributes.NoteCount);
+            double nHoldCount = Math.Log(attributes.HoldNoteCount);
+            double nNoteHoldCount = Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
+
             // https://www.desmos.com/calculator/tybjpjfjlz
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
                     return 0;
 
+                // The variable name 'logPc' means 'log probability complementary'.
                 double pMaxNote = logDiff(0, logPcNote(hMax, d));
                 double p300Note = logDiff(logPcNote(hMax, d), logPcNote(h300, d));
                 double p200Note = logDiff(logPcNote(h300, d), logPcNote(h200, d));
@@ -113,35 +119,34 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // Since we're using complementary probabilities for precision, multiplying the head and tail probabilities takes the form P(A∩B)' = P(A'∪B') = P(A') + P(B') - P(A'∩B').
                 double combinedProb(double p1, double p2) => logDiff(logSum(p1, p2), p1 + p2);
 
-                // The variable name 'logPc' means 'log probability complementary'.
                 double logPcMaxHead = logPcNote(hMax * 1.2, d);
-                double logPcMaxTail = logPcHitHoldTail(hMax * 2.4, d);
+                double logPcMaxTail = logPcHoldTail(hMax * 2.4, d);
                 double pMaxHold = logDiff(0, combinedProb(logPcMaxHead, logPcMaxTail));
 
                 double logPc300Head = logPcNote(h300 * 1.1, d);
-                double logPc300Tail = logPcHitHoldTail(h300 * 2.2, d);
+                double logPc300Tail = logPcHoldTail(h300 * 2.2, d);
                 double p300Hold = logDiff(combinedProb(logPcMaxHead, logPcMaxTail), combinedProb(logPc300Head, logPc300Tail));
 
                 double logPc200Head = logPcNote(h200, d);
-                double logPc200Tail = logPcHitHoldTail(h200 * 2, d);
+                double logPc200Tail = logPcHoldTail(h200 * 2, d);
                 double p200Hold = logDiff(combinedProb(logPc300Head, logPc300Tail), combinedProb(logPc200Head, logPc200Tail));
 
                 double logPc100Head = logPcNote(h100, d);
-                double logPc100Tail = logPcHitHoldTail(h100 * 2, d);
+                double logPc100Tail = logPcHoldTail(h100 * 2, d);
                 double p100Hold = logDiff(combinedProb(logPc200Head, logPc200Tail), combinedProb(logPc100Head, logPc100Tail));
 
                 double logPc50Head = logPcNote(h50, d);
-                double logPc50Tail = logPcHitHoldTail(h50 * 2, d);
+                double logPc50Tail = logPcHoldTail(h50 * 2, d);
                 double p50Hold = logDiff(combinedProb(logPc100Head, logPc100Tail), combinedProb(logPc50Head, logPc50Tail));
 
                 double p0Hold = combinedProb(logPc50Head, logPc50Tail);
 
-                double pMax = logSum(pMaxNote + Math.Log(attributes.NoteCount), pMaxHold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p300 = logSum(p300Note + Math.Log(attributes.NoteCount), p300Hold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p200 = logSum(p200Note + Math.Log(attributes.NoteCount), p200Hold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p100 = logSum(p100Note + Math.Log(attributes.NoteCount), p100Hold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p50 = logSum(p50Note + Math.Log(attributes.NoteCount), p50Hold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p0 = logSum(p0Note + Math.Log(attributes.NoteCount), p0Hold + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
+                double pMax = logSum(pMaxNote + nNoteCount, pMaxHold + nHoldCount) - nJudgements;
+                double p300 = logSum(p300Note + nNoteCount, p300Hold + nHoldCount) - nJudgements;
+                double p200 = logSum(p200Note + nNoteCount, p200Hold + nHoldCount) - nJudgements;
+                double p100 = logSum(p100Note + nNoteCount, p100Hold + nHoldCount) - nJudgements;
+                double p50 = logSum(p50Note + nNoteCount, p50Hold + nHoldCount) - nJudgements;
+                double p0 = logSum(p0Note + nNoteCount, p0Hold + nHoldCount) - nJudgements;
 
                 double gradient = Math.Exp(
                     (countPerfect * pMax
@@ -169,7 +174,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p0Note = logPcNote(h50, d);
 
                 // Lazer LN tails are 1.5x the hit window, so calculate the probability of hitting them separately.
-                // We don't use "logPcHitHoldTail` for these since they have the same hit mechanics as a regular note.
+                // We don't use "logPcHoldTail` for these since they have the same hit mechanics as a regular note.
                 double pMaxTail = logDiff(0, logPcNote(hMax * 1.5, d));
                 double p300Tail = logDiff(logPcNote(hMax * 1.5, d), logPcNote(h300 * 1.5, d));
                 double p200Tail = logDiff(logPcNote(h300 * 1.5, d), logPcNote(h200 * 1.5, d));
@@ -177,12 +182,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Tail = logDiff(logPcNote(h100 * 1.5, d), logPcNote(h50 * 1.5, d));
                 double p0Tail = logPcNote(h50 * 1.5, d);
 
-                double pMax = logSum(pMaxNote + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), pMaxTail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p300 = logSum(p300Note + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), p300Tail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p200 = logSum(p200Note + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), p200Tail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p100 = logSum(p100Note + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), p100Tail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p50 = logSum(p50Note + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), p50Tail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
-                double p0 = logSum(p0Note + Math.Log(attributes.NoteCount + attributes.HoldNoteCount), p0Tail + Math.Log(attributes.HoldNoteCount)) - Math.Log(totalJudgements);
+                double pMax = logSum(pMaxNote + nNoteHoldCount, pMaxTail + nHoldCount) - nJudgements;
+                double p300 = logSum(p300Note + nNoteHoldCount, p300Tail + nHoldCount) - nJudgements;
+                double p200 = logSum(p200Note + nNoteHoldCount, p200Tail + nHoldCount) - nJudgements;
+                double p100 = logSum(p100Note + nNoteHoldCount, p100Tail + nHoldCount) - nJudgements;
+                double p50 = logSum(p50Note + nNoteHoldCount, p50Tail + nHoldCount) - nJudgements;
+                double p0 = logSum(p0Note + nNoteHoldCount, p0Tail + nHoldCount) - nJudgements;
 
                 double gradient = Math.Exp(
                     (countPerfect * pMax
@@ -196,8 +201,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return -gradient;
             }
 
-            // Finding the minimum of the function returns the most likely deviation for the hit results.
-            return isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 10) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 10);
+            // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
+            double deviation = isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 10) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 10);
+            return deviation * 10;
         }
 
         private double[] getLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
@@ -229,8 +235,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double[] hitWindows = new double[5];
 
+            // Create a new track of arbitrary length
             var track = new TrackVirtual(10000);
+            // Apply the total rate change of every mod to the track (i.e. DT = 1.01-2x, HT = 0.5-0.99x)
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            // The final clock rate is the rate of the track
             double clockRate = track.Rate;
 
             double windowMultiplier = 1 / clockRate;
@@ -253,25 +262,41 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         private double logPcNote(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
+
+        // For values of x above 5, there is a very simple approximation to increase how far you can calculate x.
         private double logErfcApprox(double x) => x <= 5 ? Math.Log(SpecialFunctions.Erfc(x)) : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
 
         // Legacy LN tails take the absolute error of both hit judgements on an LN, so we use a folded normal distribution to calculate it.
-        private double logPcHitHoldTail(double x, double deviation) => Math.Log(1 - Math.Pow(2 * Normal.CDF(0, deviation * Math.Sqrt(2), x) - 1, 2));
+        private double logPcHoldTail(double x, double deviation) => Math.Log(1 - Math.Pow(2 * Normal.CDF(0, deviation * Math.Sqrt(2), x) - 1, 2));
 
         // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
-        private double logDiff(double l1, double l2) => l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
-
         private double logSum(double l1, double l2)
         {
             double maxVal = Math.Max(l1, l2);
             double minVal = Math.Min(l1, l2);
 
+            // 0 in log form becomes negative infinity, so return negative infinity if both numbers are negative infinity.
+            // We can assume negative infinity is 0 because you cannot write a negative in log form.
             if (double.IsNegativeInfinity(maxVal))
             {
                 return maxVal;
             }
 
             return maxVal + Math.Log(1 + Math.Exp(minVal - maxVal));
+        }
+
+        private double logDiff(double l1, double l2)
+        {
+            double maxVal = Math.Max(l1, l2);
+            double minVal = Math.Min(l1, l2);
+
+            // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity. See comment in logSum.
+            if (double.IsNegativeInfinity(maxVal))
+            {
+                return maxVal;
+            }
+
+            return maxVal + SpecialFunctions.Log1p(-Math.Exp(-(maxVal - minVal)));
         }
     }
 }
