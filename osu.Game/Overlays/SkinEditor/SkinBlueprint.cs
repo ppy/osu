@@ -177,6 +177,7 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         private Vector2? anchorPosition;
+        private Vector2? originPositionInDrawableSpace;
 
         protected override void Update()
         {
@@ -186,17 +187,12 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
 
             var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
-
-            anchorPosition ??= newAnchor;
-
-            anchorPosition =
-                new Vector2(
-                    (float)Interpolation.DampContinuously(anchorPosition.Value.X, newAnchor.X, 25, Clock.ElapsedFrameTime),
-                    (float)Interpolation.DampContinuously(anchorPosition.Value.Y, newAnchor.Y, 25, Clock.ElapsedFrameTime)
-                );
-
-            originBox.Position = drawable.ToSpaceOfOtherDrawable(drawable.OriginPosition, this);
+            anchorPosition = tweenPosition(anchorPosition ?? newAnchor, newAnchor);
             anchorBox.Position = anchorPosition.Value;
+
+            // for the origin, tween in the drawable's local space to avoid unwanted tweening when the drawable is being dragged.
+            originPositionInDrawableSpace = originPositionInDrawableSpace != null ? tweenPosition(originPositionInDrawableSpace.Value, drawable.OriginPosition) : drawable.OriginPosition;
+            originBox.Position = drawable.ToSpaceOfOtherDrawable(originPositionInDrawableSpace.Value, this);
 
             var point1 = ToLocalSpace(anchorBox.ScreenSpaceDrawQuad.Centre);
             var point2 = ToLocalSpace(originBox.ScreenSpaceDrawQuad.Centre);
@@ -205,5 +201,11 @@ namespace osu.Game.Overlays.SkinEditor
             anchorLine.Width = (point2 - point1).Length;
             anchorLine.Rotation = MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X));
         }
+
+        private Vector2 tweenPosition(Vector2 oldPosition, Vector2 newPosition)
+            => new Vector2(
+                (float)Interpolation.DampContinuously(oldPosition.X, newPosition.X, 25, Clock.ElapsedFrameTime),
+                (float)Interpolation.DampContinuously(oldPosition.Y, newPosition.Y, 25, Clock.ElapsedFrameTime)
+            );
     }
 }
