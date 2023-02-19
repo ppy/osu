@@ -21,6 +21,7 @@ using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Internal.DummyAudio;
 using osu.Game.Screens.LLin.Plugins.Internal.DummyBase;
 using osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar;
+using osu.Game.Screens.LLin.Plugins.Internal.LuaSupport;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
@@ -321,14 +322,17 @@ namespace osu.Game.Screens.LLin.Plugins
 
             DummyBasePluginProvider dbpp;
             DummyAudioPluginProvider dapp;
+            LuaPluginProvider luapp;
             providers.AddRange(new LLinPluginProvider[]
             {
                 dbpp = new DummyBasePluginProvider(config, this),
                 dapp = new DummyAudioPluginProvider(config, this),
+                luapp = new LuaPluginProvider()
             });
 
             AddPlugin(dbpp.CreatePlugin);
             AddPlugin(dapp.CreatePlugin);
+            AddPlugin(luapp.CreatePlugin);
 
             if (PluginStore != null)
             {
