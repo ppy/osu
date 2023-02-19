@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private OsuConfigManager config { get; set; } = null!;
 
         [Test]
-        public void TestPlacement()
+        public void TestPlacementBeforeTrackStart()
         {
             AddStep("Seek to 0", () => EditorClock.Seek(0));
             AddStep("Select note", () => InputManager.Key(Key.Number2));
