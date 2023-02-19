@@ -20,9 +20,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowHitMarkers => new TranslatableString(getKey(@"show_hit_markers"), @"Show hit markers");
 
         /// <summary>
-        /// "Seek to Object after placement"
+        /// "Seek to object after placement"
         /// </summary>
-        public static LocalisableString SeekToHitobject => new TranslatableString(getKey(@"seek_to_hitobject"), @"Seek to Object after placement");
+        public static LocalisableString SeekToHitObject => new TranslatableString(getKey(@"seek_to_hit_object"), @"Seek to object after placement");
 
         /// <summary>
         /// "Timing"
