@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using NLua;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -44,9 +45,10 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.LuaSupport
 
             Author = "mfosu";
             Name = "Lua控制台";
-            Description = "Toy";
 
             Flags.Add(PluginFlags.CanDisable);
+
+            Depth = -2;
         }
 
         private FillFlowContainer loggingTextFlow = null!;
@@ -97,6 +99,8 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.LuaSupport
 
                 Lua?.Dispose();
                 Lua = new Lua();
+
+                Lua.State.Encoding = Encoding.UTF8;
 
                 Lua.LoadCLRPackage();
                 registerLuaFunctions();
