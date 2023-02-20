@@ -57,3 +57,10 @@ dotnet_diagnostic.RS0030.severity = error
 # Temporarily disable analysing CanBeNull = true in NRT contexts due to mobile issues.
 # See: https://github.com/ppy/osu/pull/19677
 dotnet_diagnostic.OSUF001.severity = none
+
+# see https://github.com/realm/realm-dotnet/blob/main/CHANGELOG.md#10200-2023-02-10
+realm.ignore_objects_nullability = true
+dotnet_diagnostic.RS0030.severity = none
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8603.severity = none

@@ -16,6 +16,12 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# Re-enable disabled rule in .globalconfig (disabled so it doesn't run on realm source generator emitted files)
+dotnet_diagnostic.RS0030.severity = warning
+dotnet_diagnostic.CS8601.severity = warning
+dotnet_diagnostic.CS8601.severity = warning
+dotnet_diagnostic.CS8603.severity = warning
+
 #license header
 file_header_template = Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\nSee the LICENCE file in the repository root for full licence text.
 
