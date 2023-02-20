@@ -19,6 +19,7 @@ namespace osu.Game.Skinning
     {
         private const string global_identifier = @"global";
 
+        [JsonIgnore]
         public IEnumerable<SerialisedDrawableInfo> AllDrawables => DrawableInfo.Values.SelectMany(v => v);
 
         [JsonProperty]
