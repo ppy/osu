@@ -66,25 +66,20 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            if (componentsContainer == null)
-                return;
-
-            content = componentsContainer;
+            content = componentsContainer ?? new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             cancellationSource?.Cancel();
             cancellationSource = null;
 
-            if (content != null)
+            LoadComponentAsync(content, wrapper =>
             {
-                LoadComponentAsync(content, wrapper =>
-                {
-                    AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
-                    ComponentsLoaded = true;
-                }, (cancellationSource = new CancellationTokenSource()).Token);
-            }
-            else
+                AddInternal(wrapper);
+                components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
+            }, (cancellationSource = new CancellationTokenSource()).Token);
         }
 
         /// <inheritdoc cref="ISerialisableDrawableContainer"/>
