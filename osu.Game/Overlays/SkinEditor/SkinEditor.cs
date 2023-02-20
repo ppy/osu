@@ -353,12 +353,18 @@ namespace osu.Game.Overlays.SkinEditor
             placeComponent(component);
         }
 
-        private void placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
+        /// <summary>
+        /// Attempt to place a given component in the current target.
+        /// </summary>
+        /// <param name="component">The component to be placed.</param>
+        /// <param name="applyDefaults">Whether to apply default anchor / origin / position values.</param>
+        /// <returns>Whether placement succeeded. Could fail if no target is available, or if the current target has missing dependency requirements for the component.</returns>
+        private bool placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
         {
             var targetContainer = getFirstTarget();
 
             if (targetContainer == null)
-                return;
+                return false;
 
             var drawableComponent = (Drawable)component;
 
@@ -370,10 +376,19 @@ namespace osu.Game.Overlays.SkinEditor
                 drawableComponent.Y = targetContainer.DrawSize.Y / 2;
             }
 
-            targetContainer.Add(component);
+            try
+            {
+                targetContainer.Add(component);
+            }
+            catch
+            {
+                // May fail if dependencies are not available, for instance.
+                return false;
+            }
 
             SelectedComponents.Clear();
             SelectedComponents.Add(component);
+            return true;
         }
 
         private void populateSettings()
