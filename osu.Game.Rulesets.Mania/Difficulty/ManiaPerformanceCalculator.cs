@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
+        private const double tail_multiplier = 1.5; // Lazer LN tails have 1.5x the hit window of a Note or an LN head.
+
         private int countPerfect;
         private int countGreat;
         private int countGood;
@@ -173,14 +175,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double p50Note = logDiff(logPcNote(h100, d), logPcNote(h50, d));
                 double p0Note = logPcNote(h50, d);
 
-                // Lazer LN tails are 1.5x the hit window, so calculate the probability of hitting them separately.
+                // Lazer LN tails have a bigger hit window, so calculate the probability of hitting them separately.
                 // We don't use "logPcHoldTail` for these since they have the same hit mechanics as a regular note.
-                double pMaxTail = logDiff(0, logPcNote(hMax * 1.5, d));
-                double p300Tail = logDiff(logPcNote(hMax * 1.5, d), logPcNote(h300 * 1.5, d));
-                double p200Tail = logDiff(logPcNote(h300 * 1.5, d), logPcNote(h200 * 1.5, d));
-                double p100Tail = logDiff(logPcNote(h200 * 1.5, d), logPcNote(h100 * 1.5, d));
-                double p50Tail = logDiff(logPcNote(h100 * 1.5, d), logPcNote(h50 * 1.5, d));
-                double p0Tail = logPcNote(h50 * 1.5, d);
+                double pMaxTail = logDiff(0, logPcNote(hMax * tail_multiplier, d));
+                double p300Tail = logDiff(logPcNote(hMax * tail_multiplier, d), logPcNote(h300 * tail_multiplier, d));
+                double p200Tail = logDiff(logPcNote(h300 * tail_multiplier, d), logPcNote(h200 * tail_multiplier, d));
+                double p100Tail = logDiff(logPcNote(h200 * tail_multiplier, d), logPcNote(h100 * tail_multiplier, d));
+                double p50Tail = logDiff(logPcNote(h100 * tail_multiplier, d), logPcNote(h50 * tail_multiplier, d));
+                double p0Tail = logPcNote(h50 * tail_multiplier, d);
 
                 double pMax = logSum(pMaxNote + nNoteHoldCount, pMaxTail + nHoldCount) - nJudgements;
                 double p300 = logSum(p300Note + nNoteHoldCount, p300Tail + nHoldCount) - nJudgements;
@@ -288,7 +290,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double logDiff(double l1, double l2)
         {
             double maxVal = Math.Max(l1, l2);
-            double minVal = Math.Min(l1, l2);
 
             // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity. See comment in logSum.
             if (double.IsNegativeInfinity(maxVal))
@@ -296,7 +297,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return maxVal;
             }
 
-            return maxVal + SpecialFunctions.Log1p(-Math.Exp(-(maxVal - minVal)));
+            return l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
         }
     }
 }
