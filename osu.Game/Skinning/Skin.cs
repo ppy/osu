@@ -130,7 +130,7 @@ namespace osu.Game.Skinning
                     // have something in place to ensure we don't end up breaking skins of users that haven't
                     // manually saved their skin since a change was implemented.
 
-                    // if that fails, attempt to deserialise using the old naked list.
+                    // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
                     if (layoutInfo == null)
                     {
                         // handle namespace changes...
