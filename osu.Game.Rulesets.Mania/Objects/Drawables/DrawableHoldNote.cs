@@ -69,8 +69,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private double? releaseTime;
 
-        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
-
         public DrawableHoldNote()
             : this(null)
         {

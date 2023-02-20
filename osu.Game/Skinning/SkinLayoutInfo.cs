@@ -17,8 +17,9 @@ namespace osu.Game.Skinning
     [Serializable]
     public class SkinLayoutInfo
     {
-        private const string global_identifier = "global";
+        private const string global_identifier = @"global";
 
+        [JsonIgnore]
         public IEnumerable<SerialisedDrawableInfo> AllDrawables => DrawableInfo.Values.SelectMany(v => v);
 
         [JsonProperty]

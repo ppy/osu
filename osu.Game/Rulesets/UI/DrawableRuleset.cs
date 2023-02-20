@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.UI
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
-                p.RevertResult += (_, r) => RevertResult?.Invoke(r);
+                p.RevertResult += r => RevertResult?.Invoke(r);
             }));
         }
 
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -508,6 +508,15 @@ namespace osu.Game.Rulesets.UI
         public ResumeOverlay ResumeOverlay { get; protected set; }
 
         /// <summary>
+        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// Even if <c>true</c>, will not have any effect if the ruleset does not have a resume overlay (see <see cref="CreateResumeOverlay"/>).
+        /// </remarks>
+        public bool UseResumeOverlay { get; set; } = true;
+
+        /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
         /// </summary>
         [CanBeNull]
@@ -531,6 +540,11 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        /// <summary>
+        /// Create an optional resume overlay, which is displayed when a player requests to resume gameplay during non-break time.
+        /// This can be used to force the player to return their hands / cursor to the position they left off, to avoid players
+        /// using pauses as a means of adjusting their inputs (aka "pause buffering").
+        /// </summary>
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
