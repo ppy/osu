@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
     /// A mod preset is a named collection of configured mods.
     /// Presets are presented to the user in the mod select overlay for convenience.
     /// </summary>
-    public class ModPreset : RealmObject, IHasGuidPrimaryKey, ISoftDelete
+    public partial class ModPreset : IRealmObject, IHasGuidPrimaryKey, ISoftDelete
     {
         /// <summary>
         /// The internal database ID of the preset.

@@ -7,7 +7,7 @@ using Realms;
 namespace osu.Game.Models
 {
     [MapTo("File")]
-    public class RealmFile : RealmObject, IFileInfo
+    public partial class RealmFile : IRealmObject, IFileInfo
     {
         [PrimaryKey]
         public string Hash { get; set; } = string.Empty;

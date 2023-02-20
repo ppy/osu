@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
     /// </remarks>
     [Serializable]
     [MapTo("BeatmapMetadata")]
-    public class BeatmapMetadata : RealmObject, IBeatmapMetadataInfo, IDeepCloneable<BeatmapMetadata>
+    public partial class BeatmapMetadata : IRealmObject, IBeatmapMetadataInfo, IDeepCloneable<BeatmapMetadata>
     {
         public string Title { get; set; } = string.Empty;
 

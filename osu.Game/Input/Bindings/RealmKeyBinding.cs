@@ -10,7 +10,7 @@ using Realms;
 namespace osu.Game.Input.Bindings
 {
     [MapTo(nameof(KeyBinding))]
-    public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey, IKeyBinding
+    public partial class RealmKeyBinding : IRealmObject, IHasGuidPrimaryKey, IKeyBinding
     {
         [PrimaryKey]
         public Guid ID { get; set; }

@@ -9,7 +9,7 @@ using Realms;
 
 namespace osu.Game.Models
 {
-    public class RealmUser : EmbeddedObject, IUser, IEquatable<RealmUser>, IDeepCloneable<RealmUser>
+    public partial class RealmUser : IEmbeddedObject, IUser, IEquatable<RealmUser>, IDeepCloneable<RealmUser>
     {
         public int OnlineID { get; set; } = 1;
 

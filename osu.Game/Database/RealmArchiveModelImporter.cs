@@ -27,7 +27,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     public abstract class RealmArchiveModelImporter<TModel> : IModelImporter<TModel>
-        where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
+        where TModel : class, IRealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
         /// <summary>
         /// The maximum number of concurrent imports to run per import scheduler.

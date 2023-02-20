@@ -13,7 +13,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// A collection of beatmaps grouped by a name.
     /// </summary>
-    public class BeatmapCollection : RealmObject, IHasGuidPrimaryKey
+    public partial class BeatmapCollection : IRealmObject, IHasGuidPrimaryKey
     {
         [PrimaryKey]
         public Guid ID { get; set; }

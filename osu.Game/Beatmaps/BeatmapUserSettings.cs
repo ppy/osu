@@ -8,7 +8,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// User settings overrides that are attached to a beatmap.
     /// </summary>
-    public class BeatmapUserSettings : EmbeddedObject
+    public partial class BeatmapUserSettings : IEmbeddedObject
     {
         /// <summary>
         /// An audio offset that can be used for timing adjustments.

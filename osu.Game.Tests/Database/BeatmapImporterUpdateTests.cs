@@ -620,7 +620,7 @@ namespace osu.Game.Tests.Database
             });
         }
 
-        private static void checkCount<T>(RealmAccess realm, int expected, Expression<Func<T, bool>>? condition = null) where T : RealmObject
+        private static void checkCount<T>(RealmAccess realm, int expected, Expression<Func<T, bool>>? condition = null) where T : IRealmObject
         {
             var query = realm.Realm.All<T>();
 

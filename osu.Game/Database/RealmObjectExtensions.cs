@@ -187,7 +187,7 @@ namespace osu.Game.Database
         /// <param name="items">A list of managed <see cref="RealmObject"/>s to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
         /// <returns>A list containing non-managed copies of provided items.</returns>
-        public static List<T> Detach<T>(this IEnumerable<T> items) where T : RealmObjectBase
+        public static List<T> Detach<T>(this IEnumerable<T> items) where T : IRealmObjectBase
         {
             var list = new List<T>();
 
@@ -206,7 +206,7 @@ namespace osu.Game.Database
         /// <param name="item">The managed <see cref="RealmObject"/> to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
         /// <returns>A non-managed copy of provided item. Will return the provided item if already detached.</returns>
-        public static T Detach<T>(this T item) where T : RealmObjectBase
+        public static T Detach<T>(this T item) where T : IRealmObjectBase
         {
             if (!item.IsManaged)
                 return item;
@@ -226,23 +226,23 @@ namespace osu.Game.Database
         public static void CopyChangesToRealm(this BeatmapSetInfo source, BeatmapSetInfo destination)
             => copyChangesToRealm(source, destination);
 
-        private static void copyChangesToRealm<T>(T source, T destination) where T : RealmObjectBase
+        private static void copyChangesToRealm<T>(T source, T destination) where T : IRealmObjectBase
             => write_mapper.Map(source, destination);
 
         public static List<Live<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
-            where T : RealmObject, IHasGuidPrimaryKey
+            where T : class, IRealmObject, IHasGuidPrimaryKey
         {
             return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<Live<T>>().ToList();
         }
 
         public static Live<T> ToLiveUnmanaged<T>(this T realmObject)
-            where T : RealmObject, IHasGuidPrimaryKey
+            where T : class, IRealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);
         }
 
         public static Live<T> ToLive<T>(this T realmObject, RealmAccess realm)
-            where T : RealmObject, IHasGuidPrimaryKey
+            where T : class, IRealmObject, IHasGuidPrimaryKey
         {
             return new RealmLive<T>(realmObject, realm);
         }
@@ -285,8 +285,8 @@ namespace osu.Game.Database
         /// </returns>
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0})" />
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0})" />
-        public static IDisposable QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
-            where T : RealmObjectBase
+        public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
+            where T : IRealmObjectBase
         {
             if (!RealmAccess.CurrentThreadSubscriptionsAllowed)
                 throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
@@ -311,7 +311,7 @@ namespace osu.Game.Database
         /// May be null in the case the provided collection is not managed.
         /// </returns>
         public static IDisposable? QueryAsyncWithNotifications<T>(this IQueryable<T> list, NotificationCallbackDelegate<T> callback)
-            where T : RealmObjectBase
+            where T : IRealmObjectBase
         {
             // Subscribing to non-managed instances doesn't work.
             // In this usage, the instance may be non-managed in tests.
@@ -338,7 +338,7 @@ namespace osu.Game.Database
         /// May be null in the case the provided collection is not managed.
         /// </returns>
         public static IDisposable? QueryAsyncWithNotifications<T>(this IList<T> list, NotificationCallbackDelegate<T> callback)
-            where T : RealmObjectBase
+            where T : IRealmObjectBase
         {
             // Subscribing to non-managed instances doesn't work.
             // In this usage, the instance may be non-managed in tests.
