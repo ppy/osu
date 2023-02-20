@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
 
             // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
-            double deviation = isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 10) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 10);
+            double deviation = isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
             return deviation * 10;
         }
 
