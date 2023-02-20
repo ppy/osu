@@ -125,11 +125,15 @@ namespace osu.Game.Skinning
                     {
                     }
 
+                    // Of note, the migration code below runs on read of skins, but there's nothing to
+                    // force a rewrite after migration. Let's not remove these migration rules until we
+                    // have something in place to ensure we don't end up breaking skins of users that haven't
+                    // manually saved their skin since a change was implemented.
+
                     // if that fails, attempt to deserialise using the old naked list.
                     if (layoutInfo == null)
                     {
                         // handle namespace changes...
-                        // can be removed 2023-01-31
                         jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
                         jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
 
