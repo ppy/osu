@@ -423,11 +423,6 @@ namespace osu.Game.Overlays.SkinEditor
             if (!canCopy.Value)
                 return;
 
-            // This is an initial implementation just to get an idea of how people used this function.
-            // There are a couple of differences from osu!stable's implementation which will require more work to match:
-            // - The "clipboard" is not populated during the duplication process.
-            // - The duplicated hitobjects are inserted after the original pattern (add one beat_length and then quantize using beat snap).
-            // - The duplicated hitobjects are selected (but this is also applied for all paste operations so should be changed there).
             Copy();
             Paste();
         }
