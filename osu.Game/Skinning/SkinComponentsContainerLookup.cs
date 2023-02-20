@@ -17,8 +17,6 @@ namespace osu.Game.Skinning
 
         public readonly RulesetInfo? Ruleset;
 
-        public string GetSerialisableIdentifier() => Ruleset?.ShortName ?? "global";
-
         public SkinComponentsContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
         {
             Target = target;
