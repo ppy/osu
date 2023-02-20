@@ -455,11 +455,13 @@ namespace osu.Game.Overlays.SkinEditor
                                         .OfType<ISerialisableDrawable>()
                                         .ToArray();
 
-            foreach (var i in instances)
-                placeComponent(i, false);
-
             SelectedComponents.Clear();
-            SelectedComponents.AddRange(instances);
+
+            foreach (var i in instances)
+            {
+                if (placeComponent(i, false))
+                    SelectedComponents.Add(i);
+            }
 
             changeHandler?.EndChange();
         }
