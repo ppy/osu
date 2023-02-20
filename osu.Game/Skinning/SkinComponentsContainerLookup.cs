@@ -15,6 +15,10 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly TargetArea Target;
 
+        /// <summary>
+        /// The ruleset for which skin components should be returned.
+        /// A <see langword="null"/> value means that returned components are global and should be applied for all rulesets.
+        /// </summary>
         public readonly RulesetInfo? Ruleset;
 
         public SkinComponentsContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
