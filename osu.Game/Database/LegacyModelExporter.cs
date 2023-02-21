@@ -124,12 +124,12 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
         /// <returns>Whether the export was successful</returns>
-        public async Task<bool> ExportToStreamAsync(TModel model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
+        public Task<bool> ExportToStreamAsync(TModel model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
         {
             ProgressNotification notify = notification ?? new ProgressNotification();
 
             Guid id = model.ID;
-            return await Task.Run(() =>
+            return Task.Run(() =>
             {
                 realmAccess.Run(r =>
                 {
@@ -148,7 +148,7 @@ namespace osu.Game.Database
                 notify.CompletionText = "Export Complete, Click to open the folder";
                 notify.State = ProgressNotificationState.Completed;
                 return true;
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken);
         }
 
         /// <summary>
