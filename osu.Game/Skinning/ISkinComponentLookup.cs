@@ -4,7 +4,8 @@
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A lookup type which can be used with <see cref="ISkin.GetDrawableComponent"/>.
+    /// The base lookup type to be used with <see cref="ISkin.GetDrawableComponent"/>.
+    /// Should be implemented as necessary to add further criteria to lookups, which are usually consumed by ruleset transformers or legacy lookup cases.
     /// </summary>
     /// <remarks>
     /// Implementations of <see cref="ISkin.GetDrawableComponent"/> should match on types implementing this interface
