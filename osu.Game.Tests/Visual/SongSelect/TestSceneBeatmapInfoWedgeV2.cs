@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -37,12 +38,25 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.LoadComplete();
 
-            Add(infoWedge = new TestBeatmapInfoWedgeV2
+            AddRange(new Drawable[]
             {
-                State = { Value = Visibility.Visible },
-                Width = 0.6f,
-                RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding { Top = 20, Left = -10 }
+                // This exists only to make the wedge more visible in the test scene
+                new Box
+                {
+                    Y = -20,
+                    Colour = Colour4.Cornsilk.Darken(0.2f),
+                    Height = BeatmapInfoWedgeV2.WEDGE_HEIGHT + 40,
+                    Width = 0.65f,
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Top = 20, Left = -10 }
+                },
+                infoWedge = new TestBeatmapInfoWedgeV2
+                {
+                    State = { Value = Visibility.Visible },
+                    Width = 0.6f,
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Top = 20, Left = -10 }
+                },
             });
 
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
@@ -200,7 +214,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private partial class TestBeatmapInfoWedgeV2 : BeatmapInfoWedgeV2
         {
             public new Container? DisplayedContent => base.DisplayedContent;
-
             public new WedgeInfoText? Info => base.Info;
         }
 
