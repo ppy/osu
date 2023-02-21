@@ -265,20 +265,23 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double logPcNote(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
 
-        // For values of x above 5, there is a very simple approximation to increase how far you can calculate x.
+        // Legacy LN tails take the absolute error of both hit judgements on an LN, so we use a folded normal distribution to calculate it.
+        private double logPcHoldTail(double x, double deviation) => holdTailApprox(x / (deviation * Math.Sqrt(2)));
+
+        // There are numerical approximations to increase how far you can calculate x.
         private double logErfcApprox(double x) => x <= 5 ? Math.Log(SpecialFunctions.Erfc(x)) : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
 
-        // Legacy LN tails take the absolute error of both hit judgements on an LN, so we use a folded normal distribution to calculate it.
-        private double logPcHoldTail(double x, double deviation) => Math.Log(1 - Math.Pow(2 * Normal.CDF(0, deviation * Math.Sqrt(2), x) - 1, 2));
+        // A handy approximation for the folded distribution is to subtract the natural log of the complementary CDF from log(2).
+        private double holdTailApprox(double x) => x <= 7 ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x), 2)) : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
 
         // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
-        private double logSum(double l1, double l2)
+        private double logSum(double firstLog, double secondLog)
         {
-            double maxVal = Math.Max(l1, l2);
-            double minVal = Math.Min(l1, l2);
+            double maxVal = Math.Max(firstLog, secondLog);
+            double minVal = Math.Min(firstLog, secondLog);
 
             // 0 in log form becomes negative infinity, so return negative infinity if both numbers are negative infinity.
-            // We can assume negative infinity is 0 because you cannot write a negative in log form.
+            // Shouldn't happen on any UR>0, but good for redundancy purposes.
             if (double.IsNegativeInfinity(maxVal))
             {
                 return maxVal;
@@ -287,9 +290,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return maxVal + Math.Log(1 + Math.Exp(minVal - maxVal));
         }
 
-        private double logDiff(double l1, double l2)
+        private double logDiff(double firstLog, double secondLog)
         {
-            double maxVal = Math.Max(l1, l2);
+            double maxVal = Math.Max(firstLog, secondLog);
 
             // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity. See comment in logSum.
             if (double.IsNegativeInfinity(maxVal))
@@ -297,7 +300,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return maxVal;
             }
 
-            return l1 + SpecialFunctions.Log1p(-Math.Exp(-(l1 - l2)));
+            return firstLog + SpecialFunctions.Log1p(-Math.Exp(-(firstLog - secondLog)));
         }
     }
 }
