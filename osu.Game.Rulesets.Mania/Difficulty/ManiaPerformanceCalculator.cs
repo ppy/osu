@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double logErfcApprox(double x) => x <= 5 ? Math.Log(SpecialFunctions.Erfc(x)) : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
 
         // A handy approximation for the folded distribution is to subtract the natural log of the complementary CDF from log(2).
-        private double holdTailApprox(double x) => x <= 7 ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x), 2)) : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
+        private double holdTailApprox(double x) => x <= 7 ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2)) : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
 
         // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
         private double logSum(double firstLog, double secondLog)
