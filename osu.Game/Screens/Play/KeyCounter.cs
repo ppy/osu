@@ -60,17 +60,17 @@ namespace osu.Game.Screens.Play
             countPresses.Value--;
         }
 
-        protected virtual void Activate(bool increment = true)
+        protected virtual void Activate(bool forwardPlayback = true)
         {
             IsActive.Value = true;
-            if (increment)
+            if (forwardPlayback)
                 Increment();
         }
 
-        protected virtual void Deactivate(bool preserve = true)
+        protected virtual void Deactivate(bool forwardPlayback = true)
         {
             IsActive.Value = false;
-            if (!preserve)
+            if (!forwardPlayback)
                 Decrement();
         }
 
