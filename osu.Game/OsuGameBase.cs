@@ -58,7 +58,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -393,10 +392,7 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
-            SelectedMods.BindValueChanged(change => Logger.Log($"{modSetting(change.OldValue)} => {modSetting(change.NewValue)}"));
         }
-
-        private object modSetting(IReadOnlyList<Mod> mods) => mods.OfType<ModDoubleTime>().FirstOrDefault()?.GetSettingsSourceProperties().First().Item2.GetValue(mods.OfType<ModDoubleTime>().First())!;
 
         private void addFilesWarning()
         {
@@ -629,7 +625,7 @@ namespace osu.Game
                 return;
             }
 
-            //for some reason emptying SelectedMods resets all SettingSources Bindables to default value
+            //DeepCloning collection, because emptying SelectedMods resets all SettingSources Bindables to their default value
             var previouslySelectedMods = SelectedMods.Value.Select(mod => mod.DeepClone()).ToArray();
 
             if (!SelectedMods.Disabled)
@@ -643,7 +639,7 @@ namespace osu.Game
                 {
                     Mod newMod = instance.CreateModFromAcronym(oldMod.Acronym);
 
-                    newMod?.CopyFromSimilar(oldMod);
+                    newMod?.CopySharedSettings(oldMod);
 
                     return newMod;
                 }).Where(m => m != null).ToArray();
