@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -369,6 +370,53 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             changeRuleset(3);
             AddAssert("no mod selected", () => SelectedMods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestKeepSharedSettingsFromSimilarMods()
+        {
+            const float setting_change = 1.2f;
+
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModDifficultyAdjust>()! });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModDifficultyAdjust);
+
+            AddStep("change mod settings", () =>
+            {
+                var osuMod = (getMod() as OsuModDifficultyAdjust)!;
+                osuMod.ExtendedLimits.Value = true;
+                osuMod.CircleSize.Value = setting_change;
+                osuMod.DrainRate.Value = setting_change;
+                osuMod.OverallDifficulty.Value = setting_change;
+                osuMod.ApproachRate.Value = setting_change;
+            });
+
+            changeRuleset(1);
+            AddAssert("taiko variant selected", () => SelectedMods.Value.SingleOrDefault() is TaikoModDifficultyAdjust);
+
+            AddAssert("shared settings didn't change", () =>
+            {
+                var taikoMod = getMod() as TaikoModDifficultyAdjust;
+                return
+                    taikoMod?.ExtendedLimits.Value == true &&
+                    taikoMod?.DrainRate.Value == setting_change &&
+                    taikoMod?.OverallDifficulty.Value == setting_change;
+            });
+
+            AddAssert("non-shared settings at default", () =>
+            {
+                var taikoMod = getMod() as TaikoModDifficultyAdjust;
+                if (taikoMod == null)
+                    return false;
+
+                return taikoMod.ScrollSpeed.Value == taikoMod.ScrollSpeed.Default;
+            });
+
+            ModDifficultyAdjust getMod() => (SelectedMods.Value.Single() as ModDifficultyAdjust)!;
         }
 
         [Test]

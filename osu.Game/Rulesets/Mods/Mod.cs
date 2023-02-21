@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
@@ -140,6 +141,30 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
+        /// Copies all shared mod setting values from <paramref name="source"/> into this instance.
+        /// </summary>
+        /// <param name="source">The mod to copy properties from.</param>
+        public void CopyFromSimilar(Mod source)
+        {
+            Dictionary<string, object> oldSettings = new Dictionary<string, object>();
+
+            foreach (var (_, property) in source.GetSettingsSourceProperties())
+            {
+                oldSettings.Add(property.Name.ToSnakeCase(), property.GetValue(source)!);
+            }
+
+            foreach (var (_, property) in this.GetSettingsSourceProperties())
+            {
+                var targetBindable = (IBindable)property.GetValue(this)!;
+
+                if (!oldSettings.TryGetValue(property.Name.ToSnakeCase(), out object? sourceSetting))
+                    continue;
+
+                CopyAdjustedSetting(targetBindable, sourceSetting);
+            }
+        }
+
+        /// <summary>
         /// Copies mod setting values from <paramref name="source"/> into this instance, overwriting all existing settings.
         /// </summary>
         /// <param name="source">The mod to copy properties from.</param>
@@ -148,10 +173,10 @@ namespace osu.Game.Rulesets.Mods
             if (source.GetType() != GetType())
                 throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
 
-            foreach (var (_, prop) in this.GetSettingsSourceProperties())
+            foreach (var (_, property) in this.GetSettingsSourceProperties())
             {
-                var targetBindable = (IBindable)prop.GetValue(this)!;
-                var sourceBindable = (IBindable)prop.GetValue(source)!;
+                var targetBindable = (IBindable)property.GetValue(this)!;
+                var sourceBindable = (IBindable)property.GetValue(source)!;
 
                 CopyAdjustedSetting(targetBindable, sourceBindable);
             }
