@@ -152,10 +152,9 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Exports an item to Stream.
-        /// Override if custom export method is required.
+        /// Exports model to Stream.
         /// </summary>
-        /// <param name="model">The item to export.</param>
+        /// <param name="model">The model to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
