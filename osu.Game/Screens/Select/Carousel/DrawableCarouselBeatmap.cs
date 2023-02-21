@@ -42,8 +42,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly BeatmapInfo beatmapInfo;
 
-        private Sprite background = null!;
-
         private MenuItem[]? mainMenuItems;
 
         private Action<BeatmapInfo>? selectRequested;
