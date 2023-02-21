@@ -91,6 +91,10 @@ namespace osu.Game.Skinning
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
+
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.SongSelect:
