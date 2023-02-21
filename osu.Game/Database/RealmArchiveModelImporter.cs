@@ -201,8 +201,8 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(task.Path) && ShouldDeleteArchive(task.Path))
-                    File.Delete(task.Path);
+                if (import != null && ShouldDeleteArchive(task.Path))
+                    task.DeleteFile();
             }
             catch (Exception e)
             {

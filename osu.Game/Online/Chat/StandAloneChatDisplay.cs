@@ -25,6 +25,7 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public partial class StandAloneChatDisplay : CompositeDrawable
     {
+        [Cached]
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
         protected readonly ChatTextBox TextBox;
