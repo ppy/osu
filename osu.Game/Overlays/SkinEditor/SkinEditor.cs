@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public const float MENU_HEIGHT = 40;
 
-        public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
+        public readonly BindableList<ISerialisableDrawable> SelectedComponents = new BindableList<ISerialisableDrawable>();
 
         protected override bool StartHidden => true;
 
@@ -302,13 +302,13 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void placeComponent(Type type)
         {
-            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
-                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
+            if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
+                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
 
             placeComponent(component);
         }
 
-        private void placeComponent(ISkinnableDrawable component, bool applyDefaults = true)
+        private void placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
         {
             var targetContainer = getFirstTarget();
 
@@ -339,25 +339,25 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
+        private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
 
-        private ISkinnableTarget? getFirstTarget() => availableTargets.FirstOrDefault();
+        private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISkinnableTarget? getTarget(GlobalSkinComponentLookup.LookupType target)
+        private ISerialisableDrawableContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
         {
-            return availableTargets.FirstOrDefault(c => c.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
         }
 
         private void revert()
         {
-            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
+            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Target)?.Reload();
+                getTarget(t.Lookup.Target)?.Reload();
             }
         }
 
@@ -370,7 +370,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (!hasBegunMutating)
                 return;
 
-            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
+            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
@@ -400,7 +400,7 @@ namespace osu.Game.Overlays.SkinEditor
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
         }
 
-        public void DeleteItems(ISkinnableDrawable[] items)
+        public void DeleteItems(ISerialisableDrawable[] items)
         {
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
