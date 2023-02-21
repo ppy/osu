@@ -12,6 +12,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK.Input;
@@ -26,6 +27,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [SetUpSteps]
         public override void SetUpSteps()
