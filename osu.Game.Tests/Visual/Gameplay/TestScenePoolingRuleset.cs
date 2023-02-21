@@ -19,7 +19,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -36,6 +35,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private const double time_between_objects = 1000;
 
         private TestDrawablePoolingRuleset drawableRuleset;
+
+        private TestPlayfield playfield => (TestPlayfield)drawableRuleset.Playfield;
 
         [Test]
         public void TestReusedWithHitObjectsSpacedFarApart()
@@ -134,28 +135,48 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestRevertResult()
+        {
+            ManualClock clock = null;
+            Beatmap beatmap;
+
+            createTest(beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new TestHitObject { StartTime = 0 },
+                    new TestHitObject { StartTime = 500 },
+                    new TestHitObject { StartTime = 1000 },
+                }
+            }, 10, () => new FramedClock(clock = new ManualClock()));
+
+            AddStep("fast forward to end", () => clock.CurrentTime = beatmap.HitObjects[^1].GetEndTime() + 100);
+            AddUntilStep("all judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
+
+            AddStep("rewind to middle", () => clock.CurrentTime = beatmap.HitObjects[1].StartTime - 100);
+            AddUntilStep("some results reverted", () => playfield.JudgedObjects.Count, () => Is.EqualTo(1));
+
+            AddStep("fast forward to end", () => clock.CurrentTime = beatmap.HitObjects[^1].GetEndTime() + 100);
+            AddUntilStep("all judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
+
+            AddStep("disable frame stability", () => drawableRuleset.FrameStablePlayback = false);
+            AddStep("instant seek to start", () => clock.CurrentTime = beatmap.HitObjects[0].StartTime - 100);
+            AddAssert("all results reverted", () => playfield.JudgedObjects.Count, () => Is.EqualTo(0));
+        }
+
+        [Test]
         public void TestApplyHitResultOnKilled()
         {
             ManualClock clock = null;
-            bool anyJudged = false;
-
-            void onNewResult(JudgementResult _) => anyJudged = true;
 
             var beatmap = new Beatmap();
             beatmap.HitObjects.Add(new TestKilledHitObject { Duration = 20 });
 
             createTest(beatmap, 10, () => new FramedClock(clock = new ManualClock()));
 
-            AddStep("subscribe to new result", () =>
-            {
-                anyJudged = false;
-                drawableRuleset.NewResult += onNewResult;
-            });
             AddStep("skip past object", () => clock.CurrentTime = beatmap.HitObjects[0].GetEndTime() + 1000);
 
-            AddAssert("object judged", () => anyJudged);
-
-            AddStep("clean up", () => drawableRuleset.NewResult -= onNewResult);
+            AddAssert("object judged", () => playfield.JudgedObjects.Count == 1);
         }
 
         private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null)
@@ -212,12 +233,24 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private partial class TestPlayfield : Playfield
         {
+            public readonly HashSet<HitObject> JudgedObjects = new HashSet<HitObject>();
+
             private readonly int poolSize;
 
             public TestPlayfield(int poolSize)
             {
                 this.poolSize = poolSize;
                 AddInternal(HitObjectContainer);
+                NewResult += (_, r) =>
+                {
+                    Assert.That(JudgedObjects, Has.No.Member(r.HitObject));
+                    JudgedObjects.Add(r.HitObject);
+                };
+                RevertResult += r =>
+                {
+                    Assert.That(JudgedObjects, Has.Member(r.HitObject));
+                    JudgedObjects.Remove(r.HitObject);
+                };
             }
 
             [BackgroundDependencyLoader]
