@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets;
+
 namespace osu.Game.Skinning
 {
     /// <summary>
@@ -13,9 +15,16 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly TargetArea Target;
 
-        public SkinComponentsContainerLookup(TargetArea target)
+        /// <summary>
+        /// The ruleset for which skin components should be returned.
+        /// A <see langword="null"/> value means that returned components are global and should be applied for all rulesets.
+        /// </summary>
+        public readonly RulesetInfo? Ruleset;
+
+        public SkinComponentsContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
         {
             Target = target;
+            Ruleset = ruleset;
         }
 
         /// <summary>
