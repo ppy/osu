@@ -269,9 +269,7 @@ namespace osu.Game.Overlays.SkinEditor
                 selectedTarget.Default = getFirstTarget()?.Lookup;
 
                 if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
-                    selectedTarget.Value = getFirstTarget()?.Lookup;
-                else
-                    selectedTarget.TriggerChange();
+                    selectedTarget.SetDefault();
             }
         }
 
