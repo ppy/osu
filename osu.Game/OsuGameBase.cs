@@ -393,7 +393,10 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+            SelectedMods.BindValueChanged(change => Logger.Log($"{modSetting(change.OldValue)} => {modSetting(change.NewValue)}"));
         }
+
+        private object modSetting(IReadOnlyList<Mod> mods) => mods.OfType<ModDoubleTime>().FirstOrDefault()?.GetSettingsSourceProperties().First().Item2.GetValue(mods.OfType<ModDoubleTime>().First())!;
 
         private void addFilesWarning()
         {
@@ -626,7 +629,8 @@ namespace osu.Game
                 return;
             }
 
-            var previouslySelectedMods = SelectedMods.Value.ToArray();
+            //for some reason emptying SelectedMods resets all SettingSources Bindables to default value
+            var previouslySelectedMods = SelectedMods.Value.Select(mod => mod.DeepClone()).ToArray();
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
@@ -634,7 +638,16 @@ namespace osu.Game
             AvailableMods.Value = dict;
 
             if (!SelectedMods.Disabled)
-                SelectedMods.Value = previouslySelectedMods.Select(m => instance.CreateModFromAcronym(m.Acronym)).Where(m => m != null).ToArray();
+            {
+                SelectedMods.Value = previouslySelectedMods.Select(oldMod =>
+                {
+                    Mod newMod = instance.CreateModFromAcronym(oldMod.Acronym);
+
+                    newMod?.CopyFromSimilar(oldMod);
+
+                    return newMod;
+                }).Where(m => m != null).ToArray();
+            }
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
