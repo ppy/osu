@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             // This is because the (parent) object will only play its sample at the final EndTime.
             AddAssert("check valid object is slider's first nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.First()));
 
-            AddStep("seek to just after slider", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() + 100));
+            AddStep("seek to just before slider ends", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() - 100));
             waitForCatchUp();
             AddUntilStep("wait until valid object is slider's last nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.Last()));
 
