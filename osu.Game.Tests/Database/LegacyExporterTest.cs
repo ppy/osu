@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Database
             Assert.That(item.Filename.Length, Is.LessThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
 
             //Export multiple times
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 string expectedFileName = i == 0 ? short_filename : $"{short_filename} ({i})";
                 exportItemAndAssert(item, expectedFileName);
@@ -76,8 +76,11 @@ namespace osu.Game.Tests.Database
             Assert.That(item.Filename.Length, Is.GreaterThan(TestLegacyExporter.MAX_FILENAME_LENGTH));
 
             //Export multiple times
-            for (int i = 0; i < 10; i++)
-                exportItemAndAssert(item, expectedName);
+            for (int i = 0; i < 100; i++)
+            {
+                string expectedFilename = i == 0 ? expectedName : $"{expectedName} ({i})";
+                exportItemAndAssert(item, expectedFilename);
+            }
         }
 
         private void exportItemAndAssert(IHasNamedFiles item, string expectedName)
