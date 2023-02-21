@@ -31,7 +31,7 @@ namespace osu.Game.Database
         /// For more information see <see href="https://www.ibm.com/docs/en/spectrum-protect/8.1.9?topic=parameters-file-specification-syntax">file specification syntax</see>, <seealso href="https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits">file systems limitations</seealso>
         /// </para>
         /// </remarks>
-        public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars)
+        public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2 + 5); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars + account for ' (99)' suffix)
 
         /// <summary>
         /// The file extension for exports (including the leading '.').
@@ -48,7 +48,15 @@ namespace osu.Game.Database
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
-        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
+        protected virtual string GetFilename(TModel item)
+        {
+            string filename = item.GetDisplayString();
+
+            if (filename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
+                return filename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
+
+            return filename;
+        }
 
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
@@ -64,14 +72,6 @@ namespace osu.Game.Database
                     .Concat(exportStorage.GetDirectories(string.Empty));
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-
-            if (filename.Length > MAX_FILENAME_LENGTH)
-            {
-                string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
-
-                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
-                filename = $"{filenameWithoutExtension}{FileExtension}";
-            }
 
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
