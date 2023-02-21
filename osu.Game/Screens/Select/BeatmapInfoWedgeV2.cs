@@ -25,8 +25,8 @@ namespace osu.Game.Screens.Select
 {
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
+        public const float WEDGE_HEIGHT = 120;
         private const float shear_width = 21;
-        private const float wedge_height = 120;
         private const float transition_duration = 250;
         private const float corner_radius = 10;
         private const float colour_bar_width = 30;
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
         /// Todo: move this const out to song select when more new design elements are implemented for the beatmap details area, since it applies to text alignment of various elements
         private const float text_margin = 62;
 
-        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / wedge_height, 0);
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / WEDGE_HEIGHT, 0);
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapInfoWedgeV2()
         {
-            Height = wedge_height;
+            Height = WEDGE_HEIGHT;
             Shear = wedged_container_shear;
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
@@ -60,7 +60,6 @@ namespace osu.Game.Screens.Select
                 Colour = Colour4.Black.Opacity(.25f),
                 Type = EdgeEffectType.Shadow,
                 Radius = corner_radius,
-                Roundness = corner_radius
             };
             CornerRadius = corner_radius;
 
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.Select
                         Width = colour_bar_width,
                         Child = starCounter = new StarCounter
                         {
-                            Rotation = (float)(Math.Atan(shear_width / wedge_height) * (180 / Math.PI)),
+                            Rotation = (float)(Math.Atan(shear_width / WEDGE_HEIGHT) * (180 / Math.PI)),
                             Colour = Colour4.Transparent,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
