@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -155,19 +156,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("check valid object is slider's first nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.First()));
 
             AddStep("seek to just after slider", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() + 100));
+            waitForCatchUp();
             AddUntilStep("wait until valid object is slider's last nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.Last()));
 
             // After we get far enough away, the samples of the object itself should be used, not any nested object.
             AddStep("seek to further after slider", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() + 1000));
+            waitForCatchUp();
             AddUntilStep("wait until valid object is slider itself", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4]));
 
             AddStep("Seek into future", () => Beatmap.Value.Track.Seek(beatmap.HitObjects.Last().GetEndTime() + 10000));
+            waitForCatchUp();
             waitForAliveObjectIndex(null);
             checkValidObjectIndex(4);
         }
 
-        private void seekBeforeIndex(int index) =>
+        private void seekBeforeIndex(int index)
+        {
             AddStep($"seek to just before object {index}", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[index].StartTime - 100));
+            waitForCatchUp();
+        }
+
+        private void waitForCatchUp() =>
+            AddUntilStep("wait for frame stable clock to catch up", () => Precision.AlmostEquals(Beatmap.Value.Track.CurrentTime, Player.DrawableRuleset.FrameStableClock.CurrentTime));
 
         private void waitForAliveObjectIndex(int? index)
         {
