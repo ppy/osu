@@ -429,9 +429,6 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Audio adjustments which are applied to the playfield.
         /// </summary>
-        /// <remarks>
-        /// Does not affect <see cref="Overlays"/>.
-        /// </remarks>
         public abstract IAdjustableAudioComponent Audio { get; }
 
         /// <summary>
