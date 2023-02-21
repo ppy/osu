@@ -141,10 +141,28 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// Copies all shared mod setting values from <paramref name="source"/> into this instance.
+        /// Copies mod setting values from <paramref name="source"/> into this instance, overwriting all existing settings.
         /// </summary>
         /// <param name="source">The mod to copy properties from.</param>
-        public void CopyFromSimilar(Mod source)
+        public void CopyFrom(Mod source)
+        {
+            if (source.GetType() != GetType())
+                throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
+
+            foreach (var (_, property) in this.GetSettingsSourceProperties())
+            {
+                var targetBindable = (IBindable)property.GetValue(this)!;
+                var sourceBindable = (IBindable)property.GetValue(source)!;
+
+                CopyAdjustedSetting(targetBindable, sourceBindable);
+            }
+        }
+
+        /// <summary>
+        /// Copies all mod setting values sharing same <see cref="MemberInfo.Name"/> from <paramref name="source"/> into this instance.
+        /// </summary>
+        /// <param name="source">The mod to copy properties from.</param>
+        internal void CopySharedSettings(Mod source)
         {
             Dictionary<string, object> oldSettings = new Dictionary<string, object>();
 
@@ -161,24 +179,6 @@ namespace osu.Game.Rulesets.Mods
                     continue;
 
                 CopyAdjustedSetting(targetBindable, sourceSetting);
-            }
-        }
-
-        /// <summary>
-        /// Copies mod setting values from <paramref name="source"/> into this instance, overwriting all existing settings.
-        /// </summary>
-        /// <param name="source">The mod to copy properties from.</param>
-        public void CopyFrom(Mod source)
-        {
-            if (source.GetType() != GetType())
-                throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
-
-            foreach (var (_, property) in this.GetSettingsSourceProperties())
-            {
-                var targetBindable = (IBindable)property.GetValue(this)!;
-                var sourceBindable = (IBindable)property.GetValue(source)!;
-
-                CopyAdjustedSetting(targetBindable, sourceBindable);
             }
         }
 

@@ -403,8 +403,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var taikoMod = getMod() as TaikoModDifficultyAdjust;
                 return
                     taikoMod?.ExtendedLimits.Value == true &&
-                    taikoMod?.DrainRate.Value == setting_change &&
-                    taikoMod?.OverallDifficulty.Value == setting_change;
+                    taikoMod.DrainRate.Value == setting_change &&
+                    taikoMod.OverallDifficulty.Value == setting_change;
             });
 
             AddAssert("non-shared settings at default", () =>
