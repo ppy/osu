@@ -42,9 +42,9 @@ namespace osu.Game.Screens.Play
             Name = trigger.Name;
         }
 
-        protected Bindable<bool> IsActive = new BindableBool();
+        protected readonly Bindable<bool> IsActive = new BindableBool();
 
-        public void Increment()
+        private void increment()
         {
             if (!IsCounting)
                 return;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
             countPresses.Value++;
         }
 
-        public void Decrement()
+        private void decrement()
         {
             if (!IsCounting)
                 return;
@@ -64,14 +64,14 @@ namespace osu.Game.Screens.Play
         {
             IsActive.Value = true;
             if (forwardPlayback)
-                Increment();
+                increment();
         }
 
         protected virtual void Deactivate(bool forwardPlayback = true)
         {
             IsActive.Value = false;
             if (!forwardPlayback)
-                Decrement();
+                decrement();
         }
 
         protected override void Dispose(bool isDisposing)
