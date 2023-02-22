@@ -626,17 +626,12 @@ namespace osu.Game
                 return;
             }
 
-            //DeepCloning collection, because emptying SelectedMods resets all SettingSources Bindables to their default value
-            var previouslySelectedMods = SelectedMods.Value.Select(mod => mod.DeepClone()).ToArray();
-
-            if (!SelectedMods.Disabled)
-                SelectedMods.Value = Array.Empty<Mod>();
-
             AvailableMods.Value = dict;
 
             if (!SelectedMods.Disabled)
             {
-                SelectedMods.Value = previouslySelectedMods.Select(oldMod =>
+                //converting mods from one ruleset to the other, while also keeping their shared settings unchanged
+                SelectedMods.Value = SelectedMods.Value.Select(oldMod =>
                 {
                     Mod newMod = instance.CreateModFromAcronym(oldMod.Acronym);
 
