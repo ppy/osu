@@ -79,9 +79,7 @@ namespace osu.Game.Rulesets.UI
                     // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
                     // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
                     fallbackObject = hitObjectContainer.Entries
-                                                       .Where(e => e.Result?.HasResult != true)
-                                                       .OrderBy(e => e.HitObject.StartTime)
-                                                       .FirstOrDefault();
+                                                       .Where(e => e.Result?.HasResult != true).MinBy(e => e.HitObject.StartTime);
 
                     // In the case there are no unjudged objects, the last hit object should be used instead.
                     fallbackObject ??= hitObjectContainer.Entries.LastOrDefault();

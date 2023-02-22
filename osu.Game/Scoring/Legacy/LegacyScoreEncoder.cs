@@ -25,6 +25,11 @@ namespace osu.Game.Scoring.Legacy
         /// Database version in stable-compatible YYYYMMDD format.
         /// Should be incremented if any changes are made to the format/usage.
         /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
+        /// </list>
+        /// </remarks>
         public const int LATEST_VERSION = 30000001;
 
         /// <summary>
@@ -53,9 +58,9 @@ namespace osu.Game.Scoring.Legacy
                 throw new ArgumentException(@"Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
-        public void Encode(Stream stream)
+        public void Encode(Stream stream, bool leaveOpen = false)
         {
-            using (SerializationWriter sw = new SerializationWriter(stream))
+            using (SerializationWriter sw = new SerializationWriter(stream, leaveOpen))
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(LATEST_VERSION);

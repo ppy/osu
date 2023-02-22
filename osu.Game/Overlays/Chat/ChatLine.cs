@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -175,9 +176,7 @@ namespace osu.Game.Overlays.Chat
 
         private void updateTimestamp()
         {
-            drawableTimestamp.Text = prefer24HourTime.Value
-                ? $@"{message.Timestamp.LocalDateTime:HH:mm:ss}"
-                : $@"{message.Timestamp.LocalDateTime:hh:mm:ss tt}";
+            drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
     }
 }

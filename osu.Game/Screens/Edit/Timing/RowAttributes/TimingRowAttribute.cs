@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -17,7 +15,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
     {
         private readonly BindableNumber<double> beatLength;
         private readonly Bindable<TimeSignature> timeSignature;
-        private OsuSpriteText text;
+        private OsuSpriteText text = null!;
 
         public TimingRowAttribute(TimingControlPoint timing)
             : base(timing, "timing")

@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == @".osk";
+        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == @".osk";
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
@@ -179,8 +179,14 @@ namespace osu.Game.Skinning
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
+            bool hadChanges = false;
+
             skin.SkinInfo.PerformWrite(s =>
             {
                 // Update for safety
@@ -195,7 +201,7 @@ namespace osu.Game.Skinning
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
-                foreach (var drawableInfo in skin.DrawableComponentInfo)
+                foreach (var drawableInfo in skin.LayoutInfos)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
@@ -212,8 +218,14 @@ namespace osu.Game.Skinning
                     }
                 }
 
-                s.Hash = ComputeHash(s);
+                string newHash = ComputeHash(s);
+
+                hadChanges = newHash != s.Hash;
+
+                s.Hash = newHash;
             });
+
+            return hadChanges;
         }
     }
 }

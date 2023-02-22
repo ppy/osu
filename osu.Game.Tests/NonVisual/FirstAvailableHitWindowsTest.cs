@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -93,6 +94,7 @@ namespace osu.Game.Tests.NonVisual
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }

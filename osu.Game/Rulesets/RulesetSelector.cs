@@ -6,6 +6,7 @@
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets
 {
@@ -16,11 +17,16 @@ namespace osu.Game.Rulesets
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
+        protected virtual bool LegacyOnly => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             foreach (var ruleset in Rulesets.AvailableRulesets)
             {
+                if (!ruleset.IsLegacyRuleset() && LegacyOnly)
+                    continue;
+
                 try
                 {
                     AddItem(ruleset);

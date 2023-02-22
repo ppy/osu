@@ -117,11 +117,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         BeatmapID = 0,
                         RulesetID = 0,
                         Mods = user.Mods,
-                        MaximumScoringValues = new ScoringValues
+                        MaximumStatistics = new Dictionary<HitResult, int>
                         {
-                            BaseScore = 10000,
-                            MaxCombo = 1000,
-                            CountBasicHitObjects = 1000
+                            { HitResult.Perfect, 100 }
                         }
                     };
                 }

@@ -48,7 +48,7 @@ namespace osu.Game.Storyboards
 
                 if (alphaCommands.Count > 0)
                 {
-                    var firstAlpha = alphaCommands.OrderBy(t => t.startTime).First();
+                    var firstAlpha = alphaCommands.MinBy(t => t.startTime);
 
                     if (firstAlpha.isZeroStartValue)
                         return firstAlpha.startTime;

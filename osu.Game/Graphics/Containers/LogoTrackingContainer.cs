@@ -36,8 +36,7 @@ namespace osu.Game.Graphics.Containers
         /// <param name="easing">The easing type of the initial transform.</param>
         public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
         {
-            if (logo == null)
-                throw new ArgumentNullException(nameof(logo));
+            ArgumentNullException.ThrowIfNull(logo);
 
             if (logo.IsTracking && Logo == null)
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");

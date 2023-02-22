@@ -300,7 +300,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var comboColour = colours[i];
 
-                writer.Write(FormattableString.Invariant($"Combo{i}: "));
+                writer.Write(FormattableString.Invariant($"Combo{1 + i}: "));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));

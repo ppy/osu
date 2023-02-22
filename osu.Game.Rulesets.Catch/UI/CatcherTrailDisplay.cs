@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -41,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly Container<CatcherTrail> hyperDashAfterImages;
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
 
         public CatcherTrailDisplay()
         {
@@ -130,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= skinSourceChanged;
         }
     }

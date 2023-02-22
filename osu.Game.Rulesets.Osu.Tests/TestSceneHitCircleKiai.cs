@@ -4,29 +4,38 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public partial class TestSceneHitCircleKiai : TestSceneHitCircle
+    public partial class TestSceneHitCircleKiai : TestSceneHitCircle, IBeatSyncProvider
     {
+        private ControlPointInfo controlPoints { get; set; }
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            var controlPointInfo = new ControlPointInfo();
+            controlPoints = new ControlPointInfo();
 
-            controlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            controlPoints.Add(0, new EffectControlPoint { KiaiMode = true });
 
             Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
-                ControlPointInfo = controlPointInfo
+                ControlPointInfo = controlPoints
             });
 
             // track needs to be playing for BeatSyncedContainer to work.
             Beatmap.Value.Track.Start();
         });
+
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => new ChannelAmplitudes();
+        ControlPointInfo IBeatSyncProvider.ControlPoints => controlPoints;
+        IClock IBeatSyncProvider.Clock => Clock;
     }
 }

@@ -63,7 +63,7 @@ namespace osu.Game.IO.Serialization.Converters
                     throw new JsonException("Expected $type token.");
 
                 string typeName = lookupTable[(int)tok["$type"]];
-                var instance = (T)Activator.CreateInstance(Type.GetType(typeName).AsNonNull());
+                var instance = (T)Activator.CreateInstance(Type.GetType(typeName).AsNonNull())!;
                 serializer.Populate(itemReader, instance);
 
                 list.Add(instance);

@@ -98,7 +98,7 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = truncate(activity.Value.Status);
+                presence.State = truncate(activity.Value.GetStatus(privacyMode.Value == DiscordRichPresenceMode.Limited));
                 presence.Details = truncate(getDetails(activity.Value));
 
                 if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
@@ -169,7 +169,7 @@ namespace osu.Desktop
                 case UserActivity.InGame game:
                     return game.BeatmapInfo;
 
-                case UserActivity.Editing edit:
+                case UserActivity.EditingBeatmap edit:
                     return edit.BeatmapInfo;
             }
 
@@ -183,8 +183,11 @@ namespace osu.Desktop
                 case UserActivity.InGame game:
                     return game.BeatmapInfo.ToString() ?? string.Empty;
 
-                case UserActivity.Editing edit:
+                case UserActivity.EditingBeatmap edit:
                     return edit.BeatmapInfo.ToString() ?? string.Empty;
+
+                case UserActivity.WatchingReplay watching:
+                    return watching.BeatmapInfo.ToString();
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
