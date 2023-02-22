@@ -25,6 +25,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.OSD;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -69,6 +70,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
 
         private bool hasBegunMutating;
 
@@ -251,6 +254,8 @@ namespace osu.Game.Overlays.SkinEditor
             }, true);
 
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
+
+            selectedTarget.BindValueChanged(targetChanged, true);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -298,8 +303,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.Dispose();
 
-            SelectedComponents.Clear();
-
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
 
@@ -308,25 +311,73 @@ namespace osu.Game.Overlays.SkinEditor
 
             void loadBlueprintContainer()
             {
-                Debug.Assert(content != null);
+                selectedTarget.Default = getFirstTarget()?.Lookup;
 
-                changeHandler = new SkinEditorChangeHandler(targetScreen);
-                changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-                changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
+                    selectedTarget.SetDefault();
+            }
+        }
 
-                content.Child = new SkinBlueprintContainer(targetScreen);
+        private void targetChanged(ValueChangedEvent<SkinComponentsContainerLookup?> target)
+        {
+            foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
+                toolbox.Expire();
 
-                componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
+            if (target.NewValue == null)
+                return;
+
+            Debug.Assert(content != null);
+
+            SelectedComponents.Clear();
+
+            var skinComponentsContainer = getTarget(target.NewValue);
+
+            if (skinComponentsContainer == null)
+                return;
+
+            changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+            content.Child = new SkinBlueprintContainer(skinComponentsContainer);
+
+            componentsSidebar.Children = new[]
+            {
+                new EditorSidebarSection("Current working layer")
                 {
-                    RequestPlacement = type =>
+                    Children = new Drawable[]
                     {
-                        if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
-                            throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
-
-                        SelectedComponents.Clear();
-                        placeComponent(component);
+                        new SettingsDropdown<SkinComponentsContainerLookup?>
+                        {
+                            Items = availableTargets.Select(t => t.Lookup),
+                            Current = selectedTarget,
+                        }
                     }
-                };
+                },
+            };
+
+            // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
+            if (target.NewValue.Ruleset != null)
+            {
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
+                {
+                    RequestPlacement = requestPlacement
+                });
+            }
+
+            // Remove the ruleset from the lookup to get base components.
+            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            {
+                RequestPlacement = requestPlacement
+            });
+
+            void requestPlacement(Type type)
+            {
+                if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
+                    throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
+
+                SelectedComponents.Clear();
+                placeComponent(component);
             }
         }
 
@@ -360,7 +411,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// <returns>Whether placement succeeded. Could fail if no target is available, or if the current target has missing dependency requirements for the component.</returns>
         private bool placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
         {
-            var targetContainer = getFirstTarget();
+            var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer == null)
                 return false;
@@ -399,11 +450,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
 
-        private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISerialisableDrawableContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
+        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
         {
-            return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
         }
 
         private void revert()
@@ -415,7 +466,7 @@ namespace osu.Game.Overlays.SkinEditor
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Lookup.Target)?.Reload();
+                getTarget(t.Lookup)?.Reload();
             }
         }
 
