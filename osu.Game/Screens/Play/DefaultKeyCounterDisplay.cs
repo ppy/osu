@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
             Size = keyFlow.Size;
         }
 
-        public override void AddTrigger(KeyCounter.InputTrigger trigger)
+        public override void AddTrigger(InputTrigger trigger)
         {
             DefaultKeyCounter key = new DefaultKeyCounter(trigger);
             Add(key);
