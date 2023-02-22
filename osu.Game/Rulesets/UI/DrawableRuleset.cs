@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        public PassThroughInputManager KeyBindingInputManager;
+        protected PassThroughInputManager KeyBindingInputManager;
 
         public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
@@ -65,6 +65,10 @@ namespace osu.Game.Rulesets.UI
         public override Playfield Playfield => playfield.Value;
 
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        public override IAdjustableAudioComponent Audio => audioContainer;
+
+        private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -101,14 +105,6 @@ namespace osu.Game.Rulesets.UI
         private OnScreenDisplay onScreenDisplay;
 
         private DrawableRulesetDependencies dependencies;
-
-        /// <summary>
-        /// Audio adjustments which are applied to the playfield.
-        /// </summary>
-        /// <remarks>
-        /// Does not affect <see cref="Overlays"/>.
-        /// </remarks>
-        public IAdjustableAudioComponent Audio { get; private set; }
 
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
@@ -172,27 +168,21 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(CancellationToken? cancellationToken)
         {
-            AudioContainer audioContainer;
-
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
-                    audioContainer = new AudioContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = KeyBindingInputManager
-                            .WithChild(CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield)
-                            ),
-                    },
-                    Overlays,
+                    audioContainer.WithChild(KeyBindingInputManager
+                        .WithChildren(new Drawable[]
+                        {
+                            CreatePlayfieldAdjustmentContainer()
+                                .WithChild(Playfield),
+                            Overlays
+                        })),
                 }
             };
-
-            Audio = audioContainer;
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
@@ -437,12 +427,17 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
+        /// Audio adjustments which are applied to the playfield.
+        /// </summary>
+        public abstract IAdjustableAudioComponent Audio { get; }
+
+        /// <summary>
         /// The playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
 
         /// <summary>
-        /// Content to be placed above hitobjects. Will be affected by frame stability.
+        /// Content to be placed above hitobjects. Will be affected by frame stability and adjustments applied to <see cref="Audio"/>.
         /// </summary>
         public abstract Container Overlays { get; }
 
