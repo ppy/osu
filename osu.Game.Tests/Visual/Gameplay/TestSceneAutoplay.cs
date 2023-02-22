@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses.Value > 2));
 
             seekTo(referenceBeatmap.Breaks[0].StartTime);
-            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
+            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting.Value);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
 
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));

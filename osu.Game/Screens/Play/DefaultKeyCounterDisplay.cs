@@ -13,7 +13,9 @@ namespace osu.Game.Screens.Play
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        protected override Container<KeyCounter> Content => KeyFlow;
+        private readonly FillFlowContainer<KeyCounter> keyFlow = new FillFlowContainer<KeyCounter>();
+
+        protected override Container<KeyCounter> Content => keyFlow;
 
         public new IReadOnlyList<DefaultKeyCounter> Children
         {
@@ -22,12 +24,13 @@ namespace osu.Game.Screens.Play
         }
 
         public DefaultKeyCounterDisplay()
+            : base(typeof(DefaultKeyCounter))
         {
-            KeyFlow.Direction = FillDirection.Horizontal;
-            KeyFlow.AutoSizeAxes = Axes.Both;
-            KeyFlow.Alpha = 0;
+            keyFlow.Direction = FillDirection.Horizontal;
+            keyFlow.AutoSizeAxes = Axes.Both;
+            keyFlow.Alpha = 0;
 
-            InternalChild = KeyFlow;
+            InternalChild = keyFlow;
         }
 
         protected override void Update()
@@ -36,12 +39,22 @@ namespace osu.Game.Screens.Play
 
             // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
             // In turn this can cause the display to be masked off screen and never become visible again.
-            Size = KeyFlow.Size;
+            Size = keyFlow.Size;
+        }
+
+        public override void AddTrigger(KeyCounter.InputTrigger trigger)
+        {
+            DefaultKeyCounter key = new DefaultKeyCounter(trigger);
+            Add(key);
+            key.FadeTime = key_fade_time;
+            key.KeyDownTextColor = KeyDownTextColor;
+            key.KeyUpTextColor = KeyUpTextColor;
         }
 
         public override void Add(KeyCounter key)
         {
             base.Add(key);
+
             DefaultKeyCounter defaultKey = (DefaultKeyCounter)key;
 
             defaultKey.FadeTime = key_fade_time;
@@ -51,7 +64,7 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
-            KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
+            keyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
 
         private Color4 keyDownTextColor = Color4.DarkGray;
 
