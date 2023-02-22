@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void waitForCatchUp() =>
-            AddUntilStep("wait for frame stable clock to catch up", () => Precision.AlmostEquals(Beatmap.Value.Track.CurrentTime, Player.DrawableRuleset.FrameStableClock.CurrentTime));
+            AddUntilStep("wait for frame stable clock to catch up", () => Precision.AlmostEquals(Player.GameplayClockContainer.CurrentTime, Player.DrawableRuleset.FrameStableClock.CurrentTime));
 
         private void waitForAliveObjectIndex(int? index)
         {
