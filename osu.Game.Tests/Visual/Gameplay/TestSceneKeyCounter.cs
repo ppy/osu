@@ -17,20 +17,20 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         public TestSceneKeyCounter()
         {
-            DefaultKeyCounter testCounter;
-
             KeyCounterDisplay kc = new DefaultKeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Children = new[]
+                Triggers = new InputTrigger[]
                 {
-                    testCounter = new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                    new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                    new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
-                    new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
-                },
+                    new KeyCounterKeyboardTrigger(Key.X),
+                    new KeyCounterKeyboardTrigger(Key.X),
+                    new KeyCounterMouseTrigger(MouseButton.Left),
+                    new KeyCounterMouseTrigger(MouseButton.Right),
+                }
             };
+
+            var testCounter = (DefaultKeyCounter)kc.Children.First();
 
             AddStep("Add random", () =>
             {
