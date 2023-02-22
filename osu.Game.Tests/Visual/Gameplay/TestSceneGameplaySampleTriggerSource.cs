@@ -155,16 +155,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             // This is because the (parent) object will only play its sample at the final EndTime.
             AddAssert("check valid object is slider's first nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.First()));
 
-            AddStep("seek to just before slider ends", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() - 100));
+            AddStep("seek to just before slider ends", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects[4].GetEndTime() - 100));
             waitForCatchUp();
             AddUntilStep("wait until valid object is slider's last nested", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4].NestedHitObjects.Last()));
 
             // After we get far enough away, the samples of the object itself should be used, not any nested object.
-            AddStep("seek to further after slider", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[4].GetEndTime() + 1000));
+            AddStep("seek to further after slider", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects[4].GetEndTime() + 1000));
             waitForCatchUp();
             AddUntilStep("wait until valid object is slider itself", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[4]));
 
-            AddStep("Seek into future", () => Beatmap.Value.Track.Seek(beatmap.HitObjects.Last().GetEndTime() + 10000));
+            AddStep("Seek into future", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects.Last().GetEndTime() + 10000));
             waitForCatchUp();
             waitForAliveObjectIndex(null);
             checkValidObjectIndex(4);
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void seekBeforeIndex(int index)
         {
-            AddStep($"seek to just before object {index}", () => Beatmap.Value.Track.Seek(beatmap.HitObjects[index].StartTime - 100));
+            AddStep($"seek to just before object {index}", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects[index].StartTime - 100));
             waitForCatchUp();
         }
 
