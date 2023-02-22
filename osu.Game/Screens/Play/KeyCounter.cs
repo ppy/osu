@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
             MinValue = 0
         };
 
-        public bool IsCounting { get; set; } = true;
+        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
         public IBindable<int> CountPresses => countPresses;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         private void increment()
         {
-            if (!IsCounting)
+            if (!IsCounting.Value)
                 return;
 
             countPresses.Value++;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         private void decrement()
         {
-            if (!IsCounting)
+            if (!IsCounting.Value)
                 return;
 
             countPresses.Value--;

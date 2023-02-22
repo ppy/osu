@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
+                kc.AddTrigger(new KeyCounterKeyboardTrigger(key));
             });
 
             Key testKey = ((KeyCounterKeyboardTrigger)kc.Children.First().Trigger).Key;
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
-            AddStep("Disable counting", () => testCounter.IsCounting = false);
+            AddStep("Disable counting", () => testCounter.IsCounting.Value = false);
             addPressKeyStep();
             AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
