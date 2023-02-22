@@ -556,9 +556,44 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.BeginChange();
 
             foreach (var item in items)
-                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item, true);
 
             changeHandler?.EndChange();
+        }
+
+        public void BringSelectionToFront()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            // Iterating by target components order ensures we maintain the same order across selected components, regardless
+            // of the order they were selected in.
+            foreach (var d in target.Components.ToArray())
+            {
+                if (!SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+
+                // Selection would be reset by the remove.
+                SelectedComponents.Add(d);
+                target.Add(d);
+            }
+        }
+
+        public void SendSelectionToBack()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            foreach (var d in target.Components.ToArray())
+            {
+                if (SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+                target.Add(d);
+            }
         }
 
         #region Drag & drop import handling
