@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneSkinEditor : PlayerTestScene
     {
-        private SkinEditor? skinEditor;
+        private SkinEditor skinEditor = null!;
 
         protected override bool Autoplay => true;
 
@@ -40,17 +41,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("reload skin editor", () =>
             {
-                skinEditor?.Expire();
+                if (skinEditor.IsNotNull())
+                    skinEditor.Expire();
                 Player.ScaleTo(0.4f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
-            AddUntilStep("wait for loaded", () => skinEditor!.IsLoaded);
+            AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
         }
 
         [Test]
         public void TestToggleEditor()
         {
-            AddToggleStep("toggle editor visibility", _ => skinEditor!.ToggleVisibility());
+            AddToggleStep("toggle editor visibility", _ => skinEditor.ToggleVisibility());
         }
 
         [Test]
@@ -63,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
 
                 hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
-                skinEditor!.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
 
