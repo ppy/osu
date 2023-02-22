@@ -164,18 +164,14 @@ namespace osu.Game.Screens.Select
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
-            InternalChild = new OsuContextMenuContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                setPool,
+                Scroll = new CarouselScrollContainer
                 {
-                    setPool,
-                    Scroll = new CarouselScrollContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    noResultsPlaceholder = new NoResultsPlaceholder()
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
+                noResultsPlaceholder = new NoResultsPlaceholder()
             };
         }
 
