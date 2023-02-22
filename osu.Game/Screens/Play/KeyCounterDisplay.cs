@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
 
         public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
-        public IReadOnlyList<KeyCounter.InputTrigger> Triggers
+        public IReadOnlyList<InputTrigger> Triggers
         {
             get => Children.Select(c => c.Trigger).ToArray();
             set
@@ -56,9 +56,9 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public abstract void AddTrigger(KeyCounter.InputTrigger trigger);
+        public abstract void AddTrigger(InputTrigger trigger);
 
-        public void AddTriggerRange(IEnumerable<KeyCounter.InputTrigger> triggers) => triggers.ForEach(AddTrigger);
+        public void AddTriggerRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(AddTrigger);
 
         private bool checkType(KeyCounter key) => acceptedTypes.Length == 0 || acceptedTypes.Any(t => t.IsInstanceOfType(key));
 
