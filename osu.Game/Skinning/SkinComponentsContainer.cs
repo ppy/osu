@@ -100,7 +100,7 @@ namespace osu.Game.Skinning
         /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Remove(ISerialisableDrawable component)
+        public void Remove(ISerialisableDrawable component, bool disposeImmediately)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to remove a new component from a target container which is not supported by the current skin.");
@@ -108,7 +108,7 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            content.Remove(drawable, true);
+            content.Remove(drawable, disposeImmediately);
             components.Remove(component);
         }
 
