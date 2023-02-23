@@ -566,6 +566,8 @@ namespace osu.Game.Overlays.SkinEditor
             if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
                 return;
 
+            changeHandler?.BeginChange();
+
             // Iterating by target components order ensures we maintain the same order across selected components, regardless
             // of the order they were selected in.
             foreach (var d in target.Components.ToArray())
@@ -579,12 +581,16 @@ namespace osu.Game.Overlays.SkinEditor
                 SelectedComponents.Add(d);
                 target.Add(d);
             }
+
+            changeHandler?.EndChange();
         }
 
         public void SendSelectionToBack()
         {
             if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
                 return;
+
+            changeHandler?.BeginChange();
 
             foreach (var d in target.Components.ToArray())
             {
@@ -594,6 +600,8 @@ namespace osu.Game.Overlays.SkinEditor
                 target.Remove(d, false);
                 target.Add(d);
             }
+
+            changeHandler?.EndChange();
         }
 
         #region Drag & drop import handling
