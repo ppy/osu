@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             loading.Hide();
             tick.FadeIn(500, Easing.OutQuint);
 
-            Background.FadeColour(colours.Green, 500, Easing.OutQuint);
+            this.TransformTo(nameof(BackgroundColour), colours.Green, 500, Easing.OutQuint);
             progressBar.FillColour = colours.Green;
 
             this.TransformBindableTo(progressBar.Current, 1, 500, Easing.OutQuint);

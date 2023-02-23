@@ -3,9 +3,12 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
@@ -31,14 +34,22 @@ namespace osu.Game.Database
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
+        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
+
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            string filename = $"{item.GetDisplayString().GetValidFilename()}{FileExtension}";
+            string itemFilename = GetFilename(item).GetValidFilename();
 
+            IEnumerable<string> existingExports =
+                exportStorage
+                    .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
+                    .Concat(exportStorage.GetDirectories(string.Empty));
+
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 

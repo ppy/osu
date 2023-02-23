@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuObject = (OsuHitObject)hitObject;
 
-            OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
+            OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
         }
     }
 }

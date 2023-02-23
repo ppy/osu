@@ -27,16 +27,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (Reflection.Value)
             {
                 case MirrorType.Horizontal:
-                    OsuHitObjectGenerationUtils.ReflectHorizontally(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject);
                     break;
 
                 case MirrorType.Vertical:
-                    OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
                     break;
 
                 case MirrorType.Both:
-                    OsuHitObjectGenerationUtils.ReflectHorizontally(osuObject);
-                    OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
                     break;
             }
         }

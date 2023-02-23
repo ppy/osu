@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
@@ -130,16 +131,16 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
         private AudioManager audioManager { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -416,7 +417,7 @@ namespace osu.Game.Screens.Play
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
-            ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
+            ApplyToBackground(b => b.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
         protected virtual void ContentOut()
@@ -550,7 +551,7 @@ namespace osu.Game.Screens.Play
 
             public MutedNotification()
             {
-                Text = "Your game volume is too low to hear anything! Click here to restore it.";
+                Text = NotificationsStrings.GameVolumeTooLow;
             }
 
             [BackgroundDependencyLoader]
@@ -605,7 +606,7 @@ namespace osu.Game.Screens.Play
 
             public BatteryWarningNotification()
             {
-                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+                Text = NotificationsStrings.BatteryLow;
             }
 
             [BackgroundDependencyLoader]

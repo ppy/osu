@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -30,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
+
+        [SettingSource("Fade out hit circles earlier", "Make hit circles fade out into a miss, rather than after it.")]
+        public Bindable<bool> FadeHitCircleEarly { get; } = new Bindable<bool>(true);
+
+        private bool usingHiddenFading;
 
         public void ApplyToHitObject(HitObject hitObject)
         {
@@ -51,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
+
+            usingHiddenFading = drawableRuleset.Mods.OfType<OsuModHidden>().SingleOrDefault()?.OnlyFadeApproachCircles.Value == false;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject obj)
@@ -59,12 +68,32 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableSliderHead head:
                     head.TrackFollowCircle = !NoSliderHeadMovement.Value;
+                    if (FadeHitCircleEarly.Value && !usingHiddenFading)
+                        applyEarlyFading(head);
                     break;
 
                 case DrawableSliderTail tail:
                     tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
                     break;
+
+                case DrawableHitCircle circle:
+                    if (FadeHitCircleEarly.Value && !usingHiddenFading)
+                        applyEarlyFading(circle);
+                    break;
             }
+        }
+
+        private void applyEarlyFading(DrawableHitCircle circle)
+        {
+            circle.ApplyCustomUpdateState += (o, _) =>
+            {
+                using (o.BeginAbsoluteSequence(o.StateUpdateTime))
+                {
+                    double okWindow = o.HitObject.HitWindows.WindowFor(HitResult.Ok);
+                    double lateMissFadeTime = o.HitObject.HitWindows.WindowFor(HitResult.Meh) - okWindow;
+                    o.Delay(okWindow).FadeOut(lateMissFadeTime);
+                }
+            };
         }
     }
 }

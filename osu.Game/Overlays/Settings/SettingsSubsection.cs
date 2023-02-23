@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -17,15 +16,13 @@ using osu.Game.Graphics;
 namespace osu.Game.Overlays.Settings
 {
     [ExcludeFromDynamicCompile]
-    public abstract partial class SettingsSubsection : FillFlowContainer, IHasFilterableChildren
+    public abstract partial class SettingsSubsection : FillFlowContainer, IFilterable
     {
         protected override Container<Drawable> Content => FlowContent;
 
         protected readonly FillFlowContainer FlowContent;
 
         protected abstract LocalisableString Header { get; }
-
-        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
 
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 

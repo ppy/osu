@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,9 +19,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private readonly string label;
 
-        protected Drawable Background { get; private set; }
+        protected Drawable Background { get; private set; } = null!;
 
-        protected FillFlowContainer Content { get; private set; }
+        protected FillFlowContainer Content { get; private set; } = null!;
 
         public RowAttribute(ControlPoint point, string label)
         {

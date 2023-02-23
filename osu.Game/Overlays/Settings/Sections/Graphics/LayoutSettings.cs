@@ -133,6 +133,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.HorizontalPosition,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -140,6 +141,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalPosition,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -147,6 +149,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.HorizontalScale,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -154,6 +157,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalScale,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -177,13 +181,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateScreenModeWarning();
             }, true);
 
-            windowModes.BindCollectionChanged((_, _) =>
-            {
-                if (windowModes.Count > 1)
-                    windowModeDropdown.Show();
-                else
-                    windowModeDropdown.Hide();
-            }, true);
+            windowModes.BindCollectionChanged((_, _) => updateDisplaySettingsVisibility());
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
@@ -219,7 +217,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
+                scalingSettings.ForEach(s =>
+                {
+                    s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
+                    s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                });
             }
         }
 
@@ -234,20 +236,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
-                resolutionDropdown.Show();
-            else
-                resolutionDropdown.Hide();
-
-            if (displayDropdown.Items.Count() > 1)
-                displayDropdown.Show();
-            else
-                displayDropdown.Hide();
-
-            if (host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero)
-                safeAreaConsiderationsCheckbox.Show();
-            else
-                safeAreaConsiderationsCheckbox.Hide();
+            windowModeDropdown.CanBeShown.Value = windowModes.Count > 1;
+            resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
+            displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
+            safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
         }
 
         private void updateScreenModeWarning()
@@ -337,7 +329,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private partial class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }

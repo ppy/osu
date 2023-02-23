@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Set activity", () => api.Activity.Value = new UserActivity.InLobby(null));
 
-            AddStep("Run command", () => Add(new NowPlayingCommand()));
+            AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
             AddAssert("Check correct response", () => postTarget.LastMessage.Contains("is listening"));
         }
@@ -41,9 +42,9 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestEditActivity()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.Editing(new BeatmapInfo()));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.EditingBeatmap(new BeatmapInfo()));
 
-            AddStep("Run command", () => Add(new NowPlayingCommand()));
+            AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
             AddAssert("Check correct response", () => postTarget.LastMessage.Contains("is editing"));
         }
@@ -53,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
 
-            AddStep("Run command", () => Add(new NowPlayingCommand()));
+            AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
             AddAssert("Check correct response", () => postTarget.LastMessage.Contains("is playing"));
         }
@@ -69,12 +70,24 @@ namespace osu.Game.Tests.Visual.Online
                 BeatmapInfo = { OnlineID = hasOnlineId ? 1234 : -1 }
             });
 
-            AddStep("Run command", () => Add(new NowPlayingCommand()));
+            AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
             if (hasOnlineId)
                 AddAssert("Check link presence", () => postTarget.LastMessage.Contains("/b/1234"));
             else
                 AddAssert("Check link not present", () => !postTarget.LastMessage.Contains("https://"));
+        }
+
+        [Test]
+        public void TestModPresence()
+        {
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
+
+            AddStep("Add Hidden mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHidden>() });
+
+            AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
+
+            AddAssert("Check mod is present", () => postTarget.LastMessage.Contains("+HD"));
         }
 
         public partial class PostTarget : Component, IChannelPostTarget

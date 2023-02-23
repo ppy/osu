@@ -19,6 +19,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.LoginOverlayDisplayed, false);
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
+            SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
@@ -42,6 +43,7 @@ namespace osu.Game.Configuration
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
         LowBatteryNotificationShownOnce,
+        FeaturedArtistDisclaimerShownOnce,
 
         /// <summary>
         /// Info about seasonal backgrounds available fetched from API - see <see cref="APISeasonalBackgrounds"/>.
@@ -53,6 +55,6 @@ namespace osu.Game.Configuration
         /// The last playback time in milliseconds of a hover sample (from <see cref="HoverSounds"/>).
         /// Used to debounce hover sounds game-wide to avoid volume saturation, especially in scrolling views with many UI controls like <see cref="SettingsOverlay"/>.
         /// </summary>
-        LastHoverSoundPlaybackTime
+        LastHoverSoundPlaybackTime,
     }
 }
