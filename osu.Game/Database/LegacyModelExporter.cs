@@ -36,7 +36,7 @@ namespace osu.Game.Database
         public Action<Notification>? PostNotification { get; set; }
 
         // Store the model being exporting.
-        private readonly List<TModel> exportingModels = new List<TModel>();
+        private static readonly List<TModel> exportingModels = new List<TModel>();
 
         /// <summary>
         /// Construct exporter.
