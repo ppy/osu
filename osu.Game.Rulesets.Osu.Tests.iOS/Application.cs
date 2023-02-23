@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osu.Framework.iOS;
 using UIKit;
 
 namespace osu.Game.Rulesets.Osu.Tests.iOS
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Tests.iOS
     {
         public static void Main(string[] args)
         {
-            UIApplication.Main(args, typeof(GameUIApplication), typeof(AppDelegate));
+            UIApplication.Main(args, null, typeof(AppDelegate));
         }
     }
 }

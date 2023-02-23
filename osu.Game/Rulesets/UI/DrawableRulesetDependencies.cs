@@ -157,6 +157,8 @@ namespace osu.Game.Rulesets.UI
                 set => throw new NotSupportedException();
             }
 
+            public void AddExtension(string extension) => throw new NotSupportedException();
+
             public void Dispose()
             {
                 if (primary.IsNotNull()) primary.Dispose();

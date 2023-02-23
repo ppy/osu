@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract partial class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
+    public abstract partial class SettingsItem<T> : Container, IConditionalFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -143,6 +143,9 @@ namespace osu.Game.Overlays.Settings
         public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
+
+        public BindableBool CanBeShown { get; } = new BindableBool(true);
+        IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
 
         public event Action SettingChanged;
 

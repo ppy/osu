@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -187,11 +188,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+            ArgonSongProgress? getSongProgress() => hudOverlay.ChildrenOfType<ArgonSongProgress>().SingleOrDefault();
 
             bool seeked = false;
 
             createNew();
+
+            AddUntilStep("wait for song progress", () => getSongProgress() != null);
 
             AddStep("bind seek", () =>
             {
@@ -199,8 +202,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var progress = getSongProgress();
 
-                progress.ShowHandle = true;
-                progress.OnSeek += _ => seeked = true;
+                Debug.Assert(progress != null);
+
+                progress.Interactive.Value = true;
+                progress.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += _ => seeked = true;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
@@ -230,8 +235,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
-            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("bind on update", () =>
             {
@@ -249,10 +254,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
 
-            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
-            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
+            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Reload());
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().ComponentsLoaded);
         }
 
         private void createNew(Action<HUDOverlay>? action = null)

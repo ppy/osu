@@ -33,11 +33,11 @@ namespace osu.Game.Online.Notifications
 
         public override Task ConnectAsync(CancellationToken cancellationToken)
         {
-            API.Queue(CreateFetchMessagesRequest(0));
+            API.Queue(CreateInitialFetchRequest(0));
             return Task.CompletedTask;
         }
 
-        protected APIRequest CreateFetchMessagesRequest(long? lastMessageId = null)
+        protected APIRequest CreateInitialFetchRequest(long? lastMessageId = null)
         {
             var fetchReq = new GetUpdatesRequest(lastMessageId ?? this.lastMessageId);
 
@@ -67,8 +67,11 @@ namespace osu.Game.Online.Notifications
 
         protected void HandleChannelParted(Channel channel) => ChannelParted?.Invoke(channel);
 
-        protected void HandleMessages(List<Message> messages)
+        protected void HandleMessages(List<Message>? messages)
         {
+            if (messages == null)
+                return;
+
             NewMessages?.Invoke(messages);
             lastMessageId = Math.Max(lastMessageId, messages.LastOrDefault()?.Id ?? 0);
         }

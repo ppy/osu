@@ -98,6 +98,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public Bindable<Message> HighlightedMessage = new Bindable<Message>();
 
+        /// <summary>
+        /// The current text box message while in this <see cref="Channel"/>.
+        /// </summary>
+        public Bindable<string> TextBoxMessage = new Bindable<string>(string.Empty);
+
         [JsonConstructor]
         public Channel()
         {

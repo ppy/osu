@@ -317,7 +317,7 @@ namespace osu.Game.Scoring
 
         #endregion
 
-        public bool Equals(ScoreInfo other) => other.ID == ID;
+        public bool Equals(ScoreInfo? other) => other?.ID == ID;
 
         public override string ToString() => this.GetDisplayTitle();
     }

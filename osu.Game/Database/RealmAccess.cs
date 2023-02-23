@@ -481,7 +481,7 @@ namespace osu.Game.Database
                 // server, which we don't use. May want to report upstream or revisit in the future.
                 using (var realm = getRealmInstance())
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
                 pendingAsyncWrites.Signal();
             });
@@ -558,7 +558,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));

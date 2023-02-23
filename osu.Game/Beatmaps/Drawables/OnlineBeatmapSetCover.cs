@@ -18,8 +18,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public OnlineBeatmapSetCover(IBeatmapSetOnlineInfo set, BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
         {
-            if (set == null)
-                throw new ArgumentNullException(nameof(set));
+            ArgumentNullException.ThrowIfNull(set);
 
             this.set = set;
             this.type = type;

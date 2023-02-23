@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -58,7 +57,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(screen_width, screen_width / 16f * 9 / 2),
+                    Size = new Vector2(screen_width, screen_width / 16f * 9),
                     Children = new Drawable[]
                     {
                         new GridContainer
@@ -68,7 +67,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 new Drawable[]
                                 {
-                                    new SampleScreenContainer(new PinnedMainMenu()),
                                     new SampleScreenContainer(new NestedSongSelect()),
                                 },
                                 // TODO: add more screens here in the future (gameplay / results)
@@ -109,18 +107,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             public override bool? AllowTrackAdjustments => false;
         }
 
-        private partial class PinnedMainMenu : MainMenu
-        {
-            public override void OnEntering(ScreenTransitionEvent e)
-            {
-                base.OnEntering(e);
-
-                Buttons.ReturnToTopOnIdle = false;
-                Buttons.State = ButtonSystemState.TopLevel;
-            }
-        }
-
-        private partial class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }
@@ -233,7 +220,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 return parentDependencies.Get(type, info);
             }
 
-            public void Inject<T>(T instance) where T : class
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
             {
                 parentDependencies.Inject(instance);
             }

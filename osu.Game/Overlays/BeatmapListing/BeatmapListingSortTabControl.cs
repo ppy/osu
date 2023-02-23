@@ -17,18 +17,21 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
-        private SearchCategory? lastCategory;
-        private bool? lastHasQuery;
+        private (SearchCategory category, bool hasQuery)? currentParameters;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Reset(SearchCategory.Leaderboard, false);
+
+            if (currentParameters == null)
+                Reset(SearchCategory.Leaderboard, false);
         }
 
         public void Reset(SearchCategory category, bool hasQuery)
         {
-            if (category != lastCategory || hasQuery != lastHasQuery)
+            var newParameters = (category, hasQuery);
+
+            if (currentParameters != newParameters)
             {
                 TabControl.Clear();
 
@@ -63,8 +66,7 @@ namespace osu.Game.Overlays.BeatmapListing
             // see: https://github.com/ppy/osu-framework/issues/5412
             TabControl.Current.TriggerChange();
 
-            lastCategory = category;
-            lastHasQuery = hasQuery;
+            currentParameters = newParameters;
         }
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl

@@ -22,11 +22,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
 
-        private readonly OsuHitWindows hitWindows = new OsuHitWindows();
+        private readonly OsuHitWindows hitWindows;
 
         private UnstableRateCounter counter;
 
         private double prev;
+
+        public TestSceneUnstableRateCounter()
+        {
+            hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(5);
+        }
 
         [SetUpSteps]
         public void SetUp()

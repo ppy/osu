@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -135,6 +136,31 @@ namespace osu.Game.Tests.Gameplay
                 dho.MissForcefully();
             });
             AddAssert("DHO state is correct", () => dho.State.Value == ArmedState.Miss);
+        }
+
+        [Test]
+        public void TestResultSetBeforeLoadComplete()
+        {
+            TestDrawableHitObject dho = null;
+            HitObjectLifetimeEntry lifetimeEntry = null;
+            AddStep("Create lifetime entry", () =>
+            {
+                var hitObject = new HitObject { StartTime = Time.Current };
+                lifetimeEntry = new HitObjectLifetimeEntry(hitObject)
+                {
+                    Result = new JudgementResult(hitObject, hitObject.CreateJudgement())
+                    {
+                        Type = HitResult.Great
+                    }
+                };
+            });
+            AddStep("Create DHO and apply entry", () =>
+            {
+                dho = new TestDrawableHitObject();
+                dho.Apply(lifetimeEntry);
+                Child = dho;
+            });
+            AddAssert("DHO state is correct", () => dho.State.Value, () => Is.EqualTo(ArmedState.Hit));
         }
 
         private partial class TestDrawableHitObject : DrawableHitObject

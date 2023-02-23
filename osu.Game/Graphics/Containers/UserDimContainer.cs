@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public const float BREAK_LIGHTEN_AMOUNT = 0.3f;
 
-        protected const double BACKGROUND_FADE_DURATION = 800;
+        public const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
         /// Whether or not user-configured settings relating to brightness of elements should be ignored
