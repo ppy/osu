@@ -140,7 +140,7 @@ namespace osu.Game.Database
                 if (t.IsFaulted)
                 {
                     notify.State = ProgressNotificationState.Cancelled;
-                    Logger.Error(t.Exception, "An error occurred while exporting");
+                    Logger.Error(t.Exception, "An error occurred while exporting", LoggingTarget.Database);
                     return false;
                 }
 
