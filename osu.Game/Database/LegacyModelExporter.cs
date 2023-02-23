@@ -60,7 +60,7 @@ namespace osu.Game.Database
         /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
         /// </param>
         /// <returns></returns>
-        public async Task ExportAsync(TModel model, CancellationToken? cancellationToken = null)
+        public async Task<bool> ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
             // check if the model is being exporting already
             if (!exportingModels.Contains(model))
@@ -69,10 +69,7 @@ namespace osu.Game.Database
             }
             else
             {
-                PostNotification?.Invoke(new SimpleErrorNotification
-                {
-                    Text = "File is being exported"
-                });
+                // model is being exported
                 return;
             }
 
@@ -114,6 +111,8 @@ namespace osu.Game.Database
 
                 exportingModels.Remove(model);
             }
+
+            return success;
         }
 
         /// <summary>
