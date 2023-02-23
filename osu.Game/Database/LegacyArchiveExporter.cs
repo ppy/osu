@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays.Notifications;
@@ -12,6 +13,7 @@ using Realms;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 using SharpCompress.Writers.Zip;
+using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game.Database
 {
@@ -54,10 +56,7 @@ namespace osu.Game.Database
                             // Only pop up once to prevent spam.
                             if (!fileMissing)
                             {
-                                PostNotification?.Invoke(new SimpleErrorNotification
-                                {
-                                    Text = "Some of your files are missing, they will not be included in the archive"
-                                });
+                                Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
                                 fileMissing = true;
                             }
                         }
