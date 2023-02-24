@@ -97,6 +97,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double nHoldCount = Math.Log(attributes.HoldNoteCount);
             double nNoteHoldCount = Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
 
+            // Find the likelihood of a deviation resulting in the play's judgements. Higher is more likely, so we find the peak of the curve.
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -182,6 +183,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return hitWindows;
         }
 
+        // This struct allows us to return the probability of hitting every judgement with a single method.
         private struct JudgementProbs
         {
             public double PMax;
@@ -192,6 +194,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             public double P0;
         }
 
+        // This method finds the probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
         private JudgementProbs pNote(double[] hitWindows, double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
@@ -207,6 +210,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return probabilities;
         }
 
+        // This method finds the probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
         private JudgementProbs pHold(double[] hitWindows, double d)
         {
             JudgementProbs probabilities = new JudgementProbs();
@@ -239,9 +243,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return probabilities;
         }
 
-        // First object count can be either notes or notes + holds as stable LNs give one judgement but lazer LNs give two.
+        // Combines pNotes and pHolds/pTails into 1 probability value for each judgement, and compares it to the judgements of the play. A higher output means the deviation is more likely.
         private double totalProb(JudgementProbs firstProbs, JudgementProbs secondProbs, double firstObjectCount, double secondObjectCount)
         {
+            // firstObjectCount can be either Notes, or Notes + Holds, as stable LN heads don't behave like Notes but lazer LN heads do.
             double pMax = logSum(firstProbs.PMax + firstObjectCount, secondProbs.PMax + secondObjectCount) - Math.Log(totalJudgements);
             double p300 = logSum(firstProbs.P300 + firstObjectCount, secondProbs.P300 + secondObjectCount) - Math.Log(totalJudgements);
             double p200 = logSum(firstProbs.P200 + firstObjectCount, secondProbs.P200 + secondObjectCount) - Math.Log(totalJudgements);
@@ -268,11 +273,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double logErfcApprox(double x) => x <= 5
             ? Math.Log(SpecialFunctions.Erfc(x))
-            : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
+            : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/aaftj14euk
 
         private double holdTailApprox(double x) => x <= 7
             ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2))
-            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
+            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/lgwyhx0fxo
 
         // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
         private double logSum(double firstLog, double secondLog)
