@@ -47,11 +47,11 @@ namespace osu.Game.Screens.Play
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakArrows breakArrows;
 
+        public readonly BreakInfo Info;
+
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
             RelativeSizeAxes = Axes.Both;
-
-            BreakInfo info;
 
             Child = fadeContainer = new Container
             {
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.BottomCentre,
                         Margin = new MarginPadding { Bottom = vertical_margin },
                     },
-                    info = new BreakInfo
+                    Info = new BreakInfo
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.TopCentre,
@@ -105,8 +105,8 @@ namespace osu.Game.Screens.Play
 
             if (scoreProcessor != null)
             {
-                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
-                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
+                Info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+                Info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
             }
         }
 

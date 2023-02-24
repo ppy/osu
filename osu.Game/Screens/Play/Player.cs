@@ -1085,7 +1085,10 @@ namespace osu.Game.Screens.Play
 
                 // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
                 if (prepareScoreForDisplayTask == null)
+                {
+                    BreakOverlay.Info.GradeDisplay.Current.UnbindFrom(ScoreProcessor.Rank);
                     ScoreProcessor.FailScore(Score.ScoreInfo);
+                }
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
