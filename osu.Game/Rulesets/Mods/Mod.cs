@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Internal;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -173,13 +174,46 @@ namespace osu.Game.Rulesets.Mods
 
             foreach (var (_, property) in this.GetSettingsSourceProperties())
             {
-                var targetBindable = (IBindable)property.GetValue(this)!;
+                object targetSetting = property.GetValue(this)!;
 
                 if (!oldSettings.TryGetValue(property.Name.ToSnakeCase(), out object? sourceSetting))
                     continue;
 
-                CopyAdjustedSetting(targetBindable, sourceSetting);
+                if (((IBindable)sourceSetting).IsDefault)
+                    // keep at default value if the source is default
+                    continue;
+
+                Type? targetType = getGenericBaseType(targetSetting, typeof(BindableNumber<>));
+                Type? sourceType = getGenericBaseType(sourceSetting, typeof(BindableNumber<>));
+
+                if (targetType == null || sourceType == null)
+                {
+                    if (getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
+                        getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single())
+                        // change settings only if the type is the same
+                        CopyAdjustedSetting((IBindable)targetSetting, sourceSetting);
+
+                    continue;
+                }
+
+                double targetMin = getValue(targetSetting, nameof(IBindableNumber<int>.MinValue));
+                double targetMax = getValue(targetSetting, nameof(IBindableNumber<int>.MaxValue));
+                double sourceMin = getValue(sourceSetting, nameof(IBindableNumber<int>.MinValue));
+                double sourceMax = getValue(sourceSetting, nameof(IBindableNumber<int>.MaxValue));
+                double sourceValue = getValue(sourceSetting, nameof(IBindableNumber<int>.Value));
+
+                // convert value to same ratio
+                double targetValue = (sourceValue - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
+
+                targetType.GetProperty(nameof(IBindableNumber<int>.Value))!.SetValue(targetSetting,
+                    Convert.ChangeType(targetValue, targetType.GenericTypeArguments.Single()));
             }
+
+            double getValue(object target, string name) =>
+                Convert.ToDouble(target.GetType().GetProperty(name)!.GetValue(target)!);
+
+            Type? getGenericBaseType(object target, Type genericType) =>
+                target.GetType().GetTypeInheritance().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }
 
         /// <summary>

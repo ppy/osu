@@ -18,6 +18,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -387,7 +388,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("change mod settings", () =>
             {
-                var osuMod = (getMod() as OsuModDifficultyAdjust)!;
+                var osuMod = getMod<OsuModDifficultyAdjust>();
+
                 osuMod.ExtendedLimits.Value = true;
                 osuMod.CircleSize.Value = setting_change;
                 osuMod.DrainRate.Value = setting_change;
@@ -400,23 +402,60 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("shared settings didn't change", () =>
             {
-                var taikoMod = getMod() as TaikoModDifficultyAdjust;
-                return
-                    taikoMod?.ExtendedLimits.Value == true &&
-                    taikoMod.DrainRate.Value == setting_change &&
-                    taikoMod.OverallDifficulty.Value == setting_change;
+                var taikoMod = getMod<TaikoModDifficultyAdjust>();
+
+                return taikoMod.ExtendedLimits.Value &&
+                       taikoMod.DrainRate.Value == setting_change &&
+                       taikoMod.OverallDifficulty.Value == setting_change;
             });
 
-            AddAssert("non-shared settings at default", () =>
+            AddAssert("non-shared settings unchanged", () =>
             {
-                var taikoMod = getMod() as TaikoModDifficultyAdjust;
-                if (taikoMod == null)
-                    return false;
+                var taikoMod = getMod<TaikoModDifficultyAdjust>();
 
-                return taikoMod.ScrollSpeed.Value == taikoMod.ScrollSpeed.Default;
+                return taikoMod.ScrollSpeed.IsDefault;
+            });
+        }
+
+        [Test]
+        public void TestKeepSharedSettingsRatio()
+        {
+            const float setting_change = 1.8f;
+
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select flashlight mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModFlashlight>()! });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModFlashlight);
+
+            AddStep("change mod settings", () =>
+            {
+                var osuMod = getMod<OsuModFlashlight>();
+
+                // range <0.5 - 2>
+                osuMod.SizeMultiplier.Value = setting_change;
             });
 
-            ModDifficultyAdjust getMod() => (SelectedMods.Value.Single() as ModDifficultyAdjust)!;
+            changeRuleset(3);
+            AddAssert("mania variant selected", () => SelectedMods.Value.SingleOrDefault() is ManiaModFlashlight);
+
+            AddAssert("shared settings changed to closest ratio", () =>
+            {
+                var maniaMod = getMod<ManiaModFlashlight>();
+
+                // range <0.5 - 3>
+                // converted value based on ratio = (setting_change - 0.5) / (2 - 0.5) * (3 - 0.5) + 0.5 = 2.66
+                return maniaMod.SizeMultiplier.Value == 2.7f; // taking precision into account
+            });
+
+            AddAssert("other settings unchanged", () =>
+            {
+                var maniaMod = getMod<ManiaModFlashlight>();
+
+                return maniaMod.ComboBasedSize.IsDefault;
+            });
         }
 
         [Test]
@@ -514,6 +553,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForColumnLoad();
 
             AddAssert("unimplemented mod panel is filtered", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value);
+
+            AddStep("disable panel filtering", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value = false);
         }
 
         [Test]
@@ -628,6 +669,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"customisation toggle is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Disabled == disabled);
             AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Value == active);
         }
+
+        private T getMod<T>() where T : Mod => (T)SelectedMods.Value.Single();
 
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
