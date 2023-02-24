@@ -93,114 +93,33 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double[] hitWindows = isLegacyScore ? getLegacyHitWindows(score, attributes) : getLazerHitWindows(score, attributes);
 
-            double hMax = hitWindows[0];
-            double h300 = hitWindows[1];
-            double h200 = hitWindows[2];
-            double h100 = hitWindows[3];
-            double h50 = hitWindows[4];
-
-            double nJudgements = Math.Log(totalJudgements);
             double nNoteCount = Math.Log(attributes.NoteCount);
             double nHoldCount = Math.Log(attributes.HoldNoteCount);
             double nNoteHoldCount = Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
 
-            // https://www.desmos.com/calculator/tybjpjfjlz
             double legacyLikelihoodGradient(double d)
             {
                 if (d <= 0)
                     return 0;
 
-                // The variable name 'logPc' means 'log probability complementary'.
-                double pMaxNote = logDiff(0, logPcNote(hMax, d));
-                double p300Note = logDiff(logPcNote(hMax, d), logPcNote(h300, d));
-                double p200Note = logDiff(logPcNote(h300, d), logPcNote(h200, d));
-                double p100Note = logDiff(logPcNote(h200, d), logPcNote(h100, d));
-                double p50Note = logDiff(logPcNote(h100, d), logPcNote(h50, d));
-                double p0Note = logPcNote(h50, d);
+                JudgementProbs pNotes = pNote(hitWindows, d);
 
-                // Since we're using complementary probabilities for precision, multiplying the head and tail probabilities takes the form P(A∩B)' = P(A'∪B') = P(A') + P(B') - P(A'∩B').
-                double combinedProb(double p1, double p2) => logDiff(logSum(p1, p2), p1 + p2);
+                JudgementProbs pHolds = pHold(hitWindows, d);
 
-                double logPcMaxHead = logPcNote(hMax * 1.2, d);
-                double logPcMaxTail = logPcHoldTail(hMax * 2.4, d);
-                double pMaxHold = logDiff(0, combinedProb(logPcMaxHead, logPcMaxTail));
-
-                double logPc300Head = logPcNote(h300 * 1.1, d);
-                double logPc300Tail = logPcHoldTail(h300 * 2.2, d);
-                double p300Hold = logDiff(combinedProb(logPcMaxHead, logPcMaxTail), combinedProb(logPc300Head, logPc300Tail));
-
-                double logPc200Head = logPcNote(h200, d);
-                double logPc200Tail = logPcHoldTail(h200 * 2, d);
-                double p200Hold = logDiff(combinedProb(logPc300Head, logPc300Tail), combinedProb(logPc200Head, logPc200Tail));
-
-                double logPc100Head = logPcNote(h100, d);
-                double logPc100Tail = logPcHoldTail(h100 * 2, d);
-                double p100Hold = logDiff(combinedProb(logPc200Head, logPc200Tail), combinedProb(logPc100Head, logPc100Tail));
-
-                double logPc50Head = logPcNote(h50, d);
-                double logPc50Tail = logPcHoldTail(h50 * 2, d);
-                double p50Hold = logDiff(combinedProb(logPc100Head, logPc100Tail), combinedProb(logPc50Head, logPc50Tail));
-
-                double p0Hold = combinedProb(logPc50Head, logPc50Tail);
-
-                double pMax = logSum(pMaxNote + nNoteCount, pMaxHold + nHoldCount) - nJudgements;
-                double p300 = logSum(p300Note + nNoteCount, p300Hold + nHoldCount) - nJudgements;
-                double p200 = logSum(p200Note + nNoteCount, p200Hold + nHoldCount) - nJudgements;
-                double p100 = logSum(p100Note + nNoteCount, p100Hold + nHoldCount) - nJudgements;
-                double p50 = logSum(p50Note + nNoteCount, p50Hold + nHoldCount) - nJudgements;
-                double p0 = logSum(p0Note + nNoteCount, p0Hold + nHoldCount) - nJudgements;
-
-                double gradient = Math.Exp(
-                    (countPerfect * pMax
-                     + (countGreat + 0.5) * p300
-                     + countGood * p200
-                     + countOk * p100
-                     + countMeh * p50
-                     + countMiss * p0) / totalJudgements
-                );
-
-                return -gradient;
+                return -totalProb(pNotes, pHolds, nNoteCount, nHoldCount);
             }
 
-            // https://www.desmos.com/calculator/piqxqmnuks
             double lazerLikelihoodGradient(double d)
             {
                 if (d <= 0)
                     return 0;
 
-                double pMaxNote = logDiff(0, logPcNote(hMax, d));
-                double p300Note = logDiff(logPcNote(hMax, d), logPcNote(h300, d));
-                double p200Note = logDiff(logPcNote(h300, d), logPcNote(h200, d));
-                double p100Note = logDiff(logPcNote(h200, d), logPcNote(h100, d));
-                double p50Note = logDiff(logPcNote(h100, d), logPcNote(h50, d));
-                double p0Note = logPcNote(h50, d);
+                JudgementProbs pNotes = pNote(hitWindows, d);
 
-                // Lazer LN tails have a bigger hit window, so calculate the probability of hitting them separately.
-                // We don't use "logPcHoldTail` for these since they have the same hit mechanics as a regular note.
-                double pMaxTail = logDiff(0, logPcNote(hMax * tail_multiplier, d));
-                double p300Tail = logDiff(logPcNote(hMax * tail_multiplier, d), logPcNote(h300 * tail_multiplier, d));
-                double p200Tail = logDiff(logPcNote(h300 * tail_multiplier, d), logPcNote(h200 * tail_multiplier, d));
-                double p100Tail = logDiff(logPcNote(h200 * tail_multiplier, d), logPcNote(h100 * tail_multiplier, d));
-                double p50Tail = logDiff(logPcNote(h100 * tail_multiplier, d), logPcNote(h50 * tail_multiplier, d));
-                double p0Tail = logPcNote(h50 * tail_multiplier, d);
+                // We use pNote instead of pHold because lazer tails behave the same as Notes.
+                JudgementProbs pTails = pNote(hitWindows, d, tail_multiplier);
 
-                double pMax = logSum(pMaxNote + nNoteHoldCount, pMaxTail + nHoldCount) - nJudgements;
-                double p300 = logSum(p300Note + nNoteHoldCount, p300Tail + nHoldCount) - nJudgements;
-                double p200 = logSum(p200Note + nNoteHoldCount, p200Tail + nHoldCount) - nJudgements;
-                double p100 = logSum(p100Note + nNoteHoldCount, p100Tail + nHoldCount) - nJudgements;
-                double p50 = logSum(p50Note + nNoteHoldCount, p50Tail + nHoldCount) - nJudgements;
-                double p0 = logSum(p0Note + nNoteHoldCount, p0Tail + nHoldCount) - nJudgements;
-
-                double gradient = Math.Exp(
-                    (countPerfect * pMax
-                     + (countGreat + 0.5) * p300
-                     + countGood * p200
-                     + countOk * p100
-                     + countMeh * p50
-                     + countMiss * p0) / totalJudgements
-                );
-
-                return -gradient;
+                return -totalProb(pNotes, pTails, nNoteHoldCount, nHoldCount);
             }
 
             // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
@@ -263,16 +182,97 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return hitWindows;
         }
 
+        private struct JudgementProbs
+        {
+            public double PMax;
+            public double P300;
+            public double P200;
+            public double P100;
+            public double P50;
+            public double P0;
+        }
+
+        private JudgementProbs pNote(double[] hitWindows, double d, double multiplier = 1)
+        {
+            JudgementProbs probabilities = new JudgementProbs
+            {
+                PMax = logDiff(0, logPcNote(hitWindows[0] * multiplier, d)),
+                P300 = logDiff(logPcNote(hitWindows[0] * multiplier, d), logPcNote(hitWindows[1] * multiplier, d)),
+                P200 = logDiff(logPcNote(hitWindows[1] * multiplier, d), logPcNote(hitWindows[2] * multiplier, d)),
+                P100 = logDiff(logPcNote(hitWindows[2] * multiplier, d), logPcNote(hitWindows[3] * multiplier, d)),
+                P50 = logDiff(logPcNote(hitWindows[3] * multiplier, d), logPcNote(hitWindows[4] * multiplier, d)),
+                P0 = logPcNote(hitWindows[4] * multiplier, d)
+            };
+
+            return probabilities;
+        }
+
+        private JudgementProbs pHold(double[] hitWindows, double d)
+        {
+            JudgementProbs probabilities = new JudgementProbs();
+
+            // Since we're using complementary probabilities for precision, multiplying the head and tail probabilities takes the form P(A∩B)' = P(A'∪B') = P(A') + P(B') - P(A'∩B').
+            double combinedProb(double p1, double p2) => logDiff(logSum(p1, p2), p1 + p2);
+
+            double logPcMaxHead = logPcNote(hitWindows[0] * 1.2, d);
+            double logPcMaxTail = logPcHoldTail(hitWindows[0] * 2.4, d);
+            probabilities.PMax = logDiff(0, combinedProb(logPcMaxHead, logPcMaxTail));
+
+            double logPc300Head = logPcNote(hitWindows[1] * 1.1, d);
+            double logPc300Tail = logPcHoldTail(hitWindows[1] * 2.2, d);
+            probabilities.P300 = logDiff(combinedProb(logPcMaxHead, logPcMaxTail), combinedProb(logPc300Head, logPc300Tail));
+
+            double logPc200Head = logPcNote(hitWindows[2], d);
+            double logPc200Tail = logPcHoldTail(hitWindows[2] * 2, d);
+            probabilities.P200 = logDiff(combinedProb(logPc300Head, logPc300Tail), combinedProb(logPc200Head, logPc200Tail));
+
+            double logPc100Head = logPcNote(hitWindows[3], d);
+            double logPc100Tail = logPcHoldTail(hitWindows[3] * 2, d);
+            probabilities.P100 = logDiff(combinedProb(logPc200Head, logPc200Tail), combinedProb(logPc100Head, logPc100Tail));
+
+            double logPc50Head = logPcNote(hitWindows[4], d);
+            double logPc50Tail = logPcHoldTail(hitWindows[4] * 2, d);
+            probabilities.P50 = logDiff(combinedProb(logPc100Head, logPc100Tail), combinedProb(logPc50Head, logPc50Tail));
+
+            probabilities.P0 = combinedProb(logPc50Head, logPc50Tail);
+
+            return probabilities;
+        }
+
+        // First object count can be either notes or notes + holds as stable LNs give one judgement but lazer LNs give two.
+        private double totalProb(JudgementProbs firstProbs, JudgementProbs secondProbs, double firstObjectCount, double secondObjectCount)
+        {
+            double pMax = logSum(firstProbs.PMax + firstObjectCount, secondProbs.PMax + secondObjectCount) - Math.Log(totalJudgements);
+            double p300 = logSum(firstProbs.P300 + firstObjectCount, secondProbs.P300 + secondObjectCount) - Math.Log(totalJudgements);
+            double p200 = logSum(firstProbs.P200 + firstObjectCount, secondProbs.P200 + secondObjectCount) - Math.Log(totalJudgements);
+            double p100 = logSum(firstProbs.P100 + firstObjectCount, secondProbs.P100 + secondObjectCount) - Math.Log(totalJudgements);
+            double p50 = logSum(firstProbs.P50 + firstObjectCount, secondProbs.P50 + secondObjectCount) - Math.Log(totalJudgements);
+            double p0 = logSum(firstProbs.P0 + firstObjectCount, secondProbs.P0 + secondObjectCount) - Math.Log(totalJudgements);
+
+            double totalProb = Math.Exp(
+                (countPerfect * pMax
+                 + (countGreat + 0.5) * p300
+                 + countGood * p200
+                 + countOk * p100
+                 + countMeh * p50
+                 + countMiss * p0) / totalJudgements
+            );
+
+            return totalProb;
+        }
+
         private double logPcNote(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
 
         // Legacy LN tails take the absolute error of both hit judgements on an LN, so we use a folded normal distribution to calculate it.
         private double logPcHoldTail(double x, double deviation) => holdTailApprox(x / (deviation * Math.Sqrt(2)));
 
-        // There are numerical approximations to increase how far you can calculate x.
-        private double logErfcApprox(double x) => x <= 5 ? Math.Log(SpecialFunctions.Erfc(x)) : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
+        private double logErfcApprox(double x) => x <= 5
+            ? Math.Log(SpecialFunctions.Erfc(x))
+            : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
 
-        // A handy approximation for the folded distribution is to subtract the natural log of the complementary CDF from log(2).
-        private double holdTailApprox(double x) => x <= 7 ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2)) : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
+        private double holdTailApprox(double x) => x <= 7
+            ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2))
+            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI));
 
         // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
         private double logSum(double firstLog, double secondLog)
