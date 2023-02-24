@@ -306,6 +306,7 @@ namespace osu.Game.Graphics.Backgrounds
                 };
 
                 shader.Bind();
+                shader.BindUniformBlock("m_BorderData", borderDataBuffer);
 
                 foreach (TriangleParticle particle in parts)
                 {
