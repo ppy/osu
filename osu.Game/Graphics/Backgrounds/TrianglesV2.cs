@@ -227,6 +227,8 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
+            private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
+
             public override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
@@ -240,9 +242,15 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
+                borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
+                borderDataBuffer.Data = borderDataBuffer.Data with
+                {
+                    Thickness = thickness,
+                    TexelSize = texelSize
+                };
+
                 shader.Bind();
-                shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
-                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
+                shader.BindUniformBlock("m_BorderData", borderDataBuffer);
 
                 Vector2 relativeSize = Vector2.Divide(triangleSize, size);
 
@@ -303,6 +311,7 @@ namespace osu.Game.Graphics.Backgrounds
                 base.Dispose(isDisposing);
 
                 vertexBatch?.Dispose();
+                borderDataBuffer?.Dispose();
             }
         }
 
