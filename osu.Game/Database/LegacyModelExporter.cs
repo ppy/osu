@@ -36,7 +36,7 @@ namespace osu.Game.Database
         public Action<Notification>? PostNotification { get; set; }
 
         // Store the model being exporting.
-        private static readonly List<TModel> exportingModels = new List<TModel>();
+        private static readonly List<TModel> exporting_models = new List<TModel>();
 
         /// <summary>
         /// Construct exporter.
@@ -63,14 +63,14 @@ namespace osu.Game.Database
         public async Task<bool> ExportAsync(TModel model, CancellationToken? cancellationToken = null)
         {
             // check if the model is being exporting already
-            if (!exportingModels.Contains(model))
+            if (!exporting_models.Contains(model))
             {
-                exportingModels.Add(model);
+                exporting_models.Add(model);
             }
             else
             {
                 // model is being exported
-                return;
+                return false;
             }
 
             string itemFilename = GetFilename(model).GetValidFilename();
@@ -109,7 +109,7 @@ namespace osu.Game.Database
                     exportStorage.Delete(filename);
                 }
 
-                exportingModels.Remove(model);
+                exporting_models.Remove(model);
             }
 
             return success;
