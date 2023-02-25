@@ -93,38 +93,26 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double[] hitWindows = isLegacyScore ? getLegacyHitWindows(score, attributes) : getLazerHitWindows(score, attributes);
 
-            double nNoteCount = Math.Log(attributes.NoteCount);
+            // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
+            double nNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
             double nHoldCount = Math.Log(attributes.HoldNoteCount);
-            double nNoteHoldCount = Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
 
             // Find the likelihood of a deviation resulting in the play's judgements. Higher is more likely, so we find the peak of the curve.
-            double legacyLikelihoodGradient(double d)
+            double likelihoodGradient(double d)
             {
                 if (d <= 0)
                     return 0;
 
                 JudgementProbs pNotes = pNote(hitWindows, d);
-
-                JudgementProbs pHolds = pHold(hitWindows, d);
+                // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
+                JudgementProbs pHolds = isLegacyScore ? pHold(hitWindows, d) : pNote(hitWindows, d, tail_multiplier);
 
                 return -totalProb(pNotes, pHolds, nNoteCount, nHoldCount);
             }
 
-            double lazerLikelihoodGradient(double d)
-            {
-                if (d <= 0)
-                    return 0;
-
-                JudgementProbs pNotes = pNote(hitWindows, d);
-
-                // We use pNote instead of pHold because lazer tails behave the same as Notes.
-                JudgementProbs pTails = pNote(hitWindows, d, tail_multiplier);
-
-                return -totalProb(pNotes, pTails, nNoteHoldCount, nHoldCount);
-            }
-
             // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
-            double deviation = isLegacyScore ? FindMinimum.OfScalarFunction(legacyLikelihoodGradient, 30) : FindMinimum.OfScalarFunction(lazerLikelihoodGradient, 30);
+            double deviation = FindMinimum.OfScalarFunction(likelihoodGradient, 30);
+
             return deviation * 10;
         }
 
@@ -195,7 +183,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         // This method finds the probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
-        private JudgementProbs pNote(double[] hitWindows, double d, double multiplier = 1)
+        private JudgementProbs pNote(IReadOnlyList<double> hitWindows, double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
@@ -211,7 +199,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         // This method finds the probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
-        private JudgementProbs pHold(double[] hitWindows, double d)
+        private JudgementProbs pHold(IReadOnlyList<double> hitWindows, double d)
         {
             JudgementProbs probabilities = new JudgementProbs();
 
