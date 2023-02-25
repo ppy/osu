@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double logErfcApprox(double x) => x <= 5
             ? Math.Log(SpecialFunctions.Erfc(x))
-            : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/aaftj14euk
+            : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/kdbxwxgf01
 
         private double holdTailApprox(double x) => x <= 7
             ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2))
