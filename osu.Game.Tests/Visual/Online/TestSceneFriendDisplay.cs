@@ -56,7 +56,13 @@ namespace osu.Game.Tests.Visual.Online
                 IsOnline = true,
                 Statistics = new UserStatistics { GlobalRank = 1111 },
                 CountryCode = CountryCode.JP,
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                IsSupporter = true,
+                SupportLevel = 1,
+                Groups = new[]
+                {
+                    new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" }
+                }
             },
             new APIUser
             {
@@ -68,6 +74,11 @@ namespace osu.Game.Tests.Visual.Online
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 IsSupporter = true,
                 SupportLevel = 3,
+                Groups = new[]
+                {
+                    new APIUserGroup { Colour = "#0066FF", ShortName = "PPY", Name = "peppy" },
+                    new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" }
+                }
             },
             new APIUser
             {
@@ -76,7 +87,9 @@ namespace osu.Game.Tests.Visual.Online
                 CountryCode = CountryCode.BY,
                 CoverUrl = "https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                 IsOnline = false,
-                LastVisit = DateTimeOffset.Now
+                LastVisit = DateTimeOffset.Now,
+                IsSupporter = true,
+                SupportLevel = 2
             }
         };
     }

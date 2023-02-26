@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Users
 {
@@ -95,6 +96,13 @@ namespace osu.Game.Users
             });
 
             return statusContainer;
+        }
+
+        protected FillFlowContainer CreateGroupBadges()
+        {
+            var groupBadgeFlow = new GroupBadgeFlow();
+            groupBadgeFlow.User.Value = User;
+            return groupBadgeFlow;
         }
 
         private void displayStatus(UserStatus status, UserActivity activity = null)
