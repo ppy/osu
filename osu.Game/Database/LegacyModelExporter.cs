@@ -137,6 +137,12 @@ namespace osu.Game.Database
                 });
             }, cancellationToken).ContinueWith(t =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    notify.State = ProgressNotificationState.Cancelled;
+                    return false;
+                }
+
                 if (t.IsFaulted)
                 {
                     notify.State = ProgressNotificationState.Cancelled;
@@ -144,10 +150,8 @@ namespace osu.Game.Database
                     return false;
                 }
 
-                notify.CompletionText = "Export Complete, Click to open the folder";
-                notify.State = ProgressNotificationState.Completed;
                 return true;
-            }, cancellationToken);
+            }, CancellationToken.None);
         }
 
         /// <summary>
