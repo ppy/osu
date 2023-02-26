@@ -172,6 +172,7 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new OsuModTargetPractice(),
+                        new OsuModRateChanger(),
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
                         new OsuModRandom(),
