@@ -121,7 +121,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Export model to stream.
         /// </summary>
-        /// <param name="model">The medel which have <see cref="IHasGuidPrimaryKey"/>.</param>
+        /// <param name="model">The model which have <see cref="IHasGuidPrimaryKey"/>.</param>
         /// <param name="stream">The stream to export.</param>
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
