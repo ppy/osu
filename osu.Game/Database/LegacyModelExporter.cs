@@ -87,7 +87,6 @@ namespace osu.Game.Database
                 Text = "Exporting...",
                 CompletionText = "Export completed"
             };
-            notification.CompletionClickAction += () => exportStorage.PresentFileExternally(filename);
             PostNotification?.Invoke(notification);
 
             try
@@ -101,16 +100,20 @@ namespace osu.Game.Database
             {
                 success = false;
             }
-            finally
-            {
-                // cleanup if export is failed or canceled.
-                if (!success)
-                {
-                    exportStorage.Delete(filename);
-                }
 
-                exporting_models.Remove(model);
+            // cleanup if export is failed or canceled.
+            if (!success)
+            {
+                exportStorage.Delete(filename);
             }
+            else
+            {
+                notification.CompletionText = "Export Complete, Click to open the folder";
+                notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
+                notification.State = ProgressNotificationState.Completed;
+            }
+
+            exporting_models.Remove(model);
 
             return success;
         }
