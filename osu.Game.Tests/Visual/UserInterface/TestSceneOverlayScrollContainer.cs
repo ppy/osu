@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestScrollContainer : OverlayScrollContainer
         {
-            public new ScrollToTopButton Button => base.Button;
+            public new ScrollBackButton Button => base.Button;
         }
     }
 }
