@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Tests
                 {
                     Colour = OsuColour.Gray(0.5f),
                     Depth = 10
-                }, AddInternal);
+                }, Add);
 
                 // Have to construct this here, rather than in the constructor, because
                 // we depend on some dependencies to be loaded within OsuGameBase.load().

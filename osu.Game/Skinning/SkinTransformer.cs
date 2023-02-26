@@ -10,6 +10,13 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A default skin transformer, which falls back to the provided skin by default.
+    /// </summary>
+    /// <remarks>
+    /// Implementations of skin transformers should generally derive this class and override
+    /// individual lookup methods, modifying the lookup flow as required.
+    /// </remarks>
     public abstract class SkinTransformer : ISkinTransformer
     {
         public ISkin Skin { get; }

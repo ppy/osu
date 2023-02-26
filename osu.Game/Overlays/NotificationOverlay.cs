@@ -92,8 +92,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
-                                        new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, NotificationsStrings.ClearAll),
+                                        new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }, NotificationsStrings.CancelAll),
                                     }
                                 }
                             }

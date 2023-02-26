@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
@@ -29,6 +30,13 @@ namespace osu.Game.Overlays
         public const float RIGHT_WIDTH = 275;
 
         private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private IBindable<APIUser> apiUser;
+
+        private (BeatmapSetLookupType type, int id)? lastLookup;
 
         /// <remarks>
         /// Isolates the beatmap set overlay from the game-wide selected mods bindable
@@ -72,6 +80,17 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => Schedule(() =>
+            {
+                if (api.IsLoggedIn)
+                    performFetch();
+            }));
+        }
+
         protected override BeatmapSetHeader CreateHeader() => new BeatmapSetHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
@@ -84,27 +103,20 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmap(int beatmapId)
         {
+            lastLookup = (BeatmapSetLookupType.BeatmapId, beatmapId);
             beatmapSet.Value = null;
 
-            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
-            req.Success += res =>
-            {
-                beatmapSet.Value = res;
-                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == beatmapId);
-            };
-            API.Queue(req);
-
+            performFetch();
             Show();
         }
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
+            lastLookup = (BeatmapSetLookupType.SetId, beatmapSetId);
+
             beatmapSet.Value = null;
 
-            var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => beatmapSet.Value = res;
-            API.Queue(req);
-
+            performFetch();
             Show();
         }
 
@@ -116,6 +128,24 @@ namespace osu.Game.Overlays
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private void performFetch()
+        {
+            if (!api.IsLoggedIn)
+                return;
+
+            if (lastLookup == null)
+                return;
+
+            var req = new GetBeatmapSetRequest(lastLookup.Value.id, lastLookup.Value.type);
+            req.Success += res =>
+            {
+                beatmapSet.Value = res;
+                if (lastLookup.Value.type == BeatmapSetLookupType.BeatmapId)
+                    Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == lastLookup.Value.id);
+            };
+            API.Queue(req);
         }
 
         private partial class CommentsSection : BeatmapSetLayoutSection

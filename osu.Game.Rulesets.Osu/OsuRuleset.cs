@@ -165,6 +165,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                         new OsuModStrictTracking(),
+                        new OsuModAccuracyChallenge(),
                         new OsuModPrecise(),
                     };
 

@@ -4,6 +4,9 @@
     <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <UseMauiEssentials>true</UseMauiEssentials>
+    <Version>0.1.0</Version>
+    <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">$(Version)</ApplicationVersion>
+    <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
