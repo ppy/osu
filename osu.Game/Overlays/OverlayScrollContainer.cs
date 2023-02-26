@@ -22,23 +22,23 @@ using osuTK.Graphics;
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// <see cref="UserTrackingScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay{T}"/>.
+    /// <see cref="UserTrackingScrollContainer"/> which provides <see cref="ScrollBackButton"/>. Mostly used in <see cref="FullscreenOverlay{T}"/>.
     /// </summary>
     public partial class OverlayScrollContainer : UserTrackingScrollContainer
     {
         /// <summary>
-        /// Scroll position at which the <see cref="ScrollToTopButton"/> will be shown.
+        /// Scroll position at which the <see cref="ScrollBackButton"/> will be shown.
         /// </summary>
         private const int button_scroll_position = 200;
 
-        protected ScrollToTopButton Button;
+        protected ScrollBackButton Button;
 
         private readonly Bindable<float?> lastScrollTarget = new Bindable<float?>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(Button = new ScrollToTopButton
+            AddInternal(Button = new ScrollBackButton
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public partial class ScrollToTopButton : OsuHoverContainer
+        public partial class ScrollBackButton : OsuHoverContainer
         {
             private const int fade_duration = 500;
 
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays
 
             public Bindable<float?> LastScrollTarget = new Bindable<float?>();
 
-            public ScrollToTopButton()
+            public ScrollBackButton()
                 : base(HoverSampleSet.ScrollToTop)
             {
                 Size = new Vector2(50);
