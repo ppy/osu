@@ -42,7 +42,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Currently editing"
         /// </summary>
-        public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), "Currently editing");
+        public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), @"Currently editing");
+
+        /// <summary>
+        /// "Revert?"
+        /// </summary>
+        public static LocalisableString Revert => new TranslatableString(getKey(@"revert"), @"Revert?");
+
+        /// <summary>
+        /// "The skin will return to the state it was in upon import"
+        /// </summary>
+        public static LocalisableString ResetDialogue => new TranslatableString(getKey(@"the_skin_will_return_to"), @"The skin will return to the state it was in upon import");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
