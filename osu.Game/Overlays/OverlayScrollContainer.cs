@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,16 +31,20 @@ namespace osu.Game.Overlays
         /// </summary>
         private const int button_scroll_position = 200;
 
-        protected readonly ScrollToTopButton Button;
+        protected ScrollToTopButton Button;
 
-        public OverlayScrollContainer()
+        private readonly Bindable<float?> lastScrollTarget = new Bindable<float?>();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AddInternal(Button = new ScrollToTopButton
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
-                Action = scrollToTop
+                Action = scrollBack,
+                LastScrollTarget = { BindTarget = lastScrollTarget }
             });
         }
 
@@ -53,13 +58,28 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            Button.State = Target > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
+            Button.State = Target > button_scroll_position || lastScrollTarget.Value != null ? Visibility.Visible : Visibility.Hidden;
         }
 
-        private void scrollToTop()
+        protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
         {
-            ScrollToStart();
-            Button.State = Visibility.Hidden;
+            base.OnUserScroll(value, animated, distanceDecay);
+
+            lastScrollTarget.Value = null;
+        }
+
+        private void scrollBack()
+        {
+            if (lastScrollTarget.Value == null)
+            {
+                lastScrollTarget.Value = Target;
+                ScrollToStart();
+            }
+            else
+            {
+                ScrollTo(lastScrollTarget.Value.Value);
+                lastScrollTarget.Value = null;
+            }
         }
 
         public partial class ScrollToTopButton : OsuHoverContainer
@@ -88,6 +108,9 @@ namespace osu.Game.Overlays
 
             private readonly Container content;
             private readonly Box background;
+            private readonly SpriteIcon spriteIcon;
+
+            public Bindable<float?> LastScrollTarget = new Bindable<float?>();
 
             public ScrollToTopButton()
                 : base(HoverSampleSet.ScrollToTop)
@@ -113,7 +136,7 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        new SpriteIcon
+                        spriteIcon = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -132,6 +155,17 @@ namespace osu.Game.Overlays
                 IdleColour = colourProvider.Background6;
                 HoverColour = colourProvider.Background5;
                 flashColour = colourProvider.Light1;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                LastScrollTarget.BindValueChanged(target =>
+                {
+                    spriteIcon.RotateTo(target.NewValue != null ? 180 : 0, fade_duration, Easing.OutQuint);
+                    TooltipText = target.NewValue != null ? CommonStrings.ButtonsBackToPrevious : CommonStrings.ButtonsBackToTop;
+                }, true);
             }
 
             protected override bool OnClick(ClickEvent e)
