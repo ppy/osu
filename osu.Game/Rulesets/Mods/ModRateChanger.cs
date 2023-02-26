@@ -45,7 +45,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModRateChanger()
         {
-            // Muda a velocidade sem mudar o pitch.
             SpeedChange.BindValueChanged(val =>
             {
                 speedMultiplier = val.NewValue;
@@ -53,7 +52,6 @@ namespace osu.Game.Rulesets.Mods
                 ValTempoReal();
             }, true);
 
-            // Muda a velocidade e o pitch
             PitchChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = val.NewValue;
@@ -68,9 +66,8 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
-
         
-        // Implementa a função 1/x pra definir o valor do tempoAdjust.
+        // Implements 1/x to define the value of tempoAdjust.
         void ValTempoReal() {
             if ((speedMultiplier * (1/freqAdjust.Value)) > 0.05)
             {
