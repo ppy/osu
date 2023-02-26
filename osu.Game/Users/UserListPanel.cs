@@ -67,6 +67,11 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
+                            }),
+                            CreateGroupBadges().With(badges =>
+                            {
+                                badges.Anchor = Anchor.CentreLeft;
+                                badges.Origin = Anchor.CentreLeft;
                             })
                         }
                     },
