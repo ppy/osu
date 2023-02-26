@@ -15,8 +15,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Utils;
-using osu.Game.Rulesets.Taiko.Mods;
-using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -29,6 +28,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private const double flash_duration = 1000;
 
         private DrawableRuleset<TaikoHitObject> ruleset = null!;
+
+        private TaikoPlayfield playfield { get; set; } = null!;
 
         protected TaikoAction? LastAcceptedDonAction { get; private set; }
         protected TaikoAction? LastAcceptedKatAction { get; private set; }
@@ -46,6 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             ruleset = drawableRuleset;
+            playfield = (TaikoPlayfield)ruleset.Playfield;
             drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
             var periods = new List<Period>();
@@ -97,6 +99,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     return true;
             }
 
+            // If next hit object is strong, allow usage of all actions
+            if (playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong)
+                return true;
+
             if (CheckValidNewAction(action))
             {
                 if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
@@ -106,7 +112,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return true;
             }
 
-            //ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
             return false;
         }
 
