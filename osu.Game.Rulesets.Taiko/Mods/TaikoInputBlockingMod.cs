@@ -84,19 +84,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
                 return true;
 
-            switch (action)
-            {
-                case TaikoAction.LeftCentre:
-                case TaikoAction.RightCentre:
-                case TaikoAction.LeftRim:
-                case TaikoAction.RightRim:
-                    break;
-
-                // Any action which is not left or right button should be ignored.
-                default:
-                    return true;
-            }
-
             // If next hit object is strong, allow usage of all actions. Strong drumrolls are ignored in this check.
             if (playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject is TaikoStrongableHitObject hitObject
                 && hitObject.IsStrong
