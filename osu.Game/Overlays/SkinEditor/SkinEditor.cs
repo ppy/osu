@@ -631,7 +631,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        public partial class ResetConfirmDialog : PopupDialog
+        public partial class ResetConfirmDialog : DeleteConfirmationDialog
         {
             public ResetConfirmDialog(Action reset)
             {
