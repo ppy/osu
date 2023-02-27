@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModSingleTap : InputBlockingMod
+    public class TaikoModSingleTap : TaikoInputBlockingMod
     {
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
