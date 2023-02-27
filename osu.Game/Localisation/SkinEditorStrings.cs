@@ -45,9 +45,9 @@ namespace osu.Game.Localisation
         public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), @"Currently editing");
 
         /// <summary>
-        /// "Revert?"
+        /// "Revert to default?"
         /// </summary>
-        public static LocalisableString Revert => new TranslatableString(getKey(@"revert"), @"Revert?");
+        public static LocalisableString RevertToDefault => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default?");
 
         /// <summary>
         /// "The skin will return to the state it was in upon import"
