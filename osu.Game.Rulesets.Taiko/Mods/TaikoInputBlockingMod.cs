@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;
 
-        private const double flash_duration = 1000;
-
         private DrawableTaikoRuleset ruleset = null!;
 
         private TaikoPlayfield playfield { get; set; } = null!;
