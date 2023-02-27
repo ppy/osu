@@ -10,7 +10,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class LocalScoreDeleteDialog : DeleteConfirmationDialog
+    public partial class LocalScoreDeleteDialog : DangerousActionDialog
     {
         private readonly ScoreInfo score;
 

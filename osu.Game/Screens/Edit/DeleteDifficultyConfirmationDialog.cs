@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class DeleteDifficultyConfirmationDialog : DeleteConfirmationDialog
+    public partial class DeleteDifficultyConfirmationDialog : DangerousActionDialog
     {
         public DeleteDifficultyConfirmationDialog(BeatmapInfo beatmapInfo, Action deleteAction)
         {

@@ -6,7 +6,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public partial class MassDeleteConfirmationDialog : DeleteConfirmationDialog
+    public partial class MassDeleteConfirmationDialog : DangerousActionDialog
     {
         public MassDeleteConfirmationDialog(Action deleteAction)
         {

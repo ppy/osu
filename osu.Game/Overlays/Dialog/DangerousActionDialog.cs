@@ -12,14 +12,14 @@ namespace osu.Game.Overlays.Dialog
     /// Differs from <see cref="ConfirmDialog"/> in that the confirmation button is a "dangerous" one
     /// (requires the confirm button to be held).
     /// </summary>
-    public abstract partial class DeleteConfirmationDialog : PopupDialog
+    public abstract partial class DangerousActionDialog : PopupDialog
     {
         /// <summary>
         /// The action which performs the deletion.
         /// </summary>
         protected Action? DeleteAction { get; set; }
 
-        protected DeleteConfirmationDialog()
+        protected DangerousActionDialog()
         {
             HeaderText = DeleteConfirmationDialogStrings.HeaderText;
 
