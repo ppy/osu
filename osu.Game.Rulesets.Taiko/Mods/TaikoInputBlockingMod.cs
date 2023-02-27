@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private const double flash_duration = 1000;
 
-        private DrawableRuleset<TaikoHitObject> ruleset = null!;
+        private DrawableTaikoRuleset ruleset = null!;
 
         private TaikoPlayfield playfield { get; set; } = null!;
 
@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            ruleset = drawableRuleset;
+            ruleset = (DrawableTaikoRuleset)drawableRuleset;
+            ruleset.InputManager.Add(new InputInterceptor(this));
             playfield = (TaikoPlayfield)ruleset.Playfield;
-            drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
             var periods = new List<Period>();
 

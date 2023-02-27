@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public readonly BindableBool LockPlayfieldMaxAspect = new BindableBool(true);
 
+        public TaikoInputManager InputManager { get; private set; }
+
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
@@ -93,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             LockPlayfieldMaxAspect = { BindTarget = LockPlayfieldMaxAspect }
         };
 
-        protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
+        protected override PassThroughInputManager CreateInputManager() => InputManager = new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield();
 
