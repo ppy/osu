@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 else
                     Hide();
             });
-
         }
     }
 }
