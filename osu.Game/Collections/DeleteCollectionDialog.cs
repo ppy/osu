@@ -8,7 +8,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Collections
 {
-    public partial class DeleteCollectionDialog : DeleteConfirmationDialog
+    public partial class DeleteCollectionDialog : DangerousActionDialog
     {
         public DeleteCollectionDialog(Live<BeatmapCollection> collection, Action deleteAction)
         {
