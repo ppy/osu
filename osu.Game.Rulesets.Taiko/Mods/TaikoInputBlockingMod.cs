@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public abstract partial class InputBlockingMod : Mod, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
+    public abstract partial class TaikoInputBlockingMod : Mod, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
     {
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
@@ -117,9 +117,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private partial class InputInterceptor : Component, IKeyBindingHandler<TaikoAction>
         {
-            private readonly InputBlockingMod mod;
+            private readonly TaikoInputBlockingMod mod;
 
-            public InputInterceptor(InputBlockingMod mod)
+            public InputInterceptor(TaikoInputBlockingMod mod)
             {
                 this.mod = mod;
             }
