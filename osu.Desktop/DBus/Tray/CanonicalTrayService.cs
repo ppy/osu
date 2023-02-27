@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
@@ -35,7 +36,7 @@ namespace osu.Desktop.DBus.Tray
 
         private readonly RootEntry rootEntry = new RootEntry
         {
-            ChildrenDisplay = ChildrenDisplayType.SSubmenu
+            ChildrenDisplay = ChildrenDisplayType.Submenu
         };
 
         #region 列表物件存储
@@ -47,13 +48,16 @@ namespace osu.Desktop.DBus.Tray
         private void addEntry(SimpleEntry entry)
         {
             if (entry is RootEntry)
-                throw new InvalidOperationException("不能添加多个RootEntry");
+                throw new InvalidOperationException("不能添加RootEntry");
 
-            rootEntry.Children.Add(entry);
-            entries[lastEntryId] = entry;
-            entry.OnPropertyChanged = () => triggerLayoutUpdate(entry);
+            lock (entries)
+            {
+                rootEntry.Children.Add(entry);
+                entries[lastEntryId] = entry;
+                entry.OnPropertyChanged = () => triggerLayoutUpdate(entry);
 
-            lastEntryId++;
+                lastEntryId++;
+            }
         }
 
         public void AddEntryRange(SimpleEntry[] entries)
@@ -71,17 +75,20 @@ namespace osu.Desktop.DBus.Tray
 
         public void RemoveEntryFromMenu(SimpleEntry entry)
         {
-            var key = entries.FirstOrDefault(p => p.Value == entry);
-
-            if (key.Value != null)
+            lock (entries)
             {
-                entries.Remove(key.Key);
-                rootEntry.Children.Remove(key.Value);
-            }
-            else
-                throw new InvalidOperationException($"给定的 {entry} 不在列表中");
+                var key = entries.FirstOrDefault(p => p.Value == entry);
 
-            triggerLayoutUpdate();
+                if (key.Value != null)
+                {
+                    entries.Remove(key.Key);
+                    rootEntry.Children.Remove(key.Value);
+                }
+                else
+                    throw new InvalidOperationException($"给定的 {entry} 不在列表中");
+
+                triggerLayoutUpdate();
+            }
         }
 
         private void triggerLayoutUpdate(SimpleEntry entry = null)
@@ -91,10 +98,14 @@ namespace osu.Desktop.DBus.Tray
             entry ??= rootEntry;
             //Logger.Log($"{entry.ToString().Replace("\n", "\\n")}发生了变化");
 
-            updatedEntries[entry.ChildId] = entry;
+            if (entry.ChildId == null) throw new ArgumentNullException($"{entry}没有ChildID");
 
-            if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
-                OnLayoutUpdated?.Invoke((menuRevision, entry.ChildId));
+            int childId = (int)entry.ChildId;
+
+            updatedEntries[childId] = entry;
+
+            if (entry.ChildrenDisplay == ChildrenDisplayType.Submenu)
+                OnLayoutUpdated?.Invoke((menuRevision, childId));
             else
             {
                 OnEntriesUpdated?.Invoke((new[]
@@ -124,8 +135,10 @@ namespace osu.Desktop.DBus.Tray
                     IDictionary<int, SimpleEntry> additDict;
                     //int addit;
 
+                    Debug.Assert(rootEntry.ChildId != null, "rootEntry.ChildId != null");
+
                     result = (menuRevision, rootEntry.ToDbusObject(
-                        rootEntry.ChildId,
+                        (int)rootEntry.ChildId,
                         dbusItemMaxOrder,
                         out additDict));
 
@@ -136,13 +149,13 @@ namespace osu.Desktop.DBus.Tray
                     dbusItemMaxOrder += additDict.Count;
 
                     //递归检查所有新增的SimpleEntry
-                    foreach (var kvp in additDict)
+                    lock (entries)
                     {
-                        //尝试添加到entries中
-                        if (entries.TryAdd(kvp.Key, kvp.Value))
+                        foreach (var kvp in additDict)
                         {
-                            //如果成功了，订阅OnPropertyChanged
-                            kvp.Value.OnPropertyChanged = () => triggerLayoutUpdate(kvp.Value);
+                            //尝试添加到entries中, 如果成功, 订阅OnPropertyChanged
+                            if (entries.TryAdd(kvp.Key, kvp.Value))
+                                kvp.Value.OnPropertyChanged = () => triggerLayoutUpdate(kvp.Value);
                         }
                     }
 
@@ -150,15 +163,16 @@ namespace osu.Desktop.DBus.Tray
                     updatedEntries.Clear();
                 }
 
-                //如果parentID是0
+                //如果parentID是0, 返回缓存的列表
                 if (parentId == 0)
-                    //返回缓存的列表
                     return Task.FromResult(cachedLayoutObject);
 
                 var target = entries.FirstOrDefault(e => e.Key == parentId).Value;
 
+                if (target.ChildId == null) throw new ArgumentNullException($"{target}的ChildID是null");
+
                 result = (menuRevision, target.ToDbusObject(
-                    target.ChildId,
+                    (int)target.ChildId,
                     int.MinValue, //转换在上方已经完成了，因此在这里不要传递dbusItemMaxOrder
                     out _)); //同上
 
@@ -180,7 +194,7 @@ namespace osu.Desktop.DBus.Tray
             {
                 var result = new List<(int, IDictionary<string, object>)>();
 
-                foreach (var id in ids)
+                foreach (int id in ids)
                 {
                     var target = entries.FirstOrDefault(k => k.Key == id);
                     if (target.Value == null) continue;
@@ -200,7 +214,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<object> GetPropertyAsync(int id, string name)
         {
             Logger.Log($"未实现的方法被调用：GetPropertyAsync: id: {id} | name: {name}");
-            throw new NotImplementedException("未实现的接口");
+            return Task.FromException<object>(new NotImplementedException("未实现的接口"));
         }
 
         public Task EventAsync(int id, string eventId, object data, uint timestamp)

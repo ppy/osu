@@ -55,6 +55,8 @@ namespace M.DBus
         {
             //Disconnect();
 
+            currentConnection.Dispose();
+
             isDisposed = true;
             GC.SuppressFinalize(this);
         }
@@ -171,8 +173,11 @@ namespace M.DBus
             if (string.IsNullOrEmpty(targetName))
                 targetName = dbusObject.ObjectPath.ToServiceName();
 
-            //添加物件与其目标名称添加到词典
-            registerDictionary[dbusObject] = targetName;
+            lock (registerDictionary)
+            {
+                //添加物件与其目标名称添加到词典
+                registerDictionary[dbusObject] = targetName;
+            }
 
             if (connectionState == ConnectionState.Connected)
                 await registerToConection(dbusObject).ConfigureAwait(false);
@@ -180,16 +185,8 @@ namespace M.DBus
 
         public async Task RegisterNewObjects(IDBusObject[] objects)
         {
-            //添加物件到列表
-            foreach (var obj in objects)
-                registerDictionary[obj] = obj.ObjectPath.ToServiceName();
-
-            if (connectionState == ConnectionState.Connected)
-            {
-                //注册物件和DBus服务
-                foreach (var dBusObject in registerDictionary.Keys)
-                    await registerToConection(dBusObject).ConfigureAwait(false);
-            }
+            foreach (var dBusObject in objects)
+                await RegisterNewObject(dBusObject).ConfigureAwait(false);
         }
 
         //bug: 注册的服务/物件在错误的dbus-send后会直接Name Lost，无法恢复
@@ -199,7 +196,7 @@ namespace M.DBus
 
             //递归注册DBus服务
             foreach (var dBusObject in registerDictionary.Keys)
-                await registerToConection(dBusObject).ConfigureAwait(false);
+                await RegisterNewObject(dBusObject).ConfigureAwait(false);
         }
 
         private readonly List<string> registeredServices = new List<string>();
@@ -207,18 +204,26 @@ namespace M.DBus
         private async Task registerToConection(IDBusObject dBusObject)
         {
             string targetName = registerDictionary[dBusObject];
-            await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
 
+            await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
             await currentConnection.RegisterServiceAsync(targetName).ConfigureAwait(false);
 
-            if (!registeredServices.Contains(targetName))
+            bool alreadyRegistered = false;
+
+            lock (registeredServices)
+            {
+                alreadyRegistered = registeredServices.Contains(targetName);
+
+                if (!alreadyRegistered)
+                    registeredServices.Add(targetName);
+            }
+
+            if (!alreadyRegistered)
             {
                 await currentConnection.ResolveServiceOwnerAsync(
                     targetName,
                     onServiceNameChanged,
                     e => onServiceError(e, dBusObject)).ConfigureAwait(false);
-
-                registeredServices.Add(targetName);
             }
 
             Logger.Log($"为{dBusObject.ObjectPath}注册{targetName}");
@@ -230,25 +235,32 @@ namespace M.DBus
 
         public void RemoveObject(IDBusObject dBusObject)
         {
-            var target = registerDictionary.FirstOrDefault(o => o.Key.ObjectPath.Equals(dBusObject.ObjectPath)).Key;
-
-            if (target != null)
+            try
             {
-                Logger.Log($"反注册{dBusObject.ObjectPath}");
-                Task.Run(() =>
+                var target = registerDictionary.FirstOrDefault(o => o.Key.ObjectPath.Equals(dBusObject.ObjectPath)).Key;
+
+                if (target != null)
                 {
-                    unRegisterFromConnection(target).ConfigureAwait(false);
-                    registerDictionary.Remove(target);
-                });
+                    Logger.Log($"反注册{dBusObject.ObjectPath}");
+
+                    string serviceName = registerDictionary[target];
+
+                    lock (registerDictionary)
+                        registerDictionary.Remove(target);
+
+                    Task.Run(() => unRegisterFromConnection(target, serviceName).ConfigureAwait(false));
+                }
             }
-            else
-                throw new InvalidOperationException($"尝试反注册一个不存在的DBus物件: {dBusObject.ObjectPath}");
+            catch (Exception e)
+            {
+                Logger.Error(e, $"移除DBus对象时遇到异常");
+            }
         }
 
-        private async Task unRegisterFromConnection(IDBusObject dBusObject)
+        private async Task unRegisterFromConnection(IDBusObject dBusObject, string serviceName)
         {
             currentConnection.UnregisterObject(dBusObject);
-            await currentConnection.UnregisterServiceAsync(registerDictionary[dBusObject]).ConfigureAwait(false);
+            await currentConnection.UnregisterServiceAsync(serviceName).ConfigureAwait(false);
         }
 
         #endregion
@@ -302,9 +314,11 @@ namespace M.DBus
                         //设置连接状态
                         connectionState = ConnectionState.Connected;
 
+                        //注册对象
                         await registerObjects().ConfigureAwait(false);
+
                         OnConnected?.Invoke();
-                        GreetService.SwitchState(true, "");
+                        GreetService.SwitchState(true, "Initial connect");
                         break;
 
                     //case ConnectionState.Connected:

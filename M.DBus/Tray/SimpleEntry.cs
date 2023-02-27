@@ -12,7 +12,7 @@ namespace M.DBus.Tray
     /// </summary>
     public class SimpleEntry
     {
-        public int ChildId { get; internal set; } = -2;
+        public int? ChildId { get; internal set; }
 
         public Action OnPropertyChanged;
 
@@ -35,7 +35,7 @@ namespace M.DBus.Tray
             }
         }
 
-        private string type = EntryType.SStandard;
+        private string type = EntryType.Standard;
 
         /// <summary>
         /// 该项目的文本，但是：<br/>
@@ -192,7 +192,7 @@ namespace M.DBus.Tray
             }
         }
 
-        private string toggleType = Utils.Canonical.DBusMenuFlags.ToggleType.SIndependentToggleable;
+        private string toggleType = Utils.Canonical.DBusMenuFlags.ToggleType.IndependentToggleable;
 
         /// <summary>
         /// 描述“可切换”项目的当前状态。 可以是以下之一：<br/>
@@ -235,7 +235,7 @@ namespace M.DBus.Tray
             }
         }
 
-        private string childrenDisplay = ChildrenDisplayType.SNone;
+        private string childrenDisplay = ChildrenDisplayType.None;
 
         /// <summary>
         /// 该项目被激活时要执行的动作

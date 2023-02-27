@@ -59,7 +59,7 @@ namespace M.DBus.Tray
 
                 additionalEntries = new Dictionary<int, SimpleEntry>();
 
-                if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
+                if (entry.ChildrenDisplay == ChildrenDisplayType.Submenu)
                 {
                     try
                     {
@@ -74,7 +74,7 @@ namespace M.DBus.Tray
                             IDictionary<int, SimpleEntry> additDict;
 
                             //如果subEntry没有被指定ChildID
-                            if (subEntry.ChildId == -2)
+                            if (subEntry.ChildId == null)
                             {
                                 //最大id+1
                                 maxOrder++;
@@ -83,7 +83,7 @@ namespace M.DBus.Tray
                                 subEntry.ChildId = maxOrder;
 
                                 //加入要返回的词典中
-                                additionalEntries[subEntry.ChildId] = subEntry;
+                                additionalEntries[(int)subEntry.ChildId] = subEntry;
 
                                 //记录
                                 //Logger.Log($"{subEntry} 获取了新的ChildId: {subEntry.ChildId}");
@@ -91,7 +91,7 @@ namespace M.DBus.Tray
 
                             //添加目录
                             //不需要处理additonalOrders，因为已经有additDict可以用作计数了
-                            subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out additDict));
+                            subMenus.Add(subEntry.ToDbusObject((int)subEntry.ChildId, maxOrder, out additDict));
 
                             //将循环调用返回的 额外词典 加进要返回的 词典 中
 
@@ -116,6 +116,8 @@ namespace M.DBus.Tray
 
         public static (int, IDictionary<string, object>) ToDbusObject(this SimpleEntry entry)
         {
+            int childId = entry.ChildId ?? -1;
+
             var result = new Dictionary<string, object>
             {
                 ["type"] = entry.Type,
@@ -130,7 +132,7 @@ namespace M.DBus.Tray
                 ["children-display"] = entry.ChildrenDisplay,
             };
 
-            return (entry.ChildId, result);
+            return (childId, result);
         }
     }
 }

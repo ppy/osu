@@ -97,7 +97,7 @@ namespace Mvis.Plugin.CollectionSupport
         private readonly SimpleEntry trayEntry = new SimpleEntry
         {
             Label = "收藏夹（未选择任何收藏夹）",
-            ChildrenDisplay = ChildrenDisplayType.SSubmenu
+            ChildrenDisplay = ChildrenDisplayType.Submenu
         };
 
         [BackgroundDependencyLoader]

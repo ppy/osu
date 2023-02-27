@@ -6,7 +6,7 @@ namespace M.DBus.Tray
     {
         public SeparatorEntry()
         {
-            Type = EntryType.SSeparator;
+            Type = EntryType.Separator;
         }
     }
 }

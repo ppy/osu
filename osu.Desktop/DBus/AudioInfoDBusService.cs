@@ -3,6 +3,8 @@ using M.DBus;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
+#nullable enable
+
 namespace osu.Desktop.DBus
 {
     [DBusInterface("io.matrix_feather.mfosu.Audio")]
