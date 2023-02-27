@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRateChanger : ModRateChanger
     {
-        public override double ScoreMultiplier => 0;
+        public override double ScoreMultiplier => SpeedChange.Value;
     }
 }
