@@ -23,9 +23,7 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        public double speedMultiplier = 1;
-
-        bool allowLog = true;
+        public double SpeedMultiplier = 1;
         
         [SettingSource("Speed edit", "The song speed multiplier")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
@@ -47,16 +45,16 @@ namespace osu.Game.Rulesets.Mods
         {
             SpeedChange.BindValueChanged(val =>
             {
-                speedMultiplier = val.NewValue;
+                SpeedMultiplier = val.NewValue;
 
-                ValTempoReal();
+                calculateRealTempo();
             }, true);
 
             PitchChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = val.NewValue;
 
-                ValTempoReal();
+                calculateRealTempo();
             }, true);
         }
 
@@ -67,18 +65,12 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
         
-        // Implements 1/x to define the value of tempoAdjust.
-        void ValTempoReal() {
-            if ((speedMultiplier * (1/freqAdjust.Value)) > 0.05)
-            {
-                tempoAdjust.Value = speedMultiplier * (1/freqAdjust.Value);
-                allowLog = true;
-            }
-            else if (allowLog)
-            {
-                Logger.Log("Resulting internal tempo would be smaller than 0,05.", LoggingTarget.Information, LogLevel.Important);
-                allowLog = false;
-            }
+        // Counterbalances freq's tempo changes according to f(x) = 1/x and multiplies the result afterwards making it the desired speed.
+        // Freq = 0.5x (half of 1x) -> Tempo = 2x (double of 1x) to cancel out the speed change.
+        // Freq = 0.25x (half of 0.5x) -> Tempo = 4x (double of 2x).
+        private void calculateRealTempo() {
+            double realTempo = SpeedMultiplier * (1/freqAdjust.Value);
+            if (realTempo > 0.05) tempoAdjust.Value = realTempo; 
         }
     }
 }
