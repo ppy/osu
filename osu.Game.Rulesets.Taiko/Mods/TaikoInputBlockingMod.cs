@@ -67,14 +67,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void Update(Playfield playfield)
         {
-            if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
-            {
-                if (LastAcceptedDonAction != null)
-                    LastAcceptedDonAction = null;
+            if (!nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime)) return;
 
-                if (LastAcceptedKatAction != null)
-                    LastAcceptedKatAction = null;
-            }
+            if (LastAcceptedDonAction != null)
+                LastAcceptedDonAction = null;
+
+            if (LastAcceptedKatAction != null)
+                LastAcceptedKatAction = null;
         }
 
         protected abstract bool CheckValidNewAction(TaikoAction action);
