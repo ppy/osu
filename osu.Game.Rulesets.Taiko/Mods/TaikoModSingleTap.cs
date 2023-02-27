@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
-        public override LocalisableString Description => @"You must only use one key!";
+        public override LocalisableString Description => @"One key for dons, one key for kats.";
 
         protected override bool CheckValidNewAction(TaikoAction action) => LastAcceptedDonAction == null || LastAcceptedDonAction == action || LastAcceptedKatAction == null || LastAcceptedKatAction == action;
     }
