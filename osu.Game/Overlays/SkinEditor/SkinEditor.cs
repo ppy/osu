@@ -635,7 +635,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             public ResetConfirmDialog(Action reset)
             {
-                HeaderText = SkinEditorStrings.Revert;
+                HeaderText = SkinEditorStrings.RevertToDefault;
                 BodyText = SkinEditorStrings.ResetDialogue;
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
