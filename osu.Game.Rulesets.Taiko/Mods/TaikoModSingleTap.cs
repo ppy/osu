@@ -20,7 +20,7 @@ using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModSingleTap : Mod, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
+    public partial class TaikoModSingleTap : Mod, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
     {
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
