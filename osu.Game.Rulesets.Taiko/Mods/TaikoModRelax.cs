@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModRelax : ModRelax
     {
-        public override LocalisableString Description => @"No ninja-like spinners, demanding drumrolls or unexpected katu's.";
+        public override LocalisableString Description => @"No ninja-like spinners, demanding drumrolls or unexpected katus.";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap) }).ToArray();
     }
