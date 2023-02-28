@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             // If next hit object is strong, allow usage of all actions. Strong drumrolls are ignored in this check.
             if (playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject is TaikoStrongableHitObject hitObject
                 && hitObject.IsStrong
-                && hitObject as DrumRoll == null)
+                && !(hitObject is DrumRoll))
                 return true;
 
             if (CheckValidNewAction(action))
