@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -38,9 +37,9 @@ using osu.Game.Skinning.Components;
 namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
-    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>, IEditorChangeHandler
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
-        public const double TRANSITION_DURATION = 300;
+        public const double TRANSITION_DURATION = 500;
 
         public const float MENU_HEIGHT = 40;
 
@@ -84,7 +83,7 @@ namespace osu.Game.Overlays.SkinEditor
             RelativeSizeAxes = Axes.Both
         };
 
-        public readonly DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> LayerSidebarList;
+        public readonly DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>> LayerSidebarList;
 
         private readonly EditorSidebar componentsSidebar = new EditorSidebar();
         private readonly EditorSidebar settingsSidebar = new EditorSidebar();
@@ -112,7 +111,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Name = "DrawableMinimisableList"
             });
-            LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(listName);
+            LayerSidebarList = new DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>(listName);
         }
 
         public SkinEditor(Drawable targetScreen)
@@ -260,10 +259,10 @@ namespace osu.Game.Overlays.SkinEditor
         private void initLayerEditor()
         {
             LayerSidebarList.List.Items.RemoveAll(static _ => true);
-            LayerSidebarList.Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
+            LayerSidebarList.Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISerialisableDrawable>>.GetDefaultText((Drawable)t.Item);
             LayerSidebarList.Properties.SetItemDepth = static (blueprint, depth) =>
             {
-                if (blueprint.Parent is Container<SelectionBlueprint<ISkinnableDrawable>> container)
+                if (blueprint.Parent is Container<SelectionBlueprint<ISerialisableDrawable>> container)
                 {
                     container.ChangeChildDepth(blueprint, depth);
                     container.Invalidate();
@@ -361,7 +360,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             this.targetScreen = targetScreen;
 
-            changeHandler?.Dispose();
+            SelectedComponents.Clear();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
             content?.Clear();
@@ -402,7 +401,6 @@ namespace osu.Game.Overlays.SkinEditor
             SkinBlueprintContainer blueprintContainer = new SkinBlueprintContainer(skinComponentsContainer);
             content.Child = blueprintContainer;
 
-            //init sidebar element list
             bool open = LayerSidebarList.Enabled.Value;
             initLayerEditor();
             LayerSidebarList.Enabled.Value = open;
@@ -410,11 +408,12 @@ namespace osu.Game.Overlays.SkinEditor
                 blueprintContainer.SelectionBlueprints
                                   .Children
                                   .Select(static item =>
-                                      new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(item, DrawableListEntryType.Item)
+                                      new DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>(item, DrawableListEntryType.Item)
                                   ));
-            componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
+            componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget())
             {
-                RequestPlacement = placeComponent
+                RequestPlacement = requestPlacement
+
             };
 
             componentsSidebar.Children = new[]
@@ -490,6 +489,9 @@ namespace osu.Game.Overlays.SkinEditor
             var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer == null)
+                return false;
+
+            if (component is not Drawable)
                 return false;
 
             var drawableComponent = (Drawable)component;

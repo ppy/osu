@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
 
         public float Depth { get; set; }
 
-        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        /// <inheritdoc cref="ISerialisableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
