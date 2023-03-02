@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     Height = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Width = 1f,
+                    Width = (float)AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 360f,
                     Colour = OsuColour.Gray(0.3f),
                     EdgeSmoothness = new Vector2(1f)
                 }

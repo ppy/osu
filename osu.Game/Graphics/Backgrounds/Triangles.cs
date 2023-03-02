@@ -294,8 +294,14 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
+                // Due to triangles having various sizes we would need to set a different "texelSize" value for each of them, which is insanely expensive, thus we should use one single value.
+                // texelSize computed for an average triangle (size 100) will result in big triangles becoming blurry, so we may just use 0 for all of them.
+                // But we still need to specify at least something, because otherwise other shader usages will override this value.
+                float texelSize = 0f;
+
                 shader.Bind();
                 shader.GetUniform<float>("thickness").UpdateValue(ref fill);
+                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
                 foreach (TriangleParticle particle in parts)
                 {
