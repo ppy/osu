@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Right = -3 }, // Compensate for scrollbar margin
-                    Child = new OsuScrollContainer
+                    Child = new SidebarScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new Container
@@ -74,5 +75,30 @@ namespace osu.Game.Overlays
 
         [NotNull]
         protected virtual Drawable CreateContent() => Empty();
+
+        private partial class SidebarScrollContainer : OsuScrollContainer
+        {
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (e.ScrollDelta.Y > 0 && IsScrolledToStart())
+                    return false;
+
+                if (e.ScrollDelta.Y < 0 && IsScrolledToEnd())
+                    return false;
+
+                return base.OnScroll(e);
+            }
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                if (e.Delta.Y > 0 && IsScrolledToStart())
+                    return false;
+
+                if (e.Delta.Y < 0 && IsScrolledToEnd())
+                    return false;
+
+                return base.OnDragStart(e);
+            }
+        }
     }
 }
