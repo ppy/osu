@@ -7,11 +7,11 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
-using osu.Game.Skinning.Editor;
 using osuTK;
 using osuTK.Input;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         protected override void CreateDrawableList()
         {
-            BackingDrawable = new DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>(
+            BackingDrawable = new DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>(
                 new SkinBlueprint(
                     new BigBlackBox
                     {
@@ -31,9 +31,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         protected override Drawable GetContent() => BackingDrawable;
 
-        protected DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> BackingDrawable = null!;
+        protected DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>> BackingDrawable = null!;
 
-        private void expandList(Func<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>> minimisableList)
+        private void expandList(Func<DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>> minimisableList)
         {
             AddStep("Expand List", () =>
             {
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("List is Expanded", () => minimisableList().Enabled.Value && minimisableList().IsPresent);
         }
 
-        protected override DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => BackingDrawable.List;
+        protected override DrawableList<SelectionBlueprint<ISerialisableDrawable>> DrawableList => BackingDrawable.List;
 
         [SetUpSteps]
         public void SetUpList()
@@ -92,11 +92,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             const int item_count = 10;
 
-            List<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>> lists = new List<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
+            List<DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>> lists = new List<DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>>(item_count);
             AddStep("add lists", () =>
             {
                 int items = 0;
-                List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>>(item_count);
+                List<DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>> list = new List<DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>>(item_count);
                 AddElement(Enumerable.Range(0, item_count)
                                      .Select(static _ => new TextElement()),
                     list,
@@ -105,16 +105,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                     false);
                 BackingDrawable.List.Items.AddRange(list);
 
-                AbstractListItem<SelectionBlueprint<ISkinnableDrawable>> getItem(DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>> item) => BackingDrawable.List.ItemMaps[item];
-                lists.AddRange(list.Select(getItem).Cast<DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>>>().Reverse());
+                AbstractListItem<SelectionBlueprint<ISerialisableDrawable>> getItem(DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>> item) => BackingDrawable.List.ItemMaps[item];
+                lists.AddRange(list.Select(getItem).Cast<DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>>>().Reverse());
             });
             AddAssert("lists were all added", () => lists.Count == item_count);
             // ReSharper disable once HeuristicUnreachableCode
             expandList(() => lists[0]);
             ListAddItems(() => lists[0].List);
             ListAddItems(() => lists[1].List);
-            DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>> movedItem = null!;
-            AbstractListItem<SelectionBlueprint<ISkinnableDrawable>> movedDrawableItem = null!;
+            DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>> movedItem = null!;
+            AbstractListItem<SelectionBlueprint<ISerialisableDrawable>> movedDrawableItem = null!;
             AddStep("Position Mouse over 1st list 1st item", () =>
             {
                 movedItem = lists[0].List.Items[0];

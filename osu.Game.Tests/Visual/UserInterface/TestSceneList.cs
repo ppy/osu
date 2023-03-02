@@ -9,11 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.List;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
-using osu.Game.Skinning.Editor;
 using osuTK;
 using osuTK.Input;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneList : OsuManualInputManagerTestScene
     {
         protected Container SkinElements { get; set; } = null!;
-        protected DrawableList<SelectionBlueprint<ISkinnableDrawable>> BackingDrawableList = null!;
+        protected DrawableList<SelectionBlueprint<ISerialisableDrawable>> BackingDrawableList = null!;
 
         [SetUp]
         public void SetUp()
@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             drawable.Width = 100;
             drawable.RelativeSizeAxes = Axes.None;
             drawable.Anchor = Anchor.CentreRight;
-            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>.GetDefaultText((Drawable)t.Item);
-            ((IDrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)drawable).Properties.SetItemDepth = static (blueprint, depth) =>
+            ((IDrawableListItem<SelectionBlueprint<ISerialisableDrawable>>)drawable).Properties.GetName = static t => IDrawableListItem<SelectionBlueprint<ISerialisableDrawable>>.GetDefaultText((Drawable)t.Item);
+            ((IDrawableListItem<SelectionBlueprint<ISerialisableDrawable>>)drawable).Properties.SetItemDepth = static (blueprint, depth) =>
             {
                 if (blueprint.Parent is Container<Drawable> container)
                 {
@@ -67,25 +67,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         protected virtual Drawable GetContent() => BackingDrawableList;
-        protected virtual void CreateDrawableList() => BackingDrawableList = new DrawableList<SelectionBlueprint<ISkinnableDrawable>>();
-        protected virtual DrawableList<SelectionBlueprint<ISkinnableDrawable>> DrawableList => BackingDrawableList;
+        protected virtual void CreateDrawableList() => BackingDrawableList = new DrawableList<SelectionBlueprint<ISerialisableDrawable>>();
+        protected virtual DrawableList<SelectionBlueprint<ISerialisableDrawable>> DrawableList => BackingDrawableList;
 
-        protected void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list)
+        protected void AddElement(IEnumerable<ISerialisableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>> list)
         {
             string getName() => "Element" + list.Count;
             AddElement(skinnableDrawable, list, getName);
         }
 
-        protected void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list, Func<string> producer)
+        protected void AddElement(IEnumerable<ISerialisableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>> list, Func<string> producer)
             => AddElement(skinnableDrawable, list, producer, DrawableListEntryType.Item, true);
 
-        protected virtual void AddElement(IEnumerable<ISkinnableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>> list, Func<string> producer, DrawableListEntryType type, bool addToSkinElements)
+        protected virtual void AddElement(IEnumerable<ISerialisableDrawable> skinnableDrawable, IList<DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>> list, Func<string> producer, DrawableListEntryType type, bool addToSkinElements)
         {
             var represetedItems = skinnableDrawable.Select(e =>
             {
                 ((Drawable)e).Name = producer();
                 return new SkinBlueprint(e);
-            }).Select(e => new DrawableListRepresetedItem<SelectionBlueprint<ISkinnableDrawable>>(e, type));
+            }).Select(e => new DrawableListRepresetedItem<SelectionBlueprint<ISerialisableDrawable>>(e, type));
 
             //this makes sure I actually can only select a single element
 
@@ -114,16 +114,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             SkinElements.AddRange(containers);
         }
 
-        private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>> predicate,
-                                  IEnumerable<AbstractListItem<SelectionBlueprint<ISkinnableDrawable>>> items)
+        private bool applyToItems(Predicate<DrawableListItem<SelectionBlueprint<ISerialisableDrawable>>> predicate,
+                                  IEnumerable<AbstractListItem<SelectionBlueprint<ISerialisableDrawable>>> items)
         {
             foreach (var value in items)
             {
-                if (value is DrawableListItem<SelectionBlueprint<ISkinnableDrawable>> item)
+                if (value is DrawableListItem<SelectionBlueprint<ISerialisableDrawable>> item)
                 {
                     if (!predicate(item)) return false;
                 }
-                else if (value is DrawableMinimisableList<SelectionBlueprint<ISkinnableDrawable>> minimisableList)
+                else if (value is DrawableMinimisableList<SelectionBlueprint<ISerialisableDrawable>> minimisableList)
                 {
                     if (!applyToItems(predicate, minimisableList.List.ItemMaps.Values)) return false;
                 }
@@ -132,9 +132,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             return true;
         }
 
-        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISkinnableDrawable>>)DrawableList.ItemMaps[DrawableList.Items[element]]).IsSelected;
+        private bool testElementSelected(int element) => ((DrawableListItem<SelectionBlueprint<ISerialisableDrawable>>)DrawableList.ItemMaps[DrawableList.Items[element]]).IsSelected;
 
-        protected void ListAddItems(Func<DrawableList<SelectionBlueprint<ISkinnableDrawable>>> listSupplier)
+        protected void ListAddItems(Func<DrawableList<SelectionBlueprint<ISerialisableDrawable>>> listSupplier)
         {
             const int item_number = 10;
 
