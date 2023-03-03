@@ -1206,8 +1206,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 get
                 {
-                    foreach (var item in Scroll.Children)
+                    foreach (var item in Scroll.Children.OrderBy(c => c.Y))
                     {
+                        if (item.Item?.Visible != true)
+                            continue;
+
                         yield return item;
 
                         if (item is DrawableCarouselBeatmapSet set)
