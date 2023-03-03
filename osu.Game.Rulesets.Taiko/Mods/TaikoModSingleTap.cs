@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return LastAcceptedDonAction == null || LastAcceptedDonAction == action;
             if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
                 return LastAcceptedKatAction == null || LastAcceptedKatAction == action;
+
             return true;
         }
 
@@ -107,6 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     LastAcceptedDonAction = action;
                 if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
                     LastAcceptedKatAction = action;
+
                 return true;
             }
 
