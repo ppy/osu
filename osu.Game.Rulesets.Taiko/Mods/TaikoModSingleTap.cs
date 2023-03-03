@@ -26,7 +26,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Acronym => @"SG";
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
-        protected bool CheckValidNewAction(TaikoAction action) => LastAcceptedDonAction == null || LastAcceptedDonAction == action || LastAcceptedKatAction == null || LastAcceptedKatAction == action;
+        protected bool CheckValidNewAction(TaikoAction action)
+        {
+            if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
+                return LastAcceptedDonAction == null || LastAcceptedDonAction == action;
+            if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
+                return LastAcceptedKatAction == null || LastAcceptedKatAction == action;
+            return true;
+        }
 
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
