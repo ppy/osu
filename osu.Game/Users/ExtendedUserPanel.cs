@@ -13,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Users
 {

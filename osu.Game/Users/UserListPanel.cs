@@ -67,7 +67,7 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
-                            }),
+                            })
                         }
                     },
                     new FillFlowContainer
