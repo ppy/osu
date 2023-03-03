@@ -192,7 +192,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     {
                         StartTime = 2000,
                         Type = HitType.Rim,
-                        IsStrong = true
                     },
                 },
             },
