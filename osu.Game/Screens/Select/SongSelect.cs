@@ -40,6 +40,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select
 {
@@ -162,6 +163,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = () => FilterControl.InformationalText = SongSelectStrings.BeatmapsDisplayed(Carousel.CountDisplayed),
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
