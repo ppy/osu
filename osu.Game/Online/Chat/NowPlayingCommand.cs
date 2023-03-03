@@ -61,7 +61,7 @@ namespace osu.Game.Online.Chat
                     beatmapInfo = game.BeatmapInfo;
                     break;
 
-                case UserActivity.Editing edit:
+                case UserActivity.EditingBeatmap edit:
                     verb = "editing";
                     beatmapInfo = edit.BeatmapInfo;
                     break;

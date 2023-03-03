@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -55,11 +56,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Grab the input manager to disable the user's cursor, and for future use
-            inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            inputManager = ((DrawableOsuRuleset)drawableRuleset).KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;
 
             // Generate the replay frames the cursor should follow
             replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, drawableRuleset.Mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
+
+            drawableRuleset.UseResumeOverlay = false;
         }
     }
 }

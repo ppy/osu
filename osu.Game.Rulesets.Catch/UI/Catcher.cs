@@ -254,7 +254,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        public void OnRevertResult(JudgementResult result)
         {
             var catchResult = (CatchJudgementResult)result;
 
@@ -268,8 +268,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
-            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject, false);
+            caughtObjectContainer.RemoveAll(d => d.HitObject == result.HitObject, false);
+            droppedObjectTarget.RemoveAll(d => d.HitObject == result.HitObject, false);
         }
 
         /// <summary>
