@@ -50,9 +50,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RevertToDefaultDescription => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default.");
 
         /// <summary>
-        /// "The skin will return to the state it was in upon import"
+        /// "Return the skin to its default state"
         /// </summary>
-        public static LocalisableString ResetDialogue => new TranslatableString(getKey(@"the_skin_will_return_to"), @"The skin will return to the state it was in upon import");
+        public static LocalisableString ResetDialogue => new TranslatableString(getKey(@"return_the_skin_to_its"), @"Return the skin to its default state");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
