@@ -68,11 +68,6 @@ namespace osu.Game.Users
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
                             }),
-                            CreateGroupBadges().With(badges =>
-                            {
-                                badges.Anchor = Anchor.CentreLeft;
-                                badges.Origin = Anchor.CentreLeft;
-                            })
                         }
                     },
                     new FillFlowContainer
@@ -99,6 +94,16 @@ namespace osu.Game.Users
                     }
                 }
             };
+
+            if (User.Groups != null)
+            {
+                details.Add(new GroupBadgeFlow
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    User = { Value = User }
+                });
+            }
 
             if (User.IsSupporter)
             {

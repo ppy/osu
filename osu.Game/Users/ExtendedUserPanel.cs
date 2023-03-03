@@ -98,13 +98,6 @@ namespace osu.Game.Users
             return statusContainer;
         }
 
-        protected FillFlowContainer CreateGroupBadges()
-        {
-            var groupBadgeFlow = new GroupBadgeFlow();
-            groupBadgeFlow.User.Value = User;
-            return groupBadgeFlow;
-        }
-
         private void displayStatus(UserStatus status, UserActivity activity = null)
         {
             if (status != null)
