@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Tests.Mods
 {
     [TestFixture]
-    public partial class SettingsSourceAttributeTest
+    public partial class SettingSourceAttributeTest
     {
         [Test]
         public void TestOrdering()

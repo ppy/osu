@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
@@ -27,6 +28,9 @@ namespace osu.Game.Overlays.SkinEditor
         protected override bool BlockNonPositionalInput => true;
 
         private SkinEditor? skinEditor;
+
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
