@@ -55,12 +55,31 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
-            if (match && criteria.SearchTerms.Length > 0)
+            if (!match)
             {
-                string[] terms = BeatmapInfo.GetSearchableTerms();
+                Filtered.Value = !match;
+                return;
+            }
+
+            if (criteria.SearchTerms.Length > 0)
+            {
+                var terms = BeatmapInfo.GetSearchableTerms();
 
                 foreach (string criteriaTerm in criteria.SearchTerms)
-                    match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
+                {
+                    bool any = false;
+
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (string term in terms)
+                    {
+                        if (!term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase)) continue;
+
+                        any = true;
+                        break;
+                    }
+
+                    match &= any;
+                }
 
                 // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
                 // this should be done after text matching so we can prioritise matching numbers in metadata.
@@ -71,8 +90,13 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             }
 
-            if (match)
-                match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
+            if (!match)
+            {
+                Filtered.Value = !match;
+                return;
+            }
+
+            match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
 
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo);
