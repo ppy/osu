@@ -147,9 +147,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     },
                     new Hit
                     {
-                        StartTime = 200,
+                        StartTime = 300,
                         Type = HitType.Rim,
                         IsStrong = true
+                    },
+                    new Hit
+                    {
+                        StartTime = 500,
+                        Type = HitType.Rim,
                     },
                 },
             },
@@ -157,10 +162,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 new TaikoReplayFrame(100, TaikoAction.RightRim),
                 new TaikoReplayFrame(120),
-                new TaikoReplayFrame(200, TaikoAction.LeftRim),
-                new TaikoReplayFrame(220),
+                new TaikoReplayFrame(300, TaikoAction.LeftRim),
+                new TaikoReplayFrame(320),
+                new TaikoReplayFrame(500, TaikoAction.LeftRim),
+                new TaikoReplayFrame(520),
             },
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 0 && Player.ScoreProcessor.HighestCombo.Value == 2
         });
 
         [Test]
