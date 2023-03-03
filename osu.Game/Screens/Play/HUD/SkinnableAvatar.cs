@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             avatar.User = gameplayState.Score.ScoreInfo.User;
+            avatar.CornerRadius = CornerRadius.Value;
             CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue);
         }
 
