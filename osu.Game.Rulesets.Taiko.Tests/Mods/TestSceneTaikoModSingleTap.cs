@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 new TaikoReplayFrame(700, TaikoAction.LeftRim),
                 new TaikoReplayFrame(720),
             },
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 4
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 0 && Player.ScoreProcessor.HighestCombo.Value == 1
         });
 
         [Test]
