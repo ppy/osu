@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Mods;
@@ -102,6 +103,104 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 new TaikoReplayFrame(720),
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 4
+        });
+
+        [Test]
+        public void TestInputIntro() => CreateModTest(new ModTestData
+        {
+            Mod = new TaikoModSingleTap(),
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Hit
+                    {
+                        StartTime = 100,
+                        Type = HitType.Rim
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0, TaikoAction.RightRim),
+                new TaikoReplayFrame(20),
+                new TaikoReplayFrame(100, TaikoAction.LeftRim),
+                new TaikoReplayFrame(120),
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 1
+        });
+
+        [Test]
+        public void TestInputStrong() => CreateModTest(new ModTestData
+        {
+            Mod = new TaikoModSingleTap(),
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Hit
+                    {
+                        StartTime = 100,
+                        Type = HitType.Rim
+                    },
+                    new Hit
+                    {
+                        StartTime = 200,
+                        Type = HitType.Rim,
+                        IsStrong = true
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(100, TaikoAction.RightRim),
+                new TaikoReplayFrame(120),
+                new TaikoReplayFrame(200, TaikoAction.LeftRim),
+                new TaikoReplayFrame(220),
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
+        });
+
+        [Test]
+        public void TestInputBreaks() => CreateModTest(new ModTestData
+        {
+            Mod = new TaikoModSingleTap(),
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                Breaks = new List<BreakPeriod>
+                {
+                    new BreakPeriod(100, 1600),
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new Hit
+                    {
+                        StartTime = 100,
+                        Type = HitType.Rim
+                    },
+                    new Hit
+                    {
+                        StartTime = 2000,
+                        Type = HitType.Rim,
+                        IsStrong = true
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(100, TaikoAction.RightRim),
+                new TaikoReplayFrame(120),
+                // Press different key after break but before hit object.
+                new TaikoReplayFrame(1900, TaikoAction.LeftRim),
+                new TaikoReplayFrame(1820),
+                // Press original key at second hitobject and ensure it has been hit.
+                new TaikoReplayFrame(2000, TaikoAction.RightRim),
+                new TaikoReplayFrame(2020),
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
         });
     }
 }
