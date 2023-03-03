@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -18,6 +18,11 @@ namespace osu.Game.Localisation
         /// "Has been locally modified"
         /// </summary>
         public static LocalisableString LocallyModifiedTooltip => new TranslatableString(getKey(@"locally_modified_tooltip"), @"Has been locally modified");
+
+        /// <summary>
+        /// "{0} beatmaps displayed"
+        /// </summary>
+        public static LocalisableString BeatmapsDisplayed(int arg0) => new TranslatableString(getKey(@"beatmaps_displayed"), @"{0:#,0} beatmaps displayed", arg0);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
