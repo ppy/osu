@@ -435,7 +435,8 @@ namespace osu.Game.Screens.Play
                         HoldToQuit =
                         {
                             Action = () => PerformExit(true),
-                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
+                            ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         KeyCounter =
                         {
@@ -1072,7 +1073,10 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
+
+            // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
             failAnimationLayer?.Stop();
+            PauseOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully)
             {
