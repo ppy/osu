@@ -532,15 +532,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by date submitted", () => carousel.Filter(new FilterCriteria { Sort = SortMode.DateSubmitted }, false));
-            checkVisibleItemCount(diff: false, count: 8);
+            checkVisibleItemCount(diff: false, count: 20);
             checkVisibleItemCount(diff: true, count: 5);
+
             AddStep("Sort by date submitted and string", () => carousel.Filter(new FilterCriteria
             {
                 Sort = SortMode.DateSubmitted,
                 SearchText = zzz_string
             }, false));
-            checkVisibleItemCount(diff: false, count: 3);
+            checkVisibleItemCount(diff: false, count: 5);
             checkVisibleItemCount(diff: true, count: 5);
+
+            AddAssert("missing date submitted are at end",
+                () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().TakeLast(2).All(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted == null));
+            AddAssert("rest are at start", () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().Take(3).All(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted != null));
         }
 
         [Test]
@@ -1129,7 +1134,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
             AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
-                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible), () => Is.EqualTo(count));
         }
 
         private void checkSelectionIsCentered()
