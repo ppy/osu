@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.HUD;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly FillFlowContainer<GameplaySpectatorUser> Flow;
         protected readonly FillFlowContainer OtherSpectators;
         protected OsuSpriteText SpectatorText;
-        private const int fade_speed = 100;
+        private const int fade_time = 100;
 
         public int Spectators => Flow.Count;
 
@@ -34,18 +35,6 @@ namespace osu.Game.Screens.Play.HUD
 
             InternalChildren = new Drawable[]
             {
-                Flow = new FillFlowContainer<GameplaySpectatorUser>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    X = GameplaySpectatorUser.SHEAR_WIDTH,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2.5f),
-                    LayoutDuration = 450,
-                    LayoutEasing = Easing.OutQuint,
-                },
                 OtherSpectators = new FillFlowContainer
                 {
                     Anchor = Anchor.TopLeft,
@@ -66,8 +55,22 @@ namespace osu.Game.Screens.Play.HUD
                             Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                             Truncate = false,
                             Shadow = false,
+                            Margin = new MarginPadding { Left = GameplaySpectatorUser.SHEAR_WIDTH },
                         },
                     },
+                },
+                Flow = new FillFlowContainer<GameplaySpectatorUser>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    X = GameplaySpectatorUser.SHEAR_WIDTH,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2.5f),
+                    LayoutDuration = 450,
+                    LayoutEasing = Easing.OutQuint,
+                    Margin = new MarginPadding { Top = OsuFont.Torus.Size + 6.0f },
                 },
             };
 
@@ -97,35 +100,35 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateDisplay()
         {
-            if (Flow.Count > MaxNames)
+            // We removed everything, fade out everything
+            if (Spectators == 0)
             {
-                // TODO: Just display text instead of the flow's members
-                SpectatorText.Text = Flow.Count + " Spectators";
-
-                fadeInText();
+                Flow.FadeOut(fade_time);
+                OtherSpectators.FadeOut(fade_time);
+                return;
             }
-            else
+
+            // Fade in the Text if needed
+            if (OtherSpectators.Alpha == 0.0f)
             {
-                fadeInSpectatorList();
+                OtherSpectators.FadeIn(fade_time);
             }
-        }
 
-        private void fadeInText()
-        {
-            if (OtherSpectators.Alpha == 1.0)
-                return;
+            // always adjust text
+            SpectatorText.Text = SpectatorListStrings.Spectators + " (" + Spectators + ")";
 
-            Flow.FadeOut(fade_speed);
-            OtherSpectators.FadeIn(fade_speed);
-        }
+            // We exceeded the maximum number
+            if (Spectators > MaxNames && Flow.Alpha == 1.0f)
+            {
+                Flow.FadeOut(fade_time);
+            }
 
-        private void fadeInSpectatorList()
-        {
-            if (Flow.Alpha == 1.0)
-                return;
+            if (Spectators <= MaxNames && Flow.Alpha == 0.0f)
+            {
+                Flow.FadeIn(fade_time);
+            }
 
-            Flow.FadeIn(fade_speed);
-            OtherSpectators.FadeOut(fade_speed);
+
         }
 
         public void Clear()
