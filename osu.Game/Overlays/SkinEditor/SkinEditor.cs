@@ -323,12 +323,12 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
 
+            SelectedComponents.Clear();
+
             if (target.NewValue == null)
                 return;
 
             Debug.Assert(content != null);
-
-            SelectedComponents.Clear();
 
             var skinComponentsContainer = getTarget(target.NewValue);
 
