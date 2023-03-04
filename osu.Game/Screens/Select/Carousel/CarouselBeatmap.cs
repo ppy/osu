@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     bool any = false;
 
-                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
                     foreach (string term in terms)
                     {
                         if (!term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase)) continue;
