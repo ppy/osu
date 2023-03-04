@@ -324,6 +324,7 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
 
+            componentsSidebar.Clear();
             SelectedComponents.Clear();
 
             Debug.Assert(content != null);
