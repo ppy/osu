@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly FillFlowContainer<GameplaySpectatorUser> Flow;
         protected readonly FillFlowContainer OtherSpectators;
         protected OsuSpriteText SpectatorText;
+        private const int fade_speed = 100;
 
         public int Spectators => Flow.Count;
 
@@ -71,7 +72,8 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             // Hide by default
-            OtherSpectators.Hide();
+            Flow.Alpha = 0.0f;
+            OtherSpectators.Alpha = 0.0f;
         }
 
         public GameplaySpectatorUser Add([CanBeNull] IUser user)
@@ -100,13 +102,13 @@ namespace osu.Game.Screens.Play.HUD
                 // TODO: Just display text instead of the flow's members
                 SpectatorText.Text = Flow.Count + " Spectators";
 
-                Flow.Hide();
-                OtherSpectators.Show();
+                Flow.FadeTo(0.0f, fade_speed);
+                OtherSpectators.FadeTo(1, fade_speed, Easing.OutQuad);
             }
             else
             {
-                OtherSpectators.Hide();
-                Flow.Show();
+                OtherSpectators.FadeTo(0.0f, fade_speed);
+                Flow.FadeTo(1, fade_speed, Easing.OutQuad);
             }
         }
 
