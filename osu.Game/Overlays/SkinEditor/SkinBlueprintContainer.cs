@@ -7,9 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
@@ -20,16 +18,16 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinBlueprintContainer : BlueprintContainer<ISerialisableDrawable>
     {
-        private readonly Drawable target;
+        private readonly ISerialisableDrawableContainer targetContainer;
 
         private readonly List<BindableList<ISerialisableDrawable>> targetComponents = new List<BindableList<ISerialisableDrawable>>();
 
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
-        public SkinBlueprintContainer(Drawable target)
+        public SkinBlueprintContainer(ISerialisableDrawableContainer targetContainer)
         {
-            this.target = target;
+            this.targetContainer = targetContainer;
         }
 
         protected override void LoadComplete()
@@ -38,22 +36,10 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedItems.BindTo(editor.SelectedComponents);
 
-            // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<ISerialisableDrawableContainer>().ToArray();
+            var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
+            bindableList.BindCollectionChanged(componentsChanged, true);
 
-            if (targetContainers.Length == 0)
-            {
-                AddInternal(new NonSkinnableScreenPlaceholder());
-                return;
-            }
-
-            foreach (var targetContainer in targetContainers)
-            {
-                var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
-                bindableList.BindCollectionChanged(componentsChanged, true);
-
-                targetComponents.Add(bindableList);
-            }
+            targetComponents.Add(bindableList);
         }
 
         private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
