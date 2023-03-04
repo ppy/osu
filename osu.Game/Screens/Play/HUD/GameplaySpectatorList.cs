@@ -102,14 +102,30 @@ namespace osu.Game.Screens.Play.HUD
                 // TODO: Just display text instead of the flow's members
                 SpectatorText.Text = Flow.Count + " Spectators";
 
-                Flow.FadeTo(0.0f, fade_speed);
-                OtherSpectators.FadeTo(1, fade_speed, Easing.OutQuad);
+                fadeInText();
             }
             else
             {
-                OtherSpectators.FadeTo(0.0f, fade_speed);
-                Flow.FadeTo(1, fade_speed, Easing.OutQuad);
+                fadeInSpectatorList();
             }
+        }
+
+        private void fadeInText()
+        {
+            if (OtherSpectators.Alpha == 1.0)
+                return;
+
+            Flow.FadeOut(fade_speed);
+            OtherSpectators.FadeIn(fade_speed);
+        }
+
+        private void fadeInSpectatorList()
+        {
+            if (Flow.Alpha == 1.0)
+                return;
+
+            Flow.FadeIn(fade_speed);
+            OtherSpectators.FadeOut(fade_speed);
         }
 
         public void Clear()
