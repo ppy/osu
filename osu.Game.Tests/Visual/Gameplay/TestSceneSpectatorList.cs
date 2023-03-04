@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Add peppy", () =>
             {
-                createSpectator(new APIUser { Username = "peppy", Id = 3, AvatarUrl = "https://a.ppy.sh/1199528?1654635999.jpeg" });
+                createSpectator(new APIUser { Username = "peppy" });
             });
 
             AddStep("Add spectator", () =>
@@ -43,7 +44,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create spectator list", () =>
             {
-                Child = spectatorList = new TestGameplaySpectatorList { };
+                Child = spectatorList = new TestGameplaySpectatorList
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding { Top = 50 },
+                };
             });
         }
 
@@ -52,7 +58,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             APIUser user = new APIUser
             {
-                Username = RNG.NextDouble(1_000_000.0, 100_000_000_000.0).ToString(),
+                Username = RNG.NextDouble(1_000.0, 100_000_000_000.0).ToString(),
             };
 
             spectatorList.Add(user);
