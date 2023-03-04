@@ -49,6 +49,12 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(BeatmapInfo.BeatDivisor);
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(BeatmapInfo.Status);
 
+            if (!match)
+            {
+                Filtered.Value = !match;
+                return;
+            }
+
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
@@ -78,7 +84,10 @@ namespace osu.Game.Screens.Select.Carousel
                         break;
                     }
 
-                    match &= any;
+                    if (any) continue;
+
+                    match = false;
+                    break;
                 }
 
                 // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
