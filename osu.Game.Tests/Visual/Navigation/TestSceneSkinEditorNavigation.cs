@@ -188,6 +188,30 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestChangeToNonSkinnableScreen()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            AddAssert("blueprint container present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.EqualTo(1));
+            AddAssert("placeholder not present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer.NonSkinnableScreenPlaceholder>().Count(), () => Is.Zero);
+
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+            });
+            AddUntilStep("newly added component selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(1));
+
+            AddStep("exit to main menu", () => Game.ScreenStack.CurrentScreen.Exit());
+            AddAssert("selection cleared", () => skinEditor.SelectedComponents, () => Has.Count.Zero);
+            AddAssert("blueprint container not present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.Zero);
+            AddAssert("placeholder present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer.NonSkinnableScreenPlaceholder>().Count(), () => Is.EqualTo(1));
+
+            advanceToSongSelect();
+            AddAssert("blueprint container present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.EqualTo(1));
+            AddAssert("placeholder not present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer.NonSkinnableScreenPlaceholder>().Count(), () => Is.Zero);
+        }
+
         private void advanceToSongSelect()
         {
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
