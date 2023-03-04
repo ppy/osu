@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -49,6 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Margin = new MarginPadding { Top = 50 },
+                    Scale = new Vector2(1.5f),
                 };
             });
         }

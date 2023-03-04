@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     AutoSizeAxes = Axes.X,
                     RelativeSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Left = top_text_left_width_extension },
                     Children = new Drawable[]
                     {
                         backgroundPaddingAdjustContainer = new Container
