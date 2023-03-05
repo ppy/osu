@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = UserInterfaceStrings.DisplaySpectatorList,
                     Current = config.GetBindable<bool>(OsuSetting.DisplaySpectatorList),
-                    Keywords = new [] { "spectator", "display", "list" }
+                    Keywords = new[] { "spectator", "display", "list" }
                 },
             };
         }

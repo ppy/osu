@@ -833,6 +833,7 @@ namespace osu.Game.Screens.Play
         private void loadSpectators()
         {
             var spectators = CreateGameplaySpectatorList();
+
             if (spectators != null)
             {
                 LoadComponentAsync(spectators, list =>
@@ -842,11 +843,11 @@ namespace osu.Game.Screens.Play
 
                     // TODO: On new spectate, add user
                     // TODO: On spectate leave, remove user
-
                     AddSpectatorsToHUD(list);
                 });
             }
         }
+
         private void loadLeaderboard()
         {
             HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());

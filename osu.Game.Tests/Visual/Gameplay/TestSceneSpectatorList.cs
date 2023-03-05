@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneSpectatorList()
         {
-            Child = spectatorList = new TestGameplaySpectatorList { };
+            Child = spectatorList = new TestGameplaySpectatorList();
 
             AddSliderStep("set max spectators", 1, 15, 8, v => maxSpectators.Value = v);
         }
@@ -40,10 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 createSpectator(new APIUser { Username = "peppy" });
             });
 
-            AddStep("Add spectator", () =>
-            {
-                createRandomSpectator();
-            });
+            AddStep("Add spectator", createRandomSpectator);
 
             AddStep("Remove peppy", () =>
             {
@@ -72,15 +70,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void createSpectator(APIUser user) => spectatorList.Add(user);
+
         private void createRandomSpectator()
         {
             APIUser user = new APIUser
             {
-                Username = RNG.NextDouble(1_000.0, 100_000_000_000.0).ToString(),
+                Username = RNG.NextDouble(1_000.0, 100_000_000_000.0).ToString(CultureInfo.CurrentCulture),
             };
 
             spectatorList.Add(user);
         }
+
         private void removeSpectator(APIUser user) => spectatorList.Remove(user);
 
         private partial class TestGameplaySpectatorList : GameplaySpectatorList

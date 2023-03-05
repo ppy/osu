@@ -97,6 +97,7 @@ namespace osu.Game.Screens.Play
         /// Will automatically be positioned to avoid colliding with top scoring elements.
         /// </summary>
         public readonly FillFlowContainer LeaderboardFlow;
+
         public readonly FillFlowContainer SpectatorFlow;
 
         private readonly List<Drawable> hideTargets;

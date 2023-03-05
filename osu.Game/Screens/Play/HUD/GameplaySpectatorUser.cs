@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -27,26 +26,17 @@ namespace osu.Game.Screens.Play.HUD
         private const float avatar_size = 25f;
         private const float panel_transition_duration = 200f;
 
-        private OsuSpriteText? usernameText;
-
         public Color4? BackgroundColour { get; set; }
 
         public Color4? TextColour { get; set; }
 
-        [CanBeNull]
-        public IUser User { get; }
-        private Container? mainFillContainer;
+        public IUser? User;
 
-        private Box? centralFill;
-
-        private Container? backgroundPaddingAdjustContainer;
-
-        private GridContainer? gridContainer;
-
-        public GameplaySpectatorUser([CanBeNull] IUser user)
+        public GameplaySpectatorUser(IUser? user)
         {
-            User = user;
+            if (user == null) return;
 
+            User = user;
             AutoSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
         }
@@ -63,12 +53,12 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        backgroundPaddingAdjustContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                mainFillContainer = new Container
+                                new Container
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
@@ -87,13 +77,13 @@ namespace osu.Game.Screens.Play.HUD
                                 },
                             },
                         },
-                        gridContainer = new GridContainer
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.Y,
                             Width = EXTENDED_WIDTH,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            ColumnDimensions = new []
+                            ColumnDimensions = new[]
                             {
                                 new Dimension(),
                             },
@@ -115,7 +105,7 @@ namespace osu.Game.Screens.Play.HUD
                                                 RelativeSizeAxes = Axes.Both,
                                                 Children = new[]
                                                 {
-                                                    centralFill = new Box
+                                                    new Box
                                                     {
                                                         Alpha = 0.5f,
                                                         RelativeSizeAxes = Axes.Both,
@@ -152,7 +142,7 @@ namespace osu.Game.Screens.Play.HUD
                                                             }
                                                         }
                                                     },
-                                                    usernameText = new OsuSpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         Width = 0.6f,
@@ -160,7 +150,7 @@ namespace osu.Game.Screens.Play.HUD
                                                         Origin = Anchor.CentreLeft,
                                                         Colour = Color4.White,
                                                         Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                                        Text = User.Username,
+                                                        Text = User?.Username ?? string.Empty,
                                                         Truncate = true,
                                                         Shadow = false,
                                                     }

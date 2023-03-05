@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,6 +18,7 @@ namespace osu.Game.Screens.Play.HUD
     public partial class GameplaySpectatorList : CompositeDrawable
     {
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+
         // This is going to dynamically change depending on the amount of spectators
         protected readonly FillFlowContainer<GameplaySpectatorUser> Flow;
         protected readonly FillFlowContainer OtherSpectators;
@@ -26,7 +26,6 @@ namespace osu.Game.Screens.Play.HUD
         private const int fade_time = 100;
 
         public int Spectators => Flow.Count;
-
         public readonly BindableInt MaxNames = new BindableInt(10);
 
         public GameplaySpectatorList()
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
             configVisibility.ValueChanged += _ => updateDisplay();
         }
 
-        public GameplaySpectatorUser Add([CanBeNull] IUser user)
+        public GameplaySpectatorUser Add(IUser? user)
         {
             var drawable = CreateSpectatorUserDrawable(user);
 
@@ -94,11 +93,9 @@ namespace osu.Game.Screens.Play.HUD
             return drawable;
         }
 
-        public void Remove([CanBeNull] IUser user)
+        public void Remove(IUser? user)
         {
-            if (user == null) return;
-
-            Flow.RemoveAll(u => u.User.Username == user.Username, true);
+            Flow.RemoveAll(u => u.User?.Username == user?.Username, true);
 
             updateDisplay();
         }
@@ -132,18 +129,11 @@ namespace osu.Game.Screens.Play.HUD
             {
                 Flow.FadeIn(fade_time);
             }
-
-
         }
 
         public void Clear()
         {
             Flow.Clear();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
         }
 
         [BackgroundDependencyLoader]
@@ -152,7 +142,7 @@ namespace osu.Game.Screens.Play.HUD
             config.BindWith(OsuSetting.DisplaySpectatorList, configVisibility);
         }
 
-        protected virtual GameplaySpectatorUser CreateSpectatorUserDrawable([CanBeNull] IUser user) =>
+        protected virtual GameplaySpectatorUser CreateSpectatorUserDrawable(IUser? user) =>
             new GameplaySpectatorUser(user);
     }
 }
