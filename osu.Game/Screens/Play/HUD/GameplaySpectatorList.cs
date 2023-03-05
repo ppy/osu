@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.GameplaySpectatorList, configVisibility);
+            config.BindWith(OsuSetting.DisplaySpectatorList, configVisibility);
         }
 
         protected virtual GameplaySpectatorUser CreateSpectatorUserDrawable([CanBeNull] IUser user) =>

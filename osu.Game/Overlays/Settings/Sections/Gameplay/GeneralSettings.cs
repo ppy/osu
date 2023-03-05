@@ -33,6 +33,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.DisplaySpectatorList,
+                    Current = config.GetBindable<bool>(OsuSetting.DisplaySpectatorList),
+                    Keywords = new [] { "spectator", "display", "list" }
+                },
             };
         }
     }

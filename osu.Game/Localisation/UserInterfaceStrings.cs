@@ -154,6 +154,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
 
+        /// <summary>
+        /// "Show spectator list"
+        /// </summary>
+        public static LocalisableString DisplaySpectatorList => new TranslatableString(getKey(@"display_spectator_list"), @"Show spectator list");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

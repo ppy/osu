@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Invert Visibility Setting", () =>
             {
-                config.SetValue(OsuSetting.GameplaySpectatorList, !config.Get<bool>(OsuSetting.GameplaySpectatorList));
+                config.SetValue(OsuSetting.DisplaySpectatorList, !config.Get<bool>(OsuSetting.DisplaySpectatorList));
             });
         }
 
