@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Mods
         public DeleteModPresetDialog(Live<ModPreset> modPreset)
         {
             BodyText = modPreset.PerformRead(preset => preset.Name);
-            DeleteAction = () => modPreset.PerformWrite(preset => preset.DeletePending = true);
+            DangerousAction = () => modPreset.PerformWrite(preset => preset.DeletePending = true);
         }
     }
 }

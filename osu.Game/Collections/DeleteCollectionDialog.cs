@@ -13,7 +13,7 @@ namespace osu.Game.Collections
         public DeleteCollectionDialog(Live<BeatmapCollection> collection, Action deleteAction)
         {
             BodyText = collection.PerformRead(c => $"{c.Name} ({"beatmap".ToQuantity(c.BeatmapMD5Hashes.Count)})");
-            DeleteAction = deleteAction;
+            DangerousAction = deleteAction;
         }
     }
 }

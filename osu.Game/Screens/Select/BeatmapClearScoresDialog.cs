@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Select
         public BeatmapClearScoresDialog(BeatmapInfo beatmapInfo, Action onCompletion)
         {
             BodyText = $"All local scores on {beatmapInfo.GetDisplayTitle()}";
-            DeleteAction = () =>
+            DangerousAction = () =>
             {
                 Task.Run(() => scoreManager.Delete(beatmapInfo))
                     .ContinueWith(_ => onCompletion);
