@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public int Spectators => Flow.Count;
 
-        public int MaxNames = 10;
+        public readonly BindableInt MaxNames = new BindableInt(10);
 
         public GameplaySpectatorList()
         {
@@ -70,13 +70,18 @@ namespace osu.Game.Screens.Play.HUD
                     Spacing = new Vector2(2.5f),
                     LayoutDuration = 450,
                     LayoutEasing = Easing.OutQuint,
-                    Margin = new MarginPadding { Top = OsuFont.Torus.Size + 6.0f },
+                    // Make the margin a bit higher than the text height
+                    Margin = new MarginPadding { Top = OsuFont.Torus.Size * 1.5f },
                 },
             };
 
             // Hide by default
             Flow.Alpha = 0.0f;
             OtherSpectators.Alpha = 0.0f;
+
+            // When the bindable changes, update the display
+            MaxNames.ValueChanged += _ => updateDisplay();
+            configVisibility.ValueChanged += _ => updateDisplay();
         }
 
         public GameplaySpectatorUser Add([CanBeNull] IUser user)
@@ -101,7 +106,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateDisplay()
         {
             // We removed everything, fade out everything
-            if (Spectators == 0)
+            if (Spectators == 0 || configVisibility.Value == false)
             {
                 Flow.FadeOut(fade_time);
                 OtherSpectators.FadeOut(fade_time);
@@ -118,12 +123,12 @@ namespace osu.Game.Screens.Play.HUD
             SpectatorText.Text = SpectatorListStrings.Spectators + " (" + Spectators + ")";
 
             // We exceeded the maximum number
-            if (Spectators > MaxNames && Flow.Alpha == 1.0f)
+            if (Spectators > MaxNames.Value && Flow.Alpha == 1.0f)
             {
                 Flow.FadeOut(fade_time);
             }
 
-            if (Spectators <= MaxNames && Flow.Alpha == 0.0f)
+            if (Spectators <= MaxNames.Value && Flow.Alpha == 0.0f)
             {
                 Flow.FadeIn(fade_time);
             }

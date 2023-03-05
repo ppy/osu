@@ -26,7 +26,6 @@ namespace osu.Game.Screens.Play.HUD
         private const float panel_shear = 0.15f;
         private const float avatar_size = 25f;
         private const float panel_transition_duration = 200f;
-        private const float text_transition_duration = 200f;
 
         private OsuSpriteText? usernameText;
 
@@ -131,6 +130,8 @@ namespace osu.Game.Screens.Play.HUD
                                                 Origin = Anchor.CentreLeft,
                                                 RelativeSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
+                                                LayoutDuration = panel_transition_duration,
+                                                LayoutEasing = Easing.OutQuint,
                                                 Spacing = new Vector2(4f, 0f),
                                                 Children = new Drawable[]
                                                 {

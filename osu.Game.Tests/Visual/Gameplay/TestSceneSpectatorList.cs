@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -13,11 +16,18 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public partial class TestSceneSpectatorList : OsuTestScene
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private TestGameplaySpectatorList spectatorList;
+
+        private readonly BindableInt maxSpectators = new BindableInt();
 
         public TestSceneSpectatorList()
         {
             Child = spectatorList = new TestGameplaySpectatorList { };
+
+            AddSliderStep("set max spectators", 1, 15, 8, v => maxSpectators.Value = v);
         }
 
         [Test]
@@ -39,6 +49,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 removeSpectator(new APIUser { Username = "peppy" });
             });
+
+            AddStep("Invert Visibility Setting", () =>
+            {
+                config.SetValue(OsuSetting.GameplaySpectatorList, !config.Get<bool>(OsuSetting.GameplaySpectatorList));
+            });
         }
 
         private void createSpectatorList()
@@ -52,6 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Margin = new MarginPadding { Top = 50 },
                     Scale = new Vector2(1.5f),
                 };
+                spectatorList.MaxNames.BindTo(maxSpectators);
             });
         }
 
