@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Skinning;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -14,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class PlayerAvatar : CompositeDrawable, ISerialisableDrawable
     {
-        [SettingSource("Corner radius", "How much the edges should be rounded.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription))]
         public new BindableFloat CornerRadius { get; set; } = new BindableFloat
         {
             MinValue = 0,
