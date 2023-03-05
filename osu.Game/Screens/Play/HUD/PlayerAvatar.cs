@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SkinnableAvatar : CompositeDrawable, ISerialisableDrawable
+    public partial class PlayerAvatar : CompositeDrawable, ISerialisableDrawable
     {
         [SettingSource("Corner radius", "How much the edges should be rounded.")]
         public new BindableFloat CornerRadius { get; set; } = new BindableFloat
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly UpdateableAvatar avatar;
 
-        public SkinnableAvatar()
+        public PlayerAvatar()
         {
             Size = new Vector2(128f);
             InternalChild = avatar = new UpdateableAvatar(isInteractive: false)
