@@ -7,15 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Testing;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
@@ -26,16 +18,16 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinBlueprintContainer : BlueprintContainer<ISerialisableDrawable>
     {
-        private readonly Drawable target;
+        private readonly ISerialisableDrawableContainer targetContainer;
 
         private readonly List<BindableList<ISerialisableDrawable>> targetComponents = new List<BindableList<ISerialisableDrawable>>();
 
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
-        public SkinBlueprintContainer(Drawable target)
+        public SkinBlueprintContainer(ISerialisableDrawableContainer targetContainer)
         {
-            this.target = target;
+            this.targetContainer = targetContainer;
         }
 
         protected override void LoadComplete()
@@ -44,22 +36,10 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedItems.BindTo(editor.SelectedComponents);
 
-            // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<ISerialisableDrawableContainer>().ToArray();
+            var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
+            bindableList.BindCollectionChanged(componentsChanged, true);
 
-            if (targetContainers.Length == 0)
-            {
-                AddInternal(new NonSkinnableScreenPlaceholder());
-                return;
-            }
-
-            foreach (var targetContainer in targetContainers)
-            {
-                var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
-                bindableList.BindCollectionChanged(componentsChanged, true);
-
-                targetComponents.Add(bindableList);
-            }
+            targetComponents.Add(bindableList);
         }
 
         private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
@@ -159,66 +139,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             foreach (var list in targetComponents)
                 list.UnbindAll();
-        }
-
-        public partial class NonSkinnableScreenPlaceholder : CompositeDrawable
-        {
-            [Resolved]
-            private SkinEditorOverlay? skinEditorOverlay { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChildren = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colourProvider.Dark6,
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.95f,
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 5),
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Icon = FontAwesome.Solid.ExclamationCircle,
-                                Size = new Vector2(24),
-                                Y = -5,
-                            },
-                            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 18))
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                TextAnchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Text = "Please navigate to a skinnable screen using the scene library",
-                            },
-                            new RoundedButton
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Width = 200,
-                                Margin = new MarginPadding { Top = 20 },
-                                Action = () => skinEditorOverlay?.Hide(),
-                                Text = "Return to game"
-                            }
-                        }
-                    },
-                };
-            }
         }
     }
 }
