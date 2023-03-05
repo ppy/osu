@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
 
             Icon = FontAwesome.Regular.TrashAlt;
-            DeleteAction = () => scoreManager.Delete(score);
+            DangerousAction = () => scoreManager.Delete(score);
         }
     }
 }

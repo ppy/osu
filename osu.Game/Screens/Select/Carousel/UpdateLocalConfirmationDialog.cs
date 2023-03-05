@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select.Carousel
             HeaderText = PopupDialogStrings.UpdateLocallyModifiedText;
             BodyText = PopupDialogStrings.UpdateLocallyModifiedDescription;
             Icon = FontAwesome.Solid.ExclamationTriangle;
-            DeleteAction = onConfirm;
+            DangerousAction = onConfirm;
         }
     }
 }

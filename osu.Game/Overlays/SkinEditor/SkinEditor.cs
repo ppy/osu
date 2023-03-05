@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -633,25 +632,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         public partial class ResetConfirmDialog : DangerousActionDialog
         {
-            public ResetConfirmDialog(Action reset)
+            public ResetConfirmDialog(Action revert)
             {
                 HeaderText = SkinEditorStrings.RevertToDefaultDescription;
                 BodyText = SkinEditorStrings.ResetDialogue;
-
-                Icon = FontAwesome.Solid.ExclamationTriangle;
-
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogDangerousButton
-                    {
-                        Text = BeatmapOverlayStrings.UserContentConfirmButtonText,
-                        Action = reset
-                    },
-                    new PopupDialogCancelButton
-                    {
-                        Text = Web.CommonStrings.ButtonsCancel,
-                    },
-                };
+                DangerousAction = revert;
             }
         }
 

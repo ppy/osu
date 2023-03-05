@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         public MassDeleteConfirmationDialog(Action deleteAction)
         {
             BodyText = "Everything?";
-            DeleteAction = deleteAction;
+            DangerousAction = deleteAction;
         }
     }
 }

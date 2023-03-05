@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(SkinManager manager)
         {
-            DeleteAction = () =>
+            DangerousAction = () =>
             {
                 manager.Delete(skin.SkinInfo.Value);
                 manager.CurrentSkinInfo.SetDefault();

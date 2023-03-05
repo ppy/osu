@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// The action which performs the deletion.
         /// </summary>
-        protected Action? DeleteAction { get; set; }
+        protected Action? DangerousAction { get; set; }
 
         protected DangerousActionDialog()
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Dialog
                 new PopupDialogDangerousButton
                 {
                     Text = DeleteConfirmationDialogStrings.Confirm,
-                    Action = () => DeleteAction?.Invoke()
+                    Action = () => DangerousAction?.Invoke()
                 },
                 new PopupDialogCancelButton
                 {

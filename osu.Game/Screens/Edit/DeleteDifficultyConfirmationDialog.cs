@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit
         public DeleteDifficultyConfirmationDialog(BeatmapInfo beatmapInfo, Action deleteAction)
         {
             BodyText = $"\"{beatmapInfo.DifficultyName}\" difficulty";
-            DeleteAction = deleteAction;
+            DangerousAction = deleteAction;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmapManager)
         {
-            DeleteAction = () => beatmapManager.Delete(beatmapSet);
+            DangerousAction = () => beatmapManager.Delete(beatmapSet);
         }
     }
 }
