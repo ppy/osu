@@ -342,6 +342,7 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
+            Host.Window.Raise();
             string argString = link.Argument.ToString() ?? string.Empty;
 
             switch (link.Action)
@@ -416,6 +417,8 @@ namespace osu.Game
                     }
 
                     break;
+
+                case LinkAction.OpenWindow: break;
 
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");

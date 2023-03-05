@@ -87,18 +87,7 @@ namespace osu.Desktop
 
             using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
-                if (!host.IsPrimaryInstance)
-                {
-                    if (trySendIPCMessage(host, cwd, args))
-                        return;
-
-                    // we want to allow multiple instances to be started when in debug.
-                    if (!DebugUtils.IsDebugBuild)
-                    {
-                        Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                        return;
-                    }
-                }
+                if (!host.IsPrimaryInstance && trySendIPCMessage(host, cwd, args)) return;
 
                 if (host.IsPrimaryInstance)
                 {
@@ -123,10 +112,11 @@ namespace osu.Desktop
 
         private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
         {
-            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+            if ((args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal)) || (args.Length == 0 && !DebugUtils.IsDebugBuild))
             {
+                string uri = args.Length == 0 ? "osu://o" : args[0];
                 var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
-                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
+                if (!osuSchemeLinkHandler.HandleLinkAsync(uri).Wait(3000))
                     throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
 
                 return true;
