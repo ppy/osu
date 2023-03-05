@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Localisation.HUD;
+using osu.Game.Localisation;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             // always adjust text
-            SpectatorText.Text = SpectatorListStrings.Spectators + " (" + Spectators + ")";
+            SpectatorText.Text = GameplaySettingsStrings.Spectators + " (" + Spectators + ")";
 
             // We exceeded the maximum number
             if (Spectators > MaxNames.Value && Flow.Alpha == 1.0f)
