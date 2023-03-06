@@ -304,7 +304,8 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.Dispose();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
-            content?.Clear();
+            if (content?.Child is SkinBlueprintContainer)
+                content.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
@@ -323,17 +324,18 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
 
-            if (target.NewValue == null)
-                return;
+            componentsSidebar.Clear();
+            SelectedComponents.Clear();
 
             Debug.Assert(content != null);
 
-            SelectedComponents.Clear();
-
             var skinComponentsContainer = getTarget(target.NewValue);
 
-            if (skinComponentsContainer == null)
+            if (target.NewValue == null || skinComponentsContainer == null)
+            {
+                content.Child = new NonSkinnableScreenPlaceholder();
                 return;
+            }
 
             changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
