@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
         public new BindableFloat CornerRadius { get; set; } = new BindableFloat
         {
             MinValue = 0,
-            MaxValue = 63,
+            MaxValue = 64,
             Precision = 0.01f
         };
 
