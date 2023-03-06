@@ -84,11 +84,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             if (!nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime)) return;
 
-            if (lastAcceptedCentreAction != null)
-                lastAcceptedCentreAction = null;
-
-            if (lastAcceptedRimAction != null)
-                lastAcceptedRimAction = null;
+            lastAcceptedCentreAction = null;
+            lastAcceptedRimAction = null;
         }
 
         private bool checkCorrectAction(TaikoAction action)
