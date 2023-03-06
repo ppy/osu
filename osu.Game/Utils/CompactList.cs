@@ -76,7 +76,7 @@ namespace osu.Game.Utils
     {
         public double Value { get; private set; }
 
-        public double Count { get; set; }
+        public int Count { get; set; }
 
         public Number(double value, int count)
         {
