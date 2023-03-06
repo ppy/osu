@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -33,6 +32,12 @@ namespace osu.Game.Graphics.Backgrounds
         /// Whether we should create new triangles as others expire.
         /// </summary>
         protected virtual bool CreateNewTriangles => true;
+
+        /// <summary>
+        /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
+        /// shape is drawn to the screen.
+        /// </summary>
+        public bool Masking { get; set; }
 
         private readonly BindableFloat spawnRatio = new BindableFloat(1f);
 
@@ -189,6 +194,7 @@ namespace osu.Game.Graphics.Backgrounds
             private Vector2 size;
             private float thickness;
             private float texelSize;
+            private bool masking;
 
             private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
@@ -205,6 +211,7 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
+                masking = Source.Masking;
 
                 Quad triangleQuad = new Quad(
                     Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),
@@ -236,40 +243,45 @@ namespace osu.Game.Graphics.Backgrounds
                 shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
                 shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
 
-                float relativeHeight = triangleSize.Y / size.Y;
-                float relativeWidth = triangleSize.X / size.X;
+                Vector2 relativeSize = Vector2.Divide(triangleSize, size);
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    Vector2 topLeft = particle.Position - new Vector2(relativeWidth * 0.5f, 0f);
-                    Vector2 topRight = topLeft + new Vector2(relativeWidth, 0f);
-                    Vector2 bottomLeft = topLeft + new Vector2(0f, relativeHeight);
-                    Vector2 bottomRight = bottomLeft + new Vector2(relativeWidth, 0f);
+                    Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
+
+                    Quad triangleQuad = masking ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
 
                     var drawQuad = new Quad(
-                        Vector2Extensions.Transform(topLeft * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(topRight * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomLeft * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(bottomRight * size, DrawInfo.Matrix)
+                        Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.TopRight * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.BottomLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.BottomRight * size, DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, new Quad(topLeft, topRight, bottomLeft, bottomRight));
+                    RectangleF textureCoords = new RectangleF(
+                        triangleQuad.TopLeft.X - topLeft.X,
+                        triangleQuad.TopLeft.Y - topLeft.Y,
+                        triangleQuad.Width,
+                        triangleQuad.Height
+                    ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, vertexAction: vertexBatch.AddAction);
+                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour.Interpolate(triangleQuad), new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
             }
 
-            private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
+            private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
             {
-                return new ColourInfo
-                {
-                    TopLeft = source.Interpolate(quad.TopLeft),
-                    TopRight = source.Interpolate(quad.TopRight),
-                    BottomLeft = source.Interpolate(quad.BottomLeft),
-                    BottomRight = source.Interpolate(quad.BottomRight)
-                };
+                float leftClamped = Math.Clamp(topLeft.X, 0f, 1f);
+                float topClamped = Math.Clamp(topLeft.Y, 0f, 1f);
+
+                return new Quad(
+                    leftClamped,
+                    topClamped,
+                    Math.Clamp(topLeft.X + size.X, 0f, 1f) - leftClamped,
+                    Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - topClamped
+                );
             }
 
             protected override void Dispose(bool isDisposing)

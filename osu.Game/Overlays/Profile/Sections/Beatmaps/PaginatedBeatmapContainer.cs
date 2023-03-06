@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override int InitialItemsCount => type == BeatmapSetType.Graveyard ? 2 : 6;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<APIUser?> user, LocalisableString headerText)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<UserProfileData?> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             }
         }
 
-        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(APIUser user, PaginationParameters pagination) =>
-            new GetUserBeatmapsRequest(user.Id, type, pagination);
+        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserBeatmapsRequest(user.User.Id, type, pagination);
 
         protected override Drawable? CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
             ? new BeatmapCardNormal(model)

@@ -315,10 +315,10 @@ namespace osu.Game.Overlays
                 channelListing.Hide();
                 textBar.ShowSearch.Value = false;
 
-                if (loadedChannels.ContainsKey(newChannel))
+                if (loadedChannels.TryGetValue(newChannel, out var loadedChannel))
                 {
                     currentChannelContainer.Clear(false);
-                    currentChannelContainer.Add(loadedChannels[newChannel]);
+                    currentChannelContainer.Add(loadedChannel);
                 }
                 else
                 {

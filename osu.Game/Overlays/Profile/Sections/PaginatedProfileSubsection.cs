@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<APIUser?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+        protected PaginatedProfileSubsection(Bindable<UserProfileData?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
             : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<APIUser?> e)
+        private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -100,10 +100,10 @@ namespace osu.Game.Overlays.Profile.Sections
             CurrentPage = null;
             ItemsContainer.Clear();
 
-            if (e.NewValue != null)
+            if (e.NewValue?.User != null)
             {
                 showMore();
-                SetCount(GetCount(e.NewValue));
+                SetCount(GetCount(e.NewValue.User));
             }
         }
 
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(APIUser user, PaginationParameters pagination);
+        protected abstract APIRequest<List<TModel>> CreateRequest(UserProfileData user, PaginationParameters pagination);
 
         protected abstract Drawable? CreateDrawableItem(TModel model);
 
