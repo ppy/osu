@@ -26,16 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Acronym => @"SG";
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
-        protected bool CheckValidNewAction(TaikoAction action)
-        {
-            if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                return lastAcceptedCentreAction == null || lastAcceptedCentreAction == action;
-            if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                return lastAcceptedRimAction == null || lastAcceptedRimAction == action;
-
-            return true;
-        }
-
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;
@@ -99,13 +89,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 && hitObject is not DrumRoll)
                 return true;
 
-            if (CheckValidNewAction(action))
+            if ((action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
+            && (lastAcceptedCentreAction == null || lastAcceptedCentreAction == action))
             {
-                if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                    lastAcceptedCentreAction = action;
-                if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                    lastAcceptedRimAction = action;
+                lastAcceptedCentreAction = action;
+                return true;
+            }
 
+            if ((action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
+            && (lastAcceptedRimAction == null || lastAcceptedRimAction == action))
+            {
+                lastAcceptedRimAction = action;
                 return true;
             }
 
