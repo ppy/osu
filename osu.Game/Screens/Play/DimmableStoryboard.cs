@@ -50,18 +50,18 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-            ShowStoryboardConfig.BindValueChanged(_ => initializeStoryboard(true), true);
+            ShowStoryboard.BindValueChanged(_ => initializeStoryboard(true), true);
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboardConfig.Value && DimLevel < 1);
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && DimLevel < 1);
 
         private void initializeStoryboard(bool async)
         {
             if (drawableStoryboard != null)
                 return;
 
-            if (!ShowStoryboardConfig.Value && !IgnoreUserSettings.Value)
+            if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable(mods);
