@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.DateRanked:
-                    comparison = compareNullableDateTimeOffset(BeatmapSet.DateRanked, otherSet.BeatmapSet.DateRanked);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateRanked, BeatmapSet.DateRanked);
                     break;
 
                 case SortMode.LastPlayed:
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.DateSubmitted:
-                    comparison = compareNullableDateTimeOffset(BeatmapSet.DateSubmitted, otherSet.BeatmapSet.DateSubmitted);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateSubmitted, BeatmapSet.DateSubmitted);
                     break;
             }
 
@@ -122,14 +122,6 @@ namespace osu.Game.Screens.Select.Carousel
             // If DateAdded fails to break the tie, fallback to our internal GUID for stability.
             // This basically means it's a stable random sort.
             return otherSet.BeatmapSet.ID.CompareTo(BeatmapSet.ID);
-        }
-
-        private static int compareNullableDateTimeOffset(DateTimeOffset? x, DateTimeOffset? y)
-        {
-            if (x == null) return 1;
-            if (y == null) return -1;
-
-            return y.Value.CompareTo(x.Value);
         }
 
         /// <summary>
