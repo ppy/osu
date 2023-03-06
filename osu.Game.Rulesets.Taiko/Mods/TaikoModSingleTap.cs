@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private TaikoAction? lastAcceptedRimAction { get; set; }
 
         /// <summary>
-        /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
+        /// A tracker for periods where single tap should not be enforced (i.e. non-gameplay periods).
         /// </summary>
         /// <remarks>
         /// This is different from <see cref="Player.IsBreakTime"/> in that the periods here end strictly at the first object after the break, rather than the break's end time.
