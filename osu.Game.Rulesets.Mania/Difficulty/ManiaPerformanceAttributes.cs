@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         [JsonProperty("estimated_ur")]
         public double? EstimatedUr { get; set; }
 
+        [JsonProperty("hit_windows")]
+        public double[] HitWindows { get; set; }
+
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
             foreach (var attribute in base.GetAttributesForDisplay())

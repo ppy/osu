@@ -11,6 +11,7 @@ using MathNet.Numerics.Distributions;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -28,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
         private double? estimatedUr;
+        private bool isLegacyScore;
+        private double[] hitWindows;
 
         public ManiaPerformanceCalculator()
             : base(new ManiaRuleset())
@@ -44,7 +47,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUr = computeEstimatedUr(score, maniaAttributes);
+            isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && totalJudgements == maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount;
+            hitWindows = isLegacyScore ? getLegacyHitWindows(score, maniaAttributes) : getLazerHitWindows(score, maniaAttributes);
+            estimatedUr = computeEstimatedUr(maniaAttributes);
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -62,7 +67,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 Difficulty = difficultyValue,
                 Total = totalValue,
-                EstimatedUr = estimatedUr
+                EstimatedUr = estimatedUr,
+                HitWindows = hitWindows
             };
         }
 
@@ -84,14 +90,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Accuracy used to weight judgements independently from the score's actual accuracy.
         /// </summary>
-        private double? computeEstimatedUr(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        private double? computeEstimatedUr(ManiaDifficultyAttributes attributes)
         {
             if (totalSuccessfulJudgements == 0 || attributes.NoteCount + attributes.HoldNoteCount == 0)
                 return null;
-
-            bool isLegacyScore = score.Mods.Any(m => m is ModClassic) && totalJudgements == attributes.NoteCount + attributes.HoldNoteCount;
-
-            double[] hitWindows = isLegacyScore ? getLegacyHitWindows(score, attributes) : getLazerHitWindows(score, attributes);
 
             // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
             double nNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
@@ -103,9 +105,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 if (d <= 0)
                     return 0;
 
-                JudgementProbs pNotes = pNote(hitWindows, d);
+                JudgementProbs pNotes = pNote(d);
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
-                JudgementProbs pHolds = isLegacyScore ? pHold(hitWindows, d) : pNote(hitWindows, d, tail_multiplier);
+                JudgementProbs pHolds = isLegacyScore ? pHold(d) : pNote(d, tail_multiplier);
 
                 return -totalProb(pNotes, pHolds, nNoteCount, nHoldCount);
             }
@@ -118,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double[] getLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
-            double[] judgements = new double[5];
+            double[] legacyHitWindows = new double[5];
 
             double overallDifficulty = attributes.OverallDifficulty;
 
@@ -132,18 +134,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             else if (score.Mods.Any(m => m is ModEasy))
                 windowMultiplier *= 1.4;
 
-            judgements[0] = Math.Floor(16 * windowMultiplier);
-            judgements[1] = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
-            judgements[2] = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
-            judgements[3] = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
-            judgements[4] = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
+            legacyHitWindows[0] = Math.Floor(16 * windowMultiplier);
+            legacyHitWindows[1] = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
+            legacyHitWindows[2] = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
+            legacyHitWindows[3] = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
+            legacyHitWindows[4] = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
 
-            return judgements;
+            return legacyHitWindows;
         }
 
         private double[] getLazerHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
-            double[] hitWindows = new double[5];
+            double[] lazerHitWindows = new double[5];
 
             // Create a new track of arbitrary length
             var track = new TrackVirtual(10000);
@@ -160,15 +162,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 windowMultiplier *= 1.4;
 
             if (attributes.OverallDifficulty < 5)
-                hitWindows[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
+                lazerHitWindows[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
             else
-                hitWindows[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
-            hitWindows[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            hitWindows[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            hitWindows[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            hitWindows[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+                lazerHitWindows[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
+            lazerHitWindows[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            lazerHitWindows[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            lazerHitWindows[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+            lazerHitWindows[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
 
-            return hitWindows;
+            return lazerHitWindows;
         }
 
         // This struct allows us to return the probability of hitting every judgement with a single method.
@@ -183,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         // This method finds the probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
-        private JudgementProbs pNote(IReadOnlyList<double> hitWindows, double d, double multiplier = 1)
+        private JudgementProbs pNote(double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
@@ -199,7 +201,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         // This method finds the probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
-        private JudgementProbs pHold(IReadOnlyList<double> hitWindows, double d)
+        private JudgementProbs pHold(double d)
         {
             JudgementProbs probabilities = new JudgementProbs();
 
