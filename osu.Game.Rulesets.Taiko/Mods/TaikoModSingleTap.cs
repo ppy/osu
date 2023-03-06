@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
         protected bool CheckValidNewAction(TaikoAction action)
         {
             if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                return LastAcceptedDonAction == null || LastAcceptedDonAction == action;
+                return lastAcceptedCentreAction == null || lastAcceptedCentreAction == action;
             if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                return LastAcceptedKatAction == null || LastAcceptedKatAction == action;
+                return lastAcceptedRimAction == null || lastAcceptedRimAction == action;
 
             return true;
         }
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private TaikoPlayfield playfield { get; set; } = null!;
 
-        protected TaikoAction? LastAcceptedDonAction { get; private set; }
-        protected TaikoAction? LastAcceptedKatAction { get; private set; }
+        private TaikoAction? lastAcceptedCentreAction { get; set; }
+        private TaikoAction? lastAcceptedRimAction { get; set; }
 
         /// <summary>
         /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
@@ -84,11 +84,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             if (!nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime)) return;
 
-            if (LastAcceptedDonAction != null)
-                LastAcceptedDonAction = null;
+            if (lastAcceptedCentreAction != null)
+                lastAcceptedCentreAction = null;
 
-            if (LastAcceptedKatAction != null)
-                LastAcceptedKatAction = null;
+            if (lastAcceptedRimAction != null)
+                lastAcceptedRimAction = null;
         }
 
         private bool checkCorrectAction(TaikoAction action)
@@ -105,9 +105,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (CheckValidNewAction(action))
             {
                 if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                    LastAcceptedDonAction = action;
+                    lastAcceptedCentreAction = action;
                 if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                    LastAcceptedKatAction = action;
+                    lastAcceptedRimAction = action;
 
                 return true;
             }
