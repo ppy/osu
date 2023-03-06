@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
             AddStep("click delete", () =>
             {
-                var deleteItem = this.ChildrenOfType<DrawableOsuMenuItem>().Single();
+                var deleteItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1);
                 InputManager.MoveMouseTo(deleteItem);
                 InputManager.Click(MouseButton.Left);
             });
@@ -259,6 +259,175 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddUntilStep("preset deletion occurred", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
             AddAssert("preset soft-deleted", () => Realm.Run(r => r.All<ModPreset>().Count(preset => preset.DeletePending) == 1));
+        }
+
+        [Test]
+        public void TestEditPresentName()
+        {
+            ModPresetColumn modPresetColumn = null!;
+            string presetName = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                presetName = panel.Preset.Value.Name;
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("clear preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "");
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddWaitStep("wait some", 3);
+            AddAssert("present is not changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Name == presetName);
+            AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
+            AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
+            AddAssert("present is changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Name != presetName);
+        }
+
+        [Test]
+        public void TestEditPresetMod()
+        {
+            ModPresetColumn modPresetColumn = null!;
+            var mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() };
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("select mods", () => SelectedMods.Value = mods);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("enable switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value = true);
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
+            AddAssert("present mod is changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods.Count == 2);
+        }
+
+        [Test]
+        public void TestEditModSwitchDisableWithNoModSelest()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddAssert("use current mod is disblaed", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == false);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
+        }
+
+        [Test]
+        public void TestEditModSwitchDisableWithPresetSelest()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("select first preset mod", () =>
+                SelectedMods.Value = this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods.ToList());
+
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddAssert("use current mod is enabled", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == true);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddAssert("use current mod is disblaed", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == false);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
         }
 
         private ICollection<ModPreset> createTestPresets() => new[]
