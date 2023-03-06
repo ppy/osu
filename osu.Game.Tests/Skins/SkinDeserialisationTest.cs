@@ -9,7 +9,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
@@ -64,8 +63,6 @@ namespace osu.Game.Tests.Skins
 
             foreach (string oskFile in available_skins)
             {
-                Logger.Log($"Testing file {oskFile}...");
-
                 using (var stream = TestResources.OpenResource(oskFile))
                 using (var storage = new ZipArchiveReader(stream))
                 {
