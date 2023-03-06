@@ -386,7 +386,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuPopover? popover = null;
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
             AddAssert("use current mod is disblaed", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == false);
-            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled);
         }
 
         [Test]
@@ -422,12 +422,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             OsuPopover? popover = null;
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
-            AddAssert("use current mod is enabled", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == true);
-            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
+            AddAssert("use current mod is enabled", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled);
 
             AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddAssert("use current mod is disblaed", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Value == false);
-            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled == true);
+            AddAssert("use current mod switch cannot be switch", () => popover.ChildrenOfType<LabelledSwitchButton>().Single().Current.Disabled);
         }
 
         private ICollection<ModPreset> createTestPresets() => new[]
