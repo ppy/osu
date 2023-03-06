@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
 using SDL2;
@@ -123,30 +123,13 @@ namespace osu.Desktop
 
         private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
         {
-            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
-            {
-                var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
-                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
-                    throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
+            var osuInstanceHandler = new OsuInstanceIPCChannel(host);
+            Task<bool?> instanceTask = osuInstanceHandler.InstanceAsync(cwd, args);
 
-                return true;
-            }
+            if (!instanceTask.Wait(3000))
+                throw new IPCTimeoutException(osuInstanceHandler.GetType());
 
-            if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
-            {
-                var importer = new ArchiveImportIPCChannel(host);
-
-                foreach (string file in args)
-                {
-                    Console.WriteLine(@"Importing {0}", file);
-                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                        throw new IPCTimeoutException(importer.GetType());
-                }
-
-                return true;
-            }
-
-            return false;
+            return instanceTask.GetResultSafely() ?? false;
         }
 
         [SupportedOSPlatform("windows")]

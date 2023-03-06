@@ -18,6 +18,7 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Development;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
@@ -30,6 +31,7 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+        private OsuInstanceIPCChannel? osuInstanceIPCChannel;
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -125,6 +127,16 @@ namespace osu.Desktop
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
+            osuInstanceIPCChannel = new OsuInstanceIPCChannel(Host);
+            osuInstanceIPCChannel.MessageReceived += msg =>
+            {
+                bool handled = HandleCommandLineArgs(msg.Cwd, msg.Args);
+
+                if (handled || (msg.Args?.Length == 0 && !DebugUtils.IsDebugBuild))
+                    Window?.Raise();
+
+                return new OsuInstanceIPCMessage { Handled = handled };
+            };
         }
 
         public override void SetHost(GameHost host)
@@ -184,6 +196,7 @@ namespace osu.Desktop
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
             archiveImportIPCChannel?.Dispose();
+            osuInstanceIPCChannel?.Dispose();
         }
 
         private class SDL2BatteryInfo : BatteryInfo

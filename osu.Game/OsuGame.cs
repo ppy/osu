@@ -1031,29 +1031,7 @@ namespace osu.Game
             };
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
-            handleStartupImport();
-        }
-
-        private void handleStartupImport()
-        {
-            if (args?.Length > 0)
-            {
-                string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
-
-                if (paths.Length > 0)
-                {
-                    string firstPath = paths.First();
-
-                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(firstPath);
-                    }
-                    else
-                    {
-                        Task.Run(() => Import(paths));
-                    }
-                }
-            }
+            HandleCommandLineArgs(Environment.CurrentDirectory, args);
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
@@ -1423,5 +1401,23 @@ namespace osu.Game
         }
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
+
+        protected bool HandleCommandLineArgs(string cwd, [CanBeNull] string[] args)
+        {
+            // return true if a link was opened or if any files have been queued for import (regardless of the success of the import)
+            if (args?.Length == 1 && args[0].StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                HandleLink(args[0]);
+                return true;
+            }
+
+            if (args?.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
+            {
+                Task.Run(() => Import(args));
+                return true;
+            }
+
+            return false;
+        }
     }
 }
