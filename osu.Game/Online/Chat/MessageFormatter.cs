@@ -200,9 +200,7 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "osu":
-                    if (args[1] == "o") return new LinkDetails(LinkAction.OpenWindow, string.Empty);
-
-                    // every other internal link also needs some kind of argument
+                    // every internal link also needs some kind of argument
                     if (args.Length < 3)
                         break;
 
@@ -345,7 +343,6 @@ namespace osu.Game.Online.Chat
         OpenChangelog,
         FilterBeatmapSetGenre,
         FilterBeatmapSetLanguage,
-        OpenWindow,
     }
 
     public class Link : IComparable<Link>
