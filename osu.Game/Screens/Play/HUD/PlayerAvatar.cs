@@ -16,10 +16,10 @@ namespace osu.Game.Screens.Play.HUD
     public partial class PlayerAvatar : CompositeDrawable, ISerialisableDrawable
     {
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription))]
-        public new BindableFloat CornerRadius { get; set; } = new BindableFloat
+        public new BindableFloat CornerRadius { get; set; } = new BindableFloat(0.25f)
         {
             MinValue = 0,
-            MaxValue = 64,
+            MaxValue = 0.5f,
             Precision = 0.01f
         };
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             avatar.User = gameplayState.Score.ScoreInfo.User;
-            CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue, true);
+            CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue * 128f, true);
         }
 
         public bool UsesFixedAnchor { get; set; }
