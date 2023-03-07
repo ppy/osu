@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableDrawable
+    public partial class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISerialisableDrawable
     {
         /// <summary>
         /// The base opacity of the glow.

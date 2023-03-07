@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -34,6 +37,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private Drawable? lightContainer;
 
         private Drawable? light;
+        private LegacyNoteBodyStyle? bodyStyle;
 
         public LegacyBodyPiece()
         {
@@ -53,9 +57,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             float lightScale = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteLightScale)?.Value
                                ?? 1;
-
-            float minimumColumnWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.MinimumColumnWidth)?.Value
-                                       ?? 1;
 
             // Create a temporary animation to retrieve the number of frames, in an effort to calculate the intended frame length.
             // This animation is discarded and re-queried with the appropriate frame length afterwards.
@@ -83,7 +84,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 };
             }
 
-            bodySprite = skin.GetAnimation(imageName, WrapMode.ClampToEdge, WrapMode.ClampToEdge, true, true).With(d =>
+            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
+
+            var wrapMode = bodyStyle == LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
+
+            direction.BindTo(scrollingInfo.Direction);
+            isHitting.BindTo(holdNote.IsHitting);
+
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true).With(d =>
             {
                 if (d == null)
                     return;
@@ -94,16 +102,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 d.Anchor = Anchor.TopCentre;
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
-                d.FillMode = FillMode.Stretch;
-                d.Height = minimumColumnWidth / d.DrawWidth * 1.6f; // constant matching stable.
                 // Todo: Wrap?
             });
 
             if (bodySprite != null)
                 InternalChild = bodySprite;
-
-            direction.BindTo(scrollingInfo.Direction);
-            isHitting.BindTo(holdNote.IsHitting);
         }
 
         protected override void LoadComplete()
@@ -164,8 +167,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             {
                 if (bodySprite != null)
                 {
-                    bodySprite.Origin = Anchor.BottomCentre;
-                    bodySprite.Scale = new Vector2(1, -1);
+                    bodySprite.Origin = Anchor.TopCentre;
+                    bodySprite.Anchor = Anchor.BottomCentre; // needs to be flipped due to scale flip in Update.
                 }
 
                 if (light != null)
@@ -176,7 +179,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (bodySprite != null)
                 {
                     bodySprite.Origin = Anchor.TopCentre;
-                    bodySprite.Scale = Vector2.One;
+                    bodySprite.Anchor = Anchor.TopCentre;
                 }
 
                 if (light != null)
@@ -207,6 +210,33 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Update();
             missFadeTime.Value ??= holdNote.HoldBrokenTime;
+
+            int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
+
+            // here we go...
+            switch (bodyStyle)
+            {
+                case LegacyNoteBodyStyle.Stretch:
+                    // this is how lazer works by default. nothing required.
+                    if (bodySprite != null)
+                        bodySprite.Scale = new Vector2(1, scaleDirection);
+                    break;
+
+                default:
+                    // this is where things get fucked up.
+                    // honestly there's three modes to handle here but they seem really pointless?
+                    // let's wait to see if anyone actually uses them in skins.
+                    if (bodySprite != null)
+                    {
+                        var sprite = bodySprite as Sprite ?? bodySprite.ChildrenOfType<Sprite>().Single();
+
+                        bodySprite.FillMode = FillMode.Stretch;
+                        // i dunno this looks about right??
+                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
+                    }
+
+                    break;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

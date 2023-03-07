@@ -109,15 +109,16 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set online status", () => status.Value = new UserStatusOnline());
 
             AddStep("idle", () => activity.Value = null);
-            AddStep("watching", () => activity.Value = new UserActivity.Watching(createScore(@"nats")));
-            AddStep("spectating", () => activity.Value = new UserActivity.Spectating(createScore(@"mrekk")));
+            AddStep("watching replay", () => activity.Value = new UserActivity.WatchingReplay(createScore(@"nats")));
+            AddStep("spectating user", () => activity.Value = new UserActivity.SpectatingUser(createScore(@"mrekk")));
             AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
             AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
             AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
             AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
-            AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
-            AddStep("modding", () => activity.Value = new UserActivity.Modding());
+            AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(null));
+            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(null));
+            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(null, null));
         }
 
         [Test]

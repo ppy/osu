@@ -7,15 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Testing;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
@@ -24,18 +16,18 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public partial class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
+    public partial class SkinBlueprintContainer : BlueprintContainer<ISerialisableDrawable>
     {
-        private readonly Drawable target;
+        private readonly ISerialisableDrawableContainer targetContainer;
 
-        private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
+        private readonly List<BindableList<ISerialisableDrawable>> targetComponents = new List<BindableList<ISerialisableDrawable>>();
 
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
-        public SkinBlueprintContainer(Drawable target)
+        public SkinBlueprintContainer(ISerialisableDrawableContainer targetContainer)
         {
-            this.target = target;
+            this.targetContainer = targetContainer;
         }
 
         protected override void LoadComplete()
@@ -44,22 +36,10 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectedItems.BindTo(editor.SelectedComponents);
 
-            // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<ISkinnableTarget>().ToArray();
+            var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
+            bindableList.BindCollectionChanged(componentsChanged, true);
 
-            if (targetContainers.Length == 0)
-            {
-                AddInternal(new NonSkinnableScreenPlaceholder());
-                return;
-            }
-
-            foreach (var targetContainer in targetContainers)
-            {
-                var bindableList = new BindableList<ISkinnableDrawable> { BindTarget = targetContainer.Components };
-                bindableList.BindCollectionChanged(componentsChanged, true);
-
-                targetComponents.Add(bindableList);
-            }
+            targetComponents.Add(bindableList);
         }
 
         private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
@@ -69,7 +49,7 @@ namespace osu.Game.Overlays.SkinEditor
                 case NotifyCollectionChangedAction.Add:
                     Debug.Assert(e.NewItems != null);
 
-                    foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
+                    foreach (var item in e.NewItems.Cast<ISerialisableDrawable>())
                         AddBlueprintFor(item);
                     break;
 
@@ -77,7 +57,7 @@ namespace osu.Game.Overlays.SkinEditor
                 case NotifyCollectionChangedAction.Reset:
                     Debug.Assert(e.OldItems != null);
 
-                    foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
+                    foreach (var item in e.OldItems.Cast<ISerialisableDrawable>())
                         RemoveBlueprintFor(item);
                     break;
 
@@ -85,16 +65,16 @@ namespace osu.Game.Overlays.SkinEditor
                     Debug.Assert(e.NewItems != null);
                     Debug.Assert(e.OldItems != null);
 
-                    foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
+                    foreach (var item in e.OldItems.Cast<ISerialisableDrawable>())
                         RemoveBlueprintFor(item);
 
-                    foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
+                    foreach (var item in e.NewItems.Cast<ISerialisableDrawable>())
                         AddBlueprintFor(item);
                     break;
             }
         });
 
-        protected override void AddBlueprintFor(ISkinnableDrawable item)
+        protected override void AddBlueprintFor(ISerialisableDrawable item)
         {
             if (!item.IsEditable)
                 return;
@@ -145,12 +125,12 @@ namespace osu.Game.Overlays.SkinEditor
             // convert to game space coordinates
             delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
 
-            SelectionHandler.HandleMovement(new MoveSelectionEvent<ISkinnableDrawable>(firstBlueprint, delta));
+            SelectionHandler.HandleMovement(new MoveSelectionEvent<ISerialisableDrawable>(firstBlueprint, delta));
         }
 
-        protected override SelectionHandler<ISkinnableDrawable> CreateSelectionHandler() => new SkinSelectionHandler();
+        protected override SelectionHandler<ISerialisableDrawable> CreateSelectionHandler() => new SkinSelectionHandler();
 
-        protected override SelectionBlueprint<ISkinnableDrawable> CreateBlueprintFor(ISkinnableDrawable component)
+        protected override SelectionBlueprint<ISerialisableDrawable> CreateBlueprintFor(ISerialisableDrawable component)
             => new SkinBlueprint(component);
 
         protected override void Dispose(bool isDisposing)
@@ -159,66 +139,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             foreach (var list in targetComponents)
                 list.UnbindAll();
-        }
-
-        public partial class NonSkinnableScreenPlaceholder : CompositeDrawable
-        {
-            [Resolved]
-            private SkinEditorOverlay? skinEditorOverlay { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChildren = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colourProvider.Dark6,
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.95f,
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 5),
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Icon = FontAwesome.Solid.ExclamationCircle,
-                                Size = new Vector2(24),
-                                Y = -5,
-                            },
-                            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 18))
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                TextAnchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Text = "Please navigate to a skinnable screen using the scene library",
-                            },
-                            new RoundedButton
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Width = 200,
-                                Margin = new MarginPadding { Top = 20 },
-                                Action = () => skinEditorOverlay?.Hide(),
-                                Text = "Return to game"
-                            }
-                        }
-                    },
-                };
-            }
         }
     }
 }

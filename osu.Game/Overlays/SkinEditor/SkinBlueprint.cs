@@ -5,40 +5,53 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public partial class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
+    public partial class SkinBlueprint : SelectionBlueprint<ISerialisableDrawable>
     {
         private Container box = null!;
 
-        private Container outlineBox = null!;
-
         private AnchorOriginVisualiser anchorOriginVisualiser = null!;
+
+        private OsuSpriteText label = null!;
 
         private Drawable drawable => (Drawable)Item;
 
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        private Quad drawableQuad;
 
-        public SkinBlueprint(ISkinnableDrawable component)
+        public override Quad ScreenSpaceDrawQuad => drawableQuad;
+        public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
+
+        public override bool Contains(Vector2 screenSpacePos) => drawableQuad.Contains(screenSpacePos);
+
+        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
+
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) =>
+            drawableQuad.Contains(screenSpacePos);
+
+        public SkinBlueprint(ISerialisableDrawable component)
             : base(component)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -46,26 +59,30 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        outlineBox = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            BorderThickness = 3,
-                            BorderColour = Color4.White,
+                            CornerRadius = 3,
+                            BorderThickness = SelectionBox.BORDER_RADIUS / 2,
+                            BorderColour = ColourInfo.GradientVertical(colours.Pink4.Darken(0.4f), colours.Pink4),
                             Children = new Drawable[]
                             {
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0f,
+                                    Blending = BlendingParameters.Additive,
+                                    Alpha = 0.2f,
+                                    Colour = ColourInfo.GradientVertical(colours.Pink2, colours.Pink4),
                                     AlwaysPresent = true,
                                 },
                             }
                         },
-                        new OsuSpriteText
+                        label = new OsuSpriteText
                         {
                             Text = Item.GetType().Name,
                             Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
+                            Alpha = 0,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.TopRight,
                         },
@@ -83,7 +100,18 @@ namespace osu.Game.Overlays.SkinEditor
             base.LoadComplete();
 
             updateSelectedState();
-            this.FadeInFromZero(200, Easing.OutQuint);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateSelectedState();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateSelectedState();
+            base.OnHoverLost(e);
         }
 
         protected override void OnSelected()
@@ -100,72 +128,72 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateSelectedState()
         {
-            outlineBox.FadeColour(colours.Pink.Opacity(IsSelected ? 1 : 0.5f), 200, Easing.OutQuint);
-            outlineBox.Child.FadeTo(IsSelected ? 0.2f : 0, 200, Easing.OutQuint);
-
             anchorOriginVisualiser.FadeTo(IsSelected ? 1 : 0, 200, Easing.OutQuint);
+            label.FadeTo(IsSelected || IsHovered ? 1 : 0, 200, Easing.OutQuint);
         }
-
-        private Quad drawableQuad;
-
-        public override Quad ScreenSpaceDrawQuad => drawableQuad;
 
         protected override void Update()
         {
             base.Update();
 
-            drawableQuad = drawable.ScreenSpaceDrawQuad;
-            var quad = ToLocalSpace(drawable.ScreenSpaceDrawQuad);
+            drawableQuad = drawable.ToScreenSpace(
+                drawable.DrawRectangle
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
 
-            box.Position = drawable.ToSpaceOfOtherDrawable(Vector2.Zero, this);
-            box.Size = quad.Size;
+            var localSpaceQuad = ToLocalSpace(drawableQuad);
+
+            box.Position = localSpaceQuad.TopLeft;
+            box.Size = localSpaceQuad.Size;
             box.Rotation = drawable.Rotation;
             box.Scale = new Vector2(MathF.Sign(drawable.Scale.X), MathF.Sign(drawable.Scale.Y));
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);
-
-        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
-
-        public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
     }
 
     internal partial class AnchorOriginVisualiser : CompositeDrawable
     {
         private readonly Drawable drawable;
 
-        private readonly Box originBox;
+        private Drawable originBox = null!;
 
-        private readonly Box anchorBox;
-        private readonly Box anchorLine;
+        private Drawable anchorBox = null!;
+        private Drawable anchorLine = null!;
 
         public AnchorOriginVisualiser(Drawable drawable)
         {
             this.drawable = drawable;
+        }
 
-            InternalChildren = new Drawable[]
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Color4 anchorColour = colours.Red1;
+            Color4 originColour = colours.Red3;
+
+            InternalChildren = new[]
             {
-                anchorLine = new Box
+                anchorLine = new Circle
                 {
-                    Height = 2,
+                    Height = 3f,
                     Origin = Anchor.CentreLeft,
-                    Colour = Color4.Yellow,
-                    EdgeSmoothness = Vector2.One
+                    Colour = ColourInfo.GradientHorizontal(originColour.Opacity(0.5f), originColour),
                 },
-                originBox = new Box
+                originBox = new Circle
                 {
-                    Colour = Color4.Red,
+                    Colour = originColour,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(5),
+                    Size = new Vector2(7),
                 },
-                anchorBox = new Box
+                anchorBox = new Circle
                 {
-                    Colour = Color4.Red,
+                    Colour = anchorColour,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(5),
+                    Size = new Vector2(10),
                 },
             };
         }
+
+        private Vector2? anchorPosition;
+        private Vector2? originPositionInDrawableSpace;
 
         protected override void Update()
         {
@@ -174,8 +202,13 @@ namespace osu.Game.Overlays.SkinEditor
             if (drawable.Parent == null)
                 return;
 
-            originBox.Position = drawable.ToSpaceOfOtherDrawable(drawable.OriginPosition, this);
-            anchorBox.Position = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            anchorPosition = tweenPosition(anchorPosition ?? newAnchor, newAnchor);
+            anchorBox.Position = anchorPosition.Value;
+
+            // for the origin, tween in the drawable's local space to avoid unwanted tweening when the drawable is being dragged.
+            originPositionInDrawableSpace = originPositionInDrawableSpace != null ? tweenPosition(originPositionInDrawableSpace.Value, drawable.OriginPosition) : drawable.OriginPosition;
+            originBox.Position = drawable.ToSpaceOfOtherDrawable(originPositionInDrawableSpace.Value, this);
 
             var point1 = ToLocalSpace(anchorBox.ScreenSpaceDrawQuad.Centre);
             var point2 = ToLocalSpace(originBox.ScreenSpaceDrawQuad.Centre);
@@ -184,5 +217,11 @@ namespace osu.Game.Overlays.SkinEditor
             anchorLine.Width = (point2 - point1).Length;
             anchorLine.Rotation = MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X));
         }
+
+        private Vector2 tweenPosition(Vector2 oldPosition, Vector2 newPosition)
+            => new Vector2(
+                (float)Interpolation.DampContinuously(oldPosition.X, newPosition.X, 25, Clock.ElapsedFrameTime),
+                (float)Interpolation.DampContinuously(oldPosition.Y, newPosition.Y, 25, Clock.ElapsedFrameTime)
+            );
     }
 }
