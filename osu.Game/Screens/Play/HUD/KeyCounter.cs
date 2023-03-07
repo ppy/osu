@@ -12,20 +12,34 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract partial class KeyCounter : Container
     {
+        /// <summary>
+        /// The <see cref="InputTrigger"/> which activates and deactivates this <see cref="KeyCounter"/>.
+        /// </summary>
         public readonly InputTrigger Trigger;
 
-        private readonly Container content;
-
-        protected override Container<Drawable> Content => content;
+        /// <summary>
+        /// Whether the actions reported by <see cref="Trigger"/> should be counted.
+        /// </summary>
+        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
         private readonly Bindable<int> countPresses = new BindableInt
         {
             MinValue = 0
         };
 
-        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
-
+        /// <summary>
+        /// The current count of registered key presses.
+        /// </summary>
         public IBindable<int> CountPresses => countPresses;
+
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
+        /// <summary>
+        /// Whether this <see cref="KeyCounter"/> is currently in the "activated" state because the associated key is currently pressed.
+        /// </summary>
+        protected readonly Bindable<bool> IsActive = new BindableBool();
 
         protected KeyCounter(InputTrigger trigger)
         {
@@ -43,8 +57,6 @@ namespace osu.Game.Screens.Play.HUD
 
             Name = trigger.Name;
         }
-
-        protected readonly Bindable<bool> IsActive = new BindableBool();
 
         private void increment()
         {
