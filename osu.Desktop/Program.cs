@@ -117,7 +117,7 @@ namespace osu.Desktop
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
-                    host.Run(new OsuGameDesktop(args));
+                    host.Run(new OsuGameDesktop(cwd, args));
             }
         }
 

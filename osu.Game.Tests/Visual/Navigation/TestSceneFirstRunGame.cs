@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private partial class FirstRunGame : TestOsuGame
         {
-            public FirstRunGame(Storage storage, IAPIProvider api, string[] args = null)
-                : base(storage, api, args)
+            public FirstRunGame(Storage storage, IAPIProvider api, string cwd = null, string[] args = null)
+                : base(storage, api, cwd, args)
             {
             }
 

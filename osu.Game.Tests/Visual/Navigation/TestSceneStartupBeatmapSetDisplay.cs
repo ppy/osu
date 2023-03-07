@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private const int requested_beatmap_set_id = 1;
 
-        protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, new[] { $"osu://s/{requested_beatmap_set_id}" });
+        protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, args: new[] { $"osu://s/{requested_beatmap_set_id}" });
 
         [SetUp]
         public void Setup() => Schedule(() =>

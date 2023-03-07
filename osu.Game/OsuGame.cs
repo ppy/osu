@@ -188,6 +188,7 @@ namespace osu.Game
 
         private Bindable<string> configSkin;
 
+        private readonly string cwd;
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -195,10 +196,10 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
-        public OsuGame(string[] args = null)
+        public OsuGame(string cwd = null, string[] args = null)
         {
+            this.cwd = cwd;
             this.args = args;
-
             forwardGeneralLogsToNotifications();
             forwardTabletLogsToNotifications();
 
@@ -1031,7 +1032,7 @@ namespace osu.Game
             };
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
-            HandleCommandLineArgs(Environment.CurrentDirectory, args);
+            HandleCommandLineArgs(cwd, args);
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)

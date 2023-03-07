@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private string? importFilename;
 
-        protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, new[] { importFilename });
+        protected override TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API, args: new[] { importFilename });
 
         public override void SetUpSteps()
         {
