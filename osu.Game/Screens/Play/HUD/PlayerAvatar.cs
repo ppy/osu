@@ -23,9 +23,6 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 0.01f
         };
 
-        [Resolved]
-        private GameplayState gameplayState { get; set; } = null!;
-
         private readonly UpdateableAvatar avatar;
 
         private const float default_size = 80f;
@@ -41,11 +38,16 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(GameplayState gameplayState)
+        {
+            avatar.User = gameplayState.Score.ScoreInfo.User;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            avatar.User = gameplayState.Score.ScoreInfo.User;
             CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue * default_size, true);
         }
 
