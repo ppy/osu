@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -26,12 +27,13 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private HeadlessGameHost ipcSenderHost = null!;
 
-        private OsuSchemeLinkIPCChannel osuSchemeLinkIPCSender = null!;
-        private ArchiveImportIPCChannel archiveImportIPCSender = null!;
+        private OsuInstanceIPCChannel osuInstanceIPCSender = null!;
 
         private const int requested_beatmap_set_id = 1;
 
-        protected override TestOsuGame CreateTestGame() => new IpcGame(LocalStorage, API);
+        private readonly string cwd = Environment.CurrentDirectory;
+
+        protected override TestOsuGame CreateTestGame() => new IpcGame(LocalStorage, API, cwd);
 
         [Resolved]
         private GameHost gameHost { get; set; } = null!;
@@ -64,15 +66,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("create IPC sender channels", () =>
             {
                 ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { BindIPC = true });
-                osuSchemeLinkIPCSender = new OsuSchemeLinkIPCChannel(ipcSenderHost);
-                archiveImportIPCSender = new ArchiveImportIPCChannel(ipcSenderHost);
+                osuInstanceIPCSender = new OsuInstanceIPCChannel(ipcSenderHost);
             });
         }
 
         [Test]
         public void TestOsuSchemeLinkIPCChannel()
         {
-            AddStep("open beatmap via IPC", () => osuSchemeLinkIPCSender.HandleLinkAsync($@"osu://s/{requested_beatmap_set_id}").WaitSafely());
+            AddStep("open beatmap via IPC", () => osuInstanceIPCSender.SendAsync(cwd, new[] { $@"osu://s/{requested_beatmap_set_id}" }).WaitSafely());
             AddUntilStep("beatmap overlay displayed", () => Game.ChildrenOfType<BeatmapSetOverlay>().FirstOrDefault()?.State.Value == Visibility.Visible);
             AddUntilStep("beatmap overlay showing content", () => Game.ChildrenOfType<BeatmapSetOverlay>().FirstOrDefault()?.Header.BeatmapSet.Value.OnlineID == requested_beatmap_set_id);
         }
@@ -82,7 +83,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             string? beatmapFilepath = null;
 
-            AddStep("import beatmap via IPC", () => archiveImportIPCSender.ImportAsync(beatmapFilepath = TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            AddStep("import beatmap via IPC", () => osuInstanceIPCSender.SendAsync(cwd, new[] { beatmapFilepath = TestResources.GetQuickTestBeatmapForImport() }).WaitSafely());
             AddUntilStep("import complete notification was presented", () => Game.Notifications.ChildrenOfType<ProgressCompletionNotification>().Count(), () => Is.EqualTo(1));
             AddAssert("original file deleted", () => File.Exists(beatmapFilepath), () => Is.False);
         }
@@ -91,8 +92,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("dispose IPC senders", () =>
             {
-                osuSchemeLinkIPCSender.Dispose();
-                archiveImportIPCSender.Dispose();
+                osuInstanceIPCSender.Dispose();
                 ipcSenderHost.Dispose();
             });
             base.TearDownSteps();
@@ -100,26 +100,23 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private partial class IpcGame : TestOsuGame
         {
-            private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
-            private ArchiveImportIPCChannel? archiveImportIPCChannel;
+            private OsuInstanceIPCChannel? osuInstanceIPCChannel;
 
-            public IpcGame(Storage storage, IAPIProvider api, string[]? args = null)
-                : base(storage, api, args)
+            public IpcGame(Storage storage, IAPIProvider api, string cwd, string[]? args = null)
+                : base(storage, api, cwd, args)
             {
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
-                archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
+                osuInstanceIPCChannel = new OsuInstanceIPCChannel(Host);
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
-                osuSchemeLinkIPCChannel?.Dispose();
-                archiveImportIPCChannel?.Dispose();
+                osuInstanceIPCChannel?.Dispose();
             }
         }
     }
