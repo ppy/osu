@@ -25,16 +25,6 @@ namespace osu.Game.Screens.Play
 
         public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
-        public IReadOnlyList<InputTrigger> Triggers
-        {
-            get => Children.Select(c => c.Trigger).ToArray();
-            set
-            {
-                Clear();
-                value.ForEach(AddTrigger);
-            }
-        }
-
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
         protected abstract void UpdateVisibility();
@@ -60,16 +50,16 @@ namespace osu.Game.Screens.Play
 
         public void AddTriggerRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(AddTrigger);
 
-        private bool checkType(KeyCounter key) => acceptedTypes.Length == 0 || acceptedTypes.Any(t => t.IsInstanceOfType(key));
-
-        public override void Add(KeyCounter key)
+        public override void Add(KeyCounter counter)
         {
-            if (!checkType(key))
-                throw new InvalidOperationException($"{key.GetType()} is not a supported counter type. (hint: you may want to use {nameof(AddTrigger)} instead.)");
+            if (!checkType(counter))
+                throw new InvalidOperationException($"{counter.GetType()} is not a supported counter type. (hint: you may want to use {nameof(AddTrigger)} instead.)");
 
-            base.Add(key);
-            key.IsCounting.BindTo(IsCounting);
+            base.Add(counter);
+            counter.IsCounting.BindTo(IsCounting);
         }
+
+        private bool checkType(KeyCounter counter) => acceptedTypes.Length == 0 || acceptedTypes.Any(t => t.IsInstanceOfType(counter));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -110,7 +100,7 @@ namespace osu.Game.Screens.Play
                     case KeyUpEvent:
                     case MouseDownEvent:
                     case MouseUpEvent:
-                        return Target.Children.Any(c => c.TriggerEvent(e));
+                        return Target.InternalChildren.Any(c => c.TriggerEvent(e));
                 }
 
                 return base.Handle(e);
