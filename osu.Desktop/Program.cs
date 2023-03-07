@@ -124,12 +124,12 @@ namespace osu.Desktop
         private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
         {
             var osuInstanceHandler = new OsuInstanceIPCChannel(host);
-            Task<bool?> instanceTask = osuInstanceHandler.InstanceAsync(cwd, args);
+            Task<bool?> messageAndResponseTask = osuInstanceHandler.SendAsync(cwd, args);
 
-            if (!instanceTask.Wait(3000))
+            if (!messageAndResponseTask.Wait(3000))
                 throw new IPCTimeoutException(osuInstanceHandler.GetType());
 
-            return instanceTask.GetResultSafely() ?? false;
+            return messageAndResponseTask.GetResultSafely() ?? false;
         }
 
         [SupportedOSPlatform("windows")]

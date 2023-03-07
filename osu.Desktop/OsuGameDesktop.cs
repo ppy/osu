@@ -131,7 +131,7 @@ namespace osu.Desktop
                 if (handled || (msg.Args?.Length == 0 && !DebugUtils.IsDebugBuild))
                     Window?.Raise();
 
-                return new OsuInstanceIPCMessage { Handled = handled };
+                return new OsuInstanceIPCMessage(handled);
             };
         }
 

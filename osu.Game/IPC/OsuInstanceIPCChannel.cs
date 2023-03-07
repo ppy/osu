@@ -13,17 +13,30 @@ namespace osu.Game.IPC
         {
         }
 
-        public async Task<bool?> InstanceAsync(string cwd, string[] args)
+        public async Task<bool?> SendAsync(string cwd, string[] args)
         {
-            OsuInstanceIPCMessage? response = await SendMessageWithResponseAsync(new OsuInstanceIPCMessage { Cwd = cwd, Args = args }).ConfigureAwait(false);
+            OsuInstanceIPCMessage? response = await SendMessageWithResponseAsync(new OsuInstanceIPCMessage(cwd, args)).ConfigureAwait(false);
             return response?.Handled;
         }
     }
 
     public class OsuInstanceIPCMessage
     {
-        public string Cwd = "";
-        public string[]? Args;
-        public bool Handled;
+        public readonly string Cwd;
+        public readonly string[] Args;
+        public readonly bool Handled;
+
+        public OsuInstanceIPCMessage(string cwd, string[] args)
+        {
+            Cwd = cwd;
+            Args = args;
+        }
+
+        public OsuInstanceIPCMessage(bool handled)
+        {
+            Cwd = null!;
+            Args = null!;
+            Handled = handled;
+        }
     }
 }
