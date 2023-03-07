@@ -12,9 +12,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class PlayerFlag : CompositeDrawable, ISerialisableDrawable
     {
-        [Resolved]
-        private GameplayState gameplayState { get; set; } = null!;
-
         private readonly UpdateableFlag flag;
 
         private const float default_size = 40f;
@@ -28,10 +25,9 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(GameplayState gameplayState)
         {
-            base.LoadComplete();
-
             flag.CountryCode = gameplayState.Score.ScoreInfo.User.CountryCode;
         }
 
