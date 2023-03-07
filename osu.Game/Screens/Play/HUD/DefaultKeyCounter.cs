@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public partial class DefaultKeyCounter : KeyCounter
     {

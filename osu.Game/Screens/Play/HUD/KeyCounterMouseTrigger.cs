@@ -4,10 +4,10 @@
 #nullable disable
 
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osuTK;
+using osuTK.Input;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public partial class KeyCounterMouseTrigger : InputTrigger
     {

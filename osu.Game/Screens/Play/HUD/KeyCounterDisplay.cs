@@ -13,7 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osuTK;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class KeyCounterDisplay : Container<KeyCounter>
     {

@@ -6,7 +6,7 @@
 using osu.Framework.Input.Events;
 using osuTK.Input;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public partial class KeyCounterKeyboardTrigger : InputTrigger
     {

@@ -3,10 +3,11 @@
 
 #nullable disable
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
