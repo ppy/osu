@@ -40,9 +40,9 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString TextElementTextDescription => new TranslatableString(getKey(@"text_element_text_description"), "The text to be displayed.");
 
         /// <summary>
-        /// "Corner Radius"
+        /// "Corner radius"
         /// </summary>
-        public static LocalisableString CornerRadius => new TranslatableString(getKey(@"corner_radius"), "Corner Radius");
+        public static LocalisableString CornerRadius => new TranslatableString(getKey(@"corner_radius"), "Corner radius");
 
         /// <summary>
         /// "How rounded the corners should be."
