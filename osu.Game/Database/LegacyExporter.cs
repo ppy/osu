@@ -58,20 +58,15 @@ namespace osu.Game.Database
         {
             string itemFilename = GetFilename(item).GetValidFilename();
 
+            if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
+                itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
+
             IEnumerable<string> existingExports =
                 exportStorage
                     .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
                     .Concat(exportStorage.GetDirectories(string.Empty));
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-
-            if (filename.Length > MAX_FILENAME_LENGTH)
-            {
-                string filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
-
-                filenameWithoutExtension = filenameWithoutExtension.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
-                filename = $"{filenameWithoutExtension}{FileExtension}";
-            }
 
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
