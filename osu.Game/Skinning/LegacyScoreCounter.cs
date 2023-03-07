@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public partial class LegacyScoreCounter : GameplayScoreCounter, ISkinnableDrawable
+    public partial class LegacyScoreCounter : GameplayScoreCounter, ISerialisableDrawable
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;

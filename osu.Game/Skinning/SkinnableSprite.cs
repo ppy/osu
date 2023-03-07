@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skinnable element which uses a single texture backing.
     /// </summary>
-    public partial class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
+    public partial class SkinnableSprite : SkinnableDrawable, ISerialisableDrawable
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
