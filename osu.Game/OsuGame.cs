@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1035,6 +1036,29 @@ namespace osu.Game
             HandleCommandLineArgs(cwd, args);
         }
 
+        protected bool HandleCommandLineArgs(string cwd, [CanBeNull] string[] args)
+        {
+            // return true if a link was opened or if any files have been queued for import (regardless of the success of the import)
+            if (args?.Length > 0)
+            {
+                string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
+
+                if (paths.Length > 0)
+                {
+                    if (paths.Length == 1 && paths[0].StartsWith(OSU_PROTOCOL, StringComparison.Ordinal)) HandleLink(paths[0]);
+                    else
+                    {
+                        paths = paths.Where(a => a.Contains('.')).Select(a => Path.GetFullPath(a, cwd)).ToArray();
+                        Task.Run(() => Import(paths));
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
@@ -1402,23 +1426,5 @@ namespace osu.Game
         }
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
-
-        protected bool HandleCommandLineArgs(string cwd, [CanBeNull] string[] args)
-        {
-            // return true if a link was opened or if any files have been queued for import (regardless of the success of the import)
-            if (args?.Length == 1 && args[0].StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-            {
-                HandleLink(args[0]);
-                return true;
-            }
-
-            if (args?.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
-            {
-                Task.Run(() => Import(args));
-                return true;
-            }
-
-            return false;
-        }
     }
 }
