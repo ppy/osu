@@ -43,6 +43,18 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.Groups.Count, Is.EqualTo(2));
             Assert.That(cpi.TimingPoints.Count, Is.EqualTo(2));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(2));
+
+            cpi.Add(1200, new TimingControlPoint { OmitFirstBarLine = true }); // is not redundant
+
+            Assert.That(cpi.Groups.Count, Is.EqualTo(3));
+            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(3));
+            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(3));
+
+            cpi.Add(1500, new TimingControlPoint { OmitFirstBarLine = true }); // is not redundant
+
+            Assert.That(cpi.Groups.Count, Is.EqualTo(4));
+            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(4));
+            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(4));
         }
 
         [Test]
@@ -95,12 +107,12 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.EffectPoints.Count, Is.EqualTo(0));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(0));
 
-            cpi.Add(1000, new EffectControlPoint { KiaiMode = true, OmitFirstBarLine = true }); // is not redundant
-            cpi.Add(1400, new EffectControlPoint { KiaiMode = true, OmitFirstBarLine = true }); // same settings, but is not redundant
+            cpi.Add(1000, new EffectControlPoint { KiaiMode = true }); // is not redundant
+            cpi.Add(1400, new EffectControlPoint { KiaiMode = true }); // is redundant
 
-            Assert.That(cpi.Groups.Count, Is.EqualTo(2));
-            Assert.That(cpi.EffectPoints.Count, Is.EqualTo(2));
-            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(2));
+            Assert.That(cpi.Groups.Count, Is.EqualTo(1));
+            Assert.That(cpi.EffectPoints.Count, Is.EqualTo(1));
+            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(1));
         }
 
         [Test]
