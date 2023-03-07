@@ -15,6 +15,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    /// <summary>
+    /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
+    /// </summary>
     public abstract partial class KeyCounterDisplay : Container<KeyCounter>
     {
         /// <summary>

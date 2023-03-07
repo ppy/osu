@@ -7,6 +7,9 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    /// <summary>
+    /// An individual key display which is intended to be displayed within a <see cref="KeyCounterDisplay"/>.
+    /// </summary>
     public abstract partial class KeyCounter : Container
     {
         public readonly InputTrigger Trigger;
