@@ -45,14 +45,9 @@ namespace osu.Game.Localisation
         public static LocalisableString CurrentlyEditing => new TranslatableString(getKey(@"currently_editing"), @"Currently editing");
 
         /// <summary>
-        /// "Revert to default."
+        /// "All layout elements for layers in the current screen will be reset to defaults."
         /// </summary>
-        public static LocalisableString RevertToDefaultDescription => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default.");
-
-        /// <summary>
-        /// "Return the skin to its default state"
-        /// </summary>
-        public static LocalisableString ResetDialogue => new TranslatableString(getKey(@"return_the_skin_to_its"), @"Return the skin to its default state");
+        public static LocalisableString RevertToDefaultDescription => new TranslatableString(getKey(@"revert_to_default_description"), @"All layout elements for layers in the current screen will be reset to defaults.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
