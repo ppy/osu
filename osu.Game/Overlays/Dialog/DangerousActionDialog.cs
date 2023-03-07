@@ -8,10 +8,14 @@ using osu.Game.Localisation;
 namespace osu.Game.Overlays.Dialog
 {
     /// <summary>
-    /// Base class for various confirmation dialogs that concern deletion actions.
+    /// A dialog which provides confirmation for actions which result in permanent consequences.
     /// Differs from <see cref="ConfirmDialog"/> in that the confirmation button is a "dangerous" one
     /// (requires the confirm button to be held).
     /// </summary>
+    /// <remarks>
+    /// The default implementation comes with text for a generic deletion operation.
+    /// This can be further customised by specifying custom <see cref="PopupDialog.HeaderText"/>.
+    /// </remarks>
     public abstract partial class DangerousActionDialog : PopupDialog
     {
         /// <summary>
