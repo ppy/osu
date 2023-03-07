@@ -26,6 +26,11 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
+            Filtered.Value = !checkMatch(criteria);
+        }
+
+        private bool checkMatch(FilterCriteria criteria)
+        {
             bool match =
                 criteria.Ruleset == null ||
                 BeatmapInfo.Ruleset.ShortName == criteria.Ruleset.ShortName ||
@@ -34,8 +39,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
                 // only check ruleset equality or convertability for selected beatmap
-                Filtered.Value = !match;
-                return;
+                return match;
             }
 
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating);
@@ -49,11 +53,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(BeatmapInfo.BeatDivisor);
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(BeatmapInfo.Status);
 
-            if (!match)
-            {
-                Filtered.Value = !match;
-                return;
-            }
+            if (!match) return false;
 
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
@@ -61,11 +61,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
-            if (!match)
-            {
-                Filtered.Value = !match;
-                return;
-            }
+            if (!match) return false;
 
             if (criteria.SearchTerms.Length > 0)
             {
@@ -99,18 +95,14 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             }
 
-            if (!match)
-            {
-                Filtered.Value = !match;
-                return;
-            }
+            if (!match) return false;
 
             match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
 
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo);
 
-            Filtered.Value = !match;
+            return match;
         }
 
         public override int CompareTo(FilterCriteria criteria, CarouselItem other)
