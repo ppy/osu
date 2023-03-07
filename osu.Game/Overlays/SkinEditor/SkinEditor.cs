@@ -309,7 +309,8 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.Dispose();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
-            content?.Clear();
+            if (content?.Child is SkinBlueprintContainer)
+                content.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
@@ -328,17 +329,18 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
 
-            if (target.NewValue == null)
-                return;
+            componentsSidebar.Clear();
+            SelectedComponents.Clear();
 
             Debug.Assert(content != null);
 
-            SelectedComponents.Clear();
-
             var skinComponentsContainer = getTarget(target.NewValue);
 
-            if (skinComponentsContainer == null)
+            if (target.NewValue == null || skinComponentsContainer == null)
+            {
+                content.Child = new NonSkinnableScreenPlaceholder();
                 return;
+            }
 
             changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
@@ -561,7 +563,50 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.BeginChange();
 
             foreach (var item in items)
-                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item, true);
+
+            changeHandler?.EndChange();
+        }
+
+        public void BringSelectionToFront()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            changeHandler?.BeginChange();
+
+            // Iterating by target components order ensures we maintain the same order across selected components, regardless
+            // of the order they were selected in.
+            foreach (var d in target.Components.ToArray())
+            {
+                if (!SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+
+                // Selection would be reset by the remove.
+                SelectedComponents.Add(d);
+                target.Add(d);
+            }
+
+            changeHandler?.EndChange();
+        }
+
+        public void SendSelectionToBack()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            changeHandler?.BeginChange();
+
+            foreach (var d in target.Components.ToArray())
+            {
+                if (SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+                target.Add(d);
+            }
 
             changeHandler?.EndChange();
         }
