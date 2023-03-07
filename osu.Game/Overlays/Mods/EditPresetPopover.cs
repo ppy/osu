@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly LabelledTextBox nameTextBox;
         private readonly LabelledTextBox descriptionTextBox;
-        private readonly LabelledSwitchButton useCurrentSwitch;
+        private readonly ShearedButton useCurrentModButton;
         private readonly ShearedButton createButton;
 
         [Resolved]
@@ -42,6 +42,7 @@ namespace osu.Game.Overlays.Mods
                 Width = 300,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(7),
+                Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
                     nameTextBox = new LabelledTextBox
@@ -58,18 +59,30 @@ namespace osu.Game.Overlays.Mods
                         Label = CommonStrings.Description,
                         TabbableContentContainer = this
                     },
-                    useCurrentSwitch = new LabelledSwitchButton
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Label = "Use Current Mod select",
-                    },
-                    createButton = new ShearedButton
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = CommonStrings.MenuBarEdit,
-                        Action = tryEditPreset
+                        Direction = FillDirection.Horizontal,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(7),
+                        Children = new Drawable[]
+                        {
+                            useCurrentModButton = new ShearedButton
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = "Use Current Mods",
+                                Action = trySaveCurrentMod
+                            },
+                            createButton = new ShearedButton
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
+                                Action = tryEditPreset
+                            },
+                        }
                     }
                 }
             };
@@ -84,28 +97,24 @@ namespace osu.Game.Overlays.Mods
             nameTextBox.Current.Value = preset.Name;
             descriptionTextBox.Current.Value = preset.Description;
 
-            selectedMods.BindValueChanged(_ => updateMods(), true);
-
             createButton.DarkerColour = colours.Orange1;
             createButton.LighterColour = colours.Orange0;
             createButton.TextColour = colourProvider.Background6;
+
+            useCurrentModButton.DarkerColour = colours.Blue1;
+            useCurrentModButton.LighterColour = colours.Blue0;
+            useCurrentModButton.TextColour = colourProvider.Background6;
         }
 
-        private void updateMods()
+        private void trySaveCurrentMod()
         {
-            useCurrentSwitch.Current.Disabled = false;
+            if (button.Active.Value || !selectedMods.Value.Any())
+                return;
 
-            // disable the switch when mod is equal.
-            if (button.Active.Value)
+            button.Preset.PerformWrite(s =>
             {
-                useCurrentSwitch.Current.Value = true;
-                useCurrentSwitch.Current.Disabled = true;
-            }
-            else
-            {
-                useCurrentSwitch.Current.Value = false;
-                useCurrentSwitch.Current.Disabled = !selectedMods.Value.Any();
-            }
+                s.Mods = selectedMods.Value.ToArray();
+            });
         }
 
         protected override void LoadComplete()
@@ -127,11 +136,6 @@ namespace osu.Game.Overlays.Mods
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
-
-                if (useCurrentSwitch.Current.Value)
-                {
-                    s.Mods = selectedMods.Value.ToArray();
-                }
             });
 
             this.HidePopover();
