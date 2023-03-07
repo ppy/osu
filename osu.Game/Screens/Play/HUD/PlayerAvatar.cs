@@ -28,9 +28,12 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly UpdateableAvatar avatar;
 
+        private const float default_size = 80f;
+
         public PlayerAvatar()
         {
-            Size = new Vector2(128f);
+            Size = new Vector2(default_size);
+
             InternalChild = avatar = new UpdateableAvatar(isInteractive: false)
             {
                 RelativeSizeAxes = Axes.Both,
@@ -43,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             avatar.User = gameplayState.Score.ScoreInfo.User;
-            CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue * 128f, true);
+            CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue * default_size, true);
         }
 
         public bool UsesFixedAnchor { get; set; }
