@@ -165,6 +165,10 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="source">The mod to copy properties from.</param>
         internal void CopySharedSettings(Mod source)
         {
+            const string min_value = nameof(BindableNumber<int>.MinValue);
+            const string max_value = nameof(BindableNumber<int>.MaxValue);
+            const string value = nameof(Bindable<int>.Value);
+
             Dictionary<string, object> oldSettings = new Dictionary<string, object>();
 
             foreach (var (_, property) in source.GetSettingsSourceProperties())
@@ -190,27 +194,47 @@ namespace osu.Game.Rulesets.Mods
                 {
                     if (getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
                         getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single())
+                    {
                         // change settings only if the type is the same
-                        CopyAdjustedSetting((IBindable)targetSetting, sourceSetting);
+                        setValue(targetSetting, value, getValue(sourceSetting, value));
+                    }
 
                     continue;
                 }
 
-                double targetMin = getValue(targetSetting, nameof(IBindableNumber<int>.MinValue));
-                double targetMax = getValue(targetSetting, nameof(IBindableNumber<int>.MaxValue));
-                double sourceMin = getValue(sourceSetting, nameof(IBindableNumber<int>.MinValue));
-                double sourceMax = getValue(sourceSetting, nameof(IBindableNumber<int>.MaxValue));
-                double sourceValue = getValue(sourceSetting, nameof(IBindableNumber<int>.Value));
+                Type targetGenericType = targetType.GenericTypeArguments.Single();
+                Type sourceGenericType = sourceType.GenericTypeArguments.Single();
+
+                double allowedMin = Math.Max(
+                    Convert.ToDouble(targetGenericType.GetField("MinValue")!.GetValue(null)),
+                    Convert.ToDouble(sourceGenericType.GetField("MinValue")!.GetValue(null))
+                );
+
+                double allowedMax = Math.Min(
+                    Convert.ToDouble(targetGenericType.GetField("MaxValue")!.GetValue(null)),
+                    Convert.ToDouble(sourceGenericType.GetField("MaxValue")!.GetValue(null))
+                );
+
+                double targetMin = getValueDouble(targetSetting, min_value);
+                double targetMax = getValueDouble(targetSetting, max_value);
+                double sourceMin = getValueDouble(sourceSetting, min_value);
+                double sourceMax = getValueDouble(sourceSetting, max_value);
+                double sourceValue = getValueDouble(sourceSetting, value);
 
                 // convert value to same ratio
                 double targetValue = (sourceValue - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
 
-                targetType.GetProperty(nameof(IBindableNumber<int>.Value))!.SetValue(targetSetting,
-                    Convert.ChangeType(targetValue, targetType.GenericTypeArguments.Single()));
+                setValue(targetSetting, value, Convert.ChangeType(targetValue, targetType.GenericTypeArguments.Single()));
+
+                double getValueDouble(object target, string name) =>
+                    Math.Clamp(Convert.ToDouble(getValue(target, name)!), allowedMin, allowedMax);
             }
 
-            double getValue(object target, string name) =>
-                Convert.ToDouble(target.GetType().GetProperty(name)!.GetValue(target)!);
+            object? getValue(object target, string name) =>
+                target.GetType().GetProperty(name)!.GetValue(target);
+
+            void setValue(object target, string name, object? newValue) =>
+                target.GetType().GetProperty(name)!.SetValue(target, newValue);
 
             Type? getGenericBaseType(object target, Type genericType) =>
                 target.GetType().GetTypeInheritance().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
