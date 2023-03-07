@@ -21,7 +21,6 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
 using osuTK;
