@@ -634,8 +634,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             public RevertConfirmDialog(Action revert)
             {
-                HeaderText = SkinEditorStrings.RevertToDefaultDescription;
-                BodyText = SkinEditorStrings.ResetDialogue;
+                HeaderText = CommonStrings.RevertToDefault;
+                BodyText = SkinEditorStrings.RevertToDefaultDescription;
                 DangerousAction = revert;
             }
         }
