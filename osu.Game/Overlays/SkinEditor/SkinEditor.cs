@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -24,6 +25,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
@@ -97,6 +99,9 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         public SkinEditor()
         {
         }
@@ -147,8 +152,8 @@ namespace osu.Game.Overlays.SkinEditor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
@@ -667,6 +672,16 @@ namespace osu.Game.Overlays.SkinEditor
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
             {
+            }
+        }
+
+        public partial class RevertConfirmDialog : DangerousActionDialog
+        {
+            public RevertConfirmDialog(Action revert)
+            {
+                HeaderText = CommonStrings.RevertToDefault;
+                BodyText = SkinEditorStrings.RevertToDefaultDescription;
+                DangerousAction = revert;
             }
         }
 
