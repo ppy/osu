@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public partial class KeyCounterActionTrigger<T> : InputTrigger
         where T : struct

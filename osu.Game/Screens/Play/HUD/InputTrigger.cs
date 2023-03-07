@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class InputTrigger : Component
     {
