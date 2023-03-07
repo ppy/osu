@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -21,14 +20,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Triggers = new InputTrigger[]
-                {
-                    new KeyCounterKeyboardTrigger(Key.X),
-                    new KeyCounterKeyboardTrigger(Key.X),
-                    new KeyCounterMouseTrigger(MouseButton.Left),
-                    new KeyCounterMouseTrigger(MouseButton.Right),
-                }
             };
+
+            kc.AddTriggerRange(new InputTrigger[]
+            {
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterMouseTrigger(MouseButton.Left),
+                new KeyCounterMouseTrigger(MouseButton.Right),
+            });
 
             var testCounter = (DefaultKeyCounter)kc.Children.First();
 
