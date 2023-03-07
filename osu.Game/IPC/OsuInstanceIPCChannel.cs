@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using osu.Framework.Platform;
 
 namespace osu.Game.IPC
@@ -26,6 +27,7 @@ namespace osu.Game.IPC
         public readonly string[] Args;
         public readonly bool Handled;
 
+        [JsonConstructor]
         public OsuInstanceIPCMessage(string cwd, string[] args)
         {
             Cwd = cwd;

@@ -111,6 +111,11 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 base.LoadComplete();
                 osuInstanceIPCChannel = new OsuInstanceIPCChannel(Host);
+                osuInstanceIPCChannel.MessageReceived += msg =>
+                {
+                    bool handled = HandleCommandLineArgs(msg.Cwd, msg.Args);
+                    return new OsuInstanceIPCMessage(handled);
+                };
             }
 
             protected override void Dispose(bool isDisposing)
