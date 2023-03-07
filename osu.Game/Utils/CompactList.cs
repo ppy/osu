@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Utils;
 
 namespace osu.Game.Utils
@@ -44,9 +44,12 @@ namespace osu.Game.Utils
         /// <param name="count">The amount of times <paramref name="value"/> is added to the list.</param>
         public void Add(double value, int count = 1)
         {
-            if (items.LastOrDefault() is Number number && Precision.AlmostEquals(number.Value, value, ACCEPTABLE_DIFFERENCE))
-                number.Count += count;
-            else if (count > 0)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            if (items.Count > 0 && Precision.AlmostEquals(items[^1].Value, value, ACCEPTABLE_DIFFERENCE))
+                items[^1] = new Number(value, items[^1].Count + count);
+            else
                 items.Add(new Number(value, count));
 
             Count += count;
@@ -70,18 +73,18 @@ namespace osu.Game.Utils
         {
             return GetEnumerator();
         }
-    }
 
-    internal class Number
-    {
-        public double Value { get; private set; }
-
-        public int Count { get; set; }
-
-        public Number(double value, int count)
+        private readonly struct Number
         {
-            Value = value;
-            Count = count;
+            public readonly double Value;
+
+            public readonly int Count;
+
+            public Number(double value, int count)
+            {
+                Value = value;
+                Count = count;
+            }
         }
     }
 }
