@@ -553,8 +553,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForColumnLoad();
 
             AddAssert("unimplemented mod panel is filtered", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value);
-
-            AddStep("disable panel filtering", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value = false);
         }
 
         [Test]
