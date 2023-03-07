@@ -17,9 +17,11 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly UpdateableFlag flag;
 
+        private const float default_size = 40f;
+
         public PlayerFlag()
         {
-            Size = new Vector2(114, 80);
+            Size = new Vector2(default_size, default_size / 1.4f);
             InternalChild = flag = new UpdateableFlag
             {
                 RelativeSizeAxes = Axes.Both,
