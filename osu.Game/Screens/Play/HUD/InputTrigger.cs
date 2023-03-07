@@ -6,6 +6,9 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    /// <summary>
+    /// An event trigger which can be used with <see cref="KeyCounter"/> to create visual tracking of button/key presses.
+    /// </summary>
     public abstract partial class InputTrigger : Component
     {
         public event Action<bool>? OnActivate;
