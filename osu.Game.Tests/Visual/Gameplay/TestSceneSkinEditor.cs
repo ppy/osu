@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osu.Game.Skinning.Components;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -50,6 +52,44 @@ namespace osu.Game.Tests.Visual.Gameplay
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
             AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
+        }
+
+        [Test]
+        public void TestCyclicSelection()
+        {
+            SkinBlueprint[] blueprints = null!;
+
+            AddStep("Add big black boxes", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
+
+            AddStep("Store black box blueprints", () =>
+            {
+                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
+            });
+
+            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+
+            AddStep("move cursor to black box", () =>
+            {
+                // Slightly offset from centre to avoid random failures (see https://github.com/ppy/osu-framework/issues/5669).
+                InputManager.MoveMouseTo(((Drawable)blueprints[0].Item).ScreenSpaceDrawQuad.Centre + new Vector2(1));
+            });
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 2", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 3", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
         }
 
         [TestCase(false)]
