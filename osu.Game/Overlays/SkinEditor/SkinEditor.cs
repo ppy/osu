@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                 Items = new[]
                                                 {
                                                     new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new ResetConfirmDialog(revert))),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
@@ -630,9 +630,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        public partial class ResetConfirmDialog : DangerousActionDialog
+        public partial class RevertConfirmDialog : DangerousActionDialog
         {
-            public ResetConfirmDialog(Action revert)
+            public RevertConfirmDialog(Action revert)
             {
                 HeaderText = SkinEditorStrings.RevertToDefaultDescription;
                 BodyText = SkinEditorStrings.ResetDialogue;
