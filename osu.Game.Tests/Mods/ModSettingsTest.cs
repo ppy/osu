@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -37,34 +38,92 @@ namespace osu.Game.Tests.Mods
         }
 
         [Test]
-        public void TestCopySharedSettingsOfDifferentType()
+        public void TestDifferentTypeSettingsKeptWhenCopied()
         {
-            const double setting_change = 2.5;
+            const double setting_change = 50.4;
 
-            var osuMod = new TestNonMatchinSettingTypeOsuMod();
-            var maniaMod = new TestNonMatchinSettingTypeManiaMod();
+            var modDouble = new TestNonMatchingSettingTypeModDouble();
+            var modBool = new TestNonMatchingSettingTypeModBool();
 
-            osuMod.TestSetting.Value = setting_change;
-            maniaMod.CopySharedSettings(osuMod);
-            osuMod.CopySharedSettings(maniaMod);
+            modDouble.TestSetting.Value = setting_change;
+            modBool.TestSetting.Value = !modBool.TestSetting.Default;
+            modDouble.CopySharedSettings(modBool);
+            modBool.CopySharedSettings(modDouble);
 
-            Assert.That(maniaMod.TestSetting.IsDefault, "Value has been changed");
-            Assert.That(osuMod.TestSetting.Value == setting_change);
+            Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
+            Assert.That(modBool.TestSetting.Value, Is.EqualTo(!modBool.TestSetting.Default));
         }
 
-        private class TestNonMatchinSettingTypeOsuMod : TestNonMatchinSettingTypeMod
+        [Test]
+        public void TestCopyDoubleToIntWithDefaultRange()
         {
-            public override string Acronym => "NMO";
-            public override BindableNumber<double> TestSetting { get; } = new BindableDouble(3.5);
+            const double setting_change = 50.4;
+
+            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { Value = setting_change } };
+            var modInt = new TestNonMatchingSettingTypeModInt();
+
+            modInt.CopySharedSettings(modDouble);
+
+            Assert.That(modInt.TestSetting.Value, Is.EqualTo((int)setting_change));
         }
 
-        private class TestNonMatchinSettingTypeManiaMod : TestNonMatchinSettingTypeMod
+        [Test]
+        public void TestCopyIntToDoubleWithDefaultRange()
         {
-            public override string Acronym => "NMM";
-            public override Bindable<bool> TestSetting { get; } = new BindableBool(true);
+            const int setting_change = 50;
+
+            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = setting_change } };
+            var modDouble = new TestNonMatchingSettingTypeModDouble();
+
+            modDouble.CopySharedSettings(modInt);
+
+            Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
         }
 
-        private abstract class TestNonMatchinSettingTypeMod : Mod
+        [Test]
+        public void TestCopyDoubleToIntWithClampedRange()
+        {
+            const double setting_change = 50.4;
+
+            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { MaxValue = 100, MinValue = 0, Value = setting_change } };
+            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { MaxValue = 200, MinValue = 0 } };
+
+            modInt.CopySharedSettings(modDouble);
+
+            Assert.That(modInt.TestSetting.Value, Is.EqualTo(Convert.ToInt32(setting_change * 2)));
+        }
+
+        [Test]
+        public void TestDefaultValueKeptWhenCopied()
+        {
+            var modBoolTrue = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = true, Value = false } };
+            var modBoolFalse = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
+
+            modBoolFalse.CopySharedSettings(modBoolTrue);
+
+            Assert.That(modBoolFalse.TestSetting.Default, Is.EqualTo(false));
+            Assert.That(modBoolFalse.TestSetting.Value, Is.EqualTo(modBoolTrue.TestSetting.Value));
+        }
+
+        private class TestNonMatchingSettingTypeModDouble : TestNonMatchingSettingTypeMod
+        {
+            public override string Acronym => "NMD";
+            public override BindableNumber<double> TestSetting { get; } = new BindableDouble();
+        }
+
+        private class TestNonMatchingSettingTypeModInt : TestNonMatchingSettingTypeMod
+        {
+            public override string Acronym => "NMI";
+            public override BindableNumber<int> TestSetting { get; } = new BindableInt();
+        }
+
+        private class TestNonMatchingSettingTypeModBool : TestNonMatchingSettingTypeMod
+        {
+            public override string Acronym => "NMB";
+            public override Bindable<bool> TestSetting { get; } = new BindableBool();
+        }
+
+        private abstract class TestNonMatchingSettingTypeMod : Mod
         {
             public override string Name => "Non-matching setting type mod";
             public override LocalisableString Description => "Description";
