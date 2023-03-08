@@ -69,6 +69,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             return base.GetDrawableComponent(lookup);
         }
 
+        private static readonly Color4 colour_special_column = new Color4(169, 106, 255, 255);
+
+        private const int total_colours = 6;
+
+        private static readonly Color4 colour_yellow = new Color4(255, 197, 40, 255);
+        private static readonly Color4 colour_orange = new Color4(252, 109, 1, 255);
+        private static readonly Color4 colour_pink = new Color4(213, 35, 90, 255);
+        private static readonly Color4 colour_purple = new Color4(203, 60, 236, 255);
+        private static readonly Color4 colour_cyan = new Color4(72, 198, 255, 255);
+        private static readonly Color4 colour_green = new Color4(100, 192, 92, 255);
+
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
@@ -92,54 +103,208 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
 
-                        Color4 colour;
-
-                        const int total_colours = 7;
-
-                        if (stage.IsSpecialColumn(column))
-                            colour = new Color4(159, 101, 255, 255);
-                        else
-                        {
-                            switch (column % total_colours)
-                            {
-                                case 0:
-                                    colour = new Color4(240, 216, 0, 255);
-                                    break;
-
-                                case 1:
-                                    colour = new Color4(240, 101, 0, 255);
-                                    break;
-
-                                case 2:
-                                    colour = new Color4(240, 0, 130, 255);
-                                    break;
-
-                                case 3:
-                                    colour = new Color4(192, 0, 240, 255);
-                                    break;
-
-                                case 4:
-                                    colour = new Color4(0, 96, 240, 255);
-                                    break;
-
-                                case 5:
-                                    colour = new Color4(0, 226, 240, 255);
-                                    break;
-
-                                case 6:
-                                    colour = new Color4(0, 240, 96, 255);
-                                    break;
-
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                        }
+                        var colour = getColourForLayout(column, stage);
 
                         return SkinUtils.As<TValue>(new Bindable<Color4>(colour));
                 }
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        private Color4 getColourForLayout(int column, StageDefinition stage)
+        {
+            // For now, these are defined per column count as per https://user-images.githubusercontent.com/50823728/218038463-b450f46c-ef21-4551-b133-f866be59970c.png
+            // See https://github.com/ppy/osu/discussions/21996 for discussion.
+            switch (stage.Columns)
+            {
+                case 1:
+                    return colour_yellow;
+
+                case 2:
+                    switch (column)
+                    {
+                        case 0: return colour_green;
+
+                        case 1: return colour_cyan;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 3:
+                    switch (column)
+                    {
+                        case 0: return colour_pink;
+
+                        case 1: return colour_purple;
+
+                        case 2: return colour_special_column;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 4:
+                    switch (column)
+                    {
+                        case 0: return colour_yellow;
+
+                        case 1: return colour_orange;
+
+                        case 2: return colour_pink;
+
+                        case 3: return colour_purple;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 5:
+                    switch (column)
+                    {
+                        case 0: return colour_pink;
+
+                        case 1: return colour_orange;
+
+                        case 2: return colour_yellow;
+
+                        case 3: return colour_green;
+
+                        case 4: return colour_cyan;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 6:
+                    switch (column)
+                    {
+                        case 0: return colour_pink;
+
+                        case 1: return colour_orange;
+
+                        case 2: return colour_yellow;
+
+                        case 3: return colour_cyan;
+
+                        case 4: return colour_purple;
+
+                        case 5: return colour_pink;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 7:
+                    switch (column)
+                    {
+                        case 0: return colour_pink;
+
+                        case 1: return colour_cyan;
+
+                        case 2: return colour_pink;
+
+                        case 3: return colour_special_column;
+
+                        case 4: return colour_green;
+
+                        case 5: return colour_cyan;
+
+                        case 6: return colour_green;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 8:
+                    switch (column)
+                    {
+                        case 0: return colour_purple;
+
+                        case 1: return colour_pink;
+
+                        case 2: return colour_orange;
+
+                        case 3: return colour_yellow;
+
+                        case 4: return colour_yellow;
+
+                        case 5: return colour_orange;
+
+                        case 6: return colour_pink;
+
+                        case 7: return colour_purple;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 9:
+                    switch (column)
+                    {
+                        case 0: return colour_purple;
+
+                        case 1: return colour_pink;
+
+                        case 2: return colour_orange;
+
+                        case 3: return colour_yellow;
+
+                        case 4: return colour_special_column;
+
+                        case 5: return colour_yellow;
+
+                        case 6: return colour_orange;
+
+                        case 7: return colour_pink;
+
+                        case 8: return colour_purple;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+
+                case 10:
+                    switch (column)
+                    {
+                        case 0: return colour_purple;
+
+                        case 1: return colour_pink;
+
+                        case 2: return colour_orange;
+
+                        case 3: return colour_yellow;
+
+                        case 4: return colour_cyan;
+
+                        case 5: return colour_green;
+
+                        case 6: return colour_yellow;
+
+                        case 7: return colour_orange;
+
+                        case 8: return colour_pink;
+
+                        case 9: return colour_purple;
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+            }
+
+            // fallback for unhandled scenarios
+
+            if (stage.IsSpecialColumn(column))
+                return colour_special_column;
+
+            switch (column % total_colours)
+            {
+                case 0: return new Color4(255, 197, 40, 255);
+
+                case 1: return new Color4(252, 109, 1, 255);
+
+                case 2: return new Color4(213, 35, 90, 255);
+
+                case 3: return new Color4(203, 60, 236, 255);
+
+                case 4: return new Color4(72, 198, 255, 255);
+
+                case 5: return new Color4(100, 192, 92, 255);
+
+                default: throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }
