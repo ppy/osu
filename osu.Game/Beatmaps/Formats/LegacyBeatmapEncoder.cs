@@ -222,6 +222,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var samplePoint = legacyControlPoints.SamplePointAt(time);
                 var effectPoint = legacyControlPoints.EffectPointAt(time);
+                var timingPoint = legacyControlPoints.TimingPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
@@ -230,10 +231,10 @@ namespace osu.Game.Beatmaps.Formats
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
                 if (effectPoint.KiaiMode)
                     effectFlags |= LegacyEffectFlags.Kiai;
-                if (effectPoint.OmitFirstBarLine)
+                if (timingPoint.OmitFirstBarLine)
                     effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
 
-                writer.Write(FormattableString.Invariant($"{legacyControlPoints.TimingPointAt(time).TimeSignature.Numerator},"));
+                writer.Write(FormattableString.Invariant($"{timingPoint.TimeSignature.Numerator},"));
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
                 writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
