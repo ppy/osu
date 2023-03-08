@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new KeyCounterMouseTrigger(MouseButton.Right),
             });
 
-            var testCounter = (DefaultKeyCounter)kc.Children.First();
+            var testCounter = (DefaultKeyCounter)kc.Counters.First();
 
             AddStep("Add random", () =>
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 kc.AddTrigger(new KeyCounterKeyboardTrigger(key));
             });
 
-            Key testKey = ((KeyCounterKeyboardTrigger)kc.Children.First().Trigger).Key;
+            Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
 
             void addPressKeyStep()
             {
