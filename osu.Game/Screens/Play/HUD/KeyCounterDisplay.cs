@@ -18,13 +18,18 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : Container<KeyCounter>
+    public abstract partial class KeyCounterDisplay : CompositeDrawable
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
         /// This is true by default, but can be changed.
         /// </summary>
         public Bindable<bool> AlwaysVisible { get; } = new Bindable<bool>(true);
+
+        /// <summary>
+        /// The <see cref="KeyCounter"/>s contained in this <see cref="KeyCounterDisplay"/>.
+        /// </summary>
+        public abstract IEnumerable<KeyCounter> Counters { get; }
 
         public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
@@ -33,13 +38,6 @@ namespace osu.Game.Screens.Play.HUD
         protected abstract void UpdateVisibility();
 
         private Receptor? receptor;
-
-        private readonly Type[] acceptedTypes;
-
-        protected KeyCounterDisplay(params Type[] acceptedTypes)
-        {
-            this.acceptedTypes = acceptedTypes;
-        }
 
         public void SetReceptor(Receptor receptor)
         {
@@ -52,17 +50,6 @@ namespace osu.Game.Screens.Play.HUD
         public abstract void AddTrigger(InputTrigger trigger);
 
         public void AddTriggerRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(AddTrigger);
-
-        public override void Add(KeyCounter counter)
-        {
-            if (!checkType(counter))
-                throw new InvalidOperationException($"{counter.GetType()} is not a supported counter type. (hint: you may want to use {nameof(AddTrigger)} instead.)");
-
-            base.Add(counter);
-            counter.IsCounting.BindTo(IsCounting);
-        }
-
-        private bool checkType(KeyCounter counter) => acceptedTypes.Length == 0 || acceptedTypes.Any(t => t.IsInstanceOfType(counter));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

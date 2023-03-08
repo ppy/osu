@@ -13,18 +13,11 @@ namespace osu.Game.Screens.Play.HUD
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        private readonly FillFlowContainer<KeyCounter> keyFlow = new FillFlowContainer<KeyCounter>();
+        private readonly FillFlowContainer<DefaultKeyCounter> keyFlow = new FillFlowContainer<DefaultKeyCounter>();
 
-        protected override Container<KeyCounter> Content => keyFlow;
-
-        public new IReadOnlyList<DefaultKeyCounter> Children
-        {
-            get => (IReadOnlyList<DefaultKeyCounter>)base.Children;
-            set => base.Children = value;
-        }
+        public override IEnumerable<KeyCounter> Counters => keyFlow;
 
         public DefaultKeyCounterDisplay()
-            : base(typeof(DefaultKeyCounter))
         {
             keyFlow.Direction = FillDirection.Horizontal;
             keyFlow.AutoSizeAxes = Axes.Both;
@@ -45,21 +38,10 @@ namespace osu.Game.Screens.Play.HUD
         public override void AddTrigger(InputTrigger trigger)
         {
             DefaultKeyCounter key = new DefaultKeyCounter(trigger);
-            Add(key);
+            keyFlow.Add(key);
             key.FadeTime = key_fade_time;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-        }
-
-        public override void Add(KeyCounter key)
-        {
-            base.Add(key);
-
-            DefaultKeyCounter defaultKey = (DefaultKeyCounter)key;
-
-            defaultKey.FadeTime = key_fade_time;
-            defaultKey.KeyDownTextColor = KeyDownTextColor;
-            defaultKey.KeyUpTextColor = KeyUpTextColor;
         }
 
         protected override void UpdateVisibility() =>
@@ -76,7 +58,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (value != keyDownTextColor)
                 {
                     keyDownTextColor = value;
-                    foreach (var child in Children)
+                    foreach (var child in keyFlow)
                         child.KeyDownTextColor = value;
                 }
             }
@@ -92,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (value != keyUpTextColor)
                 {
                     keyUpTextColor = value;
-                    foreach (var child in Children)
+                    foreach (var child in keyFlow)
                         child.KeyUpTextColor = value;
                 }
             }
