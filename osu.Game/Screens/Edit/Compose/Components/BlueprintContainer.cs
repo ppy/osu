@@ -483,7 +483,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Whether a blueprint is currently being dragged.
         /// </summary>
-        private bool isDraggingBlueprint { get; set; }
+        private bool isDraggingBlueprint;
 
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
