@@ -19,14 +19,14 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class FlatFileWorkingBeatmap : WorkingBeatmap
     {
-        private readonly Beatmap beatmap;
+        private readonly IBeatmap beatmap;
 
         public FlatFileWorkingBeatmap(string file, int? beatmapId = null)
             : this(readFromFile(file), beatmapId)
         {
         }
 
-        private FlatFileWorkingBeatmap(Beatmap beatmap, int? beatmapId = null)
+        public FlatFileWorkingBeatmap(IBeatmap beatmap, int? beatmapId = null)
             : base(beatmap.BeatmapInfo, null)
         {
             this.beatmap = beatmap;
