@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The <see cref="KeyCounter"/>s contained in this <see cref="KeyCounterDisplay"/>.
         /// </summary>
-        public abstract Container<KeyCounter> Counters { get; }
+        public abstract IEnumerable<KeyCounter> Counters { get; }
 
         /// <summary>
         /// Whether the actions reported by all <see cref="InputTrigger"/>s within this <see cref="KeyCounterDisplay"/> should be counted.

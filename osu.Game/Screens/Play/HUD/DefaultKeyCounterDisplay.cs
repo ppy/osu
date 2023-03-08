@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
@@ -12,9 +13,9 @@ namespace osu.Game.Screens.Play.HUD
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        private readonly FillFlowContainer<KeyCounter> keyFlow = new FillFlowContainer<KeyCounter>();
+        private readonly FillFlowContainer<DefaultKeyCounter> keyFlow = new FillFlowContainer<DefaultKeyCounter>();
 
-        public override Container<KeyCounter> Counters => keyFlow;
+        public override IEnumerable<KeyCounter> Counters => keyFlow;
 
         public DefaultKeyCounterDisplay()
         {
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     keyDownTextColor = value;
                     foreach (var child in keyFlow)
-                        ((DefaultKeyCounter)child).KeyDownTextColor = value;
+                        child.KeyDownTextColor = value;
                 }
             }
         }
@@ -74,7 +75,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     keyUpTextColor = value;
                     foreach (var child in keyFlow)
-                        ((DefaultKeyCounter)child).KeyUpTextColor = value;
+                        child.KeyUpTextColor = value;
                 }
             }
         }
