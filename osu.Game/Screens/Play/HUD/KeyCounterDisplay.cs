@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public abstract IEnumerable<KeyCounter> Counters { get; }
 
+        /// <summary>
+        /// Whether the actions reported by all <see cref="InputTrigger"/>s within this <see cref="KeyCounterDisplay"/> should be counted.
+        /// </summary>
         public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
@@ -47,8 +50,16 @@ namespace osu.Game.Screens.Play.HUD
             this.receptor = receptor;
         }
 
+        /// <summary>
+        /// Adds a new <see cref="KeyCounter"/> to this <see cref="KeyCounterDisplay"/>.
+        /// </summary>
+        /// <param name="trigger">The <see cref="InputTrigger"/> the resulting <see cref="KeyCounter"/> will react to.</param>
         public abstract void AddTrigger(InputTrigger trigger);
 
+        /// <summary>
+        /// Adds a range of new <see cref="KeyCounter"/>s to this <see cref="KeyCounterDisplay"/>.
+        /// </summary>
+        /// <param name="triggers">The <see cref="InputTrigger"/>s the resulting <see cref="KeyCounter"/>s will react to.</param>
         public void AddTriggerRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(AddTrigger);
 
         [BackgroundDependencyLoader]
