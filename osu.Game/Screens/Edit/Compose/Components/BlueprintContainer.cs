@@ -382,52 +382,48 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a click selection was active.</returns>
         private bool endClickSelection(MouseButtonEvent e)
         {
-            if (!clickSelectionHandled && !isDraggingBlueprint)
+            // If already handled a selection or drag, we don't want to perform a mouse up / click action.
+            if (clickSelectionHandled || isDraggingBlueprint) return true;
+
+            if (e.Button != MouseButton.Left) return false;
+
+            if (e.ControlPressed)
             {
-                if (e.Button == MouseButton.Left)
-                {
-                    if (e.ControlPressed)
-                    {
-                        // if a selection didn't occur, we may want to trigger a deselection.
+                // if a selection didn't occur, we may want to trigger a deselection.
 
-                        // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
-                        // Priority is given to already-selected blueprints.
-                        foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.OrderByDescending(b => b.IsSelected))
-                        {
-                            if (!blueprint.IsHovered) continue;
-
-                            return clickSelectionHandled = SelectionHandler.MouseUpSelectionRequested(blueprint, e);
-                        }
-                    }
-                    else if (selectedBlueprintAlreadySelectedOnMouseDown && AllowCyclicSelection)
-                    {
-                        // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
-                        // cycle between other blueprints which are also under the cursor.
-
-                        // The depth of blueprints is constantly changing (see above where selected blueprints are brought to the front).
-                        // For this logic, we want a stable sort order so we can correctly cycle, thus using the blueprintMap instead.
-                        IEnumerable<SelectionBlueprint<T>> cyclingSelectionBlueprints = blueprintMap.Values;
-
-                        // If there's already a selection, let's start from the blueprint after the selection.
-                        cyclingSelectionBlueprints = cyclingSelectionBlueprints.SkipWhile(b => !b.IsSelected).Skip(1);
-
-                        // Add the blueprints from before the selection to the end of the enumerable to allow for cyclic selection.
-                        cyclingSelectionBlueprints = cyclingSelectionBlueprints.Concat(blueprintMap.Values.TakeWhile(b => !b.IsSelected));
-
-                        foreach (SelectionBlueprint<T> blueprint in cyclingSelectionBlueprints)
-                        {
-                            if (!blueprint.IsHovered) continue;
-
-                            // We are performing a mouse up, but selection handlers perform selection on mouse down, so we need to call that instead.
-                            return clickSelectionHandled = SelectionHandler.MouseDownSelectionRequested(blueprint, e);
-                        }
-                    }
-                }
+                // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
+                // Priority is given to already-selected blueprints.
+                foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.Where(b => b.IsHovered).OrderByDescending(b => b.IsSelected))
+                    return clickSelectionHandled = SelectionHandler.MouseUpSelectionRequested(blueprint, e);
 
                 return false;
             }
 
-            return true;
+            if (selectedBlueprintAlreadySelectedOnMouseDown && AllowCyclicSelection)
+            {
+                // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
+                // cycle between other blueprints which are also under the cursor.
+
+                // The depth of blueprints is constantly changing (see above where selected blueprints are brought to the front).
+                // For this logic, we want a stable sort order so we can correctly cycle, thus using the blueprintMap instead.
+                IEnumerable<SelectionBlueprint<T>> cyclingSelectionBlueprints = blueprintMap.Values;
+
+                // If there's already a selection, let's start from the blueprint after the selection.
+                cyclingSelectionBlueprints = cyclingSelectionBlueprints.SkipWhile(b => !b.IsSelected).Skip(1);
+
+                // Add the blueprints from before the selection to the end of the enumerable to allow for cyclic selection.
+                cyclingSelectionBlueprints = cyclingSelectionBlueprints.Concat(blueprintMap.Values.TakeWhile(b => !b.IsSelected));
+
+                foreach (SelectionBlueprint<T> blueprint in cyclingSelectionBlueprints)
+                {
+                    if (!blueprint.IsHovered) continue;
+
+                    // We are performing a mouse up, but selection handlers perform selection on mouse down, so we need to call that instead.
+                    return clickSelectionHandled = SelectionHandler.MouseDownSelectionRequested(blueprint, e);
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
