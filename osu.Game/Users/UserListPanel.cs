@@ -67,6 +67,7 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
+                                username.UseFullGlyphHeight = false;
                             })
                         }
                     },
@@ -111,7 +112,7 @@ namespace osu.Game.Users
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Height = 20,
+                    Height = 16,
                     SupportLevel = User.SupportLevel
                 });
             }
