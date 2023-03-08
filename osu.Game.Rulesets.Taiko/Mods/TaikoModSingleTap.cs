@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             ruleset = (DrawableTaikoRuleset)drawableRuleset;
-            ruleset.InputManager.Add(new InputInterceptor(this));
+            ruleset.KeyBindingInputManager.Add(new InputInterceptor(this));
             playfield = (TaikoPlayfield)ruleset.Playfield;
 
             var periods = new List<Period>();
