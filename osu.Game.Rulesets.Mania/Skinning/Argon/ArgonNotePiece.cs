@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 shadow = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black)
                 },
                 new Container
                 {
@@ -109,8 +110,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 accent.NewValue.Lighten(0.1f),
                 accent.NewValue
             );
-
-            shadow.Colour = accent.NewValue.Darken(0.5f);
         }
     }
 }
