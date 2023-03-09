@@ -22,6 +22,11 @@ namespace osu.Game.Overlays.Mods
 
         private readonly ModState modState;
 
+        public ModPanel(Mod mod)
+            : this(new ModState(mod))
+        {
+        }
+
         public ModPanel(ModState modState)
         {
             this.modState = modState;
@@ -37,11 +42,6 @@ namespace osu.Game.Overlays.Mods
                 Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                 Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
             };
-        }
-
-        public ModPanel(Mod mod)
-            : this(new ModState(mod))
-        {
         }
 
         [BackgroundDependencyLoader]
