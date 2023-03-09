@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (!(other is CarouselBeatmapSet otherSet))
                 return base.CompareTo(criteria, other);
 
-            int comparison = 0;
+            int comparison;
 
             switch (criteria.Sort)
             {
@@ -87,11 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.DateRanked:
-                    // Beatmaps which have no ranked date should already be filtered away in this mode.
-                    if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
-                        break;
-
-                    comparison = otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateRanked, BeatmapSet.DateRanked);
                     break;
 
                 case SortMode.LastPlayed:
@@ -111,11 +107,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.DateSubmitted:
-                    // Beatmaps which have no submitted date should already be filtered away in this mode.
-                    if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
-                        break;
-
-                    comparison = otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateSubmitted, BeatmapSet.DateSubmitted);
                     break;
             }
 
@@ -153,12 +145,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool filtered = Items.All(i => i.Filtered.Value);
-
-            filtered |= criteria.Sort == SortMode.DateRanked && BeatmapSet.DateRanked == null;
-            filtered |= criteria.Sort == SortMode.DateSubmitted && BeatmapSet.DateSubmitted == null;
-
-            Filtered.Value = filtered;
+            Filtered.Value = Items.All(i => i.Filtered.Value);
         }
 
         public override string ToString() => BeatmapSet.ToString();

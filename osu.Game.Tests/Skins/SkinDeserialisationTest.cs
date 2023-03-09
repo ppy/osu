@@ -48,7 +48,9 @@ namespace osu.Game.Tests.Skins
             // Covers BPM counter.
             "Archives/modified-default-20221205.osk",
             // Covers judgement counter.
-            "Archives/modified-default-20230117.osk"
+            "Archives/modified-default-20230117.osk",
+            // Covers player avatar and flag.
+            "Archives/modified-argon-20230305.osk",
         };
 
         /// <summary>

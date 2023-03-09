@@ -167,8 +167,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             {
                 if (bodySprite != null)
                 {
-                    bodySprite.Origin = Anchor.BottomCentre;
-                    bodySprite.Scale = new Vector2(bodySprite.Scale.X, Math.Abs(bodySprite.Scale.Y) * -1);
+                    bodySprite.Origin = Anchor.TopCentre;
+                    bodySprite.Anchor = Anchor.BottomCentre; // needs to be flipped due to scale flip in Update.
                 }
 
                 if (light != null)
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (bodySprite != null)
                 {
                     bodySprite.Origin = Anchor.TopCentre;
-                    bodySprite.Scale = new Vector2(bodySprite.Scale.X, Math.Abs(bodySprite.Scale.Y));
+                    bodySprite.Anchor = Anchor.TopCentre;
                 }
 
                 if (light != null)
@@ -211,11 +211,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             base.Update();
             missFadeTime.Value ??= holdNote.HoldBrokenTime;
 
+            int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
+
             // here we go...
             switch (bodyStyle)
             {
                 case LegacyNoteBodyStyle.Stretch:
                     // this is how lazer works by default. nothing required.
+                    if (bodySprite != null)
+                        bodySprite.Scale = new Vector2(1, scaleDirection);
                     break;
 
                 default:
@@ -228,7 +232,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, 32800 / sprite.DrawHeight);
+                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
                     }
 
                     break;
