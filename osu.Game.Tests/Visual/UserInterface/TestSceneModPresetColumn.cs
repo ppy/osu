@@ -327,6 +327,32 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("click use current mods", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddWaitStep("wait some", 3);
+            AddUntilStep("popover not closed", () => this.ChildrenOfType<OsuPopover>().Any());
+            AddAssert("present mod not changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods.Count == 1);
+
             AddStep("select mods", () => SelectedMods.Value = mods);
             AddStep("right click first panel", () =>
             {
@@ -343,14 +369,57 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            OsuPopover? popover = null;
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
             AddStep("click use current mods", () =>
             {
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("popover not closed", () => this.ChildrenOfType<OsuPopover>().Any());
+            AddWaitStep("wait some", 3);
+            AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
+            AddAssert("present mod is changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods.Count == 2);
+        }
+
+        [Test]
+        public void TestEditPresetModInContextMenu()
+        {
+            ModPresetColumn modPresetColumn = null!;
+            var mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() };
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddAssert("No Use Current Mods", () => this.ChildrenOfType<DrawableOsuMenuItem>().Count() == 2);
+
+            AddStep("select mods", () => SelectedMods.Value = mods);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddAssert("Have Use Current Mods", () => this.ChildrenOfType<DrawableOsuMenuItem>().Count() == 3);
+            AddStep("Click Use Current Mods", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
             AddAssert("present mod is changed", () => this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods.Count == 2);
         }
 
