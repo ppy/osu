@@ -45,7 +45,8 @@ namespace osu.Game.Overlays.Mods
         /// Contrary to <see cref="OsuGameBase.AvailableMods"/> and <see cref="globalAvailableMods"/>, the <see cref="Mod"/> instances
         /// inside the <see cref="ModState"/> objects are owned solely by this <see cref="ModSelectOverlay"/> instance.
         /// </remarks>
-        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
+        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } =
+            new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
         private Func<Mod, bool> isValidMod = _ => true;
 
@@ -438,7 +439,8 @@ namespace osu.Game.Overlays.Mods
                 }
             }
 
-            SelectedMods.Value = newSelection;
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = newSelection;
 
             externalSelectionUpdateInProgress = false;
         }
