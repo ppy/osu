@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -108,13 +107,10 @@ namespace osu.Game.Overlays.Mods
 
         private void trySaveCurrentMod()
         {
-            if (button.Active.Value || !selectedMods.Value.Any())
+            if (button.SaveCurrentMod())
                 return;
 
-            button.Preset.PerformWrite(s =>
-            {
-                s.Mods = selectedMods.Value.ToArray();
-            });
+            Body.Shake();
         }
 
         protected override void LoadComplete()
