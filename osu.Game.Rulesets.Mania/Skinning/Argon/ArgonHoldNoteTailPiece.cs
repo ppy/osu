@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
-        private readonly Box shadeBackground;
+        private readonly Box shadow;
         private readonly Box shadeForeground;
 
         public ArgonHoldNoteTailPiece()
@@ -27,30 +28,40 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             RelativeSizeAxes = Axes.X;
             Height = ArgonNotePiece.NOTE_HEIGHT;
 
-            CornerRadius = ArgonNotePiece.CORNER_RADIUS;
-            Masking = true;
-
             InternalChildren = new Drawable[]
             {
-                shadeBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = ArgonNotePiece.NOTE_HEIGHT,
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        shadeForeground = new Box
+                        shadow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black),
+                            // Avoid ugly single pixel overlap.
+                            Height = 0.9f,
                         },
-                    },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
+                            CornerRadius = ArgonNotePiece.CORNER_RADIUS,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                shadeForeground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            },
+                        },
+                    }
                 },
             };
         }
@@ -75,8 +86,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
         {
-            shadeBackground.Colour = accent.NewValue.Darken(1.7f);
-            shadeForeground.Colour = accent.NewValue.Darken(1.1f);
+            shadeForeground.Colour = ColourInfo.GradientVertical(
+                accent.NewValue.Darken(0.2f),
+                accent.NewValue.Darken(1.2f) // matches body
+            );
         }
     }
 }
