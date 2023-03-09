@@ -231,8 +231,14 @@ namespace osu.Game.Overlays.Mods
 
         protected override void LoadComplete()
         {
+            SelectedMods.BindValueChanged(_ => Scheduler.AddOnce(recreateContent));
+
             // this is called before base call so that the mod state is populated early, and the transition in `PopIn()` can play out properly.
-            globalAvailableMods.BindValueChanged(_ => createLocalMods(), true);
+            globalAvailableMods.BindValueChanged(_ =>
+            {
+                createLocalMods();
+                Scheduler.AddOnce(recreateContent);
+            }, true);
 
             base.LoadComplete();
 
@@ -243,21 +249,6 @@ namespace osu.Game.Overlays.Mods
             if (AllowCustomisation)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
-            SelectedMods.BindValueChanged(val =>
-            {
-                modSettingChangeTracker?.Dispose();
-
-                updateMultiplier();
-                updateFromExternalSelection();
-                updateCustomisation();
-
-                if (AllowCustomisation)
-                {
-                    modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
-                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
-                }
-            }, true);
-
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             // Start scrolled slightly to the right to give the user a sense that
@@ -267,6 +258,21 @@ namespace osu.Game.Overlays.Mods
                 columnScroll.ScrollTo(200, false);
                 columnScroll.ScrollToStart();
             });
+        }
+
+        private void recreateContent()
+        {
+            modSettingChangeTracker?.Dispose();
+
+            updateMultiplier();
+            updateFromExternalSelection();
+            updateCustomisation();
+
+            if (AllowCustomisation)
+            {
+                modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
+                modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+            }
         }
 
         /// <summary>
