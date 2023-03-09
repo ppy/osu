@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
-        private readonly Box shadow;
         private readonly Box foreground;
         private readonly Box foregroundAdditive;
 
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        shadow = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black),
