@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             // Without this, the width of the body will be slightly larger than the head/tail.
             Masking = true;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
-            Blending = BlendingParameters.Additive;
         }
 
         [BackgroundDependencyLoader(true)]
