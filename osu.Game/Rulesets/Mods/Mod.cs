@@ -169,28 +169,31 @@ namespace osu.Game.Rulesets.Mods
             const string max_value = nameof(BindableNumber<int>.MaxValue);
             const string value = nameof(Bindable<int>.Value);
 
-            Dictionary<string, object> oldSettings = new Dictionary<string, object>();
+            Dictionary<string, object> sourceSettings = new Dictionary<string, object>();
 
-            foreach (var (_, property) in source.GetSettingsSourceProperties())
+            foreach (var (_, sourceProperty) in source.GetSettingsSourceProperties())
             {
-                oldSettings.Add(property.Name.ToSnakeCase(), property.GetValue(source)!);
+                sourceSettings.Add(sourceProperty.Name.ToSnakeCase(), sourceProperty.GetValue(source)!);
             }
 
-            foreach (var (_, property) in this.GetSettingsSourceProperties())
+            foreach (var (_, targetProperty) in this.GetSettingsSourceProperties())
             {
-                object targetSetting = property.GetValue(this)!;
+                object targetSetting = targetProperty.GetValue(this)!;
 
-                if (!oldSettings.TryGetValue(property.Name.ToSnakeCase(), out object? sourceSetting))
+                if (!sourceSettings.TryGetValue(targetProperty.Name.ToSnakeCase(), out object? sourceSetting))
                     continue;
 
                 if (((IBindable)sourceSetting).IsDefault)
-                    // keep at default value if the source is default
+                {
+                    // reset to default value if the source is default
+                    targetSetting.GetType().GetMethod(nameof(Bindable<int>.SetDefault))!.Invoke(targetSetting, null);
                     continue;
+                }
 
-                Type? targetType = getGenericBaseType(targetSetting, typeof(BindableNumber<>));
-                Type? sourceType = getGenericBaseType(sourceSetting, typeof(BindableNumber<>));
+                Type? targetBindableNumberType = getGenericBaseType(targetSetting, typeof(BindableNumber<>));
+                Type? sourceBindableNumberType = getGenericBaseType(sourceSetting, typeof(BindableNumber<>));
 
-                if (targetType == null || sourceType == null)
+                if (targetBindableNumberType == null || sourceBindableNumberType == null)
                 {
                     if (getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
                         getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single())
@@ -202,8 +205,16 @@ namespace osu.Game.Rulesets.Mods
                     continue;
                 }
 
-                Type targetGenericType = targetType.GenericTypeArguments.Single();
-                Type sourceGenericType = sourceType.GenericTypeArguments.Single();
+                bool rangeOutOfBounds = false;
+
+                Type targetGenericType = targetBindableNumberType.GenericTypeArguments.Single();
+                Type sourceGenericType = sourceBindableNumberType.GenericTypeArguments.Single();
+
+                if (!Convert.ToBoolean(getValue(targetSetting, nameof(RangeConstrainedBindable<int>.HasDefinedRange))) ||
+                    !Convert.ToBoolean(getValue(sourceSetting, nameof(RangeConstrainedBindable<int>.HasDefinedRange))))
+                    // check if we have a range to rescale from and a range to rescale to
+                    // if not, copy the raw value
+                    rangeOutOfBounds = true;
 
                 double allowedMin = Math.Max(
                     Convert.ToDouble(targetGenericType.GetField("MinValue")!.GetValue(null)),
@@ -219,25 +230,35 @@ namespace osu.Game.Rulesets.Mods
                 double targetMax = getValueDouble(targetSetting, max_value);
                 double sourceMin = getValueDouble(sourceSetting, min_value);
                 double sourceMax = getValueDouble(sourceSetting, max_value);
-                double sourceValue = getValueDouble(sourceSetting, value);
+                double sourceValue = Math.Clamp(getValueDouble(sourceSetting, value), allowedMin, allowedMax);
 
-                // convert value to same ratio
-                double targetValue = (sourceValue - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
+                double targetValue = rangeOutOfBounds
+                    // keep raw value
+                    ? sourceValue
+                    // convert value to same ratio
+                    : (sourceValue - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
 
-                setValue(targetSetting, value, Convert.ChangeType(targetValue, targetType.GenericTypeArguments.Single()));
+                setValue(targetSetting, value, Convert.ChangeType(targetValue, targetBindableNumberType.GenericTypeArguments.Single()));
 
-                double getValueDouble(object target, string name) =>
-                    Math.Clamp(Convert.ToDouble(getValue(target, name)!), allowedMin, allowedMax);
+                double getValueDouble(object setting, string name)
+                {
+                    double settingValue = Convert.ToDouble(getValue(setting, name)!);
+
+                    if (settingValue < allowedMin || settingValue > allowedMax)
+                        rangeOutOfBounds = true;
+
+                    return settingValue;
+                }
             }
 
-            object? getValue(object target, string name) =>
-                target.GetType().GetProperty(name)!.GetValue(target);
+            object? getValue(object setting, string name) =>
+                setting.GetType().GetProperty(name)!.GetValue(setting);
 
-            void setValue(object target, string name, object? newValue) =>
-                target.GetType().GetProperty(name)!.SetValue(target, newValue);
+            void setValue(object setting, string name, object? newValue) =>
+                setting.GetType().GetProperty(name)!.SetValue(setting, newValue);
 
-            Type? getGenericBaseType(object target, Type genericType) =>
-                target.GetType().GetTypeInheritance().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
+            Type? getGenericBaseType(object setting, Type genericType) =>
+                setting.GetType().GetTypeInheritance().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }
 
         /// <summary>
