@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box colouredBox;
-        private readonly Box shadow;
 
         public ArgonNotePiece()
         {
@@ -38,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             InternalChildren = new[]
             {
-                shadow = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black)
