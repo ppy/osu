@@ -84,8 +84,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
             {
-                int column = maniaLookup.ColumnIndex ?? 0;
-                var stage = beatmap.GetStageForColumnIndex(column);
+                int columnIndex = maniaLookup.ColumnIndex ?? 0;
+                var stage = beatmap.GetStageForColumnIndex(columnIndex);
 
                 switch (maniaLookup.Lookup)
                 {
@@ -98,12 +98,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                     case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                         return SkinUtils.As<TValue>(new Bindable<float>(
-                            stage.IsSpecialColumn(column) ? 120 : 60
+                            stage.IsSpecialColumn(columnIndex) ? 120 : 60
                         ));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
 
-                        var colour = getColourForLayout(column, stage);
+                        var colour = getColourForLayout(columnIndex, stage);
 
                         return SkinUtils.As<TValue>(new Bindable<Color4>(colour));
                 }
@@ -112,8 +112,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
-        private Color4 getColourForLayout(int column, StageDefinition stage)
+        private Color4 getColourForLayout(int columnIndex, StageDefinition stage)
         {
+            // Account for cases like dual-stage (assume that all stages have the same column count for now).
+            columnIndex %= stage.Columns;
+
             // For now, these are defined per column count as per https://user-images.githubusercontent.com/50823728/218038463-b450f46c-ef21-4551-b133-f866be59970c.png
             // See https://github.com/ppy/osu/discussions/21996 for discussion.
             switch (stage.Columns)
@@ -122,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     return colour_yellow;
 
                 case 2:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_green;
 
@@ -132,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 3:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_pink;
 
@@ -144,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 4:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_yellow;
 
@@ -158,7 +161,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 5:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_pink;
 
@@ -174,7 +177,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 6:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_pink;
 
@@ -192,7 +195,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 7:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_pink;
 
@@ -212,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 8:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_purple;
 
@@ -234,7 +237,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 9:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_purple;
 
@@ -258,7 +261,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     }
 
                 case 10:
-                    switch (column)
+                    switch (columnIndex)
                     {
                         case 0: return colour_purple;
 
@@ -286,10 +289,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             // fallback for unhandled scenarios
 
-            if (stage.IsSpecialColumn(column))
+            if (stage.IsSpecialColumn(columnIndex))
                 return colour_special_column;
 
-            switch (column % total_colours)
+            switch (columnIndex % total_colours)
             {
                 case 0: return new Color4(255, 197, 40, 255);
 
