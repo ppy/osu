@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             CornerRadius = CORNER_RADIUS;
             Masking = true;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 shadow = new Box
                 {
@@ -65,17 +65,21 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     RelativeSizeAxes = Axes.X,
                     Height = CORNER_RADIUS * 2,
                 },
-                new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Y = 4,
-                    Icon = FontAwesome.Solid.AngleDown,
-                    Size = new Vector2(20),
-                    Scale = new Vector2(1, 0.7f)
-                }
+                CreateIcon(),
             };
         }
+
+        protected virtual Drawable CreateIcon() => new SpriteIcon
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Y = 4,
+            // TODO: replace with a non-squashed version.
+            // The 0.7f height scale should be removed.
+            Icon = FontAwesome.Solid.AngleDown,
+            Size = new Vector2(20),
+            Scale = new Vector2(1, 0.7f)
+        };
 
         [BackgroundDependencyLoader(true)]
         private void load(IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
