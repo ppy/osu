@@ -26,9 +26,6 @@ namespace osu.Game.Overlays.Mods
         private readonly ShearedButton useCurrentModButton;
         private readonly ShearedButton createButton;
 
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
-
         private readonly ModPreset preset;
 
         public EditPresetPopover(ModPresetPanel modPresetPanel)
