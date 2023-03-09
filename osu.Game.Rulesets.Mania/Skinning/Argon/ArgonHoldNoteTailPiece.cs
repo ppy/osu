@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box shadow;
-        private readonly Box shadeForeground;
+        private readonly Box foreground;
+        private readonly Box foregroundAdditive;
 
         public ArgonHoldNoteTailPiece()
         {
@@ -55,9 +56,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                shadeForeground = new Box
+                                foreground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                },
+                                foregroundAdditive = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Blending = BlendingParameters.Additive,
+                                    Height = 0.5f,
                                 },
                             },
                         },
@@ -86,9 +93,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
         {
-            shadeForeground.Colour = ColourInfo.GradientVertical(
-                accent.NewValue.Darken(0.2f),
-                accent.NewValue.Darken(1.2f) // matches body
+            foreground.Colour = accent.NewValue.Darken(0.6f); // matches body
+
+            foregroundAdditive.Colour = ColourInfo.GradientVertical(
+                accent.NewValue.Opacity(0.4f),
+                accent.NewValue.Opacity(0)
             );
         }
     }

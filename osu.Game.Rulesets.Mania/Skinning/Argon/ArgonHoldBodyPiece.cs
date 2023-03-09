@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             AccentColour.BindValueChanged(colour =>
             {
-                background.Colour = colour.NewValue.Darken(1.2f);
+                background.Colour = colour.NewValue.Darken(0.6f);
                 foreground.Colour = colour.NewValue.Opacity(0.2f);
             }, true);
 
