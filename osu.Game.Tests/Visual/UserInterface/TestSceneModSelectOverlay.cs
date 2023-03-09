@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -87,6 +88,50 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             createScreen();
             AddStep("toggle state", () => modSelectOverlay.ToggleVisibility());
+        }
+
+        /// <summary>
+        /// This is emulating a failure which can happen when entering and exiting the editor while on a convert ruleset with convert-specific mods applied.
+        /// It involves the decoupled bindables in song select and also leasing, which makes it a bit fiddly to reproduce here.
+        /// </summary>
+        [Test]
+        public void TestButtonStatesAfterLeasedRulesetChange()
+        {
+            LeasedBindable<IReadOnlyList<Mod>> lease = null!;
+
+            createScreen();
+
+            changeRuleset(1);
+
+            AddStep("select mod", () => SelectedMods.Value = new[] { new TaikoModSwap() });
+            AddAssert("swap mod button is active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod is TaikoModSwap).Active.Value, () => Is.True);
+
+            // This stops OsuGameBase from deselecting incompatible mods on ruleset change.
+            // Similar to what happens when entering the editor (due to lease logic).
+            AddStep("Take out lease", () => lease = SelectedMods.BeginLease(true));
+
+            // This is done on leaving song select.
+            AddStep("Unbind from selected mods", () => modSelectOverlay.SelectedMods.UnbindFrom(SelectedMods));
+
+            changeRuleset(0);
+
+            // Lease will mean that OsuGameBase doesn't reset selected mods, even though they don't match compatibility.
+            // but this is done via EditorLoader.
+            AddStep("Clear mods", () => lease.Value = Array.Empty<Mod>());
+
+            AddAssert("game selected mods empty", () => SelectedMods.Value.Count, () => Is.EqualTo(0));
+            AddAssert("mod select selected mods unchanged (not bound)", () => modSelectOverlay.SelectedMods.Value.Count, () => Is.EqualTo(1));
+
+            // but the button won't exist as it's not in available mods.
+            AddAssert("swap mod button not present", () => modSelectOverlay.ChildrenOfType<ModPanel>().Any(panel => panel.Mod is TaikoModSwap), () => Is.False);
+
+            AddStep("Return lease", () => lease.Return());
+            changeRuleset(1);
+
+            AddStep("Rebind to selected mods", () => modSelectOverlay.SelectedMods.UnbindFrom(SelectedMods));
+
+            AddAssert("selected mods not empty", () => SelectedMods.Value.Count, () => Is.EqualTo(1));
+            AddAssert("swap mod button is still active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod is TaikoModSwap).Active.Value, () => Is.True);
         }
 
         [Test]
