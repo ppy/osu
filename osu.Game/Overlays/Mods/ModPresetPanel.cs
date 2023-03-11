@@ -18,9 +18,11 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>, IHasContextMenu, IHasPopover
+    public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<List<Mod>>, IHasContextMenu, IHasPopover
     {
         public readonly Live<ModPreset> Preset;
+
+        public readonly Bindable<List<Mod>> Mods = new Bindable<List<Mod>>();
 
         public override BindableBool Active { get; } = new BindableBool();
 
@@ -35,6 +37,7 @@ namespace osu.Game.Overlays.Mods
         public ModPresetPanel(Live<ModPreset> preset)
         {
             Preset = preset;
+            Mods.Value = preset.Value.Mods.ToList();
 
             Title = preset.Value.Name;
             Description = preset.Value.Description;
@@ -51,6 +54,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
+            Mods.BindValueChanged(_ => updateActiveState(), true);
         }
 
         protected override void Select()
@@ -78,13 +82,13 @@ namespace osu.Game.Overlays.Mods
 
         private void updateActiveState()
         {
-            Active.Value = new HashSet<Mod>(Preset.Value.Mods).SetEquals(selectedMods.Value);
+            Active.Value = new HashSet<Mod>(Mods.Value).SetEquals(selectedMods.Value);
         }
 
         #region IHasCustomTooltip
 
-        public ModPreset TooltipContent => Preset.Value;
-        public ITooltip<ModPreset> GetCustomTooltip() => new ModPresetTooltip(ColourProvider);
+        public List<Mod> TooltipContent => Mods.Value;
+        public ITooltip<List<Mod>> GetCustomTooltip() => new ModPresetTooltip(ColourProvider);
 
         #endregion
 
