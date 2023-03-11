@@ -165,8 +165,6 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="source">The mod to copy properties from.</param>
         internal void CopySharedSettings(Mod source)
         {
-            const string min_value = nameof(BindableNumber<int>.MinValue);
-            const string max_value = nameof(BindableNumber<int>.MaxValue);
             const string value = nameof(Bindable<int>.Value);
 
             Dictionary<string, object> sourceSettings = new Dictionary<string, object>();
@@ -190,65 +188,22 @@ namespace osu.Game.Rulesets.Mods
                     continue;
                 }
 
+                bool hasSameGenericArgument = getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
+                                              getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single();
+
+                if (!hasSameGenericArgument)
+                    continue;
+
                 Type? targetBindableNumberType = getGenericBaseType(targetSetting, typeof(BindableNumber<>));
                 Type? sourceBindableNumberType = getGenericBaseType(sourceSetting, typeof(BindableNumber<>));
 
                 if (targetBindableNumberType == null || sourceBindableNumberType == null)
                 {
-                    if (getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
-                        getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single())
-                    {
-                        // change settings only if the type is the same
-                        setValue(targetSetting, value, getValue(sourceSetting, value));
-                    }
-
+                    setValue(targetSetting, value, getValue(sourceSetting, value));
                     continue;
                 }
 
-                bool rangeOutOfBounds = false;
-
-                Type targetGenericType = targetBindableNumberType.GenericTypeArguments.Single();
-                Type sourceGenericType = sourceBindableNumberType.GenericTypeArguments.Single();
-
-                if (!Convert.ToBoolean(getValue(targetSetting, nameof(RangeConstrainedBindable<int>.HasDefinedRange))) ||
-                    !Convert.ToBoolean(getValue(sourceSetting, nameof(RangeConstrainedBindable<int>.HasDefinedRange))))
-                    // check if we have a range to rescale from and a range to rescale to
-                    // if not, copy the raw value
-                    rangeOutOfBounds = true;
-
-                double allowedMin = Math.Max(
-                    Convert.ToDouble(targetGenericType.GetField("MinValue")!.GetValue(null)),
-                    Convert.ToDouble(sourceGenericType.GetField("MinValue")!.GetValue(null))
-                );
-
-                double allowedMax = Math.Min(
-                    Convert.ToDouble(targetGenericType.GetField("MaxValue")!.GetValue(null)),
-                    Convert.ToDouble(sourceGenericType.GetField("MaxValue")!.GetValue(null))
-                );
-
-                double targetMin = getValueDouble(targetSetting, min_value);
-                double targetMax = getValueDouble(targetSetting, max_value);
-                double sourceMin = getValueDouble(sourceSetting, min_value);
-                double sourceMax = getValueDouble(sourceSetting, max_value);
-                double sourceValue = Math.Clamp(getValueDouble(sourceSetting, value), allowedMin, allowedMax);
-
-                double targetValue = rangeOutOfBounds
-                    // keep raw value
-                    ? sourceValue
-                    // convert value to same ratio
-                    : (sourceValue - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
-
-                setValue(targetSetting, value, Convert.ChangeType(targetValue, targetBindableNumberType.GenericTypeArguments.Single()));
-
-                double getValueDouble(object setting, string name)
-                {
-                    double settingValue = Convert.ToDouble(getValue(setting, name)!);
-
-                    if (settingValue < allowedMin || settingValue > allowedMax)
-                        rangeOutOfBounds = true;
-
-                    return settingValue;
-                }
+                setValue(targetSetting, value, Convert.ChangeType(getValue(sourceSetting, value), targetBindableNumberType.GenericTypeArguments.Single()));
             }
 
             object? getValue(object setting, string name) =>

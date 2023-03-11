@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -42,16 +41,20 @@ namespace osu.Game.Tests.Mods
         {
             const double setting_change = 50.4;
 
-            var modDouble = new TestNonMatchingSettingTypeModDouble();
-            var modBool = new TestNonMatchingSettingTypeModBool();
+            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { Value = setting_change } };
+            var modBool = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
+            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = (int)setting_change } };
 
-            modDouble.TestSetting.Value = setting_change;
-            modBool.TestSetting.Value = !modBool.TestSetting.Default;
             modDouble.CopySharedSettings(modBool);
+            modDouble.CopySharedSettings(modInt);
             modBool.CopySharedSettings(modDouble);
+            modBool.CopySharedSettings(modInt);
+            modInt.CopySharedSettings(modDouble);
+            modInt.CopySharedSettings(modBool);
 
             Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
             Assert.That(modBool.TestSetting.Value, Is.EqualTo(!modBool.TestSetting.Default));
+            Assert.That(modInt.TestSetting.Value, Is.EqualTo((int)setting_change));
         }
 
         [Test]
@@ -70,75 +73,11 @@ namespace osu.Game.Tests.Mods
         public void TestValueResetsToDefaultWhenCopied()
         {
             var modDouble = new TestNonMatchingSettingTypeModDouble();
-            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = 1 } };
+            var modBool = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
 
-            modInt.CopySharedSettings(modDouble);
+            modBool.CopySharedSettings(modDouble);
 
-            Assert.That(modInt.TestSetting.Value, Is.EqualTo(modInt.TestSetting.Default));
-        }
-
-        [Test]
-        public void TestRelativelyScaleWithClampedRangeWhenCopied()
-        {
-            const double setting_change = 50.4;
-
-            var modDouble100 = new TestNonMatchingSettingTypeModDouble { TestSetting = { MaxValue = 100, MinValue = 0, Value = setting_change } };
-            var modDouble200 = new TestNonMatchingSettingTypeModDouble { TestSetting = { MaxValue = 200, MinValue = 0 } };
-
-            modDouble200.CopySharedSettings(modDouble100);
-
-            Assert.That(modDouble200.TestSetting.Value, Is.EqualTo(setting_change * 2));
-        }
-
-        [Test]
-        public void TestCopyDoubleToIntWithDefaultRange()
-        {
-            const double setting_change = 50.4;
-
-            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { Value = setting_change } };
-            var modInt = new TestNonMatchingSettingTypeModInt();
-
-            modInt.CopySharedSettings(modDouble);
-
-            Assert.That(modInt.TestSetting.Value, Is.EqualTo(Convert.ToInt32(setting_change)));
-        }
-
-        [Test]
-        public void TestCopyDoubleToIntWithOutOfBoundsRange()
-        {
-            const double setting_change = 50.4;
-
-            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { MinValue = int.MinValue - 1d, Value = setting_change } };
-            // make RangeConstrainedBindable.HasDefinedRange return true
-            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { MinValue = int.MinValue + 1 } };
-
-            modInt.CopySharedSettings(modDouble);
-
-            Assert.That(modInt.TestSetting.Value, Is.EqualTo(Convert.ToInt32(setting_change)));
-        }
-
-        [Test]
-        public void TestCopyDoubleToIntWithOutOfBoundsValue()
-        {
-            var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { MinValue = int.MinValue + 1, Value = int.MaxValue + 1d } };
-            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { MinValue = int.MinValue + 1 } };
-
-            modInt.CopySharedSettings(modDouble);
-
-            Assert.That(modInt.TestSetting.Value, Is.EqualTo(int.MaxValue));
-        }
-
-        [Test]
-        public void TestCopyIntToDoubleWithDefaultRange()
-        {
-            const int setting_change = 50;
-
-            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = setting_change } };
-            var modDouble = new TestNonMatchingSettingTypeModDouble();
-
-            modDouble.CopySharedSettings(modInt);
-
-            Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
+            Assert.That(modBool.TestSetting.Value, Is.EqualTo(modBool.TestSetting.Default));
         }
 
         private class TestNonMatchingSettingTypeModDouble : TestNonMatchingSettingTypeMod

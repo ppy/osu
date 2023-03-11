@@ -18,7 +18,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch.Mods;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -414,47 +413,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var taikoMod = getMod<TaikoModDifficultyAdjust>();
 
                 return taikoMod.ScrollSpeed.IsDefault;
-            });
-        }
-
-        [Test]
-        public void TestKeepSharedSettingsRatio()
-        {
-            const float setting_change = 1.8f;
-
-            createScreen();
-            changeRuleset(0);
-
-            AddStep("select flashlight mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModFlashlight>()! });
-
-            changeRuleset(0);
-            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModFlashlight);
-
-            AddStep("change mod settings", () =>
-            {
-                var osuMod = getMod<OsuModFlashlight>();
-
-                // range <0.5 - 2>
-                osuMod.SizeMultiplier.Value = setting_change;
-            });
-
-            changeRuleset(3);
-            AddAssert("mania variant selected", () => SelectedMods.Value.SingleOrDefault() is ManiaModFlashlight);
-
-            AddAssert("shared settings changed to closest ratio", () =>
-            {
-                var maniaMod = getMod<ManiaModFlashlight>();
-
-                // range <0.5 - 3>
-                // converted value based on ratio = (setting_change - 0.5) / (2 - 0.5) * (3 - 0.5) + 0.5 = 2.66
-                return maniaMod.SizeMultiplier.Value == 2.7f; // taking precision into account
-            });
-
-            AddAssert("other settings unchanged", () =>
-            {
-                var maniaMod = getMod<ManiaModFlashlight>();
-
-                return maniaMod.ComboBasedSize.IsDefault;
             });
         }
 
