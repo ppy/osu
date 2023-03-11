@@ -1,12 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
@@ -23,8 +27,19 @@ namespace osu.Game.Overlays.Mods
         private readonly LabelledTextBox descriptionTextBox;
         private readonly ShearedButton useCurrentModButton;
         private readonly ShearedButton createButton;
+        private readonly FillFlowContainer scrollContent;
 
         private readonly ModPreset preset;
+        private List<Mod> saveModAfterClosed = new List<Mod>();
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public EditPresetPopover(ModPresetPanel modPresetPanel)
         {
@@ -52,6 +67,19 @@ namespace osu.Game.Overlays.Mods
                         Origin = Anchor.TopCentre,
                         Label = CommonStrings.Description,
                         TabbableContentContainer = this
+                    },
+                    new OsuScrollContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 100,
+                        Padding = new MarginPadding(7),
+                        Child = scrollContent = new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(7),
+                            Spacing = new Vector2(7),
+                        }
                     },
                     new FillFlowContainer
                     {
@@ -83,7 +111,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load()
         {
             Body.BorderThickness = 3;
             Body.BorderColour = colours.Orange1;
@@ -95,17 +123,40 @@ namespace osu.Game.Overlays.Mods
             createButton.LighterColour = colours.Orange0;
             createButton.TextColour = colourProvider.Background6;
 
-            useCurrentModButton.DarkerColour = colours.Blue1;
-            useCurrentModButton.LighterColour = colours.Blue0;
-            useCurrentModButton.TextColour = colourProvider.Background6;
+            selectedMods.BindValueChanged(_ => updateActiveState(), true);
+
+            scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
         }
 
         private void trySaveCurrentMod()
         {
-            if (button.SaveCurrentMod())
+            if (!button.CheckCurrentModCanBeSave())
+            {
+                Body.Shake();
                 return;
+            }
 
-            Body.Shake();
+            saveModAfterClosed = selectedMods.Value.ToList();
+            scrollContent.Clear();
+            scrollContent.ChildrenEnumerable = saveModAfterClosed.Select(mod => new ModPresetRow(mod));
+            button.Mods.Value = saveModAfterClosed;
+            updateActiveState();
+        }
+
+        private void updateActiveState()
+        {
+            if (button.CheckCurrentModCanBeSave())
+            {
+                useCurrentModButton.DarkerColour = colours.Blue1;
+                useCurrentModButton.LighterColour = colours.Blue0;
+                useCurrentModButton.TextColour = colourProvider.Background6;
+            }
+            else
+            {
+                useCurrentModButton.DarkerColour = colours.Blue3;
+                useCurrentModButton.LighterColour = colours.Blue4;
+                useCurrentModButton.TextColour = colourProvider.Background2;
+            }
         }
 
         protected override void LoadComplete()
@@ -130,6 +181,19 @@ namespace osu.Game.Overlays.Mods
             });
 
             this.HidePopover();
+        }
+
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
+        {
+            base.UpdateState(state);
+
+            if (state.NewValue == Visibility.Hidden && saveModAfterClosed.Any())
+            {
+                button.Preset.PerformWrite(s =>
+                {
+                    s.Mods = saveModAfterClosed;
+                });
+            }
         }
     }
 }
