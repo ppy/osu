@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Mods
                     new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new DeleteModPresetDialog(Preset))),
                 };
 
-                if (checkCurrentModCanBeSave())
+                if (CheckCurrentModCanBeSave())
                 {
                     menu.Insert(1, new OsuMenuItem("Use Current Mods", MenuItemType.Destructive, () => SaveCurrentMod()));
                 }
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Mods
 
         public bool SaveCurrentMod()
         {
-            if (!checkCurrentModCanBeSave())
+            if (!CheckCurrentModCanBeSave())
                 return false;
 
             Preset.PerformWrite(s =>
@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Mods
             return true;
         }
 
-        private bool checkCurrentModCanBeSave() => (!Active.Value && selectedMods.Value.Any());
+        public bool CheckCurrentModCanBeSave() => (!Active.Value && selectedMods.Value.Any());
 
         protected override void Dispose(bool isDisposing)
         {
