@@ -30,11 +30,11 @@ namespace osu.Game.Overlays.Wiki.Markdown
             {
                 switch (line.ToString())
                 {
-                    case "outdated: true":
+                    case @"outdated: true":
                         isOutdated = true;
                         break;
 
-                    case "needs_cleanup: true":
+                    case @"needs_cleanup: true":
                         needsCleanup = true;
                         break;
                 }
