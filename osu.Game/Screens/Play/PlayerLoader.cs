@@ -101,7 +101,8 @@ namespace osu.Game.Screens.Play
             // not ready if the user is hovering one of the panes, unless they are idle.
             (IsHovered || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
-            && inputManager.DraggedDrawable == null
+            // Filter out the center panel when loading a beat map (see https://github.com/ppy/osu/issues/22657)
+            && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable.Anchor == Anchor.Centre)
             // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
