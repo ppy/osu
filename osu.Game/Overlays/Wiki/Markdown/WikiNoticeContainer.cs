@@ -19,6 +19,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     {
         private readonly bool isOutdated;
         private readonly bool needsCleanup;
+        private readonly bool isStub;
 
         public WikiNoticeContainer(YamlFrontMatterBlock yamlFrontMatterBlock)
         {
@@ -36,6 +37,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
                     case @"needs_cleanup: true":
                         needsCleanup = true;
+                        break;
+
+                    case @"stub: true":
+                        isStub = true;
                         break;
                 }
             }
@@ -58,6 +63,14 @@ namespace osu.Game.Overlays.Wiki.Markdown
                 Add(new NoticeBox
                 {
                     Text = WikiStrings.ShowNeedsCleanupOrRewrite,
+                });
+            }
+
+            if (isStub)
+            {
+                Add(new NoticeBox
+                {
+                    Text = WikiStrings.ShowStub,
                 });
             }
         }
