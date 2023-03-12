@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
@@ -26,6 +27,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
+            Spacing = new Vector2(10);
 
             foreach (object line in yamlFrontMatterBlock.Lines)
             {
