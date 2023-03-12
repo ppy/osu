@@ -69,6 +69,10 @@ namespace osu.Game.Graphics.UserInterface
                 // note that this will not work well if touch handling elements are beneath this loading layer (something to consider for the future).
                 case TouchEvent:
                     return false;
+
+                // blocking drag events to prevent unintended ui pausing while loading a beat map (see https://github.com/ppy/osu/issues/22657)
+                case DragEvent:
+                    return false;
             }
 
             return true;
