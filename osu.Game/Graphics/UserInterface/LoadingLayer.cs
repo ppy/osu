@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
                     return false;
 
                 // blocking drag events to prevent unintended ui pausing while loading a beat map (see https://github.com/ppy/osu/issues/22657)
-                case DragEvent:
+                case DragStartEvent:
                     return false;
             }
 
