@@ -170,6 +170,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeImageSpecifiedAsVideo()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("image-specified-as-video.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer foreground = storyboard.Layers.Single(l => l.Name == "Video");
+                Assert.That(foreground.Elements.Count, Is.Zero);
+            }
+        }
+
+        [Test]
         public void TestDecodeOutOfRangeLoopAnimationType()
         {
             var decoder = new LegacyStoryboardDecoder();
