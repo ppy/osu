@@ -161,6 +161,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeImageSpecifiedAsVideo()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("image-specified-as-video.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                var metadata = beatmap.Metadata;
+
+                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapTimingPoints()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
