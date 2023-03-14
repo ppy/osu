@@ -27,12 +27,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             AccentColour.BindValueChanged(colour =>
             {
-                Colour = colour.NewValue.Opacity(0.2f);
+                Colour = colour.NewValue.Lighten(0.2f).Opacity(0.3f);
             }, true);
 
             IsHitting.BindValueChanged(hitting =>
             {
-                const float animation_length = 50;
+                const float animation_length = 80;
 
                 ClearTransforms();
 
@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                     using (BeginDelayedSequence(synchronisedOffset))
                     {
-                        this.FadeTo(1, animation_length).Then()
-                            .FadeTo(0.5f, animation_length)
+                        this.FadeTo(1, animation_length, Easing.OutSine).Then()
+                            .FadeTo(0.5f, animation_length, Easing.InSine)
                             .Loop();
                     }
                 }
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 {
                     this.FadeOut(animation_length);
                 }
-            });
+            }, true);
         }
 
         public void Recycle()
