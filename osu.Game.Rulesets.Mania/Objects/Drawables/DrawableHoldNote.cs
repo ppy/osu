@@ -323,7 +323,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
             if (Time.Elapsed < 0)
+            {
+                // Except for the IsHitting state, as this handles animations that need to be reapplied
+                // after rewind.
+                isHitting.Value = false;
                 return;
+            }
 
             // Make sure a hold was started
             if (HoldStartTime == null)
