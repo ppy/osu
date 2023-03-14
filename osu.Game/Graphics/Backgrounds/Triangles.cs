@@ -252,7 +252,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private class TrianglesDrawNode : DrawNode
         {
-            private float fill = 1f;
+            private const float fill = 1f;
 
             protected new Triangles Source => (Triangles)base.Source;
 
