@@ -67,6 +67,8 @@ namespace osu.Game.Screens.Play
 
         private OsuScrollContainer settingsScroll = null!;
 
+        private Bindable<bool> showStoryboards = null!;
+
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
@@ -149,10 +151,11 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, AudioManager audio)
+        private void load(SessionStatics sessionStatics, AudioManager audio, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
+            showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             const float padding = 25;
 
@@ -463,7 +466,10 @@ namespace osu.Game.Screens.Play
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
-                if (epilepsyWarning?.IsAlive == true)
+                //
+                // note the late check of storyboard enable as the user may have just changed it
+                // from the settings on the loader screen.
+                if (epilepsyWarning?.IsAlive == true && showStoryboards.Value)
                 {
                     const double epilepsy_display_length = 3000;
 
