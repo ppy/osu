@@ -115,6 +115,10 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
+            if (Scheduler.HasPendingTasks)
+                // update samples queued due to skin change before playing them
+                UpdateSubTree();
+
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
