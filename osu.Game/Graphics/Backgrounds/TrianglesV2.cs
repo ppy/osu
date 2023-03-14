@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -267,8 +266,6 @@ namespace osu.Game.Graphics.Backgrounds
                         Vector2Extensions.Transform(triangleQuad.BottomRight * size, DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, triangleQuad);
-
                     RectangleF textureCoords = new RectangleF(
                         triangleQuad.TopLeft.X - topLeft.X,
                         triangleQuad.TopLeft.Y - topLeft.Y,
@@ -276,21 +273,10 @@ namespace osu.Game.Graphics.Backgrounds
                         triangleQuad.Height
                     ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour.Interpolate(triangleQuad), new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
-            }
-
-            private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
-            {
-                return new ColourInfo
-                {
-                    TopLeft = source.Interpolate(quad.TopLeft),
-                    TopRight = source.Interpolate(quad.TopRight),
-                    BottomLeft = source.Interpolate(quad.BottomLeft),
-                    BottomRight = source.Interpolate(quad.BottomRight)
-                };
             }
 
             private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
