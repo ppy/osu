@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -24,7 +25,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.OSD;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -70,6 +73,8 @@ namespace osu.Game.Overlays.SkinEditor
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
+
         private bool hasBegunMutating;
 
         private Container? content;
@@ -93,6 +98,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public SkinEditor()
         {
@@ -144,8 +152,8 @@ namespace osu.Game.Overlays.SkinEditor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
@@ -251,6 +259,8 @@ namespace osu.Game.Overlays.SkinEditor
             }, true);
 
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
+
+            selectedTarget.BindValueChanged(targetChanged, true);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -298,35 +308,83 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.Dispose();
 
-            SelectedComponents.Clear();
-
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
-            content?.Clear();
+            if (content?.Child is SkinBlueprintContainer)
+                content.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
             void loadBlueprintContainer()
             {
-                Debug.Assert(content != null);
+                selectedTarget.Default = getFirstTarget()?.Lookup;
 
-                changeHandler = new SkinEditorChangeHandler(targetScreen);
-                changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-                changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
+                    selectedTarget.SetDefault();
+            }
+        }
 
-                content.Child = new SkinBlueprintContainer(targetScreen);
+        private void targetChanged(ValueChangedEvent<SkinComponentsContainerLookup?> target)
+        {
+            foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
+                toolbox.Expire();
 
-                componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
+            componentsSidebar.Clear();
+            SelectedComponents.Clear();
+
+            Debug.Assert(content != null);
+
+            var skinComponentsContainer = getTarget(target.NewValue);
+
+            if (target.NewValue == null || skinComponentsContainer == null)
+            {
+                content.Child = new NonSkinnableScreenPlaceholder();
+                return;
+            }
+
+            changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+            content.Child = new SkinBlueprintContainer(skinComponentsContainer);
+
+            componentsSidebar.Children = new[]
+            {
+                new EditorSidebarSection("Current working layer")
                 {
-                    RequestPlacement = type =>
+                    Children = new Drawable[]
                     {
-                        if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
-                            throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
-
-                        SelectedComponents.Clear();
-                        placeComponent(component);
+                        new SettingsDropdown<SkinComponentsContainerLookup?>
+                        {
+                            Items = availableTargets.Select(t => t.Lookup),
+                            Current = selectedTarget,
+                        }
                     }
-                };
+                },
+            };
+
+            // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
+            if (target.NewValue.Ruleset != null)
+            {
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
+                {
+                    RequestPlacement = requestPlacement
+                });
+            }
+
+            // Remove the ruleset from the lookup to get base components.
+            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            {
+                RequestPlacement = requestPlacement
+            });
+
+            void requestPlacement(Type type)
+            {
+                if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
+                    throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
+
+                SelectedComponents.Clear();
+                placeComponent(component);
             }
         }
 
@@ -360,7 +418,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// <returns>Whether placement succeeded. Could fail if no target is available, or if the current target has missing dependency requirements for the component.</returns>
         private bool placeComponent(ISerialisableDrawable component, bool applyDefaults = true)
         {
-            var targetContainer = getFirstTarget();
+            var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer == null)
                 return false;
@@ -399,11 +457,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
 
-        private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISerialisableDrawableContainer? getTarget(SkinComponentsContainerLookup.TargetArea target)
+        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
         {
-            return availableTargets.FirstOrDefault(c => c.Lookup.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
         }
 
         private void revert()
@@ -415,7 +473,7 @@ namespace osu.Game.Overlays.SkinEditor
                 currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
-                getTarget(t.Lookup.Target)?.Reload();
+                getTarget(t.Lookup)?.Reload();
             }
         }
 
@@ -505,7 +563,50 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.BeginChange();
 
             foreach (var item in items)
-                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item, true);
+
+            changeHandler?.EndChange();
+        }
+
+        public void BringSelectionToFront()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            changeHandler?.BeginChange();
+
+            // Iterating by target components order ensures we maintain the same order across selected components, regardless
+            // of the order they were selected in.
+            foreach (var d in target.Components.ToArray())
+            {
+                if (!SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+
+                // Selection would be reset by the remove.
+                SelectedComponents.Add(d);
+                target.Add(d);
+            }
+
+            changeHandler?.EndChange();
+        }
+
+        public void SendSelectionToBack()
+        {
+            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                return;
+
+            changeHandler?.BeginChange();
+
+            foreach (var d in target.Components.ToArray())
+            {
+                if (SelectedComponents.Contains(d))
+                    continue;
+
+                target.Remove(d, false);
+                target.Add(d);
+            }
 
             changeHandler?.EndChange();
         }
@@ -571,6 +672,16 @@ namespace osu.Game.Overlays.SkinEditor
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
             {
+            }
+        }
+
+        public partial class RevertConfirmDialog : DangerousActionDialog
+        {
+            public RevertConfirmDialog(Action revert)
+            {
+                HeaderText = CommonStrings.RevertToDefault;
+                BodyText = SkinEditorStrings.RevertToDefaultDescription;
+                DangerousAction = revert;
             }
         }
 

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            osuInputManager = ((DrawableOsuRuleset)drawableRuleset).KeyBindingInputManager;
         }
 
         public void ApplyToPlayer(Player player)

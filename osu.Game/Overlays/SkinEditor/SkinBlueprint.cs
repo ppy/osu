@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.SkinEditor
                         {
                             Text = Item.GetType().Name,
                             Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
+                            Alpha = 0,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.TopRight,
                         },
@@ -99,7 +100,6 @@ namespace osu.Game.Overlays.SkinEditor
             base.LoadComplete();
 
             updateSelectedState();
-            this.FadeInFromZero(200, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)
