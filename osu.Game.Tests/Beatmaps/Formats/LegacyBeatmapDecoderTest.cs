@@ -181,16 +181,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(48428);
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033d, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(119637);
                 Assert.AreEqual(119637, timingPoint.Time);
                 Assert.AreEqual(659.340659340659, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 var difficultyPoint = controlPoints.DifficultyPointAt(0);
                 Assert.AreEqual(0, difficultyPoint.Time);
@@ -222,17 +225,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var effectPoint = controlPoints.EffectPointAt(0);
                 Assert.AreEqual(0, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(53703);
                 Assert.AreEqual(53703, effectPoint.Time);
                 Assert.IsTrue(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(116637);
                 Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
         }
 
@@ -270,6 +270,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500).Within(0.1));
+            }
+        }
+
+        [Test]
+        public void TestDecodeOmitBarLineEffect()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("omit-barline-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.EffectPoints.Count, Is.EqualTo(0));
+
+                Assert.That(controlPoints.TimingPointAt(500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(1500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.TimingPointAt(2500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(3500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(4500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(5500).OmitFirstBarLine, Is.True);
             }
         }
 

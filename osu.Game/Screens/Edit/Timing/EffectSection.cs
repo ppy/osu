@@ -14,7 +14,6 @@ namespace osu.Game.Screens.Edit.Timing
     internal partial class EffectSection : Section<EffectControlPoint>
     {
         private LabelledSwitchButton kiai = null!;
-        private LabelledSwitchButton omitBarLine = null!;
 
         private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
 
@@ -24,7 +23,6 @@ namespace osu.Game.Screens.Edit.Timing
             Flow.AddRange(new Drawable[]
             {
                 kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
                 scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
                 {
                     Current = new EffectControlPoint().ScrollSpeedBindable,
@@ -38,7 +36,6 @@ namespace osu.Game.Screens.Edit.Timing
             base.LoadComplete();
 
             kiai.Current.BindValueChanged(_ => saveChanges());
-            omitBarLine.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
 
             var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
@@ -60,7 +57,6 @@ namespace osu.Game.Screens.Edit.Timing
                 isRebinding = true;
 
                 kiai.Current = point.NewValue.KiaiModeBindable;
-                omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
                 scrollSpeedSlider.Current = point.NewValue.ScrollSpeedBindable;
 
                 isRebinding = false;
@@ -74,7 +70,6 @@ namespace osu.Game.Screens.Edit.Timing
             return new EffectControlPoint
             {
                 KiaiMode = reference.KiaiMode,
-                OmitFirstBarLine = reference.OmitFirstBarLine,
                 ScrollSpeed = reference.ScrollSpeed,
             };
         }

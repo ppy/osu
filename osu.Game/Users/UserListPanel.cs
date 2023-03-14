@@ -67,6 +67,7 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
+                                username.UseFullGlyphHeight = false;
                             })
                         }
                     },
@@ -95,13 +96,23 @@ namespace osu.Game.Users
                 }
             };
 
+            if (User.Groups != null)
+            {
+                details.Add(new GroupBadgeFlow
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    User = { Value = User }
+                });
+            }
+
             if (User.IsSupporter)
             {
                 details.Add(new SupporterIcon
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Height = 20,
+                    Height = 16,
                     SupportLevel = User.SupportLevel
                 });
             }
