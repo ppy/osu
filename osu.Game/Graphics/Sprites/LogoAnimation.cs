@@ -3,10 +3,12 @@
 
 #nullable disable
 
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Sprites
@@ -55,14 +57,32 @@ namespace osu.Game.Graphics.Sprites
                 progress = source.animationProgress;
             }
 
+            private IUniformBuffer<AnimationData> animationDataBuffer;
+
             protected override void Blit(IRenderer renderer)
             {
-                TextureShader.GetUniform<float>("progress").UpdateValue(ref progress);
+                animationDataBuffer ??= renderer.CreateUniformBuffer<AnimationData>();
+                animationDataBuffer.Data = animationDataBuffer.Data with { Progress = progress };
+
+                TextureShader.BindUniformBlock("m_AnimationData", animationDataBuffer);
 
                 base.Blit(renderer);
             }
 
             protected override bool CanDrawOpaqueInterior => false;
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                animationDataBuffer?.Dispose();
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            private record struct AnimationData
+            {
+                public UniformFloat Progress;
+                private readonly UniformPadding12 pad1;
+            }
         }
     }
 }
