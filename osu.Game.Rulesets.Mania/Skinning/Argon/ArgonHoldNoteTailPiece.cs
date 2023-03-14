@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -17,10 +18,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     internal partial class ArgonHoldNoteTailPiece : CompositeDrawable
     {
+        [Resolved]
+        private DrawableHitObject? drawableObject { get; set; }
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box foreground;
+        private readonly ArgonHoldNoteHittingLayer hittingLayer;
         private readonly Box foregroundAdditive;
 
         public ArgonHoldNoteTailPiece()
@@ -59,6 +64,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
+                                hittingLayer = new ArgonHoldNoteHittingLayer(),
                                 foregroundAdditive = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -73,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
+        private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
@@ -82,7 +88,22 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 accentColour.BindTo(drawableObject.AccentColour);
                 accentColour.BindValueChanged(onAccentChanged, true);
+
+                drawableObject.HitObjectApplied += hitObjectApplied;
             }
+        }
+
+        private void hitObjectApplied(DrawableHitObject drawableHitObject)
+        {
+            var holdNoteTail = (DrawableHoldNoteTail)drawableHitObject;
+
+            hittingLayer.Recycle();
+
+            hittingLayer.AccentColour.UnbindBindings();
+            hittingLayer.AccentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
+
+            hittingLayer.IsHitting.UnbindBindings();
+            ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHitting);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
@@ -98,6 +119,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 accent.NewValue.Opacity(0.4f),
                 accent.NewValue.Opacity(0)
             );
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.HitObjectApplied -= hitObjectApplied;
         }
     }
 }
