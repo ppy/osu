@@ -55,6 +55,72 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestDragSelection()
+        {
+            BigBlackBox box1 = null!;
+            BigBlackBox box2 = null!;
+            BigBlackBox box3 = null!;
+
+            AddStep("Add big black boxes", () =>
+            {
+                var target = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                target.Add(box1 = new BigBlackBox
+                {
+                    Position = new Vector2(-90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box2 = new BigBlackBox
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box3 = new BigBlackBox
+                {
+                    Position = new Vector2(90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            });
+
+            AddStep("Begin drag top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre + new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("First two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box1, box2 }));
+
+            AddStep("Begin drag bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.BottomRight + new Vector2(box3.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to top left", () =>
+            {
+                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+        }
+
+        [Test]
         public void TestCyclicSelection()
         {
             SkinBlueprint[] blueprints = null!;
