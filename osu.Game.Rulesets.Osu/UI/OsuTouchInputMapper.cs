@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 return;
             }
 
-            // ..or if the current position tracking touch was not a direct touch (this one is debatable and may be change in the future, but it's the simplest way to handle)
-            if (!positionTrackingTouch.DirectTouch)
+            // ..or if the current position tracking touch was not a direct touch (and didn't travel across the screen too far).
+            if (!positionTrackingTouch.DirectTouch && positionTrackingTouch.DistanceTravelled < 200)
             {
                 positionTrackingTouch = newTouch;
                 return;
@@ -117,6 +117,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void handleTouchMovement(TouchEvent touchEvent)
         {
+            if (touchEvent is TouchMoveEvent moveEvent)
+            {
+                var trackedTouch = trackedTouches.Single(t => t.Source == touchEvent.Touch.Source);
+                trackedTouch.DistanceTravelled += moveEvent.Delta.Length;
+            }
+
             // Movement should only be tracked for the most recent touch.
             if (touchEvent.Touch.Source != positionTrackingTouch?.Source)
                 return;
@@ -148,7 +154,15 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public OsuAction? Action;
 
+            /// <summary>
+            /// Whether the touch was on a hit circle receptor.
+            /// </summary>
             public readonly bool DirectTouch;
+
+            /// <summary>
+            /// The total distance on screen travelled by this touch.
+            /// </summary>
+            public double DistanceTravelled;
 
             public TrackedTouch(TouchSource source, OsuAction? action, bool directTouch)
             {
