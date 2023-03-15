@@ -110,13 +110,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public override void FlushPendingSkinChanges()
-        {
-            base.FlushPendingSkinChanges();
-
-            samplesContainer.ForEach(c => c.FlushPendingSkinChanges());
-        }
-
         /// <summary>
         /// Plays the samples.
         /// </summary>

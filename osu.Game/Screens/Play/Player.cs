@@ -316,11 +316,6 @@ namespace osu.Game.Screens.Play
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
 
-            rulesetSkinProvider.SourceChanged += () =>
-            {
-                PauseOverlay.FlushPendingSkinChanges();
-            };
-
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
                 HUDOverlay.ShowHud.Value = false;
