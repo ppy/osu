@@ -73,10 +73,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
             beatmap.ControlPointInfo.Add(start_time, new TimingControlPoint
             {
                 BeatLength = beat_length,
-                TimeSignature = new TimeSignature(time_signature_numerator)
+                TimeSignature = new TimeSignature(time_signature_numerator),
+                OmitFirstBarLine = true
             });
-
-            beatmap.ControlPointInfo.Add(start_time, new EffectControlPoint { OmitFirstBarLine = true });
 
             var barlines = new BarLineGenerator<BarLine>(beatmap).BarLines;
 

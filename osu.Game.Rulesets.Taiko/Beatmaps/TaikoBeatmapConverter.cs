@@ -72,7 +72,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
                         {
                             KiaiMode = currentEffectPoint.KiaiMode,
-                            OmitFirstBarLine = currentEffectPoint.OmitFirstBarLine,
                             ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
                         });
                     }
