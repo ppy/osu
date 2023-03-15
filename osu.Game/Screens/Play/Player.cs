@@ -870,7 +870,7 @@ namespace osu.Game.Screens.Play
 
                     // TODO: On new spectate, add user
                     // TODO: On spectate leave, remove user
-                    AddSpectatorsToHUD(list);
+                    addSpectatorsToHUD(list);
                 });
             }
         }
@@ -904,7 +904,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
-        protected virtual void AddSpectatorsToHUD(GameplaySpectatorList spectators) => HUDOverlay.SpectatorFlow.Add(spectators);
+        private void addSpectatorsToHUD(GameplaySpectatorList spectators) => HUDOverlay.SpectatorFlow.Add(spectators);
 
         private void updateLeaderboardExpandedState() =>
             LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;

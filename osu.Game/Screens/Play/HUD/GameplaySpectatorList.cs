@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Play.HUD
             config.BindWith(OsuSetting.DisplaySpectatorList, configVisibility);
         }
 
-        protected virtual GameplaySpectatorUser CreateSpectatorUserDrawable(IUser? user) =>
+        protected GameplaySpectatorUser CreateSpectatorUserDrawable(IUser? user) =>
             new GameplaySpectatorUser(user);
     }
 }
