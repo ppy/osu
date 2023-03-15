@@ -27,6 +27,15 @@ namespace osu.Game.Skinning
         /// </summary>
         protected ISkinSource CurrentSkin { get; private set; } = null!;
 
+        protected void FlushPendingSkinChanges()
+        {
+            if (pendingSkinChange == null)
+                return;
+
+            pendingSkinChange.RunTask();
+            pendingSkinChange = null;
+        }
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
@@ -42,15 +51,6 @@ namespace osu.Game.Skinning
             pendingSkinChange = Scheduler.Add(skinChanged);
         }
 
-        public virtual void FlushPendingSkinChanges()
-        {
-            if (pendingSkinChange == null)
-                return;
-
-            pendingSkinChange.RunTask();
-            pendingSkinChange = null;
-        }
-
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
@@ -61,6 +61,8 @@ namespace osu.Game.Skinning
         {
             SkinChanged(CurrentSkin);
             OnSkinChanged?.Invoke();
+
+            pendingSkinChange = null;
         }
 
         /// <summary>

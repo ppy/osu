@@ -132,6 +132,8 @@ namespace osu.Game.Skinning
             if (Sample == null)
                 return;
 
+            FlushPendingSkinChanges();
+
             activeChannel = Sample.GetChannel();
             activeChannel.Looping = Looping;
             activeChannel.Play();
