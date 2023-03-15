@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
-        private Drawable keyCounterFlow => (Drawable)hudOverlay.KeyCounter.Counters;
+        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<DefaultKeyCounter>>().Single();
 
         [Test]
         public void TestComboCounterIncrementing()
