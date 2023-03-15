@@ -51,16 +51,14 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         /// <summary>
-        /// Adds a new <see cref="KeyCounter"/> to this <see cref="KeyCounterDisplay"/>.
+        /// Add a <see cref="InputTrigger"/> to this display.
         /// </summary>
-        /// <param name="trigger">The <see cref="InputTrigger"/> the resulting <see cref="KeyCounter"/> will react to.</param>
-        public abstract void AddTrigger(InputTrigger trigger);
+        public abstract void Add(InputTrigger trigger);
 
         /// <summary>
-        /// Adds a range of new <see cref="KeyCounter"/>s to this <see cref="KeyCounterDisplay"/>.
+        /// Add a range of <see cref="InputTrigger"/> to this display.
         /// </summary>
-        /// <param name="triggers">The <see cref="InputTrigger"/>s the resulting <see cref="KeyCounter"/>s will react to.</param>
-        public void AddTriggerRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(AddTrigger);
+        public void AddRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(Add);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

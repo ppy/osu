@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Anchor = Anchor.Centre,
             };
 
-            kc.AddTriggerRange(new InputTrigger[]
+            kc.AddRange(new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.AddTrigger(new KeyCounterKeyboardTrigger(key));
+                kc.Add(new KeyCounterKeyboardTrigger(key));
             });
 
             Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
