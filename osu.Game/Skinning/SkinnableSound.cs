@@ -115,12 +115,12 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
-            if (Scheduler.HasPendingTasks)
-                // update samples queued due to skin change before playing them
-                UpdateSubTree();
+            FlushPendingSkinChanges();
 
             samplesContainer.ForEach(c =>
             {
+                c.FlushPendingSkinChanges();
+
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                 {
                     c.Stop();
