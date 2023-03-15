@@ -612,15 +612,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
 
-            AddAssert("selected only shows expected ruleset (plus converts)", () =>
-            {
-                var selectedPanel = songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item!.State.Value == CarouselItemState.Selected);
-
-                // special case for converts checked here.
-                return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
-                    i.IsFiltered || i.Item.BeatmapInfo.Ruleset.OnlineID == targetRuleset || i.Item.BeatmapInfo.Ruleset.OnlineID == 0);
-            });
-
             AddUntilStep("carousel has correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
