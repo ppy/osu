@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets.Objects
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint currentTimingPoint = timingPoints[i];
-                EffectControlPoint currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTimingPoint.Time);
                 int currentBeat = 0;
 
                 // Don't generate barlines before the hit object or t=0 (whichever is earliest). Some beatmaps use very unrealistic values here (although none are ranked).
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Objects
                     startTime = currentTimingPoint.Time + barCount * barLength;
                 }
 
-                if (currentEffectPoint.OmitFirstBarLine)
+                if (currentTimingPoint.OmitFirstBarLine)
                 {
                     startTime += barLength;
                 }
