@@ -13,17 +13,18 @@ namespace osu.Game.Screens.Play.HUD
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        private readonly FillFlowContainer<DefaultKeyCounter> keyFlow = new FillFlowContainer<DefaultKeyCounter>();
+        private readonly FillFlowContainer<DefaultKeyCounter> keyFlow;
 
         public override IEnumerable<KeyCounter> Counters => keyFlow;
 
         public DefaultKeyCounterDisplay()
         {
-            keyFlow.Direction = FillDirection.Horizontal;
-            keyFlow.AutoSizeAxes = Axes.Both;
-            keyFlow.Alpha = 0;
-
-            InternalChild = keyFlow;
+            InternalChild = keyFlow = new FillFlowContainer<DefaultKeyCounter>
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Alpha = 0,
+            };
         }
 
         protected override void Update()
@@ -36,13 +37,12 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         public override void AddTrigger(InputTrigger trigger)
-        {
-            DefaultKeyCounter key = new DefaultKeyCounter(trigger);
-            keyFlow.Add(key);
-            key.FadeTime = key_fade_time;
-            key.KeyDownTextColor = KeyDownTextColor;
-            key.KeyUpTextColor = KeyUpTextColor;
-        }
+            keyFlow.Add(new DefaultKeyCounter(trigger)
+            {
+                FadeTime = key_fade_time,
+                KeyDownTextColor = KeyDownTextColor,
+                KeyUpTextColor = KeyUpTextColor,
+            });
 
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
