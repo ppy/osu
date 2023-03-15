@@ -139,9 +139,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     {
                         case 0: return colour_pink;
 
-                        case 1: return colour_purple;
+                        case 1: return colour_orange;
 
-                        case 2: return colour_special_column;
+                        case 2: return colour_yellow;
 
                         default: throw new ArgumentOutOfRangeException();
                     }
