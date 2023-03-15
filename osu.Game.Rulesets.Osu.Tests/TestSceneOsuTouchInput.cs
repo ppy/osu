@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             beginTouch(TouchSource.Touch2);
 
             assertKeyCounter(1, 1);
-            checkPressed(OsuAction.LeftButton);
+            checkNotPressed(OsuAction.LeftButton);
             checkPressed(OsuAction.RightButton);
             // in this case, touch 2 should not become the positional tracking touch.
             checkPosition(TouchSource.Touch1);
