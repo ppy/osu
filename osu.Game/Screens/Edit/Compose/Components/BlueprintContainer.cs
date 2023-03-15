@@ -178,6 +178,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 endClickSelection(e);
                 clickSelectionHandled = false;
                 isDraggingBlueprint = false;
+                wasDragStarted = false;
             });
 
             finishSelectionMovement();
@@ -191,6 +192,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
 
             lastDragEvent = e;
+            wasDragStarted = true;
 
             if (movementBlueprints != null)
             {
@@ -399,7 +401,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
             }
 
-            if (selectedBlueprintAlreadySelectedOnMouseDown && AllowCyclicSelection)
+            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && AllowCyclicSelection)
             {
                 // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
                 // cycle between other blueprints which are also under the cursor.
@@ -484,6 +486,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether a blueprint is currently being dragged.
         /// </summary>
         private bool isDraggingBlueprint;
+
+        /// <summary>
+        /// Whether a drag operation was started at all.
+        /// </summary>
+        private bool wasDragStarted;
 
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
