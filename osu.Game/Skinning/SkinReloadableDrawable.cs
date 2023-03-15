@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
             pendingSkinChange = Scheduler.Add(skinChanged);
         }
 
-        public void FlushPendingSkinChanges()
+        public virtual void FlushPendingSkinChanges()
         {
             if (pendingSkinChange == null)
                 return;

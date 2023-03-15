@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Play
 
         private SkinnableSound pauseLoop;
 
+        public void FlushPendingSkinChanges() => pauseLoop.FlushPendingSkinChanges();
         protected override Action BackAction => () => InternalButtons.First().TriggerClick();
 
         [BackgroundDependencyLoader]

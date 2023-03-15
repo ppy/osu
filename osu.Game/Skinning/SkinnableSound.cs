@@ -110,6 +110,13 @@ namespace osu.Game.Skinning
             }
         }
 
+        public override void FlushPendingSkinChanges()
+        {
+            base.FlushPendingSkinChanges();
+
+            samplesContainer.ForEach(c => c.FlushPendingSkinChanges());
+        }
+
         /// <summary>
         /// Plays the samples.
         /// </summary>
@@ -119,8 +126,6 @@ namespace osu.Game.Skinning
 
             samplesContainer.ForEach(c =>
             {
-                c.FlushPendingSkinChanges();
-
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                 {
                     c.Stop();
