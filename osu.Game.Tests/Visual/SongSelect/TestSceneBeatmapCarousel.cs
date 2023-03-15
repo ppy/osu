@@ -47,6 +47,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestBasic()
+        {
+            loadBeatmaps(count: 10, randomDifficulties: true);
+        }
+
+        [Test]
         public void TestExternalRulesetChange()
         {
             createCarousel(new List<BeatmapSetInfo>());
