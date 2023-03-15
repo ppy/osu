@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD
             Size = keyFlow.Size;
         }
 
-        public override void AddTrigger(InputTrigger trigger)
+        public override void Add(InputTrigger trigger) =>
             keyFlow.Add(new DefaultKeyCounter(trigger)
             {
                 FadeTime = key_fade_time,

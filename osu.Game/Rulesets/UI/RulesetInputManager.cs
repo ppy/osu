@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.UI
             KeyBindingContainer.Add(receptor);
 
             keyCounter.SetReceptor(receptor);
-            keyCounter.AddTriggerRange(KeyBindingContainer.DefaultKeyBindings
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
                                                           .Select(b => b.GetAction<T>())
                                                           .Distinct()
                                                           .OrderBy(action => action)
