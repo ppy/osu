@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Threading;
 
 namespace osu.Game.Skinning
 {
@@ -14,6 +15,8 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract partial class SkinReloadableDrawable : PoolableDrawable
     {
+        private ScheduledDelegate? pendingSkinChange;
+
         /// <summary>
         /// Invoked when <see cref="CurrentSkin"/> has changed.
         /// </summary>
@@ -31,10 +34,22 @@ namespace osu.Game.Skinning
             CurrentSkin.SourceChanged += onChange;
         }
 
-        private void onChange() =>
+        private void onChange()
+        {
             // schedule required to avoid calls after disposed.
             // note that this has the side-effect of components only performing a skin change when they are alive.
-            Scheduler.AddOnce(skinChanged);
+            pendingSkinChange?.Cancel();
+            pendingSkinChange = Scheduler.Add(skinChanged);
+        }
+
+        public void FlushPendingSkinChanges()
+        {
+            if (pendingSkinChange == null)
+                return;
+
+            pendingSkinChange.RunTask();
+            pendingSkinChange = null;
+        }
 
         protected override void LoadAsyncComplete()
         {
