@@ -83,6 +83,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                 });
             });
 
+            // This step is specifically added to reproduce an edge case which was found during cyclic selection development.
+            // If everything is working as expected it should not affect the subsequent drag selections.
+            AddRepeatStep("Select top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft + new Vector2(box1.ScreenSpaceDrawQuad.Width / 8));
+                InputManager.Click(MouseButton.Left);
+            }, 2);
+
             AddStep("Begin drag top left", () =>
             {
                 InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
@@ -91,7 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Drag to bottom right", () =>
             {
-                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre + new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4));
             });
 
             AddStep("Release button", () =>
