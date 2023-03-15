@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly FillFlowContainer OtherSpectators;
         protected OsuSpriteText SpectatorText;
         private const int fade_time = 100;
+        private int spectators => Flow.Count;
 
-        public int Spectators => Flow.Count;
         public readonly BindableInt MaxNames = new BindableInt(10);
 
         public GameplaySpectatorList()
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateDisplay()
         {
             // We removed everything, fade out everything
-            if (Spectators == 0 || configVisibility.Value == false)
+            if (spectators == 0 || configVisibility.Value == false)
             {
                 Flow.FadeOut(fade_time);
                 OtherSpectators.FadeOut(fade_time);
@@ -117,15 +117,15 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             // always adjust text
-            SpectatorText.Text = GameplaySettingsStrings.Spectators + " (" + Spectators + ")";
+            SpectatorText.Text = GameplaySettingsStrings.Spectators + " (" + spectators + ")";
 
             // We exceeded the maximum number
-            if (Spectators > MaxNames.Value && Flow.Alpha == 1.0f)
+            if (spectators > MaxNames.Value && Flow.Alpha == 1.0f)
             {
                 Flow.FadeOut(fade_time);
             }
 
-            if (Spectators <= MaxNames.Value && Flow.Alpha == 0.0f)
+            if (spectators <= MaxNames.Value && Flow.Alpha == 0.0f)
             {
                 Flow.FadeIn(fade_time);
             }
