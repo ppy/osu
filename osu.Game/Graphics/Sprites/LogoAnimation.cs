@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Sprites
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation");
+            TextureShader = shaders.Load(@"LogoAnimation", @"LogoAnimation");
         }
 
         private float animationProgress;
