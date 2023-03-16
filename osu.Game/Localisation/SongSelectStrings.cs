@@ -19,11 +19,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString LocallyModifiedTooltip => new TranslatableString(getKey(@"locally_modified_tooltip"), @"Has been locally modified");
 
-        /// <summary>
-        /// "{0} beatmaps displayed"
-        /// </summary>
-        public static LocalisableString BeatmapsDisplayed(int arg0) => new TranslatableString(getKey(@"beatmaps_displayed"), @"{0:#,0} beatmaps displayed", arg0);
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
