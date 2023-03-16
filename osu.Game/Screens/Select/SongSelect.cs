@@ -40,7 +40,6 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select
 {
@@ -163,7 +162,15 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
-                FilterApplied = () => FilterControl.InformationalText = SongSelectStrings.BeatmapsDisplayed(Carousel.CountDisplayed),
+                FilterApplied = () =>
+                {
+                    FilterControl.InformationalText =
+                        Carousel.CountDisplayed == 1
+                            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                            // but also in this case we want support for formatting a number within a string).
+                            ? $"{Carousel.CountDisplayed:#,0} beatmap displayed"
+                            : $"{Carousel.CountDisplayed:#,0} beatmaps displayed";
+                },
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
