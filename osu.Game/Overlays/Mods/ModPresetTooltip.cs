@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModPresetTooltip : VisibilityContainer, ITooltip<List<Mod>>
+    public partial class ModPresetTooltip : VisibilityContainer, ITooltip<ModPreset>
     {
         protected override Container<Drawable> Content { get; }
 
@@ -43,15 +42,15 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        private List<Mod>? lastPreset;
+        private ModPreset? lastPreset;
 
-        public void SetContent(List<Mod> mods)
+        public void SetContent(ModPreset preset)
         {
-            if (ReferenceEquals(mods, lastPreset))
+            if (ReferenceEquals(preset, lastPreset))
                 return;
 
-            lastPreset = mods;
-            Content.ChildrenEnumerable = mods.Select(mod => new ModPresetRow(mod));
+            lastPreset = preset;
+            Content.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.OutQuint);
