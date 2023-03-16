@@ -66,25 +66,20 @@ namespace osu.Game.Skinning
             components.Clear();
             ComponentsLoaded = false;
 
-            if (componentsContainer == null)
-                return;
-
-            content = componentsContainer;
+            content = componentsContainer ?? new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             cancellationSource?.Cancel();
             cancellationSource = null;
 
-            if (content != null)
+            LoadComponentAsync(content, wrapper =>
             {
-                LoadComponentAsync(content, wrapper =>
-                {
-                    AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
-                    ComponentsLoaded = true;
-                }, (cancellationSource = new CancellationTokenSource()).Token);
-            }
-            else
+                AddInternal(wrapper);
+                components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
+            }, (cancellationSource = new CancellationTokenSource()).Token);
         }
 
         /// <inheritdoc cref="ISerialisableDrawableContainer"/>
@@ -105,7 +100,7 @@ namespace osu.Game.Skinning
         /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Remove(ISerialisableDrawable component)
+        public void Remove(ISerialisableDrawable component, bool disposeImmediately)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to remove a new component from a target container which is not supported by the current skin.");
@@ -113,7 +108,7 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            content.Remove(drawable, true);
+            content.Remove(drawable, disposeImmediately);
             components.Remove(component);
         }
 

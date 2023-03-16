@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 MetronomeBeat metronomeBeat;
 
-                drawableRuleset.Overlays.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+                // Importantly, this is added to FrameStableComponents and not Overlays as the latter would cause it to be self-muted by the mod's volume adjustment.
+                drawableRuleset.FrameStableComponents.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
 
                 metronomeBeat.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
