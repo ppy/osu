@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +20,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneSkinnableSound : OsuTestScene
     {
-        private TestSkinSourceContainer skinSource;
-        private PausableSkinnableSound skinnableSound;
+        private TestSkinSourceContainer skinSource = null!;
+        private PausableSkinnableSound skinnableSound = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -102,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSkinChangeDoesntPlayOnPause()
         {
-            DrawableSample sample = null;
+            DrawableSample? sample = null;
             AddStep("start sample", () =>
             {
                 skinnableSound.Play();
@@ -118,7 +116,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("retrieve and ensure current sample is different", () =>
             {
-                DrawableSample oldSample = sample;
+                DrawableSample? oldSample = sample;
                 sample = skinnableSound.ChildrenOfType<DrawableSample>().Single();
                 return sample != oldSample;
             });
@@ -134,20 +132,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         private partial class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]
-            private ISkinSource source { get; set; }
+            private ISkinSource source { get; set; } = null!;
 
-            public event Action SourceChanged;
+            public event Action? SourceChanged;
 
             public Bindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
 
             IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => SamplePlaybackDisabled;
 
-            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => source?.GetDrawableComponent(lookup);
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
-            public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : source?.FindProvider(lookupFunction);
-            public IEnumerable<ISkin> AllSources => new[] { this }.Concat(source?.AllSources ?? Enumerable.Empty<ISkin>());
+            public Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => source.GetDrawableComponent(lookup);
+            public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source.GetTexture(componentName, wrapModeS, wrapModeT);
+            public ISample? GetSample(ISampleInfo sampleInfo) => source.GetSample(sampleInfo);
+
+            public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+                where TLookup : notnull
+                where TValue : notnull
+            {
+                return source.GetConfig<TLookup, TValue>(lookup);
+            }
+
+            public ISkin? FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : source.FindProvider(lookupFunction);
+            public IEnumerable<ISkin> AllSources => new[] { this }.Concat(source.AllSources);
 
             public void TriggerSourceChanged()
             {
