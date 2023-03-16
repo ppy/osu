@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Mods
 
         private void trySaveCurrentMod()
         {
-            if (!button.CheckCurrentModCanBeSave())
+            if (!checkCanBeSave())
             {
                 Body.Shake();
                 return;
@@ -139,13 +139,12 @@ namespace osu.Game.Overlays.Mods
             saveModAfterClosed = selectedMods.Value.ToList();
             scrollContent.Clear();
             scrollContent.ChildrenEnumerable = saveModAfterClosed.Select(mod => new ModPresetRow(mod));
-            button.Mods.Value = saveModAfterClosed;
             updateActiveState();
         }
 
         private void updateActiveState()
         {
-            if (button.CheckCurrentModCanBeSave())
+            if (checkCanBeSave())
             {
                 useCurrentModButton.DarkerColour = colours.Blue1;
                 useCurrentModButton.LighterColour = colours.Blue0;
@@ -157,6 +156,19 @@ namespace osu.Game.Overlays.Mods
                 useCurrentModButton.LighterColour = colours.Blue4;
                 useCurrentModButton.TextColour = colourProvider.Background2;
             }
+        }
+
+        private bool checkCanBeSave()
+        {
+            if (!selectedMods.Value.Any())
+                return false;
+
+            if (saveModAfterClosed.Any())
+            {
+                return !new HashSet<Mod>(saveModAfterClosed).SetEquals(selectedMods.Value);
+            }
+
+            return button.CheckCurrentModCanBeSave();
         }
 
         protected override void LoadComplete()
@@ -178,22 +190,14 @@ namespace osu.Game.Overlays.Mods
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
+
+                if (saveModAfterClosed.Any())
+                {
+                    s.Mods = saveModAfterClosed;
+                }
             });
 
             this.HidePopover();
-        }
-
-        protected override void UpdateState(ValueChangedEvent<Visibility> state)
-        {
-            base.UpdateState(state);
-
-            if (state.NewValue == Visibility.Hidden && saveModAfterClosed.Any())
-            {
-                button.Preset.PerformWrite(s =>
-                {
-                    s.Mods = saveModAfterClosed;
-                });
-            }
         }
     }
 }
