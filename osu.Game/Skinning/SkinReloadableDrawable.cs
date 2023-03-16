@@ -27,6 +27,30 @@ namespace osu.Game.Skinning
         /// </summary>
         protected ISkinSource CurrentSkin { get; private set; } = null!;
 
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource source)
+        {
+            CurrentSkin = source;
+            CurrentSkin.SourceChanged += onChange;
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+            skinChanged();
+        }
+
+        /// <summary>
+        /// Force any pending <see cref="SkinChanged"/> calls to be performed immediately.
+        /// </summary>
+        /// <remarks>
+        /// When a skin change occurs, the handling provided by this class is scheduled.
+        /// In some cases, such a sample playback, this can result in the sample being played
+        /// just before it is updated to a potentially different sample.
+        ///
+        /// Calling this method will ensure any pending update operations are run immediately.
+        /// It is recommended to call this before consuming the result of skin changes for anything non-drawable.
+        /// </remarks>
         protected void FlushPendingSkinChanges()
         {
             if (pendingSkinChange == null)
@@ -36,11 +60,12 @@ namespace osu.Game.Skinning
             pendingSkinChange = null;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource source)
+        /// <summary>
+        /// Called when a change is made to the skin.
+        /// </summary>
+        /// <param name="skin">The new skin.</param>
+        protected virtual void SkinChanged(ISkinSource skin)
         {
-            CurrentSkin = source;
-            CurrentSkin.SourceChanged += onChange;
         }
 
         private void onChange()
@@ -51,26 +76,12 @@ namespace osu.Game.Skinning
             pendingSkinChange = Scheduler.Add(skinChanged);
         }
 
-        protected override void LoadAsyncComplete()
-        {
-            base.LoadAsyncComplete();
-            skinChanged();
-        }
-
         private void skinChanged()
         {
             SkinChanged(CurrentSkin);
             OnSkinChanged?.Invoke();
 
             pendingSkinChange = null;
-        }
-
-        /// <summary>
-        /// Called when a change is made to the skin.
-        /// </summary>
-        /// <param name="skin">The new skin.</param>
-        protected virtual void SkinChanged(ISkinSource skin)
-        {
         }
 
         protected override void Dispose(bool isDisposing)
