@@ -66,10 +66,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             int days = ranked_days - index + 1;
 
-            return new UserGraphTooltipContent(
-                UsersStrings.ShowRankGlobalSimple,
-                rank.ToLocalisableString("\\##,##0"),
-                days == 0 ? "now" : $"{"day".ToQuantity(days)} ago");
+            return new UserGraphTooltipContent
+            {
+                Name = UsersStrings.ShowRankGlobalSimple,
+                Count = rank.ToLocalisableString("\\##,##0"),
+                Time = days == 0 ? "now" : $"{"day".ToQuantity(days)} ago",
+            };
         }
     }
 }

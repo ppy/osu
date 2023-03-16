@@ -6,17 +6,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// A skin component that contains text and allows the user to choose its font.
     /// </summary>
-    public abstract partial class FontAdjustableSkinComponent : Container, ISkinnableDrawable
+    public abstract partial class FontAdjustableSkinComponent : Container, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Font", "The font to use.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         /// <summary>

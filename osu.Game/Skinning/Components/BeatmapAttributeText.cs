@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Skinning.Components
@@ -25,10 +26,10 @@ namespace osu.Game.Skinning.Components
     [UsedImplicitly]
     public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        [SettingSource("Attribute", "The attribute to be displayed.")]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
-        [SettingSource("Template", "Supports {Label} and {Value}, but also including arbitrary attributes like {StarRating} (see attribute list for supported values).")]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
         public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
 
         [Resolved]

@@ -234,6 +234,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Statistics.RankHistory = value;
         }
 
+        [JsonProperty(@"active_tournament_banner")]
+        [CanBeNull]
+        public TournamentBanner TournamentBanner;
+
         [JsonProperty("badges")]
         public Badge[] Badges;
 

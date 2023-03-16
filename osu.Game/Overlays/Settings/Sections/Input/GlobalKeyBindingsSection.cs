@@ -25,6 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Add(new AudioControlKeyBindingsSubsection(manager));
             Add(new SongSelectKeyBindingSubsection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
+            Add(new ReplayKeyBindingsSubsection(manager));
             Add(new EditorKeyBindingsSubsection(manager));
         }
 
@@ -69,6 +70,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 : base(null)
             {
                 Defaults = manager.InGameKeyBindings;
+            }
+        }
+
+        private partial class ReplayKeyBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override LocalisableString Header => InputSettingsStrings.ReplaySection;
+
+            public ReplayKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.ReplayKeyBindings;
             }
         }
 
