@@ -319,6 +319,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ModPresetColumn modPresetColumn = null!;
             var mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() };
+            List<Mod> previousMod = null!;
 
             AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
@@ -332,6 +333,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("right click first panel", () =>
             {
                 var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                previousMod = panel.Preset.Value.Mods.ToList();
                 InputManager.MoveMouseTo(panel);
                 InputManager.Click(MouseButton.Right);
             });
@@ -350,10 +352,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
                 InputManager.Click(MouseButton.Left);
             });
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
             AddWaitStep("wait some", 3);
-            AddUntilStep("popover not closed", () => this.ChildrenOfType<OsuPopover>().Any());
             AddAssert("present mod not changed", () =>
-                !new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Mods.Value).SetEquals(mods));
+                new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(previousMod));
 
             AddStep("select mods", () => SelectedMods.Value = mods);
             AddStep("right click first panel", () =>
@@ -377,17 +383,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
                 InputManager.Click(MouseButton.Left);
             });
-            AddWaitStep("wait some", 3);
-            AddUntilStep("popover not closed", () => this.ChildrenOfType<OsuPopover>().Any());
-            AddAssert("present mod is changed", () =>
-                new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Mods.Value).SetEquals(mods));
-
-            AddStep("click edit", () =>
+            AddStep("attempt preset edit", () =>
             {
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("present mod in realm is changed", () =>
+            AddWaitStep("wait some", 3);
+            AddAssert("present mod is changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
         }
 
