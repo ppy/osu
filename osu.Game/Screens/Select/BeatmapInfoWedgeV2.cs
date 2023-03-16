@@ -57,9 +57,9 @@ namespace osu.Game.Screens.Select
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = Colour4.Black.Opacity(.25f),
+                Colour = Colour4.Black.Opacity(0.2f),
                 Type = EdgeEffectType.Shadow,
-                Radius = corner_radius,
+                Radius = 3,
             };
             CornerRadius = corner_radius;
 
