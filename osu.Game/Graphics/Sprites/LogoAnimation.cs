@@ -59,14 +59,14 @@ namespace osu.Game.Graphics.Sprites
 
             private IUniformBuffer<AnimationData> animationDataBuffer;
 
-            protected override void Blit(IRenderer renderer)
+            protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
+                base.BindUniformResources(shader, renderer);
+
                 animationDataBuffer ??= renderer.CreateUniformBuffer<AnimationData>();
                 animationDataBuffer.Data = animationDataBuffer.Data with { Progress = progress };
 
-                TextureShader.BindUniformBlock("m_AnimationData", animationDataBuffer);
-
-                base.Blit(renderer);
+                shader.BindUniformBlock(@"m_AnimationData", animationDataBuffer);
             }
 
             protected override bool CanDrawOpaqueInterior => false;
