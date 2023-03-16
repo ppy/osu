@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Select
 
         public LocalisableString InformationalText
         {
-            get => filterText.Text;
-            set => filterText.Text = value;
+            get => searchTextBox.FilterText.Text;
+            set => searchTextBox.FilterText.Text = value;
         }
 
         private OsuTabControl<SortMode> sortTabs;
@@ -48,11 +48,9 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        private SeekLimitedSearchTextBox searchTextBox;
+        private FilterControlTextBox searchTextBox;
 
         private CollectionDropdown collectionDropdown;
-
-        private OsuSpriteText filterText;
 
         public FilterCriteria CreateCriteria()
         {
@@ -111,22 +109,9 @@ namespace osu.Game.Screens.Select
                         Spacing = new Vector2(0, 5),
                         Children = new Drawable[]
                         {
-                            searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                            new Container
+                            searchTextBox = new FilterControlTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                AutoSizeDuration = 200,
-                                AutoSizeEasing = Easing.OutQuint,
-                                Children = new Drawable[]
-                                {
-                                    filterText = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Font = OsuFont.Default.With(size: 12),
-                                    },
-                                }
                             },
                             new Box
                             {
@@ -262,5 +247,32 @@ namespace osu.Game.Screens.Select
         protected override bool OnClick(ClickEvent e) => true;
 
         protected override bool OnHover(HoverEvent e) => true;
+
+        private partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        {
+            private const float filter_text_size = 12;
+
+            public OsuSpriteText FilterText;
+
+            public FilterControlTextBox()
+            {
+                Height += filter_text_size;
+                TextContainer.Margin = new MarginPadding { Bottom = filter_text_size };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                TextContainer.Add(FilterText = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                    Depth = float.MinValue,
+                    Font = OsuFont.Default.With(size: filter_text_size, weight: FontWeight.SemiBold),
+                    Margin = new MarginPadding { Top = 2, Left = 2 },
+                    Colour = colours.Yellow
+                });
+            }
+        }
     }
 }
