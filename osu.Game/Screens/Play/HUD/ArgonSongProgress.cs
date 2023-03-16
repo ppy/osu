@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HUD
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float bar_height = 10;
 
-        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         [Resolved]

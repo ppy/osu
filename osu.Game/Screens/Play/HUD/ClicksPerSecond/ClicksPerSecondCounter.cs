@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISerialisableDrawable
     {
         [Resolved]
         private ClicksPerSecondCalculator calculator { get; set; } = null!;

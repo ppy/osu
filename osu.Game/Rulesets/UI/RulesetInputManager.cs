@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
+                if (value == recorder)
+                    return;
+
                 if (value != null && recorder != null)
                     throw new InvalidOperationException("Cannot attach more than one recorder");
 
