@@ -12,6 +12,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
@@ -31,6 +32,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached(typeof(IGameplayClock))]
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [SetUpSteps]
         public void SetUpSteps()

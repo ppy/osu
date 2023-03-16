@@ -45,6 +45,7 @@ namespace osu.Game.Skinning
         /// Remove an existing skinnable component from this target.
         /// </summary>
         /// <param name="component">The component to remove.</param>
-        void Remove(ISerialisableDrawable component);
+        /// <param name="disposeImmediately">Whether removed items should be immediately disposed.</param>
+        void Remove(ISerialisableDrawable component, bool disposeImmediately);
     }
 }

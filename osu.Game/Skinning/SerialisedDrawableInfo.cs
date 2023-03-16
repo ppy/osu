@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -100,13 +101,18 @@ namespace osu.Game.Skinning
             }
         }
 
-        public static Type[] GetAllAvailableDrawables()
+        /// <summary>
+        /// Retrieve all types available which support serialisation.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to filter results to. If <c>null</c>, global components will be returned instead.</param>
+        public static Type[] GetAllAvailableDrawables(RulesetInfo? ruleset = null)
         {
-            return typeof(OsuGame).Assembly.GetTypes()
-                                  .Where(t => !t.IsInterface && !t.IsAbstract)
-                                  .Where(t => typeof(ISerialisableDrawable).IsAssignableFrom(t))
-                                  .OrderBy(t => t.Name)
-                                  .ToArray();
+            return (ruleset?.CreateInstance().GetType() ?? typeof(OsuGame))
+                   .Assembly.GetTypes()
+                   .Where(t => !t.IsInterface && !t.IsAbstract && t.IsPublic)
+                   .Where(t => typeof(ISerialisableDrawable).IsAssignableFrom(t))
+                   .OrderBy(t => t.Name)
+                   .ToArray();
         }
     }
 }
