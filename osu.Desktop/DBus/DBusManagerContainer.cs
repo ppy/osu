@@ -245,7 +245,7 @@ namespace osu.Desktop.DBus
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
             ruleset.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.CurrentRuleset), v.NewValue?.Name ?? "???"), true);
-            bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.Status ?? "空闲"), true);
+            bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.GetStatus() ?? "空闲"), true);
 
             mprisService.Storage = storage;
             beatmapService.Storage = storage;

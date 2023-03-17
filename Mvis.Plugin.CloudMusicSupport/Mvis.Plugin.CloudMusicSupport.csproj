@@ -21,6 +21,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="7.0.0" />
   </ItemGroup>
 </Project>
