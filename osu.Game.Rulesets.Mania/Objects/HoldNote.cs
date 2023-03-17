@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         public TailNote Tail { get; private set; }
 
+        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
+
         /// <summary>
         /// The time between ticks of this hold.
         /// </summary>

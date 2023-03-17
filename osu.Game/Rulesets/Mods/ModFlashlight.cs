@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Colour = Color4.Black;
 
             flashlight.Combo.BindTo(Combo);
-            drawableRuleset.KeyBindingInputManager.Add(flashlight);
+            drawableRuleset.Overlays.Add(flashlight);
         }
 
         protected abstract Flashlight CreateFlashlight();

@@ -2,17 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Game.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -22,12 +23,12 @@ namespace osu.Game.Overlays.SkinEditor
     {
         public Action<Type>? RequestPlacement;
 
-        private readonly CompositeDrawable? target;
+        private readonly SkinComponentsContainer? target;
 
         private FillFlowContainer fill = null!;
 
-        public SkinComponentToolbox(CompositeDrawable? target = null)
-            : base(SkinEditorStrings.Components)
+        public SkinComponentToolbox(SkinComponentsContainer? target = null)
+            : base(target?.Lookup.Ruleset == null ? SkinEditorStrings.Components : LocalisableString.Interpolate($"{SkinEditorStrings.Components} ({target.Lookup.Ruleset.Name})"))
         {
             this.target = target;
         }
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SkinnableInfo.GetAllAvailableDrawables();
+            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables(target?.Lookup.Ruleset);
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }
@@ -61,11 +62,12 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
-                if (!((ISkinnableDrawable)instance).IsEditable) return;
+                if (!((ISerialisableDrawable)instance).IsEditable) return;
 
                 fill.Add(new ToolboxComponentButton(instance, target)
                 {
-                    RequestPlacement = t => RequestPlacement?.Invoke(t)
+                    RequestPlacement = t => RequestPlacement?.Invoke(t),
+                    Expanding = contractOtherButtons,
                 });
             }
             catch (DependencyNotRegisteredException)
@@ -79,14 +81,28 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
+        private void contractOtherButtons(ToolboxComponentButton obj)
+        {
+            foreach (var b in fill.OfType<ToolboxComponentButton>())
+            {
+                if (b == obj)
+                    continue;
+
+                b.Contract();
+            }
+        }
+
         public partial class ToolboxComponentButton : OsuButton
         {
             public Action<Type>? RequestPlacement;
+            public Action<ToolboxComponentButton>? Expanding;
 
             private readonly Drawable component;
             private readonly CompositeDrawable? dependencySource;
 
             private Container innerContainer = null!;
+
+            private ScheduledDelegate? expandContractAction;
 
             private const float contracted_size = 60;
             private const float expanded_size = 120;
@@ -102,20 +118,45 @@ namespace osu.Game.Overlays.SkinEditor
                 Height = contracted_size;
             }
 
+            private const double animation_duration = 500;
+
             protected override bool OnHover(HoverEvent e)
             {
-                this.Delay(300).ResizeHeightTo(expanded_size, 500, Easing.OutQuint);
+                expandContractAction?.Cancel();
+                expandContractAction = Scheduler.AddDelayed(() =>
+                {
+                    this.ResizeHeightTo(expanded_size, animation_duration, Easing.OutQuint);
+                    Expanding?.Invoke(this);
+                }, 100);
+
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                this.ResizeHeightTo(contracted_size, 500, Easing.OutQuint);
+
+                expandContractAction?.Cancel();
+                // If no other component is selected for too long, force a contract.
+                // Otherwise we will generally contract when Contract() is called from outside.
+                expandContractAction = Scheduler.AddDelayed(Contract, 1000);
+            }
+
+            public void Contract()
+            {
+                // Cheap debouncing to avoid stacking animations.
+                // The only place this is nulled is at the end of this method.
+                if (expandContractAction == null)
+                    return;
+
+                this.ResizeHeightTo(contracted_size, animation_duration, Easing.OutQuint);
+
+                expandContractAction?.Cancel();
+                expandContractAction = null;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
                 BackgroundColour = colourProvider.Background3;
 
@@ -148,9 +189,9 @@ namespace osu.Game.Overlays.SkinEditor
                 component.Origin = Anchor.Centre;
             }
 
-            protected override void Update()
+            protected override void UpdateAfterChildren()
             {
-                base.Update();
+                base.UpdateAfterChildren();
 
                 if (component.DrawSize != Vector2.Zero)
                 {

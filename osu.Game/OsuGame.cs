@@ -63,6 +63,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
@@ -565,6 +566,23 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
+        /// Present a skin select immediately.
+        /// </summary>
+        /// <param name="skin">The skin to select.</param>
+        public void PresentSkin(SkinInfo skin)
+        {
+            var databasedSkin = SkinManager.Query(s => s.ID == skin.ID);
+
+            if (databasedSkin == null)
+            {
+                Logger.Log("The requested skin could not be loaded.", LoggingTarget.Information);
+                return;
+            }
+
+            SkinManager.CurrentSkinInfo.Value = databasedSkin;
+        }
+
+        /// <summary>
         /// Present a beatmap at song select immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -840,6 +858,7 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
+            SkinManager.PresentImport = items => PresentSkin(items.First().Value);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);

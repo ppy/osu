@@ -182,6 +182,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
+            SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -378,6 +379,7 @@ namespace osu.Game.Configuration
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
         EditorShowHitMarkers,
+        EditorAutoSeekOnPlacement,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
