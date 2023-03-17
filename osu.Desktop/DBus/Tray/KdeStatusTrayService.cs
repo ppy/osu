@@ -30,7 +30,7 @@ namespace osu.Desktop.DBus.Tray
 
         public Task SetAsync(string prop, object val)
         {
-            throw new InvalidOperationException("暂时不能修改");
+            return Task.FromException(new InvalidOperationException("暂时不能修改"));
         }
 
         internal bool Set(string prop, object value)

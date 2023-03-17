@@ -99,7 +99,7 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
 
         public Task SetAsync(string prop, object val)
         {
-            throw new InvalidOperationException("只读属性");
+            return Task.FromException(new InvalidOperationException("只读属性"));
         }
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)

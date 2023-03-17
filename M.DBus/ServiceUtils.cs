@@ -20,8 +20,7 @@ namespace M.DBus
         {
             var dictionary = new Dictionary<string, object>();
 
-            foreach (var memberInfo in target.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public |
-                                                                   BindingFlags.GetProperty | BindingFlags.SetProperty))
+            foreach (var memberInfo in target.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty))
                 dictionary[memberInfo.Name] = memberInfo;
 
             return dictionary;

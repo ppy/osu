@@ -33,6 +33,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
         /// <summary>
+        /// How much padding around the selection area is added.
+        /// </summary>
+        public const float INFLATE_SIZE = 5;
+
+        /// <summary>
         /// The currently selected blueprints.
         /// Should be used when operations are dealing directly with the visible blueprints.
         /// For more general selection operations, use <see cref="SelectedItems"/> instead.
@@ -346,7 +351,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             for (int i = 1; i < selectedBlueprints.Count; i++)
                 selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            selectionRect = selectionRect.Inflate(5f);
+            selectionRect = selectionRect.Inflate(INFLATE_SIZE);
 
             SelectionBox.Position = selectionRect.Location;
             SelectionBox.Size = selectionRect.Size;

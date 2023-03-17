@@ -7,6 +7,7 @@ using M.DBus;
 using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.LLin.Misc;
 using Tmds.DBus;
 
 #nullable disable
@@ -115,8 +116,8 @@ namespace osu.Desktop.DBus
                 beatmap = value;
 
                 var info = value.BeatmapInfo;
-                playerProperties.Metadata["xesam:artist"] = new[] { info.Metadata?.ArtistUnicode ?? info.Metadata?.Artist ?? string.Empty };
-                playerProperties.Metadata["xesam:title"] = info.Metadata?.TitleUnicode ?? info.Metadata?.Title ?? string.Empty;
+                playerProperties.Metadata["xesam:artist"] = new[] { info.Metadata.GetArtist() };
+                playerProperties.Metadata["xesam:title"] = info.Metadata.GetTitle();
                 playerProperties.Metadata["mpris:artUrl"] = resolveBeatmapCoverUrl(value);
 
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
@@ -146,7 +147,7 @@ namespace osu.Desktop.DBus
         {
             const string head = "file://";
             string body;
-            string backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
+            string backgroundFilename = beatmap?.BeatmapInfo.Metadata.BackgroundFile;
 
             if (!string.IsNullOrEmpty(backgroundFilename) && !(UseAvatarLogoAsDefault?.Value ?? false))
             {

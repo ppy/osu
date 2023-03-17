@@ -2,22 +2,36 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
-    public partial class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
+    /// <summary>
+    /// A container which holds many skinnable components, with functionality to add, remove and reload layouts.
+    /// Used to allow user customisation of skin layouts.
+    /// </summary>
+    /// <remarks>
+    /// This is currently used as a means of serialising skin layouts to files.
+    /// Currently, one json file in a skin will represent one <see cref="SkinComponentsContainer"/>, containing
+    /// the output of <see cref="ISerialisableDrawableContainer.CreateSerialisedInfo"/>.
+    /// </remarks>
+    public partial class SkinComponentsContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
-        private SkinnableTargetComponentsContainer? content;
+        private Container? content;
 
-        public GlobalSkinComponentLookup.LookupType Target { get; }
+        /// <summary>
+        /// The lookup criteria which will be used to retrieve components from the active skin.
+        /// </summary>
+        public SkinComponentsContainerLookup Lookup { get; }
 
-        public IBindableList<ISkinnableDrawable> Components => components;
+        public IBindableList<ISerialisableDrawable> Components => components;
 
-        private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
+        private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks; // ensure that components are loaded even if the target container is hidden (ie. due to user toggle).
 
@@ -25,42 +39,53 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType target)
+        public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
         {
-            Target = target;
+            Lookup = lookup;
         }
 
-        /// <summary>
-        /// Reload all components in this container from the current skin.
-        /// </summary>
-        public void Reload()
+        public void Reload(SerialisedDrawableInfo[] skinnableInfo)
+        {
+            var drawables = new List<Drawable>();
+
+            foreach (var i in skinnableInfo)
+                drawables.Add(i.CreateInstance());
+
+            Reload(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = drawables,
+            });
+        }
+
+        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);
+
+        public void Reload(Container? componentsContainer)
         {
             ClearInternal();
             components.Clear();
             ComponentsLoaded = false;
 
-            content = CurrentSkin.GetDrawableComponent(new GlobalSkinComponentLookup(Target)) as SkinnableTargetComponentsContainer;
+            content = componentsContainer ?? new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             cancellationSource?.Cancel();
             cancellationSource = null;
 
-            if (content != null)
+            LoadComponentAsync(content, wrapper =>
             {
-                LoadComponentAsync(content, wrapper =>
-                {
-                    AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
-                    ComponentsLoaded = true;
-                }, (cancellationSource = new CancellationTokenSource()).Token);
-            }
-            else
+                AddInternal(wrapper);
+                components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
+            }, (cancellationSource = new CancellationTokenSource()).Token);
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Add(ISkinnableDrawable component)
+        public void Add(ISerialisableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");
@@ -72,10 +97,10 @@ namespace osu.Game.Skinning
             components.Add(component);
         }
 
-        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <inheritdoc cref="ISerialisableDrawableContainer"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Remove(ISkinnableDrawable component)
+        public void Remove(ISerialisableDrawable component, bool disposeImmediately)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to remove a new component from a target container which is not supported by the current skin.");
@@ -83,7 +108,7 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            content.Remove(drawable, true);
+            content.Remove(drawable, disposeImmediately);
             components.Remove(component);
         }
 

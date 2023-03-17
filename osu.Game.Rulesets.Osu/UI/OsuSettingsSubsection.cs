@@ -264,17 +264,17 @@ namespace osu.Game.Rulesets.Osu.UI
             };
         }
 
-        private partial class MultiplierSlider : OsuSliderBar<float>
+        private partial class MultiplierSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => Current.Value.ToString("N3") + "x";
         }
 
-        private partial class AngleSlider : OsuSliderBar<float>
+        private partial class AngleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => (Current.Value * 180).ToString("N2") + "deg";
         }
 
-        private partial class FramerateSlider : OsuSliderBar<float>
+        private partial class FramerateSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => Current.Value.ToString("N0") + "fps";
         }

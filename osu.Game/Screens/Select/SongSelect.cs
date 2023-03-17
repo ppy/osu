@@ -31,6 +31,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -156,7 +157,7 @@ namespace osu.Game.Screens.Select
                 if (!this.IsCurrentScreen())
                     return;
 
-                ApplyToBackground(b => b.BlurAmount.Value = e.NewValue ? BACKGROUND_BLUR : 0);
+                ApplyToBackground(applyBlurToBackground);
             });
 
             mConfig?.BindWith(MSetting.SongSelectBgBlur, BgBlur);
@@ -205,6 +206,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Child = new WedgeBackground
@@ -284,7 +286,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType.SongSelect)
+                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -783,17 +785,18 @@ namespace osu.Game.Screens.Select
             //我不放这oldBeatmapSet和BeatmapSetChanged就永远是null咋回事...
             oldBeatmapSet ??= Carousel.SelectedBeatmapSet;
 
-            BeatmapSetChanged = Carousel.SelectedBeatmapSet != oldBeatmapSet;
-
-            ApplyToBackground(backgroundModeBeatmap =>
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
             {
-                backgroundModeBeatmap.BlurAmount.Value = OptUI.Value ? BgBlur.Value * 100 : BACKGROUND_BLUR;
-                if (BlurOnly) return;
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            });
+                    applyBlurToBackground(backgroundModeBeatmap);
+                });
+            }
 
             beatmapInfoWedge.Beatmap = beatmap;
 
@@ -808,6 +811,14 @@ namespace osu.Game.Screens.Select
                 beatmapOptionsButton.Enabled.Value = false;
                 BeatmapOptions.Hide();
             }
+        }
+
+        private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
+        {
+            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
+
+            wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);

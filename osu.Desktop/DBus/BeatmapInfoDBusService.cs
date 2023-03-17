@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using M.DBus;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.LLin.Misc;
 using Tmds.DBus;
 
 #nullable disable
@@ -114,11 +115,9 @@ namespace osu.Desktop.DBus
         {
             set
             {
-                setProperty(nameof(properties.FullName), (value.Metadata.ArtistUnicode)
-                                                         + " - "
-                                                         + (value.Metadata.TitleUnicode));
+                setProperty(nameof(properties.FullName), value.Metadata.GetTitle() + " - " + value.Metadata.GetArtist());
 
-                setProperty(nameof(properties.Version), value.BeatmapInfo.DifficultyName ?? "???");
+                setProperty(nameof(properties.Version), value.BeatmapInfo.DifficultyName);
                 setProperty(nameof(properties.Stars), value.BeatmapInfo.StarRating);
                 setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineID);
                 setProperty(nameof(properties.BPM), value.BeatmapInfo.BPM);
@@ -142,7 +141,7 @@ namespace osu.Desktop.DBus
 
         public Task SetAsync(string prop, object val)
         {
-            throw new InvalidOperationException("只读属性");
+            return Task.FromException(new InvalidOperationException("只读属性"));
         }
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
@@ -189,9 +188,10 @@ namespace osu.Desktop.DBus
             }
             else
             {
-                var target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
-                if (!string.IsNullOrEmpty(target))
-                    body = Storage.GetFullPath(target);
+                string targetPath = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
+
+                if (!string.IsNullOrEmpty(targetPath))
+                    body = Storage.GetFullPath(targetPath);
                 else
                     return string.Empty;
             }

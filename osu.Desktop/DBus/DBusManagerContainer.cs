@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
@@ -121,12 +122,10 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(obj).ConfigureAwait(false);
         }
 
-        public void AddRange(IMDBusObject[] objects)
+        public void AddRange(IEnumerable<IMDBusObject> objects)
         {
             foreach (var obj in objects)
-            {
                 Add(obj);
-            }
         }
 
         public void Remove(IMDBusObject obj)
@@ -134,12 +133,10 @@ namespace osu.Desktop.DBus
             DBusManager.RemoveObject(obj);
         }
 
-        public void RemoveRange(IMDBusObject[] objects)
+        public void RemoveRange(IEnumerable<IMDBusObject> objects)
         {
             foreach (var obj in objects)
-            {
                 Remove(obj);
-            }
         }
 
         public void PostSystemNotification(SystemNotification notification)
@@ -177,12 +174,9 @@ namespace osu.Desktop.DBus
             enableSystemNotifications = config.GetBindable<bool>(MSetting.EnableSystemNotifications);
             config.BindWith(MSetting.MprisUpdateInterval, mprisUpdateInterval);
 
-            void onDBusFirstConnected()
+            void postConnect()
             {
-                Schedule(() =>
-                {
-                    Add(mprisService);
-                });
+                this.Add(mprisService);
 
                 trayManager.AddEntryRange(new[]
                 {
@@ -199,6 +193,9 @@ namespace osu.Desktop.DBus
                         OnActive = () =>
                         {
                             sdl2DesktopWindow.Visible = !sdl2DesktopWindow.Visible;
+
+                            if (sdl2DesktopWindow.Visible)
+                                raiseWindow();
                         },
                         IconName = "window-pop-out"
                     },
@@ -241,14 +238,14 @@ namespace osu.Desktop.DBus
                 DBusManager.OnConnected -= scheduleFirstConnected;
             }
 
-            void scheduleFirstConnected() => Schedule(onDBusFirstConnected);
+            void scheduleFirstConnected() => Schedule(postConnect);
 
             DBusManager.OnConnected += scheduleFirstConnected;
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
             ruleset.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.CurrentRuleset), v.NewValue?.Name ?? "???"), true);
-            bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.Status ?? "空闲"), true);
+            bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.GetStatus() ?? "空闲"), true);
 
             mprisService.Storage = storage;
             beatmapService.Storage = storage;
@@ -283,10 +280,12 @@ namespace osu.Desktop.DBus
 
                 mprisService.Progress = (long)(target * 1000);
             });
+
             mprisService.SetPosition += pos => Schedule(() =>
             {
                 musicController.SeekTo(pos / 1000d);
             });
+
             mprisService.OnRandom += () =>
             {
                 var usableBeatmapSets = beatmapManager.GetAllUsableBeatmapSets();
@@ -329,7 +328,7 @@ namespace osu.Desktop.DBus
             {
                 if (!sdl2DesktopWindow.Visible) sdl2DesktopWindow.Visible = true;
 
-                //sdl2DesktopWindow.Raise();
+                sdl2DesktopWindow.Raise();
             });
         }
 

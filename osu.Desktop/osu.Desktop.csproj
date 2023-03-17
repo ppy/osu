@@ -9,7 +9,7 @@
     <Product>osu!(lazer)</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2023.207.0</Version>
+    <Version>2023.305.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -32,9 +32,9 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="Clowd.Squirrel" Version="2.9.42" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
-    <PackageReference Include="System.IO.Packaging" Version="6.0.0" />
+    <PackageReference Include="System.IO.Packaging" Version="7.0.0" />
     <PackageReference Include="Tmds.DBus" Version="0.11.0" />
-    <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
+    <PackageReference Include="DiscordRichPresence" Version="1.1.3.18" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
