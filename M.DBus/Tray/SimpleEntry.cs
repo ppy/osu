@@ -12,7 +12,14 @@ namespace M.DBus.Tray
     /// </summary>
     public class SimpleEntry
     {
-        public int? ChildId { get; internal set; }
+        public SimpleEntry()
+        {
+            this.ChildId = ChildId == -1 ? Cid++ : ChildId;
+        }
+
+        public static int Cid = 1;
+
+        public int ChildId { get; protected set; } = -1;
 
         public Action OnPropertyChanged;
 

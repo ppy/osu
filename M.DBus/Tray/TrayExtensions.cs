@@ -74,13 +74,13 @@ namespace M.DBus.Tray
                             IDictionary<int, SimpleEntry> additDict;
 
                             //如果subEntry没有被指定ChildID
-                            if (subEntry.ChildId == null)
+                            if (subEntry.ChildId == -1)
                             {
                                 //最大id+1
                                 maxOrder++;
 
                                 //设置subEntry的ChildID
-                                subEntry.ChildId = maxOrder;
+                                //subEntry.ChildId = SimpleEntry.Cid++;
 
                                 //加入要返回的词典中
                                 additionalEntries[(int)subEntry.ChildId] = subEntry;
@@ -116,7 +116,7 @@ namespace M.DBus.Tray
 
         public static (int, IDictionary<string, object>) ToDbusObject(this SimpleEntry entry)
         {
-            int childId = entry.ChildId ?? -1;
+            int childId = entry.ChildId;
 
             var result = new Dictionary<string, object>
             {

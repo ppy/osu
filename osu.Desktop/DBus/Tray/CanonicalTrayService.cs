@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
@@ -98,8 +97,6 @@ namespace osu.Desktop.DBus.Tray
             entry ??= rootEntry;
             //Logger.Log($"{entry.ToString().Replace("\n", "\\n")}发生了变化");
 
-            if (entry.ChildId == null) throw new ArgumentNullException($"{entry}没有ChildID");
-
             int childId = (int)entry.ChildId;
 
             updatedEntries[childId] = entry;
@@ -135,8 +132,6 @@ namespace osu.Desktop.DBus.Tray
                     IDictionary<int, SimpleEntry> additDict;
                     //int addit;
 
-                    Debug.Assert(rootEntry.ChildId != null, "rootEntry.ChildId != null");
-
                     result = (menuRevision, rootEntry.ToDbusObject(
                         (int)rootEntry.ChildId,
                         dbusItemMaxOrder,
@@ -168,8 +163,6 @@ namespace osu.Desktop.DBus.Tray
                     return Task.FromResult(cachedLayoutObject);
 
                 var target = entries.FirstOrDefault(e => e.Key == parentId).Value;
-
-                if (target.ChildId == null) throw new ArgumentNullException($"{target}的ChildID是null");
 
                 result = (menuRevision, target.ToDbusObject(
                     (int)target.ChildId,
