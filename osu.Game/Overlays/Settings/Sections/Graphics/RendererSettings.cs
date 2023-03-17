@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -17,15 +17,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override LocalisableString Header => GraphicsSettingsStrings.RendererHeader;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay dialogOverlay, OsuGame game, GameHost host)
         {
-            // NOTE: Compatability mode omitted
+            var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
+
             Children = new Drawable[]
             {
                 new SettingsEnumDropdown<RendererType>
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
-                    Current = config.GetBindable<RendererType>(FrameworkSetting.Renderer),
+                    Current = renderer,
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
@@ -46,6 +47,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
+
+            renderer.BindValueChanged(r =>
+            {
+                if (r.NewValue == host.ResolvedRenderer)
+                    return;
+
+                dialogOverlay.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, game.AttemptExit, () =>
+                {
+                    renderer.SetDefault();
+                }));
+            });
         }
     }
 }
