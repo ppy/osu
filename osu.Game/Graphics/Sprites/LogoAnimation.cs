@@ -78,6 +78,9 @@ namespace osu.Game.Graphics.Sprites
 
             protected override void Blit(IRenderer renderer)
             {
+                if (DrawRectangle.Width == 0 || DrawRectangle.Height == 0)
+                    return;
+
                 animationDataBuffer ??= renderer.CreateUniformBuffer<AnimationData>();
                 animationVertexBatch ??= renderer.CreateQuadBatch<LogoAnimationVertex>(1, 2);
 
@@ -85,7 +88,13 @@ namespace osu.Game.Graphics.Sprites
 
                 TextureShader.BindUniformBlock("m_AnimationData", animationDataBuffer);
 
-                base.Blit(renderer);
+                renderer.DrawQuad(
+                    Texture,
+                    ScreenSpaceDrawQuad,
+                    DrawColourInfo.Colour,
+                    inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                    textureCoords: TextureCoords,
+                    vertexAction: addVertexAction);
             }
 
             protected override bool CanDrawOpaqueInterior => false;
