@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -23,6 +22,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             // NOTE: Compatability mode omitted
             Children = new Drawable[]
             {
+                new SettingsEnumDropdown<RendererType>
+                {
+                    LabelText = GraphicsSettingsStrings.Renderer,
+                    Current = config.GetBindable<RendererType>(FrameworkSetting.Renderer),
+                    Keywords = new[] { @"compatibility", @"directx" },
+                },
                 // TODO: this needs to be a custom dropdown at some point
                 new SettingsEnumDropdown<FrameSync>
                 {
