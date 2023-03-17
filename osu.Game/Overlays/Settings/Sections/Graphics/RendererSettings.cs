@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -27,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
+                    Items = host.GetPreferredRenderersForCurrentPlatform().OrderBy(t => t),
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
