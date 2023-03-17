@@ -3,13 +3,18 @@
 
 #nullable disable
 
+using System;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Graphics.ES30;
 
 namespace osu.Game.Graphics.Sprites
 {
@@ -43,11 +48,22 @@ namespace osu.Game.Graphics.Sprites
         {
             private LogoAnimation source => (LogoAnimation)Source;
 
+            private readonly Action<TexturedVertex2D> addVertexAction;
+
             private float progress;
 
             public LogoAnimationDrawNode(LogoAnimation source)
                 : base(source)
             {
+                addVertexAction = v =>
+                {
+                    animationVertexBatch!.Add(new LogoAnimationVertex
+                    {
+                        Position = v.Position,
+                        Colour = v.Colour,
+                        TexturePosition = v.TexturePosition,
+                    });
+                };
             }
 
             public override void ApplyState()
@@ -58,10 +74,13 @@ namespace osu.Game.Graphics.Sprites
             }
 
             private IUniformBuffer<AnimationData> animationDataBuffer;
+            private IVertexBatch<LogoAnimationVertex> animationVertexBatch;
 
             protected override void Blit(IRenderer renderer)
             {
                 animationDataBuffer ??= renderer.CreateUniformBuffer<AnimationData>();
+                animationVertexBatch ??= renderer.CreateQuadBatch<LogoAnimationVertex>(1, 2);
+
                 animationDataBuffer.Data = animationDataBuffer.Data with { Progress = progress };
 
                 TextureShader.BindUniformBlock("m_AnimationData", animationDataBuffer);
@@ -82,6 +101,24 @@ namespace osu.Game.Graphics.Sprites
             {
                 public UniformFloat Progress;
                 private readonly UniformPadding12 pad1;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            private struct LogoAnimationVertex : IEquatable<LogoAnimationVertex>, IVertex
+            {
+                [VertexMember(2, VertexAttribPointerType.Float)]
+                public Vector2 Position;
+
+                [VertexMember(4, VertexAttribPointerType.Float)]
+                public Color4 Colour;
+
+                [VertexMember(2, VertexAttribPointerType.Float)]
+                public Vector2 TexturePosition;
+
+                public readonly bool Equals(LogoAnimationVertex other) =>
+                    Position.Equals(other.Position)
+                    && TexturePosition.Equals(other.TexturePosition)
+                    && Colour.Equals(other.Colour);
             }
         }
     }
