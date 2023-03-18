@@ -61,6 +61,10 @@ namespace osu.Game.Screens.Select
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
+                case "played":
+                case "lastplayed":
+                    return tryUpdateLastPlayedRange(criteria, op, value);
+
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
@@ -109,7 +113,8 @@ namespace osu.Game.Screens.Select
             value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
             value.EndsWith('s') ? 1000 :
             value.EndsWith('m') ? 60000 :
-            value.EndsWith('h') ? 3600000 : 1000;
+            value.EndsWith('h') ? 3600000 :
+            value.EndsWith('d') ? 86400000 : 1000;
 
         private static bool tryParseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
@@ -367,6 +372,52 @@ namespace osu.Game.Screens.Select
             }
 
             return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
+        }
+
+        private static bool tryUpdateLastPlayedRange(FilterCriteria criteria, Operator op, string val)
+        {
+            List<string> parts = new List<string>();
+
+            GroupCollection? match = null;
+
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
+
+            if (match == null)
+                return false;
+
+            if (match["seconds"].Success)
+                parts.Add(match["seconds"].Value + "s");
+            if (match["minutes"].Success)
+                parts.Add(match["minutes"].Value + "m");
+            if (match["hours"].Success)
+                parts.Add(match["hours"].Value + "h");
+            if (match["days"].Success)
+                parts.Add(match["days"].Value + "d");
+
+
+            double totalLength = 0;
+            int minScale = 86400000;
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                string part = parts[i];
+                string partNoUnit = part.TrimEnd('m', 's', 'h', 'd') ;
+                if (!tryParseDoubleWithPoint(partNoUnit, out double length))
+                    return false;
+
+                if (i != parts.Count - 1 && length >= 60)
+                    return false;
+                if (i != 0 && partNoUnit.Contains('.'))
+                    return false;
+
+                int scale = getLengthScale(part);
+                totalLength += length * scale;
+                minScale = Math.Min(minScale, scale);
+            }
+
+            return tryUpdateCriteriaRange(ref criteria.LastPlayed, op, totalLength, minScale / 2.0);
         }
     }
 }
