@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Select
             GroupCollection? match = null;
 
             match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
-            match ??= tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
             match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
 
             if (match == null)
@@ -403,7 +403,7 @@ namespace osu.Game.Screens.Select
             for (int i = 0; i < parts.Count; i++)
             {
                 string part = parts[i];
-                string partNoUnit = part.TrimEnd('m', 's', 'h', 'd') ;
+                string partNoUnit = part.TrimEnd('m', 's', 'h', 'd');
                 if (!tryParseDoubleWithPoint(partNoUnit, out double length))
                     return false;
 
@@ -417,7 +417,16 @@ namespace osu.Game.Screens.Select
                 minScale = Math.Min(minScale, scale);
             }
 
-            return tryUpdateCriteriaRange(ref criteria.LastPlayed, op, totalLength, minScale / 2.0);
+            totalLength += minScale / 2;
+
+            // Limits the date to ~2000 years compared to now
+            // Might want to do it differently before 4000 A.C.
+            double limit = 86400000;
+            limit *= 365 * 2000;
+            totalLength = Math.Min(totalLength, limit);
+
+            DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
+            return tryUpdateCriteriaRange(ref criteria.LastPlayed, op, dateTimeOffset.AddMilliseconds(-totalLength));
         }
     }
 }
