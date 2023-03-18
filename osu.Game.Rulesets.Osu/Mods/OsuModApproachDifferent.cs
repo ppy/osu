@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableFloat Scale { get; } = new BindableFloat(4)
         {
             Precision = 0.1f,
-            MinValue = 1.5f,
+            MinValue = 0f,
             MaxValue = 10,
         };
 
