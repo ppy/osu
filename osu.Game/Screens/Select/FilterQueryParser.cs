@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
 
                 case "played":
                 case "lastplayed":
-                    return tryUpdateLastPlayedRange(criteria, op, value);
+                    return tryUpdateDateRange(ref criteria.LastPlayed, op, value);
 
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
@@ -374,59 +374,92 @@ namespace osu.Game.Screens.Select
             return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
         }
 
-        private static bool tryUpdateLastPlayedRange(FilterCriteria criteria, Operator op, string val)
+        private static bool tryUpdateDateRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
         {
-            List<string> parts = new List<string>();
-
             GroupCollection? match = null;
 
             match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
-            match ??= tryMatchRegex(val, @"^((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^((?<years>\d+(\.\d+)?)y)?((?<months>\d+(\.\d+)?)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
             match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
 
             if (match == null)
                 return false;
 
-            if (match["seconds"].Success)
-                parts.Add(match["seconds"].Value + "s");
-            if (match["minutes"].Success)
-                parts.Add(match["minutes"].Value + "m");
-            if (match["hours"].Success)
-                parts.Add(match["hours"].Value + "h");
-            if (match["days"].Success)
-                parts.Add(match["days"].Value + "d");
+            DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
 
-
-            double totalLength = 0;
-            int minScale = 86400000;
-
-            for (int i = 0; i < parts.Count; i++)
+            try
             {
-                string part = parts[i];
-                string partNoUnit = part.TrimEnd('m', 's', 'h', 'd');
-                if (!tryParseDoubleWithPoint(partNoUnit, out double length))
-                    return false;
+                List<string> keys = new List<string> { "seconds", "minutes", "hours", "days", "months", "years" };
 
-                if (i != parts.Count - 1 && length >= 60)
-                    return false;
-                if (i != 0 && partNoUnit.Contains('.'))
-                    return false;
+                foreach (string key in keys)
+                {
+                    if (match[key].Success)
+                    {
+                        if (!tryParseDoubleWithPoint(match[key].Value, out double length))
+                            return false;
 
-                int scale = getLengthScale(part);
-                totalLength += length * scale;
-                minScale = Math.Min(minScale, scale);
+                        switch (key)
+                        {
+                            case "seconds":
+                                dateTimeOffset = dateTimeOffset.AddSeconds(-length);
+                                break;
+
+                            case "minutes":
+                                dateTimeOffset = dateTimeOffset.AddMinutes(-length);
+                                break;
+
+                            case "hours":
+                                dateTimeOffset = dateTimeOffset.AddHours(-length);
+                                break;
+
+                            case "days":
+                                dateTimeOffset = dateTimeOffset.AddDays(-length);
+                                break;
+
+                            case "months":
+                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)Math.Round(length));
+                                break;
+
+                            case "years":
+                                dateTimeOffset = dateTimeOffset.AddYears(-(int)Math.Round(length));
+                                break;
+                        }
+                    }
+                }
+            }
+            // If DateTime to compare is out-scope put it to Min
+            catch (Exception)
+            {
+                dateTimeOffset = DateTimeOffset.MinValue;
+                dateTimeOffset = dateTimeOffset.AddMilliseconds(1);
             }
 
-            totalLength += minScale / 2;
+            return tryUpdateCriteriaRange(ref dateRange, invert(op), dateTimeOffset);
+        }
 
-            // Limits the date to ~2000 years compared to now
-            // Might want to do it differently before 4000 A.C.
-            double limit = 86400000;
-            limit *= 365 * 2000;
-            totalLength = Math.Min(totalLength, limit);
+        // Function to reverse an Operator
+        private static Operator invert(Operator ope)
+        {
+            switch (ope)
+            {
+                default:
+                    return Operator.Equal;
 
-            DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
-            return tryUpdateCriteriaRange(ref criteria.LastPlayed, op, dateTimeOffset.AddMilliseconds(-totalLength));
+                case Operator.Equal:
+                    return Operator.Equal;
+
+                case Operator.Greater:
+                    return Operator.Less;
+
+                case Operator.GreaterOrEqual:
+                    return Operator.LessOrEqual;
+
+                case Operator.Less:
+                    return Operator.Greater;
+
+                case Operator.LessOrEqual:
+                    return Operator.GreaterOrEqual;
+            }
         }
     }
 }

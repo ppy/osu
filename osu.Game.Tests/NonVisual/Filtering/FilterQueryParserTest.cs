@@ -316,5 +316,87 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 return false;
             }
         }
+
+        //Date criteria testing
+
+        private static readonly object[] correct_date_query_examples =
+        {
+            new object[] { "600" },
+            new object[] { "120:120" },
+            new object[] { "48:0:0" },
+            new object[] { "0.5s" },
+            new object[] { "120m" },
+            new object[] { "48h120s" },
+            new object[] { "10y24M" },
+            new object[] { "10y60d120s" },
+            new object[] { "0.1y0.1M2d" },
+            new object[] { "0.99y0.99M2d" }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(correct_date_query_examples))]
+        public void TestValidDateQueries(string dateQuery)
+        {
+            string query = $"played={dateQuery} time";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        private static readonly object[] incorrect_date_query_examples =
+        {
+            new object[] { "7m27" },
+            new object[] { "7m7m7m" },
+            new object[] { "5s6m" },
+            new object[] { "7d7y" },
+            new object[] { ":0" },
+            new object[] { "0:3:" },
+            new object[] { "\"three days\"" }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(incorrect_date_query_examples))]
+        public void TestInvalidDateQueries(string dateQuery)
+        {
+            string query = $"played={dateQuery} time";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        private static readonly object[] list_operators =
+        {
+            new object[] { "=", false, false, true, true },
+            new object[] { ":", false, false, true, true },
+            new object[] { "<", false, true, false, false },
+            new object[] { "<=", false, true, true, false },
+            new object[] { "<:", false, true, true, false },
+            new object[] { ">", true, false, false, false },
+            new object[] { ">=", true, false, false, true },
+            new object[] { ">:", true, false, false, true }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(list_operators))]
+        public void TestComparisonDateQueries(string ope, bool minIsNull, bool maxIsNull, bool isLowerInclusive, bool isUpperInclusive)
+        {
+            string query = $"played{ope}50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(isLowerInclusive, filterCriteria.LastPlayed.IsLowerInclusive);
+            Assert.AreEqual(isUpperInclusive, filterCriteria.LastPlayed.IsUpperInclusive);
+            Assert.AreEqual(maxIsNull, filterCriteria.LastPlayed.Max == null);
+            Assert.AreEqual(minIsNull, filterCriteria.LastPlayed.Min == null);
+        }
+
+        [Test]
+        public void TestOutofrangeDateQuery()
+        {
+            const string query = "played=10000y";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            Assert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
+        }
     }
 }
