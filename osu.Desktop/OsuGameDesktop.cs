@@ -139,7 +139,17 @@ namespace osu.Desktop
 
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
-            desktopWindow.DragDrop += f => fileDrop(new[] { f });
+            desktopWindow.DragDrop += f =>
+            {
+                // on macOS, URL associations are handled via SDL_DROPFILE events.
+                if (f.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                {
+                    HandleLink(f);
+                    return;
+                }
+
+                fileDrop(new[] { f });
+            };
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
