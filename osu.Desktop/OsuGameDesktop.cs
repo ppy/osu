@@ -151,10 +151,6 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                string firstExtension = Path.GetExtension(filePaths.First());
-
-                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
                 importableFiles.AddRange(filePaths);
 
                 Logger.Log($"Adding {filePaths.Length} files for import");
