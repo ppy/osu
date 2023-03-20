@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -161,10 +160,6 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                string firstExtension = Path.GetExtension(filePaths.First());
-
-                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
                 importableFiles.AddRange(filePaths);
 
                 Logger.Log($"Adding {filePaths.Length} files for import");
