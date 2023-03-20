@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Select
         {
             private const float filter_text_size = 12;
 
-            public OsuSpriteText FilterText;
+            public OsuSpriteText FilterText { get; private set; }
 
             public FilterControlTextBox()
             {
