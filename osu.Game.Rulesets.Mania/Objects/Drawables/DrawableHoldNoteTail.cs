@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
 
-        protected DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
+        protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
         public DrawableHoldNoteTail()
             : this(null)
