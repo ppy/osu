@@ -294,17 +294,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             switch (columnIndex % total_colours)
             {
-                case 0: return new Color4(255, 197, 40, 255);
+                case 0: return colour_yellow;
 
-                case 1: return new Color4(252, 109, 1, 255);
+                case 1: return colour_orange;
 
-                case 2: return new Color4(213, 35, 90, 255);
+                case 2: return colour_pink;
 
-                case 3: return new Color4(203, 60, 236, 255);
+                case 3: return colour_purple;
 
-                case 4: return new Color4(72, 198, 255, 255);
+                case 4: return colour_cyan;
 
-                case 5: return new Color4(100, 192, 92, 255);
+                case 5: return colour_green;
 
                 default: throw new ArgumentOutOfRangeException();
             }
