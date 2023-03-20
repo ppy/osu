@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// After this distance is covered, any extra touches on the screen will be considered as button inputs, unless
         /// a new touch directly interacts with a hit circle.
         /// </summary>
-        private const float distance_before_position_tracking_lock_in = 200;
+        private const float distance_before_position_tracking_lock_in = 100;
 
         private TrackedTouch? positionTrackingTouch;
 
