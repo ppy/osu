@@ -22,6 +22,13 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private readonly List<TrackedTouch> trackedTouches = new List<TrackedTouch>();
 
+        /// <summary>
+        /// The distance (in local pixels) that a touch must move before being considered a permanent tracking touch.
+        /// After this distance is covered, any extra touches on the screen will be considered as button inputs, unless
+        /// a new touch directly interacts with a hit circle.
+        /// </summary>
+        private const float distance_before_position_tracking_lock_in = 200;
+
         private TrackedTouch? positionTrackingTouch;
 
         private readonly OsuInputManager osuInputManager;
@@ -98,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.UI
             }
 
             // ..or if the current position tracking touch was not a direct touch (and didn't travel across the screen too far).
-            if (!positionTrackingTouch.DirectTouch && positionTrackingTouch.DistanceTravelled < 200)
+            if (!positionTrackingTouch.DirectTouch && positionTrackingTouch.DistanceTravelled < distance_before_position_tracking_lock_in)
             {
                 positionTrackingTouch = newTouch;
                 return;
@@ -160,9 +167,9 @@ namespace osu.Game.Rulesets.Osu.UI
             public readonly bool DirectTouch;
 
             /// <summary>
-            /// The total distance on screen travelled by this touch.
+            /// The total distance on screen travelled by this touch (in local pixels).
             /// </summary>
-            public double DistanceTravelled;
+            public float DistanceTravelled;
 
             public TrackedTouch(TouchSource source, OsuAction? action, bool directTouch)
             {
