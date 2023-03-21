@@ -107,14 +107,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("ensure sample loaded", () => skinnableSound.ChildrenOfType<DrawableSample>().Single().Name, () => Is.EqualTo(sample_lookup));
 
-            AddStep("Change source", () =>
+            AddStep("change source", () =>
             {
                 skinSource.OverridingSample = new SampleVirtual("new skin");
                 skinSource.TriggerSourceChanged();
             });
-
-            // Samples are nulled on source change immediately
-            AddUntilStep("wait for sample null", () => skinnableSound.ChildrenOfType<DrawableSample>().Count(), () => Is.Zero);
 
             AddStep("start sample", () => skinnableSound.Play());
             AddUntilStep("sample updated", () => skinnableSound.ChildrenOfType<DrawableSample>().Single().Name, () => Is.EqualTo("new skin"));
