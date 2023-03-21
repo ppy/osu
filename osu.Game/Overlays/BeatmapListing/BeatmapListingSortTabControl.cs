@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private partial class BeatmapTabButton : TabButton
+        public partial class BeatmapTabButton : TabButton
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
