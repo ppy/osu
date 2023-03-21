@@ -12,8 +12,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Scoring;
 using MathNet.Numerics;
-using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -125,17 +123,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private double? computeEstimatedUr(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow == 0)
+            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow <= 0)
                 return null;
 
-            // Create a new track to properly calculate the hit window of 100s.
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            double clockRate = track.Rate;
-
-            double overallDifficulty = (50 - attributes.GreatHitWindow * clockRate) / 3;
             double h300 = attributes.GreatHitWindow;
-            double h100 = overallDifficulty <= 5 ? (120 - 8 * overallDifficulty) / clockRate : (80 - 6 * (overallDifficulty - 5)) / clockRate;
+            double h100 = attributes.OkHitWindow;
 
             // Returns the likelihood of a deviation resulting in the score's hit judgements. The peak of the curve is the most likely deviation.
             double likelihoodGradient(double d)
@@ -167,8 +159,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double logPcHit(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
 
-        // There is a numerical approximation to increase how far you can calculate Erfc(x).
-        private double logErfcApprox(double x) => x <= 5 ? Math.Log(SpecialFunctions.Erfc(x)) : -Math.Pow(x, 2) - Math.Log(x) - Math.Log(Math.Sqrt(Math.PI));
+        // There's a numerical approximation to increase how far you can calculate ln(erfc(x)).
+        private double logErfcApprox(double x) => x <= 5
+            ? Math.Log(SpecialFunctions.Erfc(x))
+            : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/kdbxwxgf01
 
         // Log rules make subtraction of the non-log value non-trivial, this method simply subtracts the base value of 2 logs.
         private double logDiff(double firstLog, double secondLog)
