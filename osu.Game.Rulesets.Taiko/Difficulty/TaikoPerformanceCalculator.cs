@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// Estimates the player's tap deviation based on the OD, number of objects, and number of 300s, 100s, and misses,
         /// assuming the player's mean hit error is 0. The estimation is consistent in that two SS scores on the same map with the same settings
-        /// will always return the same deviation. See: https://www.desmos.com/calculator/qlr946netu
+        /// will always return the same deviation. See: https://www.desmos.com/calculator/x3mvtir093
         /// </summary>
         private double? computeEstimatedUr(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
