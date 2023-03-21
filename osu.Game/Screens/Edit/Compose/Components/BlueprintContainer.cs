@@ -401,7 +401,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
             }
 
-            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && AllowCyclicSelection)
+            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1 && AllowCyclicSelection)
             {
                 // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
                 // cycle between other blueprints which are also under the cursor.
