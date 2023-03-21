@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
             if (currentParameters == null)
                 Reset(SearchCategory.Leaderboard, false);
+
+            Current.BindValueChanged(_ => SortDirection.Value = Overlays.SortDirection.Descending);
         }
 
         public void Reset(SearchCategory category, bool hasQuery)
