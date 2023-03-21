@@ -43,6 +43,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
+        /// <summary>
+        /// The perceived hit window for an OK hit inclusive of rate-adjusting mods (DT/HT/etc).
+        /// </summary>
+        /// <remarks>
+        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
+        /// </remarks>
+        [JsonProperty("ok_hit_window")]
+        public double OkHitWindow { get; set; }
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())
