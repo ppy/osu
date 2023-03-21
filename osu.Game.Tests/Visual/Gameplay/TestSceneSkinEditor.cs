@@ -126,6 +126,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+
+            // Test cyclic selection doesn't trigger in this state.
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Last two boxes still selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
         }
 
         [Test]
@@ -164,6 +168,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
             AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+
+            AddStep("select all boxes", () =>
+            {
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.AddRange(targetContainer.Components.OfType<BigBlackBox>().Skip(1));
+            });
+
+            AddAssert("all boxes selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
         }
 
         [TestCase(false)]
