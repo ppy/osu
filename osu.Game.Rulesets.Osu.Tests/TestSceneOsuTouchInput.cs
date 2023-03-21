@@ -176,6 +176,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPressed(OsuAction.RightButton);
             // in this case, touch 2 should not become the positional tracking touch.
             checkPosition(TouchSource.Touch1);
+
+            // even if the second touch moves on the screen, the original tracking touch is retained.
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+
+            checkPosition(TouchSource.Touch1);
         }
 
         [Test]
