@@ -156,14 +156,17 @@ namespace osu.Game.Collections
                         Colour = colours.Yellow
                     });
 
-                    itemCountSubscription = realm.SubscribeToPropertyChanged<BeatmapCollection, IList<string>>(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, items =>
-                    {
-                        countText.Text = items.Count == 1
-                            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-                            // but also in this case we want support for formatting a number within a string).
-                            ? $"{items.Count:#,0} beatmap"
-                            : $"{items.Count:#,0} beatmaps";
-                    });
+                    itemCountSubscription = realm.SubscribeToPropertyChanged<BeatmapCollection, IList<string>>(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, _ =>
+                        Scheduler.AddOnce(() =>
+                        {
+                            int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
+
+                            countText.Text = count == 1
+                                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                                // but also in this case we want support for formatting a number within a string).
+                                ? $"{count:#,0} beatmap"
+                                : $"{count:#,0} beatmaps";
+                        }));
                 }
                 else
                 {
