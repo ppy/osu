@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -32,6 +33,7 @@ using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -54,6 +56,9 @@ namespace osu.Game.Tests.Visual.Online
         private OsuConfigManager config { get; set; } = null!;
 
         private int currentMessageId;
+
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+        private readonly ManualResetEventSlim requestLock = new ManualResetEventSlim();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -581,6 +586,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChatReport()
         {
+            ChatReportRequest request = null;
+
             AddStep("Show overlay with channel", () =>
             {
                 chatOverlay.Show();
@@ -589,6 +596,26 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
             waitForChannel1Visible();
+
+            AddStep("Setup request handling", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest = r =>
+                {
+                    if (!(r is ChatReportRequest req))
+                        return false;
+
+                    Task.Run(() =>
+                    {
+                        request = req;
+                        requestLock.Wait(10000);
+                        req.TriggerSuccess();
+                    });
+
+                    return true;
+                };
+            });
 
             AddStep("Show report popover", () => this.ChildrenOfType<DrawableUsername>().First().ShowPopover());
 
@@ -599,7 +626,11 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("Report message sended", () => channelManager.CurrentChannel.Value.Messages.Any(x => x.Content.Contains("!report")));
+            AddWaitStep("Wait", 3);
+
+            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("Request sent", () => request != null);
         }
 
         private void joinTestChannel(int i)

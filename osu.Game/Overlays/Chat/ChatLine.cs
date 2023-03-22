@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername = new DrawableUsername(message.Sender)
+                        drawableUsername = new DrawableUsername(message)
                         {
                             Width = UsernameWidth,
                             FontSize = FontSize,
