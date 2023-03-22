@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 SortDirection.BindValueChanged(direction =>
                 {
-                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
+                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending && Active.Value ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
                 }, true);
             }
 
