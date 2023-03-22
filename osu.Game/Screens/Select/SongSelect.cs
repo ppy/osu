@@ -666,6 +666,7 @@ namespace osu.Game.Screens.Select
         {
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             Debug.Assert(Carousel.BeatmapSetsLoaded);
+            Debug.Assert(!Carousel.AllowSelection, $"Carousel selection is still allowed on suspension. Make sure to call {nameof(FinaliseSelection)} when pushing a new screen.");
 
             // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
             // Without this, it's possible for a transfer to happen while we are not the current screen.
