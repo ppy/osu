@@ -17,10 +17,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.RendererHeader;
 
+        private bool automaticRendererInUse;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay dialogOverlay, OsuGame game, GameHost host)
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
+            automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
             Children = new Drawable[]
             {
@@ -53,6 +56,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             renderer.BindValueChanged(r =>
             {
                 if (r.NewValue == host.ResolvedRenderer)
+                    return;
+
+                // Need to check startup renderer for the "automatic" case, as ResolvedRenderer above will track the final resolved renderer instead.
+                if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
                 dialogOverlay.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, game.AttemptExit, () =>
