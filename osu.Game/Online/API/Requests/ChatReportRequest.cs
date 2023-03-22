@@ -3,7 +3,6 @@
 
 using System.Net.Http;
 using osu.Framework.IO.Network;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Online.API.Requests;
