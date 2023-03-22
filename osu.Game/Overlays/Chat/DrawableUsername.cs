@@ -163,8 +163,7 @@ namespace osu.Game.Overlays.Chat
                 };
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, openUserChannel));
-                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
+                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
                 if (currentChannel?.Value != null)
                 {
