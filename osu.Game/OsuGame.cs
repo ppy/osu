@@ -655,15 +655,23 @@ namespace osu.Game
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
-                switch (presentType)
-                {
-                    case ScorePresentType.Gameplay:
-                        screen.Push(new ReplayPlayerLoader(databasedScore));
-                        break;
+                if (screen is SongSelect songSelect)
+                    songSelect.FinaliseSelection(databasedBeatmap, databasedScore.ScoreInfo.Ruleset, customStartAction: push);
+                else
+                    push();
 
-                    case ScorePresentType.Results:
-                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
-                        break;
+                void push()
+                {
+                    switch (presentType)
+                    {
+                        case ScorePresentType.Gameplay:
+                            screen.Push(new ReplayPlayerLoader(databasedScore));
+                            break;
+
+                        case ScorePresentType.Results:
+                            screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
+                            break;
+                    }
                 }
             }, validScreens: validScreens);
         }
