@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
+            if (buttons.Contains(e.Button))
             {
                 var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
 

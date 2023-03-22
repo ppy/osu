@@ -160,7 +160,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SampleSet":
-                    defaultSampleBank = (LegacySampleBank)Enum.Parse(typeof(LegacySampleBank), pair.Value);
+                    defaultSampleBank = Enum.Parse<LegacySampleBank>(pair.Value);
                     break;
 
                 case @"SampleVolume":
@@ -218,7 +218,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = (CountdownType)Enum.Parse(typeof(CountdownType), pair.Value);
+                    beatmap.BeatmapInfo.Countdown = Enum.Parse<CountdownType>(pair.Value);
                     break;
 
                 case @"CountdownOffset":
@@ -431,6 +431,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 controlPoint.BeatLength = beatLength;
                 controlPoint.TimeSignature = timeSignature;
+                controlPoint.OmitFirstBarLine = omitFirstBarSignature;
 
                 addControlPoint(time, controlPoint, true);
             }
@@ -447,7 +448,6 @@ namespace osu.Game.Beatmaps.Formats
             var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
-                OmitFirstBarLine = omitFirstBarSignature,
             };
 
             // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.

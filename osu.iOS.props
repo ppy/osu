@@ -16,11 +16,6 @@
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.1219.0" />
-
-    <!-- Required since Veldrid references a library that depends on Microsoft.DotNet.PlatformAbstractions (2.0.3), which doesn't play nice with Realm. -->
-    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2023.314.0" />
   </ItemGroup>
 </Project>

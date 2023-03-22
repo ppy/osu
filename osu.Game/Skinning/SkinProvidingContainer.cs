@@ -15,8 +15,13 @@ using osu.Game.Audio;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which adds a local <see cref="ISkinSource"/> to the hierarchy.
+    /// A container which adds a provided <see cref="ISkin"/> to the DI skin lookup hierarchy.
     /// </summary>
+    /// <remarks>
+    /// This container will expose an <see cref="ISkinSource"/> to its children.
+    /// The source will first consider the skin provided via the constructor (if any), then fallback
+    /// to any <see cref="ISkinSource"/> providers in the parent DI hierarchy.
+    /// </remarks>
     public partial class SkinProvidingContainer : Container, ISkinSource
     {
         public event Action? SourceChanged;

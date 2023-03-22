@@ -1,6 +1,6 @@
 clone_depth: 1
 version: '{build}'
-image: Visual Studio 2019
+image: Visual Studio 2022
 test: off
 skip_non_tags: true
 configuration: Release

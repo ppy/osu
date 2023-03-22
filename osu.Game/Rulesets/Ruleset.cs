@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets
         /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
         /// use <see cref="AllMods"/> instead.
         /// </remarks>
-        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues<ModType>()
                                                        // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                        .SelectMany(GetModsFor)
                                                        // Filter out all null mods

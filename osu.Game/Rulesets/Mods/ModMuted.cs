@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 MetronomeBeat metronomeBeat;
 
-                drawableRuleset.Overlays.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+                // Importantly, this is added to FrameStableComponents and not Overlays as the latter would cause it to be self-muted by the mod's volume adjustment.
+                drawableRuleset.FrameStableComponents.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
 
                 metronomeBeat.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
@@ -94,7 +95,7 @@ namespace osu.Game.Rulesets.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 
-    public partial class MuteComboSlider : OsuSliderBar<int>
+    public partial class MuteComboSlider : RoundedSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }

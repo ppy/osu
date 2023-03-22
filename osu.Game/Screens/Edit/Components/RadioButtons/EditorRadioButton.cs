@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,7 +22,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// Invoked when this <see cref="EditorRadioButton"/> has been selected.
         /// </summary>
-        public Action<RadioButton> Selected;
+        public Action<RadioButton>? Selected;
 
         public readonly RadioButton Button;
 
@@ -33,10 +31,10 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private Color4 selectedBackgroundColour;
         private Color4 selectedIconColour;
 
-        private Drawable icon;
+        private Drawable icon = null!;
 
-        [Resolved(canBeNull: true)]
-        private EditorBeatmap editorBeatmap { get; set; }
+        [Resolved]
+        private EditorBeatmap? editorBeatmap { get; set; }
 
         public EditorRadioButton(RadioButton button)
         {

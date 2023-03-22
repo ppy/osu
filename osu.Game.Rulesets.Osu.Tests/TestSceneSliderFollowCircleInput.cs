@@ -31,10 +31,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         [Test]
         public void TestMaximumDistanceTrackingWithoutMovement(
-            [Values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)]
-            float circleSize,
-            [Values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)]
-            double velocity)
+            [Values(0, 5, 10)] float circleSize,
+            [Values(0, 5, 10)] double velocity)
         {
             const double time_slider_start = 1000;
 

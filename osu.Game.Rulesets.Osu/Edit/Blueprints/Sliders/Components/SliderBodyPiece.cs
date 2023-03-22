@@ -22,6 +22,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         public Vector2 PathStartLocation => body.PathOffset;
 
+        /// <summary>
+        /// Offset in absolute (local) coordinates from the end of the curve.
+        /// </summary>
+        public Vector2 PathEndLocation => body.PathEndOffset;
+
         public SliderBodyPiece()
         {
             InternalChild = body = new ManualSliderBody

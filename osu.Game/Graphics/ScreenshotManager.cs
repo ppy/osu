@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -117,11 +118,11 @@ namespace osu.Game.Graphics
 
                 host.GetClipboard()?.SetImage(image);
 
-                string filename = getFilename();
+                (string filename, var stream) = getWritableStream();
 
                 if (filename == null) return;
 
-                using (var stream = storage.CreateFileSafely(filename))
+                using (stream)
                 {
                     switch (screenshotFormat.Value)
                     {
@@ -142,7 +143,7 @@ namespace osu.Game.Graphics
 
                 notificationOverlay.Post(new SimpleNotification
                 {
-                    Text = $"{filename} saved!",
+                    Text = $"Screenshot {filename} saved!",
                     Activated = () =>
                     {
                         storage.PresentFileExternally(filename);
@@ -152,23 +153,28 @@ namespace osu.Game.Graphics
             }
         });
 
-        private string getFilename()
+        private static readonly object filename_reservation_lock = new object();
+
+        private (string filename, Stream stream) getWritableStream()
         {
-            var dt = DateTime.Now;
-            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
-
-            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
-            if (!storage.Exists(withoutIndex))
-                return withoutIndex;
-
-            for (ulong i = 1; i < ulong.MaxValue; i++)
+            lock (filename_reservation_lock)
             {
-                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
-                if (!storage.Exists(indexedName))
-                    return indexedName;
-            }
+                var dt = DateTime.Now;
+                string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
-            return null;
+                string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+                if (!storage.Exists(withoutIndex))
+                    return (withoutIndex, storage.GetStream(withoutIndex, FileAccess.Write, FileMode.Create));
+
+                for (ulong i = 1; i < ulong.MaxValue; i++)
+                {
+                    string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                    if (!storage.Exists(indexedName))
+                        return (indexedName, storage.GetStream(indexedName, FileAccess.Write, FileMode.Create));
+                }
+
+                return (null, null);
+            }
         }
     }
 }
