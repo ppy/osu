@@ -21,6 +21,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
@@ -72,13 +73,15 @@ namespace osu.Game.Overlays.Chat
         private Bindable<Channel?>? currentChannel { get; set; }
 
         private readonly APIUser user;
+        private readonly Message message;
         private readonly OsuSpriteText drawableText;
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableUsername(APIUser user)
+        public DrawableUsername(Message message)
         {
-            this.user = user;
+            this.message = message;
+            user = message.Sender;
 
             Action = openUserProfile;
 
@@ -171,7 +174,8 @@ namespace osu.Game.Overlays.Chat
                     }));
                 }
 
-                items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
+                if (!user.Equals(api.LocalUser.Value))
+                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
 
                 return items.ToArray();
             }
@@ -179,7 +183,19 @@ namespace osu.Game.Overlays.Chat
 
         private void report(ChatReportReason reason, string comments)
         {
-            chatManager?.PostMessage($"!report {user.Username} ({reason.GetDescription()}): {comments}");
+            var request = new ChatReportRequest(message.Id, reason, comments);
+
+            request.Failure += _ => Schedule(() =>
+            {
+                currentChannel?.Value?.AddNewMessages(new ErrorMessage("Report failed to send, please retry"));
+            });
+
+            request.Success += () => Schedule(() =>
+            {
+                currentChannel?.Value?.AddNewMessages(new InfoMessage("Report has been sent"));
+            });
+
+            api.Queue(request);
         }
 
         private void openUserChannel()
