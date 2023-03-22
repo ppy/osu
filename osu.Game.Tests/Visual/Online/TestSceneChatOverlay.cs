@@ -33,7 +33,6 @@ using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
