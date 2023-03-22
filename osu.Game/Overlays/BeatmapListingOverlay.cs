@@ -44,12 +44,7 @@ namespace osu.Game.Overlays
         private Container panelTarget;
         private FillFlowContainer<BeatmapCard> foundContent;
 
-        private BeatmapListingFilterControl filterControl => Header.FilterControl.With(f =>
-        {
-            f.TypingStarted = onTypingStarted;
-            f.SearchStarted = onSearchStarted;
-            f.SearchFinished = onSearchFinished;
-        });
+        private BeatmapListingFilterControl filterControl => Header.FilterControl;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -88,6 +83,10 @@ namespace osu.Game.Overlays
                     },
                 }
             };
+
+            filterControl.TypingStarted = onTypingStarted;
+            filterControl.SearchStarted = onSearchStarted;
+            filterControl.SearchFinished = onSearchFinished;
         }
 
         protected override void LoadComplete()
