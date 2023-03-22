@@ -664,6 +664,9 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
+            Debug.Assert(Carousel.BeatmapSetsLoaded);
+
             // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
             // Without this, it's possible for a transfer to happen while we are not the current screen.
             transferRulesetValue();
