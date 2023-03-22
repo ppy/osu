@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osu.Game.Skinning.Components;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -50,6 +52,134 @@ namespace osu.Game.Tests.Visual.Gameplay
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
             AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
+        }
+
+        [Test]
+        public void TestDragSelection()
+        {
+            BigBlackBox box1 = null!;
+            BigBlackBox box2 = null!;
+            BigBlackBox box3 = null!;
+
+            AddStep("Add big black boxes", () =>
+            {
+                var target = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                target.Add(box1 = new BigBlackBox
+                {
+                    Position = new Vector2(-90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box2 = new BigBlackBox
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box3 = new BigBlackBox
+                {
+                    Position = new Vector2(90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            });
+
+            // This step is specifically added to reproduce an edge case which was found during cyclic selection development.
+            // If everything is working as expected it should not affect the subsequent drag selections.
+            AddRepeatStep("Select top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft + new Vector2(box1.ScreenSpaceDrawQuad.Width / 8));
+                InputManager.Click(MouseButton.Left);
+            }, 2);
+
+            AddStep("Begin drag top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("First two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box1, box2 }));
+
+            AddStep("Begin drag bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.BottomRight + new Vector2(box3.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to top left", () =>
+            {
+                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+
+            // Test cyclic selection doesn't trigger in this state.
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Last two boxes still selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+        }
+
+        [Test]
+        public void TestCyclicSelection()
+        {
+            SkinBlueprint[] blueprints = null!;
+
+            AddStep("Add big black boxes", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
+
+            AddStep("Store black box blueprints", () =>
+            {
+                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
+            });
+
+            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+
+            AddStep("move cursor to black box", () =>
+            {
+                // Slightly offset from centre to avoid random failures (see https://github.com/ppy/osu-framework/issues/5669).
+                InputManager.MoveMouseTo(((Drawable)blueprints[0].Item).ScreenSpaceDrawQuad.Centre + new Vector2(1));
+            });
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 2", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 3", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+
+            AddStep("select all boxes", () =>
+            {
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.AddRange(targetContainer.Components.OfType<BigBlackBox>().Skip(1));
+            });
+
+            AddAssert("all boxes selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
         }
 
         [TestCase(false)]
