@@ -387,7 +387,7 @@ namespace osu.Game.Screens.Select
                 throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce);
-            this.Push(new EditorLoader());
+            FinaliseSelection(beatmapInfo ?? beatmapInfoNoDebounce, customStartAction: () => this.Push(new EditorLoader()));
         }
 
         /// <summary>
@@ -428,13 +428,16 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
+            Carousel.AllowSelection = false;
+
             if (customStartAction != null)
-            {
                 customStartAction();
-                Carousel.AllowSelection = false;
+            else
+            {
+                if (!OnStart())
+                    // start operation failed; allow selection again.
+                    Carousel.AllowSelection = true;
             }
-            else if (OnStart())
-                Carousel.AllowSelection = false;
         }
 
         /// <summary>
