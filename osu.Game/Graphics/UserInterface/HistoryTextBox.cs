@@ -45,6 +45,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Up:

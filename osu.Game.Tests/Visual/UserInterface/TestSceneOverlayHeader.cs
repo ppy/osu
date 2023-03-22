@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override OverlayTitle CreateTitle() => new TestTitle();
 
-            protected override Drawable CreateTitleContent() => new OverlayRulesetSelector();
+            protected override Drawable CreateTabControlContent() => new OverlayRulesetSelector();
 
             public TestStringTabControlHeader()
             {

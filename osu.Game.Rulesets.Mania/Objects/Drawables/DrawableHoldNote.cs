@@ -69,8 +69,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private double? releaseTime;
 
-        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
-
         public DrawableHoldNote()
             : this(null)
         {
@@ -238,6 +236,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             };
 
             // Position and resize the body to lie half-way under the head and the tail notes.
+            // The rationale for this is account for heads/tails with corner radius.
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
 
@@ -376,7 +375,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void OnFree()
         {
-            slidingSample.Samples = null;
+            slidingSample.ClearSamples();
             base.OnFree();
         }
     }

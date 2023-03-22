@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public override LocalisableString Description => "SS or quit.";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModSuddenDeath)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModSuddenDeath), typeof(ModAccuracyChallenge) }).ToArray();
 
         protected ModPerfect()
         {

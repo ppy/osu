@@ -155,9 +155,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
 
         /// <summary>
-        /// "Pause gameplay"
+        /// "Pause / resume gameplay"
         /// </summary>
-        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause gameplay");
+        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause / resume gameplay");
 
         /// <summary>
         /// "Setup mode"

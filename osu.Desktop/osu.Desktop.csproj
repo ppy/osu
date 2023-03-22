@@ -26,8 +26,8 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="Clowd.Squirrel" Version="2.9.42" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
-    <PackageReference Include="System.IO.Packaging" Version="6.0.0" />
-    <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
+    <PackageReference Include="System.IO.Packaging" Version="7.0.0" />
+    <PackageReference Include="DiscordRichPresence" Version="1.1.3.18" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />

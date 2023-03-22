@@ -53,6 +53,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             XOffsetBindable.UnbindFrom(HitObject.XOffsetBindable);
         }
 
+        [CanBeNull]
         public Func<CatchHitObject, bool> CheckPosition;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);

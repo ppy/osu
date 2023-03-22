@@ -7,21 +7,28 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
-using osu.Framework.Localisation;
-using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Scoring
 {
     public partial class ScoreProcessor : JudgementProcessor
     {
+        private const double accuracy_cutoff_x = 1;
+        private const double accuracy_cutoff_s = 0.95;
+        private const double accuracy_cutoff_a = 0.9;
+        private const double accuracy_cutoff_b = 0.8;
+        private const double accuracy_cutoff_c = 0.7;
+        private const double accuracy_cutoff_d = 0;
+
         private const double max_score = 1000000;
 
         /// <summary>
@@ -38,6 +45,18 @@ namespace osu.Game.Rulesets.Scoring
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The minimum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the minimum hit result.
+        /// </summary>
+        public readonly BindableDouble MinimumAccuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The maximum achievable accuracy for the whole beatmap at this stage of gameplay.
+        /// Assumes that all objects that have not been judged yet will receive the maximum hit result.
+        /// </summary>
+        public readonly BindableDouble MaximumAccuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// The current combo.
@@ -85,7 +104,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double ClassicScoreMultiplier => 36;
 
-        private readonly Ruleset ruleset;
+        /// <summary>
+        /// The ruleset this score processor is valid for.
+        /// </summary>
+        public readonly Ruleset Ruleset;
+
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -133,7 +156,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor(Ruleset ruleset)
         {
-            this.ruleset = ruleset;
+            Ruleset = ruleset;
 
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
@@ -144,7 +167,7 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
             {
-                Rank.Value = rankFrom(accuracy.NewValue);
+                Rank.Value = RankFromAccuracy(accuracy.NewValue);
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
@@ -264,6 +287,10 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
+            MinimumAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
+            MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
+                ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
+                : 1;
             TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
@@ -275,8 +302,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public double ComputeAccuracy(ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
             extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
@@ -296,8 +323,8 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
@@ -349,22 +376,6 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        private ScoreRank rankFrom(double acc)
-        {
-            if (acc == 1)
-                return ScoreRank.X;
-            if (acc >= 0.95)
-                return ScoreRank.S;
-            if (acc >= 0.9)
-                return ScoreRank.A;
-            if (acc >= 0.8)
-                return ScoreRank.B;
-            if (acc >= 0.7)
-                return ScoreRank.C;
-
-            return ScoreRank.D;
-        }
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -407,6 +418,8 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.HitEvents = hitEvents;
+            score.Statistics.Clear();
+            score.MaximumStatistics.Clear();
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
@@ -534,7 +547,7 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            maxResult = maxBasicResult ??= ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
+                            maxResult = maxBasicResult ??= Ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
                             break;
                     }
 
@@ -560,6 +573,62 @@ namespace osu.Game.Rulesets.Scoring
             base.Dispose(isDisposing);
             hitEvents.Clear();
         }
+
+        #region Static helper methods
+
+        /// <summary>
+        /// Given an accuracy (0..1), return the correct <see cref="ScoreRank"/>.
+        /// </summary>
+        public static ScoreRank RankFromAccuracy(double accuracy)
+        {
+            if (accuracy == accuracy_cutoff_x)
+                return ScoreRank.X;
+            if (accuracy >= accuracy_cutoff_s)
+                return ScoreRank.S;
+            if (accuracy >= accuracy_cutoff_a)
+                return ScoreRank.A;
+            if (accuracy >= accuracy_cutoff_b)
+                return ScoreRank.B;
+            if (accuracy >= accuracy_cutoff_c)
+                return ScoreRank.C;
+
+            return ScoreRank.D;
+        }
+
+        /// <summary>
+        /// Given a <see cref="ScoreRank"/>, return the cutoff accuracy (0..1).
+        /// Accuracy must be greater than or equal to the cutoff to qualify for the provided rank.
+        /// </summary>
+        public static double AccuracyCutoffFromRank(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    return accuracy_cutoff_x;
+
+                case ScoreRank.S:
+                case ScoreRank.SH:
+                    return accuracy_cutoff_s;
+
+                case ScoreRank.A:
+                    return accuracy_cutoff_a;
+
+                case ScoreRank.B:
+                    return accuracy_cutoff_b;
+
+                case ScoreRank.C:
+                    return accuracy_cutoff_c;
+
+                case ScoreRank.D:
+                    return accuracy_cutoff_d;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(rank), rank, null);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Stores the required scoring data that fulfils the minimum requirements for a <see cref="ScoreProcessor"/> to calculate score.

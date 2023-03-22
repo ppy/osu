@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -38,7 +36,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
             });
         }
 
-        protected override Dropdown<EditorScreenMode> CreateDropdown() => null;
+        protected override Dropdown<EditorScreenMode> CreateDropdown() => null!;
 
         protected override TabItem<EditorScreenMode> CreateTabItem(EditorScreenMode value) => new TabItem(value);
 
@@ -56,11 +54,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 Text.Font = OsuFont.TorusAlternate;
 
                 Bar.Expire();
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
             }
 
             protected override void OnActivated()

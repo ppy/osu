@@ -1,10 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
-
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public partial class DrawableTinyDroplet : DrawableDroplet
@@ -16,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
-        public DrawableTinyDroplet([CanBeNull] TinyDroplet h)
+        public DrawableTinyDroplet(TinyDroplet? h)
             : base(h)
         {
         }

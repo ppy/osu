@@ -32,7 +32,6 @@ using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -530,6 +529,52 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Remove messages from other user", () =>
             {
                 testChannel1.RemoveMessagesFromUser(testUser.Id);
+            });
+        }
+
+        [Test]
+        public void TestTextBoxSavePerChannel()
+        {
+            var testPMChannel = new Channel(testUser);
+
+            AddStep("show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
+
+            AddAssert("listing is visible", () => listingIsVisible);
+            AddStep("search for 'number 2'", () => chatOverlayTextBox.Text = "number 2");
+            AddAssert("'number 2' saved to selector", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "number 2");
+
+            AddStep("select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("text box cleared on normal channel", () => chatOverlayTextBox.Text == string.Empty);
+            AddAssert("nothing saved on normal channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == string.Empty);
+            AddStep("type '727'", () => chatOverlayTextBox.Text = "727");
+            AddAssert("'727' saved to normal channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "727");
+
+            AddStep("select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddAssert("text box cleared on PM channel", () => chatOverlayTextBox.Text == string.Empty);
+            AddAssert("nothing saved on PM channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == string.Empty);
+            AddStep("type 'hello'", () => chatOverlayTextBox.Text = "hello");
+            AddAssert("'hello' saved to PM channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "hello");
+
+            AddStep("select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("text box contains '727'", () => chatOverlayTextBox.Text == "727");
+
+            AddStep("select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddAssert("text box contains 'hello'", () => chatOverlayTextBox.Text == "hello");
+            AddStep("click close button", () =>
+            {
+                ChannelListItemCloseButton closeButton = getChannelListItem(testPMChannel).ChildrenOfType<ChannelListItemCloseButton>().Single();
+                clickDrawable(closeButton);
+            });
+
+            AddAssert("listing is visible", () => listingIsVisible);
+            AddAssert("text box contains 'channel 2'", () => chatOverlayTextBox.Text == "number 2");
+            AddUntilStep("only channel 2 visible", () =>
+            {
+                IEnumerable<ChannelListingItem> listingItems = chatOverlay.ChildrenOfType<ChannelListingItem>()
+                                                                          .Where(item => item.IsPresent);
+                return listingItems.Count() == 1 && listingItems.Single().Channel == testChannel2;
             });
         }
 

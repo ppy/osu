@@ -99,6 +99,18 @@ namespace osu.Game.Screens.Backgrounds
             }
         }
 
+        /// <summary>
+        /// Reloads beatmap's background.
+        /// </summary>
+        public void RefreshBackground()
+        {
+            Schedule(() =>
+            {
+                cancellationSource?.Cancel();
+                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+            });
+        }
+
         private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;

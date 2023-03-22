@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
+    public partial class DefaultAccuracyCounter : GameplayAccuracyCounter, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

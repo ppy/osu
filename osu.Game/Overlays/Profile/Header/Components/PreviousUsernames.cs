@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -27,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private const int width = 310;
         private const int move_offset = 15;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         private readonly TextFlowContainer text;
         private readonly Box background;
@@ -109,11 +107,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<APIUser> user)
+        private void onUserChanged(ValueChangedEvent<APIUser?> user)
         {
             text.Text = string.Empty;
 
-            string[] usernames = user.NewValue?.PreviousUsernames;
+            string[]? usernames = user.NewValue?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {
@@ -149,7 +147,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private partial class HoverIconContainer : Container
         {
-            public Action ActivateHover;
+            public Action? ActivateHover;
 
             public HoverIconContainer()
             {

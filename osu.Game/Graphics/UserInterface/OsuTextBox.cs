@@ -250,13 +250,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocus(FocusEvent e)
         {
-            BorderThickness = 3;
+            if (Masking)
+                BorderThickness = 3;
+
             base.OnFocus(e);
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            BorderThickness = 0;
+            if (Masking)
+                BorderThickness = 0;
 
             base.OnFocusLost(e);
         }

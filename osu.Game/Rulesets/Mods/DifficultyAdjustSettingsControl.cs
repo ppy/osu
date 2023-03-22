@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    new OsuSliderBar<float>
+                    new RoundedSliderBar<float>
                     {
                         RelativeSizeAxes = Axes.X,
                         Current = currentNumber,
@@ -126,8 +126,7 @@ namespace osu.Game.Rulesets.Mods
                 get => this;
                 set
                 {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
+                    ArgumentNullException.ThrowIfNull(value);
 
                     if (currentBound != null) UnbindFrom(currentBound);
                     BindTo(currentBound = value);

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -34,9 +32,9 @@ namespace osu.Game.Screens.Select.Carousel
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             Header.ReceivePositionalInputAt(screenSpacePos);
 
-        private CarouselItem item;
+        private CarouselItem? item;
 
-        public CarouselItem Item
+        public CarouselItem? Item
         {
             get => item;
             set
@@ -105,7 +103,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void UpdateItem()
         {
-            if (item == null)
+            if (Item == null)
                 return;
 
             Scheduler.AddOnce(ApplyState);
@@ -128,11 +126,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ApplyState()
         {
+            Debug.Assert(Item != null);
+
             // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
             // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
             Height = Item.TotalHeight;
-
-            Debug.Assert(Item != null);
 
             switch (Item.State.Value)
             {
@@ -162,6 +160,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
+            Debug.Assert(Item != null);
+
             Item.State.Value = CarouselItemState.Selected;
             return true;
         }

@@ -183,9 +183,15 @@ namespace osu.Game.Beatmaps.ControlPoints
         private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
             double beatLength = timingPoint.BeatLength / beatDivisor;
-            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+            double beats = (Math.Max(time, 0) - timingPoint.Time) / beatLength;
 
-            return timingPoint.Time + beatLengths * beatLength;
+            int roundedBeats = (int)Math.Round(beats, MidpointRounding.AwayFromZero);
+            double snappedTime = timingPoint.Time + roundedBeats * beatLength;
+
+            if (snappedTime >= 0)
+                return snappedTime;
+
+            return snappedTime + beatLength;
         }
 
         /// <summary>
@@ -211,8 +217,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
             where T : class, IControlPoint
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
+            ArgumentNullException.ThrowIfNull(list);
 
             if (list.Count == 0)
                 return null;

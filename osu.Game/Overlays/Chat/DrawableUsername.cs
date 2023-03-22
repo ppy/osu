@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,11 +19,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
+using ChatStrings = osu.Game.Localisation.ChatStrings;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -63,6 +67,9 @@ namespace osu.Game.Overlays.Chat
 
         [Resolved(canBeNull: true)]
         private UserProfileOverlay? profileOverlay { get; set; }
+
+        [Resolved]
+        private Bindable<Channel?>? currentChannel { get; set; }
 
         private readonly APIUser user;
         private readonly OsuSpriteText drawableText;
@@ -149,14 +156,22 @@ namespace osu.Game.Overlays.Chat
 
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem("View Profile", MenuItemType.Highlighted, openUserProfile)
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile)
                 };
 
                 if (!user.Equals(api.LocalUser.Value))
-                {
                     items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, openUserChannel));
-                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
+                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
+
+                if (currentChannel?.Value != null)
+                {
+                    items.Add(new OsuMenuItem(ChatStrings.MentionUser, MenuItemType.Standard, () =>
+                    {
+                        currentChannel.Value.TextBoxMessage.Value += $"@{user.Username} ";
+                    }));
                 }
+
+                items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
 
                 return items.ToArray();
             }

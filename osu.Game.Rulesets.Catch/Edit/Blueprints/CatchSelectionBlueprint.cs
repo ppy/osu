@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -31,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         protected CatchSelectionBlueprint(THitObject hitObject)
             : base(hitObject)

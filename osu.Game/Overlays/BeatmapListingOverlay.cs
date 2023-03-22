@@ -110,6 +110,18 @@ namespace osu.Game.Overlays
             ScrollFlow.ScrollToStart();
         }
 
+        public void ShowWithGenreFilter(SearchGenre genre)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterGenre(genre);
+        }
+
+        public void ShowWithLanguageFilter(SearchLanguage language)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterLanguage(language);
+        }
+
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;

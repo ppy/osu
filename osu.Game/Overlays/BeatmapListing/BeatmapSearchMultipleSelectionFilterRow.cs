@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osuTK;
@@ -100,9 +101,30 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected partial class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
+            private readonly Box selectedUnderline;
+
+            protected override bool HighlightOnHoverWhenActive => true;
+
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
             {
+                // This doesn't match any actual design, but should make it easier for the user to understand
+                // that filters are applied until we settle on a final design.
+                AddInternal(selectedUnderline = new Box
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1.5f,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                });
+            }
+
+            protected override void UpdateState()
+            {
+                base.UpdateState();
+                selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
+                selectedUnderline.FadeColour(IsHovered ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
             }
 
             protected override bool OnClick(ClickEvent e)

@@ -96,11 +96,11 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    statisticsPanel = new StatisticsPanel
+                                    statisticsPanel = CreateStatisticsPanel().With(panel =>
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Score = { BindTarget = SelectedScore }
-                                    },
+                                        panel.RelativeSizeAxes = Axes.Both;
+                                        panel.Score.BindTarget = SelectedScore;
+                                    }),
                                     ScorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -230,6 +230,11 @@ namespace osu.Game.Screens.Ranking
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+
+        /// <summary>
+        /// Creates the <see cref="StatisticsPanel"/> to be used to display extended information about scores.
+        /// </summary>
+        protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
 
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {

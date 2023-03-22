@@ -50,11 +50,21 @@ namespace osu.Game.Screens.Select
         public Action? BeatmapSetsChanged;
 
         /// <summary>
+        /// Triggered after filter conditions have finished being applied to the model hierarchy.
+        /// </summary>
+        public Action? FilterApplied;
+
+        /// <summary>
         /// The currently selected beatmap.
         /// </summary>
         public BeatmapInfo? SelectedBeatmapInfo => selectedBeatmap?.BeatmapInfo;
 
         private CarouselBeatmap? selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
+
+        /// <summary>
+        /// The total count of non-filtered beatmaps displayed.
+        /// </summary>
+        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.Beatmaps.Count(b => !b.Filtered.Value));
 
         /// <summary>
         /// The currently selected beatmap set.
@@ -64,7 +74,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// A function to optionally decide on a recommended difficulty from a beatmap set.
         /// </summary>
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? GetRecommendedBeatmap;
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo?>? GetRecommendedBeatmap;
 
         private CarouselBeatmapSet? selectedBeatmapSet;
 
@@ -119,7 +129,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null));
+            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).OfType<CarouselBeatmapSet>());
 
             root = newRoot;
 
@@ -596,6 +606,9 @@ namespace osu.Game.Screens.Select
 
         public void FlushPendingFilterOperations()
         {
+            if (!IsLoaded)
+                return;
+
             if (PendingFilter?.Completed == false)
             {
                 applyActiveCriteria(false);
@@ -636,6 +649,8 @@ namespace osu.Game.Screens.Select
 
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected(true);
+
+                FilterApplied?.Invoke();
             }
         }
 
@@ -739,6 +754,8 @@ namespace osu.Game.Screens.Select
 
                     foreach (var panel in Scroll.Children)
                     {
+                        Debug.Assert(panel.Item != null);
+
                         if (toDisplay.Remove(panel.Item))
                         {
                             // panel already displayed.
@@ -769,6 +786,8 @@ namespace osu.Game.Screens.Select
             foreach (DrawableCarouselItem item in Scroll.Children)
             {
                 updateItem(item);
+
+                Debug.Assert(item.Item != null);
 
                 if (item.Item.Visible)
                 {

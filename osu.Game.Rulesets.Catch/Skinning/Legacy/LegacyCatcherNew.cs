@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            foreach (var state in Enum.GetValues(typeof(CatcherAnimationState)).Cast<CatcherAnimationState>())
+            foreach (var state in Enum.GetValues<CatcherAnimationState>())
             {
                 AddInternal(drawables[state] = getDrawableFor(state).With(d =>
                 {

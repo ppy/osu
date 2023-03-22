@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         RelativeSizeAxes = Axes.Both,
                         Colour = colour.Gray1,
                     },
-                    usableAreaContainer = new Container
+                    usableAreaContainer = new UsableAreaContainer(handler)
                     {
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
@@ -223,6 +224,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             float adjust = MathF.Max(fitX, fitY);
 
             tabletContainer.Scale = new Vector2(1 / adjust);
+        }
+    }
+
+    public partial class UsableAreaContainer : Container
+    {
+        private readonly Bindable<Vector2> areaOffset;
+
+        public UsableAreaContainer(ITabletHandler tabletHandler)
+        {
+            areaOffset = tabletHandler.AreaOffset.GetBoundCopy();
+        }
+
+        protected override bool OnDragStart(DragStartEvent e) => true;
+
+        protected override void OnDrag(DragEvent e)
+        {
+            var newPos = Position + e.Delta;
+            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent.Size));
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            areaOffset.Value = Position;
+            base.OnDragEnd(e);
         }
     }
 }

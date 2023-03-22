@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -20,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new CatchSelectionHandler();
 
-        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject)
+        public override HitObjectSelectionBlueprint? CreateHitObjectBlueprintFor(HitObject hitObject)
         {
             switch (hitObject)
             {
