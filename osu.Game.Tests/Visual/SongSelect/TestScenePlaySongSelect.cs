@@ -256,7 +256,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddStep("push child screen", () => songSelect!.FinaliseSelection(customStartAction: () => songSelect.Push(new TestSceneOsuScreenStack.TestScreen("test child"))));
             AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
 
             AddStep("return", () => songSelect!.MakeCurrent());
@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddStep("push child screen", () => songSelect!.FinaliseSelection(customStartAction: () => songSelect.Push(new TestSceneOsuScreenStack.TestScreen("test child"))));
             AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
 
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
@@ -291,7 +291,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddStep("push child screen", () => songSelect!.FinaliseSelection(customStartAction: () => songSelect.Push(new TestSceneOsuScreenStack.TestScreen("test child"))));
             AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
 
             AddStep("update beatmap", () =>
@@ -546,6 +546,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             addRulesetImportStep(0);
 
             changeMods(new OsuModHardRock());
+
+            AddStep("exit first song select", () => songSelect!.Exit());
 
             createSongSelect();
 
