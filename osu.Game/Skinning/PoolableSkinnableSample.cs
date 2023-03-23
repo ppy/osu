@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -74,14 +75,29 @@ namespace osu.Game.Skinning
             updateSample();
         }
 
-        private void updateSample()
-        {
-            if (sampleInfo == null)
-                return;
+        /// <summary>
+        /// Whether this sample was playing before a skin source change.
+        /// </summary>
+        private bool wasPlaying;
 
-            bool wasPlaying = Playing;
+        private void clearPreviousSamples()
+        {
+            // only run if the samples aren't already cleared.
+            // this ensures the "wasPlaying" state is stored correctly even if multiple clear calls are executed.
+            if (!sampleContainer.Any()) return;
+
+            wasPlaying = Playing;
 
             sampleContainer.Clear();
+            Sample = null;
+        }
+
+        private void updateSample()
+        {
+            clearPreviousSamples();
+
+            if (sampleInfo == null)
+                return;
 
             var sample = CurrentSkin.GetSample(sampleInfo);
 
