@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 dialogOverlay.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, game.AttemptExit, () =>
                 {
-                    renderer.SetDefault();
+                    renderer.Value = r.OldValue;
                 }));
             });
         }
