@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public abstract BindableNumber<float> StartScale { get; }
 
+        [SettingSource("Scale Sliders", "Scale the slider bodies as well.")]
+        public BindableBool ScaleSliders { get; } = new BindableBool(true);
+
         protected virtual float EndScale => 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
@@ -42,20 +45,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             var h = (OsuHitObject)drawable.HitObject;
 
             // apply grow effect
-            switch (drawable)
+            if ((drawable is DrawableSlider && ScaleSliders.Value)
+                || (drawable is DrawableSliderHead && !ScaleSliders.Value)
+                || drawable is DrawableHitCircle)
             {
-                case DrawableSliderHead:
-                case DrawableSliderTail:
-                    // special cases we should *not* be scaling.
-                    break;
-
-                case DrawableSlider:
-                case DrawableHitCircle:
-                {
-                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                        drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
-                    break;
-                }
+                using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                    drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
             }
 
             // remove approach circles
