@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
 
                     selected = newSelected;
                     updateSelectionState(false);
-                });
+                }, true);
 
                 updateSelectionState(true);
             });
