@@ -84,16 +84,80 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
 
-            loadMoreScores(() => beatmapInfo);
-            checkCount(10);
+            importMoreScores(() => beatmapInfo);
+            checkDisplayedCount(10);
 
-            loadMoreScores(() => beatmapInfo);
-            checkCount(20);
+            importMoreScores(() => beatmapInfo);
+            checkDisplayedCount(20);
 
             clearScores();
-            checkCount(0);
+            checkDisplayedCount(0);
+        }
+
+        [Test]
+        public void TestLocalScoresDisplayOnBeatmapEdit()
+        {
+            BeatmapInfo beatmapInfo = null!;
+            string originalHash = string.Empty;
+
+            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
+
+            AddStep(@"Import beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                leaderboard.BeatmapInfo = beatmapInfo;
+            });
+
+            clearScores();
+            checkDisplayedCount(0);
+
+            AddStep(@"Perform initial save to guarantee stable hash", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+                beatmapManager.Save(beatmapInfo, beatmap);
+
+                originalHash = beatmapInfo.Hash;
+            });
+
+            importMoreScores(() => beatmapInfo);
+
+            checkDisplayedCount(10);
+            checkStoredCount(10);
+
+            AddStep(@"Save with changes", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+                beatmap.Difficulty.ApproachRate = 12;
+                beatmapManager.Save(beatmapInfo, beatmap);
+            });
+
+            AddAssert("Hash changed", () => beatmapInfo.Hash, () => Is.Not.EqualTo(originalHash));
+            checkDisplayedCount(0);
+            checkStoredCount(10);
+
+            importMoreScores(() => beatmapInfo);
+            importMoreScores(() => beatmapInfo);
+            checkDisplayedCount(20);
+            checkStoredCount(30);
+
+            AddStep(@"Revert changes", () =>
+            {
+                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(beatmapInfo).Beatmap;
+                beatmap.Difficulty.ApproachRate = 8;
+                beatmapManager.Save(beatmapInfo, beatmap);
+            });
+
+            AddAssert("Hash restored", () => beatmapInfo.Hash, () => Is.EqualTo(originalHash));
+            checkDisplayedCount(10);
+            checkStoredCount(30);
+
+            clearScores();
+            checkDisplayedCount(0);
+            checkStoredCount(0);
         }
 
         [Test]
@@ -162,9 +226,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private void loadMoreScores(Func<BeatmapInfo> beatmapInfo)
+        private void importMoreScores(Func<BeatmapInfo> beatmapInfo)
         {
-            AddStep(@"Load new scores via manager", () =>
+            AddStep(@"Import new scores", () =>
             {
                 foreach (var score in generateSampleScores(beatmapInfo()))
                     scoreManager.Import(score);
@@ -176,8 +240,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Clear all scores", () => scoreManager.Delete());
         }
 
-        private void checkCount(int expected) =>
-            AddUntilStep("Correct count displayed", () => leaderboard.ChildrenOfType<LeaderboardScore>().Count() == expected);
+        private void checkDisplayedCount(int expected) =>
+            AddUntilStep($"{expected} scores displayed", () => leaderboard.ChildrenOfType<LeaderboardScore>().Count(), () => Is.EqualTo(expected));
+
+        private void checkStoredCount(int expected) =>
+            AddUntilStep($"Total scores stored is {expected}", () => Realm.Run(r => r.All<ScoreInfo>().Count(s => !s.DeletePending)), () => Is.EqualTo(expected));
 
         private static ScoreInfo[] generateSampleScores(BeatmapInfo beatmapInfo)
         {
@@ -210,6 +277,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     User = new APIUser
                     {
                         Id = 6602580,
@@ -226,6 +294,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddSeconds(-30),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -243,6 +312,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddSeconds(-70),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -261,6 +331,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddMinutes(-40),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -279,6 +350,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -297,6 +369,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-25),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -315,6 +388,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-50),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -333,6 +407,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddHours(-72),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -351,6 +426,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddMonths(-3),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser
@@ -369,6 +445,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Date = DateTime.Now.AddYears(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
                     User = new APIUser

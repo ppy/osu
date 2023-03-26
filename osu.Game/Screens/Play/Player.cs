@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Play
 
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
+            Score.ScoreInfo.BeatmapHash = Beatmap.Value.BeatmapInfo.Hash;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
 
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = prepareAndImportScore,
+                    SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
                     OnRetry = () => Restart(),
                     OnQuit = () => PerformExit(true),
                 },
@@ -613,6 +614,9 @@ namespace osu.Game.Screens.Play
             // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             resultsDisplayDelegate?.Cancel();
 
+            // import current score if possible.
+            prepareAndImportScoreAsync();
+
             // The actual exit is performed if
             // - the pause / fail dialog was not requested
             // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
@@ -735,13 +739,8 @@ namespace osu.Game.Screens.Play
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
             ValidForResume = false;
 
-            // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
-            DrawableRuleset.SetRecordTarget(null);
-
             if (!Configuration.ShowResults)
                 return;
-
-            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
@@ -754,36 +753,6 @@ namespace osu.Game.Screens.Play
             }
 
             progressToResults(true);
-        }
-
-        /// <summary>
-        /// Asynchronously run score preparation operations (database import, online submission etc.).
-        /// </summary>
-        /// <returns>The final score.</returns>
-        private async Task<ScoreInfo> prepareAndImportScore()
-        {
-            var scoreCopy = Score.DeepClone();
-
-            try
-            {
-                await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score preparation failed!");
-            }
-
-            try
-            {
-                var danceMod = (ModDance)Mods.Value.FirstOrDefault(m => m is ModDance);
-                await ImportScore(scoreCopy, danceMod?.SaveScore.Value ?? false).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score import failed!");
-            }
-
-            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>
@@ -801,11 +770,24 @@ namespace osu.Game.Screens.Play
 
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
-                if (prepareScoreForDisplayTask?.IsCompleted != true)
+                if (prepareScoreForDisplayTask == null)
+                {
+                    // Try importing score since the task hasn't been invoked yet.
+                    prepareAndImportScoreAsync();
+                    return;
+                }
+
+                if (!prepareScoreForDisplayTask.IsCompleted)
                     // If the asynchronous preparation has not completed, keep repeating this delegate.
                     return;
 
                 resultsDisplayDelegate?.Cancel();
+
+                if (prepareScoreForDisplayTask.GetResultSafely() == null)
+                {
+                    // If score import did not occur, we do not want to show the results screen.
+                    return;
+                }
 
                 if (!this.IsCurrentScreen())
                     // This player instance may already be in the process of exiting.
@@ -815,6 +797,51 @@ namespace osu.Game.Screens.Play
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);
+        }
+
+        /// <summary>
+        /// Asynchronously run score preparation operations (database import, online submission etc.).
+        /// </summary>
+        /// <param name="forceImport">Whether the score should be imported even if non-passing (or the current configuration doesn't allow for it).</param>
+        /// <returns>The final score.</returns>
+        [ItemCanBeNull]
+        private Task<ScoreInfo> prepareAndImportScoreAsync(bool forceImport = false)
+        {
+            // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
+            DrawableRuleset.SetRecordTarget(null);
+
+            if (prepareScoreForDisplayTask != null)
+                return prepareScoreForDisplayTask;
+
+            // We do not want to import the score in cases where we don't show results
+            bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
+            if (!canShowResults && !forceImport)
+                return Task.FromResult<ScoreInfo>(null);
+
+            return prepareScoreForDisplayTask = Task.Run(async () =>
+            {
+                var scoreCopy = Score.DeepClone();
+
+                try
+                {
+                    await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, @"Score preparation failed!");
+                }
+
+                try
+                {
+                    await ImportScore(scoreCopy).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, @"Score import failed!");
+                }
+
+                return scoreCopy.ScoreInfo;
+            });
         }
 
         protected override bool OnScroll(ScrollEvent e)
