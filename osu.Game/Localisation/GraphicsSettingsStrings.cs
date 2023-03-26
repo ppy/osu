@@ -25,11 +25,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Renderer => new TranslatableString(getKey(@"renderer"), @"Renderer");
 
         /// <summary>
-        /// "Current renderer is &quot;{0}&quot;"
-        /// </summary>
-        public static LocalisableString CurrentRenderer(string arg0) => new TranslatableString(getKey(@"current_renderer"), @"Current renderer is ""{0}""", arg0);
-
-        /// <summary>
         /// "Frame limiter"
         /// </summary>
         public static LocalisableString FrameLimiter => new TranslatableString(getKey(@"frame_limiter"), @"Frame limiter");
