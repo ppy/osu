@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 protected override LocalisableString GenerateItemText(RendererType item)
                 {
                     if (item == RendererType.Automatic && automaticRendererInUse)
-                        return $"{base.GenerateItemText(item)} ({hostResolvedRenderer})";
+                        return LocalisableString.Interpolate($"{base.GenerateItemText(item)} ({hostResolvedRenderer.GetDescription()})");
 
                     return base.GenerateItemText(item);
                 }
