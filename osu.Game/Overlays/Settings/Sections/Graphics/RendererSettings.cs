@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -71,7 +72,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }));
             });
 
-            if (renderer.Value == RendererType.Automatic)
+            // TODO: remove this once we support SDL+android.
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Android)
+            {
+                rendererDropdown.Items = new[] { RendererType.Automatic, RendererType.OpenGLLegacy };
+                rendererDropdown.SetNoticeText("New renderer support for android is coming soon!", true);
+            }
+            else if (renderer.Value == RendererType.Automatic)
                 rendererDropdown.SetNoticeText(GraphicsSettingsStrings.CurrentRenderer(host.ResolvedRenderer.GetDescription()));
         }
     }
