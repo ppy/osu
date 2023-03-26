@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
                 {
-                    renderer.Value = r.OldValue;
+                    renderer.Value = automaticRendererInUse ? RendererType.Automatic : host.ResolvedRenderer;
                 }));
             });
 
