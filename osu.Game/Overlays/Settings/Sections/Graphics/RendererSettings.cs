@@ -5,11 +5,11 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             Children = new Drawable[]
             {
-                rendererDropdown = new SettingsEnumDropdown<RendererType>
+                rendererDropdown = new RendererSettingsDropdown
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
@@ -78,8 +78,33 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 rendererDropdown.Items = new[] { RendererType.Automatic, RendererType.OpenGLLegacy };
                 rendererDropdown.SetNoticeText("New renderer support for android is coming soon!", true);
             }
-            else if (renderer.Value == RendererType.Automatic)
-                rendererDropdown.SetNoticeText(GraphicsSettingsStrings.CurrentRenderer(host.ResolvedRenderer.GetDescription()));
+        }
+
+        private partial class RendererSettingsDropdown : SettingsEnumDropdown<RendererType>
+        {
+            protected override OsuDropdown<RendererType> CreateDropdown() => new RendererDropdown();
+
+            protected partial class RendererDropdown : DropdownControl
+            {
+                private RendererType hostResolvedRenderer;
+                private bool automaticRendererInUse;
+
+                [BackgroundDependencyLoader]
+                private void load(FrameworkConfigManager config, GameHost host)
+                {
+                    var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
+                    automaticRendererInUse = renderer.Value == RendererType.Automatic;
+                    hostResolvedRenderer = host.ResolvedRenderer;
+                }
+
+                protected override LocalisableString GenerateItemText(RendererType item)
+                {
+                    if (item == RendererType.Automatic && automaticRendererInUse)
+                        return $"{base.GenerateItemText(item)} ({hostResolvedRenderer})";
+
+                    return base.GenerateItemText(item);
+                }
+            }
         }
     }
 }
