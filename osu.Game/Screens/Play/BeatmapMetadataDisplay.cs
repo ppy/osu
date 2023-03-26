@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable logoFacade;
         private LoadingSpinner loading;
+
+        //mfosu: 显示Ruleset图标
         private SelectedRulesetIcon ruleseticon;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
@@ -159,8 +161,8 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(true),
-                                ruleseticon = new SelectedRulesetIcon()
+                                ruleseticon = new SelectedRulesetIcon(),
+                                loading = new LoadingLayer(dimBackground: true, blockInput: false)
                             }
                         },
                         versionFlow = new FillFlowContainer

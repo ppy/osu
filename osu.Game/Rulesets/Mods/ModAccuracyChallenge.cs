@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
-        [SettingSource("最低准确率", "准确率低于此数值时将触发失败", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
+        [SettingSource("最低准确率", "准确率低于此数值时将触发失败", SettingControlType = typeof(SettingsPercentageSlider<double>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
@@ -67,14 +66,6 @@ namespace osu.Game.Rulesets.Mods
             score.Statistics[result.Type]++;
 
             return scoreProcessor.ComputeAccuracy(score);
-        }
-    }
-
-    public partial class PercentSlider : RoundedSliderBar<double>
-    {
-        public PercentSlider()
-        {
-            DisplayAsPercentage = true;
         }
     }
 }
