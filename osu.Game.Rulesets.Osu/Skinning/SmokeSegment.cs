@@ -252,13 +252,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 renderer.SetBlend(BlendingParameters.Additive);
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                TextureShader.Bind();
+                BindTextureShader(renderer);
+
                 texture.Bind();
 
                 for (int i = 0; i < points.Count; i++)
                     drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
 
-                TextureShader.Unbind();
+                UnbindTextureShader(renderer);
                 renderer.PopLocalMatrix();
             }
 
