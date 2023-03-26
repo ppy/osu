@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private bool automaticRendererInUse;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay dialogOverlay, OsuGame game, GameHost host)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay? dialogOverlay, OsuGame? game, GameHost host)
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
-                dialogOverlay.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, game.AttemptExit, () =>
+                dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
                 {
                     renderer.Value = r.OldValue;
                 }));
