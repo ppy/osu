@@ -45,12 +45,20 @@ namespace osu.Game.Rulesets.Osu.Mods
             var h = (OsuHitObject)drawable.HitObject;
 
             // apply grow effect
-            if ((drawable is DrawableSlider && ScaleSliders.Value)
-                || (drawable is DrawableSliderHead && !ScaleSliders.Value)
-                || drawable is DrawableHitCircle)
+            switch (drawable)
             {
-                using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                    drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
+                case DrawableSliderTail:
+                    // special case we should *not* be scaling.
+                    break;
+
+                case DrawableSlider when ScaleSliders.Value:
+                case DrawableSliderHead when !ScaleSliders.Value:
+                case DrawableHitCircle:
+                {
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                        drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
+                    break;
+                }
             }
 
             // remove approach circles
