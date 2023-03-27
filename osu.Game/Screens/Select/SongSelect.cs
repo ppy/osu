@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -861,11 +862,9 @@ namespace osu.Game.Screens.Select
 
         private void updateVisibleBeatmapCount()
         {
-            FilterControl.InformationalText = Carousel.CountDisplayed == 1
-                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-                // but also in this case we want support for formatting a number within a string).
-                ? $"{Carousel.CountDisplayed:#,0} matching beatmap"
-                : $"{Carousel.CountDisplayed:#,0} matching beatmaps";
+            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+            // but also in this case we want support for formatting a number within a string).
+            FilterControl.InformationalText = $"{"matching beatmap".ToQuantity(Carousel.CountDisplayedSets, "#,0")} ({"difficulty".ToQuantity(Carousel.CountDisplayedBeatmaps, "#,0")})";
         }
 
         private bool boundLocalBindables;
