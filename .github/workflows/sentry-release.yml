@@ -3,7 +3,7 @@ name: Add Release to Sentry
 on:
   push:
     tags:
-      - "*"
+      - '*'
 
 permissions:
   contents: read # to fetch code (actions/checkout)
