@@ -2,11 +2,12 @@
 # Usage:
 #   !pp check 0        | Runs only the osu! ruleset.
 #   !pp check 0 2      | Runs only the osu! and catch rulesets.
+#
 
 name: Difficulty Calculation
 on:
   issue_comment:
-    types: [created]
+    types: [ created ]
 
 env:
   CONCURRENCY: 4
@@ -86,11 +87,11 @@ jobs:
       - name: Checkout osu (master)
         uses: actions/checkout@v3
         with:
-          path: "master/osu"
+          path: 'master/osu'
       - name: Checkout osu (pr)
         uses: actions/checkout@v3
         with:
-          path: "pr/osu"
+          path: 'pr/osu'
           repository: ${{ steps.upstreambranch.outputs.repo }}
           ref: ${{ steps.upstreambranch.outputs.branchname }}
 
@@ -98,12 +99,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ppy/osu-difficulty-calculator
-          path: "master/osu-difficulty-calculator"
+          path: 'master/osu-difficulty-calculator'
       - name: Checkout osu-difficulty-calculator (pr)
         uses: actions/checkout@v3
         with:
           repository: ppy/osu-difficulty-calculator
-          path: "pr/osu-difficulty-calculator"
+          path: 'pr/osu-difficulty-calculator'
 
       - name: Install .NET 5.0.x
         uses: actions/setup-dotnet@v3
