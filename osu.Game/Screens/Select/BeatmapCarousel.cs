@@ -64,7 +64,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The total count of non-filtered beatmaps displayed.
         /// </summary>
-        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.Beatmaps.Count(b => !b.Filtered.Value));
+        public int CountDisplayedBeatmaps => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.Beatmaps.Count(b => !b.Filtered.Value));
+
+        /// <summary>
+        /// The total count of non-filtered beatmap sets displayed.
+        /// </summary>
+        public int CountDisplayedSets => beatmapSets.Count(s => !s.Filtered.Value);
 
         /// <summary>
         /// The currently selected beatmap set.
