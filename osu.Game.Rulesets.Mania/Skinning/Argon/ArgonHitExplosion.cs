@@ -43,8 +43,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 largeFaint = new Container
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
                     Masking = true,
@@ -78,16 +76,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            if (direction.NewValue == ScrollingDirection.Up)
-            {
-                Anchor = Anchor.TopCentre;
-                Y = ArgonNotePiece.NOTE_HEIGHT / 2;
-            }
-            else
-            {
-                Anchor = Anchor.BottomCentre;
-                Y = -ArgonNotePiece.NOTE_HEIGHT / 2;
-            }
+            Anchor = largeFaint.Anchor = largeFaint.Origin = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            Y = direction.NewValue == ScrollingDirection.Up ? ArgonNotePiece.NOTE_HEIGHT / 2 : -ArgonNotePiece.NOTE_HEIGHT / 2;
         }
 
         public void Animate(JudgementResult result)
