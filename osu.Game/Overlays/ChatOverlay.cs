@@ -123,7 +123,7 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Y,
                                     Width = side_bar_width,
                                 },
-                                new PopoverContainer
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
@@ -135,9 +135,13 @@ namespace osu.Game.Overlays
                                     },
                                     Children = new Drawable[]
                                     {
-                                        currentChannelContainer = new Container<DrawableChannel>
+                                        new PopoverContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
+                                            Child = currentChannelContainer = new Container<DrawableChannel>
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            }
                                         },
                                         loading = new LoadingLayer(true),
                                         channelListing = new ChannelListing
