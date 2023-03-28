@@ -25,21 +25,28 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The texture store to be used for the ruleset.
         /// </summary>
+        /// <remarks>
+        /// Reads textures from the "Textures" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global texture store.
+        /// </remarks>
         public TextureStore TextureStore { get; }
 
         /// <summary>
         /// The sample store to be used for the ruleset.
         /// </summary>
         /// <remarks>
-        /// This is the local sample store pointing to the ruleset sample resources,
-        /// the cached sample store (<see cref="FallbackSampleStore"/>) retrieves from
-        /// this store and falls back to the parent store if this store doesn't have the requested sample.
+        /// Reads samples from the "Samples" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global sample store.
         /// </remarks>
         public ISampleStore SampleStore { get; }
 
         /// <summary>
         /// The shader manager to be used for the ruleset.
         /// </summary>
+        /// <remarks>
+        /// Reads shaders from the "Shaders" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global shader manager.
+        /// </remarks>
         public ShaderManager ShaderManager { get; }
 
         /// <summary>
