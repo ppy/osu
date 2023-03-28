@@ -24,8 +24,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private OsuEnumDropdown<T> reasonDropdown = null!;
         private OsuTextBox commentsTextBox = null!;
         private RoundedButton submitButton = null!;
-
-        public bool CanSubmitEmptyReason = false;
         public LocalisableString Header;
 
         protected ReportPopover(LocalisableString headerString)
@@ -102,13 +100,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
             };
 
-            if (!CanSubmitEmptyReason)
-            {
-                commentsTextBox.Current.BindValueChanged(e =>
-                {
-                    submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(e.NewValue);
-                }, true);
-            }
+            commentsTextBox.Current.BindValueChanged(_ => updateStatus());
+
+            reasonDropdown.Current.BindValueChanged(_ => updateStatus());
+
+            updateStatus();
+        }
+
+        private void updateStatus()
+        {
+            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || CheckCanSubmitEmptyComment(reasonDropdown.Current.Value);
+        }
+
+        protected virtual bool CheckCanSubmitEmptyComment(T reason)
+        {
+            return false;
         }
     }
 }

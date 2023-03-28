@@ -12,7 +12,11 @@ namespace osu.Game.Overlays.Chat
         public ReportChatPopover(APIUser? user)
             : base(ReportStrings.UserTitle(user?.Username ?? @"Someone"))
         {
-            CanSubmitEmptyReason = true;
+        }
+
+        protected override bool CheckCanSubmitEmptyComment(ChatReportReason reason)
+        {
+            return reason != ChatReportReason.Other;
         }
     }
 }
