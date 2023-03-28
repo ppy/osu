@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
+        private SettingsSlider<float> dimSlider = null!;
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
         private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
@@ -58,6 +59,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<float> scalingSizeX = null!;
         private Bindable<float> scalingSizeY = null!;
 
+        private Bindable<float> scalingBackgroundDim = null!;
+
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
@@ -71,6 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+            scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingMenuBackgroundDim);
 
             if (window != null)
             {
@@ -162,6 +166,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
+                        dimSlider = new SettingsSlider<float>
+                        {
+                            LabelText = GameplaySettingsStrings.BackgroundDim,
+                            Current = scalingBackgroundDim,
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
+                        },
                     }
                 },
             };
@@ -219,6 +230,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
                 scalingSettings.ForEach(s =>
                 {
+                    if (s == dimSlider)
+                    {
+                        s.TransferValueOnCommit = false;
+                        s.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
+                        return;
+                    }
+
                     s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
                     s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
                 });
