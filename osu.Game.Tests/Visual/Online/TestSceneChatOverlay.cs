@@ -618,6 +618,12 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Show report popover", () => this.ChildrenOfType<DrawableUsername>().First().ShowPopover());
 
+            AddStep("Set report reason to other", () =>
+            {
+                var reason = this.ChildrenOfType<OsuEnumDropdown<ChatReportReason>>().Single();
+                reason.Current.Value = ChatReportReason.Other;
+            });
+
             AddStep("Try to report", () =>
             {
                 var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
@@ -626,7 +632,21 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddWaitStep("Wait", 3);
+            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
+            AddStep("Set report data", () =>
+            {
+                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
+                field.Current.Value = "test other";
+            });
 
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddWaitStep("Wait", 3);
             AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
