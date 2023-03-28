@@ -100,8 +100,10 @@ namespace osu.Game.Tests.Visual.Background
 
                 private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
 
-                public override void Draw(IRenderer renderer)
+                protected override void BindUniformResources(IShader shader, IRenderer renderer)
                 {
+                    base.BindUniformResources(shader, renderer);
+
                     borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
                     borderDataBuffer.Data = borderDataBuffer.Data with
                     {
@@ -109,9 +111,7 @@ namespace osu.Game.Tests.Visual.Background
                         TexelSize = texelSize
                     };
 
-                    TextureShader.BindUniformBlock("m_BorderData", borderDataBuffer);
-
-                    base.Draw(renderer);
+                    shader.BindUniformBlock("m_BorderData", borderDataBuffer);
                 }
 
                 protected override bool CanDrawOpaqueInterior => false;

@@ -257,6 +257,7 @@ namespace osu.Game.Screens.Select
             public FilterControlTextBox()
             {
                 Height += filter_text_size;
+                TextContainer.Height *= (Height - filter_text_size) / Height;
                 TextContainer.Margin = new MarginPadding { Bottom = filter_text_size };
             }
 
