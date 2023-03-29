@@ -171,7 +171,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                             LabelText = GameplaySettingsStrings.BackgroundDim,
                             Current = scalingBackgroundDim,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
+                            DisplayAsPercentage = true,
+                            TransferValueOnCommit = false
                         },
                     }
                 },
@@ -232,7 +233,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     if (s == dimSlider)
                     {
-                        s.TransferValueOnCommit = false;
                         s.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
                         return;
                     }
