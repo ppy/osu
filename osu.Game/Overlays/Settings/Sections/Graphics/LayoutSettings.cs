@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
-            scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingMenuBackgroundDim);
+            scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
 
             if (window != null)
             {
