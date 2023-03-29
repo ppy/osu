@@ -358,14 +358,10 @@ namespace osu.Game.Screens.Play
                 ScoreProcessor.RevertResult(r);
             };
 
-            DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
-            {
-                if (storyboardEnded.NewValue)
-                    progressToResults(true);
-            };
+            DimmableStoryboard.HasStoryboardEnded.ValueChanged += _ => scoreCompleted();
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
+            ScoreProcessor.HasCompleted.BindValueChanged(_ => scoreCompleted());
             HealthProcessor.Failed += onFail;
 
             // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
@@ -706,8 +702,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
-        private void scoreCompletionChanged(ValueChangedEvent<bool> completed)
+        private void scoreCompleted()
         {
             // If this player instance is in the middle of an exit, don't attempt any kind of state update.
             if (!this.IsCurrentScreen())
@@ -718,7 +713,7 @@ namespace osu.Game.Screens.Play
             // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
             // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
             // but it still doesn't feel right that this exists here.
-            if (!completed.NewValue)
+            if (!ScoreProcessor.HasCompleted.Value)
             {
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
@@ -742,12 +737,12 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
+            bool storyboardStillRunning = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
-            if (storyboardHasOutro)
+            // If the current beatmap has a storyboard, this method will be called again on storyboard completion.
+            // Alternatively, the user may press the outro skip button, forcing immediate display of the results screen.
+            if (storyboardStillRunning)
             {
-                // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
-                // or the user pressing the skip outro button.
                 skipOutroOverlay.Show();
                 return;
             }
