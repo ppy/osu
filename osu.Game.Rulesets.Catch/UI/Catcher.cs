@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Origin = Anchor.TopCentre;
 
             Size = new Vector2(BASE_SIZE);
+
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
@@ -333,8 +334,11 @@ namespace osu.Game.Rulesets.Catch.UI
             base.Update();
 
             var scaleFromDirection = new Vector2((int)VisualDirection, 1);
+
             body.Scale = scaleFromDirection;
-            caughtObjectContainer.Scale = hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
+            // Inverse of catcher scale is applied here, as catcher gets scaled by circle size and so do the incoming fruit.
+            caughtObjectContainer.Scale = (1 / Scale.X) * (flipCatcherPlate ? scaleFromDirection : Vector2.One);
+            hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
