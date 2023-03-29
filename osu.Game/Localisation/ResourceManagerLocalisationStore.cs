@@ -11,6 +11,7 @@ using System.Linq;
 using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Development;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -63,6 +64,11 @@ namespace osu.Game.Localisation
                 }
 
                 if (manager == null)
+                    return null;
+
+                // When running a debug build and in viewing english culture, use the fallbacks rather than osu-resources baked strings.
+                // This is what a developer expects to see when making changes to `xxxStrings.cs` files.
+                if (DebugUtils.IsDebugBuild && EffectiveCulture.Name == @"en")
                     return null;
 
                 try
