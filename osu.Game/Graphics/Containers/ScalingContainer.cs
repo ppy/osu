@@ -141,7 +141,7 @@ namespace osu.Game.Graphics.Containers
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
 
-            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingMenuBackgroundDim);
+            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
             scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
         }
 

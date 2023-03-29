@@ -157,7 +157,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
-            SetDefault(OsuSetting.ScalingMenuBackgroundDim, 0.9f, 0.5f, 1f);
+            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -365,7 +365,7 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
-        ScalingMenuBackgroundDim,
+        ScalingBackgroundDim,
         UIScale,
         IntroSequence,
         NotifyOnUsernameMentioned,
