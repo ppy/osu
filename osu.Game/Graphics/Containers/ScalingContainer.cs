@@ -176,7 +176,7 @@ namespace osu.Game.Graphics.Containers
                     }
 
                     backgroundStack.FadeIn(TRANSITION_DURATION);
-                    backgroundStack.FadeColour(OsuColour.Gray(1.0f - scalingMenuBackgroundDim.Value), 800, Easing.OutQuint);
+                    backgroundStack.FadeColour(OsuColour.Gray(1.0f - scalingMenuBackgroundDim.Value), TRANSITION_DURATION, Easing.OutQuint);
                 }
                 else
                     backgroundStack?.FadeOut(TRANSITION_DURATION);
