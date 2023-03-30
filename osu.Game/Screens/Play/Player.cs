@@ -708,11 +708,13 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            // Special case to handle rewinding post-completion. This is the only way already queued forward progress can be cancelled.
-            // TODO: Investigate whether this can be moved to a RewindablePlayer subclass or similar.
-            // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
-            // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
-            // but it still doesn't feel right that this exists here.
+            // Handle cases of arriving at this method when not in a completed state.
+            // - When a storyboard completion triggered this call earlier than gameplay finishes.
+            // - When a replay has been rewound before a queued resultsDisplayDelegate has run.
+            //
+            // Currently, even if this scenario is hit, prepareAndImportScoreAsync has already been queued (and potentially run).
+            // In the scenarios above, this is a non-issue, but it still feels a bit convoluted to have to cancel in this method.
+            // Maybe this can be improved with further refactoring.
             if (!ScoreProcessor.HasCompleted.Value)
             {
                 resultsDisplayDelegate?.Cancel();
