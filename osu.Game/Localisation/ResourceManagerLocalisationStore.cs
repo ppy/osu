@@ -68,7 +68,7 @@ namespace osu.Game.Localisation
 
                 // When running a debug build and in viewing english culture, use the fallbacks rather than osu-resources baked strings.
                 // This is what a developer expects to see when making changes to `xxxStrings.cs` files.
-                if (DebugUtils.IsDebugBuild && EffectiveCulture.Name == @"en")
+                if (EffectiveCulture.Name == @"en")
                     return null;
 
                 try
