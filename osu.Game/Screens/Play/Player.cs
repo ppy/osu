@@ -358,14 +358,10 @@ namespace osu.Game.Screens.Play
                 ScoreProcessor.RevertResult(r);
             };
 
-            DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
-            {
-                if (storyboardEnded.NewValue)
-                    progressToResults(true);
-            };
+            DimmableStoryboard.HasStoryboardEnded.ValueChanged += _ => checkScoreCompleted();
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
+            ScoreProcessor.HasCompleted.BindValueChanged(_ => checkScoreCompleted());
             HealthProcessor.Failed += onFail;
 
             // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
@@ -706,19 +702,20 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
-        private void scoreCompletionChanged(ValueChangedEvent<bool> completed)
+        private void checkScoreCompleted()
         {
             // If this player instance is in the middle of an exit, don't attempt any kind of state update.
             if (!this.IsCurrentScreen())
                 return;
 
-            // Special case to handle rewinding post-completion. This is the only way already queued forward progress can be cancelled.
-            // TODO: Investigate whether this can be moved to a RewindablePlayer subclass or similar.
-            // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
-            // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
-            // but it still doesn't feel right that this exists here.
-            if (!completed.NewValue)
+            // Handle cases of arriving at this method when not in a completed state.
+            // - When a storyboard completion triggered this call earlier than gameplay finishes.
+            // - When a replay has been rewound before a queued resultsDisplayDelegate has run.
+            //
+            // Currently, even if this scenario is hit, prepareAndImportScoreAsync has already been queued (and potentially run).
+            // In the scenarios above, this is a non-issue, but it still feels a bit convoluted to have to cancel in this method.
+            // Maybe this can be improved with further refactoring.
+            if (!ScoreProcessor.HasCompleted.Value)
             {
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
@@ -742,12 +739,12 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
+            bool storyboardStillRunning = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
-            if (storyboardHasOutro)
+            // If the current beatmap has a storyboard, this method will be called again on storyboard completion.
+            // Alternatively, the user may press the outro skip button, forcing immediate display of the results screen.
+            if (storyboardStillRunning)
             {
-                // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
-                // or the user pressing the skip outro button.
                 skipOutroOverlay.Show();
                 return;
             }
@@ -792,6 +789,8 @@ namespace osu.Game.Screens.Play
                 if (!this.IsCurrentScreen())
                     // This player instance may already be in the process of exiting.
                     return;
+
+                Debug.Assert(ScoreProcessor.Rank.Value != ScoreRank.F);
 
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
