@@ -11,7 +11,6 @@ using System.Linq;
 using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Development;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
