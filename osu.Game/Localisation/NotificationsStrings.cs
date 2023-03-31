@@ -50,16 +50,18 @@ namespace osu.Game.Localisation
         public static LocalisableString NoAutoplayMod => new TranslatableString(getKey(@"no_autoplay_mod"), @"The current ruleset doesn't have an autoplay mod available!");
 
         /// <summary>
-        /// "osu! doesn&#39;t seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+        /// "osu! doesn&#39;t seem to be able to play audio correctly.
+        ///
+        /// Please try changing your audio device to a working setting."
         /// </summary>
-        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"),
-            @"osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting.");
+        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"), @"osu! doesn't seem to be able to play audio correctly.
+
+Please try changing your audio device to a working setting.");
 
         /// <summary>
         /// "The score overlay is currently disabled. You can toggle this by pressing {0}."
         /// </summary>
-        public static LocalisableString ScoreOverlayDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"score_overlay_disabled"),
-            @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
+        public static LocalisableString ScoreOverlayDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"score_overlay_disabled"), @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
