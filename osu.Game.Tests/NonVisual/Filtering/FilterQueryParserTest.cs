@@ -322,8 +322,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private static readonly object[] correct_date_query_examples =
         {
             new object[] { "600" },
-            new object[] { "120:120" },
-            new object[] { "48:0:0" },
             new object[] { "0.5s" },
             new object[] { "120m" },
             new object[] { "48h120s" },
@@ -350,6 +348,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "5s6m" },
             new object[] { "7d7y" },
             new object[] { ":0" },
+            new object[] { "0:3:6" },
             new object[] { "0:3:" },
             new object[] { "\"three days\"" }
         };
