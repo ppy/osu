@@ -54,9 +54,7 @@ namespace osu.Game.Localisation
         ///
         /// Please try changing your audio device to a working setting."
         /// </summary>
-        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"), @"osu! doesn't seem to be able to play audio correctly.
-
-Please try changing your audio device to a working setting.");
+        public static LocalisableString AudioPlaybackIssue => new TranslatableString(getKey(@"audio_playback_issue"), @"osu! doesn't seem to be able to play audio correctly. Please try changing your audio device to a working setting.");
 
         /// <summary>
         /// "The score overlay is currently disabled. You can toggle this by pressing {0}."
