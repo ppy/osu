@@ -378,9 +378,8 @@ namespace osu.Game.Screens.Select
         {
             GroupCollection? match = null;
 
-            match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
             match ??= tryMatchRegex(val, @"^((?<years>\d+(\.\d+)?)y)?((?<months>\d+(\.\d+)?)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
-            match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
+            match ??= tryMatchRegex(val, @"^(?<days>\d+(\.\d+)?)$");
 
             if (match == null)
                 return false;
@@ -417,11 +416,13 @@ namespace osu.Game.Screens.Select
                                 break;
 
                             case "months":
-                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)Math.Round(length));
+                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)Math.Floor(length));
+                                dateTimeOffset = dateTimeOffset.AddDays(-30 * (length - Math.Floor(length)));
                                 break;
 
                             case "years":
-                                dateTimeOffset = dateTimeOffset.AddYears(-(int)Math.Round(length));
+                                dateTimeOffset = dateTimeOffset.AddYears(-(int)Math.Floor(length));
+                                dateTimeOffset = dateTimeOffset.AddDays(-365 * (length - Math.Floor(length)));
                                 break;
                         }
                     }
