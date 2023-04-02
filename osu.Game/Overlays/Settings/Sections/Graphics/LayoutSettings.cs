@@ -75,7 +75,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             if (window != null)
             {
                 currentDisplay.BindTo(window.CurrentDisplayBindable);
-                windowModes.BindTo(window.SupportedWindowModes);
                 window.DisplaysChanged += onDisplaysChanged;
             }
 
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = GraphicsSettingsStrings.ScreenMode,
-                    ItemSource = windowModes,
+                    Items = window?.SupportedWindowModes,
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 displayDropdown = new DisplaySettingsDropdown
