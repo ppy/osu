@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly OsuSpriteText version, starRating, starRatingText;
+        public readonly FillFlowContainer GuestMapperContainer;
         private readonly FillFlowContainer starRatingContainer;
         private readonly Statistic plays, favourites;
 
@@ -87,6 +88,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
+                                },
+                                GuestMapperContainer = new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
                                 },
                                 starRatingContainer = new FillFlowContainer
                                 {
@@ -198,9 +205,30 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(IBeatmapInfo? beatmapInfo)
+        private void showBeatmap(APIBeatmap? beatmapInfo)
         {
+            GuestMapperContainer.Clear();
+
+            if (beatmapInfo != null && beatmapSet?.Author.OnlineID != beatmapInfo.AuthorID)
+            {
+                if (BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo.AuthorID) is APIUser user)
+                    GuestMapperContainer.Child = getGueatMapper(user);
+            }
+
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
+        }
+
+        private Drawable getGueatMapper(APIUser user)
+        {
+            return new LinkFlowContainer(s =>
+            {
+                s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+            }).With(d =>
+            {
+                d.AutoSizeAxes = Axes.Both;
+                d.AddText("mapped by ");
+                d.AddUserLink(user);
+            });
         }
 
         private void updateDifficultyButtons()
