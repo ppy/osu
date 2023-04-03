@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly OsuSpriteText version, starRating, starRatingText;
-        private readonly FillFlowContainer guestMapperContainer;
+        private readonly LinkFlowContainer guestMapperContainer;
         private readonly FillFlowContainer starRatingContainer;
         private readonly Statistic plays, favourites;
 
@@ -89,7 +89,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                                 },
-                                guestMapperContainer = new FillFlowContainer
+                                guestMapperContainer = new LinkFlowContainer(s =>
+                                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15))
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomLeft,
@@ -209,11 +210,11 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             guestMapperContainer.Clear();
 
-            if (beatmapInfo != null && beatmapSet?.Author.OnlineID != beatmapInfo.AuthorID)
+            if (beatmapInfo != null && beatmapInfo.AuthorID != beatmapSet?.AuthorID)
             {
-                    guestMapperContainer.Child = getGuestMapper(user);
-                APIUser? user = BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo?.AuthorID);
+                APIUser? user = BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo.AuthorID);
                 if (user != null)
+                    getGuestMapper(user);
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
