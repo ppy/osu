@@ -10,6 +10,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
