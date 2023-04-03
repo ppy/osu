@@ -212,13 +212,13 @@ namespace osu.Game.Overlays.BeatmapSet
             if (beatmapInfo != null && beatmapSet?.Author.OnlineID != beatmapInfo.AuthorID)
             {
                 if (BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo.AuthorID) is APIUser user)
-                    guestMapperContainer.Child = getGueatMapper(user);
+                    guestMapperContainer.Child = getGuestMapper(user);
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
         }
 
-        private Drawable getGueatMapper(APIUser user)
+        private Drawable getGuestMapper(APIUser user)
         {
             return new LinkFlowContainer(s =>
             {
