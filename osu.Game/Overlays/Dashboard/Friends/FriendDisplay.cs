@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = 50 }
+                                                Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
                                             loading = new LoadingLayer(true)
                                         }
