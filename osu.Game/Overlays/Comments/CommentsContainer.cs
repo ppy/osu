@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Comments
                                             ShowDeleted = { BindTarget = ShowDeleted },
                                             Margin = new MarginPadding
                                             {
-                                                Horizontal = 70,
+                                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                                                 Vertical = 10
                                             }
                                         },

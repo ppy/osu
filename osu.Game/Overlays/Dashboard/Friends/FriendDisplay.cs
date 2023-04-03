@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                 Padding = new MarginPadding
                                 {
                                     Top = 20,
-                                    Horizontal = 45
+                                    Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - FriendsOnlineStatusItem.PADDING
                                 },
                                 Child = onlineStreamControl = new FriendOnlineStreamControl(),
                             }
