@@ -15,6 +15,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -290,12 +291,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(0));
             });
-            AddAssert("Guset mapper information not show", () => !overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<LinkFlowContainer>().Any());
+            AddAssert("Guset mapper information not show", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().All(s => s.Text != "BanchoBot"));
             AddStep("move mouse to guest diff", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
             });
-            AddAssert("Guset mapper information show", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<LinkFlowContainer>().Any());
+            AddAssert("Guset mapper information show", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == "BanchoBot"));
         }
 
         private APIBeatmapSet createManyDifficultiesBeatmapSet()
