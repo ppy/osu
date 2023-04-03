@@ -25,21 +25,28 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The texture store to be used for the ruleset.
         /// </summary>
+        /// <remarks>
+        /// Reads textures from the "Textures" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global texture store.
+        /// </remarks>
         public TextureStore TextureStore { get; }
 
         /// <summary>
         /// The sample store to be used for the ruleset.
         /// </summary>
         /// <remarks>
-        /// This is the local sample store pointing to the ruleset sample resources,
-        /// the cached sample store (<see cref="FallbackSampleStore"/>) retrieves from
-        /// this store and falls back to the parent store if this store doesn't have the requested sample.
+        /// Reads samples from the "Samples" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global sample store.
         /// </remarks>
         public ISampleStore SampleStore { get; }
 
         /// <summary>
         /// The shader manager to be used for the ruleset.
         /// </summary>
+        /// <remarks>
+        /// Reads shaders from the "Shaders" folder in ruleset resources.
+        /// If not available locally, lookups will fallback to the global shader manager.
+        /// </remarks>
         public ShaderManager ShaderManager { get; }
 
         /// <summary>
@@ -61,8 +68,7 @@ namespace osu.Game.Rulesets.UI
             SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
             CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
-            ShaderManager = new ShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
-            CacheAs(ShaderManager = new FallbackShaderManager(host.Renderer, ShaderManager, parent.Get<ShaderManager>()));
+            CacheAs(ShaderManager = new RulesetShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"), parent.Get<ShaderManager>()));
 
             RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
@@ -190,24 +196,27 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private class FallbackShaderManager : ShaderManager
+        private class RulesetShaderManager : ShaderManager
         {
-            private readonly ShaderManager primary;
-            private readonly ShaderManager fallback;
+            private readonly ShaderManager parent;
 
-            public FallbackShaderManager(IRenderer renderer, ShaderManager primary, ShaderManager fallback)
-                : base(renderer, new ResourceStore<byte[]>())
+            public RulesetShaderManager(IRenderer renderer, NamespacedResourceStore<byte[]> rulesetResources, ShaderManager parent)
+                : base(renderer, rulesetResources)
             {
-                this.primary = primary;
-                this.fallback = fallback;
+                this.parent = parent;
             }
 
-            public override byte[]? LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
-
-            protected override void Dispose(bool disposing)
+            public override IShader Load(string vertex, string fragment)
             {
-                base.Dispose(disposing);
-                if (primary.IsNotNull()) primary.Dispose();
+                try
+                {
+                    return base.Load(vertex, fragment);
+                }
+                catch
+                {
+                    // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
+                    return parent.Load(vertex, fragment);
+                }
             }
         }
     }

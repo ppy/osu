@@ -94,6 +94,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         OnlineID = i,
                         BeatmapInfo = beatmapInfo,
+                        BeatmapHash = beatmapInfo.Hash,
                         Accuracy = RNG.NextDouble(),
                         TotalScore = RNG.Next(1, 1000000),
                         MaxCombo = RNG.Next(1, 1000),
