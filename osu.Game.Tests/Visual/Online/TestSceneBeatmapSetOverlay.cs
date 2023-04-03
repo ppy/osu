@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
