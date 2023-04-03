@@ -206,6 +206,19 @@ namespace osu.Game.Rulesets.UI
                 this.parent = parent;
             }
 
+            public override byte[] LoadRaw(string name)
+            {
+                try
+                {
+                    return base.LoadRaw(name);
+                }
+                catch
+                {
+                    // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
+                    return parent.LoadRaw(name);
+                }
+            }
+
             public override IShader Load(string vertex, string fragment)
             {
                 try
