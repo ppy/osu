@@ -151,6 +151,42 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestPositionalTrackingAfterLongDistanceTravelled()
+        {
+            // When a single touch has already travelled enough distance on screen, it should remain as the positional
+            // tracking touch until released (unless a direct touch occurs).
+
+            beginTouch(TouchSource.Touch1);
+
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+
+            // cover some distance
+            beginTouch(TouchSource.Touch1, new Vector2(0));
+            beginTouch(TouchSource.Touch1, new Vector2(9999));
+            beginTouch(TouchSource.Touch1, new Vector2(0));
+            beginTouch(TouchSource.Touch1, new Vector2(9999));
+            beginTouch(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch2);
+
+            assertKeyCounter(1, 1);
+            checkNotPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            // in this case, touch 2 should not become the positional tracking touch.
+            checkPosition(TouchSource.Touch1);
+
+            // even if the second touch moves on the screen, the original tracking touch is retained.
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+
+            checkPosition(TouchSource.Touch1);
+        }
+
+        [Test]
         public void TestPositionalInputUpdatesOnlyFromMostRecentTouch()
         {
             beginTouch(TouchSource.Touch1);
