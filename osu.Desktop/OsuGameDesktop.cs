@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -139,7 +138,17 @@ namespace osu.Desktop
 
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
-            desktopWindow.DragDrop += f => fileDrop(new[] { f });
+            desktopWindow.DragDrop += f =>
+            {
+                // on macOS, URL associations are handled via SDL_DROPFILE events.
+                if (f.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                {
+                    HandleLink(f);
+                    return;
+                }
+
+                fileDrop(new[] { f });
+            };
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
@@ -151,10 +160,6 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                string firstExtension = Path.GetExtension(filePaths.First());
-
-                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
                 importableFiles.AddRange(filePaths);
 
                 Logger.Log($"Adding {filePaths.Length} files for import");

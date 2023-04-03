@@ -22,6 +22,13 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private readonly List<TrackedTouch> trackedTouches = new List<TrackedTouch>();
 
+        /// <summary>
+        /// The distance (in local pixels) that a touch must move before being considered a permanent tracking touch.
+        /// After this distance is covered, any extra touches on the screen will be considered as button inputs, unless
+        /// a new touch directly interacts with a hit circle.
+        /// </summary>
+        private const float distance_before_position_tracking_lock_in = 100;
+
         private TrackedTouch? positionTrackingTouch;
 
         private readonly OsuInputManager osuInputManager;
@@ -97,26 +104,32 @@ namespace osu.Game.Rulesets.Osu.UI
                 return;
             }
 
-            // ..or if the current position tracking touch was not a direct touch (this one is debatable and may be change in the future, but it's the simplest way to handle)
-            if (!positionTrackingTouch.DirectTouch)
+            // ..or if the current position tracking touch was not a direct touch (and didn't travel across the screen too far).
+            if (!positionTrackingTouch.DirectTouch && positionTrackingTouch.DistanceTravelled < distance_before_position_tracking_lock_in)
             {
                 positionTrackingTouch = newTouch;
                 return;
             }
 
             // In the case the new touch was not used for position tracking, we should also check the previous position tracking touch.
-            // If it was a direct touch and still has its action pressed, that action should be released.
+            // If it still has its action pressed, that action should be released.
             //
             // This is done to allow tracking with the initial touch while still having both Left/Right actions available for alternating with two more touches.
-            if (positionTrackingTouch.DirectTouch && positionTrackingTouch.Action is OsuAction directTouchAction)
+            if (positionTrackingTouch.Action is OsuAction touchAction)
             {
-                osuInputManager.KeyBindingContainer.TriggerReleased(directTouchAction);
+                osuInputManager.KeyBindingContainer.TriggerReleased(touchAction);
                 positionTrackingTouch.Action = null;
             }
         }
 
         private void handleTouchMovement(TouchEvent touchEvent)
         {
+            if (touchEvent is TouchMoveEvent moveEvent)
+            {
+                var trackedTouch = trackedTouches.Single(t => t.Source == touchEvent.Touch.Source);
+                trackedTouch.DistanceTravelled += moveEvent.Delta.Length;
+            }
+
             // Movement should only be tracked for the most recent touch.
             if (touchEvent.Touch.Source != positionTrackingTouch?.Source)
                 return;
@@ -148,7 +161,15 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public OsuAction? Action;
 
+            /// <summary>
+            /// Whether the touch was on a hit circle receptor.
+            /// </summary>
             public readonly bool DirectTouch;
+
+            /// <summary>
+            /// The total distance on screen travelled by this touch (in local pixels).
+            /// </summary>
+            public float DistanceTravelled;
 
             public TrackedTouch(TouchSource source, OsuAction? action, bool directTouch)
             {
