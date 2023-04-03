@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
