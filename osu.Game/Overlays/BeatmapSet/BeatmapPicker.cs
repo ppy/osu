@@ -210,9 +210,9 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             guestMapperContainer.Clear();
 
-            if (beatmapInfo != null && beatmapInfo.AuthorID != beatmapSet?.AuthorID)
+            if (beatmapInfo?.AuthorID != beatmapSet?.AuthorID)
             {
-                APIUser? user = BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo.AuthorID);
+                APIUser? user = BeatmapSet?.RelatedUsers?.SingleOrDefault(u => u.OnlineID == beatmapInfo?.AuthorID);
                 if (user != null)
                     getGuestMapper(user);
             }
