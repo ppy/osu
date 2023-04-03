@@ -211,21 +211,18 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (beatmapInfo != null && beatmapSet?.Author.OnlineID != beatmapInfo.AuthorID)
             {
-                if (BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo.AuthorID) is APIUser user)
                     guestMapperContainer.Child = getGuestMapper(user);
+                APIUser? user = BeatmapSet?.RelatedUsers?.Single(u => u.OnlineID == beatmapInfo?.AuthorID);
+                if (user != null)
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
         }
 
-        private Drawable getGuestMapper(APIUser user)
+        private void getGuestMapper(APIUser user)
         {
-            return new LinkFlowContainer(s =>
+            guestMapperContainer.With(d =>
             {
-                s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
-            }).With(d =>
-            {
-                d.AutoSizeAxes = Axes.Both;
                 d.AddText("mapped by ");
                 d.AddUserLink(user);
             });
