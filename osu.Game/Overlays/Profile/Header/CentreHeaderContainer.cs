@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Origin = Anchor.CentreRight,
                             Width = 200,
                             Height = 6,
-                            Margin = new MarginPadding { Right = 50 },
+                            Margin = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING },
                             Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
