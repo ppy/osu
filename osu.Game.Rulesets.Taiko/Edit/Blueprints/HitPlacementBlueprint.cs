@@ -35,20 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            switch (e.Button)
-            {
-                case MouseButton.Left:
-                    HitObject.Type = HitType.Centre;
-                    EndPlacement(true);
-                    return true;
-
-                case MouseButton.Right:
-                    HitObject.Type = HitType.Rim;
-                    EndPlacement(true);
-                    return true;
-            }
-
-            return false;
+            EndPlacement(true);
+            return true;
         }
 
         public override void UpdateTimeAndPosition(SnapResult result)
