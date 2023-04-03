@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -156,7 +155,7 @@ namespace osu.Game.Collections
                         Colour = colours.Yellow
                     });
 
-                    itemCountSubscription = realm.SubscribeToPropertyChanged<BeatmapCollection, IList<string>>(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, _ =>
+                    itemCountSubscription = realm.SubscribeToPropertyChanged(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, _ =>
                         Scheduler.AddOnce(() =>
                         {
                             int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
