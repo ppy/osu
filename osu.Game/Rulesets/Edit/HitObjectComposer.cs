@@ -321,60 +321,75 @@ namespace osu.Game.Rulesets.Edit
 
         private void updateInspectorText()
         {
-            if (beatmap.SelectedHitObjects.Count != 1)
-            {
-                inspectorText.Clear();
-                return;
-            }
-
-            var selected = beatmap.SelectedHitObjects.Single();
-
             inspectorText.Clear();
 
-            addHeader("Type");
-            addValue($"{selected.GetType().ReadableName()}");
-
-            addHeader("Time");
-            addValue($"{selected.StartTime:#,0.##}ms");
-
-            switch (selected)
+            switch (beatmap.SelectedHitObjects.Count)
             {
-                case IHasPosition pos:
-                    addHeader("Position");
-                    addValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                case 0:
+                    addHeader("No selection");
                     break;
 
-                case IHasXPosition x:
-                    addHeader("Position");
+                case 1:
+                    var selected = beatmap.SelectedHitObjects.Single();
 
-                    addValue($"x:{x.X:#,0.##} ");
+                    addHeader("Type");
+                    addValue($"{selected.GetType().ReadableName()}");
+
+                    addHeader("Time");
+                    addValue($"{selected.StartTime:#,0.##}ms");
+
+                    switch (selected)
+                    {
+                        case IHasPosition pos:
+                            addHeader("Position");
+                            addValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                            break;
+
+                        case IHasXPosition x:
+                            addHeader("Position");
+
+                            addValue($"x:{x.X:#,0.##} ");
+                            break;
+
+                        case IHasYPosition y:
+                            addHeader("Position");
+
+                            addValue($"y:{y.Y:#,0.##}");
+                            break;
+                    }
+
+                    if (selected is IHasDistance distance)
+                    {
+                        addHeader("Distance");
+                        addValue($"{distance.Distance:#,0.##}px");
+                    }
+
+                    if (selected is IHasRepeats repeats)
+                    {
+                        addHeader("Repeats");
+                        addValue($"{repeats.RepeatCount:#,0.##}");
+                    }
+
+                    if (selected is IHasDuration duration)
+                    {
+                        addHeader("End Time");
+                        addValue($"{duration.EndTime:#,0.##}ms");
+                        addHeader("Duration");
+                        addValue($"{duration.Duration:#,0.##}ms");
+                    }
+
                     break;
 
-                case IHasYPosition y:
-                    addHeader("Position");
+                default:
+                    addHeader("Selected Objects");
+                    addValue($"{beatmap.SelectedHitObjects.Count:#,0.##}");
 
-                    addValue($"y:{y.Y:#,0.##}");
+                    addHeader("Start Time");
+                    addValue($"{beatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}");
+
+                    addHeader("End Time");
+                    addValue($"{beatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
                     break;
-            }
-
-            if (selected is IHasDistance distance)
-            {
-                addHeader("Distance");
-                addValue($"{distance.Distance:#,0.##}px");
-            }
-
-            if (selected is IHasRepeats repeats)
-            {
-                addHeader("Repeats");
-                addValue($"{repeats.RepeatCount:#,0.##}");
-            }
-
-            if (selected is IHasDuration duration)
-            {
-                addHeader("End Time");
-                addValue($"{duration.EndTime:#,0.##}ms");
-                addHeader("Duration");
-                addValue($"{duration.Duration:#,0.##}ms");
             }
 
             void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
