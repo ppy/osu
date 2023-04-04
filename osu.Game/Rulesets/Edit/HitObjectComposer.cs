@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -329,6 +330,9 @@ namespace osu.Game.Rulesets.Edit
             var selected = beatmap.SelectedHitObjects.Single();
 
             inspectorText.Clear();
+
+            addHeader("Type");
+            addValue($"{selected.GetType().ReadableName()}");
 
             addHeader("Time");
             addValue($"{selected.StartTime:#,0.##}ms");
