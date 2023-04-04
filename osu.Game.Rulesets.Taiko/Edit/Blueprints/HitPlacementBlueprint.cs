@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
@@ -32,6 +33,9 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             EndPlacement(true);
             return true;
         }
