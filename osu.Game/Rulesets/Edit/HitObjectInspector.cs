@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.TypeExtensions;
@@ -18,17 +17,20 @@ namespace osu.Game.Rulesets.Edit
 {
     internal partial class HitObjectInspector : CompositeDrawable
     {
-        private OsuTextFlowContainer inspectorText;
+        private OsuTextFlowContainer inspectorText = null!;
 
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+
             InternalChild = inspectorText = new OsuTextFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -36,10 +38,13 @@ namespace osu.Game.Rulesets.Edit
             };
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
-            updateInspectorText();
+            base.LoadComplete();
+
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => updateInspectorText();
+            EditorBeatmap.TransactionBegan += updateInspectorText;
+            EditorBeatmap.TransactionEnded += updateInspectorText;
         }
 
         private void updateInspectorText()
@@ -49,7 +54,7 @@ namespace osu.Game.Rulesets.Edit
             switch (EditorBeatmap.SelectedHitObjects.Count)
             {
                 case 0:
-                    addHeader("No selection");
+                    addValue("No selection");
                     break;
 
                 case 1:
@@ -114,6 +119,9 @@ namespace osu.Game.Rulesets.Edit
                     addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
                     break;
             }
+
+            if (EditorBeatmap.TransactionActive)
+                Scheduler.AddDelayed(updateInspectorText, 100);
 
             void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
             {
