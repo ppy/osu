@@ -428,8 +428,7 @@ namespace osu.Game.Screens.Select
                     }
                 }
             }
-            // If DateTime to compare is out-scope put it to Min
-            catch (Exception)
+            catch (ArgumentOutOfRangeException)
             {
                 dateTimeOffset = DateTimeOffset.MinValue;
                 dateTimeOffset = dateTimeOffset.AddMilliseconds(1);
