@@ -212,13 +212,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     }
                 },
             };
+
+            // Early binds and initial visibility update are important to ensure this section has its autosized height before becoming present.
+            // This aids in the settings panel being able to correctly scroll to sections using the jump-buttons on the left.
+            enabled.BindTo(tabletHandler.Enabled);
+            tablet.BindTo(tabletHandler.Tablet);
+
+            updateVisibility();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            enabled.BindTo(tabletHandler.Enabled);
             enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             rotation.BindTo(tabletHandler.Rotation);
@@ -263,7 +269,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
 
-            tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val => Schedule(() =>
             {
                 Scheduler.AddOnce(updateVisibility);
