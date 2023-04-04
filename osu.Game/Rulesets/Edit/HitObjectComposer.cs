@@ -60,6 +60,10 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
+        protected ExpandingToolboxContainer LeftToolbox { get; private set; }
+
+        protected ExpandingToolboxContainer RightToolbox { get; private set; }
+
         private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
@@ -131,7 +135,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new ExpandingToolboxContainer(60, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(60, 200)
                         {
                             Children = new Drawable[]
                             {
@@ -153,6 +157,22 @@ namespace osu.Game.Rulesets.Edit
                         },
                     }
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        RightToolbox = new ExpandingToolboxContainer(130, 250)
+                    }
+                }
             };
 
             toolboxCollection.Items = CompositionTools
