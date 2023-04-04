@@ -18,12 +18,15 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -33,6 +36,7 @@ using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
+using FontWeight = osu.Game.Graphics.FontWeight;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -76,6 +80,14 @@ namespace osu.Game.Rulesets.Edit
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private OverlayColourProvider colours { get; set; }
+
+        private OsuTextFlowContainer inspectorText;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -171,6 +183,16 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                         },
                         RightToolbox = new ExpandingToolboxContainer(130, 250)
+                        {
+                            Child = new EditorToolboxGroup("inspector")
+                            {
+                                Child = inspectorText = new OsuTextFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                }
+                            },
+                        }
                     }
                 }
             };
@@ -210,6 +232,13 @@ namespace osu.Game.Rulesets.Edit
                 if (!timing.NewValue)
                     setSelectTool();
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            updateInspectorText();
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -287,6 +316,75 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private void updateInspectorText()
+        {
+            if (beatmap.SelectedHitObjects.Count != 1)
+            {
+                inspectorText.Clear();
+                return;
+            }
+
+            var selected = beatmap.SelectedHitObjects.Single();
+
+            inspectorText.Clear();
+
+            addHeader("Time");
+            addValue($"{selected.StartTime:#,0.##}ms");
+
+            switch (selected)
+            {
+                case IHasPosition pos:
+                    addHeader("Position");
+                    addValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                    break;
+
+                case IHasXPosition x:
+                    addHeader("Position");
+
+                    addValue($"x:{x.X:#,0.##} ");
+                    break;
+
+                case IHasYPosition y:
+                    addHeader("Position");
+
+                    addValue($"y:{y.Y:#,0.##}");
+                    break;
+            }
+
+            if (selected is IHasDistance distance)
+            {
+                addHeader("Distance");
+                addValue($"{distance.Distance:#,0.##}px");
+            }
+
+            if (selected is IHasRepeats repeats)
+            {
+                addHeader("Repeats");
+                addValue($"{repeats.RepeatCount:#,0.##}");
+            }
+
+            if (selected is IHasDuration duration)
+            {
+                addHeader("End Time");
+                addValue($"{duration.EndTime:#,0.##}ms");
+                addHeader("Duration");
+                addValue($"{duration.Duration:#,0.##}ms");
+            }
+
+            void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
+            {
+                s.Padding = new MarginPadding { Top = 2 };
+                s.Font = s.Font.With(size: 12);
+                s.Colour = colours.Content2;
+            });
+
+            void addValue(string value) => inspectorText.AddParagraph(value, s =>
+            {
+                s.Font = s.Font.With(weight: FontWeight.SemiBold);
+                s.Colour = colours.Content1;
+            });
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)
