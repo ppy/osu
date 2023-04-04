@@ -10,7 +10,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,15 +18,12 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -37,7 +33,6 @@ using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
-using FontWeight = osu.Game.Graphics.FontWeight;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -84,8 +79,6 @@ namespace osu.Game.Rulesets.Edit
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
-
-        private OsuTextFlowContainer inspectorText;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -184,11 +177,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = inspectorText = new OsuTextFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                }
+                                Child = new HitObjectInspector()
                             },
                         }
                     }
@@ -230,13 +219,6 @@ namespace osu.Game.Rulesets.Edit
                 if (!timing.NewValue)
                     setSelectTool();
             });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            updateInspectorText();
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -314,93 +296,6 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
-        }
-
-        private void updateInspectorText()
-        {
-            inspectorText.Clear();
-
-            switch (EditorBeatmap.SelectedHitObjects.Count)
-            {
-                case 0:
-                    addHeader("No selection");
-                    break;
-
-                case 1:
-                    var selected = EditorBeatmap.SelectedHitObjects.Single();
-
-                    addHeader("Type");
-                    addValue($"{selected.GetType().ReadableName()}");
-
-                    addHeader("Time");
-                    addValue($"{selected.StartTime:#,0.##}ms");
-
-                    switch (selected)
-                    {
-                        case IHasPosition pos:
-                            addHeader("Position");
-                            addValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
-                            break;
-
-                        case IHasXPosition x:
-                            addHeader("Position");
-
-                            addValue($"x:{x.X:#,0.##} ");
-                            break;
-
-                        case IHasYPosition y:
-                            addHeader("Position");
-
-                            addValue($"y:{y.Y:#,0.##}");
-                            break;
-                    }
-
-                    if (selected is IHasDistance distance)
-                    {
-                        addHeader("Distance");
-                        addValue($"{distance.Distance:#,0.##}px");
-                    }
-
-                    if (selected is IHasRepeats repeats)
-                    {
-                        addHeader("Repeats");
-                        addValue($"{repeats.RepeatCount:#,0.##}");
-                    }
-
-                    if (selected is IHasDuration duration)
-                    {
-                        addHeader("End Time");
-                        addValue($"{duration.EndTime:#,0.##}ms");
-                        addHeader("Duration");
-                        addValue($"{duration.Duration:#,0.##}ms");
-                    }
-
-                    break;
-
-                default:
-                    addHeader("Selected Objects");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
-
-                    addHeader("Start Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}");
-
-                    addHeader("End Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
-                    break;
-            }
-
-            void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
-            {
-                s.Padding = new MarginPadding { Top = 2 };
-                s.Font = s.Font.With(size: 12);
-                s.Colour = colourProvider.Content2;
-            });
-
-            void addValue(string value) => inspectorText.AddParagraph(value, s =>
-            {
-                s.Font = s.Font.With(weight: FontWeight.SemiBold);
-                s.Colour = colourProvider.Content1;
-            });
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)
