@@ -206,17 +206,26 @@ namespace osu.Game.Rulesets.UI
                 this.parent = parent;
             }
 
+            // When the debugger is attached, exceptions are expensive.
+            // Manually work around this by caching failed lookups and falling back straight to parent.
+            private readonly HashSet<string> failedRawLookups = new HashSet<string>();
+
             public override byte[] LoadRaw(string name)
             {
-                try
+                if (!failedRawLookups.Contains(name))
                 {
-                    return base.LoadRaw(name);
+                    try
+                    {
+                        return base.LoadRaw(name);
+                    }
+                    catch
+                    {
+                        // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
+                        failedRawLookups.Add(name);
+                    }
                 }
-                catch
-                {
-                    // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                    return parent.LoadRaw(name);
-                }
+
+                return parent.LoadRaw(name);
             }
 
             // When the debugger is attached, exceptions are expensive.
