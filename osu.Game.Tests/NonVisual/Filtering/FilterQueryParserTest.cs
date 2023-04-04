@@ -317,7 +317,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             }
         }
 
-        //Date criteria testing
 
         private static readonly object[] correct_date_query_examples =
         {
