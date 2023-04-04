@@ -206,39 +206,26 @@ namespace osu.Game.Rulesets.UI
                 this.parent = parent;
             }
 
-            public override byte[] LoadRaw(string name)
-            {
-                try
-                {
-                    return base.LoadRaw(name);
-                }
-                catch
-                {
-                    // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                    return parent.LoadRaw(name);
-                }
-            }
-
             // When the debugger is attached, exceptions are expensive.
             // Manually work around this by caching failed lookups and falling back straight to parent.
-            private readonly HashSet<(string, string)> failedLookups = new HashSet<(string, string)>();
+            private readonly HashSet<string> failedLookups = new HashSet<string>();
 
-            public override IShader Load(string vertex, string fragment)
+            public override byte[] LoadRaw(string name)
             {
-                if (!failedLookups.Contains((vertex, fragment)))
+                if (!failedLookups.Contains(name))
                 {
                     try
                     {
-                        return base.Load(vertex, fragment);
+                        return base.LoadRaw(name);
                     }
                     catch
                     {
                         // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                        failedLookups.Add((vertex, fragment));
+                        failedLookups.Add(name);
                     }
                 }
 
-                return parent.Load(vertex, fragment);
+                return parent.LoadRaw(name);
             }
         }
     }
