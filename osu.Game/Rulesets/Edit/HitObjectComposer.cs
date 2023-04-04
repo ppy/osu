@@ -63,6 +63,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
         protected ExpandingToolboxContainer LeftToolbox { get; private set; }
@@ -82,12 +85,6 @@ namespace osu.Game.Rulesets.Edit
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
 
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
-        [Resolved]
-        private OverlayColourProvider colours { get; set; }
-
         private OsuTextFlowContainer inspectorText;
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -99,7 +96,7 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
@@ -323,14 +320,14 @@ namespace osu.Game.Rulesets.Edit
         {
             inspectorText.Clear();
 
-            switch (beatmap.SelectedHitObjects.Count)
+            switch (EditorBeatmap.SelectedHitObjects.Count)
             {
                 case 0:
                     addHeader("No selection");
                     break;
 
                 case 1:
-                    var selected = beatmap.SelectedHitObjects.Single();
+                    var selected = EditorBeatmap.SelectedHitObjects.Single();
 
                     addHeader("Type");
                     addValue($"{selected.GetType().ReadableName()}");
@@ -382,13 +379,13 @@ namespace osu.Game.Rulesets.Edit
 
                 default:
                     addHeader("Selected Objects");
-                    addValue($"{beatmap.SelectedHitObjects.Count:#,0.##}");
+                    addValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
 
                     addHeader("Start Time");
-                    addValue($"{beatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}");
+                    addValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}");
 
                     addHeader("End Time");
-                    addValue($"{beatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
+                    addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
                     break;
             }
 
@@ -396,13 +393,13 @@ namespace osu.Game.Rulesets.Edit
             {
                 s.Padding = new MarginPadding { Top = 2 };
                 s.Font = s.Font.With(size: 12);
-                s.Colour = colours.Content2;
+                s.Colour = colourProvider.Content2;
             });
 
             void addValue(string value) => inspectorText.AddParagraph(value, s =>
             {
                 s.Font = s.Font.With(weight: FontWeight.SemiBold);
-                s.Colour = colours.Content1;
+                s.Colour = colourProvider.Content1;
             });
         }
 
