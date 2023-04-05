@@ -489,6 +489,7 @@ namespace osu.Game.Screens.Play
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
                     this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    epilepsyWarning?.Expire();
                 }
 
                 pushSequence.Schedule(() =>
