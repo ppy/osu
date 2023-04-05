@@ -382,6 +382,15 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestEqualDateQuery()
+        {
+            const string query = "played=50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        [Test]
         public void TestOutofrangeDateQuery()
         {
             const string query = "played<10000y";

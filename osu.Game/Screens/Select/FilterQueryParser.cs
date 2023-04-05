@@ -376,6 +376,9 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateDateRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
         {
+            if (op == Operator.Equal)
+                return false;
+
             GroupCollection? match = null;
 
             match ??= tryMatchRegex(val, @"^((?<years>\d+(\.\d+)?)y)?((?<months>\d+(\.\d+)?)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
