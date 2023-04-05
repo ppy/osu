@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
 
-        public override double MaximumJudgementOffset => HitObject.HitWindow;
-
         protected override void OnApply()
         {
             base.OnApply();

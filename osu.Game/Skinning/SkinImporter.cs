@@ -101,7 +101,8 @@ namespace osu.Game.Skinning
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
                 if (archiveName != item.Name
                     // lazer exports use this format
-                    && archiveName != item.GetDisplayString())
+                    // GetValidFilename accounts for skins with non-ASCII characters in the name that have been exported by lazer.
+                    && archiveName != item.GetDisplayString().GetValidFilename())
                     item.Name = @$"{item.Name} [{archiveName}]";
             }
 
@@ -201,7 +202,7 @@ namespace osu.Game.Skinning
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
-                foreach (var drawableInfo in skin.DrawableComponentInfo)
+                foreach (var drawableInfo in skin.LayoutInfos)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 

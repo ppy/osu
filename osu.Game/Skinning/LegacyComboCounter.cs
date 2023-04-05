@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -15,7 +14,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public partial class LegacyComboCounter : CompositeDrawable, ISkinnableDrawable
+    public partial class LegacyComboCounter : CompositeDrawable, ISerialisableDrawable
     {
         public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
 
@@ -45,7 +44,7 @@ namespace osu.Game.Skinning
         private readonly Container counterContainer;
 
         /// <summary>
-        /// Hides the combo counter internally without affecting its <see cref="SkinnableInfo"/>.
+        /// Hides the combo counter internally without affecting its <see cref="SerialisedDrawableInfo"/>.
         /// </summary>
         /// <remarks>
         /// This is used for rulesets that provide their own combo counter and don't want this HUD one to be visible,

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
 
@@ -18,48 +19,46 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         public TestSceneKeyCounter()
         {
-            DefaultKeyCounter testCounter;
-            KeyCounterDisplay kc;
-            KeyCounterDisplay argonKc;
-
-            Children = new Drawable[]
+            KeyCounterDisplay kc = new DefaultKeyCounterDisplay
             {
-                kc = new DefaultKeyCounterDisplay
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Position = new Vector2(0, -50),
-                    Children = new[]
-                    {
-                        testCounter = new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                        new DefaultKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                        new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
-                        new DefaultKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
-                    },
-                },
-                argonKc = new ArgonKeyCounterDisplay
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Position = new Vector2(0, 50),
-                    Children = new[]
-                    {
-                        new ArgonKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                        new ArgonKeyCounter(new KeyCounterKeyboardTrigger(Key.X)),
-                        new ArgonKeyCounter(new KeyCounterMouseTrigger(MouseButton.Left)),
-                        new ArgonKeyCounter(new KeyCounterMouseTrigger(MouseButton.Right)),
-                    },
-                }
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, 72.7f)
             };
+
+            KeyCounterDisplay argonKc = new ArgonKeyCounterDisplay
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -72.7f)
+            };
+
+            kc.AddRange(new InputTrigger[]
+            {
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterMouseTrigger(MouseButton.Left),
+                new KeyCounterMouseTrigger(MouseButton.Right),
+            });
+
+            argonKc.AddRange(new InputTrigger[]
+            {
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterMouseTrigger(MouseButton.Left),
+                new KeyCounterMouseTrigger(MouseButton.Right),
+            });
+
+            var testCounter = (DefaultKeyCounter)kc.Counters.First();
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(kc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
-                argonKc.Add(argonKc.CreateKeyCounter(new KeyCounterKeyboardTrigger(key)));
+                kc.Add(new KeyCounterKeyboardTrigger(key));
+                argonKc.Add(new KeyCounterKeyboardTrigger(key));
             });
 
-            Key testKey = ((KeyCounterKeyboardTrigger)kc.Children.First().Trigger).Key;
+            Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
 
             void addPressKeyStep()
             {
@@ -67,12 +66,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 1);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 2);
-            AddStep("Disable counting", () => testCounter.IsCounting = false);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
+            AddStep("Disable counting", () => testCounter.IsCounting.Value = false);
             addPressKeyStep();
-            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses == 2);
+            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
+
+            Add(kc);
+            Add(argonKc);
         }
     }
 }

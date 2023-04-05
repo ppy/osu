@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            if (drawable is DrawableHit)
-                drawable.SnapJudgementLocation = true;
+            if (drawable is DrawableTaikoHitObject hit)
+                hit.SnapJudgementLocation = true;
         }
     }
 }

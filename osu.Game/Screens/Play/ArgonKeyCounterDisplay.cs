@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -13,30 +13,32 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        public new IReadOnlyList<ArgonKeyCounter> Children
-        {
-            get => (IReadOnlyList<ArgonKeyCounter>)base.Children;
-            set => base.Children = value;
-        }
+        private readonly FillFlowContainer<ArgonKeyCounter> keyFlow;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            KeyFlow.Direction = FillDirection.Horizontal;
-            KeyFlow.AutoSizeAxes = Axes.Both;
-            KeyFlow.Spacing = new Vector2(2);
+        public override IEnumerable<KeyCounter> Counters => keyFlow;
 
-            InternalChildren = new[]
+        public ArgonKeyCounterDisplay()
+        {
+            InternalChild = keyFlow = new FillFlowContainer<ArgonKeyCounter>
             {
-                KeyFlow
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Alpha = 0,
+                Spacing = new Vector2(2),
             };
         }
 
-        protected override bool CheckType(KeyCounter key) => key is ArgonKeyCounter;
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = keyFlow.Size;
+        }
+
+        public override void Add(InputTrigger trigger) =>
+            keyFlow.Add(new ArgonKeyCounter(trigger));
 
         protected override void UpdateVisibility()
-            => KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
-
-        public override KeyCounter CreateKeyCounter(KeyCounter.InputTrigger trigger) => new ArgonKeyCounter(trigger);
+            => keyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
     }
 }

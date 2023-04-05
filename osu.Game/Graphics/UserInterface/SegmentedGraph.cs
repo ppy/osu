@@ -249,13 +249,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private ColourInfo getSegmentColour(SegmentInfo segment)
             {
-                var segmentColour = new ColourInfo
-                {
-                    TopLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 0f)),
-                    TopRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 0f)),
-                    BottomLeft = DrawColourInfo.Colour.Interpolate(new Vector2(segment.Start, 1f)),
-                    BottomRight = DrawColourInfo.Colour.Interpolate(new Vector2(segment.End, 1f))
-                };
+                var segmentColour = DrawColourInfo.Colour.Interpolate(new Quad(segment.Start, 0f, segment.End - segment.Start, 1f));
 
                 var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
                 segmentColour.ApplyChild(tierColour);
