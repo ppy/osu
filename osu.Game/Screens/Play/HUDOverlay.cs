@@ -331,7 +331,7 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
+        protected KeyCounterDisplay CreateKeyCounter() => new DefaultKeyCounterDisplay
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,

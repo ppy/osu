@@ -116,6 +116,19 @@ namespace osu.Game.Tests.Visual.Menus
 
         [TestCase(OverlayActivation.All)]
         [TestCase(OverlayActivation.Disabled)]
+        public void TestButtonKeyboardInputRespectsOverlayActivation(OverlayActivation mode)
+        {
+            AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
+            AddStep("hide toolbar", () => toolbar.Hide());
+
+            if (mode == OverlayActivation.Disabled)
+                AddAssert("check buttons not accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Zero);
+            else
+                AddAssert("check buttons accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Not.Zero);
+        }
+
+        [TestCase(OverlayActivation.All)]
+        [TestCase(OverlayActivation.Disabled)]
         public void TestRespectsOverlayActivation(OverlayActivation mode)
         {
             AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
