@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Mods
                     };
 
                     shader.Bind();
-                    shader.BindUniformBlock("m_FlashlightParameters", flashlightParametersBuffer);
+                    shader.BindUniformBlock(@"m_FlashlightParameters", flashlightParametersBuffer);
 
                     renderer.DrawQuad(renderer.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
 

@@ -101,7 +101,8 @@ namespace osu.Game.Skinning
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
                 if (archiveName != item.Name
                     // lazer exports use this format
-                    && archiveName != item.GetDisplayString())
+                    // GetValidFilename accounts for skins with non-ASCII characters in the name that have been exported by lazer.
+                    && archiveName != item.GetDisplayString().GetValidFilename())
                     item.Name = @$"{item.Name} [{archiveName}]";
             }
 
