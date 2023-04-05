@@ -317,7 +317,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             }
         }
 
-
         private static readonly object[] correct_date_query_examples =
         {
             new object[] { "600" },
@@ -334,7 +333,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCaseSource(nameof(correct_date_query_examples))]
         public void TestValidDateQueries(string dateQuery)
         {
-            string query = $"played={dateQuery} time";
+            string query = $"played<{dateQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
@@ -342,11 +341,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
         private static readonly object[] incorrect_date_query_examples =
         {
+            new object[] { ".5s" },
             new object[] { "7m27" },
             new object[] { "7m7m7m" },
             new object[] { "5s6m" },
             new object[] { "7d7y" },
-            new object[] { ":0" },
             new object[] { "0:3:6" },
             new object[] { "0:3:" },
             new object[] { "\"three days\"" }
@@ -356,41 +355,36 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCaseSource(nameof(incorrect_date_query_examples))]
         public void TestInvalidDateQueries(string dateQuery)
         {
-            string query = $"played={dateQuery} time";
+            string query = $"played<{dateQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
         }
 
-        private static readonly object[] list_operators =
-        {
-            new object[] { "=", false, false, true, true },
-            new object[] { ":", false, false, true, true },
-            new object[] { "<", false, true, false, false },
-            new object[] { "<=", false, true, true, false },
-            new object[] { "<:", false, true, true, false },
-            new object[] { ">", true, false, false, false },
-            new object[] { ">=", true, false, false, true },
-            new object[] { ">:", true, false, false, true }
-        };
-
         [Test]
-        [TestCaseSource(nameof(list_operators))]
-        public void TestComparisonDateQueries(string ope, bool minIsNull, bool maxIsNull, bool isLowerInclusive, bool isUpperInclusive)
+        public void TestGreaterDateQuery()
         {
-            string query = $"played{ope}50";
+            const string query = "played>50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(isLowerInclusive, filterCriteria.LastPlayed.IsLowerInclusive);
-            Assert.AreEqual(isUpperInclusive, filterCriteria.LastPlayed.IsUpperInclusive);
-            Assert.AreEqual(maxIsNull, filterCriteria.LastPlayed.Max == null);
-            Assert.AreEqual(minIsNull, filterCriteria.LastPlayed.Min == null);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.Max == null);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.Min == null);
+        }
+
+        [Test]
+        public void TestLowerDateQuery()
+        {
+            const string query = "played<50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.Max == null);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.Min == null);
         }
 
         [Test]
         public void TestOutofrangeDateQuery()
         {
-            const string query = "played=10000y";
+            const string query = "played<10000y";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
