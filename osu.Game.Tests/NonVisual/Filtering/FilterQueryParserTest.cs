@@ -325,8 +325,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "48h120s" },
             new object[] { "10y24M" },
             new object[] { "10y60d120s" },
-            new object[] { "0.1y0.1M2d" },
-            new object[] { "0.99y0.99M2d" }
+            new object[] { "0y0M2d" },
+            new object[] { "1y1M2d" }
         };
 
         [Test]
@@ -348,7 +348,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "7d7y" },
             new object[] { "0:3:6" },
             new object[] { "0:3:" },
-            new object[] { "\"three days\"" }
+            new object[] { "\"three days\"" },
+            new object[] { "0.1y0.1M2d" },
+            new object[] { "0.99y0.99M2d" }
         };
 
         [Test]
