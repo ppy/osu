@@ -419,13 +419,17 @@ namespace osu.Game.Screens.Select
                                 break;
 
                             case "months":
-                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)Math.Floor(length));
-                                dateTimeOffset = dateTimeOffset.AddDays(-30 * (length - Math.Floor(length)));
+                                if (match[key].Value.Contains('.'))
+                                    return false;
+
+                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)length);
                                 break;
 
                             case "years":
-                                dateTimeOffset = dateTimeOffset.AddYears(-(int)Math.Floor(length));
-                                dateTimeOffset = dateTimeOffset.AddDays(-365 * (length - Math.Floor(length)));
+                                if (match[key].Value.Contains('.'))
+                                    return false;
+
+                                dateTimeOffset = dateTimeOffset.AddYears(-(int)length);
                                 break;
                         }
                     }
