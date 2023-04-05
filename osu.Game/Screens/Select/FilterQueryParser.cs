@@ -434,16 +434,16 @@ namespace osu.Game.Screens.Select
                 dateTimeOffset = dateTimeOffset.AddMilliseconds(1);
             }
 
-            return tryUpdateCriteriaRange(ref dateRange, invert(op), dateTimeOffset);
+            return tryUpdateCriteriaRange(ref dateRange, reverseInequalityOperator(op), dateTimeOffset);
         }
 
         // Function to reverse an Operator
-        private static Operator invert(Operator ope)
+        private static Operator reverseInequalityOperator(Operator ope)
         {
             switch (ope)
             {
                 default:
-                    return Operator.Equal;
+                    throw new ArgumentOutOfRangeException(nameof(ope), $"Unsupported operator {ope}");
 
                 case Operator.Equal:
                     return Operator.Equal;
