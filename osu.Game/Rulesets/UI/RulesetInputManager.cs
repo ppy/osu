@@ -166,10 +166,10 @@ namespace osu.Game.Rulesets.UI
 
             keyCounter.SetReceptor(receptor);
             keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
-                                                          .Select(b => b.GetAction<T>())
-                                                          .Distinct()
-                                                          .OrderBy(action => action)
-                                                          .Select(action => new KeyCounterActionTrigger<T>(action)));
+                                                   .Select(b => b.GetAction<T>())
+                                                   .Distinct()
+                                                   .OrderBy(action => action)
+                                                   .Select(action => new KeyCounterActionTrigger<T>(action)));
         }
 
         private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
