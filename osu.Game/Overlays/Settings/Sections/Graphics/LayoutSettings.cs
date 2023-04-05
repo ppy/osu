@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
-        private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<Size> sizeFullscreen = null!;
@@ -75,7 +74,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             if (window != null)
             {
                 currentDisplay.BindTo(window.CurrentDisplayBindable);
-                windowModes.BindTo(window.SupportedWindowModes);
                 window.DisplaysChanged += onDisplaysChanged;
             }
 
@@ -87,7 +85,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = GraphicsSettingsStrings.ScreenMode,
-                    ItemSource = windowModes,
+                    Items = window?.SupportedWindowModes,
+                    CanBeShown = { Value = window?.SupportedWindowModes.Count() > 1 },
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 displayDropdown = new DisplaySettingsDropdown
@@ -181,8 +180,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateScreenModeWarning();
             }, true);
 
-            windowModes.BindCollectionChanged((_, _) => updateDisplaySettingsVisibility());
-
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
                 resolutions.RemoveRange(1, resolutions.Count - 1);
@@ -236,7 +233,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            windowModeDropdown.CanBeShown.Value = windowModes.Count > 1;
             resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
             safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
