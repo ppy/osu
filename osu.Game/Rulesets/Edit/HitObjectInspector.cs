@@ -106,6 +106,9 @@ namespace osu.Game.Rulesets.Edit
                         addValue($"{duration.Duration:#,0.##}ms");
                     }
 
+                    // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
+                    // This is a good middle-ground for the time being.
+                    Scheduler.AddDelayed(updateInspectorText, 250);
                     break;
 
                 default:
@@ -119,9 +122,6 @@ namespace osu.Game.Rulesets.Edit
                     addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
                     break;
             }
-
-            if (EditorBeatmap.TransactionActive)
-                Scheduler.AddDelayed(updateInspectorText, 100);
 
             void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
             {
