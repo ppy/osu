@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -69,8 +70,8 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            IsLit.BindValueChanged(e => inputIndicator.Alpha = e.NewValue ? 1 : 0.5f, true);
-            PressesCount.BindValueChanged(e => countText.Text = e.NewValue.ToString(@"#,0"), true);
+            IsActive.BindValueChanged(e => inputIndicator.Alpha = e.NewValue ? 1 : 0.5f, true);
+            CountPresses.BindValueChanged(e => countText.Text = e.NewValue.ToString(@"#,0"), true);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
-        protected override UserActivity InitialActivity => new UserActivity.Spectating(Score.ScoreInfo);
+        protected override UserActivity InitialActivity => new UserActivity.SpectatingUser(Score.ScoreInfo);
 
         public SoloSpectatorPlayer(Score score, PlayerConfiguration configuration = null)
             : base(score, configuration)

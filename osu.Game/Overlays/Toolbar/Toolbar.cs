@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         // Toolbar and its components need keyboard input even when hidden.
-        public override bool PropagateNonPositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => OverlayActivationMode.Value != OverlayActivation.Disabled;
 
         public Toolbar()
         {

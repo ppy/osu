@@ -31,6 +31,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -148,7 +149,7 @@ namespace osu.Game.Screens.Select
                 if (!this.IsCurrentScreen())
                     return;
 
-                ApplyToBackground(b => b.BlurAmount.Value = e.NewValue ? BACKGROUND_BLUR : 0);
+                ApplyToBackground(applyBlurToBackground);
             });
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
@@ -161,6 +162,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = updateVisibleBeatmapCount,
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
@@ -194,6 +196,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Child = new WedgeBackground
@@ -273,7 +276,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType.SongSelect)
+                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -763,12 +766,18 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            ApplyToBackground(backgroundModeBeatmap =>
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
             {
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            });
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
+
+                    applyBlurToBackground(backgroundModeBeatmap);
+                });
+            }
 
             beatmapInfoWedge.Beatmap = beatmap;
 
@@ -783,6 +792,14 @@ namespace osu.Game.Screens.Select
                 beatmapOptionsButton.Enabled.Value = false;
                 BeatmapOptions.Hide();
             }
+        }
+
+        private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
+        {
+            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
+
+            wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);
@@ -812,6 +829,7 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             bindBindables();
+            updateVisibleBeatmapCount();
 
             Carousel.AllowSelection = true;
 
@@ -839,6 +857,15 @@ namespace osu.Game.Screens.Select
                 // to show the dummy beatmap (we have nothing else to display).
                 performUpdateSelected();
             }
+        }
+
+        private void updateVisibleBeatmapCount()
+        {
+            FilterControl.InformationalText = Carousel.CountDisplayed == 1
+                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                // but also in this case we want support for formatting a number within a string).
+                ? $"{Carousel.CountDisplayed:#,0} matching beatmap"
+                : $"{Carousel.CountDisplayed:#,0} matching beatmaps";
         }
 
         private bool boundLocalBindables;
