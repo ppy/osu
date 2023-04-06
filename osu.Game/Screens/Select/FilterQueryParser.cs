@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Select
 
             GroupCollection? match = null;
 
-            match ??= tryMatchRegex(val, @"^((?<years>\d+(\.\d+)?)y)?((?<months>\d+(\.\d+)?)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^((?<years>\d+)y)?((?<months>\d+)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
             match ??= tryMatchRegex(val, @"^(?<days>\d+(\.\d+)?)$");
 
             if (match == null)
@@ -419,16 +419,10 @@ namespace osu.Game.Screens.Select
                                 break;
 
                             case "months":
-                                if (match[key].Value.Contains('.'))
-                                    return false;
-
                                 dateTimeOffset = dateTimeOffset.AddMonths(-(int)length);
                                 break;
 
                             case "years":
-                                if (match[key].Value.Contains('.'))
-                                    return false;
-
                                 dateTimeOffset = dateTimeOffset.AddYears(-(int)length);
                                 break;
                         }
