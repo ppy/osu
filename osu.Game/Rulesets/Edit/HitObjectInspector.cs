@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -47,9 +48,13 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap.TransactionEnded += updateInspectorText;
         }
 
+        private ScheduledDelegate? rollingTextUpdate;
+
         private void updateInspectorText()
         {
             inspectorText.Clear();
+            rollingTextUpdate?.Cancel();
+            rollingTextUpdate = null;
 
             switch (EditorBeatmap.SelectedHitObjects.Count)
             {
@@ -108,7 +113,7 @@ namespace osu.Game.Rulesets.Edit
 
                     // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
                     // This is a good middle-ground for the time being.
-                    Scheduler.AddDelayed(updateInspectorText, 250);
+                    rollingTextUpdate ??= Scheduler.AddDelayed(updateInspectorText, 250);
                     break;
 
                 default:
