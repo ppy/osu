@@ -134,10 +134,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 cumulativeRotation.Value = rawCumulativeRotation;
             }
 
-            if (cumulativeRotation.Value < -180)
-                cumulativeRotation.Value += 360;
-            else if (cumulativeRotation.Value > 180)
-                cumulativeRotation.Value -= 360;
+            cumulativeRotation.Value = (cumulativeRotation.Value - 180) % 360 + 180;
 
             HandleRotate?.Invoke((float)cumulativeRotation.Value - oldRotation);
         }
