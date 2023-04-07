@@ -16,6 +16,8 @@ using osu.Framework.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
+using Key = osuTK.Input.Key;
+
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
@@ -26,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private SpriteIcon icon;
 
+        private const float snapStep = 15;
+        private float rawCumulativeRotation = 0;
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
 
         [Resolved]
@@ -74,21 +78,38 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnDrag(e);
 
-            float instantaneousAngle = convertDragEventToAngleOfRotation(e);
-            cumulativeRotation.Value += instantaneousAngle;
+            rawCumulativeRotation += convertDragEventToAngleOfRotation(e);
 
-            if (cumulativeRotation.Value < -180)
-                cumulativeRotation.Value += 360;
-            else if (cumulativeRotation.Value > 180)
-                cumulativeRotation.Value -= 360;
+            applyRotation(shouldSnap: e.ShiftPressed);
+        }
 
-            HandleRotate?.Invoke(instantaneousAngle);
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            base.OnKeyDown(e);
+
+            if (cumulativeRotation.Value != null && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+            {
+                applyRotation(shouldSnap: true);
+            }
+
+            return true;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (cumulativeRotation.Value != null && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+            {
+                applyRotation(shouldSnap: false);
+            }
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
             base.OnDragEnd(e);
             cumulativeRotation.Value = null;
+            rawCumulativeRotation = 0;
         }
 
         private float convertDragEventToAngleOfRotation(DragEvent e)
@@ -98,6 +119,33 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float endAngle = MathF.Atan2(e.MousePosition.Y - selectionBox.DrawHeight / 2, e.MousePosition.X - selectionBox.DrawWidth / 2);
 
             return (endAngle - startAngle) * 180 / MathF.PI;
+        }
+
+        private void applyRotation(bool shouldSnap)
+        {
+            float oldRotation = cumulativeRotation.Value ?? 0;
+
+            if (shouldSnap)
+            {
+                cumulativeRotation.Value = snap(rawCumulativeRotation, snapStep);
+            }
+            else
+            {
+                cumulativeRotation.Value = rawCumulativeRotation;
+            }
+
+            if (cumulativeRotation.Value < -180)
+                cumulativeRotation.Value += 360;
+            else if (cumulativeRotation.Value > 180)
+                cumulativeRotation.Value -= 360;
+
+            HandleRotate?.Invoke((float)cumulativeRotation.Value - oldRotation);
+        }
+
+        private float snap(float value, float step)
+        {
+            float floor = MathF.Floor(value / step) * step;
+            return value - floor < step / 2f ? floor : floor + step;
         }
 
         private void updateTooltipText()
