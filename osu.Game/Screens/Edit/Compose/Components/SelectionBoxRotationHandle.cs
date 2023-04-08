@@ -15,7 +15,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osuTK;
 using osuTK.Graphics;
-
 using Key = osuTK.Input.Key;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -28,8 +27,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private SpriteIcon icon;
 
-        private const float snapStep = 15;
-        private float rawCumulativeRotation = 0;
+        private const float snap_step = 15;
+
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
 
         [Resolved]
@@ -65,6 +64,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.UpdateHoverState();
             icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
         }
+
+        private float rawCumulativeRotation;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -125,17 +126,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             float oldRotation = cumulativeRotation.Value ?? 0;
 
-            if (shouldSnap)
-            {
-                cumulativeRotation.Value = snap(rawCumulativeRotation, snapStep);
-            }
-            else
-            {
-                cumulativeRotation.Value = rawCumulativeRotation;
-            }
+            float newRotation = shouldSnap ? snap(rawCumulativeRotation, snap_step) : rawCumulativeRotation;
+            newRotation = (newRotation - 180) % 360 + 180;
 
-            cumulativeRotation.Value = (cumulativeRotation.Value - 180) % 360 + 180;
-
+            cumulativeRotation.Value = newRotation;
             HandleRotate?.Invoke((float)cumulativeRotation.Value - oldRotation);
         }
 
