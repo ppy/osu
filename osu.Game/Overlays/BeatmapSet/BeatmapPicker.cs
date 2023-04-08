@@ -90,11 +90,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                                 },
                                 guestMapperContainer = new LinkFlowContainer(s =>
-                                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15))
+                                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 11))
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
+                                    Margin = new MarginPadding { Bottom = 1 },
                                 },
                                 starRatingContainer = new FillFlowContainer
                                 {
