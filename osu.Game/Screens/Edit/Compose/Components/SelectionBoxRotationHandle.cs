@@ -54,11 +54,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-        }
-
         protected override void UpdateHoverState()
         {
             base.UpdateHoverState();
