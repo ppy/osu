@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 using Key = osuTK.Input.Key;
@@ -56,7 +57,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            cumulativeRotation.BindValueChanged(_ => updateTooltipText(), true);
         }
 
         protected override void UpdateHoverState()
@@ -130,18 +130,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             newRotation = (newRotation - 180) % 360 + 180;
 
             cumulativeRotation.Value = newRotation;
-            HandleRotate?.Invoke((float)cumulativeRotation.Value - oldRotation);
+
+            HandleRotate?.Invoke(newRotation - oldRotation);
+            string tooltipFormat = shouldSnap ? EditorStrings.RotationFormatSnapped.ToString() : EditorStrings.RotationFormatUnsnapped.ToString();
+            TooltipText = newRotation.ToLocalisableString(tooltipFormat);
         }
 
         private float snap(float value, float step)
         {
             float floor = MathF.Floor(value / step) * step;
             return value - floor < step / 2f ? floor : floor + step;
-        }
-
-        private void updateTooltipText()
-        {
-            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default;
         }
     }
 }
