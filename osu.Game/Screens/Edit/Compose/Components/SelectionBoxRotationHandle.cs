@@ -111,6 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.OnDragEnd(e);
             cumulativeRotation.Value = null;
             rawCumulativeRotation = 0;
+            TooltipText = default;
         }
 
         private float convertDragEventToAngleOfRotation(DragEvent e)
