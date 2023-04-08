@@ -81,24 +81,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            base.OnKeyDown(e);
-
-            if (cumulativeRotation.Value != null && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
             {
                 applyRotation(shouldSnap: true);
+                return true;
             }
 
-            return true;
+            return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
             base.OnKeyUp(e);
 
-            if (cumulativeRotation.Value != null && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
-            {
+            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
                 applyRotation(shouldSnap: false);
-            }
         }
 
         protected override void OnDragEnd(DragEndEvent e)
