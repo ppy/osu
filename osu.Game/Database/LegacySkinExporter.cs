@@ -8,7 +8,8 @@ namespace osu.Game.Database
 {
     public class LegacySkinExporter : LegacyArchiveExporter<SkinInfo>
     {
-        public LegacySkinExporter(Storage storage) : base(storage)
+        public LegacySkinExporter(Storage storage)
+            : base(storage)
         {
         }
 

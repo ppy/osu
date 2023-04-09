@@ -13,7 +13,8 @@ namespace osu.Game.Database
 {
     public class LegacyScoreExporter : LegacyModelExporter<ScoreInfo>
     {
-        public LegacyScoreExporter(Storage storage) : base(storage)
+        public LegacyScoreExporter(Storage storage)
+            : base(storage)
         {
         }
 

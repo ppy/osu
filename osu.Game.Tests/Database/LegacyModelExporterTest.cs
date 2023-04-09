@@ -92,7 +92,6 @@ namespace osu.Game.Tests.Database
 
         private void exportItemAndAssert(TestRealmObject item, string expectedName)
         {
-            // ReSharper disable once AsyncVoidLambda
             Assert.DoesNotThrow(() =>
             {
                 Task t = Task.Run(() => legacyExporter.ExportAsync(new TestRealmLive(item)));
