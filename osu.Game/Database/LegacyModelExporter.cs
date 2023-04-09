@@ -107,7 +107,7 @@ namespace osu.Game.Database
                     .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
                     .Concat(exportStorage.GetDirectories(string.Empty));
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-            bool success = false;
+            bool success;
 
             ProgressNotification notification = new ProgressNotification
             {
