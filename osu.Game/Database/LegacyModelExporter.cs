@@ -31,24 +31,35 @@ namespace osu.Game.Database
         private readonly Storage exportStorage;
         protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
-        private readonly RealmAccess realmAccess;
-
         public Action<Notification>? PostNotification { get; set; }
 
         // Store the model being exporting.
-        private static readonly List<TModel> exporting_models = new List<TModel>();
+        private static readonly List<Live<TModel>> exporting_models = new List<Live<TModel>>();
 
         /// <summary>
         /// Construct exporter.
         /// Create a new exporter for each export, otherwise it will cause confusing notifications.
         /// </summary>
         /// <param name="storage">Storage for storing exported files. Basically it is used to provide export stream</param>
-        /// <param name="realm">The RealmAccess used to provide the exported file.</param>
-        protected LegacyModelExporter(Storage storage, RealmAccess realm)
+        protected LegacyModelExporter(Storage storage)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
-            realmAccess = realm;
+        }
+
+        /// <summary>
+        /// Export the model to default folder.
+        /// </summary>
+        /// <param name="model">The model should export.</param>
+        /// <param name="realm">Realm that convert model to Live.</param>
+        /// <param name="cancellationToken">
+        /// The Cancellation token that can cancel the exporting.
+        /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
+        /// </param>
+        /// <returns></returns>
+        public Task<bool> ExportAsync(TModel model, RealmAccess realm, CancellationToken cancellationToken = default)
+        {
+            return ExportAsync(model.ToLive(realm), cancellationToken);
         }
 
         /// <summary>
@@ -60,7 +71,7 @@ namespace osu.Game.Database
         /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
         /// </param>
         /// <returns></returns>
-        public async Task<bool> ExportAsync(TModel model, CancellationToken cancellationToken = default)
+        public async Task<bool> ExportAsync(Live<TModel> model, CancellationToken cancellationToken = default)
         {
             // check if the model is being exporting already
             if (!exporting_models.Contains(model))
@@ -73,7 +84,8 @@ namespace osu.Game.Database
                 return false;
             }
 
-            string itemFilename = GetFilename(model).GetValidFilename();
+            string itemFilename = model.PerformRead(s => GetFilename(s).GetValidFilename());
+
             IEnumerable<string> existingExports =
                 exportStorage
                     .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
@@ -128,15 +140,13 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
         /// <returns>Whether the export was successful</returns>
-        public Task<bool> ExportToStreamAsync(TModel model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
+        public Task<bool> ExportToStreamAsync(Live<TModel> model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
         {
-            Guid id = model.ID;
             return Task.Run(() =>
             {
-                realmAccess.Run(r =>
+                model.PerformRead(s =>
                 {
-                    TModel refetchModel = r.Find<TModel>(id);
-                    ExportToStream(refetchModel, stream, notification, cancellationToken);
+                    ExportToStream(s, stream, notification, cancellationToken);
                 });
             }, cancellationToken).ContinueWith(t =>
             {

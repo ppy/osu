@@ -13,8 +13,7 @@ namespace osu.Game.Database
 {
     public class LegacyScoreExporter : LegacyModelExporter<ScoreInfo>
     {
-        public LegacyScoreExporter(Storage storage, RealmAccess realm)
-            : base(storage, realm)
+        public LegacyScoreExporter(Storage storage) : base(storage)
         {
         }
 
@@ -28,7 +27,7 @@ namespace osu.Game.Database
 
         protected override string FileExtension => ".osr";
 
-        protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification notification, CancellationToken cancellationToken = default)
+        protected override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
             var file = model.Files.SingleOrDefault();
             if (file == null)

@@ -8,8 +8,8 @@ namespace osu.Game.Database
 {
     public class LegacyBeatmapExporter : LegacyArchiveExporter<BeatmapSetInfo>
     {
-        public LegacyBeatmapExporter(Storage storage, RealmAccess realm)
-            : base(storage, realm)
+        public LegacyBeatmapExporter(Storage storage)
+            : base(storage)
         {
         }
 

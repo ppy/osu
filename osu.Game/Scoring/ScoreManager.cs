@@ -50,7 +50,7 @@ namespace osu.Game.Scoring
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
 
-            scoreExporter = new LegacyScoreExporter(storage, realm)
+            scoreExporter = new LegacyScoreExporter(storage)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -193,7 +193,7 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
 
-        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score);
+        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score, Realm);
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 

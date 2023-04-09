@@ -119,10 +119,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "custom.osk"));
             assertCorrectMetadata(import1, "name 1 [custom]", "author 1", osu);
 
-            await import1.PerformRead(async s =>
-            {
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>()).ExportToStreamAsync(s, exportStream);
-            });
+            await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(import1, exportStream);
 
             string exportFilename = import1.GetDisplayString();
 
@@ -203,7 +200,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>()).ExportToStreamAsync(s, exportStream);
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
                 Assert.Greater(exportStream.Length, 0);
             });
@@ -236,7 +233,7 @@ namespace osu.Game.Tests.Skins.IO
                 Assert.IsFalse(s.Protected);
                 Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
 
-                await new LegacySkinExporter(osu.Dependencies.Get<Storage>(), osu.Dependencies.Get<RealmAccess>()).ExportToStreamAsync(s, exportStream);
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
                 Assert.Greater(exportStream.Length, 0);
             });
