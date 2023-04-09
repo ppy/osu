@@ -110,9 +110,9 @@ namespace osu.Game.Tests.Database
             public override string ToString() => Filename;
         }
 
-        private class TestLegacyExporter : LegacyExporter<IHasNamedFiles>
+        private class TestLegacyModelExporter : LegacyModelExporter<IHasNamedFiles>
         {
-            public TestLegacyExporter(Storage storage)
+            public TestLegacyModelExporter(Storage storage)
                 : base(storage)
             {
             }
