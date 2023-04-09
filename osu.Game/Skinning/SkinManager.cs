@@ -123,7 +123,7 @@ namespace osu.Game.Skinning
                 SourceChanged?.Invoke();
             };
 
-            skinExporter = new LegacySkinExporter(storage, realm)
+            skinExporter = new LegacySkinExporter(storage)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -305,7 +305,9 @@ namespace osu.Game.Skinning
         public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             skinImporter.Import(task, parameters, cancellationToken);
 
-        public Task ExportSkin(SkinInfo skin) => skinExporter.ExportAsync(skin);
+        public Task ExportCurrentSkin() => ExportSkin(CurrentSkinInfo.Value);
+
+        public Task ExportSkin(Live<SkinInfo> skin) => skinExporter.ExportAsync(skin);
 
         #endregion
 

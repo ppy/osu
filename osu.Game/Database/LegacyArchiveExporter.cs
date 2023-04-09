@@ -20,8 +20,8 @@ namespace osu.Game.Database
     public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
-        protected LegacyArchiveExporter(Storage storage, RealmAccess realm)
-            : base(storage, realm)
+        protected LegacyArchiveExporter(Storage storage)
+            : base(storage)
         {
         }
 
