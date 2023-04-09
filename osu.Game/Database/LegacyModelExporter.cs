@@ -122,7 +122,7 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = "Export Complete, Click to open the folder";
+                notification.CompletionText = $"Exported {itemFilename}! Click to view.";
                 notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
                 notification.State = ProgressNotificationState.Completed;
             }
