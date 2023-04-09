@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<DefaultKeyCounter>>().Single();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -235,8 +235,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
-            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("bind on update", () =>
             {
@@ -254,10 +254,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
 
-            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
-            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
+            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Reload());
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().ComponentsLoaded);
         }
 
         private void createNew(Action<HUDOverlay>? action = null)
@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
-                hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                 scoreProcessor.Combo.Value = 1;
 

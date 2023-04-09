@@ -516,14 +516,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 sets.Clear();
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     var set = TestResources.CreateTestBeatmapSetInfo(5);
 
-                    if (i >= 2 && i < 10)
+                    // A total of 6 sets have date submitted (4 don't)
+                    // A total of 5 sets have artist string (3 of which also have date submitted)
+
+                    if (i >= 2 && i < 8) // i = 2, 3, 4, 5, 6, 7 have submitted date
                         set.DateSubmitted = DateTimeOffset.Now.AddMinutes(i);
-                    if (i < 5)
+                    if (i < 5) // i = 0, 1, 2, 3, 4 have matching string
                         set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
+
+                    set.Beatmaps.ForEach(b => b.Metadata.Title = $"submitted: {set.DateSubmitted}");
 
                     sets.Add(set);
                 }
@@ -532,15 +537,26 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by date submitted", () => carousel.Filter(new FilterCriteria { Sort = SortMode.DateSubmitted }, false));
-            checkVisibleItemCount(diff: false, count: 8);
+            checkVisibleItemCount(diff: false, count: 10);
             checkVisibleItemCount(diff: true, count: 5);
+
+            AddAssert("missing date are at end",
+                () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().Reverse().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted == null).Count(), () => Is.EqualTo(4));
+            AddAssert("rest are at start", () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted != null).Count(),
+                () => Is.EqualTo(6));
+
             AddStep("Sort by date submitted and string", () => carousel.Filter(new FilterCriteria
             {
                 Sort = SortMode.DateSubmitted,
                 SearchText = zzz_string
             }, false));
-            checkVisibleItemCount(diff: false, count: 3);
+            checkVisibleItemCount(diff: false, count: 5);
             checkVisibleItemCount(diff: true, count: 5);
+
+            AddAssert("missing date are at end",
+                () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().Reverse().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted == null).Count(), () => Is.EqualTo(2));
+            AddAssert("rest are at start", () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted != null).Count(),
+                () => Is.EqualTo(3));
         }
 
         [Test]
@@ -1129,7 +1145,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
             AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
-                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible), () => Is.EqualTo(count));
         }
 
         private void checkSelectionIsCentered()
@@ -1190,8 +1206,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 get
                 {
-                    foreach (var item in Scroll.Children)
+                    foreach (var item in Scroll.Children.OrderBy(c => c.Y))
                     {
+                        if (item.Item?.Visible != true)
+                            continue;
+
                         yield return item;
 
                         if (item is DrawableCarouselBeatmapSet set)

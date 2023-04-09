@@ -35,7 +35,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class PerformancePointsCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class PerformancePointsCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

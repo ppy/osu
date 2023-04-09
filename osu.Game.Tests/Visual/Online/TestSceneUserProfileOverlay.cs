@@ -126,6 +126,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 13926,
                 TournamentId = 35,
                 ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US.jpg",
+                Image = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US@2x.jpg",
             },
             Badges = new[]
             {

@@ -130,6 +130,22 @@ namespace osu.Game.Tests.Skins.IO
         });
 
         [Test]
+        public Task TestImportExportedNonAsciiSkinFilename() => runSkinTest(async osu =>
+        {
+            MemoryStream exportStream = new MemoryStream();
+
+            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 『1』", "author 1"), "custom.osk"));
+            assertCorrectMetadata(import1, "name 『1』 [custom]", "author 1", osu);
+
+            await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(import1, exportStream);
+
+            string exportFilename = import1.GetDisplayString().GetValidFilename();
+
+            var import2 = await loadSkinIntoOsu(osu, new ImportTask(exportStream, $"{exportFilename}.osk"));
+            assertCorrectMetadata(import2, "name 『1』 [custom]", "author 1", osu);
+        });
+
+        [Test]
         public Task TestSameMetadataNameSameFolderName([Values] bool batchImport) => runSkinTest(async osu =>
         {
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"), batchImport);
