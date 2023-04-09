@@ -124,8 +124,15 @@ namespace osu.Game.Database
                         cancellationToken == CancellationToken.None ? notification.CancellationToken : cancellationToken).ConfigureAwait(false);
                 }
             }
-            catch (OperationCanceledException)
+            catch
             {
+                notification.State = ProgressNotificationState.Cancelled;
+                throw;
+            }
+            finally
+            {
+                // Determines whether to export repeatedly, so he must be removed from the list at the end whether there is a error.
+                exporting_models.Remove(model);
             }
 
             // cleanup if export is failed or canceled.
@@ -141,7 +148,6 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Completed;
             }
 
-            exporting_models.Remove(model);
             return success;
         }
 
@@ -171,7 +177,7 @@ namespace osu.Game.Database
                 if (t.IsFaulted)
                 {
                     Logger.Error(t.Exception, "An error occurred while exporting", LoggingTarget.Database);
-                    return false;
+                    throw t.Exception!;
                 }
 
                 return true;
