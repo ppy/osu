@@ -115,6 +115,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
+            FlushPendingSkinChanges();
+
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)

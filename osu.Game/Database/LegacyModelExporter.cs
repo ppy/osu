@@ -23,6 +23,19 @@ namespace osu.Game.Database
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         /// <summary>
+        /// Max length of filename (including extension).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The filename limit for most OSs is 255. This actual usable length is smaller because <see cref="Storage.CreateFileSafely(string)"/> adds an additional "_<see cref="Guid"/>" to the end of the path.
+        /// </para>
+        /// <para>
+        /// For more information see <see href="https://www.ibm.com/docs/en/spectrum-protect/8.1.9?topic=parameters-file-specification-syntax">file specification syntax</see>, <seealso href="https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits">file systems limitations</seealso>
+        /// </para>
+        /// </remarks>
+        public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2 + 5); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars + account for ' (99)' suffix)
+
+        /// <summary>
         /// The file extension for exports (including the leading '.').
         /// </summary>
         protected abstract string FileExtension { get; }
@@ -86,6 +99,9 @@ namespace osu.Game.Database
 
             string itemFilename = model.PerformRead(s => GetFilename(s).GetValidFilename());
 
+            if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
+                itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
+
             IEnumerable<string> existingExports =
                 exportStorage
                     .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
@@ -110,7 +126,6 @@ namespace osu.Game.Database
             }
             catch (OperationCanceledException)
             {
-                success = false;
             }
 
             // cleanup if export is failed or canceled.
@@ -127,7 +142,6 @@ namespace osu.Game.Database
             }
 
             exporting_models.Remove(model);
-
             return success;
         }
 
