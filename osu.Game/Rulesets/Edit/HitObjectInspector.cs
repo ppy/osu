@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => updateInspectorText();
             EditorBeatmap.TransactionBegan += updateInspectorText;
             EditorBeatmap.TransactionEnded += updateInspectorText;
+            updateInspectorText();
         }
 
         private ScheduledDelegate? rollingTextUpdate;
