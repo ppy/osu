@@ -121,10 +121,10 @@ namespace osu.Game.Rulesets.Edit
                     addValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
 
                     addHeader("Start Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}");
+                    addValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}ms");
 
                     addHeader("End Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}");
+                    addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}ms");
                     break;
             }
 
