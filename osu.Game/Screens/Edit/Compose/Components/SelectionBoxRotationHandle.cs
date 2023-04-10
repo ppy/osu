@@ -129,10 +129,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             TooltipText = newRotation.ToLocalisableString(tooltipFormat);
         }
 
-        private float snap(float value, float step)
-        {
-            float floor = MathF.Floor(value / step) * step;
-            return value - floor < step / 2f ? floor : floor + step;
-        }
+        private float snap(float value, float step) => MathF.Round(value / step) * step;
     }
 }
