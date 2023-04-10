@@ -1,19 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osuTK;
+using osuTK.Input;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterMouse : KeyCounter
+    public partial class KeyCounterMouseTrigger : InputTrigger
     {
         public MouseButton Button { get; }
 
-        public KeyCounterMouse(MouseButton button)
+        public KeyCounterMouseTrigger(MouseButton button)
             : base(getStringRepresentation(button))
         {
             Button = button;
@@ -39,17 +37,16 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button == Button)
-            {
-                IsLit = true;
-                Increment();
-            }
+                Activate();
 
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == Button) IsLit = false;
+            if (e.Button == Button)
+                Deactivate();
+
             base.OnMouseUp(e);
         }
     }
