@@ -214,20 +214,15 @@ namespace osu.Game.Overlays.BeatmapSet
             if (beatmapInfo?.AuthorID != BeatmapSet?.AuthorID)
             {
                 APIUser? user = BeatmapSet?.RelatedUsers?.SingleOrDefault(u => u.OnlineID == beatmapInfo?.AuthorID);
+
                 if (user != null)
-                    getGuestMapper(user);
+                {
+                    guestMapperContainer.AddText("mapped by ");
+                    guestMapperContainer.AddUserLink(user);
+                }
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
-        }
-
-        private void getGuestMapper(APIUser user)
-        {
-            guestMapperContainer.With(d =>
-            {
-                d.AddText("mapped by ");
-                d.AddUserLink(user);
-            });
         }
 
         private void updateDifficultyButtons()
