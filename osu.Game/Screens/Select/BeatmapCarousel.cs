@@ -50,11 +50,6 @@ namespace osu.Game.Screens.Select
         public Action? BeatmapSetsChanged;
 
         /// <summary>
-        /// Triggered when the deleted <see cref="BeatmapSets"/> change.
-        /// </summary>
-        public Action? DeletedBeatmapSetsChanged;
-
-        /// <summary>
         /// Triggered after filter conditions have finished being applied to the model hierarchy.
         /// </summary>
         public Action? FilterApplied;
@@ -359,7 +354,7 @@ namespace osu.Game.Screens.Select
             if (!Scroll.UserScrolling)
                 ScrollToSelected(true);
 
-            DeletedBeatmapSetsChanged?.Invoke();
+            BeatmapSetsChanged?.Invoke();
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
