@@ -283,15 +283,15 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestBeatmapSetWithGuestDIff()
+        public void TestBeatmapSetWithGuestDifficulty()
         {
-            AddStep("show map", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDiff()));
-            AddStep("move mouse to host diff", () =>
+            AddStep("show map", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty()));
+            AddStep("move mouse to host difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(0));
             });
             AddAssert("guest mapper information not shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().All(s => s.Text != "BanchoBot"));
-            AddStep("move mouse to guest diff", () =>
+            AddStep("move mouse to guest difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
             });
@@ -337,7 +337,7 @@ namespace osu.Game.Tests.Visual.Online
             return beatmapSet;
         }
 
-        private APIBeatmapSet createBeatmapSetWithGuestDiff()
+        private APIBeatmapSet createBeatmapSetWithGuestDifficulty()
         {
             var set = getBeatmapSet();
 
