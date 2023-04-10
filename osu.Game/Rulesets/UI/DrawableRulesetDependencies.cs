@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.UI
 
             isDisposed = true;
 
-            if (ShaderManager.IsNotNull()) SampleStore.Dispose();
+            if (SampleStore.IsNotNull()) SampleStore.Dispose();
             if (TextureStore.IsNotNull()) TextureStore.Dispose();
             if (ShaderManager.IsNotNull()) ShaderManager.Dispose();
         }
