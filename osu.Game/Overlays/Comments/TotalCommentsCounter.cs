@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Comments
                 Origin = Anchor.CentreLeft,
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Margin = new MarginPadding { Left = 50 },
+                Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
