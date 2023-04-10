@@ -109,6 +109,14 @@ namespace osu.Game.Beatmaps.Formats
                         int offset = Parsing.ParseInt(split[1]);
                         string path = CleanFilename(split[2]);
 
+                        // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
+                        // the file extension is not a valid video.
+                        //
+                        // This avoids potential weird crashes when ffmpeg attempts to parse an image file as a video
+                        // (see https://github.com/ppy/osu/issues/22829#issuecomment-1465552451).
+                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path)))
+                            break;
+
                         storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
                         break;
                     }
@@ -276,7 +284,8 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                            startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":

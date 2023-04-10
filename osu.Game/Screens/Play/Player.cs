@@ -437,8 +437,11 @@ namespace osu.Game.Screens.Play
                         },
                         KeyCounter =
                         {
+                            IsCounting =
+                            {
+                                Value = false
+                            },
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
-                            IsCounting = false
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
@@ -478,7 +481,7 @@ namespace osu.Game.Screens.Play
         {
             updateGameplayState();
             updatePauseOnFocusLostState();
-            HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
+            HUDOverlay.KeyCounter.IsCounting.Value = !isBreakTime.NewValue;
         }
 
         private void updateGameplayState()
@@ -1111,7 +1114,7 @@ namespace osu.Game.Screens.Play
                     GameplayState.HasQuit = true;
 
                 // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-                if (prepareScoreForDisplayTask == null)
+                if (prepareScoreForDisplayTask == null && DrawableRuleset.ReplayScore == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
             }
 

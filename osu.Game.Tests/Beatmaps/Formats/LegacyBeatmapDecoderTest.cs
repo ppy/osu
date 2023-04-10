@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -158,6 +157,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(122474, breakPoint.StartTime);
                 Assert.AreEqual(140135, breakPoint.EndTime);
                 Assert.IsTrue(breakPoint.HasEffect);
+            }
+        }
+
+        [Test]
+        public void TestDecodeImageSpecifiedAsVideo()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("image-specified-as-video.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                var metadata = beatmap.Metadata;
+
+                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
             }
         }
 
@@ -320,6 +334,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
 
+                Debug.Assert(comboColors != null);
+
                 Color4[] expectedColors =
                 {
                     new Color4(142, 199, 255, 255),
@@ -330,7 +346,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
-                Assert.AreEqual(expectedColors.Length, comboColors?.Count);
+                Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
             }
@@ -415,14 +431,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.IsNotNull(positionData);
                 Assert.IsNotNull(curveData);
-                Assert.AreEqual(new Vector2(192, 168), positionData.Position);
+                Assert.AreEqual(new Vector2(192, 168), positionData!.Position);
                 Assert.AreEqual(956, hitObjects[0].StartTime);
                 Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
                 positionData = hitObjects[1] as IHasPosition;
 
                 Assert.IsNotNull(positionData);
-                Assert.AreEqual(new Vector2(304, 56), positionData.Position);
+                Assert.AreEqual(new Vector2(304, 56), positionData!.Position);
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
                 Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
             }
@@ -578,8 +594,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestFallbackDecoderForCorruptedHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -596,8 +612,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestFallbackDecoderForMissingHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("missing-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -614,8 +630,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithEmptyLinesAtStart()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("empty-lines-at-start.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -632,8 +648,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithEmptyLinesAndNoHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("empty-line-instead-of-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -650,8 +666,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithContentImmediatelyAfterHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("no-empty-line-after-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -678,7 +694,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestAllowFallbackDecoderOverwrite()
         {
-            Decoder<Beatmap> decoder = null;
+            Decoder<Beatmap> decoder = null!;
 
             using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
             using (var stream = new LineBufferedReader(resStream))

@@ -7,7 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -17,28 +17,29 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         public TestSceneKeyCounter()
         {
-            KeyCounterKeyboard testCounter;
-
-            KeyCounterDisplay kc = new KeyCounterDisplay
+            KeyCounterDisplay kc = new DefaultKeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Children = new KeyCounter[]
-                {
-                    testCounter = new KeyCounterKeyboard(Key.X),
-                    new KeyCounterKeyboard(Key.X),
-                    new KeyCounterMouse(MouseButton.Left),
-                    new KeyCounterMouse(MouseButton.Right),
-                },
             };
+
+            kc.AddRange(new InputTrigger[]
+            {
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterMouseTrigger(MouseButton.Left),
+                new KeyCounterMouseTrigger(MouseButton.Right),
+            });
+
+            var testCounter = (DefaultKeyCounter)kc.Counters.First();
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(new KeyCounterKeyboard(key));
+                kc.Add(new KeyCounterKeyboardTrigger(key));
             });
 
-            Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
+            Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
 
             void addPressKeyStep()
             {
@@ -46,12 +47,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 1);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 2);
-            AddStep("Disable counting", () => testCounter.IsCounting = false);
+            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
+            AddStep("Disable counting", () => testCounter.IsCounting.Value = false);
             addPressKeyStep();
-            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses == 2);
+            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
             Add(kc);
         }

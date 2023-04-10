@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected partial class TabButton : HeaderButton
+        public partial class TabButton : HeaderButton
         {
             public readonly BindableBool Active = new BindableBool();
 

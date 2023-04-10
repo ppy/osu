@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(LocalisableString header)
+            protected CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
