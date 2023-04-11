@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Threading;
 
 namespace osu.Game.Skinning
 {
@@ -14,6 +15,8 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract partial class SkinReloadableDrawable : PoolableDrawable
     {
+        private ScheduledDelegate? pendingSkinChange;
+
         /// <summary>
         /// Invoked when <see cref="CurrentSkin"/> has changed.
         /// </summary>
@@ -31,21 +34,30 @@ namespace osu.Game.Skinning
             CurrentSkin.SourceChanged += onChange;
         }
 
-        private void onChange() =>
-            // schedule required to avoid calls after disposed.
-            // note that this has the side-effect of components only performing a skin change when they are alive.
-            Scheduler.AddOnce(skinChanged);
-
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
             skinChanged();
         }
 
-        private void skinChanged()
+        /// <summary>
+        /// Force any pending <see cref="SkinChanged"/> calls to be performed immediately.
+        /// </summary>
+        /// <remarks>
+        /// When a skin change occurs, the handling provided by this class is scheduled.
+        /// In some cases, such a sample playback, this can result in the sample being played
+        /// just before it is updated to a potentially different sample.
+        ///
+        /// Calling this method will ensure any pending update operations are run immediately.
+        /// It is recommended to call this before consuming the result of skin changes for anything non-drawable.
+        /// </remarks>
+        protected void FlushPendingSkinChanges()
         {
-            SkinChanged(CurrentSkin);
-            OnSkinChanged?.Invoke();
+            if (pendingSkinChange == null)
+                return;
+
+            pendingSkinChange.RunTask();
+            pendingSkinChange = null;
         }
 
         /// <summary>
@@ -54,6 +66,22 @@ namespace osu.Game.Skinning
         /// <param name="skin">The new skin.</param>
         protected virtual void SkinChanged(ISkinSource skin)
         {
+        }
+
+        private void onChange()
+        {
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
+            pendingSkinChange?.Cancel();
+            pendingSkinChange = Scheduler.Add(skinChanged);
+        }
+
+        private void skinChanged()
+        {
+            SkinChanged(CurrentSkin);
+            OnSkinChanged?.Invoke();
+
+            pendingSkinChange = null;
         }
 
         protected override void Dispose(bool isDisposing)

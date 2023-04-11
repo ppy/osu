@@ -1,7 +1,5 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,70 +11,23 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public abstract partial class KeyCounter : Container
+    public partial class DefaultKeyCounter : KeyCounter
     {
-        private Sprite buttonSprite;
-        private Sprite glowSprite;
-        private Container textLayer;
-        private SpriteText countSpriteText;
-
-        public bool IsCounting { get; set; } = true;
-        private int countPresses;
-
-        public int CountPresses
-        {
-            get => countPresses;
-            private set
-            {
-                if (countPresses != value)
-                {
-                    countPresses = value;
-                    countSpriteText.Text = value.ToString(@"#,0");
-                }
-            }
-        }
-
-        private bool isLit;
-
-        public bool IsLit
-        {
-            get => isLit;
-            protected set
-            {
-                if (isLit != value)
-                {
-                    isLit = value;
-                    updateGlowSprite(value);
-                }
-            }
-        }
-
-        public void Increment()
-        {
-            if (!IsCounting)
-                return;
-
-            CountPresses++;
-        }
-
-        public void Decrement()
-        {
-            if (!IsCounting)
-                return;
-
-            CountPresses--;
-        }
+        private Sprite buttonSprite = null!;
+        private Sprite glowSprite = null!;
+        private Container textLayer = null!;
+        private SpriteText countSpriteText = null!;
 
         //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
         public double FadeTime { get; set; }
 
-        protected KeyCounter(string name)
+        public DefaultKeyCounter(InputTrigger trigger)
+            : base(trigger)
         {
-            Name = name;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -116,7 +67,7 @@ namespace osu.Game.Screens.Play
                         },
                         countSpriteText = new OsuSpriteText
                         {
-                            Text = CountPresses.ToString(@"#,0"),
+                            Text = CountPresses.Value.ToString(@"#,0"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
@@ -130,6 +81,9 @@ namespace osu.Game.Screens.Play
             // so the size can be changing between buttonSprite and glowSprite.
             Height = buttonSprite.DrawHeight;
             Width = buttonSprite.DrawWidth;
+
+            IsActive.BindValueChanged(e => updateGlowSprite(e.NewValue), true);
+            CountPresses.BindValueChanged(e => countSpriteText.Text = e.NewValue.ToString(@"#,0"), true);
         }
 
         private void updateGlowSprite(bool show)

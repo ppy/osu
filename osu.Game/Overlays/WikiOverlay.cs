@@ -145,7 +145,7 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = 50,
+                        Horizontal = HORIZONTAL_PADDING,
                     },
                 });
             }

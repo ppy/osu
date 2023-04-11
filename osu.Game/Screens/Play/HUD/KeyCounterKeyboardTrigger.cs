@@ -1,18 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Input.Events;
 using osuTK.Input;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterKeyboard : KeyCounter
+    public partial class KeyCounterKeyboardTrigger : InputTrigger
     {
         public Key Key { get; }
 
-        public KeyCounterKeyboard(Key key)
+        public KeyCounterKeyboardTrigger(Key key)
             : base(key.ToString())
         {
             Key = key;
@@ -22,8 +20,7 @@ namespace osu.Game.Screens.Play
         {
             if (e.Key == Key)
             {
-                IsLit = true;
-                Increment();
+                Activate();
             }
 
             return base.OnKeyDown(e);
@@ -31,7 +28,9 @@ namespace osu.Game.Screens.Play
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (e.Key == Key) IsLit = false;
+            if (e.Key == Key)
+                Deactivate();
+
             base.OnKeyUp(e);
         }
     }
