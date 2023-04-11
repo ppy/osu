@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit
             public RowBackground(object item)
             {
                 Item = item;
-                locked_item = false; 
+                locked_item = false;
 
                 RelativeSizeAxes = Axes.X;
                 Height = 25;
@@ -163,12 +163,12 @@ namespace osu.Game.Screens.Edit
                 else if (!locked_table)
                 {
                     locked_item = true;
-                    locked_table = true; 
+                    locked_table = true;
                 }
                 updateState();
                 return true;
             }
-            
+
             private void updateState()
             {
                 if (locked_table)
