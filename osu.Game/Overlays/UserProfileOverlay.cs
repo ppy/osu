@@ -45,8 +45,6 @@ namespace osu.Game.Overlays
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public const float CONTENT_X_MARGIN = 50;
-
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
         {
@@ -184,7 +182,7 @@ namespace osu.Game.Overlays
             public ProfileSectionTabControl()
             {
                 Height = 40;
-                Padding = new MarginPadding { Horizontal = CONTENT_X_MARGIN };
+                Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
                 TabContainer.Spacing = new Vector2(20);
             }
 
