@@ -104,6 +104,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             changeHandler?.BeginChange();
 
+            ControlPointTable.locked_table = false;
+
             var currentGroupItems = SelectedGroup.Value.ControlPoints.ToArray();
 
             Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);

@@ -44,7 +44,8 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         Action = () =>
                         {
-                            selectedGroup.Value = group;
+                            if (!ControlPointTable.locked_table)
+                                selectedGroup.Value = group;
                             clock.SeekSmoothlyTo(group.Time);
                         }
                     });

@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Edit
 
         public const int TEXT_SIZE = 14;
 
+        public static bool locked_table = false;
+
         protected readonly FillFlowContainer<RowBackground> BackgroundFlow;
 
         protected EditorTable()
@@ -48,6 +50,9 @@ namespace osu.Game.Screens.Edit
 
         protected void SetSelectedRow(object? item)
         {
+            if (locked_table)
+                return;
+
             foreach (var b in BackgroundFlow)
             {
                 b.Selected = ReferenceEquals(b.Item, item);
@@ -74,11 +79,14 @@ namespace osu.Game.Screens.Edit
 
             private const int fade_duration = 100;
 
+            private bool locked_item = false;
+
             private readonly Box hoveredBackground;
 
             public RowBackground(object item)
             {
                 Item = item;
+                locked_item = false; 
 
                 RelativeSizeAxes = Axes.X;
                 Height = 25;
@@ -100,12 +108,14 @@ namespace osu.Game.Screens.Edit
 
             private Color4 colourHover;
             private Color4 colourSelected;
+            private Color4 colourLocked;
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
             {
                 colourHover = colours.Background1;
                 colourSelected = colours.Colour3;
+                colourLocked = colours.Colour2;
             }
 
             protected override void LoadComplete()
@@ -143,9 +153,28 @@ namespace osu.Game.Screens.Edit
                 base.OnHoverLost(e);
             }
 
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                if (locked_table && locked_item)
+                {
+                    locked_item = false;
+                    locked_table = false;
+                }
+                else if (!locked_table)
+                {
+                    locked_item = true;
+                    locked_table = true; 
+                }
+                updateState();
+                return true;
+            }
+            
             private void updateState()
             {
-                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
+                if (locked_table)
+                    hoveredBackground.FadeColour(selected ? colourLocked : colourHover, 450, Easing.OutQuint);
+                else
+                    hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
 
                 if (selected || IsHovered)
                     hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
