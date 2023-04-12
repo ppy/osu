@@ -18,6 +18,16 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <summary>
         /// A <see cref="Hit"/> that can be hit by the rim portion of the drum.
         /// </summary>
-        Rim
+        Rim,
+
+        /// <summary>
+        /// A <see cref="Hit"/> that can be hit by the centre portion of the drum.
+        /// </summary>
+        StrongCentre,
+
+        /// <summary>
+        /// A <see cref="Hit"/> that can be hit by the rim portion of the drum.
+        /// </summary>
+        StrongRim
     }
 }

@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
@@ -26,16 +27,20 @@ namespace osu.Game.Rulesets.UI
 
         private int nextHitSoundIndex;
 
-        private readonly Container<SkinnableSound> hitSounds;
+        protected readonly Container<SkinnableSound> HitSounds;
+        protected readonly DrawableAudioMixer AudioMixer;
 
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
 
-            InternalChild = hitSounds = new Container<SkinnableSound>
+            InternalChild = AudioMixer = new DrawableAudioMixer
             {
-                Name = "concurrent sample pool",
-                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                Child = HitSounds = new Container<SkinnableSound>
+                {
+                    Name = "concurrent sample pool",
+                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                }
             };
         }
 
@@ -59,9 +64,9 @@ namespace osu.Game.Rulesets.UI
             PlaySamples(samples);
         }
 
-        protected void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
+        protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
-            var hitSound = getNextSample();
+            var hitSound = GetNextSample();
             hitSound.Samples = samples;
             hitSound.Play();
         });
@@ -126,9 +131,9 @@ namespace osu.Game.Rulesets.UI
             return nested != null ? getEarliestNestedObject(nested) : hitObject;
         }
 
-        private SkinnableSound getNextSample()
+        protected SkinnableSound GetNextSample()
         {
-            SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
+            SkinnableSound hitSound = HitSounds[nextHitSoundIndex];
 
             // round robin over available samples to allow for concurrent playback.
             nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
