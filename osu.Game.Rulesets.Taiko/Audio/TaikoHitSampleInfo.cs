@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
     {
         public const string TAIKO_STRONG_HIT = @"taiko-strong-hit";
         public const string TAIKO_STRONG_CLAP = @"taiko-strong-clap";
+        public const string TAIKO_STRONG_FLOURISH = @"taiko-strong-flourish";
 
         public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
@@ -33,6 +34,12 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
                 switch (Name)
                 {
+                    // flourish shouldn't fallback to anything, it should just not play if missing
+                    case TAIKO_STRONG_FLOURISH:
+                        lookupNames.Add(@$"Gameplay/{Name}");
+
+                        return lookupNames;
+
                     case TAIKO_STRONG_HIT:
                     case TAIKO_STRONG_CLAP:
                         lookupNames.Add(@$"Gameplay/{Name}");

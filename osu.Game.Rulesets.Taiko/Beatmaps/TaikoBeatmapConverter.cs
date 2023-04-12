@@ -16,6 +16,7 @@ using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -36,6 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
         private const float taiko_base_distance = 100;
+
+        /// <summary>
+        /// The minimum time to leave between flourishes that are added to strong hits.
+        /// </summary>
+        private const double time_between_flourishes = 2000;
 
         private readonly bool isForCurrentRuleset;
 
@@ -89,6 +95,23 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     return first;
                 }).ToList();
             }
+
+            // Add an additional 'flourish' sample to strong rim hits (that are at least `time_between_flourishes` apart). This is applied to hitobjects in reverse order, as to
+            // sound more musically coherent by biasing towards to end of groups/combos of strong rim hits instead of the start.
+            double? lastFlourish = null;
+            converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(x =>
+            {
+                if (x is not TaikoStrongableHitObject hitObj || !hitObj.IsStrong || ((Hit)hitObj).Type != HitType.Rim)
+                    return x;
+
+                if (lastFlourish == null || Math.Abs(hitObj.StartTime - (double)lastFlourish) >= time_between_flourishes)
+                {
+                    hitObj.Samples.Add(new TaikoHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH, volume: x.Samples.First().Volume));
+                    lastFlourish = hitObj.StartTime;
+                }
+
+                return x;
+            }).Reverse().ToList();
 
             return converted;
         }
