@@ -266,6 +266,9 @@ namespace osu.Game.Beatmaps.ControlPoints
 
                 case EffectControlPoint:
                     existing = EffectPointAt(time);
+                    // EffectPointAt() still returns even if no point is at time so a check is needed
+                    if (existing.Time != time)
+                        existing = null;
                     break;
             }
 
