@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
+        private readonly Bindable<bool> keepLeaderboardExpanded = new Bindable<bool>();
+
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
         /// </summary>
@@ -216,6 +218,8 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            config.BindWith(OsuSetting.KeepGameplayLeaderboardExpanded, keepLeaderboardExpanded);
 
             if (game != null)
                 gameActive.BindTo(game.IsActive);
@@ -887,7 +891,7 @@ namespace osu.Game.Screens.Play
         protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
         private void updateLeaderboardExpandedState() =>
-            LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
+            LeaderboardExpandedState.Value = keepLeaderboardExpanded.Value || !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
 
         #endregion
 

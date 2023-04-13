@@ -134,6 +134,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
+            SetDefault(OsuSetting.KeepGameplayLeaderboardExpanded, false);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -305,6 +306,7 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard,
+        KeepGameplayLeaderboardExpanded,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,

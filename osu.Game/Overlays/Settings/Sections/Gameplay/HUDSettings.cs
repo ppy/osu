@@ -43,6 +43,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.KeepGameplayLeaderboardExpanded,
+                    Current = config.GetBindable<bool>(OsuSetting.KeepGameplayLeaderboardExpanded),
+                },
             };
         }
     }
