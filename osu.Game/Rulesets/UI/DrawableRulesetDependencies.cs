@@ -41,15 +41,6 @@ namespace osu.Game.Rulesets.UI
         public ISampleStore SampleStore { get; }
 
         /// <summary>
-        /// The shader manager to be used for the ruleset.
-        /// </summary>
-        /// <remarks>
-        /// Reads shaders from the "Shaders" folder in ruleset resources.
-        /// If not available locally, lookups will fallback to the global shader manager.
-        /// </remarks>
-        public ShaderManager ShaderManager { get; }
-
-        /// <summary>
         /// The ruleset config manager. May be null if ruleset does not expose a configuration manager.
         /// </summary>
         public IRulesetConfigManager? RulesetConfigManager { get; }
@@ -68,7 +59,7 @@ namespace osu.Game.Rulesets.UI
             SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
             CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
-            CacheAs(ShaderManager = new RulesetShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"), parent.Get<ShaderManager>()));
+            parent.Get<ShaderManager>().AddStore(ruleset.ShortName, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
 
             RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
@@ -100,7 +91,6 @@ namespace osu.Game.Rulesets.UI
 
             if (SampleStore.IsNotNull()) SampleStore.Dispose();
             if (TextureStore.IsNotNull()) TextureStore.Dispose();
-            if (ShaderManager.IsNotNull()) ShaderManager.Dispose();
         }
 
         #endregion
@@ -193,39 +183,6 @@ namespace osu.Game.Rulesets.UI
             {
                 base.Dispose(disposing);
                 if (primary.IsNotNull()) primary.Dispose();
-            }
-        }
-
-        private class RulesetShaderManager : ShaderManager
-        {
-            private readonly ShaderManager parent;
-
-            public RulesetShaderManager(IRenderer renderer, NamespacedResourceStore<byte[]> rulesetResources, ShaderManager parent)
-                : base(renderer, rulesetResources)
-            {
-                this.parent = parent;
-            }
-
-            // When the debugger is attached, exceptions are expensive.
-            // Manually work around this by caching failed lookups and falling back straight to parent.
-            private readonly HashSet<(string, string)> failedLookups = new HashSet<(string, string)>();
-
-            public override IShader Load(string vertex, string fragment)
-            {
-                if (!failedLookups.Contains((vertex, fragment)))
-                {
-                    try
-                    {
-                        return base.Load(vertex, fragment);
-                    }
-                    catch
-                    {
-                        // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                        failedLookups.Add((vertex, fragment));
-                    }
-                }
-
-                return parent.Load(vertex, fragment);
             }
         }
     }
