@@ -234,22 +234,30 @@ namespace osu.Desktop
             {
                 const BindingFlags binding_flag = BindingFlags.Instance | BindingFlags.NonPublic;
 
-                FieldInfo[] fields = desktopWindow switch
+                try
                 {
-                    WindowsWindow windowsWindow => windowsWindow.GetType().BaseType!.GetFields(binding_flag),
-                    MacOSWindow macOSWindow => macOSWindow.GetType().BaseType!.GetFields(binding_flag),
-                    _ => desktopWindow.GetType().GetFields(binding_flag)
-                };
+                    // WindowsWindow/MacOSWindow -> SDL2DesktopWindow -> SDL2Window
+                    FieldInfo[] fields = desktopWindow switch
+                    {
+                        WindowsWindow windowsWindow => windowsWindow.GetType().BaseType!.BaseType!.GetFields(binding_flag),
+                        MacOSWindow macOSWindow => macOSWindow.GetType().BaseType!.BaseType!.GetFields(binding_flag),
+                        _ => desktopWindow.GetType().BaseType!.GetFields(binding_flag)
+                    };
 
-                foreach (var fieldInfo in fields)
+                    foreach (var fieldInfo in fields)
+                    {
+                        if (!fieldInfo.Name.Contains("SDLWindowHandle")) continue;
+
+                        object? val = fieldInfo.GetValue(desktopWindow);
+
+                        windowHandle = (val is IntPtr ptr) ? ptr : IntPtr.Zero;
+
+                        break;
+                    }
+                }
+                catch (Exception e)
                 {
-                    if (!fieldInfo.Name.Contains("SDLWindowHandle")) continue;
-
-                    object? val = fieldInfo.GetValue(desktopWindow);
-
-                    windowHandle = (val is IntPtr ptr) ? ptr : IntPtr.Zero;
-
-                    break;
+                    Logger.Error(e, "寻找WindowHandle时出现问题");
                 }
 
                 if (windowHandle == null || windowHandle == IntPtr.Zero)
