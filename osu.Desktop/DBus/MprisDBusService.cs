@@ -20,6 +20,7 @@ namespace osu.Desktop.DBus
         public static readonly ObjectPath PATH = new ObjectPath("/org/mpris/MediaPlayer2");
 
         public string CustomRegisterName => "org.mpris.MediaPlayer2.mfosu";
+        public bool IsService => true;
 
         private readonly PlayerProperties playerProperties = new PlayerProperties();
 
@@ -95,11 +96,10 @@ namespace osu.Desktop.DBus
             {
                 long oldval = (long)playerProperties.Metadata["mpris:length"];
 
-                if (oldval != value)
-                {
-                    playerProperties.Metadata["mpris:length"] = value;
-                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
-                }
+                if (oldval == value) return;
+
+                playerProperties.Metadata["mpris:length"] = value;
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
             }
         }
 

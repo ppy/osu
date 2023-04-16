@@ -1,7 +1,9 @@
 #nullable disable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
 
 namespace M.DBus.Tray
@@ -15,6 +17,12 @@ namespace M.DBus.Tray
         public SimpleEntry()
         {
             this.ChildId = ChildId == -1 ? Cid++ : ChildId;
+            this.children.OnModifyCall += () =>
+            {
+                this.ChildModified = true;
+                this.TriggerPropertyChangedEvent();
+                this.ChildModified = false;
+            };
         }
 
         public static int Cid = 1;
@@ -256,17 +264,98 @@ namespace M.DBus.Tray
         public IList<SimpleEntry> Children
         {
             get => children;
-            set
+        }
+
+        private class WrappedList : IList<SimpleEntry>
+        {
+            private readonly List<SimpleEntry> list = new List<SimpleEntry>();
+
+            [CanBeNull]
+            public Action OnModifyCall;
+
+            public IEnumerator<SimpleEntry> GetEnumerator()
             {
-                if (!ReferenceEquals(children, value))
+                return list.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public void Add(SimpleEntry item)
+            {
+                list.Add(item);
+                OnModifyCall?.Invoke();
+            }
+
+            public void Clear()
+            {
+                list.Clear();
+                OnModifyCall?.Invoke();
+            }
+
+            public bool Contains(SimpleEntry item)
+            {
+                return list.Contains(item);
+            }
+
+            public void CopyTo(SimpleEntry[] array, int arrayIndex)
+            {
+                list.CopyTo(array, arrayIndex);
+            }
+
+            public bool Remove(SimpleEntry item)
+            {
+                try
                 {
-                    children = value;
-                    OnPropertyChanged?.Invoke();
+                    OnModifyCall?.Invoke();
+                }
+                catch (Exception)
+                {
+                }
+
+                return list.Remove(item);
+            }
+
+            public int Count => list.Count;
+            public bool IsReadOnly => false;
+
+            public int IndexOf(SimpleEntry item)
+            {
+                return list.IndexOf(item);
+            }
+
+            public void Insert(int index, SimpleEntry item)
+            {
+                list.Insert(index, item);
+                OnModifyCall?.Invoke();
+            }
+
+            public void RemoveAt(int index)
+            {
+                list.RemoveAt(index);
+                OnModifyCall?.Invoke();
+            }
+
+            public SimpleEntry this[int index]
+            {
+                get => list[index];
+                set
+                {
+                    list[index] = value;
+
+                    OnModifyCall?.Invoke();
                 }
             }
         }
 
-        private IList<SimpleEntry> children = new List<SimpleEntry>();
+        [CanBeNull]
+        public Action OnChildrenModify;
+
+        public bool ChildModified { get; private set; }
+
+        private readonly WrappedList children = new WrappedList();
 
         public override string ToString() => $"({ChildId}) DBusMenuEntry '{Label.Replace("\n", "\\n")}'";
     }

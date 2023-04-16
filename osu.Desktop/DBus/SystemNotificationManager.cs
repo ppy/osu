@@ -16,9 +16,9 @@ namespace osu.Desktop.DBus
 {
     public class SystemNotificationManager : IHandleSystemNotifications
     {
-        private DBusManager<IMDBusObject> dBusManager;
+        private DBusMgrNew dBusManager;
 
-        public void SetDBusManager(DBusManager<IMDBusObject> dBusManager)
+        public void SetDBusManager(DBusMgrNew dBusManager)
         {
             this.dBusManager = dBusManager;
         }
@@ -43,7 +43,7 @@ namespace osu.Desktop.DBus
             try
             {
                 var path = new ObjectPath("/org/freedesktop/Notifications");
-                systemNotification = dBusManager.GetDBusObject<INotifications>(path, path.ToServiceName());
+                systemNotification = dBusManager.GetProxyObject<INotifications>(path, path.ToServiceName());
 
                 if (!notificationWatched)
                 {

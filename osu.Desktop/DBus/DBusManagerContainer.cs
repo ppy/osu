@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using M.DBus;
 using M.DBus.Services.Notifications;
 using M.DBus.Tray;
@@ -9,7 +8,7 @@ using M.DBus.Utils;
 using osu.Desktop.DBus.Tray;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -28,9 +27,9 @@ using osu.Game.Users;
 
 namespace osu.Desktop.DBus
 {
-    public partial class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
+    public partial class DBusManagerContainer : CompositeDrawable, IDBusManagerContainer<IMDBusObject>
     {
-        public DBusManager<IMDBusObject> DBusManager;
+        public DBusMgrNew DBusManager;
 
         public Action<Notification> NotificationAction { get; set; }
         private readonly Bindable<bool> controlSource;
@@ -39,7 +38,7 @@ namespace osu.Desktop.DBus
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
-        private KdeStatusTrayService kdeTrayService => trayManager.KdeTrayService;
+        private TrayIconService kdeTrayService => trayManager.KdeTrayService;
         private CanonicalTrayService canonicalTrayService => trayManager.CanonicalTrayService;
 
         private SDL2DesktopWindow sdl2DesktopWindow => (SDL2DesktopWindow)host.Window;
@@ -85,7 +84,7 @@ namespace osu.Desktop.DBus
                 this.controlSource = controlSource;
             else if (controlSource == null && autoStart) throw new InvalidOperationException("设置了自动启动但是控制源是null?");
 
-            DBusManager = new DBusManager<IMDBusObject>(false, trayManager, systemNotificationManager);
+            DBusManager = new DBusMgrNew();
             trayManager.SetDBusManager(DBusManager);
             systemNotificationManager.SetDBusManager(DBusManager);
         }
@@ -117,9 +116,7 @@ namespace osu.Desktop.DBus
         public void Add(IMDBusObject obj)
         {
             if (!string.IsNullOrEmpty(obj.CustomRegisterName))
-                DBusManager.RegisterNewObject(obj, obj.CustomRegisterName).ConfigureAwait(false);
-            else
-                DBusManager.RegisterNewObject(obj).ConfigureAwait(false);
+                Logger.Log($"Adding {obj} lasted result {DBusManager.RegisterObject(obj)}");
         }
 
         public void AddRange(IEnumerable<IMDBusObject> objects)
@@ -130,7 +127,7 @@ namespace osu.Desktop.DBus
 
         public void Remove(IMDBusObject obj)
         {
-            DBusManager.RemoveObject(obj);
+            DBusManager.UnRegisterObject(obj);
         }
 
         public void RemoveRange(IEnumerable<IMDBusObject> objects)
@@ -166,8 +163,12 @@ namespace osu.Desktop.DBus
                 userInfoService = new UserInfoDBusService()
             });
 
-            DBusManager.GreetService.AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost);
-            DBusManager.GreetService.OnMessageRecive = onMessageRevicedFromDBus;
+            this.Add(mprisService);
+
+            this.AddInternal(trayManager);
+
+            //DBusManager.GreetService.AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost);
+            //DBusManager.GreetService.OnMessageRecive = onMessageRevicedFromDBus;
 
             iconName = config.GetBindable<string>(MSetting.TrayIconName);
             enableTray = config.GetBindable<bool>(MSetting.EnableTray);
@@ -176,8 +177,6 @@ namespace osu.Desktop.DBus
 
             void postConnect()
             {
-                this.Add(mprisService);
-
                 trayManager.AddEntryRange(new[]
                 {
                     new SimpleEntry
@@ -208,12 +207,12 @@ namespace osu.Desktop.DBus
                     new SeparatorEntry()
                 });
 
-                enableTray.BindValueChanged(onEnableTrayChanged, true);
-                enableSystemNotifications.BindValueChanged(systemNotificationManager.OnEnableNotificationsChanged, true);
-
                 //workaround: 执行到这里时一些dbus服务可能还没注册完成，因此延迟一些时间执行这些
                 Scheduler.AddDelayed(() =>
                 {
+                    enableTray.BindValueChanged(onEnableTrayChanged, true);
+                    enableSystemNotifications.BindValueChanged(systemNotificationManager.OnEnableNotificationsChanged, true);
+
                     game.Audio.Volume.BindValueChanged(v =>
                         mprisService.Set("Volume", v.NewValue), true);
 
@@ -225,14 +224,7 @@ namespace osu.Desktop.DBus
                     iconName.BindValueChanged(v =>
                     {
                         kdeTrayService.Set(nameof(kdeTrayService.KdeProperties.IconName), v.NewValue);
-                    }, true);
-
-                    mprisService.AllowSet = true;
-
-                    //workaround: 让GNOME插件Mpris Indicator Button能触发Shuffle
-                    mprisService.TriggerPropertyChangeFor("Shuffle");
-
-                    updateMprisProgress();
+                    });
                 }, config.Get<double>(MSetting.DBusWaitOnline));
 
                 DBusManager.OnConnected -= scheduleFirstConnected;
@@ -241,6 +233,16 @@ namespace osu.Desktop.DBus
             void scheduleFirstConnected() => Schedule(postConnect);
 
             DBusManager.OnConnected += scheduleFirstConnected;
+            DBusManager.OnConnected += () =>
+            {
+                kdeTrayService.KdeProperties.IconName = iconName.Value;
+                mprisService.AllowSet = true;
+
+                //workaround: 让GNOME插件Mpris Indicator Button能触发Shuffle
+                mprisService.TriggerPropertyChangeFor("Shuffle");
+
+                updateMprisProgress();
+            };
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
@@ -310,15 +312,13 @@ namespace osu.Desktop.DBus
         {
             if (v.NewValue)
             {
-                Add(canonicalTrayService);
                 Add(kdeTrayService);
-
-                Task.Run(trayManager.ConnectToWatcher);
+                Add(canonicalTrayService);
             }
             else
             {
-                Remove(canonicalTrayService);
                 Remove(kdeTrayService);
+                Remove(canonicalTrayService);
             }
         }
 
@@ -361,9 +361,9 @@ namespace osu.Desktop.DBus
         private void onControlSourceChanged(ValueChangedEvent<bool> v)
         {
             if (v.NewValue)
-                DBusManager.Connect();
-            //else
-            //    DBusManager.Disconnect();
+                DBusManager.StartConnect();
+            else
+                DBusManager.Disconnect();
         }
 
         private void updateMprisProgress()

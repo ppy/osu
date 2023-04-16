@@ -54,14 +54,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 intergrationCheckbox.SetNoticeText("非Linux平台可能需要自行安装并启用DBus", true);
             }
 
-            intergrationCheckbox.Current.BindValueChanged(v =>
-            {
-                intergrationCheckbox.SetNoticeText(v.NewValue ? "" : "需要重启", true);
-            });
-
             dbusWaitOnlineSlider.Current.BindValueChanged(v =>
             {
-                dbusWaitOnlineSlider.SetNoticeText(v.NewValue == 3000d ? "真得有桌面需要拉这么高的值吗 O.O" : "");
+                dbusWaitOnlineSlider.SetNoticeText(v.NewValue == 3000d ? "真的有桌面需要拉这么高的值吗 O.O" : "");
             }, true);
         }
     }

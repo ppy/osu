@@ -11,12 +11,13 @@ namespace osu.Desktop.DBus.Tray
     /// <summary>
     ///     WIP
     /// </summary>
-    public class KdeStatusTrayService : IMDBusObject, IStatusNotifierItem
+    public class TrayIconService : IMDBusObject, IStatusNotifierItem
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/StatusNotifierItem");
 
         public string CustomRegisterName => "org.kde.StatusNotifierItem.mfosu";
+        public bool IsService => true;
 
         public Action WindowRaise { get; set; }
 
@@ -35,7 +36,7 @@ namespace osu.Desktop.DBus.Tray
 
         internal bool Set(string prop, object value)
         {
-            var result = KdeProperties.Set(prop, value);
+            bool result = KdeProperties.Set(prop, value);
 
             if (result)
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(prop, value));

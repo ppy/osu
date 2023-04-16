@@ -13,14 +13,21 @@ namespace osu.Desktop.DBus.Tray
 {
     public partial class TrayManager : Component, IHandleTrayManagement
     {
-        private DBusManager<IMDBusObject> dBusManager;
+        private DBusMgrNew dBusManager;
 
-        public readonly KdeStatusTrayService KdeTrayService = new KdeStatusTrayService();
+        public readonly TrayIconService KdeTrayService = new TrayIconService();
         public readonly CanonicalTrayService CanonicalTrayService = new CanonicalTrayService();
 
-        internal void SetDBusManager(DBusManager<IMDBusObject> dBusManager)
+        internal void SetDBusManager(DBusMgrNew dBusManager)
         {
             this.dBusManager = dBusManager;
+
+            dBusManager.OnObjectRegisteredToConnection += o =>
+            {
+                if (o is TrayIconService)
+                    this.Scheduler.AddDelayed(() =>
+                        Task.Run(ConnectToWatcher), 300);
+            };
         }
 
         private IStatusNotifierWatcher trayWatcher;
@@ -29,14 +36,14 @@ namespace osu.Desktop.DBus.Tray
         {
             try
             {
-                trayWatcher = dBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
+                trayWatcher = dBusManager.GetProxyObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
 
                 await trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 trayWatcher = null;
-                Logger.Error(e, "未能连接到 org.kde.StatusNotifierWatcher, 请检查相关配置");
+                Logger.Error(e, "未能连接到 org.kde.StatusNotifierWatcher");
                 return false;
             }
 
