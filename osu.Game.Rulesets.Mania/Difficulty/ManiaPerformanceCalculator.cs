@@ -136,9 +136,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double greatWindowLeniency = 0;
             double goodWindowLeniency = 0;
 
+            // When converting beatmaps to osu!mania in stable, the resulting hit window sizes are dependent on whether the beatmap's OD is above or below 4.
             if (attributes.IsConvert)
             {
-                // When converting beatmaps to osu!mania in stable, the resulting hit window sizes are dependent on whether the beatmap's OD is above or below 4.
                 overallDifficulty = 10;
 
                 if (attributes.OverallDifficulty <= 4)
