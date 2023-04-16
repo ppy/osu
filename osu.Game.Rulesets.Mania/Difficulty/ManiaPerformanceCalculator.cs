@@ -78,12 +78,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2); // Star rating to pp curve
+            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2)
+                                     * (1 + 0.1 * Math.Min(1, (attributes.NoteCount + attributes.HoldNoteCount) / 1500)); // Star rating to pp curve
 
             if (estimatedUr == null)
                 return 0;
 
-            difficultyValue *= Math.Max(1.2 * Math.Pow(SpecialFunctions.Erf(300 / estimatedUr.Value), 1.6) - 0.2, 0); // UR to multiplier curve, see https://www.desmos.com/calculator/xt58vzt2y4
+            difficultyValue *= Math.Max(SpecialFunctions.Erf(200 / estimatedUr.Value) * (1 - Math.Pow(estimatedUr.Value / 1000, 1.3)), 0); // UR to multiplier curve, see https://www.desmos.com/calculator/2hqbzcfh79
 
             return difficultyValue;
         }
