@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using Precision = osu.Framework.Utils.Precision;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && totalJudgements == maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount;
+            isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && !Precision.DefinitelyBigger(totalJudgements, maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount);
             hitWindows = isLegacyScore ? getLegacyHitWindows(score, maniaAttributes) : getLazerHitWindows(score, maniaAttributes);
             estimatedUr = computeEstimatedUr(maniaAttributes);
 
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double totalSuccessfulJudgements => countPerfect + countOk + countGreat + countGood + countMeh;
 
         /// <summary>
-        /// Accuracy used to weight judgements independently from the score's actual accuracy.
+        /// Returns the estimated tapping deviation of the score, assuming the average hit location is in the center of the hit window.
         /// </summary>
         private double? computeEstimatedUr(ManiaDifficultyAttributes attributes)
         {
@@ -99,10 +100,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return null;
 
             // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
-            double nNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
-            double nHoldCount = Math.Log(attributes.HoldNoteCount);
+            double logNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
+            double logHoldCount = Math.Log(attributes.HoldNoteCount);
 
-            // Find the likelihood of a deviation resulting in the play's judgements. Higher is more likely, so we find the peak of the curve.
             double likelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
                 JudgementProbs pHolds = isLegacyScore ? pHold(d) : pNote(d, tail_multiplier);
 
-                return -totalProb(pNotes, pHolds, nNoteCount, nHoldCount);
+                return -totalProb(pNotes, pHolds, logNoteCount, logHoldCount);
             }
 
             // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
@@ -150,11 +150,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double[] lazerHitWindows = new double[5];
 
-            // Create a new track of arbitrary length
+            // Create a new track of arbitrary length, and apply the total rate change of every mod to the track (i.e. DT = 1.01-2x, HT = 0.5-0.99x)
             var track = new TrackVirtual(10000);
-            // Apply the total rate change of every mod to the track (i.e. DT = 1.01-2x, HT = 0.5-0.99x)
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            // The final clock rate is the rate of the track
             double clockRate = track.Rate;
 
             double windowMultiplier = 1 / clockRate;
@@ -176,7 +174,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return lazerHitWindows;
         }
 
-        // This struct allows us to return the probability of hitting every judgement with a single method.
         private struct JudgementProbs
         {
             public double PMax;
@@ -187,7 +184,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             public double P0;
         }
 
-        // This method finds the probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
+        // Probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
         private JudgementProbs pNote(double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
@@ -203,7 +200,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return probabilities;
         }
 
-        // This method finds the probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
+        // Probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
         private JudgementProbs pHold(double d)
         {
             JudgementProbs probabilities = new JudgementProbs();
@@ -236,7 +233,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return probabilities;
         }
 
-        // Combines pNotes and pHolds/pTails into 1 probability value for each judgement, and compares it to the judgements of the play. A higher output means the deviation is more likely.
+        /// <summary>
+        /// Combines pNotes and pHolds/pTails into a single probability value for each judgement, and compares them to the judgements of the play.
+        /// </summary>
         private double totalProb(JudgementProbs firstProbs, JudgementProbs secondProbs, double firstObjectCount, double secondObjectCount)
         {
             // firstObjectCount can be either Notes, or Notes + Holds, as stable LN heads don't behave like Notes but lazer LN heads do.
@@ -259,27 +258,37 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return totalProb;
         }
 
-        private double logPcNote(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
+        /// <summary>
+        /// The log complementary probability of hitting within a hit window with a certain deviation.
+        /// </summary>
+        /// <returns>
+        /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
+        /// </returns>
+        private double logPcNote(double x, double deviation) => logErfc(x / (deviation * Math.Sqrt(2)));
 
-        // Legacy LN tails take the absolute error of both hit judgements on an LN, so we use a folded normal distribution to calculate it.
-        private double logPcHoldTail(double x, double deviation) => holdTailApprox(x / (deviation * Math.Sqrt(2)));
+        /// <summary>
+        /// The log complementary probability of hitting within a hit window with a certain deviation.
+        /// Exclusively for stable LN tails, as they give a result from 2 error values (total error on the head + the tail).
+        /// </summary>
+        /// <returns>
+        /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
+        /// </returns>
+        private double logPcHoldTail(double x, double deviation) => logProbTail(x / (deviation * Math.Sqrt(2)));
 
-        private double logErfcApprox(double x) => x <= 5
+        private double logErfc(double x) => x <= 5
             ? Math.Log(SpecialFunctions.Erfc(x))
-            : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/kdbxwxgf01
+            : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/kdbxwxgf01
 
-        private double holdTailApprox(double x) => x <= 7
+        private double logProbTail(double x) => x <= 7
             ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2))
-            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/lgwyhx0fxo
+            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/lgwyhx0fxo
 
-        // Log rules make addition and subtraction of the non-log value non-trivial, these methods simply add and subtract the base value of logs.
         private double logSum(double firstLog, double secondLog)
         {
             double maxVal = Math.Max(firstLog, secondLog);
             double minVal = Math.Min(firstLog, secondLog);
 
             // 0 in log form becomes negative infinity, so return negative infinity if both numbers are negative infinity.
-            // Shouldn't happen on any UR>0, but good for redundancy purposes.
             if (double.IsNegativeInfinity(maxVal))
             {
                 return maxVal;
