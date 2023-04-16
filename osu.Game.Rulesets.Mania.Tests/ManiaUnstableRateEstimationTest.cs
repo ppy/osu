@@ -27,15 +27,18 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const string resource_namespace = "Testing.Beatmaps";
         protected string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
+        // Test that both SS scores and near 0% scores are handled properly, within a margin of +-0.001 UR
         [TestCase(42.978515625d, new[] { 11847, 0, 0, 0, 0, 0 }, "ur-estimation-test")]
         [TestCase(9523485.0d, new[] { 0, 0, 0, 0, 1, 11846 }, "ur-estimation-test")]
         public void Test1(double expectedEstimatedUnstableRate, int[] judgements, string name)
             => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name);
 
+        // General test to make sure UR estimation isn't changed by anything, within a margin of +-0.001 UR. Tests rate changes as well.
         [TestCase(309.990234375d, new[] { 5336, 3886, 1661, 445, 226, 293 }, "ur-estimation-test")]
         public void Test1ClockRateAdjusted(double expectedEstimatedUnstableRate, int[] judgements, string name)
             => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name, new ManiaModDoubleTime());
 
+        // Compares the true hit windows to the hit windows computed manually in perfcalc, within a margin of error of +-0.000001ms.
         [TestCase(7.0d, "ur-estimation-test")]
         public void Test2(double overallDifficulty, string name)
             => TestHitWindows(overallDifficulty, name);
@@ -61,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             }, attributes);
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
-            Assert.That(perfAttributes.EstimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001));
+            Assert.That(perfAttributes.EstimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
         }
 
         protected void TestHitWindows(double overallDifficulty, string name)
@@ -83,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo(getBeatmap(name).BeatmapInfo), attributes);
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
-            Assert.That(perfAttributes.HitWindows, Is.EqualTo(trueHitWindows).Within(0.000001));
+            Assert.That(perfAttributes.HitWindows, Is.EqualTo(trueHitWindows).Within(0.000001), "The true mania hit windows are different to the ones calculated in ManiaPerformanceCalculator.");
         }
 
         private WorkingBeatmap getBeatmap(string name)
