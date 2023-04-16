@@ -133,9 +133,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double[] legacyHitWindows = new double[5];
 
             double overallDifficulty = attributes.OverallDifficulty;
+            double greatWindowLeniency = 0;
+            double goodWindowLeniency = 0;
 
-            if (attributes.Convert)
+            if (attributes.IsConvert)
+            {
+                // When converting beatmaps to osu!mania in stable, the resulting hit window sizes are dependent on whether the beatmap's OD is above or below 4.
                 overallDifficulty = 10;
+
+                if (attributes.OverallDifficulty <= 4)
+                {
+                    greatWindowLeniency = 13;
+                    goodWindowLeniency = 10;
+                }
+            }
 
             double windowMultiplier = 1;
 
@@ -145,8 +156,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 windowMultiplier *= 1.4;
 
             legacyHitWindows[0] = Math.Floor(16 * windowMultiplier);
-            legacyHitWindows[1] = Math.Floor((64 - 3 * overallDifficulty) * windowMultiplier);
-            legacyHitWindows[2] = Math.Floor((97 - 3 * overallDifficulty) * windowMultiplier);
+            legacyHitWindows[1] = Math.Floor((64 - 3 * overallDifficulty + greatWindowLeniency) * windowMultiplier);
+            legacyHitWindows[2] = Math.Floor((97 - 3 * overallDifficulty + goodWindowLeniency) * windowMultiplier);
             legacyHitWindows[3] = Math.Floor((127 - 3 * overallDifficulty) * windowMultiplier);
             legacyHitWindows[4] = Math.Floor((151 - 3 * overallDifficulty) * windowMultiplier);
 

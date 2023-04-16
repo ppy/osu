@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             int noteCount = beatmap.HitObjects.Count(h => h is Note);
             int holdNoteCount = beatmap.HitObjects.Count(h => h is HoldNote);
-            bool convert = beatmap.BeatmapInfo.Ruleset.OnlineID != 3;
+            bool isConvert = beatmap.BeatmapInfo.Ruleset.OnlineID != 3;
 
             return new ManiaDifficultyAttributes
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
                 NoteCount = noteCount,
                 HoldNoteCount = holdNoteCount,
-                Convert = convert
+                IsConvert = isConvert
             };
         }
 

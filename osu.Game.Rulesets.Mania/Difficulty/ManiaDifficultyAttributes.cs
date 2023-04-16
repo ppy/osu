@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Conversion status from standard.
         /// </summary>
-        public bool Convert { get; set; }
+        public bool IsConvert { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
