@@ -209,8 +209,10 @@ public partial class DBusMgrNew : CompositeDrawable
 
         this.currentConnection!.UnregisterObject(mdBusObject);
 
+        string serviceName = registedObjects[mdBusObject];
+
         if (mdBusObject.IsService)
-            await this.currentConnection!.UnregisterServiceAsync(mdBusObject.CustomRegisterName).ConfigureAwait(false);
+            await this.currentConnection!.UnregisterServiceAsync(serviceName).ConfigureAwait(false);
     }
 
     #endregion
