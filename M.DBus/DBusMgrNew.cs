@@ -189,12 +189,14 @@ public partial class DBusMgrNew : CompositeDrawable
         if (!registedObjects.ContainsKey(mdBusObject))
             return RegisterResult.NO_SUCH_OBJECT;
 
+        string? srvName = registedObjects.GetValueOrDefault(mdBusObject);
+
         if (!registedObjects.TryRemove(mdBusObject, out _))
             return RegisterResult.FAILED;
 
         this.currentConnection?.UnregisterObject(mdBusObject);
 
-        Task.Run(() => unRegisterFromConnectionTask(mdBusObject));
+        Task.Run(() => unRegisterFromConnectionTask(mdBusObject, srvName!));
         return RegisterResult.OK;
     }
 
@@ -203,13 +205,11 @@ public partial class DBusMgrNew : CompositeDrawable
     /// <br/>
     /// 如果连接没准备好，则不会做任何事
     /// </summary>
-    private async Task unRegisterFromConnectionTask(IMDBusObject mdBusObject)
+    private async Task unRegisterFromConnectionTask(IMDBusObject mdBusObject, string serviceName)
     {
         if (!ConnectionReady()) return;
 
         this.currentConnection!.UnregisterObject(mdBusObject);
-
-        string serviceName = registedObjects[mdBusObject];
 
         if (mdBusObject.IsService)
             await this.currentConnection!.UnregisterServiceAsync(serviceName).ConfigureAwait(false);
