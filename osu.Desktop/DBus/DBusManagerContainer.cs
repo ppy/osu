@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Play;
 using osu.Game.Users;
 
 namespace osu.Desktop.DBus
@@ -115,6 +117,12 @@ namespace osu.Desktop.DBus
 
         private readonly Bindable<string> iconName = new Bindable<string>();
 
+        public void OnScreenChange(IScreen next)
+        {
+            if (mprisService != null)
+                mprisService.AudioControlDisabled = next is Player or PlayerLoader;
+        }
+
         #region IDBusManagerContainer
 
         public void Add(IMDBusObject obj)
@@ -179,7 +187,12 @@ namespace osu.Desktop.DBus
                 canonicalTrayService ?? null,
             });
 
-            mprisService = new MprisPlayerService();
+            var newMpris = new MprisPlayerService
+            {
+                AudioControlDisabled = mprisService?.AudioControlDisabled ?? false
+            };
+
+            mprisService = newMpris;
 
             beatmapService = new BeatmapInfoDBusService();
             audioservice = new AudioInfoDBusService();

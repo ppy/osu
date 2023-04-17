@@ -1,4 +1,3 @@
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -48,11 +47,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     Current = config.GetBindable<double>(MSetting.DBusWaitOnline)
                 }
             };
-
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
-            {
-                intergrationCheckbox.SetNoticeText("非Linux平台可能需要自行安装并启用DBus", true);
-            }
 
             dbusWaitOnlineSlider.Current.BindValueChanged(v =>
             {

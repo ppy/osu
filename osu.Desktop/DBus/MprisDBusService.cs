@@ -72,10 +72,17 @@ namespace osu.Desktop.DBus
             }
         }
 
+        internal bool AudioControlDisabled { get; set; }
+
+        private bool beatmapDisabled;
+
         internal bool BeatmapDisabled
         {
+            get => beatmapDisabled;
             set
             {
+                beatmapDisabled = value;
+
                 playerProperties.CanGoNext = !value;
                 playerProperties.CanGoPrevious = !value;
                 playerProperties.CanSeek = !value;
@@ -203,36 +210,54 @@ namespace osu.Desktop.DBus
 
         public Task NextAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Next?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PreviousAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Previous?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PauseAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Pause?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PlayPauseAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             PlayPause?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task StopAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Stop?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PlayAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Play?.Invoke();
             playerProperties._PlaybackStatus = "Playing";
             return Task.CompletedTask;
@@ -240,12 +265,18 @@ namespace osu.Desktop.DBus
 
         public Task SeekAsync(long offset)
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Seek?.Invoke(offset);
             return Task.CompletedTask;
         }
 
         public Task SetPositionAsync(ObjectPath trackId, long position)
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             SetPosition?.Invoke(position);
             return Task.CompletedTask;
         }

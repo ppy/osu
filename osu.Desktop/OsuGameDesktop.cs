@@ -186,6 +186,8 @@ namespace osu.Desktop
         {
             base.ScreenChanged(lastScreen, newScreen);
 
+            dBusManagerContainer?.OnScreenChange(newScreen);
+
             switch (newScreen)
             {
                 case IntroScreen introScreen:
