@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double scoreAccuracy;
         private double? estimatedUr;
         private bool isLegacyScore;
         private double[] hitWindows;
@@ -52,7 +51,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            scoreAccuracy = calculateCustomAccuracy();
             isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && !Precision.DefinitelyBigger(totalJudgements, maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount);
             hitWindows = isLegacyScore ? getLegacyHitWindows(score, maniaAttributes) : getLazerHitWindows(score, maniaAttributes);
             estimatedUr = computeEstimatedUr(maniaAttributes);
@@ -80,23 +78,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2) // Star rating to pp curve
-                                     * Math.Max(0, 5 * scoreAccuracy - 4) // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
-                                     * (1 + 0.1 * Math.Min(1, (attributes.NoteCount + attributes.HoldNoteCount) / 1500.0)); // Length bonus, capped at 1500 notes
+            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2)
+                                     * (1 + 0.1 * Math.Min(1, (attributes.NoteCount + attributes.HoldNoteCount) / 1500.0)); // Star rating to pp curve
+
+            if (estimatedUr == null)
+                return 0;
+
+            difficultyValue *= Math.Max(SpecialFunctions.Erf(260 / estimatedUr.Value) * (1 - Math.Pow(estimatedUr.Value / 1000, 1.3)), 0); // UR to multiplier curve, see https://www.desmos.com/calculator/2hqbzcfh79
 
             return difficultyValue;
         }
 
         private double totalJudgements => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulJudgements => countPerfect + countOk + countGreat + countGood + countMeh;
-
-        private double calculateCustomAccuracy()
-        {
-            if (totalJudgements == 0)
-                return 0;
-
-            return (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalJudgements * 320);
-        }
 
         /// <summary>
         /// Returns the estimated tapping deviation of the score, assuming the average hit location is in the center of the hit window.

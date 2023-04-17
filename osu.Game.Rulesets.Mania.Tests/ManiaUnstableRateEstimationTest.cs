@@ -33,14 +33,26 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void Test1(double expectedEstimatedUnstableRate, int[] judgements, string name)
             => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name);
 
-        // General test to make sure UR estimation isn't changed by anything, within a margin of +-0.001 UR. Tests rate changes as well.
+        // General test to make sure UR estimation isn't changed by anything, inclusive of rate changing, within a margin of +-0.001 UR.
         [TestCase(309.990234375d, new[] { 5336, 3886, 1661, 445, 226, 293 }, "ur-estimation-test")]
         public void Test1ClockRateAdjusted(double expectedEstimatedUnstableRate, int[] judgements, string name)
             => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name, new ManiaModDoubleTime());
 
+        // Ensure the UR estimation only returns null when it is supposed to.
+        [TestCase(false, new[] { 1, 0, 0, 0, 0, 0 })]
+        [TestCase(true, new[] { 0, 0, 0, 0, 0, 1 })]
+        [TestCase(true, new[] { 0, 0, 0, 0, 0, 0 })]
+        public void Test2(bool returnsNull, int[] judgements)
+            => TestNullUnstableRate(returnsNull, judgements);
+
+        // Ensure the estimated deviation doesn't reach too high of a value in a single note situation, as a sanity check.
+        [TestCase(new[] { 0, 0, 0, 0, 1, 0 })]
+        public void Test3(int[] judgements)
+            => TestSingleNoteBound(judgements);
+
         // Compares the true hit windows to the hit windows computed manually in perfcalc, within a margin of error of +-0.000001ms.
         [TestCase(7.0d, "ur-estimation-test")]
-        public void Test2(double overallDifficulty, string name)
+        public void Test4(double overallDifficulty, string name)
             => TestHitWindows(overallDifficulty, name);
 
         protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, string name, params Mod[] mods)
@@ -65,6 +77,54 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
             Assert.That(perfAttributes.EstimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
+        }
+
+        protected void TestNullUnstableRate(bool expectedNullStatus, int[] judgementCounts)
+        {
+            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 10 };
+
+            var judgements = new Dictionary<HitResult, int>
+            {
+                { HitResult.Perfect, judgementCounts[0] },
+                { HitResult.Great, judgementCounts[1] },
+                { HitResult.Good, judgementCounts[2] },
+                { HitResult.Ok, judgementCounts[3] },
+                { HitResult.Meh, judgementCounts[4] },
+                { HitResult.Miss, judgementCounts[5] }
+            };
+
+            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo
+            {
+                Statistics = judgements
+            }, attributes);
+
+            bool isNull = perfAttributes.EstimatedUr == null;
+
+            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
+            Assert.That(isNull, Is.EqualTo(expectedNullStatus), "The estimated mania UR was/wasn't null.");
+        }
+
+        protected void TestSingleNoteBound(int[] judgementCounts)
+        {
+            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 0 };
+
+            var judgements = new Dictionary<HitResult, int>
+            {
+                { HitResult.Perfect, judgementCounts[0] },
+                { HitResult.Great, judgementCounts[1] },
+                { HitResult.Good, judgementCounts[2] },
+                { HitResult.Ok, judgementCounts[3] },
+                { HitResult.Meh, judgementCounts[4] },
+                { HitResult.Miss, judgementCounts[5] }
+            };
+
+            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo
+            {
+                Statistics = judgements
+            }, attributes);
+
+            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
+            Assert.That(perfAttributes.EstimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
         }
 
         protected void TestHitWindows(double overallDifficulty, string name)
