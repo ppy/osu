@@ -382,13 +382,12 @@ namespace Mvis.Plugin.CloudMusicSupport
 
                 currentLine = value;
 
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                {
-                    dbusObject.RawLyric = value.Content;
-                    dbusObject.TranslatedLyric = value.TranslatedString;
+                if (RuntimeInfo.OS != RuntimeInfo.Platform.Linux) return;
 
-                    lyricEntry.Label = value.Content + "\n" + value.TranslatedString;
-                }
+                dbusObject.RawLyric = value.Content;
+                dbusObject.TranslatedLyric = value.TranslatedString;
+
+                lyricEntry.Label = $"♩: {value.TranslatedString}\n♪: {value.Content}";
             }
         }
 

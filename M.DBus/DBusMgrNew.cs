@@ -180,9 +180,17 @@ public partial class DBusMgrNew : CompositeDrawable
         OnObjectRegisteredToConnection?.Invoke(obj);
     }
 
-    public RegisterResult UnRegisterObject(IMDBusObject? mdBusObject)
+    /// <summary>
+    /// 从当前连接移除DBus对象
+    /// </summary>
+    /// <param name="mdBusObject">要移除的对象</param>
+    /// <param name="failSoft">对象不在注册表中时返回<see cref="RegisterResult.FAILED"/>而不是抛出异常</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">给定的对象不在注册表中</exception>
+    public RegisterResult UnRegisterObject(IMDBusObject? mdBusObject, bool failSoft = false)
     {
         Logger.Log($"Unregister object: {mdBusObject}", level: LogLevel.Debug);
+
         if (mdBusObject == null)
             return RegisterResult.NULL_OBJECT;
 
@@ -192,7 +200,11 @@ public partial class DBusMgrNew : CompositeDrawable
         string? srvName = registedObjects.GetValueOrDefault(mdBusObject);
 
         if (!registedObjects.TryRemove(mdBusObject, out _))
-            return RegisterResult.FAILED;
+        {
+            if (failSoft) return RegisterResult.FAILED;
+
+            throw new InvalidOperationException($"The given object ({mdBusObject}) does not exist in the current registry");
+        }
 
         this.currentConnection?.UnregisterObject(mdBusObject);
 
