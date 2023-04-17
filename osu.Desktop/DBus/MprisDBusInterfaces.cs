@@ -142,6 +142,12 @@ namespace osu.Desktop.DBus
             return ServiceUtils.CheckifContained(this, prop, members);
         }
 
+        internal IDictionary<string, object> GetMembers()
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return members;
+        }
+
         internal string _PlaybackStatus = "Paused";
 
         public string PlaybackStatus
@@ -240,9 +246,13 @@ namespace osu.Desktop.DBus
 
         public bool CanPause => _CanPause;
 
-        private readonly bool _CanSeek = true;
+        private bool _CanSeek = true;
 
-        public bool CanSeek => _CanSeek;
+        public bool CanSeek
+        {
+            get => _CanSeek;
+            set => _CanSeek = value;
+        }
 
         private readonly bool _CanControl = true;
 

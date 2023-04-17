@@ -14,7 +14,7 @@ namespace M.DBus;
 public partial class DBusMgrNew : CompositeDrawable
 {
     private Connection? currentConnection;
-    private ConnectionState connectionState = ConnectionState.Disconnected;
+    public ConnectionState ConnectionState { get; private set; } = ConnectionState.Disconnected;
 
     private string targetUrl = Address.Session;
 
@@ -63,13 +63,13 @@ public partial class DBusMgrNew : CompositeDrawable
                 throw new NullDependencyException("Called StartConnect but DBusConnection is not ready!");
 
             this.currentConnection = new Connection(TargetURL);
-            this.connectionState = ConnectionState.Connecting;
+            this.ConnectionState = ConnectionState.Connecting;
 
             // Await for connection to finish
             await currentConnection.ConnectAsync().ConfigureAwait(false);
             currentConnection.StateChanged += onConnectionStateChanged;
 
-            this.connectionState = ConnectionState.Connected;
+            this.ConnectionState = ConnectionState.Connected;
 
             // Resolve all previously registed objects to DBus
             foreach (var keyValuePair in registedObjects)
@@ -79,7 +79,7 @@ public partial class DBusMgrNew : CompositeDrawable
         }
         catch (Exception e)
         {
-            this.connectionState = ConnectionState.Disconnected;
+            this.ConnectionState = ConnectionState.Disconnected;
             Logger.Error(e, "初始化到DBus的连接时出现异常");
         }
         finally
@@ -107,7 +107,7 @@ public partial class DBusMgrNew : CompositeDrawable
 
         Logger.Log($"-----------------------End State Report---------------------------------------");
 
-        this.connectionState = e.State;
+        this.ConnectionState = e.State;
     }
 
     public void Disconnect()
@@ -191,7 +191,7 @@ public partial class DBusMgrNew : CompositeDrawable
         if (!registedObjects.TryRemove(mdBusObject, out _))
             return RegisterResult.FAILED;
 
-        this.currentConnection!.UnregisterObject(mdBusObject);
+        this.currentConnection?.UnregisterObject(mdBusObject);
 
         Task.Run(() => unRegisterFromConnectionTask(mdBusObject));
         return RegisterResult.OK;
@@ -272,7 +272,7 @@ public partial class DBusMgrNew : CompositeDrawable
 
     public bool ConnectionReady()
     {
-        return this.connectionState == ConnectionState.Connected && this.currentConnection != null;
+        return this.ConnectionState == ConnectionState.Connected && this.currentConnection != null;
     }
 
     protected override void Dispose(bool isDisposing)

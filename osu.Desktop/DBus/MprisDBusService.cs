@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using M.DBus;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.LLin.Misc;
@@ -77,14 +78,44 @@ namespace osu.Desktop.DBus
             {
                 playerProperties.CanGoNext = !value;
                 playerProperties.CanGoPrevious = !value;
+                playerProperties.CanSeek = !value;
+
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoNext", playerProperties.CanGoNext));
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoPrevious", playerProperties.CanGoPrevious));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanSeek", playerProperties.CanSeek));
             }
         }
 
         internal long Progress
         {
             set => Set(nameof(playerProperties.Position), value);
+        }
+
+        internal void TriggerAll()
+        {
+            var members = ServiceUtils.GetMembers(playerProperties);
+
+            foreach (var keyValuePair in members)
+            {
+                var val = ServiceUtils.GetValueFor(playerProperties, keyValuePair.Key, members);
+
+                Logger.Log($"Triggering {keyValuePair.Key} --> {val}");
+
+                if (val != null)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(keyValuePair.Key, val));
+            }
+
+            var m2Members = ServiceUtils.GetMembers(mp2Properties);
+
+            foreach (var keyValuePair in m2Members)
+            {
+                var val = ServiceUtils.GetValueFor(mp2Properties, keyValuePair.Key, m2Members);
+
+                Logger.Log($"Triggering {keyValuePair.Key} --> {val}");
+
+                if (val != null)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(keyValuePair.Key, val));
+            }
         }
 
         //Position可以直接调用OnPropertiesChanged

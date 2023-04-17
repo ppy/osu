@@ -46,6 +46,13 @@ namespace osu.Desktop.DBus.Tray
         private readonly ConcurrentDictionary<int, SimpleEntry> entriesFlatMap = new ConcurrentDictionary<int, SimpleEntry>();
         private readonly ConcurrentDictionary<SimpleEntry, List<SimpleEntry>> entryChildren = new ConcurrentDictionary<SimpleEntry, List<SimpleEntry>>();
 
+        public SimpleEntry[] GetEntries()
+        {
+            return entriesFlatMap.Values
+                                 .Where(e => !e.Children.Any())
+                                 .ToArray();
+        }
+
         private void addEntry(SimpleEntry entry, bool onlyUpdateEntryIndex = false)
         {
             if (entry is RootEntry)

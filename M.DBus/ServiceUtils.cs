@@ -21,7 +21,14 @@ namespace M.DBus
             var dictionary = new Dictionary<string, object>();
 
             foreach (var memberInfo in target.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty))
-                dictionary[memberInfo.Name] = memberInfo;
+            {
+                if (!memberInfo.Name.StartsWith(".", StringComparison.Ordinal)
+                    && !memberInfo.Name.StartsWith("get_", StringComparison.Ordinal)
+                    && !memberInfo.Name.StartsWith("set_", StringComparison.Ordinal))
+                {
+                    dictionary[memberInfo.Name] = memberInfo;
+                }
+            }
 
             return dictionary;
         }

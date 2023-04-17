@@ -15,12 +15,26 @@ namespace osu.Desktop.DBus.Tray
     {
         private DBusMgrNew dBusManager;
 
-        public readonly TrayIconService KdeTrayService = new TrayIconService();
-        public readonly CanonicalTrayService CanonicalTrayService = new CanonicalTrayService();
+        public TrayIconService KdeTrayService { get; private set; } = new TrayIconService();
+        public CanonicalTrayService CanonicalTrayService { get; private set; } = new CanonicalTrayService();
+
+        public void ReloadTray()
+        {
+            var prevCanonicalSrv = this.CanonicalTrayService;
+
+            this.KdeTrayService = new TrayIconService();
+            this.CanonicalTrayService = new CanonicalTrayService();
+
+            this.CanonicalTrayService.AddEntryRange(prevCanonicalSrv.GetEntries());
+        }
 
         internal void SetDBusManager(DBusMgrNew dBusManager)
         {
+            if (this.dBusManager == dBusManager) return;
+
             this.dBusManager = dBusManager;
+
+            ReloadTray();
 
             dBusManager.OnObjectRegisteredToConnection += o =>
             {
@@ -48,6 +62,11 @@ namespace osu.Desktop.DBus.Tray
             }
 
             return true;
+        }
+
+        public SimpleEntry[] GetEntries()
+        {
+            return CanonicalTrayService.GetEntries();
         }
 
         public void AddEntry(SimpleEntry entry)
