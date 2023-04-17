@@ -127,8 +127,8 @@ namespace osu.Desktop.DBus
 
         public void Add(IMDBusObject obj)
         {
-            if (!string.IsNullOrEmpty(obj.CustomRegisterName))
-                Logger.Log($"Adding {obj} lasted result {DBusManager.RegisterObject(obj)}");
+            var result = DBusManager.RegisterObject(obj);
+            Logger.Log($"Adding {obj} lasted result {result}", level: LogLevel.Debug);
         }
 
         public void AddRange(IEnumerable<IMDBusObject> objects)
