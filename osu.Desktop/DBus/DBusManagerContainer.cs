@@ -266,7 +266,11 @@ namespace osu.Desktop.DBus
             config.BindWith(MSetting.EnableTray, enableTray);
             config.BindWith(MSetting.TrayIconName, iconName);
 
+            AddInternal(trayManager);
+
             reloadServices();
+
+            this.trayManager.SetDBusManager(DBusManager);
 
             void postConnect()
             {
@@ -303,8 +307,6 @@ namespace osu.Desktop.DBus
                 //workaround: 执行到这里时一些dbus服务可能还没注册完成，因此延迟一些时间执行这些
                 Scheduler.AddDelayed(() =>
                 {
-                    this.trayManager.SetDBusManager(DBusManager);
-
                     enableTray.BindValueChanged(onEnableTrayChanged, true);
 
                     enableSystemNotifications!.BindValueChanged(systemNotificationManager.OnEnableNotificationsChanged, true);
@@ -363,13 +365,13 @@ namespace osu.Desktop.DBus
 
                 kdeTrayService!.WindowRaise = raiseWindow;
 
-                Add(canonicalTrayService!);
                 Add(kdeTrayService!);
+                Add(canonicalTrayService!);
             }
             else
             {
-                Remove(canonicalTrayService!);
                 Remove(kdeTrayService!);
+                Remove(canonicalTrayService!);
             }
         }
 

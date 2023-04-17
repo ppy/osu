@@ -22,13 +22,38 @@ namespace osu.Desktop.DBus.Tray
     /// 似乎dde不支持com.canonical.dbusmenu?<br/>
     /// https://github.com/linuxdeepin/dtkwidget/issues/85
     /// </summary>
-    public class CanonicalTrayService : IMDBusObject, IDBusMenu
+    public class CanonicalTrayService : IMDBusObject, IDBusMenu, ICloneable
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/MenuBar");
 
         public string CustomRegisterName => "io.matrix_feather.dbus.menu";
         public bool IsService => true;
+
+        public object Clone()
+        {
+            var instance = new CanonicalTrayService
+            {
+                canonicalProperties =
+                {
+                    Status = this.canonicalProperties.Status,
+                    Version = this.canonicalProperties.Version,
+                    TextDirection = this.canonicalProperties.TextDirection,
+                    IconThemePath = this.canonicalProperties.IconThemePath
+                },
+
+                menuRevision = this.menuRevision
+            };
+
+            instance.AddEntryRange(this.GetEntries());
+
+            instance.OnEntriesUpdated = this.OnEntriesUpdated;
+            instance.OnPropertiesChanged = this.OnPropertiesChanged;
+            instance.OnLayoutUpdated = this.OnLayoutUpdated;
+            instance.OnItemActivationRequested = this.OnItemActivationRequested;
+
+            return instance;
+        }
 
         #region Canonical DBus
 
@@ -46,11 +71,11 @@ namespace osu.Desktop.DBus.Tray
         private readonly ConcurrentDictionary<int, SimpleEntry> entriesFlatMap = new ConcurrentDictionary<int, SimpleEntry>();
         private readonly ConcurrentDictionary<SimpleEntry, List<SimpleEntry>> entryChildren = new ConcurrentDictionary<SimpleEntry, List<SimpleEntry>>();
 
+        private readonly List<SimpleEntry> rawEntries = new List<SimpleEntry>();
+
         public SimpleEntry[] GetEntries()
         {
-            return entriesFlatMap.Values
-                                 .Where(e => !e.Children.Any())
-                                 .ToArray();
+            return rawEntries.ToArray();
         }
 
         private void addEntry(SimpleEntry entry, bool onlyUpdateEntryIndex = false)
@@ -81,13 +106,16 @@ namespace osu.Desktop.DBus.Tray
                         if (oldChildren != null)
                         {
                             //先从flatMap中移除所有旧的Entry
-                            foreach (var simpleEntry in oldChildren)
-                                entriesFlatMap.TryRemove(simpleEntry.ChildId, out _);
+                            foreach (var oldChild in oldChildren)
+                                entriesFlatMap.TryRemove(oldChild.ChildId, out _);
                         }
 
                         //然后再添加到Flatmap中
-                        foreach (var simpleEntry in children)
-                            addEntry(simpleEntry, true);
+                        foreach (var childEntry in children)
+                        {
+                            childEntry.ParentId = entry.ChildId;
+                            addEntry(childEntry, true);
+                        }
                     }
 
                     notifyLayoutUpdate(entry);
@@ -105,13 +133,18 @@ namespace osu.Desktop.DBus.Tray
 
         public void AddEntryRange(SimpleEntry[] entries)
         {
-            foreach (var entry in entries) addEntry(entry);
+            foreach (var entry in entries)
+            {
+                rawEntries.Add(entry);
+                addEntry(entry);
+            }
 
             notifyLayoutUpdate();
         }
 
         public void AddEntryToMenu(SimpleEntry entry)
         {
+            rawEntries.Add(entry);
             addEntry(entry);
             notifyLayoutUpdate();
         }
@@ -120,6 +153,8 @@ namespace osu.Desktop.DBus.Tray
         {
             lock (entriesFlatMap)
             {
+                rawEntries.Remove(entry);
+
                 var key = entriesFlatMap.FirstOrDefault(p => p.Value == entry);
 
                 if (key.Value != null)

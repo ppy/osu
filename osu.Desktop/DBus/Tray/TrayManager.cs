@@ -22,10 +22,12 @@ namespace osu.Desktop.DBus.Tray
         {
             var prevCanonicalSrv = this.CanonicalTrayService;
 
-            this.KdeTrayService = new TrayIconService();
-            this.CanonicalTrayService = new CanonicalTrayService();
+            this.KdeTrayService = (TrayIconService)KdeTrayService.Clone();
+            this.CanonicalTrayService = (CanonicalTrayService)CanonicalTrayService.Clone();
 
-            this.CanonicalTrayService.AddEntryRange(prevCanonicalSrv.GetEntries());
+            //this.CanonicalTrayService.AddEntryRange(prevCanonicalSrv.GetEntries());
+
+            trayWatcher = null;
         }
 
         internal void SetDBusManager(DBusMgrNew dBusManager)
@@ -38,7 +40,7 @@ namespace osu.Desktop.DBus.Tray
 
             dBusManager.OnObjectRegisteredToConnection += o =>
             {
-                if (o is TrayIconService)
+                if (o is TrayIconService && trayWatcher == null)
                     this.Scheduler.AddDelayed(() =>
                         Task.Run(ConnectToWatcher), 300);
             };

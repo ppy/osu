@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -216,6 +217,8 @@ public partial class DBusMgrNew : CompositeDrawable
 
     #region Object Resolving
 
+    private readonly List<string> resolvedServiceNames = new List<string>();
+
     private async Task resolveOwnerTask(IMDBusObject obj)
     {
         if (!ConnectionReady())
@@ -224,12 +227,18 @@ public partial class DBusMgrNew : CompositeDrawable
         string serviceName = registedObjects[obj];
 
         Debug.Assert(currentConnection != null, nameof(currentConnection) + " != null");
-        await currentConnection.ResolveServiceOwnerAsync
-        (
-            serviceName,
-            onServiceNameChanged,
-            e => onServiceError(e, obj)
-        ).ConfigureAwait(false);
+
+        if (!resolvedServiceNames.Contains(serviceName))
+        {
+            await currentConnection.ResolveServiceOwnerAsync
+            (
+                serviceName,
+                onServiceNameChanged,
+                e => onServiceError(e, serviceName)
+            ).ConfigureAwait(false);
+
+            resolvedServiceNames.Add(serviceName);
+        }
 
         Logger.Log($"为{obj.ObjectPath}注册{serviceName}", level: LogLevel.Debug);
     }
@@ -239,11 +248,9 @@ public partial class DBusMgrNew : CompositeDrawable
         Logger.Log($"服务 '{args.ServiceName}' 的归属现在从 '{args.OldOwner}' 变为 '{args.NewOwner}'");
     }
 
-    private void onServiceError(Exception e, IMDBusObject dBusObject)
+    private void onServiceError(Exception e, string serviceName)
     {
         if (e is ObjectDisposedException) return;
-
-        string serviceName = registedObjects[dBusObject];
 
         Logger.Error(e, $"位于 '{serviceName}' 的DBus服务出现错误");
     }

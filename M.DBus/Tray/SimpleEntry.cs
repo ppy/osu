@@ -29,6 +29,8 @@ namespace M.DBus.Tray
 
         public int ChildId { get; protected set; } = -1;
 
+        public int ParentId = -1;
+
         public Action OnPropertyChanged;
 
         public void TriggerPropertyChangedEvent() => OnPropertyChanged?.Invoke();

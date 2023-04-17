@@ -11,7 +11,7 @@ namespace osu.Desktop.DBus.Tray
     /// <summary>
     ///     WIP
     /// </summary>
-    public class TrayIconService : IMDBusObject, IStatusNotifierItem
+    public class TrayIconService : IMDBusObject, IStatusNotifierItem, ICloneable
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/StatusNotifierItem");
@@ -49,6 +49,45 @@ namespace osu.Desktop.DBus.Tray
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
         {
             return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
+        }
+
+        public object Clone()
+        {
+            var instance = new TrayIconService
+            {
+                KdeProperties =
+                {
+                    IconName = this.KdeProperties.IconName,
+                    Category = this.KdeProperties.Category,
+                    Id = this.KdeProperties.Id,
+                    IconPixmap = this.KdeProperties.IconPixmap,
+                    Title = this.KdeProperties.Title,
+                    Menu = this.KdeProperties.Menu,
+                    Status = this.KdeProperties.Status,
+                    ToolTip = this.KdeProperties.ToolTip,
+                    WindowId = this.KdeProperties.WindowId,
+                    AttentionIconName = this.KdeProperties.AttentionIconName,
+                    AttentionIconPixmap = this.KdeProperties.AttentionIconPixmap,
+                    AttentionMovieName = this.KdeProperties.AttentionMovieName,
+                    IconThemePath = this.KdeProperties.IconThemePath,
+                    ItemIsMenu = this.KdeProperties.ItemIsMenu,
+                    OverlayIconName = this.KdeProperties.OverlayIconName,
+                    OverlayIconPixmap = this.KdeProperties.OverlayIconPixmap
+                },
+
+                WindowRaise = this.WindowRaise,
+            };
+
+            instance.OnIconChanged = this.OnIconChanged;
+            instance.OnMenuCreated = this.OnMenuCreated;
+            instance.OnPropertiesChanged = this.OnPropertiesChanged;
+            instance.OnStatusChanged = this.OnStatusChanged;
+            instance.OnTitleChanged = this.OnTitleChanged;
+            instance.OnTooltipChanged = this.OnTooltipChanged;
+            instance.OnNewAttentionIcon = this.OnNewAttentionIcon;
+            instance.OnOverlayIconChanged = this.OnOverlayIconChanged;
+
+            return instance;
         }
 
         #region KDE DBus
