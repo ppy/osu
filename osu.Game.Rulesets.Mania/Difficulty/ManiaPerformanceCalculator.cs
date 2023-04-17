@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (estimatedUr == null)
                 return 0;
 
-            difficultyValue *= Math.Max(SpecialFunctions.Erf(260 / estimatedUr.Value) * (1 - Math.Pow(estimatedUr.Value / 1000, 1.3)), 0); // UR to multiplier curve, see https://www.desmos.com/calculator/m0t9pqjjja
+            difficultyValue *= Math.Max(SpecialFunctions.Erf(260 / estimatedUr.Value) * (1 - Math.Pow(estimatedUr.Value / 700, 1.7)), 0); // UR to multiplier curve, see https://www.desmos.com/calculator/fx1anl8ftd
 
             return difficultyValue;
         }
