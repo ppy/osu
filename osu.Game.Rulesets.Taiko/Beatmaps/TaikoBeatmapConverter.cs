@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         private const float taiko_base_distance = 100;
 
         /// <summary>
-        /// The minimum time to leave between flourishes that are added to strong hits.
+        /// The minimum time to leave between flourishes that are added to strong rim hits.
         /// </summary>
         private const double time_between_flourishes = 2000;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double? lastFlourish = null;
             converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(x =>
             {
-                if (x is not TaikoStrongableHitObject hitObj || !hitObj.IsStrong || ((Hit)hitObj).Type != HitType.Rim)
+                if (x is not Hit hitObj || !hitObj.IsStrong || hitObj.Type != HitType.Rim)
                     return x;
 
                 if (lastFlourish == null || Math.Abs(hitObj.StartTime - (double)lastFlourish) >= time_between_flourishes)
