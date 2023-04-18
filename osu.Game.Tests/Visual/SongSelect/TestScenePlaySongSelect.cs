@@ -1073,14 +1073,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
 
-            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matching beatmaps");
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
 
             addRulesetImportStep(0);
 
-            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matching beatmaps");
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
             AddStep("delete all beatmaps", () => manager.Delete());
             AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
-            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matching beatmaps");
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
         }
 
         private void waitForInitialSelection()
