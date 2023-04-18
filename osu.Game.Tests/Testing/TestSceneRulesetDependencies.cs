@@ -51,8 +51,8 @@ namespace osu.Game.Tests.Testing
         {
             AddStep("ruleset shaders retrieved without error", () =>
             {
-                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestVertex.vs");
-                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestFragment.fs");
+                Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestVertex.vs");
+                Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestFragment.fs");
             });
         }
 
