@@ -19,31 +19,32 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         public Bindable<SampleBalance> Balance = new Bindable<SampleBalance>(SampleBalance.C);
-        private readonly Bindable<double> balanceDouble = new Bindable<double>();
+
+        private readonly Bindable<double> balanceBindable = new Bindable<double>();
         private const double stereo_separation = 0.2;
 
         public DrumSampleTriggerSource(HitObjectContainer hitObjectContainer)
             : base(hitObjectContainer)
         {
-            Balance.ValueChanged += @event =>
+            Balance.ValueChanged += change =>
             {
-                switch (@event.NewValue)
+                switch (change.NewValue)
                 {
                     case SampleBalance.L:
-                        balanceDouble.Value = -stereo_separation;
+                        balanceBindable.Value = -stereo_separation;
                         break;
 
                     case SampleBalance.C:
-                        balanceDouble.Value = 0;
+                        balanceBindable.Value = 0;
                         break;
 
                     case SampleBalance.R:
-                        balanceDouble.Value = stereo_separation;
+                        balanceBindable.Value = stereo_separation;
                         break;
                 }
             };
 
-            AudioMixer.Balance.BindTo(balanceDouble);
+            AudioMixer.Balance.BindTo(balanceBindable);
         }
 
         public void Play(HitType hitType)
@@ -60,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 _ => throw new InvalidOperationException(@"Attempted to trigger sample playback of an invalid HitType")
             };
 
-            if (hitType is HitType.StrongRim or HitType.StrongCentre || (hitType == HitType.Centre && hitObject.SampleControlPoint.SampleVolume >= TaikoHitSampleInfo.SAMPLE_VOLUME_THRESHOLD_HARD))
+            if (hitType is HitType.StrongRim or HitType.StrongCentre)
                 FlushPlayback();
 
             var scp = hitObject.SampleControlPoint;
