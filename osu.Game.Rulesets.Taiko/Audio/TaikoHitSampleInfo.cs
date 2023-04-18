@@ -28,23 +28,31 @@ namespace osu.Game.Rulesets.Taiko.Audio
             {
                 List<string> lookupNames = new List<string>();
 
-                // custom sample sets should still take priority
+                string velocity = Volume switch
+                {
+                    >= SAMPLE_VOLUME_THRESHOLD_HARD => "hard",
+                    >= SAMPLE_VOLUME_THRESHOLD_MEDIUM => "medium",
+                    _ => "soft"
+                };
+
+                // Custom sample sets should still take priority
                 if (!string.IsNullOrEmpty(Suffix))
                     lookupNames.Add($"Gameplay/{Bank}-{Name}{Suffix}");
 
                 switch (Name)
                 {
-                    // flourish shouldn't fallback to anything, it should just not play if missing
+                    // Flourish shouldn't fallback to anything, it should just not play if missing
                     case TAIKO_STRONG_FLOURISH:
                         lookupNames.Add(@$"Gameplay/{Name}");
 
                         return lookupNames;
 
+                    // Strongs should fallback to normals (for non-Argon skins, etc), so the hits remain audible. Playback of strongs cancels playback of the triggering
+                    // normal hits (to prevent overlapping samples) - see DrumSamplePlayer
                     case TAIKO_STRONG_HIT:
                     case TAIKO_STRONG_CLAP:
                         lookupNames.Add(@$"Gameplay/{Name}");
 
-                        // fallback to a standard hit/clip (for non-Argon skins)
                         string? fallback = Name switch
                         {
                             TAIKO_STRONG_HIT => HIT_NORMAL,
@@ -54,27 +62,19 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
                         if (fallback != null)
                         {
-                            lookupNames.Add($"Gameplay/taiko-{fallback}");
+                            lookupNames.Add($"Gameplay/taiko-{Bank}-{fallback}");
                             lookupNames.Add($"Gameplay/{Bank}-{fallback}");
                         }
 
-                        break;
+                        return lookupNames;
 
                     case HIT_NORMAL:
                     case HIT_CLAP:
-                        string velocitySuffix = Volume switch
-                        {
-                            >= SAMPLE_VOLUME_THRESHOLD_HARD => "hard",
-                            >= SAMPLE_VOLUME_THRESHOLD_MEDIUM => "medium",
-                            _ => "soft"
-                        };
-
-                        lookupNames.Add($"Gameplay/taiko-{Name}-{velocitySuffix}");
-                        lookupNames.Add($"Gameplay/taiko-{Name}");
-
+                        lookupNames.Add($"Gameplay/taiko-{Name}-{velocity}");
                         break;
                 }
 
+                lookupNames.Add($"Gameplay/taiko-{Bank}-{Name}");
                 lookupNames.Add($"Gameplay/{Bank}-{Name}");
                 return lookupNames;
             }
