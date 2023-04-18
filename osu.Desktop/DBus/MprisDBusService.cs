@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using M.DBus;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.LLin.Misc;
@@ -20,6 +21,7 @@ namespace osu.Desktop.DBus
         public static readonly ObjectPath PATH = new ObjectPath("/org/mpris/MediaPlayer2");
 
         public string CustomRegisterName => "org.mpris.MediaPlayer2.mfosu";
+        public bool IsService => true;
 
         private readonly PlayerProperties playerProperties = new PlayerProperties();
 
@@ -70,20 +72,57 @@ namespace osu.Desktop.DBus
             }
         }
 
+        internal bool AudioControlDisabled { get; set; }
+
+        private bool beatmapDisabled;
+
         internal bool BeatmapDisabled
         {
+            get => beatmapDisabled;
             set
             {
+                beatmapDisabled = value;
+
                 playerProperties.CanGoNext = !value;
                 playerProperties.CanGoPrevious = !value;
+                playerProperties.CanSeek = !value;
+
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoNext", playerProperties.CanGoNext));
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoPrevious", playerProperties.CanGoPrevious));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanSeek", playerProperties.CanSeek));
             }
         }
 
         internal long Progress
         {
             set => Set(nameof(playerProperties.Position), value);
+        }
+
+        internal void TriggerAll()
+        {
+            var members = ServiceUtils.GetMembers(playerProperties);
+
+            foreach (var keyValuePair in members)
+            {
+                var val = ServiceUtils.GetValueFor(playerProperties, keyValuePair.Key, members);
+
+                Logger.Log($"Triggering {keyValuePair.Key} --> {val}");
+
+                if (val != null)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(keyValuePair.Key, val));
+            }
+
+            var m2Members = ServiceUtils.GetMembers(mp2Properties);
+
+            foreach (var keyValuePair in m2Members)
+            {
+                var val = ServiceUtils.GetValueFor(mp2Properties, keyValuePair.Key, m2Members);
+
+                Logger.Log($"Triggering {keyValuePair.Key} --> {val}");
+
+                if (val != null)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(keyValuePair.Key, val));
+            }
         }
 
         //Position可以直接调用OnPropertiesChanged
@@ -95,11 +134,10 @@ namespace osu.Desktop.DBus
             {
                 long oldval = (long)playerProperties.Metadata["mpris:length"];
 
-                if (oldval != value)
-                {
-                    playerProperties.Metadata["mpris:length"] = value;
-                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
-                }
+                if (oldval == value) return;
+
+                playerProperties.Metadata["mpris:length"] = value;
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
             }
         }
 
@@ -172,36 +210,54 @@ namespace osu.Desktop.DBus
 
         public Task NextAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Next?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PreviousAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Previous?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PauseAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Pause?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PlayPauseAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             PlayPause?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task StopAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Stop?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task PlayAsync()
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Play?.Invoke();
             playerProperties._PlaybackStatus = "Playing";
             return Task.CompletedTask;
@@ -209,12 +265,18 @@ namespace osu.Desktop.DBus
 
         public Task SeekAsync(long offset)
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             Seek?.Invoke(offset);
             return Task.CompletedTask;
         }
 
         public Task SetPositionAsync(ObjectPath trackId, long position)
         {
+            if (AudioControlDisabled)
+                return Task.CompletedTask;
+
             SetPosition?.Invoke(position);
             return Task.CompletedTask;
         }

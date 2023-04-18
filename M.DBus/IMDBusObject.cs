@@ -4,6 +4,11 @@ namespace M.DBus
 {
     public interface IMDBusObject : IDBusObject
     {
-        public string CustomRegisterName { get; }
+        /// <summary>
+        /// Service name
+        /// </summary>
+        public string? CustomRegisterName { get; }
+
+        public bool IsService { get; }
     }
 }

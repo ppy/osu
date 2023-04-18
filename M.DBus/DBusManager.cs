@@ -63,61 +63,6 @@ namespace M.DBus
 
         #endregion
 
-/*
-        #region 断开连接
-
-        public bool Disconnect()
-        {
-            Logger.Log("正在断开连接!");
-
-            try
-            {
-                switch (connectionState)
-                {
-                    case ConnectionState.Connected:
-                        GreetService.SwitchState(false, "Diconnecting");
-
-                        //反注册物件
-                        currentConnection.UnregisterObjects(registerDictionary.Keys);
-
-                        //foreach (var dBusObject in registerDictionary.Keys)
-                        //    unRegisterFromConnection(dBusObject).ConfigureAwait(false);
-
-                        //清除当前连接目标
-                        currentConnectTarget = string.Empty;
-
-                        currentConnection.Dispose();
-                        currentConnection = null;
-                        break;
-
-                    case ConnectionState.Connecting:
-                        //如果正在连接，中断当前任务
-                        cancellationTokenSource?.Cancel();
-                        break;
-
-                    case ConnectionState.Faulted:
-                        currentConnection.Dispose();
-                        currentConnection = null;
-                        Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
-                        break;
-                }
-
-                connectionState = ConnectionState.NotConnected;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "停止DBus服务时出现了错误");
-                connectionState = ConnectionState.Faulted;
-
-                return false;
-            }
-
-            return true;
-        }
-
-        #endregion
-*/
-
         #region 工具
 
         public async Task GetAllServices()

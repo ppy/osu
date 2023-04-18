@@ -133,7 +133,7 @@ namespace M.DBus.Services.Kde
 
         private string _Title = "mfosu";
 
-        private string _Status = "osu";
+        private string _Status = "Active";
 
         private int _WindowId;
 

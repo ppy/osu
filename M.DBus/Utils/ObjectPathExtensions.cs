@@ -5,6 +5,13 @@ namespace M.DBus.Utils
     public static class ObjectPathExtensions
     {
         public static string ToServiceName(this ObjectPath path)
-            => path.ToString().Replace('/', '.').Remove(0, 1);
+        {
+            string str = path.ToString().Replace('/', '.').Remove(0, 1);
+
+            if (str.EndsWith('.'))
+                str = str.Remove(str.Length - 1, 1);
+
+            return str;
+        }
     }
 }

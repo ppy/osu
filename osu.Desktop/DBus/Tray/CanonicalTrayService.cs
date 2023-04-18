@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using M.DBus;
 using M.DBus.Services.Canonical;
 using M.DBus.Tray;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
+using osu.Framework.Development;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
@@ -20,12 +22,38 @@ namespace osu.Desktop.DBus.Tray
     /// 似乎dde不支持com.canonical.dbusmenu?<br/>
     /// https://github.com/linuxdeepin/dtkwidget/issues/85
     /// </summary>
-    public class CanonicalTrayService : IMDBusObject, IDBusMenu
+    public class CanonicalTrayService : IMDBusObject, IDBusMenu, ICloneable
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/MenuBar");
 
         public string CustomRegisterName => "io.matrix_feather.dbus.menu";
+        public bool IsService => true;
+
+        public object Clone()
+        {
+            var instance = new CanonicalTrayService
+            {
+                canonicalProperties =
+                {
+                    Status = this.canonicalProperties.Status,
+                    Version = this.canonicalProperties.Version,
+                    TextDirection = this.canonicalProperties.TextDirection,
+                    IconThemePath = this.canonicalProperties.IconThemePath
+                },
+
+                menuRevision = this.menuRevision
+            };
+
+            instance.AddEntryRange(this.GetEntries());
+
+            instance.OnEntriesUpdated = this.OnEntriesUpdated;
+            instance.OnPropertiesChanged = this.OnPropertiesChanged;
+            instance.OnLayoutUpdated = this.OnLayoutUpdated;
+            instance.OnItemActivationRequested = this.OnItemActivationRequested;
+
+            return instance;
+        }
 
         #region Canonical DBus
 
@@ -40,69 +68,131 @@ namespace osu.Desktop.DBus.Tray
 
         #region 列表物件存储
 
-        private readonly Dictionary<int, SimpleEntry> entries = new Dictionary<int, SimpleEntry>();
+        private readonly ConcurrentDictionary<int, SimpleEntry> entriesFlatMap = new ConcurrentDictionary<int, SimpleEntry>();
+        private readonly ConcurrentDictionary<SimpleEntry, List<SimpleEntry>> entryChildren = new ConcurrentDictionary<SimpleEntry, List<SimpleEntry>>();
 
-        private int lastEntryId = 1;
+        private readonly List<SimpleEntry> rawEntries = new List<SimpleEntry>();
 
-        private void addEntry(SimpleEntry entry)
+        public SimpleEntry[] GetEntries()
+        {
+            return rawEntries.ToArray();
+        }
+
+        private void addEntry(SimpleEntry entry, bool onlyUpdateEntryIndex = false)
         {
             if (entry is RootEntry)
                 throw new InvalidOperationException("不能添加RootEntry");
 
-            lock (entries)
-            {
-                rootEntry.Children.Add(entry);
-                entries[lastEntryId] = entry;
-                entry.OnPropertyChanged = () => triggerLayoutUpdate(entry);
+            Logger.Log($"Adding entry {entry} with id {entry.ChildId} to Index...", level: LogLevel.Debug);
 
-                lastEntryId++;
+            lock (entriesFlatMap)
+            {
+                if (!onlyUpdateEntryIndex)
+                    rootEntry.Children.Add(entry);
+
+                entriesFlatMap[entry.ChildId] = entry;
+
+                //当此Child属性发生改变时更新Layout
+                entry.OnPropertyChanged = () =>
+                {
+                    Logger.Log($"OnChanged: {entry}, ChildModified: {entry.ChildModified}", level: LogLevel.Debug);
+
+                    //如果子目录发生改变，则更新子目录
+                    if (entry.ChildModified)
+                    {
+                        var children = getChildren(entry);
+                        var oldChildren = entryChildren.GetValueOrDefault(entry);
+
+                        if (oldChildren != null)
+                        {
+                            //先从flatMap中移除所有旧的Entry
+                            foreach (var oldChild in oldChildren)
+                                entriesFlatMap.TryRemove(oldChild.ChildId, out _);
+                        }
+
+                        //然后再添加到Flatmap中
+                        foreach (var childEntry in children)
+                        {
+                            childEntry.ParentId = entry.ChildId;
+                            addEntry(childEntry, true);
+                        }
+                    }
+
+                    notifyLayoutUpdate(entry);
+                };
+
+                if (entry.Children.Count <= 0) return;
+
+                var children = this.getChildren(entry);
+                this.entryChildren[entry] = children.ToList();
+
+                foreach (var simpleEntry in this.getChildren(entry))
+                    this.addEntry(simpleEntry, true);
             }
         }
 
         public void AddEntryRange(SimpleEntry[] entries)
         {
-            foreach (var entry in entries) addEntry(entry);
+            foreach (var entry in entries)
+            {
+                rawEntries.Add(entry);
+                addEntry(entry);
+            }
 
-            triggerLayoutUpdate();
+            notifyLayoutUpdate();
         }
 
         public void AddEntryToMenu(SimpleEntry entry)
         {
+            rawEntries.Add(entry);
             addEntry(entry);
-            triggerLayoutUpdate();
+            notifyLayoutUpdate();
         }
 
         public void RemoveEntryFromMenu(SimpleEntry entry)
         {
-            lock (entries)
+            lock (entriesFlatMap)
             {
-                var key = entries.FirstOrDefault(p => p.Value == entry);
+                rawEntries.Remove(entry);
+
+                var key = entriesFlatMap.FirstOrDefault(p => p.Value == entry);
 
                 if (key.Value != null)
                 {
-                    entries.Remove(key.Key);
+                    entriesFlatMap.Remove(key.Key, out _);
                     rootEntry.Children.Remove(key.Value);
+
+                    var children = entryChildren.GetValueOrDefault(entry);
+
+                    if (children != null)
+                    {
+                        foreach (var simpleEntry in children)
+                            entriesFlatMap.TryRemove(simpleEntry.ChildId, out _);
+                    }
                 }
                 else
                     throw new InvalidOperationException($"给定的 {entry} 不在列表中");
 
-                triggerLayoutUpdate();
+                notifyLayoutUpdate();
             }
         }
 
-        private void triggerLayoutUpdate(SimpleEntry entry = null)
+        private void notifyLayoutUpdate(SimpleEntry entry = null)
         {
+            invalidateLayout();
             menuRevision++;
 
-            entry ??= rootEntry;
-            //Logger.Log($"{entry.ToString().Replace("\n", "\\n")}发生了变化");
+            lock (entriesFlatMap)
+            {
+                entry ??= rootEntry;
+            }
 
-            int childId = (int)entry.ChildId;
-
-            updatedEntries[childId] = entry;
+            int childId = entry.ChildId;
 
             if (entry.ChildrenDisplay == ChildrenDisplayType.Submenu)
+            {
                 OnLayoutUpdated?.Invoke((menuRevision, childId));
+            }
             else
             {
                 OnEntriesUpdated?.Invoke((new[]
@@ -114,60 +204,35 @@ namespace osu.Desktop.DBus.Tray
 
         #endregion
 
-        private int dbusItemMaxOrder;
-        private readonly Dictionary<int, SimpleEntry> updatedEntries = new Dictionary<int, SimpleEntry>();
-        private (uint menuRevision, (int, IDictionary<string, object>, object[])) cachedLayoutObject;
+        private (uint revision, (int, IDictionary<string, object>, object[]) layout) cachedLayout;
+
+        private void invalidateLayout()
+        {
+            this.layoutValid = false;
+        }
+
+        private bool layoutValid;
 
         public Task<(uint revision, (int, IDictionary<string, object>, object[]) layout)> GetLayoutAsync(int parentId, int recursionDepth, string[] propertyNames)
         {
-            //Logger.Log($"方法被调用：GetLayoutAsync: parentId: {parentId} | recursionDepth: {recursionDepth}", level: LogLevel.Verbose);
+            Logger.Log($"方法被调用：GetLayoutAsync: parentId: {parentId} | recursionDepth: {recursionDepth}", level: LogLevel.Debug);
 
             try
             {
-                (uint menuRevision, (int, IDictionary<string, object>, object[])) result;
+                SimpleEntry target;
 
-                if (updatedEntries.Count != 0)
+                lock (entriesFlatMap)
                 {
-                    //Logger.Log("刷新DBus目录缓存", level: LogLevel.Verbose);
-                    IDictionary<int, SimpleEntry> additDict;
-                    //int addit;
-
-                    result = (menuRevision, rootEntry.ToDbusObject(
-                        (int)rootEntry.ChildId,
-                        dbusItemMaxOrder,
-                        out additDict));
-
-                    //缓存当前结果到cachedLayoutObject中
-                    cachedLayoutObject = result;
-
-                    //更新最大id
-                    dbusItemMaxOrder += additDict.Count;
-
-                    //递归检查所有新增的SimpleEntry
-                    lock (entries)
-                    {
-                        foreach (var kvp in additDict)
-                        {
-                            //尝试添加到entries中, 如果成功, 订阅OnPropertyChanged
-                            if (entries.TryAdd(kvp.Key, kvp.Value))
-                                kvp.Value.OnPropertyChanged = () => triggerLayoutUpdate(kvp.Value);
-                        }
-                    }
-
-                    //因为Layout已经更新，updatedEntries中现有的值已经不需要了，故对其清空
-                    updatedEntries.Clear();
+                    target = parentId == 0
+                        ? rootEntry
+                        : entriesFlatMap.FirstOrDefault(e => e.Key == parentId).Value;
                 }
 
-                //如果parentID是0, 返回缓存的列表
-                if (parentId == 0)
-                    return Task.FromResult(cachedLayoutObject);
+                var result = layoutValid ? cachedLayout : (menuRevision, target.ToDbusObject(out _));
+                this.cachedLayout = result;
+                layoutValid = true;
 
-                var target = entries.FirstOrDefault(e => e.Key == parentId).Value;
-
-                result = (menuRevision, target.ToDbusObject(
-                    (int)target.ChildId,
-                    int.MinValue, //转换在上方已经完成了，因此在这里不要传递dbusItemMaxOrder
-                    out _)); //同上
+                Logger.Log($"Result: REVISION: {menuRevision} :: EntryID: {result.Item2.Item1} :: SubMenusSize: {result.Item2.Item3.Length}", level: LogLevel.Debug);
 
                 return Task.FromResult(result);
             }
@@ -178,9 +243,26 @@ namespace osu.Desktop.DBus.Tray
             }
         }
 
+        private List<SimpleEntry> getChildren(SimpleEntry entry)
+        {
+            var list = new List<SimpleEntry>();
+
+            if (entry.Children.Count == 0) return list;
+
+            foreach (var simpleEntry in entry.Children)
+            {
+                list.Add(simpleEntry);
+
+                if (simpleEntry.Children.Count > 0)
+                    list.AddRange(getChildren(simpleEntry));
+            }
+
+            return list;
+        }
+
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
         {
-            Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
+            Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Debug);
             //foreach (var id in ids) Logger.Log(id.ToString());
 
             try
@@ -189,7 +271,7 @@ namespace osu.Desktop.DBus.Tray
 
                 foreach (int id in ids)
                 {
-                    var target = entries.FirstOrDefault(k => k.Key == id);
+                    var target = entriesFlatMap.FirstOrDefault(k => k.Key == id);
                     if (target.Value == null) continue;
 
                     result.Add(target.Value.ToDbusObject());
@@ -214,6 +296,8 @@ namespace osu.Desktop.DBus.Tray
         {
             var eventType = eventId.ToEventType();
 
+            Logger.Log($"Event Async -> {id} :: {eventId} :: {data} :: {timestamp}", level: LogLevel.Debug);
+
             switch (eventType)
             {
                 case EventType.Clicked:
@@ -221,8 +305,16 @@ namespace osu.Desktop.DBus.Tray
 
                     try
                     {
-                        target = entries.FirstOrDefault(p => p.Key == id).Value;
-                        target.OnActive?.Invoke();
+                        target = entriesFlatMap.FirstOrDefault(p => p.Key == id).Value;
+                        target?.OnActive?.Invoke();
+
+                        if (DebugUtils.IsDebugBuild)
+                        {
+                            Logger.Log($"Get target entry: {target}");
+
+                            foreach (var keyValuePair in entriesFlatMap)
+                                Logger.Log($"Entries :: Id: {keyValuePair.Key} --> {keyValuePair.Value.ChildId} :: {keyValuePair.Value.Label}");
+                        }
                     }
                     catch (Exception e)
                     {
@@ -248,9 +340,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<int[]> EventGroupAsync((int, string, object, uint)[] events)
         {
             foreach (var obj in events)
-            {
                 EventAsync(obj.Item1, obj.Item2, obj.Item3, obj.Item4);
-            }
 
             Logger.Log($"未完全实现的方法被调用：EventGroupAsync: {events}");
             return Task.FromResult(Array.Empty<int>());
@@ -258,11 +348,19 @@ namespace osu.Desktop.DBus.Tray
 
         public Task<bool> AboutToShowAsync(int id)
         {
-            Logger.Log($"方法被调用: AboutToShowAsync id: {id}", level: LogLevel.Verbose);
+            try
+            {
+                //bool returnValue = id == 0 || entriesFlatMap.ContainsKey(id);
+                //Logger.Log($"方法被调用: AboutToShowAsync id: {id} -> {returnValue}", level: LogLevel.Debug);
 
-            var returnValue = updatedEntries.ContainsKey(id);
+                return Task.FromResult(false);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "???");
+            }
 
-            return Task.FromResult(returnValue);
+            return Task.FromResult(false);
         }
 
         public Task<(int[] updatesNeeded, int[] idErrors)> AboutToShowGroupAsync(int[] ids)

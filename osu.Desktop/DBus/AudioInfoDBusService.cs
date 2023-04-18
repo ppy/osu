@@ -19,7 +19,8 @@ namespace osu.Desktop.DBus
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/Audio");
 
-        public string CustomRegisterName { get; } = string.Empty;
+        public string? CustomRegisterName => null;
+        public bool IsService => true;
 
         public WorkingBeatmap? Beatmap { get; set; }
 

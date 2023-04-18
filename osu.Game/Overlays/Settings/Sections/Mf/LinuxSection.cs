@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private void load(MConfigManager config, OsuConfigManager osuConfig, GameHost host)
         {
             Add(new LinuxSettings());
+            Add(new DBusSettings());
         }
     }
 }

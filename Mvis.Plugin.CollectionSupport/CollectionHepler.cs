@@ -130,7 +130,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         private void onMvisExiting()
         {
-            PluginManager!.UnRegisterDBusObject(new CollectionDBusObject());
+            PluginManager!.UnRegisterDBusObject(dBusObject);
 
             if (!Disabled.Value)
                 PluginManager.RemoveDBusMenuEntry(trayEntry);

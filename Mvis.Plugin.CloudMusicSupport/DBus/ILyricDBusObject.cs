@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using M.DBus;
 using Tmds.DBus;
 
@@ -63,7 +64,10 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mvis/lyric");
         public ObjectPath ObjectPath => PATH;
 
-        public string CustomRegisterName { get; } = string.Empty;
+        [CanBeNull]
+        public string CustomRegisterName => null;
+
+        public bool IsService => true;
 
         internal string RawLyric
         {
