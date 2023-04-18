@@ -51,9 +51,13 @@ namespace osu.Game.Rulesets.Mania.Tests
             => TestSingleNoteBound(judgements);
 
         // Compares the true hit windows to the hit windows computed manually in perfcalc, within a margin of error of +-0.000001ms.
-        [TestCase(7.0d, "ur-estimation-test")]
-        public void Test4(double overallDifficulty, string name)
-            => TestHitWindows(overallDifficulty, name);
+        [TestCase(0.0d)]
+        [TestCase(2.5d)]
+        [TestCase(5.0d)]
+        [TestCase(7.5d)]
+        [TestCase(10.0d)]
+        public void Test4(double overallDifficulty)
+            => TestHitWindows(overallDifficulty);
 
         protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, string name, params Mod[] mods)
         {
@@ -127,9 +131,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             Assert.That(perfAttributes.EstimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
         }
 
-        protected void TestHitWindows(double overallDifficulty, string name)
+        protected void TestHitWindows(double overallDifficulty)
         {
-            DifficultyAttributes attributes = new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, getBeatmap(name)).Calculate();
+            DifficultyAttributes attributes = new ManiaDifficultyAttributes { OverallDifficulty = overallDifficulty };
 
             var hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(overallDifficulty);
@@ -143,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 hitWindows.WindowFor(HitResult.Meh)
             };
 
-            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo(getBeatmap(name).BeatmapInfo), attributes);
+            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo(), attributes);
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
             Assert.That(perfAttributes.HitWindows, Is.EqualTo(trueHitWindows).Within(0.000001), "The true mania hit windows are different to the ones calculated in ManiaPerformanceCalculator.");
