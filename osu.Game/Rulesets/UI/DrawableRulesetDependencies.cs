@@ -206,27 +206,11 @@ namespace osu.Game.Rulesets.UI
                 this.parent = parent;
             }
 
-            // When the debugger is attached, exceptions are expensive.
-            // Manually work around this by caching failed lookups and falling back straight to parent.
-            private readonly HashSet<(string, string)> failedLookups = new HashSet<(string, string)>();
+            public override IShader? GetCachedShader(string vertex, string fragment) => base.GetCachedShader(vertex, fragment) ?? parent.GetCachedShader(vertex, fragment);
 
-            public override IShader Load(string vertex, string fragment)
-            {
-                if (!failedLookups.Contains((vertex, fragment)))
-                {
-                    try
-                    {
-                        return base.Load(vertex, fragment);
-                    }
-                    catch
-                    {
-                        // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                        failedLookups.Add((vertex, fragment));
-                    }
-                }
+            public override IShaderPart? GetCachedShaderPart(string name) => base.GetCachedShaderPart(name) ?? parent.GetCachedShaderPart(name);
 
-                return parent.Load(vertex, fragment);
-            }
+            public override byte[]? GetRawData(string fileName) => base.GetRawData(fileName) ?? parent.GetRawData(fileName);
         }
     }
 }
