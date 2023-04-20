@@ -167,7 +167,7 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         public double DistanceSpacing { get; set; } = 1.0;
 
-        public int BeatDivisor { get; set; }
+        public int BeatDivisor { get; set; } = 4;
 
         public int GridSize { get; set; }
 
