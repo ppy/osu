@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Music
                 var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
                 titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-                titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
+                titlePart.DrawablePartsRecreated += _ => updateSelectionState(SelectedSet.Value, instant: true);
 
                 text.AddText(@"  "); // to separate the title from the artist.
                 text.AddText(artist, sprite =>
@@ -66,25 +66,22 @@ namespace osu.Game.Overlays.Music
                     sprite.Padding = new MarginPadding { Top = 1 };
                 });
 
-                SelectedSet.BindValueChanged(set =>
-                {
-                    bool newSelected = set.NewValue?.Equals(Model) == true;
-
-                    if (newSelected == selected)
-                        return;
-
-                    selected = newSelected;
-                    updateSelectionState(false);
-                }, true);
-
-                updateSelectionState(true);
+                SelectedSet.BindValueChanged(set => updateSelectionState(set.NewValue, instant: false));
+                updateSelectionState(SelectedSet.Value, instant: true);
             });
         }
 
         private bool selected;
 
-        private void updateSelectionState(bool instant)
+        private void updateSelectionState(Live<BeatmapSetInfo> selectedSet, bool instant)
         {
+            bool newSelected = selectedSet?.Equals(Model) == true;
+
+            if (newSelected == selected && !instant) // instant updates should forcibly set correct state regardless of previous state.
+                return;
+
+            selected = newSelected;
+
             foreach (Drawable s in titlePart.Drawables)
                 s.FadeColour(selected ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
         }
