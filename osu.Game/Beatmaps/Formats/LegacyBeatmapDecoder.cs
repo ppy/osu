@@ -13,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -234,11 +235,15 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.BeatmapInfo.Bookmarks = pair.Value.ToString().Split(',').Select(v =>
+                    var bookmarkList = new List<int>();
+
+                    // LINQ is not avaiable for ref struct
+                    foreach (var range in pair.Value.Split(','))
                     {
-                        bool result = int.TryParse(v, out int val);
-                        return new { result, val };
-                    }).Where(p => p.result).Select(p => p.val).ToArray();
+                        if (int.TryParse(pair.Value[range], out int result))
+                            bookmarkList.Add(result);
+                    }
+                    beatmap.BeatmapInfo.Bookmarks = bookmarkList.ToArray();
                     break;
 
                 case @"DistanceSpacing":
@@ -348,23 +353,30 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvent(ReadOnlySpan<char> line)
         {
-            string[] split = line.ToString().Split(',');
+            var split = line.Split(',');
 
-            if (!Enum.TryParse(split[0], out LegacyEventType type))
-                throw new InvalidDataException($@"Unknown event type: {split[0]}");
+            split.MoveNext(); // split[0]
+            if (!Enum.TryParse(split.CurrentSpan, out LegacyEventType type))
+                throw new InvalidDataException($@"Unknown event type: {split.CurrentSpan}");
 
             switch (type)
             {
                 case LegacyEventType.Sprite:
+                    split.MoveNext(); // split[1]
+                    split.MoveNext(); // split[2]
+                    split.MoveNext(); // split[3]
+
                     // Generally, the background is the first thing defined in a beatmap file.
                     // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
                     // Allow the first sprite (by file order) to act as the background in such cases.
                     if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.CurrentSpan);
                     break;
 
                 case LegacyEventType.Video:
-                    string filename = CleanFilename(split[2]);
+                    split.MoveNext(); // split[1]
+                    split.MoveNext(); // split[2]
+                    string filename = CleanFilename(split.CurrentSpan);
 
                     // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                     // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
@@ -377,12 +389,16 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case LegacyEventType.Background:
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
+                    split.MoveNext(); // split[1]
+                    split.MoveNext(); // split[2]
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.CurrentSpan);
                     break;
 
                 case LegacyEventType.Break:
-                    double start = getOffsetTime(Parsing.ParseDouble(split[1]));
-                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
+                    split.MoveNext(); // split[1]
+                    double start = getOffsetTime(Parsing.ParseDouble(split.CurrentSpan));
+                    split.MoveNext(); // split[2]
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split.CurrentSpan)));
 
                     beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
@@ -391,49 +407,65 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoint(ReadOnlySpan<char> line)
         {
-            string[] split = line.ToString().Split(',');
+            var split = line.Split(',');
 
-            double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+            split.MoveNext(); // split[0]
+            double time = getOffsetTime(Parsing.ParseDouble(split.CurrentSpan));
 
+            split.MoveNext(); // split[1]
             // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
-            double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
+            double beatLength = Parsing.ParseDouble(split.CurrentSpan, allowNaN: true);
 
             // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
-            if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split[2]));
+            if (split.MoveNext()) // split[2]
+                timeSignature = split.CurrentSpan[0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split.CurrentSpan));
 
             LegacySampleBank sampleSet = defaultSampleBank;
-            if (split.Length >= 4)
-                sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
+            if (split.MoveNext()) // split[3]
+                sampleSet = (LegacySampleBank)Parsing.ParseInt(split.CurrentSpan);
 
             int customSampleBank = 0;
-            if (split.Length >= 5)
-                customSampleBank = Parsing.ParseInt(split[4]);
+            if (split.MoveNext()) // split[4]
+                customSampleBank = Parsing.ParseInt(split.CurrentSpan);
 
             int sampleVolume = defaultSampleVolume;
-            if (split.Length >= 6)
-                sampleVolume = Parsing.ParseInt(split[5]);
+            if (split.MoveNext()) // split[5]
+                sampleVolume = Parsing.ParseInt(split.CurrentSpan);
 
             bool timingChange = true;
-            if (split.Length >= 7)
-                timingChange = split[6][0] == '1';
+            if (split.MoveNext()) // split[6]
+                timingChange = split.CurrentSpan[0] == '1';
 
             bool kiaiMode = false;
             bool omitFirstBarSignature = false;
 
-            if (split.Length >= 8)
+            if (split.MoveNext()) // split[7]
             {
-                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split.CurrentSpan);
                 kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
                 omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
-            string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
-            if (stringSampleSet == @"none")
-                stringSampleSet = @"normal";
+            string stringSampleSet;
+
+            switch (sampleSet)
+            {
+                default:
+                case LegacySampleBank.Normal:
+                    stringSampleSet = @"normal";
+                    break;
+
+                case LegacySampleBank.Soft:
+                    stringSampleSet = @"soft";
+                    break;
+
+                case LegacySampleBank.Drum:
+                    stringSampleSet = @"drum";
+                    break;
+            }
 
             if (timingChange)
             {

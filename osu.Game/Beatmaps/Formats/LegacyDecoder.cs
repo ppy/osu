@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
 using osuTK.Graphics;
@@ -101,21 +102,25 @@ namespace osu.Game.Beatmaps.Formats
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
-            string[] split = pair.Value.ToString().Split(',');
-
-            if (split.Length != 3 && split.Length != 4)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
-
             Color4 colour;
 
             try
             {
-                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
+                var split = pair.Value.Split(',');
+
+                split.MoveNext();
+                byte r = byte.Parse(split.CurrentSpan);
+                split.MoveNext();
+                byte g = byte.Parse(split.CurrentSpan);
+                split.MoveNext();
+                byte b = byte.Parse(split.CurrentSpan);
+
+                byte alpha = allowAlpha && split.MoveNext() ? byte.Parse(split.CurrentSpan) : (byte)255;
+                colour = new Color4(r, g, b, alpha);
             }
             catch
             {
-                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+                throw new InvalidOperationException($@"Color must be specified in R,G,B or R,G,B,A with 8-bit integer components. Got {pair.Value}.");
             }
 
             if (isCombo)
@@ -186,10 +191,11 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected string CleanFilename(string path) => path
+        protected string CleanFilename(ReadOnlySpan<char> path) => path
+                                                       .Trim('"')
+                                                       .ToString()
                                                        // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
                                                        .Replace(@"\\", @"\")
-                                                       .Trim('"')
                                                        .ToStandardisedPath();
 
         public enum Section
