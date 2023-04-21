@@ -6,9 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Extensions;
 
 namespace osu.Game.Skinning
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             currentConfig = null;
         }
 
-        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
+        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
                     switch (pair.Key)
                     {
                         case "Keys":
-                            currentConfig = new LegacyManiaSkinConfiguration(int.Parse(pair.Value, CultureInfo.InvariantCulture));
+                            currentConfig = new LegacyManiaSkinConfiguration(Parsing.ParseInt(pair.Value));
 
                             // Silently ignore duplicate configurations.
                             if (output.All(c => c.Keys != currentConfig.Keys))
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
                             break;
 
                         default:
-                            pendingLines.Add(line);
+                            pendingLines.Add(line.ToString());
 
                             // Hold all lines until a "Keys" item is found.
                             if (currentConfig != null)
@@ -70,7 +70,7 @@ namespace osu.Game.Skinning
 
             foreach (string line in pendingLines)
             {
-                var pair = SplitKeyVal(line);
+                var pair = SplitKeyVal(line.AsSpan());
 
                 switch (pair.Key)
                 {
@@ -87,15 +87,15 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.HitPosition = (480 - Math.Clamp(Parsing.ParseFloat(pair.Value), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
-                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.LightPosition = (480 - Parsing.ParseFloat(pair.Value)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "ScorePosition":
-                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ScorePosition = Parsing.ParseFloat(pair.Value) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
@@ -120,20 +120,20 @@ namespace osu.Game.Skinning
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.WidthForNoteHeightScale = Parsing.ParseFloat(pair.Value) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
-                    case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line, true);
                         break;
 
                     // Custom sprite paths
-                    case string when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
-                        currentConfig.ImageLookups[pair.Key] = pair.Value;
+                    case { } when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                        currentConfig.ImageLookups[pair.Key.ToString()] = pair.Value.ToString();
                         break;
                 }
             }
@@ -141,16 +141,17 @@ namespace osu.Game.Skinning
             pendingLines.Clear();
         }
 
-        private void parseArrayValue(string value, float[] output, bool applyScaleFactor = true)
+        private void parseArrayValue(ReadOnlySpan<char> value, float[] output, bool applyScaleFactor = true)
         {
-            string[] values = value.Split(',');
+            int i = 0;
 
-            for (int i = 0; i < values.Length; i++)
+            foreach (var range in value.Split(','))
             {
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                output[i] = Parsing.ParseFloat(value[range]) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                i++;
             }
         }
     }
