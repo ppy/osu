@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(SkinConfiguration skin, Section section, ReadOnlySpan<char> line)
         {
             if (section != Section.Colours)
             {
@@ -25,11 +26,11 @@ namespace osu.Game.Skinning
                         switch (pair.Key)
                         {
                             case @"Name":
-                                skin.SkinInfo.Name = pair.Value;
+                                skin.SkinInfo.Name = pair.Value.ToString();
                                 return;
 
                             case @"Author":
-                                skin.SkinInfo.Creator = pair.Value;
+                                skin.SkinInfo.Creator = pair.Value.ToString();
                                 return;
 
                             case @"Version":
@@ -50,8 +51,8 @@ namespace osu.Game.Skinning
                         return;
                 }
 
-                if (!string.IsNullOrEmpty(pair.Key))
-                    skin.ConfigDictionary[pair.Key] = pair.Value;
+                if (!pair.Key.IsEmpty)
+                    skin.ConfigDictionary[pair.Key.ToString()] = pair.Value.ToString();
             }
 
             base.ParseLine(skin, section, line);
