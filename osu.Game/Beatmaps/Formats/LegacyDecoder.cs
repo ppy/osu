@@ -161,20 +161,6 @@ namespace osu.Game.Beatmaps.Formats
                 return index == -1
                     ? new SpanPair
                     {
-                        Key = line,
-                        Value = default
-                    }
-                    : new SpanPair
-                    {
-                        Key = line[0..index],
-                        Value = line[(index + 1)..]
-                    };
-            }
-            else
-            {
-                return index == -1
-                    ? new SpanPair
-                    {
                         Key = line.Trim(),
                         Value = default
                     }
@@ -182,6 +168,20 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         Key = line[0..index].Trim(),
                         Value = line[(index + 1)..].Trim()
+                    };
+            }
+            else
+            {
+                return index == -1
+                    ? new SpanPair
+                    {
+                        Key = line,
+                        Value = default
+                    }
+                    : new SpanPair
+                    {
+                        Key = line[0..index],
+                        Value = line[(index + 1)..]
                     };
             }
         }
