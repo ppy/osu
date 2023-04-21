@@ -201,10 +201,26 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             usableAreaQuad *= matrix;
 
             IsWithinBounds =
-                tabletArea.Contains(usableAreaQuad.TopLeft) &&
-                tabletArea.Contains(usableAreaQuad.TopRight) &&
-                tabletArea.Contains(usableAreaQuad.BottomLeft) &&
-                tabletArea.Contains(usableAreaQuad.BottomRight);
+                tabletArea.TopLeft.X < usableAreaQuad.TopLeft.X &&
+                tabletArea.TopLeft.Y < usableAreaQuad.TopLeft.Y &&
+                tabletArea.BottomLeft.X < usableAreaQuad.BottomLeft.X &&
+                tabletArea.BottomLeft.Y > usableAreaQuad.BottomLeft.Y &&
+                tabletArea.TopRight.X > usableAreaQuad.TopRight.X &&
+                tabletArea.TopRight.Y < usableAreaQuad.TopRight.Y &&
+                tabletArea.BottomRight.X > usableAreaQuad.BottomRight.X &&
+                tabletArea.BottomRight.Y > usableAreaQuad.BottomRight.Y;
+
+            //flag is a hypothetical settings checkbox
+            bool flag = true;
+            if(!IsWithinBounds && flag){
+                //Snap to top left
+                Vector2 newLocation = new Vector2(tabletArea.TopLeft.X + halfUsableArea.X, tabletArea.TopLeft.Y + halfUsableArea.Y);
+                usableAreaContainer.MoveTo(newLocation, 100, Easing.OutQuint);
+                areaOffset.Value = newLocation;
+                IsWithinBounds = tabletArea.Contains(newLocation);
+                Console.WriteLine("kok");
+            }
+            
 
             usableFill.FadeColour(IsWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
