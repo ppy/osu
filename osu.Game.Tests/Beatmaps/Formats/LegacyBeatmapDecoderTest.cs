@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
-using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
