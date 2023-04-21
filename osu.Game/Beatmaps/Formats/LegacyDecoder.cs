@@ -33,21 +33,22 @@ namespace osu.Game.Beatmaps.Formats
 
             while ((line = stream.ReadLine()) != null)
             {
+                ReadOnlySpan<char> lineSpan = line;
                 if (ShouldSkipLine(line))
                     continue;
 
                 if (section != Section.Metadata)
                 {
                     // comments should not be stripped from metadata lines, as the song metadata may contain "//" as valid data.
-                    line = StripComments(line);
+                    lineSpan = StripComments(lineSpan);
                 }
 
-                line = line.TrimEnd();
+                lineSpan = lineSpan.TrimEnd();
 
-                if (line.StartsWith('[') && line.EndsWith(']'))
+                if (lineSpan[0] == '[' && lineSpan[^1] == ']')
                 {
-                    if (!Enum.TryParse(line[1..^1], out section))
-                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
+                    if (!Enum.TryParse(lineSpan[1..^1], out section))
+                        Logger.Log($"Unknown section \"{lineSpan}\" in \"{output}\"");
 
                     OnBeginNewSection(section);
                     continue;
@@ -55,11 +56,11 @@ namespace osu.Game.Beatmaps.Formats
 
                 try
                 {
-                    ParseLine(output, section, line);
+                    ParseLine(output, section, lineSpan);
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
+                    Logger.Log($"Failed to process line \"{lineSpan}\" into \"{output}\": {e.Message}");
                 }
             }
         }
@@ -84,11 +85,11 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected string StripComments(string line)
+        protected ReadOnlySpan<char> StripComments(ReadOnlySpan<char> line)
         {
-            int index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.IndexOf("//");
             if (index > 0)
-                return line.Substring(0, index);
+                return line[..index];
 
             return line;
         }
