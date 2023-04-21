@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
@@ -140,6 +141,49 @@ namespace osu.Game.Beatmaps.Formats
                 split[0],
                 split.Length > 1 ? split[1] : string.Empty
             );
+        }
+
+        protected ref struct SpanPair
+        {
+            // Use tuple when ref struct in generic parameter is a thing
+            public ReadOnlySpan<char> Key;
+            public ReadOnlySpan<char> Value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected SpanPair SplitKeyVal(ReadOnlySpan<char> line, char separator = ':', bool shouldTrim = true)
+        {
+            // https://github.com/dotnet/runtime/issues/934
+            int index = line.IndexOf(separator);
+
+            if (shouldTrim)
+            {
+                return index == -1
+                    ? new SpanPair
+                    {
+                        Key = line,
+                        Value = default
+                    }
+                    : new SpanPair
+                    {
+                        Key = line[0..index],
+                        Value = line[(index + 1)..]
+                    };
+            }
+            else
+            {
+                return index == -1
+                    ? new SpanPair
+                    {
+                        Key = line.Trim(),
+                        Value = default
+                    }
+                    : new SpanPair
+                    {
+                        Key = line[0..index].Trim(),
+                        Value = line[(index + 1)..].Trim()
+                    };
+            }
         }
 
         protected string CleanFilename(string path) => path
