@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
@@ -157,6 +158,36 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(122474, breakPoint.StartTime);
                 Assert.AreEqual(140135, breakPoint.EndTime);
                 Assert.IsTrue(breakPoint.HasEffect);
+            }
+        }
+
+        [Test]
+        public void TestDecodeVideoWithLowercaseExtension()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("video-with-lowercase-extension.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                var metadata = beatmap.Metadata;
+
+                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+            }
+        }
+
+        [Test]
+        public void TestDecodeVideoWithUppercaseExtension()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("video-with-uppercase-extension.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                var metadata = beatmap.Metadata;
+
+                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
             }
         }
 
