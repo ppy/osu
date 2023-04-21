@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 get
                 {
-                    if (OsuGameBase.VIDEO_EXTENSIONS.Contains(File.Extension))
+                    if (OsuGameBase.VIDEO_EXTENSIONS.Contains(File.Extension.ToUpperInvariant()))
                         return FontAwesome.Regular.FileVideo;
 
                     switch (File.Extension)
