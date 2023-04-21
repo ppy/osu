@@ -71,7 +71,7 @@ namespace osu.Game
     [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
+        public static readonly string[] VIDEO_EXTENSIONS = { ".MP4", ".MOV", ".AVI", ".FLV", ".MPG", ".WMV", ".M4V" };
 
         public const string OSU_PROTOCOL = "osu://";
 
