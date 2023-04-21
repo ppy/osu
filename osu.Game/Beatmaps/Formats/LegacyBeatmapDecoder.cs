@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
 
-        protected override void ParseLine(Beatmap beatmap, Section section, string line)
+        protected override void ParseLine(Beatmap beatmap, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -139,7 +139,7 @@ namespace osu.Game.Beatmaps.Formats
             base.ParseLine(beatmap, section, line);
         }
 
-        private void handleGeneral(string line)
+        private void handleGeneral(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = pair.Value.ToStandardisedPath();
+                    metadata.AudioFile = pair.Value.ToString().ToStandardisedPath();
                     break;
 
                 case @"AudioLeadIn":
@@ -227,14 +227,14 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEditor(string line)
+        private void handleEditor(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.BeatmapInfo.Bookmarks = pair.Value.Split(',').Select(v =>
+                    beatmap.BeatmapInfo.Bookmarks = pair.Value.ToString().Split(',').Select(v =>
                     {
                         bool result = int.TryParse(v, out int val);
                         return new { result, val };
@@ -259,7 +259,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleMetadata(string line)
+        private void handleMetadata(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -268,35 +268,35 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Title":
-                    metadata.Title = pair.Value;
+                    metadata.Title = pair.Value.ToString();
                     break;
 
                 case @"TitleUnicode":
-                    metadata.TitleUnicode = pair.Value;
+                    metadata.TitleUnicode = pair.Value.ToString();
                     break;
 
                 case @"Artist":
-                    metadata.Artist = pair.Value;
+                    metadata.Artist = pair.Value.ToString();
                     break;
 
                 case @"ArtistUnicode":
-                    metadata.ArtistUnicode = pair.Value;
+                    metadata.ArtistUnicode = pair.Value.ToString();
                     break;
 
                 case @"Creator":
-                    metadata.Author.Username = pair.Value;
+                    metadata.Author.Username = pair.Value.ToString();
                     break;
 
                 case @"Version":
-                    beatmap.BeatmapInfo.DifficultyName = pair.Value;
+                    beatmap.BeatmapInfo.DifficultyName = pair.Value.ToString();
                     break;
 
                 case @"Source":
-                    metadata.Source = pair.Value;
+                    metadata.Source = pair.Value.ToString();
                     break;
 
                 case @"Tags":
-                    metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value.ToString();
                     break;
 
                 case @"BeatmapID":
@@ -309,7 +309,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleDifficulty(string line)
+        private void handleDifficulty(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -346,9 +346,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvent(string line)
+        private void handleEvent(ReadOnlySpan<char> line)
         {
-            string[] split = line.Split(',');
+            string[] split = line.ToString().Split(',');
 
             if (!Enum.TryParse(split[0], out LegacyEventType type))
                 throw new InvalidDataException($@"Unknown event type: {split[0]}");
@@ -389,9 +389,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleTimingPoint(string line)
+        private void handleTimingPoint(ReadOnlySpan<char> line)
         {
-            string[] split = line.Split(',');
+            string[] split = line.ToString().Split(',');
 
             double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
 
@@ -512,7 +512,7 @@ namespace osu.Game.Beatmaps.Formats
             pendingControlPointTypes.Clear();
         }
 
-        private void handleHitObject(string line)
+        private void handleHitObject(ReadOnlySpan<char> line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
