@@ -76,7 +76,7 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        protected virtual void ParseLine(T output, Section section, string line)
+        protected virtual void ParseLine(T output, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -95,13 +95,13 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        protected void HandleColours<TModel>(TModel output, ReadOnlySpan<char> line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
-            string[] split = pair.Value.Split(',');
+            string[] split = pair.Value.ToString().Split(',');
 
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
@@ -128,7 +128,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
 
-                tHasCustomColours.CustomColours[pair.Key] = colour;
+                tHasCustomColours.CustomColours[pair.Key.ToString()] = colour;
             }
         }
 
