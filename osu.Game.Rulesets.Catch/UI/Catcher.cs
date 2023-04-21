@@ -418,9 +418,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var droppedObjects = caughtObjectContainer.Children.Select(getDroppedObject).ToArray();
+            var caughtObjects = caughtObjectContainer.Children.ToArray();
 
             caughtObjectContainer.Clear(false);
+
+            //use the already returned PoolableDrawables for new objects
+            var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
 
             droppedObjectTarget.AddRange(droppedObjects);
 
@@ -430,13 +433,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void removeFromPlate(CaughtObject caughtObject, DroppedObjectAnimation animation)
         {
-            var droppedObject = getDroppedObject(caughtObject);
-
             caughtObjectContainer.Remove(caughtObject, false);
 
-            droppedObjectTarget.Add(droppedObject);
+            droppedObjectTarget.Add(getDroppedObject(caughtObject));
 
-            applyDropAnimation(droppedObject, animation);
+            applyDropAnimation(caughtObject, animation);
         }
 
         private void applyDropAnimation(Drawable d, DroppedObjectAnimation animation)
@@ -456,6 +457,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
             }
 
+            //define lifetime start for dropped objects to be disposed correctly when rewinding replay
+            d.LifetimeStart = Clock.CurrentTime;
             d.Expire();
         }
 
