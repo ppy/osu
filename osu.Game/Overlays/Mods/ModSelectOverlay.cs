@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (AllowCustomisation)
                 {
-                    modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
+                    modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
                     modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
                 }
             }, true);
