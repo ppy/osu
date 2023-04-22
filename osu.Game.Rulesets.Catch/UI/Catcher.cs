@@ -422,7 +422,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.Clear(false);
 
-            //use the already returned PoolableDrawables for new objects
+            // Use the already returned PoolableDrawables for new objects
             var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
 
             droppedObjectTarget.AddRange(droppedObjects);
@@ -435,9 +435,11 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             caughtObjectContainer.Remove(caughtObject, false);
 
-            droppedObjectTarget.Add(getDroppedObject(caughtObject));
+            var droppedObject = getDroppedObject(caughtObject);
 
-            applyDropAnimation(caughtObject, animation);
+            droppedObjectTarget.Add(droppedObject);
+
+            applyDropAnimation(droppedObject, animation);
         }
 
         private void applyDropAnimation(Drawable d, DroppedObjectAnimation animation)
@@ -457,7 +459,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
             }
 
-            //define lifetime start for dropped objects to be disposed correctly when rewinding replay
+            // Define lifetime start for dropped objects to be disposed correctly when rewinding replay
             d.LifetimeStart = Clock.CurrentTime;
             d.Expire();
         }
