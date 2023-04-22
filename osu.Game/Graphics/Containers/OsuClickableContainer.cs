@@ -46,8 +46,8 @@ namespace osu.Game.Graphics.Containers
 
             AddRangeInternal(new Drawable[]
             {
+                CreateHoverSounds(sampleSet),
                 content,
-                CreateHoverSounds(sampleSet)
             });
         }
 

@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
@@ -33,7 +32,6 @@ namespace osu.Game.Overlays.Comments
         public ReplyCommentEditor(Comment parent)
         {
             parentComment = parent;
-            OnCancel = () => this.FadeOut(200).Expire();
         }
 
         protected override void LoadComplete()

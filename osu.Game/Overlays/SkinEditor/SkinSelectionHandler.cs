@@ -13,13 +13,14 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public partial class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
+    public partial class SkinSelectionHandler : SelectionHandler<ISerialisableDrawable>
     {
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
@@ -147,7 +148,7 @@ namespace osu.Game.Overlays.SkinEditor
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<ISerialisableDrawable> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
@@ -178,10 +179,10 @@ namespace osu.Game.Overlays.SkinEditor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items) =>
+        protected override void DeleteItems(IEnumerable<ISerialisableDrawable> items) =>
             skinEditor.DeleteItems(items.ToArray());
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISerialisableDrawable>> selection)
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
@@ -206,10 +207,18 @@ namespace osu.Game.Overlays.SkinEditor
                     ((Drawable)blueprint.Item).Position = Vector2.Zero;
             });
 
+            yield return new EditorMenuItemSpacer();
+
+            yield return new OsuMenuItem("Bring to front", MenuItemType.Standard, () => skinEditor.BringSelectionToFront());
+
+            yield return new OsuMenuItem("Send to back", MenuItemType.Standard, () => skinEditor.SendSelectionToBack());
+
+            yield return new EditorMenuItemSpacer();
+
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISkinnableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISerialisableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -241,6 +250,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyOrigins(Anchor origin)
         {
+            OnOperationBegan();
+
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
@@ -255,6 +266,8 @@ namespace osu.Game.Overlays.SkinEditor
 
                 ApplyClosestAnchor(drawable);
             }
+
+            OnOperationEnded();
         }
 
         /// <summary>
@@ -266,6 +279,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyFixedAnchors(Anchor anchor)
         {
+            OnOperationBegan();
+
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
@@ -273,15 +288,21 @@ namespace osu.Game.Overlays.SkinEditor
                 item.UsesFixedAnchor = true;
                 applyAnchor(drawable, anchor);
             }
+
+            OnOperationEnded();
         }
 
         private void applyClosestAnchors()
         {
+            OnOperationBegan();
+
             foreach (var item in SelectedItems)
             {
                 item.UsesFixedAnchor = false;
                 ApplyClosestAnchor((Drawable)item);
             }
+
+            OnOperationEnded();
         }
 
         private static Anchor getClosestAnchor(Drawable drawable)

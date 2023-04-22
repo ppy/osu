@@ -363,6 +363,19 @@ namespace osu.Game.Beatmaps.Formats
                         beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
                     break;
 
+                case LegacyEventType.Video:
+                    string filename = CleanFilename(split[2]);
+
+                    // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
+                    // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
+                    // video extensions and handle similar to a background if it doesn't match.
+                    if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename)))
+                    {
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                    }
+
+                    break;
+
                 case LegacyEventType.Background:
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
@@ -431,6 +444,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 controlPoint.BeatLength = beatLength;
                 controlPoint.TimeSignature = timeSignature;
+                controlPoint.OmitFirstBarLine = omitFirstBarSignature;
 
                 addControlPoint(time, controlPoint, true);
             }
@@ -447,7 +461,6 @@ namespace osu.Game.Beatmaps.Formats
             var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
-                OmitFirstBarLine = omitFirstBarSignature,
             };
 
             // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.

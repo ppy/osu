@@ -11,9 +11,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SpinnerTick : OsuHitObject
     {
+        /// <summary>
+        /// Duration of the <see cref="Spinner"/> containing this spinner tick.
+        /// </summary>
+        public double SpinnerDuration { get; set; }
+
         public override Judgement CreateJudgement() => new OsuSpinnerTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override double MaximumJudgementOffset => SpinnerDuration;
 
         public class OsuSpinnerTickJudgement : OsuJudgement
         {

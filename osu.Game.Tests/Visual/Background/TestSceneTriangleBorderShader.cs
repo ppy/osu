@@ -9,6 +9,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Rendering;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -97,15 +98,29 @@ namespace osu.Game.Tests.Visual.Background
                     texelSize = Source.texelSize;
                 }
 
-                public override void Draw(IRenderer renderer)
-                {
-                    TextureShader.GetUniform<float>("thickness").UpdateValue(ref thickness);
-                    TextureShader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
+                private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
 
-                    base.Draw(renderer);
+                protected override void BindUniformResources(IShader shader, IRenderer renderer)
+                {
+                    base.BindUniformResources(shader, renderer);
+
+                    borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
+                    borderDataBuffer.Data = borderDataBuffer.Data with
+                    {
+                        Thickness = thickness,
+                        TexelSize = texelSize
+                    };
+
+                    shader.BindUniformBlock("m_BorderData", borderDataBuffer);
                 }
 
                 protected override bool CanDrawOpaqueInterior => false;
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    borderDataBuffer?.Dispose();
+                }
             }
         }
     }

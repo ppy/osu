@@ -158,6 +158,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModDifficultyAdjust(),
                         new TaikoModClassic(),
                         new TaikoModSwap(),
+                        new TaikoModSingleTap(),
                     };
 
                 case ModType.Automation:
@@ -209,9 +210,8 @@ namespace osu.Game.Rulesets.Taiko
                 HitResult.Great,
                 HitResult.Ok,
 
-                HitResult.SmallTickHit,
-
                 HitResult.SmallBonus,
+                HitResult.LargeBonus,
             };
         }
 
@@ -220,6 +220,9 @@ namespace osu.Game.Rulesets.Taiko
             switch (result)
             {
                 case HitResult.SmallBonus:
+                    return "drum tick";
+
+                case HitResult.LargeBonus:
                     return "bonus";
             }
 

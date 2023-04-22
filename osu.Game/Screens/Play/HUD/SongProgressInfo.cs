@@ -121,8 +121,8 @@ namespace osu.Game.Screens.Play.HUD
                     AutoSizeAxes = Axes.Both,
                     Child = new UprightAspectMaintainingContainer
                     {
-                        Origin = Anchor.CentreRight,
-                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Scaling = ScaleMode.Vertical,
                         ScalingFactor = 0.5f,
