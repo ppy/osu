@@ -250,7 +250,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 Vector2 halfSize = Size / 2;
 
-                if (Parent.Rotation < -45 && Parent.Rotation > -135 || Parent.Rotation < -225 && Parent.Rotation > -315)
+                if ((Parent.Rotation < -45 && Parent.Rotation > -135) || (Parent.Rotation < -225 && Parent.Rotation > -315))
                 {
                     halfSize = new Vector2(halfSize.Y, halfSize.X);
                 }
