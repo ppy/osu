@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Container usableAreaContainer;
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
+        private readonly Bindable<bool> dragConfine;
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float>();
@@ -42,9 +43,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Box usableFill;
         private OsuSpriteText usableAreaText;
 
-        public TabletAreaSelection(ITabletHandler handler)
+        public TabletAreaSelection(ITabletHandler handler, Bindable<bool> dragConfine)
         {
             this.handler = handler;
+            this.dragConfine = dragConfine.GetBoundCopy();
 
             Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
         }
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         RelativeSizeAxes = Axes.Both,
                         Colour = colour.Gray1,
                     },
-                    usableAreaContainer = new UsableAreaContainer(handler)
+                    usableAreaContainer = new UsableAreaContainer(handler, dragConfine)
                     {
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
@@ -201,26 +203,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             usableAreaQuad *= matrix;
 
             IsWithinBounds =
-                tabletArea.TopLeft.X < usableAreaQuad.TopLeft.X &&
-                tabletArea.TopLeft.Y < usableAreaQuad.TopLeft.Y &&
-                tabletArea.BottomLeft.X < usableAreaQuad.BottomLeft.X &&
-                tabletArea.BottomLeft.Y > usableAreaQuad.BottomLeft.Y &&
-                tabletArea.TopRight.X > usableAreaQuad.TopRight.X &&
-                tabletArea.TopRight.Y < usableAreaQuad.TopRight.Y &&
-                tabletArea.BottomRight.X > usableAreaQuad.BottomRight.X &&
-                tabletArea.BottomRight.Y > usableAreaQuad.BottomRight.Y;
-
-            //flag is a hypothetical settings checkbox
-            bool flag = true;
-            if(!IsWithinBounds && flag){
-                //Snap to top left
-                Vector2 newLocation = new Vector2(tabletArea.TopLeft.X + halfUsableArea.X, tabletArea.TopLeft.Y + halfUsableArea.Y);
-                usableAreaContainer.MoveTo(newLocation, 100, Easing.OutQuint);
-                areaOffset.Value = newLocation;
-                IsWithinBounds = tabletArea.Contains(newLocation);
-                Console.WriteLine("kok");
-            }
-            
+                tabletArea.Contains(usableAreaQuad.TopLeft) &&
+                tabletArea.Contains(usableAreaQuad.TopRight) &&
+                tabletArea.Contains(usableAreaQuad.BottomLeft) &&
+                tabletArea.Contains(usableAreaQuad.BottomRight);
 
             usableFill.FadeColour(IsWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
@@ -246,10 +232,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     public partial class UsableAreaContainer : Container
     {
         private readonly Bindable<Vector2> areaOffset;
+        private readonly Bindable<bool> dragConfine;
 
-        public UsableAreaContainer(ITabletHandler tabletHandler)
+        public UsableAreaContainer(ITabletHandler tabletHandler, Bindable<bool> dragConfine)
         {
             areaOffset = tabletHandler.AreaOffset.GetBoundCopy();
+            this.dragConfine = dragConfine.GetBoundCopy();
         }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
@@ -257,7 +245,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void OnDrag(DragEvent e)
         {
             var newPos = Position + e.Delta;
-            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent.Size));
+
+            if (dragConfine.Value)
+            {
+                Vector2 halfSize = Size / 2;
+
+                if (Parent.Rotation < -45 && Parent.Rotation > -135 || Parent.Rotation < -225 && Parent.Rotation > -315)
+                {
+                    halfSize = new Vector2(halfSize.Y, halfSize.X);
+                }
+                this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero + halfSize, Parent.Size - halfSize));
+            }
+            else
+            {
+                this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent.Size));
+            }
         }
 
         protected override void OnDragEnd(DragEndEvent e)

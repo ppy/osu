@@ -36,6 +36,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
         private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0 };
 
+        private readonly BindableBool dragConfine = new BindableBool();
+
         private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
         private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
 
@@ -128,7 +130,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        AreaSelection = new TabletAreaSelection(tabletHandler)
+                        AreaSelection = new TabletAreaSelection(tabletHandler, dragConfine)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 300,
@@ -166,6 +168,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.YOffset,
                             Current = offsetY,
+                            CanBeShown = { BindTarget = enabled }
+                        },
+                        new SettingsCheckbox
+                        {
+                            LabelText = TabletSettingsStrings.ConfineDraggingWithinArea,
+                            Current = dragConfine,
                             CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
