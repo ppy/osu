@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Net;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
@@ -21,6 +23,9 @@ namespace osu.Game.Tests.Visual.Online
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private WikiOverlay wiki;
+
+        [Resolved]
+        private FrameworkConfigManager frameworkConfigManager { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() => Child = wiki = new WikiOverlay());
@@ -71,6 +76,14 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show nonexistent page", () => wiki.ShowPage("This_page_will_error_out"));
             AddUntilStep("Wait for error page", () => wiki.CurrentPath == "error");
             AddUntilStep("Error message correct", () => wiki.ChildrenOfType<SpriteText>().Any(text => text.Text == "\"This_page_will_error_out\"."));
+        }
+
+        [Test]
+        public void TestLanguageChange()
+        {
+            frameworkConfigManager.SetValue(FrameworkSetting.Locale, "zh");
+            setUpWikiResponse(responseArticleZhPage);
+            AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria"));
         }
 
         private void setUpWikiResponse(APIWikiPage r, string redirectionPath = null)
@@ -127,6 +140,17 @@ namespace osu.Game.Tests.Visual.Online
             Subtitle = null,
             Markdown =
                 "---\ntags:\n  - wiki standards\n---\n\n# Article styling criteria\n\n*For news posts, see: [News Styling Criteria](/wiki/News_styling_criteria)*\n\nThe article styling criteria (ASC) serve as the osu! wiki's enforced styling standards to keep consistency in clarity, formatting, and layout in all articles, and to help them strive for proper grammar, correct spelling, and correct information.\n\nThese articles are primarily tools to aid in reviewing and represent the consensus of osu! wiki contributors formed over the years. Since the wiki is a collaborative effort through the review process, it is not necessary to read or memorise all of the ASC at once. If you are looking to contribute, read the [contribution guide](/wiki/osu!_wiki/Contribution_guide).\n\nTo suggest changes regarding the article styling criteria, [open an issue on GitHub](https://github.com/ppy/osu-wiki/issues/new).\n\n## Standards\n\n*Notice: The articles below use [RFC 2119](https://tools.ietf.org/html/rfc2119) to describe requirement levels.*\n\nThe article styling criteria are split up into two articles:\n\n- [Formatting](Formatting): includes Markdown and other formatting rules\n- [Writing](Writing): includes writing practices and other grammar rules\n"
+        };
+
+        private APIWikiPage responseArticleZhPage => new APIWikiPage
+        {
+            Title = "文章风格规范",
+            Layout = "markdown_page",
+            Path = "Article_styling_criteria",
+            Locale = "cn",
+            Subtitle = null,
+            Markdown =
+                "# 文章风格规范\r\n\r\n*相关文章：[文章风格规范——新闻篇](/wiki/News_styling_criteria)*\r\n\r\n文章风格规范（ASC）通过硬性规定来确保 osu!wiki 的文章通俗易懂，格式统一。\r\n\r\n所有的文章都应该力图做到无语病，无笔误，并提供准确的信息。记住，审稿人（Reviewer）会对你试图提交的文章进行审核并提出修改建议。一个好的 osu!wiki 作者应该阅读他们的修改建议并据此提高文章的整体质量，以确保读者能有更好的阅读体验。\r\n\r\n如果你对文章风格规范有任何建议，请在 Github 的 osu!wiki 仓库中 [发起 issue](https://github.com/ppy/osu-wiki/issues/new)。\r\n\r\n## 适用文件\r\n\r\n本节的规则仅适用于 `wiki/` 下的文章。\r\n\r\n## 本地化\r\n\r\n下面是 osu!wiki 允许的语言列表。文件名是两个字符的语言代码 ([ISO 639-1](https://baike.baidu.com/item/ISO%20639-1/8292914))，扩展名为`.md`，如`zh.md`。如果语言在不同国家/地区存在差异，则文件名是两个字符的语言代码 ([ISO 639-1](https://baike.baidu.com/item/ISO%20639-1/8292914))，后跟一个连字号 (`-`)，两个字符的国家/地区代码 ([ISO 3166-2](https://baike.baidu.com/item/ISO%203166-1/5269555))，然后加上扩展名`.md`，如`zh-tw.md`。"
         };
     }
 }

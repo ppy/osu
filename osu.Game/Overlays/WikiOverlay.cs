@@ -8,7 +8,9 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -30,6 +32,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private Bindable<string> languageConfig;
+        private IBindable<LocalisationParameters> localisationParameters;
+
         private GetWikiRequest request;
 
         private CancellationTokenSource cancellationToken;
@@ -41,6 +46,13 @@ namespace osu.Game.Overlays
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(FrameworkConfigManager frameworkConfig, LocalisationManager localisation)
+        {
+            languageConfig = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            localisationParameters = localisation.CurrentParameters.GetBoundCopy();
         }
 
         public void ShowPage(string pagePath = index_path)
@@ -58,6 +70,8 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            languageConfig.BindValueChanged(_ => updatePage());
+            localisationParameters.BindValueChanged(_ => updatePage());
             path.BindValueChanged(onPathChanged);
             wikiData.BindTo(Header.WikiPageData);
         }
@@ -107,18 +121,23 @@ namespace osu.Game.Overlays
             if (e.NewValue == wikiData.Value?.Path)
                 return;
 
-            if (e.NewValue == "error")
+            updatePage();
+        }
+
+        private void updatePage()
+        {
+            if (path.Value == "error")
                 return;
 
             cancellationToken?.Cancel();
             request?.Cancel();
 
-            string[] values = e.NewValue.Split('/', 2);
+            string[] values = path.Value.Split('/', 2);
 
             if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
                 request = new GetWikiRequest(values[1], language);
             else
-                request = new GetWikiRequest(e.NewValue);
+                request = new GetWikiRequest(path.Value, LanguageExtensions.GetLanguageFor(languageConfig.Value, localisationParameters.Value));
 
             Loading.Show();
 
