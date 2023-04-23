@@ -50,10 +50,12 @@ namespace osu.Game.Screens.Play.HUD
             this.receptor = receptor;
         }
 
+        protected abstract KeyCounter CreateCounter(InputTrigger trigger);
+
         /// <summary>
         /// Add a <see cref="InputTrigger"/> to this display.
         /// </summary>
-        public abstract void Add(InputTrigger trigger);
+        public void Add(InputTrigger trigger) => CreateCounter(trigger).IsCounting.BindTo(IsCounting);
 
         /// <summary>
         /// Add a range of <see cref="InputTrigger"/> to this display.
