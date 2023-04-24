@@ -12,6 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -33,7 +34,10 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         private Bindable<string> languageConfig;
-        private IBindable<LocalisationParameters> localisationParameters;
+
+        // We should implement the function of switching languages in the upper right corner of the wiki overlay just like the web.
+        // So save the language used by the current page here
+        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
 
         private GetWikiRequest request;
 
@@ -52,7 +56,6 @@ namespace osu.Game.Overlays
         private void load(FrameworkConfigManager frameworkConfig, LocalisationManager localisation)
         {
             languageConfig = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
-            localisationParameters = localisation.CurrentParameters.GetBoundCopy();
         }
 
         public void ShowPage(string pagePath = index_path)
@@ -70,8 +73,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            languageConfig.BindValueChanged(_ => updatePage());
-            localisationParameters.BindValueChanged(_ => updatePage());
+            languageConfig.BindValueChanged(_ => path.TriggerChange());
             path.BindValueChanged(onPathChanged);
             wikiData.BindTo(Header.WikiPageData);
         }
@@ -116,29 +118,39 @@ namespace osu.Game.Overlays
 
         private void onPathChanged(ValueChangedEvent<string> e)
         {
+            string[] values = path.Value.Split('/', 2);
+            string newPath;
+            Language newLanguage = Language.en;
+
+            // Parse the language first to determine whether the currently requested language is consistent with the content language.
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
+            {
+                newPath = values[1];
+                newLanguage = language;
+            }
+            else
+            {
+                newPath = values[0];
+
+                // No language specified, use the current game language.
+                if (LanguageExtensions.TryParseCultureCode(languageConfig.Value, out var gameLanguage))
+                {
+                    newLanguage = gameLanguage;
+                }
+            }
+
             // the path could change as a result of redirecting to a newer location of the same page.
             // we already have the correct wiki data, so we can safely return here.
-            if (e.NewValue == wikiData.Value?.Path)
+            if (newPath == wikiData.Value?.Path && newLanguage == currentLanguage.Value)
                 return;
 
-            updatePage();
-        }
-
-        private void updatePage()
-        {
-            if (path.Value == "error")
+            if (newPath == "error")
                 return;
 
             cancellationToken?.Cancel();
             request?.Cancel();
 
-            string[] values = path.Value.Split('/', 2);
-
-            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
-                request = new GetWikiRequest(values[1], language);
-            else
-                request = new GetWikiRequest(path.Value, LanguageExtensions.GetLanguageFor(languageConfig.Value, localisationParameters.Value));
-
+            request = new GetWikiRequest(path.Value, currentLanguage.Value);
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
@@ -155,6 +167,11 @@ namespace osu.Game.Overlays
         {
             wikiData.Value = response;
             path.Value = response.Path;
+
+            if (LanguageExtensions.TryParseCultureCode(response.Locale, out var language))
+            {
+                currentLanguage.Value = language;
+            }
 
             if (response.Layout == index_path)
             {
@@ -177,6 +194,7 @@ namespace osu.Game.Overlays
         private void onFail(string originalPath)
         {
             path.Value = "error";
+            currentLanguage.Value = Language.en;
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
                 $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_Page)."));
         }
