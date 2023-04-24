@@ -42,8 +42,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 FadeTime = key_fade_time,
                 KeyDownTextColor = KeyDownTextColor,
-                KeyUpTextColor = KeyUpTextColor,
-                IsCounting = { BindTarget = IsCounting }
+                KeyUpTextColor = KeyUpTextColor
             };
 
             keyFlow.Add(keyCounter);
