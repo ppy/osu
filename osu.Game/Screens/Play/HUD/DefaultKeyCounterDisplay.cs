@@ -36,19 +36,13 @@ namespace osu.Game.Screens.Play.HUD
             Size = keyFlow.Size;
         }
 
-        protected override KeyCounter CreateCounter(InputTrigger trigger)
-        {
-            var keyCounter = new DefaultKeyCounter(trigger)
+        public override void Add(InputTrigger trigger) =>
+            keyFlow.Add(new DefaultKeyCounter(trigger)
             {
                 FadeTime = key_fade_time,
                 KeyDownTextColor = KeyDownTextColor,
                 KeyUpTextColor = KeyUpTextColor
-            };
-
-            keyFlow.Add(keyCounter);
-
-            return keyCounter;
-        }
+            });
 
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.

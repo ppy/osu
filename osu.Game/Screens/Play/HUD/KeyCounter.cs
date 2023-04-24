@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Whether the actions reported by <see cref="Trigger"/> should be counted.
         /// </summary>
-        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
+        public bool IsCounting { get; set; } = true;
 
         private readonly Bindable<int> countPresses = new BindableInt
         {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void increment()
         {
-            if (!IsCounting.Value)
+            if (!IsCounting)
                 return;
 
             countPresses.Value++;
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void decrement()
         {
-            if (!IsCounting.Value)
+            if (!IsCounting)
                 return;
 
             countPresses.Value--;

@@ -50,12 +50,10 @@ namespace osu.Game.Screens.Play.HUD
             this.receptor = receptor;
         }
 
-        protected abstract KeyCounter CreateCounter(InputTrigger trigger);
-
         /// <summary>
         /// Add a <see cref="InputTrigger"/> to this display.
         /// </summary>
-        public void Add(InputTrigger trigger) => CreateCounter(trigger).IsCounting.BindTo(IsCounting);
+        public abstract void Add(InputTrigger trigger);
 
         /// <summary>
         /// Add a range of <see cref="InputTrigger"/> to this display.
@@ -74,6 +72,7 @@ namespace osu.Game.Screens.Play.HUD
 
             AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
             ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
+            IsCounting.BindValueChanged(change => Counters.ForEach(counter => counter.IsCounting = change.NewValue), true);
         }
 
         public override bool HandleNonPositionalInput => receptor == null;
