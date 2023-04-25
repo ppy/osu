@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
@@ -51,8 +52,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
 
             double beatLength;
-            if (hitObject.LegacyBpmMultiplier.HasValue)
-                beatLength = timingPoint.BeatLength * hitObject.LegacyBpmMultiplier.Value;
+            if (hitObject.HasContext<LegacyContext>())
+                beatLength = timingPoint.BeatLength * hitObject.GetContext<LegacyContext>().BpmMultiplier;
             else if (hitObject is IHasSliderVelocity hasSliderVelocity)
                 beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
             else

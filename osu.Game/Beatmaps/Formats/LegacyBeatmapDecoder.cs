@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
@@ -86,9 +87,22 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var hitObject in this.beatmap.HitObjects)
             {
-                hitObject.ApplyLegacyInfo(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+                applyLegacyInfoToHitObject(hitObject);
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
             }
+        }
+
+        private void applyLegacyInfoToHitObject(HitObject hitObject)
+        {
+            var legacyInfo = beatmap.ControlPointInfo as LegacyControlPointInfo;
+
+            DifficultyControlPoint difficultyControlPoint = legacyInfo != null ? legacyInfo.DifficultyPointAt(hitObject.StartTime) : DifficultyControlPoint.DEFAULT;
+#pragma warning disable 618
+            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
+#pragma warning restore 618
+                hitObject.SetContext(new LegacyContext(legacyDifficultyControlPoint.BpmMultiplier, legacyDifficultyControlPoint.GenerateTicks));
+
+            hitObject.ApplyLegacyInfo(beatmap.ControlPointInfo, beatmap.Difficulty);
         }
 
         /// <summary>
