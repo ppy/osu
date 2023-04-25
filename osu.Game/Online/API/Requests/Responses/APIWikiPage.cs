@@ -10,6 +10,9 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIWikiPage
     {
+        [JsonProperty("available_locales")]
+        public string[] AvailableLocales { get; set; }
+
         [JsonProperty("layout")]
         public string Layout { get; set; }
 
