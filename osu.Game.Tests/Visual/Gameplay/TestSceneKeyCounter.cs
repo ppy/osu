@@ -19,21 +19,21 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         public TestSceneKeyCounter()
         {
-            KeyCounterDisplay kc = new DefaultKeyCounterDisplay
+            KeyCounterDisplay defaultDisplay = new DefaultKeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Position = new Vector2(0, 72.7f)
             };
 
-            KeyCounterDisplay argonKc = new ArgonKeyCounterDisplay
+            KeyCounterDisplay argonDisplay = new ArgonKeyCounterDisplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Position = new Vector2(0, -72.7f)
             };
 
-            kc.AddRange(new InputTrigger[]
+            defaultDisplay.AddRange(new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new KeyCounterMouseTrigger(MouseButton.Right),
             });
 
-            argonKc.AddRange(new InputTrigger[]
+            argonDisplay.AddRange(new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
@@ -49,32 +49,33 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new KeyCounterMouseTrigger(MouseButton.Right),
             });
 
-            var testCounter = (DefaultKeyCounter)kc.Counters.First();
+            var testCounter = (DefaultKeyCounter)defaultDisplay.Counters.First();
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(new KeyCounterKeyboardTrigger(key));
-                argonKc.Add(new KeyCounterKeyboardTrigger(key));
+                defaultDisplay.Add(new KeyCounterKeyboardTrigger(key));
+                argonDisplay.Add(new KeyCounterKeyboardTrigger(key));
             });
 
-            Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
-
-            void addPressKeyStep()
-            {
-                AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
-            }
+            Key testKey = ((KeyCounterKeyboardTrigger)defaultDisplay.Counters.First().Trigger).Key;
 
             addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
-            AddStep("Disable counting", () => testCounter.IsCounting.Value = false);
+            AddStep("Disable counting", () =>
+            {
+                argonDisplay.IsCounting.Value = false;
+                defaultDisplay.IsCounting.Value = false;
+            });
             addPressKeyStep();
             AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
-            Add(kc);
-            Add(argonKc);
+            Add(defaultDisplay);
+            Add(argonDisplay);
+
+            void addPressKeyStep() => AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
         }
     }
 }
