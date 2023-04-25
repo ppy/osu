@@ -9,10 +9,11 @@ using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset, IHasSliderVelocity
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -40,15 +41,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Velocity = 1;
 
+        public double SliderVelocity { get; set; } = 1;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
+        }
+
+        protected override void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
+        {
+            base.ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
+
+            DifficultyControlPoint difficultyControlPoint = controlPointInfo is LegacyControlPointInfo legacyInfo ? legacyInfo.DifficultyPointAt(StartTime) : DifficultyControlPoint.DEFAULT;
+            SliderVelocity = difficultyControlPoint.SliderVelocity;
         }
 
         public double LegacyLastTickOffset => 36;

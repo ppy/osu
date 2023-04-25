@@ -85,7 +85,10 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
+            {
+                hitObject.ApplyLegacyInfo(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+            }
         }
 
         /// <summary>
