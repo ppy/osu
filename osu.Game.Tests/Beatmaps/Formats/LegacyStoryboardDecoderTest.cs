@@ -110,7 +110,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.AreEqual(2000, background.Elements[0].StartTime);
                 Assert.AreEqual(2000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
-                Assert.AreEqual(12000, (background.Elements[0] as StoryboardAnimation)?.GetEndTime());
+
+                Assert.AreEqual(3000, (background.Elements[0] as StoryboardAnimation)?.GetEndTime());
+                Assert.AreEqual(12000, (background.Elements[0] as StoryboardAnimation)?.EndTimeForDisplay);
             }
         }
 

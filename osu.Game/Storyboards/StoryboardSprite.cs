@@ -81,6 +81,19 @@ namespace osu.Game.Storyboards
             }
         }
 
+        public double EndTimeForDisplay
+        {
+            get
+            {
+                double latestEndTime = TimelineGroup.EndTime;
+
+                foreach (var l in loops)
+                    latestEndTime = Math.Max(latestEndTime, l.StartTime + l.CommandsDuration * l.TotalIterations);
+
+                return latestEndTime;
+            }
+        }
+
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
