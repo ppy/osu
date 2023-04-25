@@ -55,7 +55,14 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Add a <see cref="InputTrigger"/> to this display.
         /// </summary>
-        public void Add(InputTrigger trigger) => KeyFlow.Add(CreateCounter(trigger));
+        public void Add(InputTrigger trigger)
+        {
+            var keyCounter = CreateCounter(trigger);
+
+            KeyFlow.Add(keyCounter);
+
+            IsCounting.BindTo(keyCounter.IsCounting);
+        }
 
         /// <summary>
         /// Add a range of <see cref="InputTrigger"/> to this display.
