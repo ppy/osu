@@ -120,11 +120,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (item is IHasSliderVelocity)
             {
                 AddInternal(new DifficultyPointPiece(Item)
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.BottomCentre
-                    }
-                );
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.BottomCentre
+                });
             }
         }
 
