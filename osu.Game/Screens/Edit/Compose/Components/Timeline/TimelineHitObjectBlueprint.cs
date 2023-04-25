@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
-                sampleOverrideDisplay = new SamplePointPiece(Item)
+                new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (item is IHasSliderVelocity)
             {
-                AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
+                AddInternal(new DifficultyPointPiece(Item)
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.BottomCentre
@@ -201,12 +201,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var averageColour = Interpolation.ValueAt(0.5, circle.Colour.TopLeft, circle.Colour.TopRight, 0, 1);
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(averageColour);
         }
-
-        private SamplePointPiece? sampleOverrideDisplay;
-        private DifficultyPointPiece? difficultyOverrideDisplay;
-
-        private DifficultyControlPoint difficultyControlPoint = null!;
-        private SampleControlPoint sampleControlPoint = null!;
 
         protected override void Update()
         {
