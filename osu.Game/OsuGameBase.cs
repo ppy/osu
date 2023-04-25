@@ -641,6 +641,16 @@ namespace osu.Game
                 convertedCommonMods.Add(convertedMod);
             }
 
+            if (!ModUtils.CheckValidForGameplay(convertedCommonMods, out var invalid))
+            {
+                invalid.ForEach(mod =>
+                {
+                    int index = convertedCommonMods.IndexOf(mod);
+                    convertedCommonMods.RemoveAt(index);
+                    previouslySelectedCommonMods.RemoveAt(index);
+                });
+            }
+
             if (!SelectedMods.Disabled)
                 // Select common mods to play the deselect samples for other mods
                 SelectedMods.Value = previouslySelectedCommonMods;
