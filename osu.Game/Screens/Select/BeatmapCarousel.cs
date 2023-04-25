@@ -540,7 +540,7 @@ namespace osu.Game.Screens.Select
             {
                 var beatmap = randomSelectedBeatmaps.Pop();
 
-                if (!beatmap.Filtered.Value)
+                if (!beatmap.Filtered.Value && beatmapSets.Any(beatset => beatset.Beatmaps.Contains(beatmap)))
                 {
                     if (selectedBeatmapSet != null)
                     {
