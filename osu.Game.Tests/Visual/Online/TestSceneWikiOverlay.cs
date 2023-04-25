@@ -109,6 +109,7 @@ namespace osu.Game.Tests.Visual.Online
         // From https://osu.ppy.sh/api/v2/wiki/en/Main_Page
         private APIWikiPage responseMainPage => new APIWikiPage
         {
+            AvailableLocales = new[] { "en" },
             Title = "Main Page",
             Layout = "main_page",
             Path = "Main_Page",
@@ -121,6 +122,7 @@ namespace osu.Game.Tests.Visual.Online
         // From https://osu.ppy.sh/api/v2/wiki/en/Article_styling_criteria/Formatting
         private APIWikiPage responseArticlePage => new APIWikiPage
         {
+            AvailableLocales = new[] { "en" },
             Title = "Formatting",
             Layout = "markdown_page",
             Path = "Article_styling_criteria/Formatting",
@@ -133,6 +135,7 @@ namespace osu.Game.Tests.Visual.Online
         // From https://osu.ppy.sh/api/v2/wiki/en/Article_styling_criteria
         private APIWikiPage responseArticleParentPage => new APIWikiPage
         {
+            AvailableLocales = new[] { "en" },
             Title = "Article styling criteria",
             Layout = "markdown_page",
             Path = "Article_styling_criteria",
@@ -144,6 +147,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private APIWikiPage responseArticleZhPage => new APIWikiPage
         {
+            AvailableLocales = new[] { "en", "zh" },
             Title = "文章风格规范",
             Layout = "markdown_page",
             Path = "Article_styling_criteria",
