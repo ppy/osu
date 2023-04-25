@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Velocity = 1;
 
-        public BindableDouble SliderVelocityBindable = new BindableDouble(1);
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1);
 
         public double SliderVelocity
         {
