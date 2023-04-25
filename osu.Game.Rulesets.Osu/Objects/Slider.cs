@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
