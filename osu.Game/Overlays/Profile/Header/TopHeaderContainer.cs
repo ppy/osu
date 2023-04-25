@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding
                                     {
-                                        Left = UserProfileOverlay.CONTENT_X_MARGIN,
+                                        Left = WaveOverlayContainer.HORIZONTAL_PADDING,
                                         Vertical = vertical_padding
                                     },
                                     Height = content_height + 2 * vertical_padding,

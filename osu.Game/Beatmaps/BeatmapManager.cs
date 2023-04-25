@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
         public override bool PauseImports
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
+            beatmapImporter.ProcessBeatmap = (beatmapSet, scope) => ProcessBeatmap?.Invoke(beatmapSet, scope);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -454,7 +454,9 @@ namespace osu.Game.Beatmaps
                     if (transferCollections)
                         beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
-                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
+                    // do not look up metadata.
+                    // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
+                    ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
                 });
             }
 
@@ -542,4 +544,11 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
     }
+
+    /// <summary>
+    /// Delegate type for beatmap processing callbacks.
+    /// </summary>
+    /// <param name="beatmapSet">The beatmap set to be processed.</param>
+    /// <param name="lookupScope">The scope to use when looking up metadata.</param>
+    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope);
 }
