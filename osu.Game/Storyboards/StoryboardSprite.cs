@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Storyboards.Drawables;
 using osuTK;
@@ -114,7 +111,7 @@ namespace osu.Game.Storyboards
         public virtual Drawable CreateDrawable()
             => new DrawableStoryboardSprite(this);
 
-        public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups = null)
+        public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>>? triggeredGroups = null)
         {
             // For performance reasons, we need to apply the commands in order by start time. Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
             // To achieve this, commands are "generated" as pairs of (command, initFunc, transformFunc) and batched into a contiguous list
@@ -156,7 +153,7 @@ namespace osu.Game.Storyboards
 
             foreach (var command in commands)
             {
-                DrawablePropertyInitializer<T> initFunc = null;
+                DrawablePropertyInitializer<T>? initFunc = null;
 
                 if (!initialized)
                 {
@@ -169,7 +166,7 @@ namespace osu.Game.Storyboards
             }
         }
 
-        private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
+        private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>>? triggeredGroups)
         {
             var commands = TimelineGroup.GetCommands(timelineSelector);
             foreach (var loop in loops)
@@ -198,11 +195,11 @@ namespace osu.Game.Storyboards
         {
             public double StartTime => command.StartTime;
 
-            private readonly DrawablePropertyInitializer<T> initializeProperty;
+            private readonly DrawablePropertyInitializer<T>? initializeProperty;
             private readonly DrawableTransformer<T> transform;
             private readonly CommandTimeline<T>.TypedCommand command;
 
-            public GeneratedCommand([NotNull] CommandTimeline<T>.TypedCommand command, [CanBeNull] DrawablePropertyInitializer<T> initializeProperty, [NotNull] DrawableTransformer<T> transform)
+            public GeneratedCommand(CommandTimeline<T>.TypedCommand command, DrawablePropertyInitializer<T>? initializeProperty, DrawableTransformer<T> transform)
             {
                 this.command = command;
                 this.initializeProperty = initializeProperty;
