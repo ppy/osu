@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play
                     Position = new Vector2(0, -13) * scale_factor,
                     Font = OsuFont.Torus.With(size: name_font_size * scale_factor, weight: FontWeight.Bold),
                     Colour = colours.Blue0,
-                    Text = Name
+                    Text = Trigger.Name
                 },
                 countText = new OsuSpriteText
                 {
