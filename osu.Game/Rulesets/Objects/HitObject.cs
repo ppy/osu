@@ -16,6 +16,7 @@ using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -81,6 +82,12 @@ namespace osu.Game.Rulesets.Objects
         public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
+        /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+        /// DO NOT USE THIS UNLESS 100% SURE.
+        /// </summary>
+        public double? LegacyBpmMultiplier { get; private set; }
+
+        /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
         [JsonIgnore]
@@ -105,25 +112,6 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
-            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
-
-            if (legacyInfo != null)
-                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-            else if (ReferenceEquals(DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
-                DifficultyControlPoint = new DifficultyControlPoint();
-
-            DifficultyControlPoint.Time = StartTime;
-
-            ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
-            if (legacyInfo != null)
-                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-            else if (ReferenceEquals(SampleControlPoint, SampleControlPoint.DEFAULT))
-                SampleControlPoint = new SampleControlPoint();
-
-            SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
-
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects(cancellationToken);
@@ -164,9 +152,6 @@ namespace osu.Game.Rulesets.Objects
 
                 foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
-
-                DifficultyControlPoint.Time = time.NewValue;
-                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             }
         }
 
@@ -176,6 +161,38 @@ namespace osu.Game.Rulesets.Objects
 
             HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
+        }
+
+        /// <summary>
+        /// Applies legacy information to this HitObject.
+        /// This method gets called at the end of <see cref="LegacyBeatmapDecoder"/> before applying defaults.
+        /// </summary>
+        /// <param name="controlPointInfo">The control points.</param>
+        /// <param name="difficulty">The difficulty settings to use.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public void ApplyLegacyInfo(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
+        {
+            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
+
+            DifficultyControlPoint difficultyControlPoint = legacyInfo != null ? legacyInfo.DifficultyPointAt(StartTime) : DifficultyControlPoint.DEFAULT;
+#pragma warning disable 618
+            if (difficultyControlPoint is LegacyBeatmapDecoder.LegacyDifficultyControlPoint legacyDifficultyControlPoint)
+#pragma warning restore 618
+                LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
+
+            ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
+
+            // This is done here after ApplyLegacyInfoToSelf as we may require custom defaults to be applied to have an accurate end time.
+            SampleControlPoint sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency) : SampleControlPoint.DEFAULT;
+
+            foreach (var hitSampleInfo in Samples)
+            {
+                sampleControlPoint.ApplyTo(hitSampleInfo);
+            }
+        }
+
+        protected virtual void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
+        {
         }
 
         protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
