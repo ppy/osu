@@ -56,7 +56,6 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
-                    Text = "0"
                 },
             };
 
