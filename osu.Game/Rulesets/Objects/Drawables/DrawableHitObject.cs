@@ -239,6 +239,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     OnNestedDrawableCreated?.Invoke(drawableNested);
 
                 drawableNested.OnNewResult += onNewResult;
+                drawableNested.OnRevertResult += onNestedRevertResult;
                 drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
                 // This is only necessary for non-pooled DHOs. For pooled DHOs, this is handled inside GetPooledDrawableRepresentation().
@@ -312,6 +313,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var obj in nestedHitObjects)
             {
                 obj.OnNewResult -= onNewResult;
+                obj.OnRevertResult -= onNestedRevertResult;
                 obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
             }
 
@@ -375,6 +377,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             updateState(ArmedState.Idle);
             OnRevertResult?.Invoke(this, Result);
         }
+
+        private void onNestedRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
 
         private void onApplyCustomUpdateState(DrawableHitObject drawableHitObject, ArmedState state) => ApplyCustomUpdateState?.Invoke(drawableHitObject, state);
 
