@@ -43,18 +43,18 @@ namespace osu.Game.Tests.Mods
 
             var modDouble = new TestNonMatchingSettingTypeModDouble { TestSetting = { Value = setting_change } };
             var modBool = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
-            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = (int)setting_change } };
+            var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = (int)setting_change / 2 } };
 
-            modDouble.CopySharedSettings(modBool);
-            modDouble.CopySharedSettings(modInt);
-            modBool.CopySharedSettings(modDouble);
-            modBool.CopySharedSettings(modInt);
-            modInt.CopySharedSettings(modDouble);
-            modInt.CopySharedSettings(modBool);
+            modDouble.CopyCommonSettings(modBool);
+            modDouble.CopyCommonSettings(modInt);
+            modBool.CopyCommonSettings(modDouble);
+            modBool.CopyCommonSettings(modInt);
+            modInt.CopyCommonSettings(modDouble);
+            modInt.CopyCommonSettings(modBool);
 
             Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
             Assert.That(modBool.TestSetting.Value, Is.EqualTo(!modBool.TestSetting.Default));
-            Assert.That(modInt.TestSetting.Value, Is.EqualTo((int)setting_change));
+            Assert.That(modInt.TestSetting.Value, Is.EqualTo((int)setting_change / 2));
         }
 
         [Test]
@@ -63,21 +63,10 @@ namespace osu.Game.Tests.Mods
             var modBoolTrue = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = true, Value = false } };
             var modBoolFalse = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
 
-            modBoolFalse.CopySharedSettings(modBoolTrue);
+            modBoolFalse.CopyCommonSettings(modBoolTrue);
 
             Assert.That(modBoolFalse.TestSetting.Default, Is.EqualTo(false));
             Assert.That(modBoolFalse.TestSetting.Value, Is.EqualTo(modBoolTrue.TestSetting.Value));
-        }
-
-        [Test]
-        public void TestValueResetsToDefaultWhenCopied()
-        {
-            var modDouble = new TestNonMatchingSettingTypeModDouble();
-            var modBool = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
-
-            modBool.CopySharedSettings(modDouble);
-
-            Assert.That(modBool.TestSetting.Value, Is.EqualTo(modBool.TestSetting.Default));
         }
 
         private class TestNonMatchingSettingTypeModDouble : TestNonMatchingSettingTypeMod

@@ -115,21 +115,25 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
-        private IReadOnlyList<IBindable>? settingsBacking;
+        private IReadOnlyDictionary<string, IBindable>? settingsBacking;
 
         /// <summary>
-        /// A list of the all <see cref="IBindable"/> settings within this mod.
+        /// All <see cref="IBindable"/> settings within this mod.
         /// </summary>
-        internal IReadOnlyList<IBindable> Settings =>
+        internal IEnumerable<IBindable> SettingsBindables => Settings.Values;
+
+        /// <summary>
+        /// Provides mapping of names to <see cref="IBindable"/>s of all settings within this mod.
+        /// </summary>
+        internal IReadOnlyDictionary<string, IBindable> Settings =>
             settingsBacking ??= this.GetSettingsSourceProperties()
-                                    .Select(p => p.Item2.GetValue(this))
-                                    .Cast<IBindable>()
-                                    .ToList();
+                                    .Select(p => p.Item2)
+                                    .ToDictionary(property => property.Name.ToSnakeCase(), property => (IBindable)property.GetValue(this)!);
 
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => Settings.All(s => s.IsDefault);
+        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -160,60 +164,37 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// Copies all mod setting values sharing same <see cref="MemberInfo.Name"/> from <paramref name="source"/> into this instance.
+        /// When converting mods from one ruleset to the other, this method makes sure
+        /// to also copy the values of all settings sharing same <see cref="MemberInfo.Name"/> between the two instances.
         /// </summary>
-        /// <param name="source">The mod to copy properties from.</param>
-        internal void CopySharedSettings(Mod source)
+        /// <remarks>Copied values are unchanged, even if they have different clamping ranges.</remarks>
+        /// <param name="source">The mod to extract settings from.</param>
+        public void CopyCommonSettings(Mod source)
         {
-            const string value = nameof(Bindable<int>.Value);
+            if (source.UsesDefaultConfiguration)
+                return;
 
-            Dictionary<string, object> sourceSettings = new Dictionary<string, object>();
-
-            foreach (var (_, sourceProperty) in source.GetSettingsSourceProperties())
+            foreach (var (name, targetSetting) in Settings)
             {
-                sourceSettings.Add(sourceProperty.Name.ToSnakeCase(), sourceProperty.GetValue(source)!);
+                if (!source.Settings.TryGetValue(name, out IBindable? sourceSetting))
+                    continue;
+
+                if (sourceSetting.IsDefault)
+                    continue;
+
+                if (getBindableGenericType(targetSetting) != getBindableGenericType(sourceSetting))
+                    continue;
+
+                // TODO: special case for handling number types
+
+                PropertyInfo property = targetSetting.GetType().GetProperty(nameof(Bindable<bool>.Value))!;
+                property.SetValue(targetSetting, property.GetValue(sourceSetting));
             }
 
-            foreach (var (_, targetProperty) in this.GetSettingsSourceProperties())
-            {
-                object targetSetting = targetProperty.GetValue(this)!;
-
-                if (!sourceSettings.TryGetValue(targetProperty.Name.ToSnakeCase(), out object? sourceSetting))
-                    continue;
-
-                if (((IBindable)sourceSetting).IsDefault)
-                {
-                    // reset to default value if the source is default
-                    targetSetting.GetType().GetMethod(nameof(Bindable<int>.SetDefault))!.Invoke(targetSetting, null);
-                    continue;
-                }
-
-                bool hasSameGenericArgument = getGenericBaseType(targetSetting, typeof(Bindable<>))!.GenericTypeArguments.Single() ==
-                                              getGenericBaseType(sourceSetting, typeof(Bindable<>))!.GenericTypeArguments.Single();
-
-                if (!hasSameGenericArgument)
-                    continue;
-
-                Type? targetBindableNumberType = getGenericBaseType(targetSetting, typeof(BindableNumber<>));
-                Type? sourceBindableNumberType = getGenericBaseType(sourceSetting, typeof(BindableNumber<>));
-
-                if (targetBindableNumberType == null || sourceBindableNumberType == null)
-                {
-                    setValue(targetSetting, value, getValue(sourceSetting, value));
-                    continue;
-                }
-
-                setValue(targetSetting, value, Convert.ChangeType(getValue(sourceSetting, value), targetBindableNumberType.GenericTypeArguments.Single()));
-            }
-
-            object? getValue(object setting, string name) =>
-                setting.GetType().GetProperty(name)!.GetValue(setting);
-
-            void setValue(object setting, string name, object? newValue) =>
-                setting.GetType().GetProperty(name)!.SetValue(setting, newValue);
-
-            Type? getGenericBaseType(object setting, Type genericType) =>
-                setting.GetType().GetTypeInheritance().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
+            Type getBindableGenericType(IBindable setting) =>
+                setting.GetType().GetTypeInheritance()
+                       .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Bindable<>))
+                       .GenericTypeArguments.Single();
         }
 
         /// <summary>
@@ -250,7 +231,7 @@ namespace osu.Game.Rulesets.Mods
             if (ReferenceEquals(this, other)) return true;
 
             return GetType() == other.GetType() &&
-                   Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+                   SettingsBindables.SequenceEqual(other.SettingsBindables, ModSettingsEqualityComparer.Default);
         }
 
         public override int GetHashCode()
@@ -259,7 +240,7 @@ namespace osu.Game.Rulesets.Mods
 
             hashCode.Add(GetType());
 
-            foreach (var setting in Settings)
+            foreach (var setting in SettingsBindables)
                 hashCode.Add(setting.GetUnderlyingSettingValue());
 
             return hashCode.ToHashCode();

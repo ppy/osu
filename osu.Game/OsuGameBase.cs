@@ -58,7 +58,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -71,7 +70,7 @@ namespace osu.Game
     [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
         public const string OSU_PROTOCOL = "osu://";
 
@@ -626,20 +625,30 @@ namespace osu.Game
                 return;
             }
 
+            var previouslySelectedCommonMods = new List<Mod>(SelectedMods.Value.Count);
+            var convertedCommonMods = new List<Mod>(SelectedMods.Value.Count);
+
+            foreach (var mod in SelectedMods.Value)
+            {
+                var convertedMod = instance.CreateModFromAcronym(mod.Acronym);
+
+                if (convertedMod == null)
+                    continue;
+
+                previouslySelectedCommonMods.Add(mod);
+
+                convertedMod.CopyCommonSettings(mod);
+                convertedCommonMods.Add(convertedMod);
+            }
+
+            if (!SelectedMods.Disabled)
+                // Select common mods to play the deselect samples for other mods
+                SelectedMods.Value = previouslySelectedCommonMods;
+
             AvailableMods.Value = dict;
 
             if (!SelectedMods.Disabled)
-            {
-                //converting mods from one ruleset to the other, while also keeping their shared settings unchanged
-                SelectedMods.Value = SelectedMods.Value.Select(oldMod =>
-                {
-                    Mod newMod = instance.CreateModFromAcronym(oldMod.Acronym);
-
-                    newMod?.CopySharedSettings(oldMod);
-
-                    return newMod;
-                }).Where(m => m != null).ToArray();
-            }
+                SelectedMods.Value = convertedCommonMods;
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
