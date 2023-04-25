@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
@@ -13,13 +12,11 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        private readonly FillFlowContainer<ArgonKeyCounter> keyFlow;
-
-        public override IEnumerable<KeyCounter> Counters => keyFlow;
+        protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
 
         public ArgonKeyCounterDisplay()
         {
-            InternalChild = keyFlow = new FillFlowContainer<ArgonKeyCounter>
+            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
@@ -32,13 +29,12 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            Size = keyFlow.Size;
+            Size = KeyFlow.Size;
         }
 
-        public override void Add(InputTrigger trigger) =>
-            keyFlow.Add(new ArgonKeyCounter(trigger));
+        protected override KeyCounter CreateCounter(InputTrigger trigger) => new ArgonKeyCounter(trigger);
 
         protected override void UpdateVisibility()
-            => keyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
+            => KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
     }
 }
