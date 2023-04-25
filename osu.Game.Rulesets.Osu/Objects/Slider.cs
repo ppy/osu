@@ -163,14 +163,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
-        protected override void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
-        {
-            base.ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
-
-            DifficultyControlPoint difficultyControlPoint = controlPointInfo is LegacyControlPointInfo legacyInfo ? legacyInfo.DifficultyPointAt(StartTime) : DifficultyControlPoint.DEFAULT;
-            SliderVelocity = difficultyControlPoint.SliderVelocity;
-        }
-
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);

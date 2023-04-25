@@ -54,14 +54,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             Velocity = scoringDistance / timingPoint.BeatLength;
         }
 
-        protected override void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
-        {
-            base.ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
-
-            DifficultyControlPoint difficultyControlPoint = controlPointInfo is LegacyControlPointInfo legacyInfo ? legacyInfo.DifficultyPointAt(StartTime) : DifficultyControlPoint.DEFAULT;
-            SliderVelocity = difficultyControlPoint.SliderVelocity;
-        }
-
         public double LegacyLastTickOffset => 36;
     }
 }
