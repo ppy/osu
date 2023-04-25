@@ -6,6 +6,7 @@
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -40,7 +41,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Velocity = 1;
 
-        public double SliderVelocity { get; set; } = 1;
+        public BindableDouble SliderVelocityBindable = new BindableDouble(1);
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {

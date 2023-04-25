@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -135,7 +136,13 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool OnlyJudgeNestedObjects = true;
 
-        public double SliderVelocity { get; set; } = 1;
+        public BindableDouble SliderVelocityBindable = new BindableDouble(1);
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
 
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }

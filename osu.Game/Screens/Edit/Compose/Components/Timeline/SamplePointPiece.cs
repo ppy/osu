@@ -13,10 +13,12 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -28,12 +30,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly BindableNumber<int> volume;
 
         public SamplePointPiece(HitObject hitObject)
-            : base(hitObject.SampleControlPoint)
         {
             HitObject = hitObject;
             volume = hitObject.SampleControlPoint.SampleVolumeBindable.GetBoundCopy();
             bank = hitObject.SampleControlPoint.SampleBankBindable.GetBoundCopy();
         }
+
+        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
 
         [BackgroundDependencyLoader]
         private void load()
