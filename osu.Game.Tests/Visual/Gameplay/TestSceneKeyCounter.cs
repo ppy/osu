@@ -64,7 +64,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
             addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
-            AddStep("Disable counting", () => defaultDisplay.IsCounting.Value = false);
+            AddStep("Disable counting", () =>
+            {
+                argonDisplay.IsCounting.Value = false;
+                defaultDisplay.IsCounting.Value = false;
+            });
             addPressKeyStep();
             AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
