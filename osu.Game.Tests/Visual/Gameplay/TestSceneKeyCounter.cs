@@ -7,7 +7,9 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -21,9 +23,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
+                Position = new Vector2(0, 72.7f)
+            };
+
+            KeyCounterDisplay argonKc = new ArgonKeyCounterDisplay
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -72.7f)
             };
 
             kc.AddRange(new InputTrigger[]
+            {
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterKeyboardTrigger(Key.X),
+                new KeyCounterMouseTrigger(MouseButton.Left),
+                new KeyCounterMouseTrigger(MouseButton.Right),
+            });
+
+            argonKc.AddRange(new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
@@ -37,6 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboardTrigger(key));
+                argonKc.Add(new KeyCounterKeyboardTrigger(key));
             });
 
             Key testKey = ((KeyCounterKeyboardTrigger)kc.Counters.First().Trigger).Key;
@@ -55,6 +74,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
 
             Add(kc);
+            Add(argonKc);
         }
     }
 }
