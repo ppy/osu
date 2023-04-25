@@ -52,6 +52,7 @@ public partial class HitObjectPointPiece : CircularContainer
                 }
             },
         };
+    }
 
     protected virtual Color4 GetRepresentingColour(OsuColour colours)
     {
