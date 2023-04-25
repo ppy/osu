@@ -102,6 +102,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
+                sampleOverrideDisplay = new SamplePointPiece(Item)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre
+                },
             });
 
             if (item is IHasDuration)
@@ -110,6 +115,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
+            }
+
+            if (item is IHasSliderVelocity)
+            {
+                AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
+                    {
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.BottomCentre
+                    }
+                );
             }
         }
 
@@ -207,36 +222,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // kind of haphazard but yeah, no bindables.
                 if (Item is IHasRepeats repeats)
                     updateRepeats(repeats);
-            }
-
-            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
-            {
-                difficultyControlPoint = Item.DifficultyControlPoint;
-                difficultyOverrideDisplay?.Expire();
-
-                if (Item.DifficultyControlPoint != null && Item is IHasDistance)
-                {
-                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.BottomCentre
-                    });
-                }
-            }
-
-            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
-            {
-                sampleControlPoint = Item.SampleControlPoint;
-                sampleOverrideDisplay?.Expire();
-
-                if (Item.SampleControlPoint != null)
-                {
-                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item)
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.TopCentre
-                    });
-                }
             }
         }
 
