@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
