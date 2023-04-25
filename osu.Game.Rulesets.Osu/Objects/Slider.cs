@@ -138,11 +138,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double SliderVelocity { get; set; } = 1;
 
-        /// <summary>
-        /// Whether to generate ticks on this <see cref="Slider"/>.
-        /// </summary>
-        public bool GenerateTicks = true;
-
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
 
@@ -162,9 +157,10 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
             double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocity;
+            bool generateTicks = !HasContext<LegacyContext>() || GetContext<LegacyContext>().GenerateTicks;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
+            TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
@@ -172,12 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
 
             DifficultyControlPoint difficultyControlPoint = controlPointInfo is LegacyControlPointInfo legacyInfo ? legacyInfo.DifficultyPointAt(StartTime) : DifficultyControlPoint.DEFAULT;
-#pragma warning disable 618
-            var legacyDifficultyPoint = difficultyControlPoint as LegacyBeatmapDecoder.LegacyDifficultyControlPoint;
-#pragma warning restore 618
-
             SliderVelocity = difficultyControlPoint.SliderVelocity;
-            GenerateTicks = legacyDifficultyPoint?.GenerateTicks ?? true;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
