@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
-            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank((beatmap.HitObjects.FirstOrDefault()?.SampleControlPoint ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints?.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -268,7 +268,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 foreach (var hitObject in hitObjects)
                 {
-                    yield return hitObject.SampleControlPoint;
+                    if (hitObject.Samples.Count > 0)
+                    {
+                        int volume = hitObject.Samples.Max(o => o.Volume);
+                        int customIndex = hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank);
+                        yield return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = hitObject.GetEndTime(), SampleVolume = volume, CustomSampleBank = customIndex };
+                    }
 
                     foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
                         yield return nested;
