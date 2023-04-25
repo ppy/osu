@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool OnlyJudgeNestedObjects = true;
 
-        public BindableDouble SliderVelocityBindable = new BindableDouble(1);
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1);
 
         public double SliderVelocity
         {
