@@ -158,32 +158,6 @@ namespace osu.Game.Rulesets.Objects
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
-        /// <summary>
-        /// Applies legacy information to this HitObject.
-        /// This method gets called at the end of <see cref="LegacyBeatmapDecoder"/> before applying defaults.
-        /// </summary>
-        /// <param name="controlPointInfo">The control points.</param>
-        /// <param name="difficulty">The difficulty settings to use.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public void ApplyLegacyInfo(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
-        {
-            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
-
-            ApplyLegacyInfoToSelf(controlPointInfo, difficulty);
-
-            // This is done here after ApplyLegacyInfoToSelf as we may require custom defaults to be applied to have an accurate end time.
-            SampleControlPoint sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency) : SampleControlPoint.DEFAULT;
-
-            foreach (var hitSampleInfo in Samples)
-            {
-                sampleControlPoint.ApplyTo(hitSampleInfo);
-            }
-        }
-
-        protected virtual void ApplyLegacyInfoToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
         }

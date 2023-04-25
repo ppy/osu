@@ -17,6 +17,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -26,6 +27,11 @@ namespace osu.Game.Beatmaps.Formats
         /// An offset which needs to be applied to old beatmaps (v4 and lower) to correct timing changes that were applied at a game client level.
         /// </summary>
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
+
+        /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
 
         internal static RulesetStore RulesetStore;
 
@@ -87,12 +93,11 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var hitObject in this.beatmap.HitObjects)
             {
-                applyLegacyInfoToHitObject(hitObject);
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+                applyLegacyInfoAndDefaults(hitObject);
             }
         }
 
-        private void applyLegacyInfoToHitObject(HitObject hitObject)
+        private void applyLegacyInfoAndDefaults(HitObject hitObject)
         {
             var legacyInfo = beatmap.ControlPointInfo as LegacyControlPointInfo;
 
@@ -102,7 +107,30 @@ namespace osu.Game.Beatmaps.Formats
 #pragma warning restore 618
                 hitObject.SetContext(new LegacyContext(legacyDifficultyControlPoint.BpmMultiplier, legacyDifficultyControlPoint.GenerateTicks));
 
-            hitObject.ApplyLegacyInfo(beatmap.ControlPointInfo, beatmap.Difficulty);
+            if (hitObject is IHasSliderVelocity hasSliderVelocity)
+                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+
+            hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            SampleControlPoint sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(hitObject.GetEndTime() + control_point_leniency) : SampleControlPoint.DEFAULT;
+
+            foreach (var hitSampleInfo in hitObject.Samples)
+            {
+                sampleControlPoint.ApplyTo(hitSampleInfo);
+            }
+
+            if (hitObject is not IHasRepeats hasRepeats) return;
+
+            for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
+            {
+                double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + control_point_leniency;
+                sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(time) : SampleControlPoint.DEFAULT;
+
+                foreach (var hitSampleInfo in hasRepeats.NodeSamples[i])
+                {
+                    sampleControlPoint.ApplyTo(hitSampleInfo);
+                }
+            }
         }
 
         /// <summary>
