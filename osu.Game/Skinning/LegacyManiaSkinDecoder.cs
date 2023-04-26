@@ -145,12 +145,12 @@ namespace osu.Game.Skinning
         {
             int i = 0;
 
-            foreach (var range in value.Split(','))
+            foreach (var v in value.Split(','))
             {
                 if (i >= output.Length)
                     break;
 
-                output[i] = Parsing.ParseFloat(value[range]) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                output[i] = Parsing.ParseFloat(v) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
                 i++;
             }
         }

@@ -49,17 +49,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var split = text.Split(',');
 
             split.MoveNext(); // split[0]
-            var posX = split.CurrentSpan;
+            var posX = split.Current;
             split.MoveNext(); // split[1]
-            var posY = split.CurrentSpan;
+            var posY = split.Current;
             Vector2 pos = new Vector2((int)Parsing.ParseFloat(posX, Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(posY, Parsing.MAX_COORDINATE_VALUE));
 
             split.MoveNext(); // split[2]
-            var startTimeSpan = split.CurrentSpan;
+            var startTimeSpan = split.Current;
             double startTime = Parsing.ParseDouble(startTimeSpan) + Offset;
 
             split.MoveNext(); // split[3]
-            var typeSpan = split.CurrentSpan;
+            var typeSpan = split.Current;
             LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(typeSpan);
 
             int comboOffset = (int)(type & LegacyHitObjectType.ComboOffset) >> 4;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             type &= ~LegacyHitObjectType.NewCombo;
 
             split.MoveNext(); // split[4]
-            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split.CurrentSpan);
+            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split.Current);
             var bankInfo = new SampleBankInfo();
 
             HitObject result = null;
@@ -79,17 +79,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = CreateHit(pos, combo, comboOffset);
 
                 if (split.MoveNext()) // split[5]
-                    readCustomSampleBanks(split.CurrentSpan, bankInfo);
+                    readCustomSampleBanks(split.Current, bankInfo);
             }
             else if (type.HasFlagFast(LegacyHitObjectType.Slider))
             {
                 split.MoveNext(); // split[5]
-                var pointSpan = split.CurrentSpan;
+                var pointSpan = split.Current;
 
                 double? length = null;
 
                 split.MoveNext(); // split[6]
-                int repeatCount = Parsing.ParseInt(split.CurrentSpan);
+                int repeatCount = Parsing.ParseInt(split.Current);
 
                 if (repeatCount > 9000)
                     throw new FormatException(@"Repeat count is way too high");
@@ -98,13 +98,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 repeatCount = Math.Max(0, repeatCount - 1);
 
                 split.MoveNext(); // split[7]
-                var lengthSpan = split.CurrentSpan;
+                var lengthSpan = split.Current;
                 split.MoveNext(); // split[8]
-                var perNodeSound = split.CurrentSpan;
+                var perNodeSound = split.Current;
                 split.MoveNext(); // split[9]
-                var perNodeSample = split.CurrentSpan;
+                var perNodeSample = split.Current;
                 split.MoveNext(); // split[10]
-                var sampleBanks = split.CurrentSpan;
+                var sampleBanks = split.Current;
 
                 if (!lengthSpan.IsEmpty)
                 {
@@ -128,13 +128,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (!perNodeSample.IsEmpty)
                 {
                     int i = 0;
-                    foreach (Range set in perNodeSample.Split('|'))
+                    foreach (var set in perNodeSample.Split('|'))
                     {
                         if (i >= nodes)
                             break;
 
                         SampleBankInfo info = nodeBankInfos[i];
-                        readCustomSampleBanks(perNodeSample[set], info);
+                        readCustomSampleBanks(set, info);
                         i++;
                     }
                 }
@@ -148,12 +148,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (!perNodeSound.IsEmpty)
                 {
                     int i = 0;
-                    foreach (Range add in perNodeSound.Split('|'))
+                    foreach (var add in perNodeSound.Split('|'))
                     {
                         if (i >= nodes)
                             break;
 
-                        int.TryParse(perNodeSound[add], out int sound);
+                        int.TryParse(add, out int sound);
                         nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                         i++;
                     }
@@ -169,12 +169,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             else if (type.HasFlagFast(LegacyHitObjectType.Spinner))
             {
                 split.MoveNext(); // split[5]
-                double duration = Math.Max(0, Parsing.ParseDouble(split.CurrentSpan) + Offset - startTime);
+                double duration = Math.Max(0, Parsing.ParseDouble(split.Current) + Offset - startTime);
 
                 result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
 
                 if (!split.MoveNext()) // split[6]
-                    readCustomSampleBanks(split.CurrentSpan, bankInfo);
+                    readCustomSampleBanks(split.Current, bankInfo);
             }
             else if (type.HasFlagFast(LegacyHitObjectType.Hold))
             {
@@ -184,9 +184,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (split.MoveNext()) // split[5]
                 {
-                    var ss = split.CurrentSpan.Split(':');
+                    var ss = split.Current.Split(':');
                     ss.MoveNext();
-                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss.CurrentSpan));
+                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss.Current));
                     readCustomSampleBanks(ss.RemainingSpan, bankInfo);
                 }
 
@@ -214,9 +214,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var split = str.Split(':');
 
             split.MoveNext(); // split[0]
-            var bank = (LegacySampleBank)Parsing.ParseInt(split.CurrentSpan);
+            var bank = (LegacySampleBank)Parsing.ParseInt(split.Current);
             split.MoveNext(); // split[1]
-            var addBank = (LegacySampleBank)Parsing.ParseInt(split.CurrentSpan);
+            var addBank = (LegacySampleBank)Parsing.ParseInt(split.Current);
 
             static string toStringBank(LegacySampleBank value)
             {
@@ -244,13 +244,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (split.MoveNext()) // split[2]
-                bankInfo.CustomSampleBank = Parsing.ParseInt(split.CurrentSpan);
+                bankInfo.CustomSampleBank = Parsing.ParseInt(split.Current);
 
             if (split.MoveNext()) // split[3]
-                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split.CurrentSpan));
+                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split.Current));
 
             bankInfo.Filename = split.MoveNext() // split[4]
-                ? split.CurrentSpan.ToString()
+                ? split.Current.ToString()
                 : null;
         }
 
@@ -328,8 +328,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var pointSplitList = new List<PointOrPathType>();
 
             // LINQ is unavailable to ref struct
-            foreach (var range in pointString.Split('|'))
-                pointSplitList.Add(PointOrPathType.ParseFromPointString(pointString[range]));
+            foreach (var s in pointString.Split('|'))
+                pointSplitList.Add(PointOrPathType.ParseFromPointString(s));
             PointOrPathType[] pointSplit = pointSplitList.ToArray();
 
             var controlPoints = new List<Memory<PathControlPoint>>();

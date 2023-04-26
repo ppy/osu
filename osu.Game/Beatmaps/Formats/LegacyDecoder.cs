@@ -109,13 +109,13 @@ namespace osu.Game.Beatmaps.Formats
                 var split = pair.Value.Split(',');
 
                 split.MoveNext();
-                byte r = byte.Parse(split.CurrentSpan);
+                byte r = byte.Parse(split.Current);
                 split.MoveNext();
-                byte g = byte.Parse(split.CurrentSpan);
+                byte g = byte.Parse(split.Current);
                 split.MoveNext();
-                byte b = byte.Parse(split.CurrentSpan);
+                byte b = byte.Parse(split.Current);
 
-                byte alpha = allowAlpha && split.MoveNext() ? byte.Parse(split.CurrentSpan) : (byte)255;
+                byte alpha = allowAlpha && split.MoveNext() ? byte.Parse(split.Current) : (byte)255;
                 colour = new Color4(r, g, b, alpha);
             }
             catch

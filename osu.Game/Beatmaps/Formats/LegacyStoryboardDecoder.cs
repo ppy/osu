@@ -102,17 +102,17 @@ namespace osu.Game.Beatmaps.Formats
                 storyboardSprite = null;
 
                 split.MoveNext(); // split[0]
-                if (!Enum.TryParse(split.CurrentSpan, out LegacyEventType type))
-                    throw new InvalidDataException($@"Unknown event type: {split.CurrentSpan}");
+                if (!Enum.TryParse(split.Current, out LegacyEventType type))
+                    throw new InvalidDataException($@"Unknown event type: {split.Current}");
 
                 switch (type)
                 {
                     case LegacyEventType.Video:
                     {
                         split.MoveNext(); // split[1];
-                        int offset = Parsing.ParseInt(split.CurrentSpan);
+                        int offset = Parsing.ParseInt(split.Current);
                         split.MoveNext(); // split[2];
-                        string path = CleanFilename(split.CurrentSpan);
+                        string path = CleanFilename(split.Current);
 
                         // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
                         // the file extension is not a valid video.
@@ -129,15 +129,15 @@ namespace osu.Game.Beatmaps.Formats
                     case LegacyEventType.Sprite:
                     {
                         split.MoveNext(); // split[1]
-                        string layer = parseLayer(split.CurrentSpan);
+                        string layer = parseLayer(split.Current);
                         split.MoveNext(); // split[2]
-                        var origin = parseOrigin(split.CurrentSpan);
+                        var origin = parseOrigin(split.Current);
                         split.MoveNext(); // split[3]
-                        string path = CleanFilename(split.CurrentSpan);
+                        string path = CleanFilename(split.Current);
                         split.MoveNext(); // split[4]
-                        float x = Parsing.ParseFloat(split.CurrentSpan, Parsing.MAX_COORDINATE_VALUE);
+                        float x = Parsing.ParseFloat(split.Current, Parsing.MAX_COORDINATE_VALUE);
                         split.MoveNext(); // split[5]
-                        float y = Parsing.ParseFloat(split.CurrentSpan, Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(split.Current, Parsing.MAX_COORDINATE_VALUE);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -146,25 +146,25 @@ namespace osu.Game.Beatmaps.Formats
                     case LegacyEventType.Animation:
                     {
                         split.MoveNext(); // split[1]
-                        string layer = parseLayer(split.CurrentSpan);
+                        string layer = parseLayer(split.Current);
                         split.MoveNext(); // split[2]
-                        var origin = parseOrigin(split.CurrentSpan);
+                        var origin = parseOrigin(split.Current);
                         split.MoveNext(); // split[3]
-                        string path = CleanFilename(split.CurrentSpan);
+                        string path = CleanFilename(split.Current);
                         split.MoveNext(); // split[4]
-                        float x = Parsing.ParseFloat(split.CurrentSpan, Parsing.MAX_COORDINATE_VALUE);
+                        float x = Parsing.ParseFloat(split.Current, Parsing.MAX_COORDINATE_VALUE);
                         split.MoveNext(); // split[5]
-                        float y = Parsing.ParseFloat(split.CurrentSpan, Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(split.Current, Parsing.MAX_COORDINATE_VALUE);
                         split.MoveNext(); // split[6]
-                        int frameCount = Parsing.ParseInt(split.CurrentSpan);
+                        int frameCount = Parsing.ParseInt(split.Current);
                         split.MoveNext(); // split[7]
-                        double frameDelay = Parsing.ParseDouble(split.CurrentSpan);
+                        double frameDelay = Parsing.ParseDouble(split.Current);
 
                         if (FormatVersion < 6)
                             // this is random as hell but taken straight from osu-stable.
                             frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
 
-                        var loopType = split.MoveNext() ? parseAnimationLoopType(split.CurrentSpan) : AnimationLoopType.LoopForever; // split[8]
+                        var loopType = split.MoveNext() ? parseAnimationLoopType(split.Current) : AnimationLoopType.LoopForever; // split[8]
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -173,12 +173,12 @@ namespace osu.Game.Beatmaps.Formats
                     case LegacyEventType.Sample:
                     {
                         split.MoveNext(); // split[1]
-                        double time = Parsing.ParseDouble(split.CurrentSpan);
+                        double time = Parsing.ParseDouble(split.Current);
                         split.MoveNext(); // split[2]
-                        string layer = parseLayer(split.CurrentSpan);
+                        string layer = parseLayer(split.Current);
                         split.MoveNext(); // split[3]
-                        string path = CleanFilename(split.CurrentSpan);
-                        float volume = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : 100; // split[4]
+                        string path = CleanFilename(split.Current);
+                        float volume = split.MoveNext() ? Parsing.ParseFloat(split.Current) : 100; // split[4]
                         storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
@@ -190,17 +190,17 @@ namespace osu.Game.Beatmaps.Formats
                     timelineGroup = storyboardSprite?.TimelineGroup;
 
                 split.MoveNext(); // split[0]
-                ReadOnlySpan<char> commandType = split.CurrentSpan;
+                ReadOnlySpan<char> commandType = split.Current;
 
                 switch (commandType)
                 {
                     case "T":
                     {
                         split.MoveNext(); // split[1]
-                        string triggerName = split.CurrentSpan.ToString();
-                        double startTime = split.MoveNext() ? Parsing.ParseDouble(split.CurrentSpan) : double.MinValue; // split[2]
-                        double endTime = split.MoveNext() ? Parsing.ParseDouble(split.CurrentSpan) : double.MaxValue; // split[3]
-                        int groupNumber = split.MoveNext() ? Parsing.ParseInt(split.CurrentSpan) : 0; // split[4]
+                        string triggerName = split.Current.ToString();
+                        double startTime = split.MoveNext() ? Parsing.ParseDouble(split.Current) : double.MinValue; // split[2]
+                        double endTime = split.MoveNext() ? Parsing.ParseDouble(split.Current) : double.MaxValue; // split[3]
+                        int groupNumber = split.MoveNext() ? Parsing.ParseInt(split.Current) : 0; // split[4]
                         timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
                         break;
                     }
@@ -208,9 +208,9 @@ namespace osu.Game.Beatmaps.Formats
                     case "L":
                     {
                         split.MoveNext(); // split[1]
-                        double startTime = Parsing.ParseDouble(split.CurrentSpan);
+                        double startTime = Parsing.ParseDouble(split.Current);
                         split.MoveNext(); // split[2]
-                        int repeatCount = Parsing.ParseInt(split.CurrentSpan);
+                        int repeatCount = Parsing.ParseInt(split.Current);
                         timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
                         break;
                     }
@@ -218,19 +218,19 @@ namespace osu.Game.Beatmaps.Formats
                     default:
                     {
                         split.MoveNext(); // split[1]
-                        var easing = (Easing)Parsing.ParseInt(split.CurrentSpan);
+                        var easing = (Easing)Parsing.ParseInt(split.Current);
                         split.MoveNext(); // split[2]
-                        double startTime = Parsing.ParseDouble(split.CurrentSpan);
+                        double startTime = Parsing.ParseDouble(split.Current);
                         split.MoveNext(); // split[3]
-                        double endTime = split.CurrentSpan.IsEmpty ? startTime : Parsing.ParseDouble(split.CurrentSpan);
+                        double endTime = split.Current.IsEmpty ? startTime : Parsing.ParseDouble(split.Current);
 
                         switch (commandType)
                         {
                             case "F":
                             {
                                 split.MoveNext(); // split[4]
-                                float startValue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startValue; // split[5]
+                                float startValue = Parsing.ParseFloat(split.Current);
+                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startValue; // split[5]
                                 timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
@@ -238,8 +238,8 @@ namespace osu.Game.Beatmaps.Formats
                             case "S":
                             {
                                 split.MoveNext(); // split[4]
-                                float startValue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startValue; // split[5]
+                                float startValue = Parsing.ParseFloat(split.Current);
+                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startValue; // split[5]
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
@@ -247,11 +247,11 @@ namespace osu.Game.Beatmaps.Formats
                             case "V":
                             {
                                 split.MoveNext(); // split[4]
-                                float startX = Parsing.ParseFloat(split.CurrentSpan);
+                                float startX = Parsing.ParseFloat(split.Current);
                                 split.MoveNext(); // split[5]
-                                float startY = Parsing.ParseFloat(split.CurrentSpan);
-                                float endX = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startX; // split[6]
-                                float endY = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startY; // split[7]
+                                float startY = Parsing.ParseFloat(split.Current);
+                                float endX = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startX; // split[6]
+                                float endY = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startY; // split[7]
                                 timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
@@ -259,8 +259,8 @@ namespace osu.Game.Beatmaps.Formats
                             case "R":
                             {
                                 split.MoveNext(); // split[4]
-                                float startValue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startValue; // split[5]
+                                float startValue = Parsing.ParseFloat(split.Current);
+                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startValue; // split[5]
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
                                 break;
                             }
@@ -268,11 +268,11 @@ namespace osu.Game.Beatmaps.Formats
                             case "M":
                             {
                                 split.MoveNext(); // split[4]
-                                float startX = Parsing.ParseFloat(split.CurrentSpan);
+                                float startX = Parsing.ParseFloat(split.Current);
                                 split.MoveNext(); // split[5]
-                                float startY = Parsing.ParseFloat(split.CurrentSpan);
-                                float endX = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startX; // split[6]
-                                float endY = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startY; // split[7]
+                                float startY = Parsing.ParseFloat(split.Current);
+                                float endX = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startX; // split[6]
+                                float endY = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startY; // split[7]
                                 timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
                                 break;
@@ -281,8 +281,8 @@ namespace osu.Game.Beatmaps.Formats
                             case "MX":
                             {
                                 split.MoveNext(); // split[4]
-                                float startValue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startValue; // split[5]
+                                float startValue = Parsing.ParseFloat(split.Current);
+                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startValue; // split[5]
                                 timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
@@ -290,8 +290,8 @@ namespace osu.Game.Beatmaps.Formats
                             case "MY":
                             {
                                 split.MoveNext(); // split[4]
-                                float startValue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startValue; // split[5]
+                                float startValue = Parsing.ParseFloat(split.Current);
+                                float endValue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startValue; // split[5]
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
@@ -299,14 +299,14 @@ namespace osu.Game.Beatmaps.Formats
                             case "C":
                             {
                                 split.MoveNext(); // split[4]
-                                float startRed = Parsing.ParseFloat(split.CurrentSpan);
+                                float startRed = Parsing.ParseFloat(split.Current);
                                 split.MoveNext(); // split[5]
-                                float startGreen = Parsing.ParseFloat(split.CurrentSpan);
+                                float startGreen = Parsing.ParseFloat(split.Current);
                                 split.MoveNext(); // split[6]
-                                float startBlue = Parsing.ParseFloat(split.CurrentSpan);
-                                float endRed = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startRed; // split[7]
-                                float endGreen = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startGreen; // split[8]
-                                float endBlue = split.MoveNext() ? Parsing.ParseFloat(split.CurrentSpan) : startBlue; // split[9]
+                                float startBlue = Parsing.ParseFloat(split.Current);
+                                float endRed = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startRed; // split[7]
+                                float endGreen = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startGreen; // split[8]
+                                float endBlue = split.MoveNext() ? Parsing.ParseFloat(split.Current) : startBlue; // split[9]
                                 timelineGroup?.Colour.Add(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
@@ -316,7 +316,7 @@ namespace osu.Game.Beatmaps.Formats
                             case "P":
                             {
                                 split.MoveNext(); // split[4]
-                                switch (split.CurrentSpan)
+                                switch (split.Current)
                                 {
                                     case "A":
                                         timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,

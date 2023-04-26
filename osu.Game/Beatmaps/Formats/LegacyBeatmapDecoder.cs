@@ -238,9 +238,9 @@ namespace osu.Game.Beatmaps.Formats
                     var bookmarkList = new List<int>();
 
                     // LINQ is not avaiable for ref struct
-                    foreach (var range in pair.Value.Split(','))
+                    foreach (var bookmark in pair.Value.Split(','))
                     {
-                        if (int.TryParse(pair.Value[range], out int result))
+                        if (int.TryParse(bookmark, out int result))
                             bookmarkList.Add(result);
                     }
                     beatmap.BeatmapInfo.Bookmarks = bookmarkList.ToArray();
@@ -356,8 +356,8 @@ namespace osu.Game.Beatmaps.Formats
             var split = line.Split(',');
 
             split.MoveNext(); // split[0]
-            if (!Enum.TryParse(split.CurrentSpan, out LegacyEventType type))
-                throw new InvalidDataException($@"Unknown event type: {split.CurrentSpan}");
+            if (!Enum.TryParse(split.Current, out LegacyEventType type))
+                throw new InvalidDataException($@"Unknown event type: {split.Current}");
 
             switch (type)
             {
@@ -370,13 +370,13 @@ namespace osu.Game.Beatmaps.Formats
                     // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
                     // Allow the first sprite (by file order) to act as the background in such cases.
                     if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.CurrentSpan);
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.Current);
                     break;
 
                 case LegacyEventType.Video:
                     split.MoveNext(); // split[1]
                     split.MoveNext(); // split[2]
-                    string filename = CleanFilename(split.CurrentSpan);
+                    string filename = CleanFilename(split.Current);
 
                     // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                     // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
@@ -391,14 +391,14 @@ namespace osu.Game.Beatmaps.Formats
                 case LegacyEventType.Background:
                     split.MoveNext(); // split[1]
                     split.MoveNext(); // split[2]
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.CurrentSpan);
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split.Current);
                     break;
 
                 case LegacyEventType.Break:
                     split.MoveNext(); // split[1]
-                    double start = getOffsetTime(Parsing.ParseDouble(split.CurrentSpan));
+                    double start = getOffsetTime(Parsing.ParseDouble(split.Current));
                     split.MoveNext(); // split[2]
-                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split.CurrentSpan)));
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split.Current)));
 
                     beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
@@ -410,41 +410,41 @@ namespace osu.Game.Beatmaps.Formats
             var split = line.Split(',');
 
             split.MoveNext(); // split[0]
-            double time = getOffsetTime(Parsing.ParseDouble(split.CurrentSpan));
+            double time = getOffsetTime(Parsing.ParseDouble(split.Current));
 
             split.MoveNext(); // split[1]
             // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
-            double beatLength = Parsing.ParseDouble(split.CurrentSpan, allowNaN: true);
+            double beatLength = Parsing.ParseDouble(split.Current, allowNaN: true);
 
             // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
             if (split.MoveNext()) // split[2]
-                timeSignature = split.CurrentSpan[0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split.CurrentSpan));
+                timeSignature = split.Current[0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split.Current));
 
             LegacySampleBank sampleSet = defaultSampleBank;
             if (split.MoveNext()) // split[3]
-                sampleSet = (LegacySampleBank)Parsing.ParseInt(split.CurrentSpan);
+                sampleSet = (LegacySampleBank)Parsing.ParseInt(split.Current);
 
             int customSampleBank = 0;
             if (split.MoveNext()) // split[4]
-                customSampleBank = Parsing.ParseInt(split.CurrentSpan);
+                customSampleBank = Parsing.ParseInt(split.Current);
 
             int sampleVolume = defaultSampleVolume;
             if (split.MoveNext()) // split[5]
-                sampleVolume = Parsing.ParseInt(split.CurrentSpan);
+                sampleVolume = Parsing.ParseInt(split.Current);
 
             bool timingChange = true;
             if (split.MoveNext()) // split[6]
-                timingChange = split.CurrentSpan[0] == '1';
+                timingChange = split.Current[0] == '1';
 
             bool kiaiMode = false;
             bool omitFirstBarSignature = false;
 
             if (split.MoveNext()) // split[7]
             {
-                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split.CurrentSpan);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split.Current);
                 kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
                 omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }

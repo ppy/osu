@@ -48,12 +48,12 @@ namespace osu.Game.Extensions
             return true;
         }
 
-        public readonly Range Current => currentFrom..nextIndex;
+        public readonly Range CurrentRange => currentFrom..nextIndex;
 
         // foreach support
         public void Dispose() { }
 
-        public readonly ReadOnlySpan<T> CurrentSpan => value[Current];
+        public readonly ReadOnlySpan<T> Current => value[CurrentRange];
 
         public readonly ReadOnlySpan<T> RemainingSpan => nextIndex < value.Length ? value[(nextIndex + 1)..] : value[^0..];
     }
