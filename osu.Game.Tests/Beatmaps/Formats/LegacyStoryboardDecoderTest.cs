@@ -191,6 +191,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeVideoWithLowercaseExtension()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("video-with-lowercase-extension.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+                Assert.That(video.Elements.Count, Is.EqualTo(1));
+
+                Assert.AreEqual("Video.avi", ((StoryboardVideo)video.Elements[0]).Path);
+            }
+        }
+
+        [Test]
+        public void TestDecodeVideoWithUppercaseExtension()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("video-with-uppercase-extension.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+                Assert.That(video.Elements.Count, Is.EqualTo(1));
+
+                Assert.AreEqual("Video.AVI", ((StoryboardVideo)video.Elements[0]).Path);
+            }
+        }
+
+        [Test]
         public void TestDecodeImageSpecifiedAsVideo()
         {
             var decoder = new LegacyStoryboardDecoder();
@@ -200,8 +234,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var storyboard = decoder.Decode(stream);
 
-                StoryboardLayer foreground = storyboard.Layers.Single(l => l.Name == "Video");
-                Assert.That(foreground.Elements.Count, Is.Zero);
+                StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+                Assert.That(video.Elements.Count, Is.Zero);
             }
         }
 
