@@ -76,8 +76,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
-        public DifficultyControlPoint DifficultyControlPoint { get; set; } = DifficultyControlPoint.DEFAULT;
-
         /// <summary>
         /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
         /// DO NOT USE THIS UNLESS 100% SURE.
