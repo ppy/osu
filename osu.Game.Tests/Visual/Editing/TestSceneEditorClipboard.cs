@@ -6,7 +6,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
