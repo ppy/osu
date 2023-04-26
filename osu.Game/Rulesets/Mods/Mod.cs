@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AutoMapper.Internal;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -182,7 +181,10 @@ namespace osu.Game.Rulesets.Mods
                 if (sourceSetting.IsDefault)
                     continue;
 
-                if (getBindableGenericType(targetSetting) != getBindableGenericType(sourceSetting))
+                var targetType = targetSetting.GetType();
+                var sourceType = sourceSetting.GetType();
+
+                if (!targetType.IsAssignableFrom(sourceType) && !sourceType.IsAssignableFrom(targetType))
                     continue;
 
                 // TODO: special case for handling number types
@@ -190,11 +192,6 @@ namespace osu.Game.Rulesets.Mods
                 PropertyInfo property = targetSetting.GetType().GetProperty(nameof(Bindable<bool>.Value))!;
                 property.SetValue(targetSetting, property.GetValue(sourceSetting));
             }
-
-            Type getBindableGenericType(IBindable setting) =>
-                setting.GetType().GetTypeInheritance()
-                       .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Bindable<>))
-                       .GenericTypeArguments.Single();
         }
 
         /// <summary>
