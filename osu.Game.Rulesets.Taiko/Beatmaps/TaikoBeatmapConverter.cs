@@ -64,7 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 foreach (HitObject hitObject in original.HitObjects)
                 {
-                    double nextScrollSpeed = hitObject.DifficultyControlPoint.SliderVelocity;
+                    if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
+
+                    double nextScrollSpeed = hasSliderVelocity.SliderVelocity;
                     EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
                     if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
