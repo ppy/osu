@@ -271,7 +271,9 @@ namespace osu.Game.Beatmaps.Formats
                     if (hitObject.Samples.Count > 0)
                     {
                         int volume = hitObject.Samples.Max(o => o.Volume);
-                        int customIndex = hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank);
+                        int customIndex = hitObject.Samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
+                            ? hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
+                            : 0;
                         yield return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = hitObject.GetEndTime(), SampleVolume = volume, CustomSampleBank = customIndex };
                     }
 
