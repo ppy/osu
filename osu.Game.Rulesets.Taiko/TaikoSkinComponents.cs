@@ -21,5 +21,6 @@ namespace osu.Game.Rulesets.Taiko
         TaikoExplosionKiai,
         Scroller,
         Mascot,
+        KiaiGlow
     }
 }

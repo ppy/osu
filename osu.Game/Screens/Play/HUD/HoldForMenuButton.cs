@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,11 +25,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldForMenuButton : FillFlowContainer
+    public partial class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+        public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
         private HoldButton button;
 
@@ -58,6 +62,7 @@ namespace osu.Game.Screens.Play.HUD
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
                     IsPaused = { BindTarget = IsPaused },
+                    ReplayLoaded = { BindTarget = ReplayLoaded },
                     Action = () => Action(),
                 }
             };
@@ -100,13 +105,15 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
             private Circle overlayCircle;
 
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
             protected override bool AllowMultipleFires => true;
 
@@ -216,7 +223,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
-                             .OnComplete(a =>
+                             .OnComplete(_ =>
                              {
                                  icon.ScaleTo(1, 100);
                                  circularProgress.FadeOut(100).OnComplete(_ =>
@@ -249,7 +256,14 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
-                    case GlobalAction.PauseGameplay: // in the future this behaviour will differ for replays etc.
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+
+                    case GlobalAction.PauseGameplay:
+                        // handled by replay player
+                        if (ReplayLoaded.Value) return false;
+
                         if (!pendingAnimation)
                             BeginConfirm();
                         return true;
@@ -263,7 +277,12 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
+                        AbortConfirm();
+                        break;
+
                     case GlobalAction.PauseGameplay:
+                        if (ReplayLoaded.Value) return;
+
                         AbortConfirm();
                         break;
                 }

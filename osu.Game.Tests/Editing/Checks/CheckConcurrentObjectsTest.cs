@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckConcurrentObjectsTest
     {
-        private CheckConcurrentObjects check;
+        private CheckConcurrentObjects check = null!;
 
         [SetUp]
         public void Setup()

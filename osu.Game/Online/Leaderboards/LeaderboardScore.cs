@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +37,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public partial class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -179,11 +181,11 @@ namespace osu.Game.Online.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new UpdateableFlag(user.Country)
+                                                        new UpdateableFlag(user.CountryCode)
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
-                                                            Size = new Vector2(30f, 20f),
+                                                            Size = new Vector2(28, 20),
                                                         },
                                                         new DateLabel(Score.Date)
                                                         {
@@ -308,7 +310,7 @@ namespace osu.Game.Online.Leaderboards
             base.OnHoverLost(e);
         }
 
-        private class ScoreComponentLabel : Container, IHasTooltip
+        private partial class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
             private readonly FillFlowContainer content;
@@ -370,7 +372,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class RankLabel : Container, IHasTooltip
+        private partial class RankLabel : Container, IHasTooltip
         {
             public RankLabel(int? rank)
             {
@@ -389,7 +391,7 @@ namespace osu.Game.Online.Leaderboards
             public LocalisableString TooltipText { get; }
         }
 
-        private class DateLabel : DrawableDate
+        private partial class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
                 : base(date)
@@ -424,10 +426,10 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.Files.Count > 0)
+                {
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
-
-                if (!isOnlineScope)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

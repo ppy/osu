@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressCompletionNotification : SimpleNotification
+    public partial class ProgressCompletionNotification : SimpleNotification
     {
         public ProgressCompletionNotification()
         {
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Notifications
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IconBackground.Colour = ColourInfo.GradientVertical(colours.GreenDark, colours.GreenLight);
+            IconContent.Colour = ColourInfo.GradientVertical(colours.GreenDark, colours.GreenLight);
         }
     }
 }

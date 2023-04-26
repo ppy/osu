@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -14,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTabControl<T> : OsuTabControl<T>
+    public abstract partial class OverlayTabControl<T> : OsuTabControl<T>
     {
         private readonly Box bar;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem(value);
 
-        protected class OverlayTabItem : TabItem<T>, IHasAccentColour
+        protected partial class OverlayTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
@@ -13,7 +15,7 @@ using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Users
 {
-    public class UserListPanel : ExtendedUserPanel
+    public partial class UserListPanel : ExtendedUserPanel
     {
         public UserListPanel(APIUser user)
             : base(user)
@@ -65,6 +67,7 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
+                                username.UseFullGlyphHeight = false;
                             })
                         }
                     },
@@ -93,13 +96,23 @@ namespace osu.Game.Users
                 }
             };
 
+            if (User.Groups != null)
+            {
+                details.Add(new GroupBadgeFlow
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    User = { Value = User }
+                });
+            }
+
             if (User.IsSupporter)
             {
                 details.Add(new SupporterIcon
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Height = 20,
+                    Height = 16,
                     SupportLevel = User.SupportLevel
                 });
             }

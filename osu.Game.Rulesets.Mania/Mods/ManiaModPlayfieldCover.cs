@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -22,6 +24,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
+        [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
+        public abstract BindableNumber<float> Coverage { get; }
+
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
@@ -31,12 +36,12 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
-                hocParent.Remove(hoc);
+                hocParent.Remove(hoc, false);
                 hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
-                    c.Coverage = 0.5f;
+                    c.Coverage = Coverage.Value;
                 }));
             }
         }

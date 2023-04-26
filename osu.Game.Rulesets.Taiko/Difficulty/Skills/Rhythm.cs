@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
@@ -106,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     if (!samePattern(start, mostRecentPatternsToCompare))
                         continue;
 
-                    int notesSince = hitObject.ObjectIndex - rhythmHistory[start].ObjectIndex;
+                    int notesSince = hitObject.Index - rhythmHistory[start].Index;
                     penalty *= repetitionPenalty(notesSince);
                     break;
                 }

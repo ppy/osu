@@ -7,13 +7,18 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ShowRepliesButton : CommentRepliesButton
+    public partial class ShowRepliesButton : CommentRepliesButton
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
         public ShowRepliesButton(int count)
         {
-            Text = "reply".ToQuantity(count);
+            Count = count;
+        }
+
+        public int Count
+        {
+            set => Text = "reply".ToQuantity(value);
         }
 
         protected override void LoadComplete()

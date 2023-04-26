@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     public interface IRulesetStore

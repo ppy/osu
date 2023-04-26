@@ -10,10 +10,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public class VertexPiece : Circle
+    public partial class VertexPiece : Circle
     {
         [Resolved]
-        private OsuColour osuColour { get; set; }
+        private OsuColour osuColour { get; set; } = null!;
 
         public VertexPiece()
         {

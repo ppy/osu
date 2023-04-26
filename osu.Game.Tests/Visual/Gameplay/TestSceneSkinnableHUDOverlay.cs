@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +18,13 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableHUDOverlay : SkinnableTestScene
+    public partial class TestSceneSkinnableHUDOverlay : SkinnableTestScene
     {
         private HUDOverlay hudOverlay;
 
@@ -34,14 +37,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -86,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                     action?.Invoke(hudOverlay);
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Drawing;
 using System.Linq;
@@ -21,7 +23,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tournament.Screens.Editors
 {
     [Cached]
-    public class LadderEditorScreen : LadderScreen, IHasContextMenu
+    public partial class LadderEditorScreen : LadderScreen, IHasContextMenu
     {
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
@@ -42,7 +44,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
 
-            LadderInfo.Matches.CollectionChanged += (_, __) => updateMessage();
+            LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
         }
 
@@ -84,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Editors
             MatchesContainer.FirstOrDefault(p => p.Match == match)?.Remove();
         }
 
-        private class JoinVisualiser : CompositeDrawable
+        private partial class JoinVisualiser : CompositeDrawable
         {
             private readonly Container<DrawableTournamentMatch> matchesContainer;
             public readonly TournamentMatch Source;

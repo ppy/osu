@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -11,18 +13,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// The tail of a <see cref="DrawableHoldNote"/>.
     /// </summary>
-    public class DrawableHoldNoteTail : DrawableNote
+    public partial class DrawableHoldNoteTail : DrawableNote
     {
-        /// <summary>
-        /// Lenience of release hit windows. This is to make cases where the hold note release
-        /// is timed alongside presses of other hit objects less awkward.
-        /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
-        /// </summary>
-        private const double release_window_lenience = 1.5;
-
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
 
-        protected DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
+        protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
         public DrawableHoldNoteTail()
             : this(null)
@@ -38,14 +33,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
-
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
             // Factor in the release lenience
-            timeOffset /= release_window_lenience;
+            timeOffset /= TailNote.RELEASE_WINDOW_LENIENCE;
 
             if (!userTriggered)
             {

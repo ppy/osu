@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// <summary>
     /// A <see cref="CompositeDrawable"/> that exposes bindables for <see cref="Room"/> properties.
     /// </summary>
-    public class OnlinePlayComposite : CompositeDrawable
+    public partial class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
         protected Bindable<long?> RoomID { get; private set; }
@@ -84,6 +86,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan> AutoStartDuration { get; private set; }
 
+        [Resolved(typeof(Room))]
+        protected Bindable<bool> AutoSkip { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
 
@@ -92,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay
             base.LoadComplete();
 
             subScreenSelectedItem?.BindValueChanged(_ => UpdateSelectedItem());
-            Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
+            Playlist.BindCollectionChanged((_, _) => UpdateSelectedItem(), true);
         }
 
         protected void UpdateSelectedItem()

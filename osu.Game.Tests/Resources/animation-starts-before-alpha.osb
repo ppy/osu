@@ -1,0 +1,5 @@
+[Events]
+//Storyboard Layer 0 (Background)
+Animation,Background,Centre,"img.jpg",320,240,2,150,LoopForever
+ S,0,1000,1500,0.08 // animation should start playing from this point in time..
+ F,0,2000,,0,1      // .. not this point in time

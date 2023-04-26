@@ -1,23 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Taiko.Replays;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -25,11 +27,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
+    public partial class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
+        public readonly BindableBool LockPlayfieldMaxAspect = new BindableBool(true);
+
+        public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
@@ -41,7 +45,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
-            TimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
@@ -49,11 +52,26 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
-            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
+            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
             {
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue
             });
+
+            KeyBindingInputManager.Add(new DrumTouchInputArea());
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
+            const float scroll_rate = 10;
+
+            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
+            float ratio = DrawHeight / 480;
+
+            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
         }
 
         protected override void UpdateAfterChildren()
@@ -74,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect }
+            LockPlayfieldMaxAspect = { BindTarget = LockPlayfieldMaxAspect }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);

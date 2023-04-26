@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -16,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -29,12 +32,11 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
+    public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;
 
-        private RulesetStore rulesetStore;
         private BeatmapManager beatmapManager;
         private ScoreManager scoreManager;
 
@@ -69,9 +71,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            dependencies.Cache(new RealmRulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
 
             return dependencies;
@@ -92,12 +94,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         OnlineID = i,
                         BeatmapInfo = beatmapInfo,
+                        BeatmapHash = beatmapInfo.Hash,
                         Accuracy = RNG.NextDouble(),
                         TotalScore = RNG.Next(1, 1000000),
                         MaxCombo = RNG.Next(1, 1000),
                         Rank = ScoreRank.XH,
                         User = new APIUser { Username = "TestUser" },
                         Ruleset = new OsuRuleset().RulesetInfo,
+                        Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
                     importedScores.Add(scoreManager.Import(score).Value);
@@ -160,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
+            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
 
             // "Clean up"
@@ -171,7 +175,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestDeleteViaDatabase()
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
-            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
+            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }

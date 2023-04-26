@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
@@ -19,8 +18,11 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [HeadlessTest]
-    public class LegacyMainCirclePieceTest : OsuTestScene
+    public partial class LegacyMainCirclePieceTest : OsuTestScene
     {
+        [Resolved]
+        private IRenderer renderer { get; set; } = null!;
+
         private static readonly object?[][] texture_priority_cases =
         {
             // default priority lookup
@@ -78,7 +80,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
 
                 skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
-                    .Returns((string componentName, WrapMode _, WrapMode __) => new Texture(1, 1) { AssetName = componentName });
+                    .Returns((string componentName, WrapMode _, WrapMode _) =>
+                    {
+                        var tex = renderer.CreateTexture(1, 1);
+                        tex.AssetName = componentName;
+                        return tex;
+                    });
 
                 Child = new DependencyProvidingContainer
                 {
@@ -86,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Child = piece = new TestLegacyMainCirclePiece(priorityLookup),
                 };
 
-                var sprites = this.ChildrenOfType<Sprite>().Where(s => s.Texture.AssetName != null).DistinctBy(s => s.Texture.AssetName).ToArray();
+                var sprites = this.ChildrenOfType<Sprite>().Where(s => !string.IsNullOrEmpty(s.Texture.AssetName)).DistinctBy(s => s.Texture.AssetName).ToArray();
                 Debug.Assert(sprites.Length <= 2);
             });
 
@@ -94,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("check overlay sprite", () => piece.OverlaySprite?.Texture?.AssetName == expectedOverlay);
         }
 
-        private class TestLegacyMainCirclePiece : LegacyMainCirclePiece
+        private partial class TestLegacyMainCirclePiece : LegacyMainCirclePiece
         {
             public new Sprite? CircleSprite => base.CircleSprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();
             public new Sprite? OverlaySprite => base.OverlaySprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();

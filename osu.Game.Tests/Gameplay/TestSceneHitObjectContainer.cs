@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -12,7 +14,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneHitObjectContainer : OsuTestScene
+    public partial class TestSceneHitObjectContainer : OsuTestScene
     {
         private HitObjectContainer container;
 
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("second object index is 0", () => container.IndexOf(secondObject) == 1);
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private partial class TestDrawableHitObject : DrawableHitObject
         {
             public TestDrawableHitObject([NotNull] HitObject hitObject)
                 : base(hitObject)

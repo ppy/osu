@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -106,7 +109,7 @@ namespace osu.Game.Rulesets.Objects
 
             if (legacyInfo != null)
                 DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+            else if (ReferenceEquals(DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                 DifficultyControlPoint = new DifficultyControlPoint();
 
             DifficultyControlPoint.Time = StartTime;
@@ -116,7 +119,7 @@ namespace osu.Game.Rulesets.Objects
             // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
             if (legacyInfo != null)
                 SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+            else if (ReferenceEquals(SampleControlPoint, SampleControlPoint.DEFAULT))
                 SampleControlPoint = new SampleControlPoint();
 
             SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
@@ -196,6 +199,29 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+
+        /// <summary>
+        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="HitObject"/> can be judged.
+        /// <para>
+        /// Defaults to the miss window.
+        /// </para>
+        /// </summary>
+        public virtual double MaximumJudgementOffset => HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+
+        public IList<HitSampleInfo> CreateSlidingSamples()
+        {
+            var slidingSamples = new List<HitSampleInfo>();
+
+            var normalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(normalSample.With("sliderslide"));
+
+            var whistleSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(whistleSample.With("sliderwhistle"));
+
+            return slidingSamples;
+        }
     }
 
     public static class HitObjectExtensions

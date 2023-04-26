@@ -13,14 +13,15 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorTrail : CursorTrail
+    public partial class LegacyCursorTrail : CursorTrail
     {
         private readonly ISkin skin;
         private const double disjoint_trail_time_separation = 1000 / 60.0;
 
         private bool disjointTrail;
         private double lastTrailTime;
-        private IBindable<float> cursorSize;
+
+        private IBindable<float> cursorSize = null!;
 
         private Vector2? currentPosition;
 
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
+
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
@@ -52,8 +55,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
                 Texture.ScaleAdjust *= 1.6f;
             }
-
-            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
         }
 
         protected override double FadeDuration => disjointTrail ? 150 : 500;

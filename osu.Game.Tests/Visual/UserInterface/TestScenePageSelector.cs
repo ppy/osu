@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePageSelector : OsuTestScene
+    public partial class TestScenePageSelector : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider provider { get; } = new OverlayColourProvider(OverlayColourScheme.Green);

@@ -1,15 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -18,7 +22,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         public Bindable<IReadOnlyList<Mod>> Current
         {
@@ -59,14 +63,28 @@ namespace osu.Game.Screens.Select
             Hotkey = GlobalAction.ToggleModSelection;
         }
 
+        [CanBeNull]
+        private ModSettingChangeTracker modSettingChangeTracker;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => updateMultiplierText(), true);
+            Current.BindValueChanged(mods =>
+            {
+                modSettingChangeTracker?.Dispose();
+
+                updateMultiplierText();
+
+                if (mods.NewValue != null)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplierText();
+                }
+            }, true);
         }
 
-        private void updateMultiplierText()
+        private void updateMultiplierText() => Schedule(() =>
         {
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
 
@@ -83,6 +101,6 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn();
             else
                 modDisplay.FadeOut();
-        }
+        });
     }
 }

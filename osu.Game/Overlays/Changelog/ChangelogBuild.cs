@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,10 +16,8 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogBuild : FillFlowContainer
+    public partial class ChangelogBuild : FillFlowContainer
     {
-        public const float HORIZONTAL_PADDING = 70;
-
         public Action<APIChangelogBuild> SelectBuild;
 
         protected readonly APIChangelogBuild Build;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
+            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING };
 
             Children = new Drawable[]
             {
@@ -66,11 +66,15 @@ namespace osu.Game.Overlays.Changelog
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
             AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal,
+            Direction = FillDirection.Vertical,
             Margin = new MarginPadding { Top = 20 },
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new OsuHoverContainer
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Child = new OsuHoverContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

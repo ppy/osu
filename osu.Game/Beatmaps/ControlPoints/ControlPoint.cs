@@ -9,17 +9,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>, IControlPoint
     {
-        /// <summary>
-        /// The time at which the control point takes effect.
-        /// </summary>
         [JsonIgnore]
         public double Time { get; set; }
 
         public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
-        public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPoint? other) => Time.CompareTo(other?.Time);
 
         public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
@@ -28,14 +25,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="existing">An existing control point to compare with.</param>
         /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
-        public abstract bool IsRedundant(ControlPoint existing);
+        public abstract bool IsRedundant(ControlPoint? existing);
 
         /// <summary>
         /// Create an unbound copy of this control point.
         /// </summary>
         public ControlPoint DeepClone()
         {
-            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+            var copy = (ControlPoint)Activator.CreateInstance(GetType())!;
 
             copy.CopyFrom(this);
 
@@ -46,5 +43,20 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             Time = other.Time;
         }
+
+        public sealed override bool Equals(object? obj)
+            => obj is ControlPoint otherControlPoint
+               && Equals(otherControlPoint);
+
+        public virtual bool Equals(ControlPoint? other)
+        {
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(other, this)) return true;
+
+            return Time == other.Time;
+        }
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => Time.GetHashCode();
     }
 }

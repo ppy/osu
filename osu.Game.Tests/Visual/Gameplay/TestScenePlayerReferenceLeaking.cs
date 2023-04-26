@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
@@ -10,7 +12,7 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerReferenceLeaking : TestSceneAllRulesetPlayers
+    public partial class TestScenePlayerReferenceLeaking : TestSceneAllRulesetPlayers
     {
         private readonly WeakList<IWorkingBeatmap> workingWeakReferences = new WeakList<IWorkingBeatmap>();
 

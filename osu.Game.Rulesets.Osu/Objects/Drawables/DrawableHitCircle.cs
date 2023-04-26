@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -21,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece, IHasApproachCircle
+    public partial class DrawableHitCircle : DrawableOsuHitObject, IHasApproachCircle
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -45,12 +48,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
+        private ShakeContainer shakeContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Origin = Anchor.Centre;
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 scaleContainer = new Container
                 {
@@ -70,27 +75,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece())
+                        shakeContainer = new ShakeContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            ShakeDuration = 30,
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            Scale = new Vector2(4),
+                            Children = new Drawable[]
+                            {
+                                CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(CirclePieceComponent), _ => new MainCirclePiece())
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                ApproachCircle = new ProxyableSkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ApproachCircle), _ => new DefaultApproachCircle())
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    Scale = new Vector2(4),
+                                }
+                            }
                         }
                     }
                 },
-            };
+            });
 
             Size = HitArea.DrawSize;
 
-            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            PositionBindable.BindValueChanged(_ => UpdatePosition());
+            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
@@ -121,6 +134,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        protected virtual void UpdatePosition()
+        {
+            Position = HitObject.StackedPosition;
+        }
+
+        public override void Shake() => shakeContainer.Shake();
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -137,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
-                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
+                Shake();
                 return;
             }
 
@@ -189,12 +209,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
 
-            // in the case of an early state change, the fade should be expedited to the current point in time.
-            if (HitStateUpdateTime < HitObject.StartTime)
-                ApproachCircle.FadeOut(50);
-
             switch (state)
             {
+                default:
+                    ApproachCircle.FadeOut();
+                    break;
+
                 case ArmedState.Idle:
                     HitArea.HitAction = null;
                     break;
@@ -211,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuHitCircleJudgementResult(HitObject, judgement);
 
-        public class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
+        public partial class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {
             // IsHovered is used
             public override bool HandlePositionalInput => true;
@@ -254,12 +274,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        private class ProxyableSkinnableDrawable : SkinnableDrawable
+        private partial class ProxyableSkinnableDrawable : SkinnableDrawable
         {
             public override bool RemoveWhenNotAlive => false;
 
-            public ProxyableSkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-                : base(component, defaultImplementation, confineMode)
+            public ProxyableSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+                : base(lookup, defaultImplementation, confineMode)
             {
             }
         }

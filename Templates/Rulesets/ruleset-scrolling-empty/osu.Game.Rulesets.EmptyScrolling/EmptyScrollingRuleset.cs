@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.EmptyScrolling
                     return new[] { new EmptyScrollingModAutoplay() };
 
                 default:
-                    return new Mod[] { null };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -53,5 +54,8 @@ namespace osu.Game.Rulesets.EmptyScrolling
             Text = ShortName[0].ToString(),
             Font = OsuFont.Default.With(size: 18),
         };
+
+        // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
     }
 }

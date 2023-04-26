@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,7 +18,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchFilterRow<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class BeatmapSearchFilterRow<T> : CompositeDrawable, IHasCurrentValue<T>
     {
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [NotNull]
         protected virtual Drawable CreateFilter() => new BeatmapSearchFilter();
 
-        protected class BeatmapSearchFilter : TabControl<T>
+        protected partial class BeatmapSearchFilter : TabControl<T>
         {
             public BeatmapSearchFilter()
             {
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem<T>(value);
 
-            private class FilterDropdown : OsuTabDropdown<T>
+            private partial class FilterDropdown : OsuTabDropdown<T>
             {
                 protected override DropdownHeader CreateHeader() => new FilterHeader
                 {
@@ -104,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Origin = Anchor.TopRight
                 };
 
-                private class FilterHeader : OsuTabDropdownHeader
+                private partial class FilterHeader : OsuTabDropdownHeader
                 {
                     public FilterHeader()
                     {

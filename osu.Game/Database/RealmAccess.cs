@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +14,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -25,10 +24,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -46,8 +46,6 @@ namespace osu.Game.Database
         /// </summary>
         public readonly string Filename;
 
-        private readonly IDatabaseContextFactory? efContextFactory;
-
         private readonly SynchronizationContext? updateThreadSyncContext;
 
         /// <summary>
@@ -61,15 +59,30 @@ namespace osu.Game.Database
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
         /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
+        /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
+        /// 16   2022-07-15    Removed HasReplay from ScoreInfo.
+        /// 17   2022-07-16    Added CountryCode to RealmUser.
+        /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
+        /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
+        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
+        /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
+        /// 22   2022-07-31    Added ModPreset.
+        /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
+        /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
+        /// 25   2022-09-18    Remove skins to add with new naming.
+        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// </summary>
-        private const int schema_version = 14;
+        private const int schema_version = 26;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
-        private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
+        /// <summary>
+        /// <c>true</c> when the current thread has already entered the <see cref="realmRetrievalLock"/>.
+        /// </summary>
+        private readonly ThreadLocal<bool> currentThreadHasRealmRetrievalLock = new ThreadLocal<bool>();
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
@@ -101,9 +114,13 @@ namespace osu.Game.Database
 
         private static readonly GlobalStatistic<int> total_writes_async = GlobalStatistics.Get<int>(@"Realm", @"Writes (Async)");
 
-        private readonly object realmLock = new object();
-
         private Realm? updateRealm;
+
+        /// <summary>
+        /// Tracks whether a realm was ever fetched from this instance.
+        /// After a fetch occurs, blocking operations will be guaranteed to restore any subscriptions.
+        /// </summary>
+        private bool hasInitialisedOnce;
 
         private bool isSendingNotificationResetEvents;
 
@@ -119,23 +136,21 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"Use {nameof(getRealmInstance)} when performing realm operations from a non-update thread");
 
-            lock (realmLock)
+            if (updateRealm == null)
             {
-                if (updateRealm == null)
-                {
-                    updateRealm = getRealmInstance();
+                updateRealm = getRealmInstance();
+                hasInitialisedOnce = true;
 
-                    Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
+                Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
 
-                    // Resubscribe any subscriptions
-                    foreach (var action in customSubscriptionsResetMap.Keys)
-                        registerSubscription(action);
-                }
-
-                Debug.Assert(updateRealm != null);
-
-                return updateRealm;
+                // Resubscribe any subscriptions
+                foreach (var action in customSubscriptionsResetMap.Keys.ToArray())
+                    registerSubscription(action);
             }
+
+            Debug.Assert(updateRealm != null);
+
+            return updateRealm;
         }
 
         internal static bool CurrentThreadSubscriptionsAllowed => current_thread_subscriptions_allowed.Value;
@@ -148,11 +163,9 @@ namespace osu.Game.Database
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
         /// <param name="updateThread">The game update thread, used to post realm operations into a thread-safe context.</param>
-        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null)
         {
             this.storage = storage;
-            this.efContextFactory = efContextFactory;
 
             updateThreadSyncContext = updateThread?.SynchronizationContext ?? SynchronizationContext.Current;
 
@@ -160,6 +173,11 @@ namespace osu.Game.Database
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+#if DEBUG
+            if (!DebugUtils.IsNUnitRunning)
+                applyFilenameSchemaSuffix(ref Filename);
+#endif
 
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
@@ -185,19 +203,64 @@ namespace osu.Game.Database
 
                     // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
-                        CreateBackup(newerVersionFilename);
+                        createBackup(newerVersionFilename);
 
                     storage.Delete(Filename);
                 }
                 else
                 {
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
-                    CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                     storage.Delete(Filename);
                 }
 
                 cleanupPendingDeletions();
             }
+        }
+
+        /// <summary>
+        /// Some developers may be annoyed if a newer version migration (ie. caused by testing a pull request)
+        /// cause their test database to be unusable with previous versions.
+        /// To get around this, store development databases against their realm version.
+        /// Note that this means changes made on newer realm versions will disappear.
+        /// </summary>
+        private void applyFilenameSchemaSuffix(ref string filename)
+        {
+            string originalFilename = filename;
+
+            filename = getVersionedFilename(schema_version);
+
+            // First check if the current realm version already exists...
+            if (storage.Exists(filename))
+                return;
+
+            // Check for a previous version we can use as a base database to migrate from...
+            for (int i = schema_version - 1; i >= 0; i--)
+            {
+                string previousFilename = getVersionedFilename(i);
+
+                if (storage.Exists(previousFilename))
+                {
+                    copyPreviousVersion(previousFilename, filename);
+                    return;
+                }
+            }
+
+            // Finally, check for  a non-versioned file exists (aka before this method was added)...
+            if (storage.Exists(originalFilename))
+                copyPreviousVersion(originalFilename, filename);
+
+            void copyPreviousVersion(string previousFilename, string newFilename)
+            {
+                using (var previous = storage.GetStream(previousFilename))
+                using (var current = storage.CreateFileSafely(newFilename))
+                {
+                    Logger.Log(@$"Copying previous realm database {previousFilename} to {newFilename} for migration to schema version {schema_version}");
+                    previous.CopyTo(current);
+                }
+            }
+
+            string getVersionedFilename(int version) => originalFilename.Replace(realm_extension, $"_{version}{realm_extension}");
         }
 
         private void attemptRecoverFromFile(string recoveryFilename)
@@ -237,7 +300,7 @@ namespace osu.Game.Database
             }
 
             // For extra safety, also store the temporarily-used database which we are about to replace.
-            CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
+            createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
 
             storage.Delete(Filename);
 
@@ -270,7 +333,6 @@ namespace osu.Game.Database
                             realm.Remove(score);
 
                         realm.Remove(beatmap.Metadata);
-
                         realm.Remove(beatmap);
                     }
 
@@ -280,6 +342,11 @@ namespace osu.Game.Database
                 var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
 
                 foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
+
+                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeletePresets)
                     realm.Remove(s);
 
                 transaction.Commit();
@@ -384,15 +451,43 @@ namespace osu.Game.Database
             }
         }
 
+        private readonly CountdownEvent pendingAsyncWrites = new CountdownEvent(0);
+
         /// <summary>
         /// Write changes to realm asynchronously, guaranteeing order of execution.
         /// </summary>
         /// <param name="action">The work to run.</param>
-        public async Task WriteAsync(Action<Realm> action)
+        public Task WriteAsync(Action<Realm> action)
         {
-            total_writes_async.Value++;
-            using (var realm = getRealmInstance())
-                await realm.WriteAsync(() => action(realm));
+            if (isDisposed)
+                throw new ObjectDisposedException(nameof(RealmAccess));
+
+            // Required to ensure the write is tracked and accounted for before disposal.
+            // Can potentially be avoided if we have a need to do so in the future.
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(WriteAsync)} must be called from the update thread.");
+
+            // CountdownEvent will fail if already at zero.
+            if (!pendingAsyncWrites.TryAddCount())
+                pendingAsyncWrites.Reset(1);
+
+            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+            // Adding a forced Task.Run resolves this.
+            var writeTask = Task.Run(async () =>
+            {
+                total_writes_async.Value++;
+
+                // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
+                // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
+                // server, which we don't use. May want to report upstream or revisit in the future.
+                using (var realm = getRealmInstance())
+                    // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
+
+                pendingAsyncWrites.Signal();
+            });
+
+            return writeTask;
         }
 
         /// <summary>
@@ -417,14 +512,15 @@ namespace osu.Game.Database
         public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            lock (realmLock)
-            {
-                Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
+            Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
 
+            lock (notificationsResetMap)
+            {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
                 notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
-                return RegisterCustomSubscription(action);
             }
+
+            return RegisterCustomSubscription(action);
         }
 
         /// <summary>
@@ -446,7 +542,7 @@ namespace osu.Game.Database
         public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
             where TModel : RealmObjectBase
         {
-            return RegisterCustomSubscription(r =>
+            return RegisterCustomSubscription(_ =>
             {
                 string propertyName = getMemberName(propertyLookup);
 
@@ -463,7 +559,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));
@@ -515,15 +611,17 @@ namespace osu.Game.Database
 
                 void unsubscribe()
                 {
-                    lock (realmLock)
+                    if (customSubscriptionsResetMap.TryGetValue(action, out var unsubscriptionAction))
                     {
-                        if (customSubscriptionsResetMap.TryGetValue(action, out var unsubscriptionAction))
+                        unsubscriptionAction?.Dispose();
+                        customSubscriptionsResetMap.Remove(action);
+
+                        lock (notificationsResetMap)
                         {
-                            unsubscriptionAction?.Dispose();
-                            customSubscriptionsResetMap.Remove(action);
                             notificationsResetMap.Remove(action);
-                            total_subscriptions.Value--;
                         }
+
+                        total_subscriptions.Value--;
                     }
                 }
             });
@@ -533,19 +631,16 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            lock (realmLock)
-            {
-                // Retrieve realm instance outside of flag update to ensure that the instance is retrieved,
-                // as attempting to access it inside the subscription if it's not constructed would lead to
-                // cyclic invocations of the subscription callback.
-                var realm = Realm;
+            // Retrieve realm instance outside of flag update to ensure that the instance is retrieved,
+            // as attempting to access it inside the subscription if it's not constructed would lead to
+            // cyclic invocations of the subscription callback.
+            var realm = Realm;
 
-                Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
+            Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
 
-                current_thread_subscriptions_allowed.Value = true;
-                customSubscriptionsResetMap[action] = action(realm);
-                current_thread_subscriptions_allowed.Value = false;
-            }
+            current_thread_subscriptions_allowed.Value = true;
+            customSubscriptionsResetMap[action] = action(realm);
+            current_thread_subscriptions_allowed.Value = false;
         }
 
         private Realm getRealmInstance()
@@ -557,10 +652,11 @@ namespace osu.Game.Database
 
             try
             {
-                if (!currentThreadCanCreateRealmInstances.Value)
+                // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
+                if (!currentThreadHasRealmRetrievalLock.Value)
                 {
                     realmRetrievalLock.Wait();
-                    currentThreadCanCreateRealmInstances.Value = true;
+                    currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
@@ -584,7 +680,7 @@ namespace osu.Game.Database
                 if (tookSemaphoreLock)
                 {
                     realmRetrievalLock.Release();
-                    currentThreadCanCreateRealmInstances.Value = false;
+                    currentThreadHasRealmRetrievalLock.Value = false;
                 }
             }
         }
@@ -744,35 +840,95 @@ namespace osu.Game.Database
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
                         beatmap.UserSettings = new BeatmapUserSettings();
+
+                    break;
+
+                case 20:
+                    // As we now have versioned difficulty calculations, let's reset
+                    // all star ratings and have `BackgroundBeatmapProcessor` recalculate them.
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.StarRating = -1;
+
+                    break;
+
+                case 21:
+                    // Migrate collections from external file to inside realm.
+                    // We use the "legacy" importer because that is how things were actually being saved out until now.
+                    var legacyCollectionImporter = new LegacyCollectionImporter(this);
+
+                    if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
+                    {
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(_ => storage.Move("collection.db", "collection.db.migrated"));
+                    }
+
+                    break;
+
+                case 25:
+                    // Remove the default skins so they can be added back by SkinManager with updated naming.
+                    migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
+                    break;
+
+                case 26:
+                    // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                        score.BeatmapHash = score.BeatmapInfo.Hash;
+
                     break;
             }
         }
 
-        private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
-            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+        private string? getRulesetShortNameFromLegacyID(long rulesetId)
+        {
+            try
+            {
+                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// Create a full realm backup.
+        /// </summary>
+        /// <param name="backupFilename">The filename for the backup.</param>
         public void CreateBackup(string backupFilename)
         {
-            using (BlockAllOperations())
+            if (realmRetrievalLock.CurrentCount != 0)
+                throw new InvalidOperationException($"Call {nameof(BlockAllOperations)} before creating a backup.");
+
+            createBackup(backupFilename);
+        }
+
+        private void createBackup(string backupFilename)
+        {
+            Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+
+            int attempts = 10;
+
+            while (attempts-- > 0)
             {
-                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
-
-                int attempts = 10;
-
-                while (attempts-- > 0)
+                try
                 {
-                    try
+                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                     {
-                        using (var source = storage.GetStream(Filename))
+                        // source may not exist.
+                        if (source == null)
+                            return;
+
                         using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                             source.CopyTo(destination);
-                        return;
                     }
-                    catch (IOException)
-                    {
-                        // file may be locked during use.
-                        Thread.Sleep(500);
-                    }
+
+                    return;
+                }
+                catch (IOException)
+                {
+                    // file may be locked during use.
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -784,9 +940,15 @@ namespace osu.Game.Database
         /// This should be used in places we need to ensure no ongoing reads/writes are occurring with realm.
         /// ie. to move the realm backing file to a new location.
         /// </remarks>
+        /// <param name="reason">The reason for blocking. Used for logging purposes.</param>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
-        public IDisposable BlockAllOperations()
+        public IDisposable BlockAllOperations(string reason)
         {
+            Logger.Log($@"Attempting to block all realm operations for {reason}.", LoggingTarget.Database);
+
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmAccess));
 
@@ -796,39 +958,27 @@ namespace osu.Game.Database
             {
                 realmRetrievalLock.Wait();
 
-                lock (realmLock)
+                if (hasInitialisedOnce)
                 {
-                    if (updateRealm == null)
+                    syncContext = SynchronizationContext.Current;
+
+                    // Before disposing the update context, clean up all subscriptions.
+                    // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
+                    // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
+                    foreach (var action in customSubscriptionsResetMap.ToArray())
                     {
-                        // null realm means the update thread has not yet retrieved its instance.
-                        // we don't need to worry about reviving the update instance in this case, so don't bother with the SynchronizationContext.
-                        Debug.Assert(!ThreadSafety.IsUpdateThread);
+                        action.Value?.Dispose();
+                        customSubscriptionsResetMap[action.Key] = null;
                     }
-                    else
-                    {
-                        if (!ThreadSafety.IsUpdateThread)
-                            throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
-                        syncContext = SynchronizationContext.Current;
-
-                        // Before disposing the update context, clean up all subscriptions.
-                        // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
-                        // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
-                        foreach (var action in customSubscriptionsResetMap)
-                        {
-                            action.Value?.Dispose();
-                            customSubscriptionsResetMap[action.Key] = null;
-                        }
-                    }
-
-                    Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
                     updateRealm?.Dispose();
                     updateRealm = null;
                 }
 
+                Logger.Log(@"Lock acquired for blocking operations", LoggingTarget.Database);
+
                 const int sleep_length = 200;
-                int timeout = 5000;
+                int timeSpent = 0;
 
                 try
                 {
@@ -836,10 +986,10 @@ namespace osu.Game.Database
                     while (!Compact())
                     {
                         Thread.Sleep(sleep_length);
-                        timeout -= sleep_length;
+                        timeSpent += sleep_length;
 
-                        if (timeout < 0)
-                            throw new TimeoutException(@"Took too long to acquire lock");
+                        if (timeSpent > 5000)
+                            throw new TimeoutException($@"Realm compact failed after {timeSpent / sleep_length} attempts over {timeSpent / 1000} seconds");
                     }
                 }
                 catch (RealmException e)
@@ -848,6 +998,8 @@ namespace osu.Game.Database
                     // We still want to continue with the blocking operation, though.
                     Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
+
+                Logger.Log(@"Realm usage isolated via compact", LoggingTarget.Database);
 
                 // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
                 // and must be posted to the synchronization context.
@@ -862,8 +1014,11 @@ namespace osu.Game.Database
 
                     try
                     {
-                        foreach (var action in notificationsResetMap.Values)
-                            action();
+                        lock (notificationsResetMap)
+                        {
+                            foreach (var action in notificationsResetMap.Values)
+                                action();
+                        }
                     }
                     finally
                     {
@@ -881,16 +1036,39 @@ namespace osu.Game.Database
 
             void restoreOperation()
             {
+                // Release of lock needs to happen here rather than on the update thread, as there may be another
+                // operation already blocking the update thread waiting for the blocking operation to complete.
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
+
+                if (syncContext == null) return;
+
+                ManualResetEventSlim updateRealmReestablished = new ManualResetEventSlim();
 
                 // Post back to the update thread to revive any subscriptions.
                 // In the case we are on the update thread, let's also require this to run synchronously.
                 // This requirement is mostly due to test coverage, but shouldn't cause any harm.
                 if (ThreadSafety.IsUpdateThread)
-                    syncContext?.Send(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Send(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
                 else
-                    syncContext?.Post(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Post(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
+
+                // Wait for the post to complete to ensure a second `Migrate` operation doesn't start in the mean time.
+                // This is important to ensure `ensureUpdateRealm` is run before another blocking migration operation starts.
+                if (!updateRealmReestablished.Wait(10000))
+                    throw new TimeoutException(@"Reestablishing update realm after block took too long");
             }
         }
 
@@ -901,10 +1079,10 @@ namespace osu.Game.Database
 
         public void Dispose()
         {
-            lock (realmLock)
-            {
-                updateRealm?.Dispose();
-            }
+            if (!pendingAsyncWrites.Wait(10000))
+                Logger.Log("Realm took too long waiting on pending async writes", level: LogLevel.Error);
+
+            updateRealm?.Dispose();
 
             if (!isDisposed)
             {

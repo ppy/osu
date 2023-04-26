@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 
@@ -15,7 +17,7 @@ namespace osu.Game.Tournament.Models
         public Bindable<int> Seed = new BindableInt
         {
             MinValue = 1,
-            MaxValue = 64
+            MaxValue = 256
         };
     }
 }

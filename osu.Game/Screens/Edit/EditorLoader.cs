@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -23,7 +25,7 @@ namespace osu.Game.Screens.Edit
     /// Transition screen for the editor.
     /// Used to avoid backing out to main menu/song select when switching difficulties from within the editor.
     /// </summary>
-    public class EditorLoader : ScreenWithBeatmapBackground
+    public partial class EditorLoader : ScreenWithBeatmapBackground
     {
         /// <summary>
         /// The stored state from the last editor opened.
@@ -63,6 +65,8 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
 
             // will be restored via lease, see `DisallowExternalBeatmapRulesetChanges`.
+            if (!(Beatmap.Value is DummyWorkingBeatmap))
+                Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
             Mods.Value = Array.Empty<Mod>();
         }
 

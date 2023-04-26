@@ -1,2 +1,0 @@
-app_identifier("sh.ppy.osulazer") # The bundle identifier of your app
-apple_id("apple-dev@ppy.sh") # Your Apple email address

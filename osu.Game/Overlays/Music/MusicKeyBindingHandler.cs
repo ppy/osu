@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.Music
     /// <summary>
     /// Handles <see cref="GlobalAction"/>s related to music playback, and displays <see cref="Toast"/>s via the global <see cref="OnScreenDisplay"/> accordingly.
     /// </summary>
-    public class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
+    public partial class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Music
         {
         }
 
-        private class MusicActionToast : Toast
+        private partial class MusicActionToast : Toast
         {
             private readonly GlobalAction action;
 

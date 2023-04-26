@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,7 +24,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightSelector : CompositeDrawable, IHasCurrentValue<APISpotlight>
+    public partial class SpotlightSelector : CompositeDrawable, IHasCurrentValue<APISpotlight>
     {
         private readonly BindableWithCurrent<APISpotlight> current = new BindableWithCurrent<APISpotlight>();
         public readonly Bindable<RankingsSortCriteria> Sort = new Bindable<RankingsSortCriteria>();
@@ -61,7 +63,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
@@ -131,7 +133,7 @@ namespace osu.Game.Overlays.Rankings
 
         private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString(@"yyyy-MM-dd");
 
-        private class InfoColumn : FillFlowContainer
+        private partial class InfoColumn : FillFlowContainer
         {
             public LocalisableString Value
             {
@@ -173,7 +175,7 @@ namespace osu.Game.Overlays.Rankings
             }
         }
 
-        private class SpotlightsDropdown : OsuDropdown<APISpotlight>
+        private partial class SpotlightsDropdown : OsuDropdown<APISpotlight>
         {
             private OsuDropdownMenu menu;
 
@@ -190,7 +192,7 @@ namespace osu.Game.Overlays.Rankings
                 Padding = new MarginPadding { Vertical = 20 };
             }
 
-            private class SpotlightsDropdownHeader : OsuDropdownHeader
+            private partial class SpotlightsDropdownHeader : OsuDropdownHeader
             {
                 public SpotlightsDropdownHeader()
                 {

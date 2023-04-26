@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class AnalogClockDisplay : ClockDisplay
+    public partial class AnalogClockDisplay : ClockDisplay
     {
         private const float hand_thickness = 2.4f;
 
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
                 hand.RotateTo(rotation, duration, Easing.OutElastic);
         }
 
-        private class CentreCircle : CompositeDrawable
+        private partial class CentreCircle : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -99,7 +101,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        private class SecondHand : CompositeDrawable
+        private partial class SecondHand : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -124,7 +126,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        private class LargeHand : CompositeDrawable
+        private partial class LargeHand : CompositeDrawable
         {
             public LargeHand(float length)
             {

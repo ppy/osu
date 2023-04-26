@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -18,7 +20,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinner : OsuSkinnableTestScene
+    public partial class TestSceneSpinner : OsuSkinnableTestScene
     {
         private int depthIndex;
 
@@ -91,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return drawableSpinner;
         }
 
-        private class TestDrawableSpinner : DrawableSpinner
+        private partial class TestDrawableSpinner : DrawableSpinner
         {
             private readonly bool auto;
 

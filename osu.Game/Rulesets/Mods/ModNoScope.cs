@@ -6,7 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -28,26 +30,31 @@ namespace osu.Game.Rulesets.Mods
 
         protected const float TRANSITION_DURATION = 100;
 
-        protected BindableNumber<int> CurrentCombo;
+        protected readonly BindableNumber<int> CurrentCombo = new BindableInt();
 
-        protected IBindable<bool> IsBreakTime;
+        protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         protected float ComboBasedAlpha;
 
+        [SettingSource(
+            "Hidden at combo",
+            "The combo count at which the cursor becomes completely hidden",
+            SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
+        )]
         public abstract BindableInt HiddenComboCount { get; }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         public void ApplyToPlayer(Player player)
         {
-            IsBreakTime = player.IsBreakTime.GetBoundCopy();
+            IsBreakTime.BindTo(player.IsBreakTime);
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (HiddenComboCount.Value == 0) return;
 
-            CurrentCombo = scoreProcessor.Combo.GetBoundCopy();
+            CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
                 ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
@@ -55,7 +62,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public class HiddenComboSlider : OsuSliderBar<int>
+    public partial class HiddenComboSlider : RoundedSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
     }

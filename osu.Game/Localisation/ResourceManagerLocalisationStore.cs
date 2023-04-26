@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -61,6 +63,11 @@ namespace osu.Game.Localisation
                 }
 
                 if (manager == null)
+                    return null;
+
+                // When using the English culture, prefer the fallbacks rather than osu-resources baked strings.
+                // They are guaranteed to be up-to-date, and is also what a developer expects to see when making changes to `xxxStrings.cs` files.
+                if (EffectiveCulture.Name == @"en")
                     return null;
 
                 try

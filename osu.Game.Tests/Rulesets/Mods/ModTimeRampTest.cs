@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Rulesets.Mods
         private const double start_time = 1000;
         private const double duration = 9000;
 
-        private TrackVirtual track;
-        private OsuPlayfield playfield;
+        private TrackVirtual track = null!;
+        private OsuPlayfield playfield = null!;
 
         [SetUp]
         public void SetUp()

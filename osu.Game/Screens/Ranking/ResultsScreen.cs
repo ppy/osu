@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -25,7 +29,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public abstract class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
@@ -58,6 +62,8 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
 
+        private Sample popInSample;
+
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
@@ -68,9 +74,11 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             FillFlowContainer buttons;
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
             InternalChild = new GridContainer
             {
@@ -88,11 +96,11 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    statisticsPanel = new StatisticsPanel
+                                    statisticsPanel = CreateStatisticsPanel().With(panel =>
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Score = { BindTarget = SelectedScore }
-                                    },
+                                        panel.RelativeSizeAxes = Axes.Both;
+                                        panel.Score.BindTarget = SelectedScore;
+                                    }),
                                     ScorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -169,7 +177,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }
@@ -223,6 +231,11 @@ namespace osu.Game.Screens.Ranking
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
+        /// <summary>
+        /// Creates the <see cref="StatisticsPanel"/> to be used to display extended information about scores.
+        /// </summary>
+        protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
+
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
             foreach (var s in scores)
@@ -242,6 +255,8 @@ namespace osu.Game.Screens.Ranking
             });
 
             bottomPanel.FadeTo(1, 250);
+
+            popInSample?.Play();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -307,7 +322,7 @@ namespace osu.Game.Screens.Ranking
                 var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
 
                 // Remove from the local container and re-attach.
-                detachedPanelContainer.Remove(detachedPanel);
+                detachedPanelContainer.Remove(detachedPanel, false);
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
@@ -347,7 +362,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected class VerticalScrollContainer : OsuScrollContainer
+        protected partial class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 

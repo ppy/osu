@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -38,5 +40,7 @@ namespace osu.Game.Tournament.Models
             MinValue = 3,
             MaxValue = 4,
         };
+
+        public Bindable<bool> AutoProgressScreens = new BindableBool(true);
     }
 }

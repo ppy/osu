@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorMenuBar : OsuMenu
+    public partial class EditorMenuBar : OsuMenu
     {
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
-        private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        private partial class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
             protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
 
-            private new class TextContainer : DrawableOsuMenuItem.TextContainer
+            private new partial class TextContainer : DrawableOsuMenuItem.TextContainer
             {
                 public TextContainer()
                 {
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
             }
         }
 
-        private class SubMenu : OsuMenu
+        private partial class SubMenu : OsuMenu
         {
             public SubMenu()
                 : base(Direction.Vertical)
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 }
             }
 
-            private class EditorStatefulMenuItem : DrawableStatefulMenuItem
+            private partial class EditorStatefulMenuItem : DrawableStatefulMenuItem
             {
                 public EditorStatefulMenuItem(StatefulMenuItem item)
                     : base(item)
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 }
             }
 
-            private class EditorMenuItem : DrawableOsuMenuItem
+            private partial class EditorMenuItem : DrawableOsuMenuItem
             {
                 public EditorMenuItem(MenuItem item)
                     : base(item)
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 }
             }
 
-            private class DrawableSpacer : DrawableOsuMenuItem
+            private partial class DrawableSpacer : DrawableOsuMenuItem
             {
                 public DrawableSpacer(MenuItem item)
                     : base(item)

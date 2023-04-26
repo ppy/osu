@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TapTimingControl : CompositeDrawable
+    public partial class TapTimingControl : CompositeDrawable
     {
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
@@ -90,7 +88,7 @@ namespace osu.Game.Screens.Edit.Timing
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
                                                 },
-                                                new WaveformComparisonDisplay(),
+                                                new WaveformComparisonDisplay()
                                             }
                                         },
                                     }
@@ -185,18 +183,29 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void start()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Seek(selectedGroup.Value.Time);
             editorClock.Start();
         }
 
         private void reset()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Stop();
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
         private void adjustOffset(double adjust)
         {
+            if (selectedGroup.Value == null)
+                return;
+
+            bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
+
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
 
@@ -210,13 +219,13 @@ namespace osu.Game.Screens.Edit.Timing
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
 
-            if (!editorClock.IsRunning)
+            if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
         }
 
         private void adjustBpm(double adjust)
         {
-            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+            var timing = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (timing == null)
                 return;
@@ -224,7 +233,7 @@ namespace osu.Game.Screens.Edit.Timing
             timing.BeatLength = 60000 / (timing.BPM + adjust);
         }
 
-        private class InlineButton : OsuButton
+        private partial class InlineButton : OsuButton
         {
             private readonly IconUsage icon;
             private readonly Anchor anchor;

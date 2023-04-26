@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
+    public partial class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -45,8 +47,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
-                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
+                    cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
         }
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             ActiveCursor.ScaleTo(CursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
-        private class DefaultCursorTrail : CursorTrail
+        private partial class DefaultCursorTrail : CursorTrail
         {
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)

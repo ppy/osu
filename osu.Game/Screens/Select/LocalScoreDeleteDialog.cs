@@ -10,44 +10,25 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
-    public class LocalScoreDeleteDialog : PopupDialog
+    public partial class LocalScoreDeleteDialog : DangerousActionDialog
     {
         private readonly ScoreInfo score;
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
 
         public LocalScoreDeleteDialog(ScoreInfo score)
         {
             this.score = score;
-            Debug.Assert(score != null);
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapManager beatmapManager, ScoreManager scoreManager)
         {
-            BeatmapInfo beatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
+            BeatmapInfo? beatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
             Debug.Assert(beatmapInfo != null);
 
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
 
             Icon = FontAwesome.Regular.TrashAlt;
-            HeaderText = "Confirm deletion of local score";
-            Buttons = new PopupDialogButton[]
-            {
-                new PopupDialogDangerousButton
-                {
-                    Text = "Yes. Please.",
-                    Action = () => scoreManager?.Delete(score)
-                },
-                new PopupDialogCancelButton
-                {
-                    Text = "No, I'm still attached.",
-                },
-            };
+            DangerousAction = () => scoreManager.Delete(score);
         }
     }
 }

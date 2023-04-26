@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableTournamentMatch : CompositeDrawable
+    public partial class DrawableTournamentMatch : CompositeDrawable
     {
         public readonly TournamentMatch Match;
         private readonly bool editor;
@@ -278,7 +280,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (editorInfo == null || Match is ConditionalTournamentMatch)
+            if (editorInfo == null || Match is ConditionalTournamentMatch || e.Button != MouseButton.Left)
                 return false;
 
             Selected = true;

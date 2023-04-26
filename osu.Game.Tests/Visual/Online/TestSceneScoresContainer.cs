@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK.Graphics;
@@ -23,7 +26,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneScoresContainer : OsuTestScene
+    public partial class TestSceneScoresContainer : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -138,27 +141,36 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("best score not displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
         }
 
-        private int onlineID = 1;
+        [Test]
+        public void TestUnprocessedPP()
+        {
+            AddStep("Load scores with unprocessed PP", () =>
+            {
+                var allScores = createScores();
+                allScores.Scores[0].PP = null;
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.PP = null;
+                scoresContainer.Scores = allScores;
+            });
+        }
+
+        private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
         {
             var scores = new APIScoresCollection
             {
-                Scores = new List<APIScore>
+                Scores = new List<SoloScoreInfo>
                 {
-                    new APIScore
+                    new SoloScoreInfo
                     {
-                        Date = DateTimeOffset.Now,
-                        OnlineID = onlineID++,
+                        EndedAt = DateTimeOffset.Now,
+                        ID = onlineID++,
                         User = new APIUser
                         {
                             Id = 6602580,
                             Username = @"waaiiru",
-                            Country = new Country
-                            {
-                                FullName = @"Spain",
-                                FlagName = @"ES",
-                            },
+                            CountryCode = CountryCode.ES,
                         },
                         Mods = new[]
                         {
@@ -173,19 +185,15 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567890,
                         Accuracy = 1,
                     },
-                    new APIScore
+                    new SoloScoreInfo
                     {
-                        Date = DateTimeOffset.Now,
-                        OnlineID = onlineID++,
+                        EndedAt = DateTimeOffset.Now,
+                        ID = onlineID++,
                         User = new APIUser
                         {
                             Id = 4608074,
                             Username = @"Skycries",
-                            Country = new Country
-                            {
-                                FullName = @"Brazil",
-                                FlagName = @"BR",
-                            },
+                            CountryCode = CountryCode.BR,
                         },
                         Mods = new[]
                         {
@@ -199,19 +207,15 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234789,
                         Accuracy = 0.9997,
                     },
-                    new APIScore
+                    new SoloScoreInfo
                     {
-                        Date = DateTimeOffset.Now,
-                        OnlineID = onlineID++,
+                        EndedAt = DateTimeOffset.Now,
+                        ID = onlineID++,
                         User = new APIUser
                         {
                             Id = 1014222,
                             Username = @"eLy",
-                            Country = new Country
-                            {
-                                FullName = @"Japan",
-                                FlagName = @"JP",
-                            },
+                            CountryCode = CountryCode.JP,
                         },
                         Mods = new[]
                         {
@@ -224,19 +228,15 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
                     },
-                    new APIScore
+                    new SoloScoreInfo
                     {
-                        Date = DateTimeOffset.Now,
-                        OnlineID = onlineID++,
+                        EndedAt = DateTimeOffset.Now,
+                        ID = onlineID++,
                         User = new APIUser
                         {
                             Id = 1541390,
                             Username = @"Toukai",
-                            Country = new Country
-                            {
-                                FullName = @"Canada",
-                                FlagName = @"CA",
-                            },
+                            CountryCode = CountryCode.CA,
                         },
                         Mods = new[]
                         {
@@ -248,19 +248,15 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567,
                         Accuracy = 0.8765,
                     },
-                    new APIScore
+                    new SoloScoreInfo
                     {
-                        Date = DateTimeOffset.Now,
-                        OnlineID = onlineID++,
+                        EndedAt = DateTimeOffset.Now,
+                        ID = onlineID++,
                         User = new APIUser
                         {
                             Id = 7151382,
                             Username = @"Mayuri Hana",
-                            Country = new Country
-                            {
-                                FullName = @"Thailand",
-                                FlagName = @"TH",
-                            },
+                            CountryCode = CountryCode.TH,
                         },
                         Rank = ScoreRank.D,
                         PP = 160,
@@ -271,15 +267,26 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
+            const int initial_great_count = 2000;
+            const int initial_tick_count = 100;
+
+            int greatCount = initial_great_count;
+            int tickCount = initial_tick_count;
+
             foreach (var s in scores.Scores)
             {
-                s.Statistics = new Dictionary<string, int>
+                s.Statistics = new Dictionary<HitResult, int>
                 {
-                    { "count_300", RNG.Next(2000) },
-                    { "count_100", RNG.Next(2000) },
-                    { "count_50", RNG.Next(2000) },
-                    { "count_miss", RNG.Next(2000) }
+                    { HitResult.Great, greatCount },
+                    { HitResult.LargeTickHit, tickCount },
+                    { HitResult.Ok, RNG.Next(100) },
+                    { HitResult.Meh, RNG.Next(100) },
+                    { HitResult.Miss, initial_great_count - greatCount },
+                    { HitResult.LargeTickMiss, initial_tick_count - tickCount },
                 };
+
+                greatCount -= 100;
+                tickCount -= RNG.Next(1, 5);
             }
 
             return scores;
@@ -287,19 +294,15 @@ namespace osu.Game.Tests.Visual.Online
 
         private APIScoreWithPosition createUserBest() => new APIScoreWithPosition
         {
-            Score = new APIScore
+            Score = new SoloScoreInfo
             {
-                Date = DateTimeOffset.Now,
-                OnlineID = onlineID++,
+                EndedAt = DateTimeOffset.Now,
+                ID = onlineID++,
                 User = new APIUser
                 {
                     Id = 7151382,
                     Username = @"Mayuri Hana",
-                    Country = new Country
-                    {
-                        FullName = @"Thailand",
-                        FlagName = @"TH",
-                    },
+                    CountryCode = CountryCode.TH,
                 },
                 Rank = ScoreRank.D,
                 PP = 160,
@@ -310,7 +313,7 @@ namespace osu.Game.Tests.Visual.Online
             Position = 1337,
         };
 
-        private class TestScoresContainer : ScoresContainer
+        private partial class TestScoresContainer : ScoresContainer
         {
             public new APIScoresCollection Scores
             {

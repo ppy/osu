@@ -5,8 +5,6 @@ using osu.Framework.Testing;
 using osu.Game.IO;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Models
 {
     [ExcludeFromDynamicCompile]

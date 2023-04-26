@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -11,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+    public abstract partial class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
         where T : ManiaHitObject
     {
         [Resolved]

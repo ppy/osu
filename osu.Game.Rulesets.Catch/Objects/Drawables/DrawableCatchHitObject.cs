@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
@@ -13,7 +15,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
+    public abstract partial class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
         public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
@@ -51,6 +53,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             XOffsetBindable.UnbindFrom(HitObject.XOffsetBindable);
         }
 
+        [CanBeNull]
         public Func<CatchHitObject, bool> CheckPosition;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);

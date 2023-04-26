@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class HitObjectContainer : PooledDrawableWithLifetimeContainer<HitObjectLifetimeEntry, DrawableHitObject>, IHitObjectContainer
+    public partial class HitObjectContainer : PooledDrawableWithLifetimeContainer<HitObjectLifetimeEntry, DrawableHitObject>, IHitObjectContainer
     {
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
@@ -25,11 +27,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> NewResult;
-
-        /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
-        /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
@@ -109,7 +106,6 @@ namespace osu.Game.Rulesets.UI
         private void addDrawable(DrawableHitObject drawable)
         {
             drawable.OnNewResult += onNewResult;
-            drawable.OnRevertResult += onRevertResult;
 
             bindStartTime(drawable);
             AddInternal(drawable);
@@ -118,11 +114,10 @@ namespace osu.Game.Rulesets.UI
         private void removeDrawable(DrawableHitObject drawable)
         {
             drawable.OnNewResult -= onNewResult;
-            drawable.OnRevertResult -= onRevertResult;
 
             unbindStartTime(drawable);
 
-            RemoveInternal(drawable);
+            RemoveInternal(drawable, false);
         }
 
         #endregion
@@ -152,7 +147,6 @@ namespace osu.Game.Rulesets.UI
         #endregion
 
         private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
-        private void onRevertResult(DrawableHitObject d, JudgementResult r) => RevertResult?.Invoke(d, r);
 
         #region Comparator + StartTime tracking
 

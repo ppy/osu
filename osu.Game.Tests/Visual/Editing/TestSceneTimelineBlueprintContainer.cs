@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -8,14 +10,14 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimelineBlueprintContainer : TimelineTestScene
+    public partial class TestSceneTimelineBlueprintContainer : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => new TimelineBlueprintContainer(Composer);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Clock.Seek(10000);
+            EditorClock.Seek(10000);
         }
     }
 }

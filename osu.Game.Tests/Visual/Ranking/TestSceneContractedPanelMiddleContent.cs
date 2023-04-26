@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneContractedPanelMiddleContent : OsuTestScene
+    public partial class TestSceneContractedPanelMiddleContent : OsuTestScene
     {
         [Test]
         public void TestShowPanel()
@@ -43,7 +45,7 @@ namespace osu.Game.Tests.Visual.Ranking
             Child = new ContractedPanelMiddleContentContainer(workingBeatmap, score);
         }
 
-        private class ContractedPanelMiddleContentContainer : Container
+        private partial class ContractedPanelMiddleContentContainer : Container
         {
             [Cached]
             private Bindable<WorkingBeatmap> workingBeatmap { get; set; }

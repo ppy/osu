@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class AudioSettings : PlayerSettingsGroup
+    public partial class AudioSettings : PlayerSettingsGroup
     {
         public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
 

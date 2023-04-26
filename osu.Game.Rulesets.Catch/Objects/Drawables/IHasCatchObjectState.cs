@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         PalpableCatchHitObject HitObject { get; }
 
+        double DisplayStartTime { get; }
+
         Bindable<Color4> AccentColour { get; }
 
         Bindable<bool> HyperDash { get; }

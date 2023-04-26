@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -24,7 +26,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
+    public abstract partial class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
         protected const int TOTAL_USERS = 16;
 
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // To emulate `MultiplayerClient.CurrentMatchPlayingUserIds` we need a bindable list of *only IDs*.
             // This tracks the list of users 1:1.
-            MultiplayerUsers.BindCollectionChanged((c, e) =>
+            MultiplayerUsers.BindCollectionChanged((_, e) =>
             {
                 switch (e.Action)
                 {
@@ -115,11 +117,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         BeatmapID = 0,
                         RulesetID = 0,
                         Mods = user.Mods,
-                        MaximumScoringValues = new ScoringValues
+                        MaximumStatistics = new Dictionary<HitResult, int>
                         {
-                            BaseScore = 10000,
-                            MaxCombo = 1000,
-                            CountBasicHitObjects = 1000
+                            { HitResult.Perfect, 100 }
                         }
                     };
                 }

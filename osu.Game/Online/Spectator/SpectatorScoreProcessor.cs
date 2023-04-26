@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,12 +21,12 @@ namespace osu.Game.Online.Spectator
     /// A wrapper over a <see cref="ScoreProcessor"/> for spectated users.
     /// This should be used when a local "playable" beatmap is unavailable or expensive to generate for the spectated user.
     /// </summary>
-    public class SpectatorScoreProcessor : Component
+    public partial class SpectatorScoreProcessor : Component
     {
         /// <summary>
         /// The current total score.
         /// </summary>
-        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+        public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
@@ -154,12 +152,12 @@ namespace osu.Game.Online.Spectator
 
             scoreInfo.MaxCombo = frame.Header.MaxCombo;
             scoreInfo.Statistics = frame.Header.Statistics;
+            scoreInfo.MaximumStatistics = spectatorState.MaximumStatistics;
 
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
 
-            scoreProcessor.ExtractScoringValues(frame.Header, out var currentScoringValues, out _);
-            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, currentScoringValues, spectatorState.MaximumScoringValues);
+            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -186,7 +184,7 @@ namespace osu.Game.Online.Spectator
                 Header = header;
             }
 
-            public int CompareTo(TimedFrame other) => Time.CompareTo(other.Time);
+            public int CompareTo(TimedFrame? other) => Time.CompareTo(other?.Time);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsHeader : BreadcrumbControlOverlayHeader
+    public partial class NewsHeader : BreadcrumbControlOverlayHeader
     {
         public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
 
@@ -60,7 +62,7 @@ namespace osu.Game.Overlays.News
 
         protected override OverlayTitle CreateTitle() => new NewsHeaderTitle();
 
-        private class NewsHeaderTitle : OverlayTitle
+        private partial class NewsHeaderTitle : OverlayTitle
         {
             public NewsHeaderTitle()
             {

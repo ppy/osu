@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -82,8 +83,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = OriginalX + Path.PositionAt(
-                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
+                                X = ClampToPlayfield(EffectiveX + Path.PositionAt(
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X),
                             });
                         }
                     }
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
+                            X = ClampToPlayfield(EffectiveX + Path.PositionAt(e.PathProgress).X),
                         });
                         break;
 
@@ -111,14 +112,16 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
+                            X = ClampToPlayfield(EffectiveX + Path.PositionAt(e.PathProgress).X),
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => OriginalX + this.CurvePositionAt(1).X;
+        public float EndX => ClampToPlayfield(EffectiveX + this.CurvePositionAt(1).X);
+
+        public float ClampToPlayfield(float value) => Math.Clamp(value, 0, CatchPlayfield.WIDTH);
 
         [JsonIgnore]
         public double Duration
@@ -137,13 +140,8 @@ namespace osu.Game.Rulesets.Catch.Objects
             set
             {
                 path.ControlPoints.Clear();
-                path.ExpectedDistance.Value = null;
-
-                if (value != null)
-                {
-                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
-                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
-                }
+                path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
+                path.ExpectedDistance.Value = value.ExpectedDistance.Value;
             }
         }
 

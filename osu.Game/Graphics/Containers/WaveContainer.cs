@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class WaveContainer : VisibilityContainer
+    public partial class WaveContainer : VisibilityContainer
     {
         public const float APPEAR_DURATION = 800;
         public const float DISAPPEAR_DURATION = 500;
@@ -129,7 +131,7 @@ namespace osu.Game.Graphics.Containers
             wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
-        private class Wave : VisibilityContainer
+        private partial class Wave : VisibilityContainer
         {
             public float FinalPosition;
 

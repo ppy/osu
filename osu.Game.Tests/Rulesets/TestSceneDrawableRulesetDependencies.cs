@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,11 +15,12 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -26,7 +29,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneDrawableRulesetDependencies : OsuTestScene
+    public partial class TestSceneDrawableRulesetDependencies : OsuTestScene
     {
         [Test]
         public void TestDisposalDoesNotDisposeParentStores()
@@ -60,7 +63,7 @@ namespace osu.Game.Tests.Rulesets
             AddAssert("parent shader manager not disposed", () => !shaderManager.IsDisposed);
         }
 
-        private class DrawableWithDependencies : CompositeDrawable
+        private partial class DrawableWithDependencies : CompositeDrawable
         {
             public TestTextureStore ParentTextureStore { get; private set; }
             public TestSampleStore ParentSampleStore { get; private set; }
@@ -75,9 +78,9 @@ namespace osu.Game.Tests.Rulesets
             {
                 var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-                dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore());
+                dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore(parent.Get<GameHost>().Renderer));
                 dependencies.CacheAs<ISampleStore>(ParentSampleStore = new TestSampleStore());
-                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager());
+                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager(parent.Get<GameHost>().Renderer, parent.Get<ShaderManager>()));
 
                 return new DrawableRulesetDependencies(new OsuRuleset(), dependencies);
             }
@@ -93,6 +96,11 @@ namespace osu.Game.Tests.Rulesets
 
         private class TestTextureStore : TextureStore
         {
+            public TestTextureStore(IRenderer renderer)
+                : base(renderer)
+            {
+            }
+
             public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
             public bool IsDisposed { get; private set; }
@@ -142,16 +150,21 @@ namespace osu.Game.Tests.Rulesets
             public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
             public int PlaybackConcurrency { get; set; }
+
+            public void AddExtension(string extension) => throw new NotImplementedException();
         }
 
         private class TestShaderManager : ShaderManager
         {
-            public TestShaderManager()
-                : base(new ResourceStore<byte[]>())
+            private readonly ShaderManager parentManager;
+
+            public TestShaderManager(IRenderer renderer, ShaderManager parentManager)
+                : base(renderer, new ResourceStore<byte[]>())
             {
+                this.parentManager = parentManager;
             }
 
-            public override byte[] LoadRaw(string name) => null;
+            public override byte[] GetRawData(string fileName) => parentManager.GetRawData(fileName);
 
             public bool IsDisposed { get; private set; }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
@@ -78,6 +80,8 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// The tail note of the hold.
         /// </summary>
         public TailNote Tail { get; private set; }
+
+        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
         /// <summary>
         /// The time between ticks of this hold.

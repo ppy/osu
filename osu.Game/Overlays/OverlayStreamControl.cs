@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamControl<T> : TabControl<T>
+    public abstract partial class OverlayStreamControl<T> : TabControl<T>
     {
         protected OverlayStreamControl()
         {

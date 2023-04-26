@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,7 +19,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.
@@ -67,20 +69,6 @@ namespace osu.Game.Skinning
                 updateSample();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            CurrentSkin.SourceChanged += skinChangedImmediate;
-        }
-
-        private void skinChangedImmediate()
-        {
-            // Clean up the previous sample immediately on a source change.
-            // This avoids a potential call to Play() of an already disposed sample (samples are disposed along with the skin, but SkinChanged is scheduled).
-            clearPreviousSamples();
-        }
-
         protected override void SkinChanged(ISkinSource skin)
         {
             base.SkinChanged(skin);
@@ -106,6 +94,8 @@ namespace osu.Game.Skinning
 
         private void updateSample()
         {
+            clearPreviousSamples();
+
             if (sampleInfo == null)
                 return;
 
@@ -126,6 +116,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public void Play()
         {
+            FlushPendingSkinChanges();
+
             if (Sample == null)
                 return;
 
@@ -167,14 +159,6 @@ namespace osu.Game.Skinning
                 if (activeChannel != null)
                     activeChannel.Looping = value;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (CurrentSkin != null)
-                CurrentSkin.SourceChanged -= skinChangedImmediate;
         }
 
         #region Re-expose AudioContainer

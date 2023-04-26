@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModPerfect : ModPerfectTestScene
+    public partial class TestSceneOsuModPerfect : ModPerfectTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

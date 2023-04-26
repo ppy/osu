@@ -7,7 +7,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyHit : LegacyCirclePiece
+    public partial class LegacyHit : LegacyCirclePiece
     {
         private readonly TaikoSkinComponents component;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -11,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePopupDialog : OsuManualInputManagerTestScene
+    public partial class TestScenePopupDialog : OsuManualInputManagerTestScene
     {
         private TestPopupDialog dialog;
 
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
-        private class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : PopupDialog
         {
             public PopupDialogDangerousButton DangerousButton { get; }
 

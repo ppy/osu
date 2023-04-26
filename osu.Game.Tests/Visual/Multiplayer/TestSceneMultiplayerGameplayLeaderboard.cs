@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -13,7 +15,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerGameplayLeaderboardTestScene
+    public partial class TestSceneMultiplayerGameplayLeaderboard : MultiplayerGameplayLeaderboardTestScene
     {
         protected override MultiplayerRoomUser CreateUser(int userId)
         {
@@ -45,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private class TestLeaderboard : MultiplayerGameplayLeaderboard
+        private partial class TestLeaderboard : MultiplayerGameplayLeaderboard
         {
             public Dictionary<int, IReadOnlyList<Mod>> UserMods => UserScores.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ScoreProcessor.Mods);
 

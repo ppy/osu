@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
@@ -19,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePause : OsuPlayerTestScene
+    public partial class TestScenePause : OsuPlayerTestScene
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
@@ -29,7 +33,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestScenePause()
         {
-            base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
+            base.Content.Add(content = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0);
         }
 
         [SetUpSteps]
@@ -39,6 +49,22 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
+        }
+
+        [Test]
+        public void TestTogglePauseViaBackAction()
+        {
+            pauseViaBackAction();
+            pauseViaBackAction();
+            confirmPausedWithNoOverlay();
+        }
+
+        [Test]
+        public void TestTogglePauseViaPauseGameplayAction()
+        {
+            pauseViaPauseGameplayAction();
+            pauseViaPauseGameplayAction();
+            confirmPausedWithNoOverlay();
         }
 
         [Test]
@@ -64,7 +90,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.OnUpdate += _ =>
                 {
                     double currentTime = Player.GameplayClockContainer.CurrentTime;
-                    alwaysGoingForward &= currentTime >= lastTime;
+                    bool goingForward = currentTime >= lastTime - 500;
+
+                    alwaysGoingForward &= goingForward;
+
+                    if (!goingForward)
+                        Logger.Log($"Backwards time occurred ({currentTime:N1} -> {lastTime:N1})");
+
                     lastTime = currentTime;
                 };
             });
@@ -75,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("time didn't go backwards", () => alwaysGoingForward);
+            AddAssert("time didn't go too far backwards", () => alwaysGoingForward);
 
             AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
         }
@@ -88,6 +120,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("player not playing", () => !Player.LocalUserPlaying.Value);
 
             resumeAndConfirm();
+
+            AddAssert("Resumed without seeking forward", () => Player.LastResumeTime, () => Is.LessThanOrEqualTo(Player.LastPauseTime));
+
             AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
 
@@ -139,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("disable pause support", () => Player.Configuration.AllowPause = false);
 
-            pauseFromUserExitKey();
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -151,7 +186,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            pauseFromUserExitKey();
+            pauseViaBackAction();
 
             confirmResumed();
             confirmNotExited();
@@ -165,7 +200,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            AddStep("pause via exit key", () => Player.ExitViaQuickExit());
+            exitViaQuickExitAction();
 
             confirmResumed();
             AddAssert("exited", () => !Player.IsCurrentScreen());
@@ -209,7 +244,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             confirmClockRunning(false);
 
-            AddStep("exit via user pause", () => Player.ExitViaPause());
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -219,11 +254,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             // will finish the fail animation and show the fail/pause screen.
-            AddStep("attempt exit via pause key", () => Player.ExitViaPause());
+            pauseViaBackAction();
             AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
 
             // will actually exit.
-            AddStep("exit via pause key", () => Player.ExitViaPause());
+            pauseViaBackAction();
             confirmExited();
         }
 
@@ -240,7 +275,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickExitFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            exitViaQuickExitAction();
 
             confirmExited();
         }
@@ -256,7 +291,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromGameplay()
         {
-            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            exitViaQuickExitAction();
 
             confirmExited();
         }
@@ -311,7 +346,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("pause again", () =>
             {
                 Player.Pause();
-                return !Player.GameplayClockContainer.GameplayClock.IsRunning;
+                return !Player.GameplayClockContainer.IsRunning;
             });
 
             AddAssert("loop is playing", () => getLoop().IsPlaying);
@@ -322,7 +357,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void pauseAndConfirm()
         {
-            pauseFromUserExitKey();
+            pauseViaBackAction();
             confirmPaused();
         }
 
@@ -365,37 +400,72 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void confirmNoTrackAdjustments()
         {
-            AddAssert("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value == 1);
+            AddUntilStep("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value, () => Is.EqualTo(1));
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());
-        private void pauseFromUserExitKey() => AddStep("user pause", () => Player.ExitViaPause());
+        private void pauseViaBackAction() => AddStep("press escape", () => InputManager.Key(Key.Escape));
+        private void pauseViaPauseGameplayAction() => AddStep("press middle mouse", () => InputManager.Click(MouseButton.Middle));
+
+        private void exitViaQuickExitAction() => AddStep("press ctrl-tilde", () =>
+        {
+            InputManager.PressKey(Key.ControlLeft);
+            InputManager.PressKey(Key.Tilde);
+            InputManager.ReleaseKey(Key.Tilde);
+            InputManager.ReleaseKey(Key.ControlLeft);
+        });
+
         private void resume() => AddStep("resume", () => Player.Resume());
 
         private void confirmPauseOverlayShown(bool isShown) =>
             AddAssert("pause overlay " + (isShown ? "shown" : "hidden"), () => Player.PauseOverlayVisible == isShown);
 
         private void confirmClockRunning(bool isRunning) =>
-            AddUntilStep("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.GameplayClock.IsRunning == isRunning);
+            AddUntilStep("clock " + (isRunning ? "running" : "stopped"), () =>
+            {
+                bool completed = Player.GameplayClockContainer.IsRunning == isRunning;
+
+                if (completed)
+                {
+                }
+
+                return completed;
+            });
 
         protected override bool AllowFail => true;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
-        protected class PausePlayer : TestPlayer
+        protected partial class PausePlayer : TestPlayer
         {
+            public double LastPauseTime { get; private set; }
+            public double LastResumeTime { get; private set; }
+
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
-
-            public void ExitViaPause() => PerformExit(true);
-
-            public void ExitViaQuickExit() => PerformExit(false);
 
             public override void OnEntering(ScreenTransitionEvent e)
             {
                 base.OnEntering(e);
                 GameplayClockContainer.Stop();
+            }
+
+            private bool? isRunning;
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (GameplayClockContainer.IsRunning != isRunning)
+                {
+                    isRunning = GameplayClockContainer.IsRunning;
+
+                    if (isRunning.Value)
+                        LastResumeTime = GameplayClockContainer.CurrentTime;
+                    else
+                        LastPauseTime = GameplayClockContainer.CurrentTime;
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Textures;
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     [LongRunningLoad]
-    public class MedalIcon : Container
+    public partial class MedalIcon : Container
     {
         private readonly string slug;
         private readonly Sprite sprite;

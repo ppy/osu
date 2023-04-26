@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailAnimation : TestSceneAllRulesetPlayers
+    public partial class TestSceneFailAnimation : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -37,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("frequency only ever decreased", () => !((FailPlayer)Player).FrequencyIncreased);
         }
 
-        private class FailPlayer : TestPlayer
+        private partial class FailPlayer : TestPlayer
         {
             public new FailOverlay FailOverlay => base.FailOverlay;
 
@@ -51,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                HealthProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, _) => true;
             }
 
             private double lastFrequency = double.MaxValue;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,12 +19,13 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
+    public abstract partial class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -36,6 +39,9 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
+                if (value == recorder)
+                    return;
+
                 if (value != null && recorder != null)
                     throw new InvalidOperationException("Cannot attach more than one recorder");
 
@@ -121,7 +127,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent _:
+                case MouseDownEvent:
                     if (mouseDisabled.Value)
                         return true; // importantly, block upwards propagation so global bindings also don't fire.
 
@@ -163,22 +169,56 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
                                                    .OrderBy(action => action)
-                                                   .Select(action => new KeyCounterAction<T>(action)));
+                                                   .Select(action => new KeyCounterActionTrigger<T>(action)));
         }
 
-        public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
         {
             public ActionReceptor(KeyCounterDisplay target)
                 : base(target)
             {
             }
 
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>)
+                                                                      .Select(c => (KeyCounterActionTrigger<T>)c.Trigger)
+                                                                      .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
-                foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
+                foreach (var c
+                         in Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>).Select(c => (KeyCounterActionTrigger<T>)c.Trigger))
                     c.OnReleased(e.Action, Clock.Rate >= 0);
+            }
+        }
+
+        #endregion
+
+        #region Keys per second Counter Attachment
+
+        public void Attach(ClicksPerSecondCalculator calculator)
+        {
+            var listener = new ActionListener(calculator);
+
+            KeyBindingContainer.Add(listener);
+        }
+
+        private partial class ActionListener : Component, IKeyBindingHandler<T>
+        {
+            private readonly ClicksPerSecondCalculator calculator;
+
+            public ActionListener(ClicksPerSecondCalculator calculator)
+            {
+                this.calculator = calculator;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<T> e)
+            {
+                calculator.AddInputTimestamp();
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
             }
         }
 
@@ -187,7 +227,7 @@ namespace osu.Game.Rulesets.UI
         protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
-        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
+        public partial class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
             protected override bool HandleRepeats => false;
 
@@ -196,9 +236,9 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            protected override void ReloadMappings()
+            protected override void ReloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
             {
-                base.ReloadMappings();
+                base.ReloadMappings(realmKeyBindings);
 
                 KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
@@ -219,12 +259,13 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Supports attaching a <see cref="KeyCounterDisplay"/>.
+    /// Supports attaching various HUD pieces.
     /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
-    public interface ICanAttachKeyCounter
+    public interface ICanAttachHUDPieces
     {
         void Attach(KeyCounterDisplay keyCounter);
+        void Attach(ClicksPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

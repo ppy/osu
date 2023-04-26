@@ -2,40 +2,28 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
 {
-    public class SkinDeleteDialog : PopupDialog
+    public partial class SkinDeleteDialog : DangerousActionDialog
     {
-        [Resolved]
-        private SkinManager manager { get; set; }
+        private readonly Skin skin;
 
         public SkinDeleteDialog(Skin skin)
         {
+            this.skin = skin;
             BodyText = skin.SkinInfo.Value.Name;
-            Icon = FontAwesome.Regular.TrashAlt;
-            HeaderText = @"Confirm deletion of";
-            Buttons = new PopupDialogButton[]
-            {
-                new PopupDialogDangerousButton
-                {
-                    Text = @"Yes. Totally. Delete it.",
-                    Action = () =>
-                    {
-                        if (manager == null)
-                            return;
+        }
 
-                        manager.Delete(skin.SkinInfo.Value);
-                        manager.CurrentSkinInfo.SetDefault();
-                    },
-                },
-                new PopupDialogCancelButton
-                {
-                    Text = @"Firetruck, I didn't mean to!",
-                },
+        [BackgroundDependencyLoader]
+        private void load(SkinManager manager)
+        {
+            DangerousAction = () =>
+            {
+                manager.Delete(skin.SkinInfo.Value);
+                manager.CurrentSkinInfo.SetDefault();
             };
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +22,7 @@ namespace osu.Game.Graphics.Containers
     /// The <see cref="Progress"/> is exposed as a transforming bindable which smoothly tracks the progress of a hold operation.
     /// It can be used for animating and displaying progress directly.
     /// </remarks>
-    public abstract class HoldToConfirmContainer : Container
+    public abstract partial class HoldToConfirmContainer : Container
     {
         public const double DANGEROUS_HOLD_ACTIVATION_DELAY = 500;
 
@@ -98,9 +100,9 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Abort any ongoing confirmation. Should be called when the container's interaction is no longer valid (ie. the user releases a key).
         /// </summary>
-        protected void AbortConfirm()
+        protected virtual void AbortConfirm()
         {
-            if (!AllowMultipleFires && Fired) return;
+            if (!confirming || (!AllowMultipleFires && Fired)) return;
 
             confirming = false;
             Fired = false;

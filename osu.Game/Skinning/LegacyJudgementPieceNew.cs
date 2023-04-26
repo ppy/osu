@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -14,17 +13,17 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
+    public partial class LegacyJudgementPieceNew : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
-        private readonly LegacyJudgementPieceOld temporaryOldStyle;
+        private readonly LegacyJudgementPieceOld? temporaryOldStyle;
 
         private readonly Drawable mainPiece;
 
-        private readonly ParticleExplosion particles;
+        private readonly ParticleExplosion? particles;
 
-        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture particleTexture)
+        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Texture? particleTexture)
         {
             this.result = result;
 
@@ -54,7 +53,7 @@ namespace osu.Game.Skinning
             if (result != HitResult.Miss)
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
@@ -100,21 +99,6 @@ namespace osu.Game.Skinning
 
             switch (result)
             {
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
-
-                    //todo: this only applies to osu! ruleset apparently.
-                    this.MoveTo(new Vector2(0, -2));
-                    this.MoveToOffset(new Vector2(0, 20), fade_out_delay + fade_out_length, Easing.In);
-
-                    float rotation = RNG.NextSingle(-8.6f, 8.6f);
-
-                    this.RotateTo(0);
-                    this.RotateTo(rotation, fade_in_length)
-                        .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
-                    break;
-
                 default:
                     mainPiece.ScaleTo(0.9f);
                     mainPiece.ScaleTo(1.05f, fade_out_delay + fade_out_length);
@@ -122,6 +106,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
+        public Drawable? GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
     }
 }

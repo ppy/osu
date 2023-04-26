@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Markdig.Syntax;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiArticlePage : CompositeDrawable
+    public partial class WikiArticlePage : CompositeDrawable
     {
         public Container SidebarContainer { get; }
 
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Wiki
                             {
                                 Vertical = 20,
                                 Left = 30,
-                                Right = 50,
+                                Right = WaveOverlayContainer.HORIZONTAL_PADDING,
                             },
                             OnAddHeading = sidebar.AddEntry,
                         }
@@ -63,7 +65,7 @@ namespace osu.Game.Overlays.Wiki
             };
         }
 
-        private class ArticleMarkdownContainer : WikiMarkdownContainer
+        private partial class ArticleMarkdownContainer : WikiMarkdownContainer
         {
             public Action<HeadingBlock, MarkdownHeading> OnAddHeading;
 

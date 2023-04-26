@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -88,6 +88,76 @@ namespace osu.Game.Localisation
         /// "Collections"
         /// </summary>
         public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
+
+        /// <summary>
+        /// "Mod presets"
+        /// </summary>
+        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Mod presets");
+
+        /// <summary>
+        /// "Name"
+        /// </summary>
+        public static LocalisableString Name => new TranslatableString(getKey(@"name"), @"Name");
+
+        /// <summary>
+        /// "Description"
+        /// </summary>
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"Description");
+
+        /// <summary>
+        /// "File"
+        /// </summary>
+        public static LocalisableString MenuBarFile => new TranslatableString(getKey(@"menu_bar_file"), @"File");
+
+        /// <summary>
+        /// "Edit"
+        /// </summary>
+        public static LocalisableString MenuBarEdit => new TranslatableString(getKey(@"menu_bar_edit"), @"Edit");
+
+        /// <summary>
+        /// "View"
+        /// </summary>
+        public static LocalisableString MenuBarView => new TranslatableString(getKey(@"menu_bar_view"), @"View");
+
+        /// <summary>
+        /// "Undo"
+        /// </summary>
+        public static LocalisableString Undo => new TranslatableString(getKey(@"undo"), @"Undo");
+
+        /// <summary>
+        /// "Redo"
+        /// </summary>
+        public static LocalisableString Redo => new TranslatableString(getKey(@"redo"), @"Redo");
+
+        /// <summary>
+        /// "Cut"
+        /// </summary>
+        public static LocalisableString Cut => new TranslatableString(getKey(@"cut"), @"Cut");
+
+        /// <summary>
+        /// "Copy"
+        /// </summary>
+        public static LocalisableString Copy => new TranslatableString(getKey(@"copy"), @"Copy");
+
+        /// <summary>
+        /// "Paste"
+        /// </summary>
+        public static LocalisableString Paste => new TranslatableString(getKey(@"paste"), @"Paste");
+
+        /// <summary>
+        /// "Clone"
+        /// </summary>
+        public static LocalisableString Clone => new TranslatableString(getKey(@"clone"), @"Clone");
+
+        /// <summary>
+        /// "Exit"
+        /// </summary>
+        public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
+
+        /// <summary>
+        /// "Revert to default"
+        /// </summary>
+        public static LocalisableString RevertToDefault => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

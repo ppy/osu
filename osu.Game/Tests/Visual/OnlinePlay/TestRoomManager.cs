@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,7 +15,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A very simple <see cref="RoomManager"/> for use in online play test scenes.
     /// </summary>
-    public class TestRoomManager : RoomManager
+    public partial class TestRoomManager : RoomManager
     {
         public Action<Room, string> JoinRoomRequested;
 

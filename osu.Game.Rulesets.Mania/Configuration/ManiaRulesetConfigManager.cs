@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Configuration.Tracking;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaRulesetConfigManager : RulesetConfigManager<ManiaRulesetSetting>
     {
-        public ManiaRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+        public ManiaRulesetConfigManager(SettingsStore? settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
         }
@@ -30,8 +31,8 @@ namespace osu.Game.Rulesets.Mania.Configuration
             new TrackedSetting<double>(ManiaRulesetSetting.ScrollTime,
                 scrollTime => new SettingDescription(
                     rawValue: scrollTime,
-                    name: "Scroll Speed",
-                    value: $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)} ({scrollTime}ms)"
+                    name: RulesetSettingsStrings.ScrollSpeed,
+                    value: RulesetSettingsStrings.ScrollSpeedTooltip(scrollTime, (int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime))
                 )
             )
         };

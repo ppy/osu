@@ -32,10 +32,10 @@ namespace osu.Game.Audio
                 Volume);
         }
 
-        public bool Equals(SampleInfo other)
+        public bool Equals(SampleInfo? other)
             => other != null && sampleNames.SequenceEqual(other.sampleNames);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is SampleInfo other && Equals(other);
     }
 }

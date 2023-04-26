@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapSetOverlaySuccessRate : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlaySuccessRate : OsuTestScene
     {
         private GraphExposingSuccessRate successRate;
 
@@ -102,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
         }
 
-        private class GraphExposingSuccessRate : SuccessRate
+        private partial class GraphExposingSuccessRate : SuccessRate
         {
             public new FailRetryGraph Graph => base.Graph;
         }

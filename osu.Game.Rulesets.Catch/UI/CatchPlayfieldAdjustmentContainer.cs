@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float playfield_size_adjust = 0.8f;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// A <see cref="Container"/> which scales its content relative to a target width.
         /// </summary>
-        private class ScalingContainer : Container
+        private partial class ScalingContainer : Container
         {
             protected override void Update()
             {

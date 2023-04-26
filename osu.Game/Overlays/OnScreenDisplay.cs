@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
@@ -18,7 +20,7 @@ namespace osu.Game.Overlays
     /// An on-screen display which automatically tracks and displays toast notifications for <seealso cref="TrackedSettings"/>.
     /// Can also display custom content via <see cref="Display(Toast)"/>
     /// </summary>
-    public class OnScreenDisplay : Container
+    public partial class OnScreenDisplay : Container
     {
         private readonly Container box;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays
         /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is already being tracked from the same <paramref name="source"/>.</exception>
         public void BeginTracking(object source, ITrackableConfigManager configManager)
         {
-            if (configManager == null) throw new ArgumentNullException(nameof(configManager));
+            ArgumentNullException.ThrowIfNull(configManager);
 
             if (trackedConfigManagers.ContainsKey((source, configManager)))
                 throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
@@ -80,7 +82,7 @@ namespace osu.Game.Overlays
         /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <paramref name="source"/>.</exception>
         public void StopTracking(object source, ITrackableConfigManager configManager)
         {
-            if (configManager == null) throw new ArgumentNullException(nameof(configManager));
+            ArgumentNullException.ThrowIfNull(configManager);
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
                 return;

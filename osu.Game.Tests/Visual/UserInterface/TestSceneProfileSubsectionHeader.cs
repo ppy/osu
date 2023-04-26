@@ -11,12 +11,12 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneProfileSubsectionHeader : OsuTestScene
+    public partial class TestSceneProfileSubsectionHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private ProfileSubsectionHeader header;
+        private ProfileSubsectionHeader header = null!;
 
         [Test]
         public void TestHiddenCounter()

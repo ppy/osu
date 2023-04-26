@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -15,11 +16,11 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneUserProfileScores : OsuTestScene
+    public partial class TestSceneUserProfileScores : OsuTestScene
     {
         public TestSceneUserProfileScores()
         {
-            var firstScore = new APIScore
+            var firstScore = new SoloScoreInfo
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "Extreme"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
                     new APIMod { Acronym = new OsuModHidden().Acronym },
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.9813
             };
 
-            var secondScore = new APIScore
+            var secondScore = new SoloScoreInfo
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "[4K] Regret"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
                     new APIMod { Acronym = new OsuModHardRock().Acronym },
@@ -64,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.998546
             };
 
-            var thirdScore = new APIScore
+            var thirdScore = new SoloScoreInfo
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
@@ -77,11 +78,11 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "Insane"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.9726
             };
 
-            var noPPScore = new APIScore
+            var noPPScore = new SoloScoreInfo
             {
                 Rank = ScoreRank.B,
                 Beatmap = new APIBeatmap
@@ -93,7 +94,24 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "[4K] Cataclysmic Hypernova"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
+                Accuracy = 0.55879
+            };
+
+            var unprocessedPPScore = new SoloScoreInfo
+            {
+                Rank = ScoreRank.B,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "C18H27NO3(extend)",
+                        Artist = "Team Grimoire",
+                    },
+                    DifficultyName = "[4K] Cataclysmic Hypernova",
+                    Status = BeatmapOnlineStatus.Ranked,
+                },
+                EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879
             };
 
@@ -110,6 +128,7 @@ namespace osu.Game.Tests.Visual.Online
                     new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(firstScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(secondScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(unprocessedPPScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.85)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, 0.66)),
@@ -117,7 +136,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private class ColourProvidedContainer : Container
+        private partial class ColourProvidedContainer : Container
         {
             [Cached]
             private readonly OverlayColourProvider colourProvider;

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -18,27 +19,39 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class TopLocalRank : UpdateableRank
+    public partial class TopLocalRank : CompositeDrawable
     {
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
-        private IDisposable scoreSubscription;
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private IDisposable? scoreSubscription;
+
+        private readonly UpdateableRank updateable;
+
+        public ScoreRank? DisplayedRank => updateable.Rank;
 
         public TopLocalRank(BeatmapInfo beatmapInfo)
-            : base(null)
         {
             this.beatmapInfo = beatmapInfo;
 
-            Size = new Vector2(40, 20);
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = updateable = new UpdateableRank
+            {
+                Size = new Vector2(40, 20),
+                Alpha = 0,
+            };
         }
 
         protected override void LoadComplete()
@@ -52,24 +65,29 @@ namespace osu.Game.Screens.Select.Carousel
                         r.All<ScoreInfo>()
                          .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
-                         .OrderByDescending(s => s.TotalScore),
-                    (items, changes, ___) =>
-                    {
-                        Rank = items.FirstOrDefault()?.Rank;
-                        // Required since presence is changed via IsPresent override
-                        Invalidate(Invalidation.Presence);
-                    });
+                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
+                    localScoresChanged);
             }, true);
-        }
 
-        public override bool IsPresent => base.IsPresent && Rank != null;
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception _)
+            {
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
+                    return;
+
+                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
+
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
+            }
+        }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
             scoreSubscription?.Dispose();
         }
     }

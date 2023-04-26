@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -112,22 +114,25 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
-                    case "WidthForNoteHeightScale":
-                        float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
-                        if (minWidth > 0)
-                            currentConfig.MinimumColumnWidth = minWidth;
+                    case "NoteBodyStyle":
+                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                            currentConfig.NoteBodyStyle = style;
                         break;
 
-                    case string _ when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
-                        HandleColours(currentConfig, line);
+                    case "WidthForNoteHeightScale":
+                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
+                        HandleColours(currentConfig, line, true);
                         break;
 
                     // Custom sprite paths
-                    case string _ when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }

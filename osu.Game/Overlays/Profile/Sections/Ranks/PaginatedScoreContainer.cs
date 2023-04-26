@@ -15,11 +15,11 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScore>
+    public partial class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<APIUser> user, LocalisableString headerText)
+        public PaginatedScoreContainer(ScoreType type, Bindable<UserProfileData?> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        protected override void OnItemsReceived(List<APIScore> items)
+        protected override void OnItemsReceived(List<SoloScoreInfo> items)
         {
             if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
@@ -60,12 +60,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest(PaginationParameters pagination) =>
-            new GetUserScoresRequest(User.Value.Id, type, pagination);
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserScoresRequest(user.User.Id, type, pagination, user.Ruleset);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(APIScore model)
+        protected override Drawable CreateDrawableItem(SoloScoreInfo model)
         {
             switch (type)
             {

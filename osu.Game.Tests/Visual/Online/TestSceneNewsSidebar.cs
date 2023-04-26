@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ using static osu.Game.Overlays.News.Sidebar.YearsPanel;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsSidebar : OsuTestScene
+    public partial class TestSceneNewsSidebar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -209,7 +211,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         };
 
-        private class TestNewsSidebar : NewsSidebar
+        private partial class TestNewsSidebar : NewsSidebar
         {
             public Action<int> YearChanged;
 
@@ -217,7 +219,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                Metadata.BindValueChanged(metadata =>
+                Metadata.BindValueChanged(_ =>
                 {
                     foreach (var b in this.ChildrenOfType<YearButton>())
                         b.Action = () => YearChanged?.Invoke(b.Year);

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Muted";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "Can you still feel the rhythm without music?";
+        public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -33,37 +33,23 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
-        private BindableNumber<int> currentCombo;
+        private readonly BindableNumber<int> currentCombo = new BindableInt();
+
+        [SettingSource("Start muted", "Increase volume as combo builds.")]
+        public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
-        public BindableBool EnableMetronome { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool EnableMetronome { get; } = new BindableBool(true);
 
         [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
-        public BindableInt MuteComboCount { get; } = new BindableInt
+        public BindableInt MuteComboCount { get; } = new BindableInt(100)
         {
-            Default = 100,
-            Value = 100,
             MinValue = 0,
             MaxValue = 500,
         };
 
-        [SettingSource("Start muted", "Increase volume as combo builds.")]
-        public BindableBool InverseMuting { get; } = new BindableBool
-        {
-            Default = false,
-            Value = false
-        };
-
         [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
+        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
 
         protected ModMuted()
         {
@@ -81,7 +67,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 MetronomeBeat metronomeBeat;
 
-                drawableRuleset.Overlays.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+                // Importantly, this is added to FrameStableComponents and not Overlays as the latter would cause it to be self-muted by the mod's volume adjustment.
+                drawableRuleset.FrameStableComponents.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
 
                 metronomeBeat.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
@@ -92,7 +79,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
+            currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;
@@ -108,7 +95,7 @@ namespace osu.Game.Rulesets.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 
-    public class MuteComboSlider : OsuSliderBar<int>
+    public partial class MuteComboSlider : RoundedSliderBar<int>
     {
         public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }

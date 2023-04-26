@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class SwitchButton : Checkbox
+    public partial class SwitchButton : Checkbox
     {
         private const float border_thickness = 4.5f;
         private const float padding = 1.25f;
@@ -130,7 +128,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             circularContainer.TransformBorderTo((Current.Value ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0));
         }
 
-        private class CircularBorderContainer : CircularContainer
+        private partial class CircularBorderContainer : CircularContainer
         {
             public void TransformBorderTo(ColourInfo colour)
                 => this.TransformTo(nameof(BorderColour), colour, 250, Easing.OutQuint);

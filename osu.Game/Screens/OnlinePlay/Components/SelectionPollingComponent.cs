@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Game.Online.Rooms;
 
@@ -9,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// <summary>
     /// A <see cref="RoomPollingComponent"/> that polls for the currently-selected room.
     /// </summary>
-    public class SelectionPollingComponent : RoomPollingComponent
+    public partial class SelectionPollingComponent : RoomPollingComponent
     {
         private readonly Room room;
 

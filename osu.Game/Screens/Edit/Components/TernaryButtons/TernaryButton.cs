@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public readonly Func<Drawable> CreateIcon;
+        public readonly Func<Drawable>? CreateIcon;
 
-        public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable> createIcon = null)
+        public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable>? createIcon = null)
         {
             Bindable = bindable;
             Description = description;

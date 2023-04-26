@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class HyperDropletBorderPiece : HyperBorderPiece
+    public partial class HyperDropletBorderPiece : HyperBorderPiece
     {
         public HyperDropletBorderPiece()
         {

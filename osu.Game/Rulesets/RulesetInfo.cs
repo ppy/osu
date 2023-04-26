@@ -4,9 +4,8 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.Difficulty;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Rulesets
 {
@@ -23,6 +22,11 @@ namespace osu.Game.Rulesets
         public string Name { get; set; } = string.Empty;
 
         public string InstantiationInfo { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Stores the last applied <see cref="DifficultyCalculator.Version"/>
+        /// </summary>
+        public int LastAppliedDifficultyVersion { get; set; }
 
         public RulesetInfo(string shortName, string name, string instantiationInfo, int onlineID)
         {
@@ -49,21 +53,21 @@ namespace osu.Game.Rulesets
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo r && Equals(r);
 
-        public int CompareTo(RulesetInfo other)
+        public int CompareTo(RulesetInfo? other)
         {
-            if (OnlineID >= 0 && other.OnlineID >= 0)
+            if (OnlineID >= 0 && other?.OnlineID >= 0)
                 return OnlineID.CompareTo(other.OnlineID);
 
             // Official rulesets are always given precedence for the time being.
             if (OnlineID >= 0)
                 return -1;
-            if (other.OnlineID >= 0)
+            if (other?.OnlineID >= 0)
                 return 1;
 
-            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+            return string.Compare(ShortName, other?.ShortName, StringComparison.Ordinal);
         }
 
-        public int CompareTo(IRulesetInfo other)
+        public int CompareTo(IRulesetInfo? other)
         {
             if (!(other is RulesetInfo ruleset))
                 throw new ArgumentException($@"Object is not of type {nameof(RulesetInfo)}.", nameof(other));
@@ -88,7 +92,8 @@ namespace osu.Game.Rulesets
             Name = Name,
             ShortName = ShortName,
             InstantiationInfo = InstantiationInfo,
-            Available = Available
+            Available = Available,
+            LastAppliedDifficultyVersion = LastAppliedDifficultyVersion,
         };
 
         public Ruleset CreateInstance()

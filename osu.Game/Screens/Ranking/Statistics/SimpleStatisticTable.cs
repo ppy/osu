@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// Represents a table with simple statistics (ones that only need textual display).
     /// Richer visualisations should be done with <see cref="StatisticRow"/>s and <see cref="StatisticItem"/>s.
     /// </summary>
-    public class SimpleStatisticTable : CompositeDrawable
+    public partial class SimpleStatisticTable : CompositeDrawable
     {
         private readonly SimpleStatisticItem[] items;
         private readonly int columnCount;
@@ -96,7 +98,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             Direction = FillDirection.Vertical
         };
 
-        private class Spacer : CompositeDrawable
+        private partial class Spacer : CompositeDrawable
         {
             public Spacer()
             {

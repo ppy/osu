@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
-    public class TestSceneUserDimContainer : OsuTestScene
+    public partial class TestSceneUserDimContainer : OsuTestScene
     {
         private TestUserDimContainer userDimContainer;
 
@@ -102,7 +104,7 @@ namespace osu.Game.Tests.Visual.Background
             AddAssert("no dim", () => userDimContainer.DimEqual(0));
         }
 
-        private class TestUserDimContainer : UserDimContainer
+        private partial class TestUserDimContainer : UserDimContainer
         {
             public bool DimEqual(float expectedDimLevel) => Content.Colour == OsuColour.Gray(1f - expectedDimLevel);
 

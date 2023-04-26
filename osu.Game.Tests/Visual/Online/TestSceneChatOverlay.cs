@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -32,14 +34,16 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private APIUser testUser;
-        private Channel testPMChannel;
+        private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
+        private readonly APIUser testUser1 = new APIUser { Username = "test user", Id = 5071480 };
+
         private Channel[] testChannels;
+        private Message[] initialMessages;
 
         private Channel testChannel1 => testChannels[0];
         private Channel testChannel2 => testChannels[1];
@@ -47,19 +51,21 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private int currentMessageId;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            testUser = new APIUser { Username = "test user", Id = 5071479 };
-            testPMChannel = new Channel(testUser);
+            currentMessageId = 0;
             testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
+            initialMessages = testChannels.SelectMany(createChannelMessages).ToArray();
 
             Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(ChannelManager), channelManager = new ChannelManager()),
+                    (typeof(ChannelManager), channelManager = new ChannelManager(API)),
                 },
                 Children = new Drawable[]
                 {
@@ -78,6 +84,14 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     switch (req)
                     {
+                        case CreateChannelRequest createRequest:
+                            createRequest.TriggerSuccess(new APIChatChannel
+                            {
+                                ChannelID = ((int)createRequest.Channel.Id),
+                                RecentMessages = new List<Message>()
+                            });
+                            return true;
+
                         case GetUpdatesRequest getUpdates:
                             getUpdates.TriggerFailure(new WebException());
                             return true;
@@ -91,7 +105,7 @@ namespace osu.Game.Tests.Visual.Online
                             return true;
 
                         case GetMessagesRequest getMessages:
-                            getMessages.TriggerSuccess(createChannelMessages(getMessages.Channel));
+                            getMessages.TriggerSuccess(initialMessages.ToList());
                             return true;
 
                         case GetUserRequest getUser:
@@ -179,7 +193,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Listing is visible", () => listingIsVisible);
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             waitForChannel1Visible();
         }
@@ -201,12 +215,11 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelCloseButton()
         {
+            var testPMChannel = new Channel(testUser);
+
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join PM and public channels", () =>
-            {
-                channelManager.JoinChannel(testChannel1);
-                channelManager.JoinChannel(testPMChannel);
-            });
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
             AddStep("Select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
             AddStep("Click close button", () =>
             {
@@ -227,7 +240,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestChatCommand()
         {
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Open chat with user", () => channelManager.PostCommand($"chat {testUser.Username}"));
             AddAssert("PM channel is selected", () =>
@@ -246,14 +259,16 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestMultiplayerChannelIsNotShown()
         {
-            Channel multiplayerChannel = null;
+            Channel multiplayerChannel;
 
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
+
+            joinChannel(multiplayerChannel = new Channel(new APIUser())
             {
                 Name = "#mp_1",
                 Type = ChannelType.Multiplayer,
-            }));
+            });
+
             AddAssert("Channel is joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
             AddUntilStep("Channel not present in listing", () => !chatOverlay.ChildrenOfType<ChannelListingItem>()
                                                                              .Where(item => item.IsPresent)
@@ -267,7 +282,7 @@ namespace osu.Game.Tests.Visual.Online
             Message message = null;
 
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 1", () =>
             {
@@ -289,8 +304,8 @@ namespace osu.Game.Tests.Visual.Online
             Message message = null;
 
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
-            AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
+            joinTestChannel(0);
+            joinTestChannel(1);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 2", () =>
             {
@@ -312,8 +327,8 @@ namespace osu.Game.Tests.Visual.Online
             Message message = null;
 
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
-            AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
+            joinTestChannel(0);
+            joinTestChannel(1);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 2", () =>
             {
@@ -335,7 +350,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Send message in channel 1", () =>
             {
                 testChannel1.AddNewMessages(message = new Message
@@ -355,7 +370,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Send message in channel 1", () =>
             {
                 testChannel1.AddNewMessages(message = new Message
@@ -376,7 +391,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             waitForChannel1Visible();
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
@@ -402,11 +417,11 @@ namespace osu.Game.Tests.Visual.Online
                 chatOverlay.Show();
                 chatOverlay.SlowLoading = true;
             });
-            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            joinTestChannel(0);
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddUntilStep("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
 
-            AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
+            joinTestChannel(1);
             AddStep("Select channel 2", () => clickDrawable(getChannelListItem(testChannel2)));
             AddUntilStep("Channel 2 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel2).LoadState == LoadState.Loading);
 
@@ -459,19 +474,17 @@ namespace osu.Game.Tests.Visual.Online
             Channel pmChannel1 = createPrivateChannel();
             Channel pmChannel2 = createPrivateChannel();
 
-            AddStep("Show overlay with channels", () =>
-            {
-                channelManager.JoinChannel(testChannel1);
-                channelManager.JoinChannel(testChannel2);
-                channelManager.JoinChannel(pmChannel1);
-                channelManager.JoinChannel(pmChannel2);
-                channelManager.JoinChannel(announceChannel);
-                chatOverlay.Show();
-            });
+            joinTestChannel(0);
+            joinTestChannel(1);
+            joinChannel(pmChannel1);
+            joinChannel(pmChannel2);
+            joinChannel(announceChannel);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
 
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-
             waitForChannel1Visible();
+
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel2Visible();
 
@@ -486,6 +499,93 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel1Visible();
+        }
+
+        [Test]
+        public void TestRemoveMessages()
+        {
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            AddStep("Send message from another user", () =>
+            {
+                testChannel1.AddNewMessages(new Message
+                {
+                    ChannelId = testChannel1.Id,
+                    Content = "Message from another user",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = testUser1,
+                });
+            });
+
+            AddStep("Remove messages from other user", () =>
+            {
+                testChannel1.RemoveMessagesFromUser(testUser.Id);
+            });
+        }
+
+        [Test]
+        public void TestTextBoxSavePerChannel()
+        {
+            var testPMChannel = new Channel(testUser);
+
+            AddStep("show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
+
+            AddAssert("listing is visible", () => listingIsVisible);
+            AddStep("search for 'number 2'", () => chatOverlayTextBox.Text = "number 2");
+            AddAssert("'number 2' saved to selector", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "number 2");
+
+            AddStep("select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("text box cleared on normal channel", () => chatOverlayTextBox.Text == string.Empty);
+            AddAssert("nothing saved on normal channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == string.Empty);
+            AddStep("type '727'", () => chatOverlayTextBox.Text = "727");
+            AddAssert("'727' saved to normal channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "727");
+
+            AddStep("select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddAssert("text box cleared on PM channel", () => chatOverlayTextBox.Text == string.Empty);
+            AddAssert("nothing saved on PM channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == string.Empty);
+            AddStep("type 'hello'", () => chatOverlayTextBox.Text = "hello");
+            AddAssert("'hello' saved to PM channel", () => channelManager.CurrentChannel.Value.TextBoxMessage.Value == "hello");
+
+            AddStep("select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("text box contains '727'", () => chatOverlayTextBox.Text == "727");
+
+            AddStep("select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddAssert("text box contains 'hello'", () => chatOverlayTextBox.Text == "hello");
+            AddStep("click close button", () =>
+            {
+                ChannelListItemCloseButton closeButton = getChannelListItem(testPMChannel).ChildrenOfType<ChannelListItemCloseButton>().Single();
+                clickDrawable(closeButton);
+            });
+
+            AddAssert("listing is visible", () => listingIsVisible);
+            AddAssert("text box contains 'channel 2'", () => chatOverlayTextBox.Text == "number 2");
+            AddUntilStep("only channel 2 visible", () =>
+            {
+                IEnumerable<ChannelListingItem> listingItems = chatOverlay.ChildrenOfType<ChannelListingItem>()
+                                                                          .Where(item => item.IsPresent);
+                return listingItems.Count() == 1 && listingItems.Single().Channel == testChannel2;
+            });
+        }
+
+        private void joinTestChannel(int i)
+        {
+            AddStep($"Join test channel {i}", () => channelManager.JoinChannel(testChannels[i]));
+            AddUntilStep("wait for join completed", () => testChannels[i].Joined.Value);
+        }
+
+        private void joinChannel(Channel channel)
+        {
+            AddStep($"Join channel {channel}", () => channelManager.JoinChannel(channel));
+            AddUntilStep("wait for join completed", () => channel.Joined.Value);
         }
 
         private void waitForChannel1Visible() =>
@@ -527,7 +627,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private List<Message> createChannelMessages(Channel channel)
         {
-            var message = new Message
+            var message = new Message(currentMessageId++)
             {
                 ChannelId = channel.Id,
                 Content = $"Hello, this is a message in {channel.Name}",
@@ -547,7 +647,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createPrivateChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
             return new Channel(new APIUser
             {
                 Id = id,
@@ -557,16 +657,17 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createAnnounceChannel()
         {
-            int id = RNG.Next(0, 10000);
+            const int announce_channel_id = 133337;
+
             return new Channel
             {
-                Name = $"Announce {id}",
+                Name = $"Announce {announce_channel_id}",
                 Type = ChannelType.Announce,
-                Id = id,
+                Id = announce_channel_id,
             };
         }
 
-        private class TestChatOverlay : ChatOverlay
+        private partial class TestChatOverlay : ChatOverlay
         {
             public bool SlowLoading { get; set; }
 
@@ -580,7 +681,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class SlowLoadingDrawableChannel : DrawableChannel
+        private partial class SlowLoadingDrawableChannel : DrawableChannel
         {
             public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
 

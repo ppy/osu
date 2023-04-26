@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class HeaderButton : Container
+    public partial class HeaderButton : Container
     {
         private const int transition_duration = 200;
 

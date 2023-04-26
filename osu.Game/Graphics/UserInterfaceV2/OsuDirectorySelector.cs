@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuDirectorySelector : DirectorySelector
+    public partial class OsuDirectorySelector : DirectorySelector
     {
         public const float ITEM_HEIGHT = 20;
 
@@ -28,6 +30,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
 
         protected override DirectorySelectorBreadcrumbDisplay CreateBreadcrumb() => new OsuDirectorySelectorBreadcrumbDisplay();
+
+        protected override Drawable CreateHiddenToggleButton() => new OsuDirectorySelectorHiddenToggle { Current = { BindTarget = ShowHiddenItems } };
 
         protected override DirectorySelectorDirectory CreateParentDirectoryItem(DirectoryInfo directory) => new OsuDirectorySelectorParentDirectory(directory);
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -22,7 +24,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class VotePill : LoadingButton, IHasAccentColour
+    public partial class VotePill : LoadingButton, IHasAccentColour
     {
         private const int duration = 200;
 
@@ -130,11 +132,10 @@ namespace osu.Game.Overlays.Comments
                 },
                 sideNumber = new OsuSpriteText
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
                     Text = "+1",
                     Font = OsuFont.GetFont(size: 14),
-                    Margin = new MarginPadding { Right = 3 },
                     Alpha = 0,
                 },
                 votesCounter = new OsuSpriteText
@@ -187,7 +188,7 @@ namespace osu.Game.Overlays.Comments
             else
                 sideNumber.FadeTo(IsHovered ? 1 : 0);
 
-            borderContainer.BorderThickness = IsHovered ? 3 : 0;
+            borderContainer.BorderThickness = IsHovered ? 2 : 0;
         }
 
         private void onHoverAction()

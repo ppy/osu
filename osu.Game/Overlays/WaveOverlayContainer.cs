@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public abstract class WaveOverlayContainer : OsuFocusedOverlayContainer
+    public abstract partial class WaveOverlayContainer : OsuFocusedOverlayContainer
     {
         protected readonly WaveContainer Waves;
 
@@ -19,6 +21,8 @@ namespace osu.Game.Overlays
         protected override bool StartHidden => true;
 
         protected override string PopInSampleName => "UI/wave-pop-in";
+
+        public const float HORIZONTAL_PADDING = 50;
 
         protected WaveOverlayContainer()
         {

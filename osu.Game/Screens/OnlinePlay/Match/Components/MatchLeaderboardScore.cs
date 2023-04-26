@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -11,7 +13,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchLeaderboardScore : LeaderboardScore
+    public partial class MatchLeaderboardScore : LeaderboardScore
     {
         private readonly APIUserScoreAggregate score;
 

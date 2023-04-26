@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public abstract class ProfileHeaderStatisticsButton : ProfileHeaderButton
+    public abstract partial class ProfileHeaderStatisticsButton : ProfileHeaderButton
     {
         private readonly OsuSpriteText drawableText;
 

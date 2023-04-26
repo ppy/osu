@@ -1,0 +1,15 @@
+osu file format v14
+
+[TimingPoints]
+
+// NaN bpm (should be rejected)
+0,NaN,4,2,0,100,1,0
+
+// 120 bpm
+1000,500,4,2,0,100,1,0
+
+// NaN slider velocity
+2000,NaN,4,3,0,100,0,1
+
+// 1.0x slider velocity
+3000,-100,4,3,0,100,0,1

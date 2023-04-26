@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     [TestFixture]
     public class CheckTimeDistanceEqualityTest
     {
-        private CheckTimeDistanceEquality check;
+        private CheckTimeDistanceEquality check = null!;
 
         [SetUp]
         public void Setup()

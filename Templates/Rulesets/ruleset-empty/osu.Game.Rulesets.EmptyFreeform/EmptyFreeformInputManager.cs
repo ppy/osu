@@ -7,7 +7,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.EmptyFreeform
 {
-    public class EmptyFreeformInputManager : RulesetInputManager<EmptyFreeformAction>
+    public partial class EmptyFreeformInputManager : RulesetInputManager<EmptyFreeformAction>
     {
         public EmptyFreeformInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)

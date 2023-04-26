@@ -9,7 +9,7 @@ using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class MaintenanceSection : SettingsSection
+    public partial class MaintenanceSection : SettingsSection
     {
         public override LocalisableString Header => MaintenanceSettingsStrings.MaintenanceSectionHeader;
 
@@ -22,7 +22,11 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new GeneralSettings()
+                new BeatmapSettings(),
+                new SkinSettings(),
+                new CollectionsSettings(),
+                new ScoreSettings(),
+                new ModPresetSettings()
             };
         }
     }

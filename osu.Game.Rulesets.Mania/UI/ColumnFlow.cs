@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// Content can be added to individual columns via <see cref="SetContentForColumn"/>.
     /// </summary>
     /// <typeparam name="TContent">The type of content in each column.</typeparam>
-    public class ColumnFlow<TContent> : CompositeDrawable
+    public partial class ColumnFlow<TContent> : CompositeDrawable
         where TContent : Drawable
     {
         /// <summary>
@@ -33,6 +35,8 @@ namespace osu.Game.Rulesets.Mania.UI
             this.stageDefinition = stageDefinition;
 
             AutoSizeAxes = Axes.X;
+
+            Masking = true;
 
             InternalChild = columns = new FillFlowContainer<Container>
             {

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : BeatmapSetLayoutSection
+    public partial class ScoresContainer : BeatmapSetLayoutSection
     {
         private const int spacing = 15;
 
@@ -85,27 +85,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(task => Schedule(() =>
-                            {
-                                if (loadCancellationSource.IsCancellationRequested)
-                                    return;
+                var scores = scoreManager.OrderByTotalScore(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo))).ToArray();
+                var topScore = scores.First();
 
-                                var scores = task.GetResultSafely();
+                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
+                scoreTable.Show();
 
-                                var topScore = scores.First();
+                var userScore = value.UserScore;
+                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
-                                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
-                                scoreTable.Show();
+                topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                                var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, beatmapInfo);
-
-                                topScoresContainer.Add(new DrawableTopScore(topScore));
-
-                                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
-                                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
             });
         }
 
@@ -124,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Margin = new MarginPadding { Vertical = 20 },
                     Children = new Drawable[]
                     {
@@ -215,7 +207,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, _) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);
@@ -242,8 +234,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 modSelector.DeselectAll();
             else
                 getScores();
-
-            modSelector.FadeTo(userIsSupporter ? 1 : 0);
         }
 
         private void getScores()
@@ -260,7 +250,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
-            if (scope.Value != BeatmapLeaderboardScope.Global && !userIsSupporter)
+            if ((scope.Value != BeatmapLeaderboardScope.Global || modSelector.SelectedMods.Count > 0) && !userIsSupporter)
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();

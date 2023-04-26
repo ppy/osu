@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
+    public partial class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
         private readonly TournamentMatch match;
         private readonly bool losers;

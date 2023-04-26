@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -17,7 +19,7 @@ using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class UpdateSettings : SettingsSubsection
+    public partial class UpdateSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = $"You are running the latest release ({game.Version})",
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }
@@ -68,6 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.OpenOsuFolder,
+                    Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
 

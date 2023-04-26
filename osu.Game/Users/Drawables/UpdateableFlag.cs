@@ -11,33 +11,33 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public class UpdateableFlag : ModelBackedDrawable<Country>
+    public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
-        public Country Country
+        public CountryCode CountryCode
         {
             get => Model;
             set => Model = value;
         }
 
         /// <summary>
-        /// Whether to show a place holder on null country.
+        /// Whether to show a place holder on unknown country.
         /// </summary>
-        public bool ShowPlaceholderOnNull = true;
+        public bool ShowPlaceholderOnUnknown = true;
 
         /// <summary>
         /// Perform an action in addition to showing the country ranking.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
         /// </summary>
-        public Action Action;
+        public Action? Action;
 
-        public UpdateableFlag(Country country = null)
+        public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
-            Country = country;
+            CountryCode = countryCode;
         }
 
-        protected override Drawable CreateDrawable(Country country)
+        protected override Drawable? CreateDrawable(CountryCode countryCode)
         {
-            if (country == null && !ShowPlaceholderOnNull)
+            if (countryCode == CountryCode.Unknown && !ShowPlaceholderOnUnknown)
                 return null;
 
             return new Container
@@ -45,7 +45,7 @@ namespace osu.Game.Users.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new DrawableFlag(country)
+                    new DrawableFlag(countryCode)
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -54,13 +54,13 @@ namespace osu.Game.Users.Drawables
             };
         }
 
-        [Resolved(canBeNull: true)]
-        private RankingsOverlay rankingsOverlay { get; set; }
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
 
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
-            rankingsOverlay?.ShowCountry(Country);
+            rankingsOverlay?.ShowCountry(CountryCode);
             return true;
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -18,7 +20,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatLink : OsuTestScene
+    public partial class TestSceneChatLink : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
         private Color4 linkColour;
@@ -39,11 +41,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             linkColour = colours.Blue;
 
-            var chatManager = new ChannelManager();
+            var chatManager = new ChannelManager(API);
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
+
+            Add(chatManager);
         }
 
         [SetUp]
@@ -126,11 +130,11 @@ namespace osu.Game.Tests.Visual.Online
 
                     Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
-                    var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                    var linkCompilers = newLine.DrawableContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
                     var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                     return linkSprites.All(d => d.Colour == linkColour)
-                           && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                           && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
                 }
             }
         }
@@ -203,7 +207,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
-        private class TestChatLineContainer : FillFlowContainer<ChatLine>
+        private partial class TestChatLineContainer : FillFlowContainer<ChatLine>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

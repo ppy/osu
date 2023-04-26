@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using System.Linq;
@@ -18,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDesignSection : OsuManualInputManagerTestScene
+    public partial class TestSceneDesignSection : OsuManualInputManagerTestScene
     {
         private TestDesignSection designSection;
         private EditorBeatmap editorBeatmap { get; set; }
@@ -95,7 +97,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.BeatmapInfo.CountdownOffset == expectedFinalValue);
         }
 
-        private class TestDesignSection : DesignSection
+        private partial class TestDesignSection : DesignSection
         {
             public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
 

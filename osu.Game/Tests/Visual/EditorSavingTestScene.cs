@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -16,7 +18,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// Tests the general expected flow of creating a new beatmap, saving it, then loading it back from song select.
     /// </summary>
-    public abstract class EditorSavingTestScene : OsuGameTestScene
+    public abstract partial class EditorSavingTestScene : OsuGameTestScene
     {
         protected Editor Editor => Game.ChildrenOfType<Editor>().FirstOrDefault();
 

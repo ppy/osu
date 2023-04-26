@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinnerTick : DrawableOsuHitObject
+    public partial class DrawableSpinnerTick : DrawableOsuHitObject
     {
         public override bool DisplayResult => false;
 
@@ -22,8 +24,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
-
-        protected override double MaximumJudgementOffset => DrawableSpinner.HitObject.Duration;
 
         /// <summary>
         /// Apply a judgement result.

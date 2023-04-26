@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -133,25 +135,55 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
 
+                case GetBeatmapRequest getBeatmapRequest:
+                {
+                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.BeatmapInfo.OnlineID).Single());
+                    return true;
+                }
+
                 case GetBeatmapsRequest getBeatmapsRequest:
-                    var result = new List<APIBeatmap>();
+                {
+                    getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = createResponseBeatmaps(getBeatmapsRequest.BeatmapIds.ToArray()) });
+                    return true;
+                }
 
-                    foreach (int id in getBeatmapsRequest.BeatmapIds)
+                case GetBeatmapSetRequest getBeatmapSetRequest:
+                {
+                    var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
+                        ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
+                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+
+                    if (baseBeatmap == null)
                     {
-                        var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
-
-                        if (baseBeatmap == null)
-                        {
-                            baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
-                            baseBeatmap.OnlineID = id;
-                            baseBeatmap.BeatmapSet!.OnlineID = id;
-                        }
-
-                        result.Add(OsuTestScene.CreateAPIBeatmap(baseBeatmap));
+                        baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
+                        baseBeatmap.OnlineID = getBeatmapSetRequest.ID;
+                        baseBeatmap.BeatmapSet!.OnlineID = getBeatmapSetRequest.ID;
                     }
 
-                    getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = result });
+                    getBeatmapSetRequest.TriggerSuccess(OsuTestScene.CreateAPIBeatmapSet(baseBeatmap));
                     return true;
+                }
+            }
+
+            List<APIBeatmap> createResponseBeatmaps(params int[] beatmapIds)
+            {
+                var result = new List<APIBeatmap>();
+
+                foreach (int id in beatmapIds)
+                {
+                    var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
+
+                    if (baseBeatmap == null)
+                    {
+                        baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
+                        baseBeatmap.OnlineID = id;
+                        baseBeatmap.BeatmapSet!.OnlineID = id;
+                    }
+
+                    result.Add(OsuTestScene.CreateAPIBeatmap(baseBeatmap));
+                }
+
+                return result;
             }
 
             return false;

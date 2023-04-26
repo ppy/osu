@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneUpdateableBeatmapSetCover : OsuTestScene
+    public partial class TestSceneUpdateableBeatmapSetCover : OsuTestScene
     {
         [Test]
         public void TestLocal([Values] BeatmapSetCoverType coverType)
@@ -137,7 +139,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
         };
 
-        private class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             private readonly int loadDelay;
 
@@ -161,7 +163,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
+        private partial class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
         {
             private readonly int loadDelay;
 

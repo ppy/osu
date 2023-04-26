@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ParticipantsList : OnlinePlayComposite
+    public partial class ParticipantsList : OnlinePlayComposite
     {
         public const float TILE_SIZE = 35;
 
@@ -58,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            RecentParticipants.CollectionChanged += (_, __) => updateParticipants();
+            RecentParticipants.CollectionChanged += (_, _) => updateParticipants();
             updateParticipants();
         }
 
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
-        private class UserTile : CompositeDrawable
+        private partial class UserTile : CompositeDrawable
         {
             public APIUser User
             {

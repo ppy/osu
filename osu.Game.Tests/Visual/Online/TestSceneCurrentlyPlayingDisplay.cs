@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -18,7 +20,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
+    public partial class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
         private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Panel no longer present", () => !currentlyPlaying.ChildrenOfType<UserGridPanel>().Any());
         }
 
-        internal class TestUserLookupCache : UserLookupCache
+        internal partial class TestUserLookupCache : UserLookupCache
         {
             private static readonly string[] usernames =
             {

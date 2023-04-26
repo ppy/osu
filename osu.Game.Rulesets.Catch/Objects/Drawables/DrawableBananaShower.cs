@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBananaShower : DrawableCatchHitObject
+    public partial class DrawableBananaShower : DrawableCatchHitObject
     {
         private readonly Container bananaContainer;
 
@@ -17,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
-        public DrawableBananaShower([CanBeNull] BananaShower s)
+        public DrawableBananaShower(BananaShower? s)
             : base(s)
         {
             RelativeSizeAxes = Axes.X;

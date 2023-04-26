@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -15,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBeatmap : BackgroundScreen
+    public partial class BackgroundScreenBeatmap : BackgroundScreen
     {
         /// <summary>
         /// The amount of blur to apply when full user blur is requested.
@@ -41,6 +43,11 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+        /// <summary>
+        /// The amount of dim to be used when <see cref="IgnoreUserSettings"/> is <c>true</c>.
+        /// </summary>
+        public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
+
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
@@ -56,6 +63,7 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
+            dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
 
             StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
@@ -91,6 +99,18 @@ namespace osu.Game.Screens.Backgrounds
             }
         }
 
+        /// <summary>
+        /// Reloads beatmap's background.
+        /// </summary>
+        public void RefreshBackground()
+        {
+            Schedule(() =>
+            {
+                cancellationSource?.Cancel();
+                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+            });
+        }
+
         private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;
@@ -114,7 +134,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        public class DimmableBackground : UserDimContainer
+        public partial class DimmableBackground : UserDimContainer
         {
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.

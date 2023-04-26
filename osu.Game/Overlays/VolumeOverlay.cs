@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -21,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
-    public class VolumeOverlay : VisibilityContainer
+    public partial class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
 
@@ -140,11 +142,16 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate popOutDelegate;
 
+        public void FocusMasterVolume()
+        {
+            volumeMeters.Select(volumeMeterMaster);
+        }
+
         public override void Show()
         {
             // Focus on the master meter as a default if previously hidden
             if (State.Value == Visibility.Hidden)
-                volumeMeters.Select(volumeMeterMaster);
+                FocusMasterVolume();
 
             if (State.Value == Visibility.Visible)
                 schedulePopOut();

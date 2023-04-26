@@ -12,14 +12,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public abstract class PlaySliderBody : SnakingSliderBody
+    public abstract partial class PlaySliderBody : SnakingSliderBody
     {
-        private IBindable<float> scaleBindable;
-        private IBindable<int> pathVersion;
-        private IBindable<Color4> accentColour;
+        protected IBindable<float> ScaleBindable { get; private set; } = null!;
+
+        protected IBindable<Color4> AccentColourBindable { get; private set; } = null!;
+
+        private IBindable<int> pathVersion = null!;
 
         [Resolved(CanBeNull = true)]
-        private OsuRulesetConfigManager config { get; set; }
+        private OsuRulesetConfigManager? config { get; set; }
 
         private readonly Bindable<bool> configSnakingOut = new Bindable<bool>();
 
@@ -28,14 +30,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             var drawableSlider = (DrawableSlider)drawableObject;
 
-            scaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
-            scaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
+            ScaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
+            ScaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
 
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
             pathVersion.BindValueChanged(_ => Refresh());
 
-            accentColour = drawableObject.AccentColour.GetBoundCopy();
-            accentColour.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
+            AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
+            AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
 
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, configSnakingOut);

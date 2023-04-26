@@ -8,6 +8,5 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModNightcore : ModNightcore<TaikoHitObject>
     {
-        public override double ScoreMultiplier => 1.12;
     }
 }

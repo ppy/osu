@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -16,7 +19,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Tests.NonVisual
 {
-    public class FirstAvailableHitWindowsTest
+    public partial class FirstAvailableHitWindowsTest
     {
         private TestDrawableRuleset testDrawableRuleset;
 
@@ -74,23 +77,24 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-        private class TestDrawableRuleset : DrawableRuleset
+        private partial class TestDrawableRuleset : DrawableRuleset
         {
             public List<HitObject> HitObjects;
             public override IEnumerable<HitObject> Objects => HitObjects;
 
             public override event Action<JudgementResult> NewResult
             {
-                add => throw new InvalidOperationException();
-                remove => throw new InvalidOperationException();
+                add => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
             }
 
             public override event Action<JudgementResult> RevertResult
             {
-                add => throw new InvalidOperationException();
-                remove => throw new InvalidOperationException();
+                add => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }

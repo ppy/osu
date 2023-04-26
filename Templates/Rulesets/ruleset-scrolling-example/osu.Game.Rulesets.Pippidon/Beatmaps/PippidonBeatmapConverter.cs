@@ -21,8 +21,11 @@ namespace osu.Game.Rulesets.Pippidon.Beatmaps
         public PippidonBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
             : base(beatmap, ruleset)
         {
-            minPosition = beatmap.HitObjects.Min(getUsablePosition);
-            maxPosition = beatmap.HitObjects.Max(getUsablePosition);
+            if (beatmap.HitObjects.Any())
+            {
+                minPosition = beatmap.HitObjects.Min(getUsablePosition);
+                maxPosition = beatmap.HitObjects.Max(getUsablePosition);
+            }
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition && h is IHasYPosition);

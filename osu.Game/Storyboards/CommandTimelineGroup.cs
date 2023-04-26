@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -45,30 +47,11 @@ namespace osu.Game.Storyboards
             };
         }
 
-        /// <summary>
-        /// Returns the earliest visible time. Will be null unless this group's first <see cref="Alpha"/> command has a start value of zero.
-        /// </summary>
-        public double? EarliestDisplayedTime
-        {
-            get
-            {
-                var first = Alpha.Commands.FirstOrDefault();
-
-                return first?.StartValue == 0 ? first.StartTime : (double?)null;
-            }
-        }
-
         [JsonIgnore]
         public double CommandsStartTime
         {
             get
             {
-                // if the first alpha command starts at zero it should be given priority over anything else.
-                // this is due to it creating a state where the target is not present before that time, causing any other events to not be visible.
-                double? earliestDisplay = EarliestDisplayedTime;
-                if (earliestDisplay != null)
-                    return earliestDisplay.Value;
-
                 double min = double.MaxValue;
 
                 for (int i = 0; i < timelines.Length; i++)
@@ -100,9 +83,6 @@ namespace osu.Game.Storyboards
 
         [JsonIgnore]
         public virtual double EndTime => CommandsEndTime;
-
-        [JsonIgnore]
-        public double Duration => EndTime - StartTime;
 
         [JsonIgnore]
         public bool HasCommands

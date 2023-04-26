@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class Pulp : Circle
+    public partial class Pulp : Circle
     {
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
 
