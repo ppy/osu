@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects(cancellationToken);
