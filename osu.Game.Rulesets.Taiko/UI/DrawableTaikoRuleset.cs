@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public readonly BindableBool LockPlayfieldMaxAspect = new BindableBool(true);
 
+        public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
+
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
