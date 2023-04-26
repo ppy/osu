@@ -61,10 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
                             new PathControlPoint(new Vector2(100, 0))
                         }
                     },
-                    DifficultyControlPoint = new DifficultyControlPoint
-                    {
-                        SliderVelocity = 2
-                    }
+                    SliderVelocity = 2
                 });
             });
         }
