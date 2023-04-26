@@ -15,14 +15,13 @@ using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasPathWithRepeats, IHasSliderVelocity
+    public class Slider : OsuHitObject, IHasPathWithRepeats, IHasSliderVelocity, IHasGenerateTicks
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
@@ -143,6 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => SliderVelocityBindable.Value = value;
         }
 
+        public bool GenerateTicks { get; set; }
+
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
 
@@ -162,10 +163,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
             double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocity;
-            bool generateTicks = !HasContext<LegacyContext>() || GetContext<LegacyContext>().GenerateTicks;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
+            TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

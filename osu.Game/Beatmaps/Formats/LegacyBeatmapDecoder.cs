@@ -105,7 +105,11 @@ namespace osu.Game.Beatmaps.Formats
 #pragma warning disable 618
             if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
 #pragma warning restore 618
-                hitObject.SetContext(new LegacyContext(legacyDifficultyControlPoint.BpmMultiplier, legacyDifficultyControlPoint.GenerateTicks));
+            {
+                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
+                if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
+            }
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
                 hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;

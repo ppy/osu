@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
 
             double beatLength;
-            if (hitObject.HasContext<LegacyContext>())
-                beatLength = timingPoint.BeatLength * hitObject.GetContext<LegacyContext>().BpmMultiplier;
+            if (hitObject.LegacyBpmMultiplier.HasValue)
+                beatLength = timingPoint.BeatLength * hitObject.LegacyBpmMultiplier.Value;
             else if (hitObject is IHasSliderVelocity hasSliderVelocity)
                 beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
             else

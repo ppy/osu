@@ -16,7 +16,6 @@ using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Context;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Objects
     /// HitObjects may contain more properties for which you should be checking through the IHas* types.
     /// </para>
     /// </summary>
-    public class HitObject : ContextContainer
+    public class HitObject
     {
         /// <summary>
         /// A small adjustment to the start time of control points to account for rounding/precision errors.
@@ -79,6 +78,12 @@ namespace osu.Game.Rulesets.Objects
 
         public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
         public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
+
+        /// <summary>
+        /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+        /// DO NOT USE THIS UNLESS 100% SURE.
+        /// </summary>
+        public double? LegacyBpmMultiplier { get; set; }
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
