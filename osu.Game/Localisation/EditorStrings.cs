@@ -99,6 +99,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TimelineTicks => new TranslatableString(getKey(@"timeline_ticks"), @"Ticks");
 
+        /// <summary>
+        /// "{0:0}&#176;"
+        /// </summary>
+        public static LocalisableString RotationUnsnapped(float newRotation) => new TranslatableString(getKey(@"rotation_unsnapped"), @"{0:0}°", newRotation);
+
+        /// <summary>
+        /// "{0:0}&#176; (snapped)"
+        /// </summary>
+        public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RendererHeader => new TranslatableString(getKey(@"renderer_header"), @"Renderer");
 
         /// <summary>
+        /// "Renderer"
+        /// </summary>
+        public static LocalisableString Renderer => new TranslatableString(getKey(@"renderer"), @"Renderer");
+
+        /// <summary>
         /// "Frame limiter"
         /// </summary>
         public static LocalisableString FrameLimiter => new TranslatableString(getKey(@"frame_limiter"), @"Frame limiter");
@@ -143,6 +148,12 @@ namespace osu.Game.Localisation
         /// "PNG (lossless)"
         /// </summary>
         public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
+
+        /// <summary>
+        /// "In order to change the renderer, the game will close. Please open it again."
+        /// </summary>
+        public static LocalisableString ChangeRendererConfirmation =>
+            new TranslatableString(getKey(@"change_renderer_configuration"), @"In order to change the renderer, the game will close. Please open it again.");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
