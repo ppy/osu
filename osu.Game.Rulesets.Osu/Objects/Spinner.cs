@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             return new[]
             {
-                SampleControlPoint.ApplyTo(referenceSample).With("spinnerspin")
+                referenceSample.With("spinnerspin")
             };
         }
     }
