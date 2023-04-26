@@ -96,6 +96,27 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestLoopWithoutExplicitFadeOut()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("animation-loop-no-explicit-end-time.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(1, background.Elements.Count);
+
+                Assert.AreEqual(2000, background.Elements[0].StartTime);
+                Assert.AreEqual(2000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
+
+                Assert.AreEqual(3000, (background.Elements[0] as StoryboardAnimation)?.GetEndTime());
+                Assert.AreEqual(12000, (background.Elements[0] as StoryboardAnimation)?.EndTimeForDisplay);
+            }
+        }
+
+        [Test]
         public void TestCorrectAnimationStartTime()
         {
             var decoder = new LegacyStoryboardDecoder();
