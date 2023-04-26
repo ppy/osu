@@ -19,18 +19,19 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool PerformFail() => true;
 
         public virtual bool RestartOnFail => Restart.Value;
-        private event Action failureTriggered;
+
+        private Action? triggerFailureDelegate;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            failureTriggered = healthProcessor.TriggerFailure;
+            triggerFailureDelegate = healthProcessor.TriggerFailure;
             healthProcessor.FailConditions += FailCondition;
         }
 
         /// <summary>
         /// Immediately triggers a failure on the loaded <see cref="HealthProcessor"/>.
         /// </summary>
-        protected void TriggerFailure() => failureTriggered?.Invoke();
+        protected void TriggerFailure() => triggerFailureDelegate?.Invoke();
 
         /// <summary>
         /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
