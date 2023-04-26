@@ -16,7 +16,6 @@ using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
