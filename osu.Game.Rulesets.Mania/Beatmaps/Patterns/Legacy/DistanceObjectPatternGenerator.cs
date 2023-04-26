@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
