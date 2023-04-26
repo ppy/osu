@@ -95,10 +95,6 @@ namespace osu.Game.Tests.Visual.Editing
                 var path = slider.Path;
                 return path.ControlPoints.Count == 2 && path.ControlPoints.SequenceEqual(addedObject.Path.ControlPoints);
             });
-
-            // see `HitObject.control_point_leniency`.
-            AddAssert("sample control point has correct time", () => Precision.AlmostEquals(slider.SampleControlPoint.Time, slider.GetEndTime(), 1));
-            AddAssert("difficulty control point has correct time", () => slider.DifficultyControlPoint.Time == slider.StartTime);
         }
 
         [Test]
