@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Play.HUD
 
             Trigger.OnActivate += Activate;
             Trigger.OnDeactivate += Deactivate;
-
-            Name = trigger.Name;
         }
 
         private void increment()
