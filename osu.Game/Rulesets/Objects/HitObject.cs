@@ -76,7 +76,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
-        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
         public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
