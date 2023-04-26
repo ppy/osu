@@ -1,44 +1,38 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Utils;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroTriangles : IntroScreen
+    public partial class IntroTriangles : IntroScreen
     {
         protected override string BeatmapHash => "a1556d0801b3a6b175dda32ef546f0ec812b400499f575c44fccbe9c67f9b1e5";
 
         protected override string BeatmapFile => "triangles.osz";
 
-        protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
-        {
-            Alpha = 0,
-        };
-
         [Resolved]
         private AudioManager audio { get; set; }
-
-        private BackgroundScreenDefault background;
 
         private Sample welcome;
 
@@ -73,18 +67,34 @@ namespace osu.Game.Screens.Menu
                 if (UsingThemedIntro)
                     decoupledClock.ChangeSource(Track);
 
-                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background)
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground())
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
                     LoadMenu = LoadMenu
-                }, t =>
+                }, _ =>
                 {
-                    AddInternal(t);
-                    if (!UsingThemedIntro)
-                        welcome?.Play();
+                    AddInternal(intro);
 
-                    StartTrack();
+                    // There is a chance that the intro timed out before being displayed, and this scheduled callback could
+                    // happen during the outro rather than intro.
+                    // In such a scenario, we don't want to play the intro sample, nor attempt to start the intro track
+                    // (that may have already been since disposed by MusicController).
+                    if (DidLoadMenu)
+                        return;
+
+                    if (!UsingThemedIntro)
+                    {
+                        // If the user has requested no theme, fallback to the same intro voice and delay as IntroCircles.
+                        // The triangles intro voice and theme are combined which makes it impossible to use.
+                        welcome?.Play();
+                        Scheduler.AddDelayed(StartTrack, IntroCircles.TRACK_START_DELAY);
+                    }
+                    else
+                        StartTrack();
+
+                    // no-op for the case of themed intro, no harm in calling for both scenarios as a safety measure.
+                    decoupledClock.Start();
                 });
             }
         }
@@ -93,28 +103,14 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(e);
 
-            // ensure the background is shown, even if the TriangleIntroSequence failed to do so.
-            background.ApplyToBackground(b => b.Show());
-
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
         }
 
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-            background.FadeOut(100);
-        }
-
-        protected override void StartTrack()
-        {
-            decoupledClock.Start();
-        }
-
-        private class TrianglesIntroSequence : CompositeDrawable
+        private partial class TrianglesIntroSequence : CompositeDrawable
         {
             private readonly OsuLogo logo;
-            private readonly BackgroundScreenDefault background;
+            private readonly Action showBackgroundAction;
             private OsuSpriteText welcomeText;
 
             private RulesetFlow rulesets;
@@ -126,10 +122,10 @@ namespace osu.Game.Screens.Menu
 
             public Action LoadMenu;
 
-            public TrianglesIntroSequence(OsuLogo logo, BackgroundScreenDefault background)
+            public TrianglesIntroSequence(OsuLogo logo, Action showBackgroundAction)
             {
                 this.logo = logo;
-                this.background = background;
+                this.showBackgroundAction = showBackgroundAction;
             }
 
             [Resolved]
@@ -203,7 +199,6 @@ namespace osu.Game.Screens.Menu
 
                 rulesets.Hide();
                 lazerLogo.Hide();
-                background.ApplyToBackground(b => b.Hide());
 
                 using (BeginAbsoluteSequence(0))
                 {
@@ -229,8 +224,8 @@ namespace osu.Game.Screens.Menu
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
                         rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
-                        welcomeText.FadeOut();
-                        triangles.FadeOut();
+                        welcomeText.FadeOut().Expire();
+                        triangles.FadeOut().Expire();
                     }
 
                     using (BeginDelayedSequence(rulesets_2))
@@ -260,12 +255,11 @@ namespace osu.Game.Screens.Menu
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
-                            logoContainerSecondary.Remove(lazerLogo);
-                            lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
+                            logoContainerSecondary.Remove(lazerLogo, true);
 
                             logo.FadeIn();
 
-                            background.ApplyToBackground(b => b.Show());
+                            showBackgroundAction();
 
                             game.Add(new GameWideFlash());
 
@@ -275,7 +269,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class GameWideFlash : Box
+            private partial class GameWideFlash : Box
             {
                 private const double flash_length = 1000;
 
@@ -293,7 +287,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class LazerLogo : CompositeDrawable
+            private partial class LazerLogo : CompositeDrawable
             {
                 private LogoAnimation highlight, background;
 
@@ -313,7 +307,7 @@ namespace osu.Game.Screens.Menu
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(TextureStore textures)
+                private void load(LargeTextureStore textures)
                 {
                     InternalChildren = new Drawable[]
                     {
@@ -333,33 +327,37 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class RulesetFlow : FillFlowContainer
+            private partial class RulesetFlow : FillFlowContainer
             {
                 [BackgroundDependencyLoader]
                 private void load(RulesetStore rulesets)
                 {
-                    var modes = new List<Drawable>();
-
-                    foreach (var ruleset in rulesets.AvailableRulesets)
-                    {
-                        var icon = new ConstrainedIconContainer
-                        {
-                            Icon = ruleset.CreateInstance().CreateIcon(),
-                            Size = new Vector2(30),
-                        };
-
-                        modes.Add(icon);
-                    }
-
                     AutoSizeAxes = Axes.Both;
-                    Children = modes;
 
                     Anchor = Anchor.Centre;
                     Origin = Anchor.Centre;
+
+                    foreach (var ruleset in rulesets.AvailableRulesets)
+                    {
+                        try
+                        {
+                            var icon = new ConstrainedIconContainer
+                            {
+                                Icon = ruleset.CreateInstance().CreateIcon(),
+                                Size = new Vector2(30),
+                            };
+
+                            Add(icon);
+                        }
+                        catch
+                        {
+                            Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                        }
+                    }
                 }
             }
 
-            private class GlitchingTriangles : CompositeDrawable
+            private partial class GlitchingTriangles : CompositeDrawable
             {
                 public GlitchingTriangles()
                 {
@@ -393,7 +391,7 @@ namespace osu.Game.Screens.Menu
                 /// <summary>
                 /// Represents a sprite that is drawn in a triangle shape, instead of a rectangle shape.
                 /// </summary>
-                public class OutlineTriangle : BufferedContainer
+                public partial class OutlineTriangle : BufferedContainer
                 {
                     public OutlineTriangle(bool outlineOnly, float size)
                         : base(cachedFrameBuffer: true)

@@ -4,13 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuSettingsSubsection : RulesetSettingsSubsection
+    public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
         protected override LocalisableString Header => "osu!";
 
@@ -28,23 +29,23 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Snaking in sliders",
+                    LabelText = RulesetSettingsStrings.SnakingInSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     ClassicDefault = false,
-                    LabelText = "Snaking out sliders",
+                    LabelText = RulesetSettingsStrings.SnakingOutSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Cursor trail",
+                    LabelText = RulesetSettingsStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
-                    LabelText = "Playfield border style",
+                    LabelText = RulesetSettingsStrings.PlayfieldBorderStyle,
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };

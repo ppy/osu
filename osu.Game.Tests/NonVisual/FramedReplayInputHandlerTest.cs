@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -362,12 +364,12 @@ namespace osu.Game.Tests.NonVisual
 
         private void confirmCurrentFrame(int? frame)
         {
-            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.CurrentFrame?.Time, "Unexpected current frame");
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.CurrentFrame?.Time, "Unexpected current frame");
         }
 
         private void confirmNextFrame(int? frame)
         {
-            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.NextFrame?.Time, "Unexpected next frame");
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.NextFrame?.Time, "Unexpected next frame");
         }
 
         private class TestReplayFrame : ReplayFrame

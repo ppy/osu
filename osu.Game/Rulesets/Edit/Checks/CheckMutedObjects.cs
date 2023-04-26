@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private IEnumerable<Issue> getVolumeIssues(HitObject hitObject, HitObject sampledHitObject = null)
+        private IEnumerable<Issue> getVolumeIssues(HitObject hitObject, HitObject? sampledHitObject = null)
         {
             sampledHitObject ??= hitObject;
             if (!sampledHitObject.Samples.Any())
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (edgeType == EdgeType.None)
                 yield break;
 
-            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLower() : null;
+            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLowerInvariant() : string.Empty;
 
             if (maxVolume <= muted_threshold)
             {

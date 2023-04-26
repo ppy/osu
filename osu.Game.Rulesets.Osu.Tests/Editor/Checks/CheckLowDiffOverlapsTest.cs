@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     [TestFixture]
     public class CheckLowDiffOverlapsTest
     {
-        private CheckLowDiffOverlaps check;
+        private CheckLowDiffOverlaps check = null!;
 
         [SetUp]
         public void Setup()

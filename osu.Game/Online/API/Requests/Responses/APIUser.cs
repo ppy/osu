@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +34,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        private CountryCode? countryCode;
+
+        public CountryCode CountryCode
+        {
+            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
+            set => countryCode = value;
+        }
+
+#pragma warning disable 649
+        [CanBeNull]
         [JsonProperty(@"country")]
-        public Country Country;
+        private Country country;
+#pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -151,6 +164,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"guest_beatmapset_count")]
         public int GuestBeatmapsetCount;
 
+        [JsonProperty(@"nominated_beatmapset_count")]
+        public int NominatedBeatmapsetCount;
+
         [JsonProperty(@"scores_best_count")]
         public int ScoresBestCount;
 
@@ -169,7 +185,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playstyle")]
         private string[] playStyle
         {
-            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(APIPlayStyle), str, true)).Cast<APIPlayStyle>().ToArray();
+            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).ToArray();
         }
 
         public APIPlayStyle[] PlayStyles;
@@ -215,8 +231,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
-            set => statistics.RankHistory = value;
+            set => Statistics.RankHistory = value;
         }
+
+        [JsonProperty(@"active_tournament_banner")]
+        [CanBeNull]
+        public TournamentBanner TournamentBanner;
 
         [JsonProperty("badges")]
         public Badge[] Badges;
@@ -239,6 +259,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [CanBeNull]
         public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
 
+        [JsonProperty("groups")]
+        public APIUserGroup[] Groups;
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -254,5 +277,13 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID => Id;
 
         public bool Equals(APIUser other) => this.MatchesOnlineID(other);
+
+#pragma warning disable 649
+        private class Country
+        {
+            [JsonProperty(@"code")]
+            public string Code;
+        }
+#pragma warning restore 649
     }
 }

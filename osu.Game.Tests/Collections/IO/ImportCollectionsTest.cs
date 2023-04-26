@@ -1,14 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Collections.IO
@@ -27,7 +32,11 @@ namespace osu.Game.Tests.Collections.IO
 
                     await importCollectionsFromStream(osu, new MemoryStream());
 
-                    Assert.That(osu.CollectionManager.Collections.Count, Is.Zero);
+                    osu.Realm.Run(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
+                        Assert.That(collections.Count, Is.Zero);
+                    });
                 }
                 finally
                 {
@@ -47,13 +56,22 @@ namespace osu.Game.Tests.Collections.IO
 
                     await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
-                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
+                    osu.Realm.Run(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
+                        Assert.That(collections.Count, Is.EqualTo(2));
 
-                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.Zero);
+                        // Even with no beatmaps imported, collections are tracking the hashes and will continue to.
+                        // In the future this whole mechanism will be replaced with having the collections in realm,
+                        // but until that happens it makes rough sense that we want to track not-yet-imported beatmaps
+                        // and have them associate with collections if/when they become available.
 
-                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.Zero);
+                        Assert.That(collections[0].Name, Is.EqualTo("First"));
+                        Assert.That(collections[0].BeatmapMD5Hashes.Count, Is.EqualTo(1));
+
+                        Assert.That(collections[1].Name, Is.EqualTo("Second"));
+                        Assert.That(collections[1].BeatmapMD5Hashes.Count, Is.EqualTo(12));
+                    });
                 }
                 finally
                 {
@@ -73,13 +91,18 @@ namespace osu.Game.Tests.Collections.IO
 
                     await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
-                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
+                    osu.Realm.Run(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
 
-                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
+                        Assert.That(collections.Count, Is.EqualTo(2));
 
-                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(12));
+                        Assert.That(collections[0].Name, Is.EqualTo("First"));
+                        Assert.That(collections[0].BeatmapMD5Hashes.Count, Is.EqualTo(1));
+
+                        Assert.That(collections[1].Name, Is.EqualTo("Second"));
+                        Assert.That(collections[1].BeatmapMD5Hashes.Count, Is.EqualTo(12));
+                    });
                 }
                 finally
                 {
@@ -92,7 +115,7 @@ namespace osu.Game.Tests.Collections.IO
         public async Task TestImportMalformedDatabase()
         {
             bool exceptionThrown = false;
-            UnhandledExceptionEventHandler setException = (_, __) => exceptionThrown = true;
+            UnhandledExceptionEventHandler setException = (_, _) => exceptionThrown = true;
 
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
@@ -116,7 +139,11 @@ namespace osu.Game.Tests.Collections.IO
                     }
 
                     Assert.That(exceptionThrown, Is.False);
-                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(0));
+                    osu.Realm.Run(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
+                        Assert.That(collections.Count, Is.EqualTo(0));
+                    });
                 }
                 finally
                 {
@@ -131,7 +158,7 @@ namespace osu.Game.Tests.Collections.IO
         {
             string firstRunName;
 
-            using (var host = new CleanRunHeadlessGameHost(bypassCleanup: true))
+            using (var host = new CleanRunHeadlessGameHost(bypassCleanupOnDispose: true))
             {
                 firstRunName = host.Name;
 
@@ -141,12 +168,18 @@ namespace osu.Game.Tests.Collections.IO
 
                     await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
-                    // Move first beatmap from second collection into the first.
-                    osu.CollectionManager.Collections[0].Beatmaps.Add(osu.CollectionManager.Collections[1].Beatmaps[0]);
-                    osu.CollectionManager.Collections[1].Beatmaps.RemoveAt(0);
+                    // ReSharper disable once MethodHasAsyncOverload
+                    osu.Realm.Write(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
 
-                    // Rename the second collecction.
-                    osu.CollectionManager.Collections[1].Name.Value = "Another";
+                        // Move first beatmap from second collection into the first.
+                        collections[0].BeatmapMD5Hashes.Add(collections[1].BeatmapMD5Hashes[0]);
+                        collections[1].BeatmapMD5Hashes.RemoveAt(0);
+
+                        // Rename the second collecction.
+                        collections[1].Name = "Another";
+                    });
                 }
                 finally
                 {
@@ -155,19 +188,23 @@ namespace osu.Game.Tests.Collections.IO
             }
 
             // Name matches the automatically chosen name from `CleanRunHeadlessGameHost` above, so we end up using the same storage location.
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName, null))
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName))
             {
                 try
                 {
                     var osu = LoadOsuIntoHost(host, true);
 
-                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
+                    osu.Realm.Run(realm =>
+                    {
+                        var collections = realm.All<BeatmapCollection>().ToList();
+                        Assert.That(collections.Count, Is.EqualTo(2));
 
-                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(2));
+                        Assert.That(collections[0].Name, Is.EqualTo("First"));
+                        Assert.That(collections[0].BeatmapMD5Hashes.Count, Is.EqualTo(2));
 
-                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Another"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(11));
+                        Assert.That(collections[1].Name, Is.EqualTo("Another"));
+                        Assert.That(collections[1].BeatmapMD5Hashes.Count, Is.EqualTo(11));
+                    });
                 }
                 finally
                 {
@@ -180,7 +217,7 @@ namespace osu.Game.Tests.Collections.IO
         {
             // intentionally spin this up on a separate task to avoid disposal deadlocks.
             // see https://github.com/EventStore/EventStore/issues/1179
-            await Task.Factory.StartNew(() => osu.CollectionManager.Import(stream).WaitSafely(), TaskCreationOptions.LongRunning);
+            await Task.Factory.StartNew(() => new LegacyCollectionImporter(osu.Realm).Import(stream).WaitSafely(), TaskCreationOptions.LongRunning);
         }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class OsuHSVColourPicker : HSVColourPicker
+    public partial class OsuHSVColourPicker : HSVColourPicker
     {
         private const float spacing = 10;
         private const float corner_radius = 10;
@@ -40,7 +42,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Colour = Colour4.Black.Opacity(0.3f)
         };
 
-        private class OsuHueSelector : HueSelector
+        private partial class OsuHueSelector : HueSelector
         {
             public OsuHueSelector()
             {
@@ -50,7 +52,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override Drawable CreateSliderNub() => new SliderNub(this);
 
-            private class SliderNub : CompositeDrawable
+            private partial class SliderNub : CompositeDrawable
             {
                 private readonly Bindable<float> hue;
                 private readonly Box fill;
@@ -83,7 +85,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private class OsuSaturationValueSelector : SaturationValueSelector
+        private partial class OsuSaturationValueSelector : SaturationValueSelector
         {
             public OsuSaturationValueSelector()
             {
@@ -93,7 +95,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override Marker CreateMarker() => new OsuMarker();
 
-            private class OsuMarker : Marker
+            private partial class OsuMarker : Marker
             {
                 private readonly Box previewBox;
 

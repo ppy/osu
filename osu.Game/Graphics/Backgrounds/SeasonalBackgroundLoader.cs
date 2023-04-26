@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -15,7 +17,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class SeasonalBackgroundLoader : Component
+    public partial class SeasonalBackgroundLoader : Component
     {
         /// <summary>
         /// Fired when background should be changed due to receiving backgrounds from API
@@ -39,7 +41,11 @@ namespace osu.Game.Graphics.Backgrounds
             seasonalBackgroundMode.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
 
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
-            seasonalBackgrounds.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
+            seasonalBackgrounds.BindValueChanged(_ =>
+            {
+                if (shouldShowSeasonal)
+                    SeasonalBackgroundChanged?.Invoke();
+            });
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
@@ -62,15 +68,10 @@ namespace osu.Game.Graphics.Backgrounds
 
         public SeasonalBackground LoadNextBackground()
         {
-            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Never
-                || (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && !isInSeason))
-            {
+            if (!shouldShowSeasonal)
                 return null;
-            }
 
-            var backgrounds = seasonalBackgrounds.Value?.Backgrounds;
-            if (backgrounds == null || !backgrounds.Any())
-                return null;
+            var backgrounds = seasonalBackgrounds.Value.Backgrounds;
 
             current = (current + 1) % backgrounds.Count;
             string url = backgrounds[current].Url;
@@ -78,11 +79,25 @@ namespace osu.Game.Graphics.Backgrounds
             return new SeasonalBackground(url);
         }
 
+        private bool shouldShowSeasonal
+        {
+            get
+            {
+                if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Never)
+                    return false;
+
+                if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && !isInSeason)
+                    return false;
+
+                return seasonalBackgrounds.Value?.Backgrounds?.Any() == true;
+            }
+        }
+
         private bool isInSeason => seasonalBackgrounds.Value != null && DateTimeOffset.Now < seasonalBackgrounds.Value.EndDate;
     }
 
     [LongRunningLoad]
-    public class SeasonalBackground : Background
+    public partial class SeasonalBackground : Background
     {
         private readonly string url;
         private const string fallback_texture_name = @"Backgrounds/bg1";
@@ -96,8 +111,6 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(LargeTextureStore textures)
         {
             Sprite.Texture = textures.Get(url) ?? textures.Get(fallback_texture_name);
-            // ensure we're not loading in without a transition.
-            this.FadeInFromZero(200, Easing.InOutSine);
         }
 
         public override bool Equals(Background other)

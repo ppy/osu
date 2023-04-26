@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +12,7 @@ using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -91,9 +94,11 @@ namespace osu.Game.Tests.Resources
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
+                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
                 Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
+
+            Logger.Log($"🛠️ Generating beatmap set \"{metadata}\" for test consumption.");
 
             var beatmapSet = new BeatmapSetInfo
             {
@@ -126,16 +131,20 @@ namespace osu.Game.Tests.Resources
 
                     var rulesetInfo = getRuleset();
 
+                    string hash = Guid.NewGuid().ToString().ComputeMD5Hash();
+
                     yield return new BeatmapInfo
                     {
                         OnlineID = beatmapId,
                         DifficultyName = $"{version} {beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                         StarRating = diff,
                         Length = length,
+                        BeatmapSet = beatmapSet,
                         BPM = bpm,
-                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        Hash = hash,
+                        MD5Hash = hash,
                         Ruleset = rulesetInfo,
-                        Metadata = metadata,
+                        Metadata = metadata.DeepClone(),
                         Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
@@ -167,6 +176,7 @@ namespace osu.Game.Tests.Resources
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             },
             BeatmapInfo = beatmap,
+            BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 2845370,
@@ -188,8 +198,16 @@ namespace osu.Game.Tests.Resources
                 [HitResult.LargeTickHit] = 100,
                 [HitResult.LargeTickMiss] = 50,
                 [HitResult.SmallBonus] = 10,
-                [HitResult.SmallBonus] = 50
+                [HitResult.LargeBonus] = 50
             },
+            MaximumStatistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Perfect] = 971,
+                [HitResult.SmallTickHit] = 75,
+                [HitResult.LargeTickHit] = 150,
+                [HitResult.SmallBonus] = 10,
+                [HitResult.LargeBonus] = 50,
+            }
         };
 
         private class TestModHardRock : ModHardRock

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// <summary>
     /// A scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
     /// </summary>
-    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
+    public partial class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The currently-selected item. Selection is visually represented with a border.
@@ -154,6 +156,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
+            LayoutDuration = 200,
+            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 
@@ -179,7 +183,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             // schedules added as the properties may change value while the drawable items haven't been created yet.
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
-            Items.BindCollectionChanged((_, __) => Scheduler.AddOnce(scrollToSelection), true);
+            Items.BindCollectionChanged((_, _) => Scheduler.AddOnce(scrollToSelection), true);
         }
 
         private void scrollToSelection()
@@ -202,6 +206,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!AllowSelection)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
@@ -222,9 +229,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void selectNext(int direction)
         {
-            if (!AllowSelection)
-                return;
-
             var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
 
             PlaylistItem item;

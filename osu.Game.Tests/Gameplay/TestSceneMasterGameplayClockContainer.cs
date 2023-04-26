@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
@@ -16,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneMasterGameplayClockContainer : OsuTestScene
+    public partial class TestSceneMasterGameplayClockContainer : OsuTestScene
     {
         private OsuConfigManager localConfig;
 
@@ -40,13 +41,11 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.GameplayClock.ElapsedFrameTime > 0);
+            AddUntilStep("elapsed greater than zero", () => gameplayClockContainer.ElapsedFrameTime > 0);
         }
 
         [Test]
@@ -57,22 +56,20 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
             AddStep("start clock", () => gameplayClockContainer.Start());
-            AddUntilStep("current time greater 2000", () => gameplayClockContainer.GameplayClock.CurrentTime > 2000);
+            AddUntilStep("current time greater 2000", () => gameplayClockContainer.CurrentTime > 2000);
 
             double timeAtReset = 0;
             AddStep("reset clock", () =>
             {
-                timeAtReset = gameplayClockContainer.GameplayClock.CurrentTime;
+                timeAtReset = gameplayClockContainer.CurrentTime;
                 gameplayClockContainer.Reset();
             });
 
-            AddAssert("current time < time at reset", () => gameplayClockContainer.GameplayClock.CurrentTime < timeAtReset);
+            AddAssert("current time < time at reset", () => gameplayClockContainer.CurrentTime < timeAtReset);
         }
 
         [Test]
@@ -85,29 +82,30 @@ namespace osu.Game.Tests.Gameplay
             ClockBackedTestWorkingBeatmap working = null;
             GameplayClockContainer gameplayClockContainer = null;
 
+            // ReSharper disable once NotAccessedVariable
+            BindableDouble trackAdjustment = null; // keeping a reference for track adjustment
+
             if (setAudioOffsetBeforeConstruction)
                 AddStep($"preset audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("create container", () =>
             {
                 working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
 
                 gameplayClockContainer.Reset(startClock: !whileStopped);
             });
 
-            AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(clockRate)));
+            AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, trackAdjustment = new BindableDouble(clockRate)));
 
             if (!setAudioOffsetBeforeConstruction)
                 AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("seek to 2500", () => gameplayClockContainer.Seek(2500));
-            AddAssert("gameplay clock time = 2500", () => Precision.AlmostEquals(gameplayClockContainer.CurrentTime, 2500, 10f));
+            AddAssert("gameplay clock time = 2500", () => gameplayClockContainer.CurrentTime, () => Is.EqualTo(2500).Within(10f));
 
             AddStep("seek to 10000", () => gameplayClockContainer.Seek(10000));
-            AddAssert("gameplay clock time = 10000", () => Precision.AlmostEquals(gameplayClockContainer.CurrentTime, 10000, 10f));
+            AddAssert("gameplay clock time = 10000", () => gameplayClockContainer.CurrentTime, () => Is.EqualTo(10000).Within(10f));
         }
 
         protected override void Dispose(bool isDisposing)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -18,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MatchStartControl : MultiplayerRoomComposite
+    public partial class MatchStartControl : MultiplayerRoomComposite
     {
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
@@ -107,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Debug.Assert(clickOperation == null);
             clickOperation = ongoingOperationTracker.BeginOperation();
 
-            if (isReady() && Client.IsHost && Room.Countdown == null)
+            if (isReady() && Client.IsHost && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                 startMatch();
             else
                 toggleReady();
@@ -138,10 +140,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void cancelCountdown()
         {
+            if (Client.Room == null)
+                return;
+
             Debug.Assert(clickOperation == null);
             clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.SendMatchRequest(new StopCountdownRequest()).ContinueWith(_ => endOperation());
+            MultiplayerCountdown countdown = Client.Room.ActiveCountdowns.Single(c => c is MatchStartCountdown);
+            Client.SendMatchRequest(new StopCountdownRequest(countdown.ID)).ContinueWith(_ => endOperation());
         }
 
         private void endOperation()
@@ -190,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             // When the local user is the host and spectating the match, the ready button should be enabled only if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)
-                readyButton.Enabled.Value &= Client.IsHost && newCountReady > 0 && Room.Countdown == null;
+                readyButton.Enabled.Value &= Client.IsHost && newCountReady > 0 && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown);
 
             if (newCountReady == countReady)
                 return;

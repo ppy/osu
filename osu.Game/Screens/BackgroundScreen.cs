@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
@@ -9,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens
 {
-    public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
+    public abstract partial class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
         protected const float TRANSITION_LENGTH = 500;
         private const float x_movement_amount = 50;

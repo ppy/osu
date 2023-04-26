@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -45,13 +43,13 @@ namespace osu.Game.Skinning
             return new RealmBackedResourceStore<BeatmapSetInfo>(beatmapInfo.BeatmapSet.ToLive(resources.RealmAccess), resources.Files, resources.RealmAccess);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is SkinnableTargetComponent targetComponent)
+            if (lookup is SkinComponentsContainerLookup containerLookup)
             {
-                switch (targetComponent.Target)
+                switch (containerLookup.Target)
                 {
-                    case SkinnableTarget.MainHUDComponents:
+                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
                         // therefore keep the check here until fallback default legacy skin is supported.
                         if (!this.HasFont(LegacyFont.Score))
@@ -61,7 +59,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
@@ -98,7 +96,7 @@ namespace osu.Game.Skinning
             new SkinInfo
             {
                 Name = beatmapInfo.ToString(),
-                Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty
+                Creator = beatmapInfo.Metadata.Author.Username
             };
     }
 }

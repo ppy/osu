@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// <summary>
     /// Represents a spanning point on a timeline part.
     /// </summary>
-    public class DurationVisualisation : Circle
+    public partial class DurationVisualisation : Circle
     {
         protected DurationVisualisation(double startTime, double endTime)
         {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Android.Content.PM;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,7 +11,7 @@ using osu.Game;
 
 namespace osu.Android
 {
-    public class GameplayScreenRotationLocker : Component
+    public partial class GameplayScreenRotationLocker : Component
     {
         private Bindable<bool> localUserPlaying;
 

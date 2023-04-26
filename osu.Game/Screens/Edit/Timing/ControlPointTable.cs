@@ -18,15 +18,15 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class ControlPointTable : EditorTable
+    public partial class ControlPointTable : EditorTable
     {
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; }
+        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        private EditorClock clock { get; set; } = null!;
 
-        public const float TIMING_COLUMN_WIDTH = 230;
+        public const float TIMING_COLUMN_WIDTH = 300;
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Content = null;
                 BackgroundFlow.Clear();
 
-                if (value?.Any() != true)
+                if (!value.Any())
                     return;
 
                 foreach (var group in value)
@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Edit.Timing
 
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
+
+                updateSelectedGroup();
             }
         }
 
@@ -59,12 +61,10 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(group =>
-            {
-                // TODO: This should scroll the selected row into view.
-                foreach (var b in BackgroundFlow) b.Selected = b.Item == group.NewValue;
-            }, true);
+            selectedGroup.BindValueChanged(_ => updateSelectedGroup(), true);
         }
+
+        private void updateSelectedGroup() => SetSelectedRow(selectedGroup.Value);
 
         private TableColumn[] createHeaders()
         {
@@ -81,33 +81,39 @@ namespace osu.Game.Screens.Edit.Timing
         {
             return new Drawable[]
             {
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = TIMING_COLUMN_WIDTH,
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = group.Time.ToEditorFormattedString(),
-                            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                            Width = 70,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        },
-                        new ControlGroupAttributes(group, c => c is TimingControlPoint)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        }
-                    }
-                },
-                new ControlGroupAttributes(group, c => !(c is TimingControlPoint))
+                new ControlGroupTiming(group),
+                new ControlGroupAttributes(group, c => c is not TimingControlPoint)
             };
         }
 
-        private class ControlGroupAttributes : CompositeDrawable
+        private partial class ControlGroupTiming : FillFlowContainer
+        {
+            public ControlGroupTiming(ControlPointGroup group)
+            {
+                Name = @"ControlGroupTiming";
+                RelativeSizeAxes = Axes.Y;
+                Width = TIMING_COLUMN_WIDTH;
+                Spacing = new Vector2(5);
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = group.Time.ToEditorFormattedString(),
+                        Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
+                        Width = 70,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    new ControlGroupAttributes(group, c => c is TimingControlPoint)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }
+                };
+            }
+        }
+
+        private partial class ControlGroupAttributes : CompositeDrawable
         {
             private readonly Func<ControlPoint, bool> matchFunction;
 
@@ -121,6 +127,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
+                Name = @"ControlGroupAttributes";
 
                 InternalChild = fill = new FillFlowContainer
                 {
@@ -142,7 +149,7 @@ namespace osu.Game.Screens.Edit.Timing
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                controlPoints.CollectionChanged += (_, __) => createChildren();
+                controlPoints.CollectionChanged += (_, _) => createChildren();
             }
 
             private void createChildren()
@@ -150,7 +157,6 @@ namespace osu.Game.Screens.Edit.Timing
                 fill.ChildrenEnumerable = controlPoints
                                           .Where(matchFunction)
                                           .Select(createAttribute)
-                                          .Where(c => c != null)
                                           // arbitrary ordering to make timing points first.
                                           // probably want to explicitly define order in the future.
                                           .OrderByDescending(c => c.GetType().Name);
@@ -173,7 +179,7 @@ namespace osu.Game.Screens.Edit.Timing
                         return new SampleRowAttribute(sample);
                 }
 
-                return null;
+                throw new ArgumentOutOfRangeException(nameof(controlPoint), $"Control point type {controlPoint.GetType()} is not supported");
             }
         }
     }

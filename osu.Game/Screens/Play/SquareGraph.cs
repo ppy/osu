@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +15,13 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Layout;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
-    public class SquareGraph : Container
+    public partial class SquareGraph : Container
     {
         private BufferedContainer<Column> columns;
-
-        public SquareGraph()
-        {
-            AddLayout(layout);
-        }
 
         public int ColumnCount => columns?.Children.Count ?? 0;
 
@@ -55,7 +51,7 @@ namespace osu.Game.Screens.Play
                 if (value == values) return;
 
                 values = value;
-                layout.Invalidate();
+                graphNeedsUpdate = true;
             }
         }
 
@@ -73,21 +69,25 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
         private ScheduledDelegate scheduledCreate;
+
+        private bool graphNeedsUpdate;
+
+        private Vector2 previousDrawSize;
 
         protected override void Update()
         {
             base.Update();
 
-            if (values != null && !layout.IsValid)
+            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize))
             {
                 columns?.FadeOut(500, Easing.OutQuint).Expire();
 
                 scheduledCreate?.Cancel();
                 scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
 
-                layout.Validate();
+                previousDrawSize = DrawSize;
+                graphNeedsUpdate = false;
             }
         }
 
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
             calculatedValues = newValues.ToArray();
         }
 
-        public class Column : Container, IStateful<ColumnState>
+        public partial class Column : Container, IStateful<ColumnState>
         {
             protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
             public Color4 LitColour = Color4.LightBlue;

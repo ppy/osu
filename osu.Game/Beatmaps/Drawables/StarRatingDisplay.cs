@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// A pill that displays the star rating of a beatmap.
     /// </summary>
-    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
+    public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
         private readonly bool animated;
         private readonly Box background;
@@ -149,7 +151,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             displayedStars.BindValueChanged(s =>
             {
-                starsText.Text = s.NewValue.ToLocalisableString("0.00");
+                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.ToLocalisableString("0.00");
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 

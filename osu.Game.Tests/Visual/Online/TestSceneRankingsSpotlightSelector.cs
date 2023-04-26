@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -13,7 +15,7 @@ using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsSpotlightSelector : OsuTestScene
+    public partial class TestSceneRankingsSpotlightSelector : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

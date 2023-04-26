@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input.Events;
@@ -10,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -23,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSnapping : EditorTestScene
+    public partial class TestSceneSliderSnapping : EditorTestScene
     {
         private const double beat_length = 1000;
 
@@ -53,9 +56,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     ControlPoints =
                     {
-                        new PathControlPoint(Vector2.Zero),
-                        new PathControlPoint(OsuPlayfield.BASE_SIZE * 2 / 5),
-                        new PathControlPoint(OsuPlayfield.BASE_SIZE * 3 / 5)
+                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(136, 205)),
+                        new PathControlPoint(new Vector2(-4, 226))
                     }
                 }
             }));
@@ -69,14 +72,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestMovingUnsnappedSliderNodesSnaps()
         {
-            PathControlPointPiece sliderEnd = null;
+            PathControlPointPiece<Slider> sliderEnd = null;
 
             assertSliderSnapped(false);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("select slider end", () =>
             {
-                sliderEnd = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
+                sliderEnd = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
                 InputManager.MoveMouseTo(sliderEnd.ScreenSpaceDrawQuad.Centre);
             });
             AddStep("move slider end", () =>
@@ -96,9 +99,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to new point location", () =>
             {
-                var firstPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
-                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
-                InputManager.MoveMouseTo((firstPiece.ScreenSpaceDrawQuad.Centre + secondPiece.ScreenSpaceDrawQuad.Centre) / 2);
+                var firstPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
+                var pos = slider.Path.PositionAt(0.25d) + slider.Position;
+                InputManager.MoveMouseTo(firstPiece.Parent.ToScreenSpace(pos));
             });
             AddStep("move slider end", () =>
             {
@@ -117,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to second control point", () =>
             {
-                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
+                var secondPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
                 InputManager.MoveMouseTo(secondPiece);
             });
             AddStep("quick delete", () =>
@@ -174,6 +177,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestRotatingSliderRetainsPerfectControlPointType()
+        {
+            OsuSelectionHandler selectionHandler;
+
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+            AddStep("rotate 90 degrees ccw", () =>
+            {
+                selectionHandler = this.ChildrenOfType<OsuSelectionHandler>().Single();
+                selectionHandler.HandleRotation(-90);
+            });
+
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+        }
+
+        [Test]
         public void TestFlippingSliderDoesNotSnap()
         {
             OsuSelectionHandler selectionHandler = null;
@@ -196,6 +216,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             assertSliderSnapped(false);
+        }
+
+        [Test]
+        public void TestFlippingSliderRetainsPerfectControlPointType()
+        {
+            OsuSelectionHandler selectionHandler;
+
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+            AddStep("flip slider horizontally", () =>
+            {
+                selectionHandler = this.ChildrenOfType<OsuSelectionHandler>().Single();
+                selectionHandler.OnPressed(new KeyBindingPressEvent<GlobalAction>(InputManager.CurrentState, GlobalAction.EditorFlipVertically));
+            });
+
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
         }
 
         [Test]

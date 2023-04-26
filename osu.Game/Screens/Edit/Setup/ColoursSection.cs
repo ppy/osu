@@ -5,14 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class ColoursSection : SetupSection
+    internal partial class ColoursSection : SetupSection
     {
-        public override LocalisableString Title => "Colours";
+        public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 
-        private LabelledColourPalette comboColours;
+        private LabelledColourPalette comboColours = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -21,9 +22,9 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 comboColours = new LabelledColourPalette
                 {
-                    Label = "Hitcircle / Slider Combos",
+                    Label = EditorSetupStrings.HitCircleSliderCombos,
                     FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = "Combo"
+                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
                 }
             };
 

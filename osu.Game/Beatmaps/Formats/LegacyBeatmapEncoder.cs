@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -220,6 +222,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var samplePoint = legacyControlPoints.SamplePointAt(time);
                 var effectPoint = legacyControlPoints.EffectPointAt(time);
+                var timingPoint = legacyControlPoints.TimingPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
@@ -228,10 +231,10 @@ namespace osu.Game.Beatmaps.Formats
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
                 if (effectPoint.KiaiMode)
                     effectFlags |= LegacyEffectFlags.Kiai;
-                if (effectPoint.OmitFirstBarLine)
+                if (timingPoint.OmitFirstBarLine)
                     effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
 
-                writer.Write(FormattableString.Invariant($"{legacyControlPoints.TimingPointAt(time).TimeSignature.Numerator},"));
+                writer.Write(FormattableString.Invariant($"{timingPoint.TimeSignature.Numerator},"));
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
                 writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
@@ -298,7 +301,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var comboColour = colours[i];
 
-                writer.Write(FormattableString.Invariant($"Combo{i}: "));
+                writer.Write(FormattableString.Invariant($"Combo{1 + i}: "));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
@@ -371,11 +374,11 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasPath _:
+                case IHasPath:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasDuration _:
+                case IHasDuration:
                     if (onlineRulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else

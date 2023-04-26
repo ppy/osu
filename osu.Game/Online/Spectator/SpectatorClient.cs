@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +21,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
 {
-    public abstract class SpectatorClient : Component, ISpectatorClient
+    public abstract partial class SpectatorClient : Component, ISpectatorClient
     {
         /// <summary>
         /// The maximum milliseconds between frame bundle sends.
@@ -49,7 +47,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Whether the local user is playing.
         /// </summary>
-        protected bool IsPlaying { get; private set; }
+        protected internal bool IsPlaying { get; private set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
@@ -67,16 +65,23 @@ namespace osu.Game.Online.Spectator
         public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
-        /// All users currently being watched.
+        /// Called whenever a user-submitted score has been fully processed.
         /// </summary>
-        private readonly List<int> watchedUsers = new List<int>();
+        public virtual event Action<int, long>? OnUserScoreProcessed;
+
+        /// <summary>
+        /// A dictionary containing all users currently being watched, with the number of watching components for each user.
+        /// </summary>
+        private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
 
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
+
         private readonly BindableList<int> playingUsers = new BindableList<int>();
         private readonly SpectatorState currentState = new SpectatorState();
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
+        private long? currentScoreToken;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
@@ -96,17 +101,20 @@ namespace osu.Game.Online.Spectator
                 if (connected.NewValue)
                 {
                     // get all the users that were previously being watched
-                    int[] users = watchedUsers.ToArray();
-                    watchedUsers.Clear();
+                    var users = new Dictionary<int, int>(watchedUsersRefCounts);
+                    watchedUsersRefCounts.Clear();
 
                     // resubscribe to watched users.
-                    foreach (int userId in users)
-                        WatchUser(userId);
+                    foreach ((int user, int watchers) in users)
+                    {
+                        for (int i = 0; i < watchers; i++)
+                            WatchUser(user);
+                    }
 
                     // re-send state in case it wasn't received
                     if (IsPlaying)
                         // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
-                        BeginPlayingInternal(currentState);
+                        BeginPlayingInternal(currentScoreToken, currentState);
                 }
                 else
                 {
@@ -123,7 +131,7 @@ namespace osu.Game.Online.Spectator
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserBeganPlaying?.Invoke(userId, state);
@@ -138,7 +146,7 @@ namespace osu.Game.Online.Spectator
             {
                 playingUsers.Remove(userId);
 
-                if (watchedUsers.Contains(userId))
+                if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
                 OnUserFinishedPlaying?.Invoke(userId, state);
@@ -157,7 +165,14 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayState state, Score score)
+        Task ISpectatorClient.UserScoreProcessed(int userId, long scoreId)
+        {
+            Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
+
+            return Task.CompletedTask;
+        }
+
+        public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
@@ -172,12 +187,13 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
-                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
+                currentState.MaximumStatistics = state.ScoreProcessor.MaximumStatistics;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
+                currentScoreToken = scoreToken;
 
-                BeginPlayingInternal(currentState);
+                BeginPlayingInternal(currentScoreToken, currentState);
             });
         }
 
@@ -190,7 +206,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
+            {
+                Debug.Assert(currentBeatmap != null);
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
@@ -203,6 +222,11 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 if (!IsPlaying)
+                    return;
+
+                // Disposal can take some time, leading to EndPlaying potentially being called after a future play session.
+                // Account for this by ensuring the score of the current play matches the one in the provided state.
+                if (currentScore != state.Score)
                     return;
 
                 if (pendingFrames.Count > 0)
@@ -226,11 +250,13 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchedUsers.Contains(userId))
+            if (watchedUsersRefCounts.ContainsKey(userId))
+            {
+                watchedUsersRefCounts[userId]++;
                 return;
+            }
 
-            watchedUsers.Add(userId);
-
+            watchedUsersRefCounts.Add(userId, 1);
             WatchUserInternal(userId);
         }
 
@@ -240,13 +266,19 @@ namespace osu.Game.Online.Spectator
             // Todo: This should not be a thing, but requires framework changes.
             Schedule(() =>
             {
-                watchedUsers.Remove(userId);
+                if (watchedUsersRefCounts.TryGetValue(userId, out int watchers) && watchers > 1)
+                {
+                    watchedUsersRefCounts[userId]--;
+                    return;
+                }
+
+                watchedUsersRefCounts.Remove(userId);
                 watchedUserStates.Remove(userId);
                 StopWatchingUserInternal(userId);
             });
         }
 
-        protected abstract Task BeginPlayingInternal(SpectatorState state);
+        protected abstract Task BeginPlayingInternal(long? scoreToken, SpectatorState state);
 
         protected abstract Task SendFramesInternal(FrameDataBundle bundle);
 
@@ -296,17 +328,21 @@ namespace osu.Game.Online.Spectator
 
             lastSend = tcs.Task;
 
-            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            SendFramesInternal(bundle).ContinueWith(t =>
             {
+                // Handle exception outside of `Schedule` to ensure it doesn't go unobserved.
                 bool wasSuccessful = t.Exception == null;
 
-                // If the last bundle send wasn't successful, try again without dequeuing.
-                if (wasSuccessful)
-                    pendingFrameBundles.Dequeue();
+                return Schedule(() =>
+                {
+                    // If the last bundle send wasn't successful, try again without dequeuing.
+                    if (wasSuccessful)
+                        pendingFrameBundles.Dequeue();
 
-                tcs.SetResult(wasSuccessful);
-                sendNextBundleIfRequired();
-            }));
+                    tcs.SetResult(wasSuccessful);
+                    sendNextBundleIfRequired();
+                });
+            });
         }
     }
 }

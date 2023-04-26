@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuScrollContainer : OsuScrollContainer<Drawable>
+    public partial class OsuScrollContainer : OsuScrollContainer<Drawable>
     {
         public OsuScrollContainer()
         {
@@ -28,7 +26,7 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
+    public partial class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
     {
         public const float SCROLL_BAR_HEIGHT = 10;
         public const float SCROLL_BAR_PADDING = 3;
@@ -133,7 +131,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
-        protected class OsuScrollbar : ScrollbarContainer
+        protected partial class OsuScrollbar : ScrollbarContainer
         {
             private Color4 hoverColour;
             private Color4 defaultColour;

@@ -5,15 +5,15 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class BananaPiece : CatchHitObjectPiece
+    public partial class BananaPiece : CatchHitObjectPiece
     {
-        protected override BorderPiece BorderPiece { get; }
+        protected override Drawable BorderPiece { get; }
 
         public BananaPiece()
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new BananaPulpFormation
                 {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : CompositeDrawable
+    public partial class FriendDisplay : CompositeDrawable
     {
         private List<APIUser> users = new List<APIUser>();
 
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                 Padding = new MarginPadding
                                 {
                                     Top = 20,
-                                    Horizontal = 45
+                                    Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - FriendsOnlineStatusItem.PADDING
                                 },
                                 Child = onlineStreamControl = new FriendOnlineStreamControl(),
                             }
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = 50 }
+                                                Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
                                             loading = new LoadingLayer(true)
                                         }
@@ -143,7 +145,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
 
             apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, __) => Schedule(() => Users = apiFriends.ToList()), true);
+            apiFriends.BindCollectionChanged((_, _) => Schedule(() => Users = apiFriends.ToList()), true);
         }
 
         protected override void LoadComplete()

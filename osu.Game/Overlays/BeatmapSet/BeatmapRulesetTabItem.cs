@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapRulesetTabItem : OverlayRulesetTabItem
+    public partial class BeatmapRulesetTabItem : OverlayRulesetTabItem
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
@@ -66,11 +68,12 @@ namespace osu.Game.Overlays.BeatmapSet
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 int beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.MatchesOnlineID(Value)) ?? 0;
+                int osuBeatmaps = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.OnlineID == 0) ?? 0;
 
                 count.Text = beatmapsCount.ToString();
                 countContainer.FadeTo(beatmapsCount > 0 ? 1 : 0);
 
-                Enabled.Value = beatmapsCount > 0;
+                Enabled.Value = beatmapsCount > 0 || osuBeatmaps > 0;
             }, true);
         }
     }

@@ -11,7 +11,7 @@ namespace osu.Desktop.LegacyIpc
     /// </remarks>
     public class LegacyIpcDifficultyCalculationRequest
     {
-        public string BeatmapFile { get; set; }
+        public string BeatmapFile { get; set; } = string.Empty;
         public int RulesetId { get; set; }
         public int Mods { get; set; }
     }

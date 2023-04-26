@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +35,7 @@ using Realms;
 namespace osu.Game.Tests.Visual.Ranking
 {
     [TestFixture]
-    public class TestSceneResultsScreen : OsuManualInputManagerTestScene
+    public partial class TestSceneResultsScreen : OsuManualInputManagerTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -307,7 +309,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo());
 
-        private class TestResultsContainer : Container
+        private partial class TestResultsContainer : Container
         {
             [Cached(typeof(Player))]
             private readonly Player player = new TestPlayer();
@@ -326,7 +328,7 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class TestResultsScreen : ResultsScreen
+        private partial class TestResultsScreen : ResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
@@ -360,7 +362,7 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class DelayedFetchResultsScreen : TestResultsScreen
+        private partial class DelayedFetchResultsScreen : TestResultsScreen
         {
             private readonly Task fetchWaitTask;
 
@@ -396,7 +398,7 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class UnrankedSoloResultsScreen : SoloResultsScreen
+        private partial class UnrankedSoloResultsScreen : SoloResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 

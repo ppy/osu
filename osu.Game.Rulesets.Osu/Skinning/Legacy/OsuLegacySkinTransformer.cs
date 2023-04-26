@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle.Value;
+
         private readonly Lazy<bool> hasHitCircle;
 
         /// <summary>
@@ -26,24 +28,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is OsuSkinComponent osuComponent)
+            if (lookup is OsuSkinComponentLookup osuComponent)
             {
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation(component.LookupName, true, true, true, startAtCurrentTime: false);
+                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false);
 
                     case OsuSkinComponents.SliderScorePoint:
-                        return this.GetAnimation(component.LookupName, false, false);
+                        return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
-                        if (followCircle != null)
-                            // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
-                            followCircle.Scale *= 0.5f;
-                        return followCircle;
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
+                        if (followCircleContent != null)
+                            return new LegacyFollowCircle(followCircleContent);
+
+                        return null;
 
                     case OsuSkinComponents.SliderBall:
                         var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
@@ -104,6 +106,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
+                    case OsuSkinComponents.CursorSmoke:
+                        if (GetTexture("cursor-smoke") != null)
+                            return new LegacySmokeSegment();
+
+                        return null;
+
                     case OsuSkinComponents.HitCircleText:
                         if (!this.HasFont(LegacyFont.HitCircle))
                             return null;
@@ -128,14 +136,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyApproachCircle();
 
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {

@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -20,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
+    public partial class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
     {
         public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(getBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
 
@@ -51,9 +50,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private Vector2 rightMouseDownPosition;
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private EditorBeatmap editorBeatmap { get; set; }
+        [Resolved]
+        private EditorBeatmap? editorBeatmap { get; set; }
 
         public JuiceStreamSelectionBlueprint(JuiceStream hitObject)
             : base(hitObject)

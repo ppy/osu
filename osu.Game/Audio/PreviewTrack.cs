@@ -10,21 +10,21 @@ using osu.Framework.Threading;
 namespace osu.Game.Audio
 {
     [LongRunningLoad]
-    public abstract class PreviewTrack : Component
+    public abstract partial class PreviewTrack : Component
     {
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
         /// Not invoked in a thread-safe context.
         /// </summary>
-        public event Action Stopped;
+        public event Action? Stopped;
 
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has started playing.
         /// Not invoked in a thread-safe context.
         /// </summary>
-        public event Action Started;
+        public event Action? Started;
 
-        protected Track Track { get; private set; }
+        protected Track? Track { get; private set; }
 
         private bool hasStarted;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Audio
         /// </summary>
         public bool IsRunning => Track?.IsRunning ?? false;
 
-        private ScheduledDelegate startDelegate;
+        private ScheduledDelegate? startDelegate;
 
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
@@ -98,12 +98,23 @@ namespace osu.Game.Audio
 
             Track.Stop();
 
+            // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
+            Track.Seek(0);
+
             Stopped?.Invoke();
         }
 
         /// <summary>
         /// Retrieves the audio track.
         /// </summary>
-        protected abstract Track GetTrack();
+        protected abstract Track? GetTrack();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Stop();
+            Track?.Dispose();
+        }
     }
 }

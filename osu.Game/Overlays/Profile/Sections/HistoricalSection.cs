@@ -10,7 +10,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class HistoricalSection : ProfileSection
+    public partial class HistoricalSection : ProfileSection
     {
         public override LocalisableString Title => UsersStrings.ShowExtraHistoricalTitle;
 

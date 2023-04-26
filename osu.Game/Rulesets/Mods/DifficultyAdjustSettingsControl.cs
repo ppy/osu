@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,11 +10,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class DifficultyAdjustSettingsControl : SettingsItem<float?>
+    public partial class DifficultyAdjustSettingsControl : SettingsItem<float?>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -53,8 +56,8 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(current => updateCurrentFromSlider());
-            beatmap.BindValueChanged(b => updateCurrentFromSlider(), true);
+            Current.BindValueChanged(_ => updateCurrentFromSlider());
+            beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
             sliderDisplayCurrent.BindValueChanged(number =>
             {
@@ -85,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             isInternalChange = false;
         }
 
-        private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
+        private partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
@@ -101,9 +104,9 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    new SettingsSlider<float>
+                    new RoundedSliderBar<float>
                     {
-                        ShowsDefaultIndicator = false,
+                        RelativeSizeAxes = Axes.X,
                         Current = currentNumber,
                         KeyboardStep = 0.1f,
                     }
@@ -123,8 +126,7 @@ namespace osu.Game.Rulesets.Mods
                 get => this;
                 set
                 {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
+                    ArgumentNullException.ThrowIfNull(value);
 
                     if (currentBound != null) UnbindFrom(currentBound);
                     BindTo(currentBound = value);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class DifficultyPointPiece : HitObjectPointPiece, IHasPopover
+    public partial class DifficultyPointPiece : HitObjectPointPiece, IHasPopover
     {
         public readonly HitObject HitObject;
 
@@ -49,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public Popover GetPopover() => new DifficultyEditPopover(HitObject);
 
-        public class DifficultyEditPopover : OsuPopover
+        public partial class DifficultyEditPopover : OsuPopover
         {
             private readonly HitObject hitObject;
 

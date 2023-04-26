@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -15,7 +17,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsItem : OsuTestScene
+    public partial class TestSceneSettingsItem : OsuTestScene
     {
         [Test]
         public void TestRestoreDefaultValueButtonVisibility()
@@ -27,11 +29,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Child = textBox = new SettingsTextBox
                 {
-                    Current = new Bindable<string>
-                    {
-                        Default = "test",
-                        Value = "test"
-                    }
+                    Current = new Bindable<string>("test")
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
@@ -57,11 +55,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Child = textBox = new SettingsTextBox
                 {
-                    Current = new Bindable<string>
-                    {
-                        Default = "test",
-                        Value = "test"
-                    }
+                    Current = new Bindable<string>("test")
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);

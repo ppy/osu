@@ -2,19 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlayerCheckbox : OsuCheckbox
+    public partial class PlayerCheckbox : SettingsCheckbox
     {
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override Drawable CreateControl() => new PlayerCheckboxControl();
+
+        public partial class PlayerCheckboxControl : OsuCheckbox
         {
-            Nub.AccentColour = colours.Yellow;
-            Nub.GlowingAccentColour = colours.YellowLighter;
-            Nub.GlowColour = colours.YellowDark;
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Nub.AccentColour = colours.Yellow;
+                Nub.GlowingAccentColour = colours.YellowLighter;
+                Nub.GlowColour = colours.YellowDark;
+            }
         }
     }
 }

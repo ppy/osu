@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -16,14 +18,12 @@ using osu.Game.Overlays;
 namespace osu.Game.Graphics.Containers
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private Sample samplePopIn;
         private Sample samplePopOut;
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
-
-        protected override bool BlockScrollInput => false;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -86,6 +86,15 @@ namespace osu.Game.Graphics.Containers
                 Hide();
 
             base.OnMouseUp(e);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // allow for controlling volume when alt is held.
+            // mostly for compatibility with osu-stable.
+            if (e.AltPressed) return false;
+
+            return true;
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

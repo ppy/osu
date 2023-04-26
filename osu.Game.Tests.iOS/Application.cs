@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.iOS;
-using UIKit;
 
 namespace osu.Game.Tests.iOS
 {
@@ -10,7 +9,7 @@ namespace osu.Game.Tests.iOS
     {
         public static void Main(string[] args)
         {
-            UIApplication.Main(args, typeof(GameUIApplication), typeof(AppDelegate));
+            GameApplication.Main(new OsuTestBrowser());
         }
     }
 }

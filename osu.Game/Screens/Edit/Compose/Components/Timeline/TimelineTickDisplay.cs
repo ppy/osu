@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Linq;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -15,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineTickDisplay : TimelinePart<PointVisualisation>
+    public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -31,8 +34,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private OsuColour colours { get; set; }
-
-        private static readonly int highest_divisor = BindableBeatDivisor.PREDEFINED_DIVISORS.Last();
 
         public TimelineTickDisplay()
         {
@@ -78,20 +79,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
-            if (timeline != null)
+            if (timeline == null || DrawWidth <= 0) return;
+
+            (float, float) newRange = (
+                (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
+                (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+
+            if (visibleRange != newRange)
             {
-                var newRange = (
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+                visibleRange = newRange;
 
-                if (visibleRange != newRange)
-                {
-                    visibleRange = newRange;
-
-                    // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
-                    if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
-                        tickCache.Invalidate();
-                }
+                // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
+                if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
+                    tickCache.Invalidate();
             }
 
             if (!tickCache.IsValid)
@@ -147,6 +147,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     beat++;
                 }
+            }
+
+            if (Children.Count > 512)
+            {
+                // There should always be a sanely small number of ticks rendered.
+                // If this assertion triggers, either the zoom logic is broken or a beatmap is
+                // probably doing weird things...
+                //
+                // Let's hope the latter never happens.
+                // If it does, we can choose to either fix it or ignore it as an outlier.
+                string message = $"Timeline is rendering many ticks ({Children.Count})";
+
+                Logger.Log(message);
+                Debug.Fail(message);
             }
 
             int usedDrawables = drawableIndex;

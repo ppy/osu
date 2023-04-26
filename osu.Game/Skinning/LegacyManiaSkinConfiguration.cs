@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,8 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
 
+        public float WidthForNoteHeightScale;
+
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
@@ -38,6 +42,8 @@ namespace osu.Game.Skinning
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
+
+        public LegacyNoteBodyStyle? NoteBodyStyle;
 
         public LegacyManiaSkinConfiguration(int keys)
         {
@@ -53,12 +59,6 @@ namespace osu.Game.Skinning
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
         }
 
-        private float? minimumColumnWidth;
-
-        public float MinimumColumnWidth
-        {
-            get => minimumColumnWidth ?? ColumnWidth.Min();
-            set => minimumColumnWidth = value;
-        }
+        public float MinimumColumnWidth => ColumnWidth.Min();
     }
 }

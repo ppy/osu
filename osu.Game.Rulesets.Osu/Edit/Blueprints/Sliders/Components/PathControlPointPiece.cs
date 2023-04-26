@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,11 +29,13 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     /// <summary>
-    /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
+    /// A visualisation of a single <see cref="PathControlPoint"/> in an osu hit object with a path.
     /// </summary>
-    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
+    /// <typeparam name="T">The type of <see cref="OsuHitObject"/> which this <see cref="PathControlPointPiece{T}"/> visualises.</typeparam>
+    public partial class PathControlPointPiece<T> : BlueprintPiece<T>, IHasTooltip
+        where T : OsuHitObject, IHasPath
     {
-        public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
+        public Action<PathControlPointPiece<T>, MouseButtonEvent> RequestSelection;
 
         public Action<PathControlPoint> DragStarted;
         public Action<DragEvent> DragInProgress;
@@ -41,29 +46,36 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
 
-        private readonly Slider slider;
+        private readonly T hitObject;
         private readonly Container marker;
         private readonly Drawable markerRing;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private IBindable<Vector2> sliderPosition;
-        private IBindable<float> sliderScale;
+        private IBindable<Vector2> hitObjectPosition;
+        private IBindable<float> hitObjectScale;
 
-        public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
+        [UsedImplicitly]
+        private readonly IBindable<int> hitObjectVersion;
+
+        public PathControlPointPiece(T hitObject, PathControlPoint controlPoint)
         {
-            this.slider = slider;
+            this.hitObject = hitObject;
             ControlPoint = controlPoint;
 
-            // we don't want to run the path type update on construction as it may inadvertently change the slider.
-            cachePoints(slider);
+            // we don't want to run the path type update on construction as it may inadvertently change the hit object.
+            cachePoints(hitObject);
 
-            slider.Path.Version.BindValueChanged(_ =>
+            hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
+
+            // schedule ensure that updates are only applied after all operations from a single frame are applied.
+            // this avoids inadvertently changing the hit object path type for batch operations.
+            hitObjectVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
             {
-                cachePoints(slider);
+                cachePoints(hitObject);
                 updatePathType();
-            });
+            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 
@@ -110,11 +122,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.LoadComplete();
 
-            sliderPosition = slider.PositionBindable.GetBoundCopy();
-            sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
+            hitObjectPosition = hitObject.PositionBindable.GetBoundCopy();
+            hitObjectPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            sliderScale = slider.ScaleBindable.GetBoundCopy();
-            sliderScale.BindValueChanged(_ => updateMarkerDisplay());
+            hitObjectScale = hitObject.ScaleBindable.GetBoundCopy();
+            hitObjectScale.BindValueChanged(_ => updateMarkerDisplay());
 
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -202,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDragEnd(DragEndEvent e) => DragEnded?.Invoke();
 
-        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+        private void cachePoints(T hitObject) => PointsInSegment = hitObject.Path.PointsInSegment(ControlPoint);
 
         /// <summary>
         /// Handles correction of invalid path types.
@@ -229,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updateMarkerDisplay()
         {
-            Position = slider.StackedPosition + ControlPoint.Position;
+            Position = hitObject.StackedPosition + ControlPoint.Position;
 
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
@@ -239,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 colour = colour.Lighten(1);
 
             marker.Colour = colour;
-            marker.Scale = new Vector2(slider.Scale);
+            marker.Scale = new Vector2(hitObject.Scale);
         }
 
         private Color4 getColourFromNodeType()

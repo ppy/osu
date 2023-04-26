@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,13 +44,13 @@ namespace osu.Game
             }
         }
 
-        public virtual async Task Import(params ImportTask[] tasks)
+        public virtual async Task Import(ImportTask[] tasks, ImportParameters parameters = default)
         {
             var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
             await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
             {
                 var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
-                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
+                return importer?.Import(taskGroup.ToArray(), parameters) ?? Task.CompletedTask;
             })).ConfigureAwait(false);
         }
 

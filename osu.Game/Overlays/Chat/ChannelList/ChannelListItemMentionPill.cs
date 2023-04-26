@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelListItemMentionPill : CircularContainer
+    public partial class ChannelListItemMentionPill : CircularContainer
     {
         public readonly BindableInt Mentions = new BindableInt();
 

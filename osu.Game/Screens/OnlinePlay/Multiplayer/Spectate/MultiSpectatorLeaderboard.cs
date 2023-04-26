@@ -8,7 +8,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
+    public partial class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
     {
         public MultiSpectatorLeaderboard(MultiplayerRoomUser[] users)
             : base(users)

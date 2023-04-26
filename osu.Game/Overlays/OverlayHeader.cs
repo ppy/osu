@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayHeader : Container
+    public abstract partial class OverlayHeader : Container
     {
         public OverlayTitle Title { get; }
 
@@ -73,19 +75,11 @@ namespace osu.Game.Overlays
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Children = new[]
+                                        Child = Title = CreateTitle().With(title =>
                                         {
-                                            Title = CreateTitle().With(title =>
-                                            {
-                                                title.Anchor = Anchor.CentreLeft;
-                                                title.Origin = Anchor.CentreLeft;
-                                            }),
-                                            CreateTitleContent().With(content =>
-                                            {
-                                                content.Anchor = Anchor.CentreRight;
-                                                content.Origin = Anchor.CentreRight;
-                                            })
-                                        }
+                                            title.Anchor = Anchor.CentreLeft;
+                                            title.Origin = Anchor.CentreLeft;
+                                        }),
                                     }
                                 }
                             },
@@ -95,7 +89,7 @@ namespace osu.Game.Overlays
                 }
             });
 
-            ContentSidePadding = 50;
+            ContentSidePadding = WaveOverlayContainer.HORIZONTAL_PADDING;
         }
 
         [BackgroundDependencyLoader]
@@ -109,12 +103,6 @@ namespace osu.Game.Overlays
 
         [NotNull]
         protected virtual Drawable CreateBackground() => Empty();
-
-        /// <summary>
-        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="OverlayTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
-        /// </summary>
-        [NotNull]
-        protected virtual Drawable CreateTitleContent() => Empty();
 
         protected abstract OverlayTitle CreateTitle();
     }

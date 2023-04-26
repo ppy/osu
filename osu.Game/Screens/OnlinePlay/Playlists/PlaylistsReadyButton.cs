@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,7 +15,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsReadyButton : ReadyButton
+    public partial class PlaylistsReadyButton : ReadyButton
     {
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset?> endDate { get; set; }
@@ -36,8 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.Green;
-            Triangles.ColourDark = colours.Green;
-            Triangles.ColourLight = colours.GreenLight;
         }
 
         private bool hasRemainingAttempts = true;

@@ -20,10 +20,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneStoryboard : OsuTestScene
+    public partial class TestSceneStoryboard : OsuTestScene
     {
-        private Container<DrawableStoryboard> storyboardContainer;
-        private DrawableStoryboard storyboard;
+        private Container<DrawableStoryboard> storyboardContainer = null!;
+
+        private DrawableStoryboard? storyboard;
 
         [Test]
         public void TestStoryboard()
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardMissingVideo()
         {
-            AddStep("Load storyboard with missing video", loadStoryboardNoVideo);
+            AddStep("Load storyboard with missing video", () => loadStoryboard("storyboard_no_video.osu"));
         }
 
         [BackgroundDependencyLoader]
@@ -75,53 +76,44 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e) => loadStoryboard(e.NewValue);
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e) => loadStoryboard(e.NewValue.Storyboard);
 
         private void restart()
         {
             var track = Beatmap.Value.Track;
 
             track.Reset();
-            loadStoryboard(Beatmap.Value);
+            loadStoryboard(Beatmap.Value.Storyboard);
             track.Start();
         }
 
-        private void loadStoryboard(IWorkingBeatmap working)
+        private void loadStoryboard(Storyboard toLoad)
         {
             if (storyboard != null)
-                storyboardContainer.Remove(storyboard);
+                storyboardContainer.Remove(storyboard, true);
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(SelectedMods.Value);
+            storyboard = toLoad.CreateDrawable(SelectedMods.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(working.Track);
+            decoupledClock.ChangeSource(Beatmap.Value.Track);
         }
 
-        private void loadStoryboardNoVideo()
+        private void loadStoryboard(string filename)
         {
-            if (storyboard != null)
-                storyboardContainer.Remove(storyboard);
+            Storyboard loaded;
 
-            var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            storyboardContainer.Clock = decoupledClock;
-
-            Storyboard sb;
-
-            using (var str = TestResources.OpenResource("storyboard_no_video.osu"))
+            using (var str = TestResources.OpenResource(filename))
             using (var bfr = new LineBufferedReader(str))
             {
                 var decoder = new LegacyStoryboardDecoder();
-                sb = decoder.Decode(bfr);
+                loaded = decoder.Decode(bfr);
             }
 
-            storyboard = sb.CreateDrawable(SelectedMods.Value);
-
-            storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(Beatmap.Value.Track);
+            loadStoryboard(loaded);
         }
     }
 }

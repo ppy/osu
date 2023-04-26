@@ -14,8 +14,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckFilePresenceTest
     {
-        private CheckBackgroundPresence check;
-        private IBeatmap beatmap;
+        private CheckBackgroundPresence check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()

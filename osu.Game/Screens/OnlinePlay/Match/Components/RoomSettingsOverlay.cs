@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 25;
@@ -99,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         /// use expanded overhanging content (like an <see cref="OsuDropdown{T}"/>'s dropdown),
         /// then the overhanging content will be correctly Z-ordered.
         /// </remarks>
-        protected class SectionContainer : ReverseChildIDFillFlowContainer<Section>
+        protected partial class SectionContainer : ReverseChildIDFillFlowContainer<Section>
         {
             public SectionContainer()
             {
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             }
         }
 
-        protected class Section : Container
+        protected partial class Section : Container
         {
             private readonly Container content;
 
@@ -133,7 +135,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
-                            Text = title.ToUpper(),
+                            Text = title.ToUpperInvariant(),
                         },
                         content = new Container
                         {

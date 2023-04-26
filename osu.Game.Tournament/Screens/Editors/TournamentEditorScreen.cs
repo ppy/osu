@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract partial class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {
@@ -100,11 +103,15 @@ namespace osu.Game.Tournament.Screens.Editors
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         args.NewItems.Cast<TModel>().ForEach(i => flow.Add(CreateDrawable(i)));
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i));
+                        Debug.Assert(args.OldItems != null);
+
+                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i, true));
                         break;
                 }
             };

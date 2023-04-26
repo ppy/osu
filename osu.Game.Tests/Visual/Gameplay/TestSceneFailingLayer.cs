@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -14,7 +16,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailingLayer : OsuTestScene
+    public partial class TestSceneFailingLayer : OsuTestScene
     {
         private FailingLayer layer;
 
@@ -109,7 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("layer fade is visible", () => layer.IsPresent);
         }
 
-        private class HealthProcessorContainer : Container
+        private partial class HealthProcessorContainer : Container
         {
             [Cached(typeof(HealthProcessor))]
             private readonly HealthProcessor healthProcessor;

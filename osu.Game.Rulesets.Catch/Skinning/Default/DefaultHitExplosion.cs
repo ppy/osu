@@ -14,12 +14,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
-        private CircularContainer largeFaint;
-        private CircularContainer smallFaint;
-        private CircularContainer directionalGlow1;
-        private CircularContainer directionalGlow2;
+        private CircularContainer largeFaint = null!;
+        private CircularContainer smallFaint = null!;
+        private CircularContainer directionalGlow1 = null!;
+        private CircularContainer directionalGlow2 = null!;
 
         [BackgroundDependencyLoader]
         private void load()

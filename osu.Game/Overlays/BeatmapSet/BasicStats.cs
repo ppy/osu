@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BasicStats : Container
+    public partial class BasicStats : Container
     {
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDisplay();
         }
 
-        private class Statistic : Container, IHasTooltip
+        private partial class Statistic : Container, IHasTooltip
         {
             private readonly OsuSpriteText value;
 

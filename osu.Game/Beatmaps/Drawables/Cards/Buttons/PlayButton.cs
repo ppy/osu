@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class PlayButton : OsuHoverContainer
+    public partial class PlayButton : OsuHoverContainer
     {
         public IBindable<double> Progress => progress;
         private readonly BindableDouble progress = new BindableDouble();
@@ -42,6 +40,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             this.beatmapSetInfo = beatmapSetInfo;
 
             Anchor = Origin = Anchor.Centre;
+
+            // needed for touch input to work when card is not hovered/expanded
+            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
@@ -120,7 +121,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 // another async load might have completed before this one.
                 // if so, do not make any changes.
                 if (loadedPreview != previewTrack)
+                {
+                    loadedPreview.Dispose();
                     return;
+                }
 
                 AddInternal(loadedPreview);
                 toggleLoading(false);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using NUnit.Framework;
@@ -12,7 +14,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
     public class ParsingTest
     {
         [Test]
-        public void TestNaNHandling() => allThrow<FormatException>("NaN");
+        public void TestNaNHandling()
+        {
+            allThrow<FormatException>("NaN");
+            Assert.That(Parsing.ParseFloat("NaN", allowNaN: true), Is.NaN);
+            Assert.That(Parsing.ParseDouble("NaN", allowNaN: true), Is.NaN);
+        }
 
         [Test]
         public void TestBadStringHandling() => allThrow<FormatException>("Random string 123");

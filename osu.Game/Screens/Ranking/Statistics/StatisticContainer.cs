@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics.CodeAnalysis;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -15,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Wraps a <see cref="StatisticItem"/> to add a header and suitable layout for use in <see cref="ResultsScreen"/>.
     /// </summary>
-    internal class StatisticContainer : CompositeDrawable
+    internal partial class StatisticContainer : CompositeDrawable
     {
         /// <summary>
         /// Creates a new <see cref="StatisticContainer"/>.
@@ -57,7 +60,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         private static Drawable createHeader(StatisticItem item)
         {
-            if (string.IsNullOrEmpty(item.Name))
+            if (LocalisableString.IsNullOrEmpty(item.Name))
                 return Empty();
 
             return new FillFlowContainer

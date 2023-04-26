@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrumSampleTriggerSource : GameplaySampleTriggerSource
+    public partial class DrumSampleTriggerSource : GameplaySampleTriggerSource
     {
         public DrumSampleTriggerSource(HitObjectContainer hitObjectContainer)
             : base(hitObjectContainer)

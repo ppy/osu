@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
@@ -20,62 +21,62 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skinnable element which uses a single texture backing.
     /// </summary>
-    public class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
+    public partial class SkinnableSprite : SkinnableDrawable, ISerialisableDrawable
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
         [Resolved]
-        private TextureStore textures { get; set; }
+        private TextureStore textures { get; set; } = null!;
 
-        [SettingSource("Sprite name", "The filename of the sprite", SettingControlType = typeof(SpriteSelectorControl))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), nameof(SkinnableComponentStrings.SpriteNameDescription), SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
 
         [Resolved]
-        private ISkinSource source { get; set; }
+        private ISkinSource source { get; set; } = null!;
 
         public SkinnableSprite(string textureName, ConfineMode confineMode = ConfineMode.NoScaling)
-            : base(new SpriteComponent(textureName), confineMode)
+            : base(new SpriteComponentLookup(textureName), confineMode)
         {
             SpriteName.Value = textureName;
         }
 
         public SkinnableSprite()
-            : base(new SpriteComponent(string.Empty), ConfineMode.NoScaling)
+            : base(new SpriteComponentLookup(string.Empty), ConfineMode.NoScaling)
         {
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.Both;
 
             SpriteName.BindValueChanged(name =>
             {
-                ((SpriteComponent)Component).LookupName = name.NewValue ?? string.Empty;
+                ((SpriteComponentLookup)ComponentLookup).LookupName = name.NewValue ?? string.Empty;
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });
         }
 
-        protected override Drawable CreateDefault(ISkinComponent component)
+        protected override Drawable CreateDefault(ISkinComponentLookup lookup)
         {
-            var texture = textures.Get(component.LookupName);
+            var texture = textures.Get(((SpriteComponentLookup)lookup).LookupName);
 
             if (texture == null)
-                return new SpriteNotFound(component.LookupName);
+                return new SpriteNotFound(((SpriteComponentLookup)lookup).LookupName);
 
             return new Sprite { Texture = texture };
         }
 
         public bool UsesFixedAnchor { get; set; }
 
-        internal class SpriteComponent : ISkinComponent
+        internal class SpriteComponentLookup : ISkinComponentLookup
         {
             public string LookupName { get; set; }
 
-            public SpriteComponent(string textureName)
+            public SpriteComponentLookup(string textureName)
             {
                 LookupName = textureName;
             }
         }
 
-        public class SpriteSelectorControl : SettingsDropdown<string>
+        public partial class SpriteSelectorControl : SettingsDropdown<string>
         {
             protected override void LoadComplete()
             {
@@ -86,19 +87,19 @@ namespace osu.Game.Skinning
                 // but that requires further thought.
                 var highestPrioritySkin = getHighestPriorityUserSkin(((SkinnableSprite)SettingSourceObject).source.AllSources) as Skin;
 
-                string[] availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
-                                                                                          .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
-                                                                                                      || f.Filename.EndsWith(".jpg", StringComparison.Ordinal))
-                                                                                          .Select(f => f.Filename).Distinct()).ToArray();
+                string[]? availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
+                                                                                           .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
+                                                                                                       || f.Filename.EndsWith(".jpg", StringComparison.Ordinal))
+                                                                                           .Select(f => f.Filename).Distinct()).ToArray();
 
                 if (availableFiles?.Length > 0)
                     Items = availableFiles;
 
-                static ISkin getHighestPriorityUserSkin(IEnumerable<ISkin> skins)
+                static ISkin? getHighestPriorityUserSkin(IEnumerable<ISkin> skins)
                 {
                     foreach (var skin in skins)
                     {
-                        if (skin is LegacySkinTransformer transformer && isUserSkin(transformer.Skin))
+                        if (skin is ISkinTransformer transformer && isUserSkin(transformer.Skin))
                             return transformer.Skin;
 
                         if (isUserSkin(skin))
@@ -110,13 +111,15 @@ namespace osu.Game.Skinning
 
                 // Temporarily used to exclude undesirable ISkin implementations
                 static bool isUserSkin(ISkin skin)
-                    => skin.GetType() == typeof(DefaultSkin)
+                    => skin.GetType() == typeof(TrianglesSkin)
+                       || skin.GetType() == typeof(ArgonProSkin)
+                       || skin.GetType() == typeof(ArgonSkin)
                        || skin.GetType() == typeof(DefaultLegacySkin)
                        || skin.GetType() == typeof(LegacySkin);
             }
         }
 
-        public class SpriteNotFound : CompositeDrawable
+        public partial class SpriteNotFound : CompositeDrawable
         {
             public SpriteNotFound(string lookup)
             {

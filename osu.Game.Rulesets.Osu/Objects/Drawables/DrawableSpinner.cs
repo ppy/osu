@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -22,7 +24,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinner : DrawableOsuHitObject
+    public partial class DrawableSpinner : DrawableOsuHitObject
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 
@@ -55,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public readonly IBindable<double> SpinsPerMinute = new BindableDouble();
 
-        private const double fade_out_duration = 160;
+        private const double fade_out_duration = 240;
 
         public DrawableSpinner()
             : this(null)
@@ -90,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
+                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
@@ -117,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnFree();
 
-            spinningSample.Samples = null;
+            spinningSample.ClearSamples();
         }
 
         protected override void LoadSamples()

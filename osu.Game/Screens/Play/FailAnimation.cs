@@ -1,26 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.UI;
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,29 +30,29 @@ namespace osu.Game.Screens.Play
     /// Manage the animation to be applied when a player fails.
     /// Single use and automatically disposed after use.
     /// </summary>
-    public class FailAnimation : Container
+    public partial class FailAnimation : Container
     {
-        public Action OnComplete;
+        public Action? OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
         private readonly BindableDouble volumeAdjustment = new BindableDouble(0.5);
 
-        private Container filters;
+        private Container filters = null!;
 
-        private Box redFlashLayer;
+        private Box redFlashLayer = null!;
 
-        private Track track;
+        private Track track = null!;
 
-        private AudioFilter failLowPassFilter;
-        private AudioFilter failHighPassFilter;
+        private AudioFilter failLowPassFilter = null!;
+        private AudioFilter failHighPassFilter = null!;
 
         private const float duration = 2500;
 
-        private Sample failSample;
+        private SkinnableSound failSample = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -64,8 +64,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The player screen background, used to adjust appearance on failing.
         /// </summary>
-        [CanBeNull]
-        public BackgroundScreen Background { private get; set; }
+        public BackgroundScreen? Background { private get; set; }
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
         {
             track = beatmap.Value.Track;
-            failSample = audio.Samples.Get(@"Gameplay/failsound");
+            AddInternal(failSample = new SkinnableSound(new SampleInfo("Gameplay/failsound")));
 
             AddRangeInternal(new Drawable[]
             {
@@ -103,6 +102,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool started;
+        private bool filtersRemoved;
 
         /// <summary>
         /// Start the fail animation playing.
@@ -111,13 +111,14 @@ namespace osu.Game.Screens.Play
         public void Start()
         {
             if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (filtersRemoved) throw new InvalidOperationException("Animation cannot be started after filters have been removed.");
 
             started = true;
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
                 // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
-                RemoveFilters(false);
+                removeFilters(false);
                 OnComplete?.Invoke();
             });
 
@@ -151,18 +152,31 @@ namespace osu.Game.Screens.Play
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
-        public void RemoveFilters(bool resetTrackFrequency = true)
+        /// <summary>
+        /// Stops any and all persistent effects added by the ongoing fail animation.
+        /// </summary>
+        public void Stop()
         {
-            if (resetTrackFrequency)
-                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            failSample.Stop();
+            removeFilters();
+        }
 
-            track?.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+        private void removeFilters(bool resetTrackFrequency = true)
+        {
+            filtersRemoved = true;
+
+            if (!started)
+                return;
+
+            if (resetTrackFrequency)
+                track.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             if (filters.Parent == null)
                 return;
 
-            RemoveInternal(filters);
-            filters.Dispose();
+            RemoveInternal(filters, true);
         }
 
         protected override void Update()
@@ -196,7 +210,7 @@ namespace osu.Game.Screens.Play
                 dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 // need to reapply the fail drop after judgement state changes
-                obj.ApplyCustomUpdateState += (o, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                obj.ApplyCustomUpdateState += (_, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 appliedObjects.Add(obj);
             }

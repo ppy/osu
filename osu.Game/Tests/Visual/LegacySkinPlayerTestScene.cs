@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,7 +14,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public abstract class LegacySkinPlayerTestScene : PlayerTestScene
+    public abstract partial class LegacySkinPlayerTestScene : PlayerTestScene
     {
         protected LegacySkin LegacySkin { get; private set; }
 
@@ -43,16 +45,16 @@ namespace osu.Game.Tests.Visual
 
         private void addResetTargetsStep()
         {
-            AddStep("reset targets", () => this.ChildrenOfType<SkinnableTargetContainer>().ForEach(t =>
+            AddStep("reset targets", () => this.ChildrenOfType<SkinComponentsContainer>().ForEach(t =>
             {
                 LegacySkin.ResetDrawableTarget(t);
                 t.Reload();
             }));
 
-            AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinnableTargetContainer>().All(t => t.ComponentsLoaded));
+            AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinComponentsContainer>().All(t => t.ComponentsLoaded));
         }
 
-        public class SkinProvidingPlayer : TestPlayer
+        public partial class SkinProvidingPlayer : TestPlayer
         {
             [Cached(typeof(ISkinSource))]
             private readonly ISkinSource skinSource;

@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +32,7 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHitErrorMeter : OsuTestScene
+    public partial class TestSceneHitErrorMeter : OsuTestScene
     {
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
@@ -105,13 +108,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddAssert("circle added", () =>
                 this.ChildrenOfType<ColourHitErrorMeter>().All(
-                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 1));
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() == 1));
 
             AddStep("miss", () => newJudgement(50, HitResult.Miss));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddAssert("circle added", () =>
                 this.ChildrenOfType<ColourHitErrorMeter>().All(
-                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 2));
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() == 2));
         }
 
         [Test]
@@ -121,11 +124,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("small bonus", () => newJudgement(result: HitResult.SmallBonus));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
-            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
 
             AddStep("large bonus", () => newJudgement(result: HitResult.LargeBonus));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
-            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
         }
 
         [Test]
@@ -135,11 +138,39 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("ignore hit", () => newJudgement(result: HitResult.IgnoreHit));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
-            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
 
             AddStep("ignore miss", () => newJudgement(result: HitResult.IgnoreMiss));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
-            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
+        }
+
+        [Test]
+        public void TestProcessingWhileHidden()
+        {
+            const int max_displayed_judgements = 20;
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("hide displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Hide();
+            });
+
+            AddRepeatStep("hit", () => newJudgement(), max_displayed_judgements * 2);
+
+            AddAssert("bars added", () => this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
+
+            AddUntilStep("wait for bars to disappear", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddUntilStep("ensure max circles not exceeded", () =>
+                this.ChildrenOfType<ColourHitErrorMeter>().First().ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count(), () => Is.LessThanOrEqualTo(max_displayed_judgements));
+
+            AddStep("show displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Show();
+            });
         }
 
         [Test]
@@ -151,12 +182,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("bar added", () => this.ChildrenOfType<BarHitErrorMeter>().All(
                 meter => meter.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Count() == 1));
             AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter>().All(
-                meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 1));
+                meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() == 1));
 
             AddStep("clear", () => this.ChildrenOfType<HitErrorMeter>().ForEach(meter => meter.Clear()));
 
             AddAssert("bar cleared", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
-            AddAssert("colour cleared", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+            AddAssert("colour cleared", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
         }
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
@@ -233,7 +264,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-        private class TestDrawableRuleset : DrawableRuleset
+        private partial class TestDrawableRuleset : DrawableRuleset
         {
             public HitWindows HitWindows;
 
@@ -241,16 +272,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override event Action<JudgementResult> NewResult
             {
-                add => throw new InvalidOperationException();
-                remove => throw new InvalidOperationException();
+                add => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
             }
 
             public override event Action<JudgementResult> RevertResult
             {
-                add => throw new InvalidOperationException();
-                remove => throw new InvalidOperationException();
+                add => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
@@ -275,7 +307,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void CancelResume() => throw new NotImplementedException();
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             public TestScoreProcessor()
                 : base(new OsuRuleset())

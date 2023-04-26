@@ -8,18 +8,25 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield
+    public partial class CatchPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The width of the playfield.
         /// The horizontal movement of the catcher is confined in the area of this width.
         /// </summary>
         public const float WIDTH = 512;
+
+        /// <summary>
+        /// The height of the playfield.
+        /// This doesn't include the catcher area.
+        /// </summary>
+        public const float HEIGHT = 384;
 
         /// <summary>
         /// The center position of the playfield.
@@ -30,9 +37,9 @@ namespace osu.Game.Rulesets.Catch.UI
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
 
-        internal Catcher Catcher { get; private set; }
+        internal Catcher Catcher { get; private set; } = null!;
 
-        internal CatcherArea CatcherArea { get; private set; }
+        internal CatcherArea CatcherArea { get; private set; } = null!;
 
         private readonly IBeatmapDifficultyInfo difficulty;
 
@@ -40,6 +47,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             this.difficulty = difficulty;
         }
+
+        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -94,7 +103,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
 
-        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
+        private void onRevertResult(JudgementResult result)
+            => CatcherArea.OnRevertResult(result);
     }
 }

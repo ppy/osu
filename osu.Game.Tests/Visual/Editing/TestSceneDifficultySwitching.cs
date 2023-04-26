@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -18,7 +20,7 @@ using osu.Game.Tests.Beatmaps.IO;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDifficultySwitching : EditorTestScene
+    public partial class TestSceneDifficultySwitching : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

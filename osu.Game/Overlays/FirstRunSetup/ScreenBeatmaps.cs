@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -22,7 +20,7 @@ using Realms;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupBeatmapScreenStrings), nameof(FirstRunSetupBeatmapScreenStrings.Header))]
-    public class ScreenBeatmaps : FirstRunSetupScreen
+    public partial class ScreenBeatmaps : FirstRunSetupScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;
@@ -125,7 +123,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             beatmapSubscription?.Dispose();
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => Schedule(() =>
         {
             currentlyLoadedBeatmaps.Text = FirstRunSetupBeatmapScreenStrings.CurrentlyLoadedBeatmaps(sender.Count);
 
@@ -141,7 +139,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 currentlyLoadedBeatmaps.ScaleTo(1.1f)
                                        .ScaleTo(1, 1500, Easing.OutQuint);
             }
-        }
+        });
 
         private void downloadTutorial()
         {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
@@ -9,12 +10,13 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// Interface for a component that manages changes in the <see cref="Editor"/>.
     /// </summary>
+    [Cached]
     public interface IEditorChangeHandler
     {
         /// <summary>
         /// Fired whenever a state change occurs.
         /// </summary>
-        event Action OnStateChange;
+        event Action? OnStateChange;
 
         /// <summary>
         /// Begins a bulk state change event. <see cref="EndChange"/> should be invoked soon after.

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         protected GlobalAction? Hotkey { get; set; }
 
@@ -161,7 +163,7 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => false;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -177,7 +179,7 @@ namespace osu.Game.Overlays.Toolbar
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
 
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
@@ -217,7 +219,7 @@ namespace osu.Game.Overlays.Toolbar
         }
     }
 
-    public class OpaqueBackground : Container
+    public partial class OpaqueBackground : Container
     {
         public OpaqueBackground()
         {

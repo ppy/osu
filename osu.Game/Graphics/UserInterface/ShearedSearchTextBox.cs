@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
+    public partial class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
     {
         private const float corner_radius = 7;
 
@@ -93,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
 
-        private class InnerSearchTextBox : SearchTextBox
+        private partial class InnerSearchTextBox : SearchTextBox
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -110,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();
 
-            internal class SearchPlaceholder : SpriteText
+            internal partial class SearchPlaceholder : SpriteText
             {
                 public override void Show()
                 {

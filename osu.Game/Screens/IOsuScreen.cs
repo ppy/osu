@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -38,6 +40,11 @@ namespace osu.Game.Screens
         /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
         bool HideOverlaysOnEnter { get; }
+
+        /// <summary>
+        /// Whether the menu cursor should be hidden when non-mouse input is received.
+        /// </summary>
+        bool HideMenuCursorOnNonMouseInput { get; }
 
         /// <summary>
         /// Whether overlays should be able to be opened when this screen is current.

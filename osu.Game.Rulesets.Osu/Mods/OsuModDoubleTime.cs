@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDoubleTime : ModDoubleTime
     {
-        public override double ScoreMultiplier => 1.12;
     }
 }

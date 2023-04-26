@@ -1,28 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Provides access to skinnable elements.
+    /// Provides access to various elements contained by a skin.
     /// </summary>
     public interface ISkin
     {
         /// <summary>
         /// Retrieve a <see cref="Drawable"/> component implementation.
         /// </summary>
-        /// <param name="component">The requested component.</param>
+        /// <param name="lookup">The requested component.</param>
         /// <returns>A drawable representation for the requested component, or null if unavailable.</returns>
-        Drawable? GetDrawableComponent(ISkinComponent component);
+        Drawable? GetDrawableComponent(ISkinComponentLookup lookup);
 
         /// <summary>
         /// Retrieve a <see cref="Texture"/>.

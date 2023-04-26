@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class GroupContainer : Container
+    public partial class GroupContainer : Container
     {
         private readonly List<Group> groups = new List<Group>();
 

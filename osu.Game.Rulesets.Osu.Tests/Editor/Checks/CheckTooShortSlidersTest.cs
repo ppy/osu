@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     [TestFixture]
     public class CheckTooShortSlidersTest
     {
-        private CheckTooShortSliders check;
+        private CheckTooShortSliders check = null!;
 
         [SetUp]
         public void Setup()

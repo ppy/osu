@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -10,24 +12,24 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
+    public partial class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
-        public Bindable<Country> Country => countryFilter.Current;
+        public Bindable<CountryCode> Country => countryFilter.Current;
 
         private OverlayRulesetSelector rulesetSelector;
         private CountryFilter countryFilter;
 
         protected override OverlayTitle CreateTitle() => new RankingsTitle();
 
-        protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
+        protected override Drawable CreateTabControlContent() => rulesetSelector = new OverlayRulesetSelector();
 
         protected override Drawable CreateContent() => countryFilter = new CountryFilter();
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground("Headers/rankings");
 
-        private class RankingsTitle : OverlayTitle
+        private partial class RankingsTitle : OverlayTitle
         {
             public RankingsTitle()
             {

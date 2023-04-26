@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,11 +20,11 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
+    public partial class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
     {
         protected override BindableList<TournamentRound> Storage => LadderInfo.Rounds;
 
-        public class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
+        public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
             public TournamentRound Model { get; }
 
@@ -111,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 AutoSizeAxes = Axes.Y;
             }
 
-            public class RoundBeatmapEditor : CompositeDrawable
+            public partial class RoundBeatmapEditor : CompositeDrawable
             {
                 private readonly TournamentRound round;
                 private readonly FillFlowContainer flow;
@@ -139,7 +141,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     flow.Add(new RoundBeatmapRow(round, user));
                 }
 
-                public class RoundBeatmapRow : CompositeDrawable
+                public partial class RoundBeatmapRow : CompositeDrawable
                 {
                     public RoundBeatmap Model { get; }
 
@@ -237,7 +239,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
-                                Model.Beatmap = res;
+                                Model.Beatmap = new TournamentBeatmap(res);
                                 updatePanel();
                             };
 
@@ -254,7 +256,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
                     }
 
-                    private void updatePanel()
+                    private void updatePanel() => Schedule(() =>
                     {
                         drawableContainer.Clear();
 
@@ -267,7 +269,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 300
                             };
                         }
-                    }
+                    });
                 }
             }
         }

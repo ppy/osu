@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -12,7 +14,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneOsuHoverContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuHoverContainer : OsuManualInputManagerTestScene
     {
         private OsuHoverTestContainer hoverContainer;
         private Box colourContainer;
@@ -179,7 +181,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void doMoveOut()
             => InputManager.MoveMouseTo(new Vector2(InputManager.ScreenSpaceDrawQuad.TopLeft.X, InputManager.ScreenSpaceDrawQuad.TopLeft.Y));
 
-        private sealed class OsuHoverTestContainer : OsuHoverContainer
+        private sealed partial class OsuHoverTestContainer : OsuHoverContainer
         {
             public static readonly Color4 HOVER_COLOUR = Color4.Red;
             public static readonly Color4 IDLE_COLOUR = Color4.Green;

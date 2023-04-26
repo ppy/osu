@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class GradientLineTabControl<TModel> : PageTabControl<TModel>
+    public abstract partial class GradientLineTabControl<TModel> : PageTabControl<TModel>
     {
         protected Color4 LineColour
         {
@@ -44,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
             Spacing = new Vector2(20, 0),
         };
 
-        private class GradientLine : GridContainer
+        private partial class GradientLine : GridContainer
         {
             public GradientLine()
             {

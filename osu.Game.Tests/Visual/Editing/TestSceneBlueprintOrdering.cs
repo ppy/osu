@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -22,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneBlueprintOrdering : EditorTestScene
+    public partial class TestSceneBlueprintOrdering : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to common point", () =>
             {
-                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
+                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("right click", () => InputManager.Click(MouseButton.Right));

@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
@@ -23,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class WaveformComparisonDisplay : CompositeDrawable
+    internal partial class WaveformComparisonDisplay : CompositeDrawable
     {
         private const int total_waveforms = 8;
 
@@ -93,7 +92,7 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
+            controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
             beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
 
@@ -130,7 +129,7 @@ namespace osu.Game.Screens.Edit.Timing
             double? offsetChange = newStartTime - selectedGroupStartTime;
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
-                                         .SkipWhile(g => g != tcp)
+                                         .SkipWhile(g => !ReferenceEquals(g, tcp))
                                          .Skip(1)
                                          .FirstOrDefault();
 
@@ -152,7 +151,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (!displayLocked.Value)
             {
                 float trackLength = (float)beatmap.Value.Track.Length;
-                int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
+                int totalBeatsAvailable = (int)((trackLength - timingPoint.Time) / timingPoint.BeatLength);
 
                 Scheduler.AddOnce(showFromBeat, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
             }
@@ -224,7 +223,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        internal class LockedOverlay : CompositeDrawable
+        internal partial class LockedOverlay : CompositeDrawable
         {
             private OsuSpriteText text = null!;
 
@@ -287,7 +286,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        internal class WaveformRow : CompositeDrawable
+        internal partial class WaveformRow : CompositeDrawable
         {
             private readonly bool isMainRow;
             private OsuSpriteText beatIndexText = null!;
@@ -296,13 +295,18 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
+            [Resolved]
+            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+            private readonly IBindable<Track> track = new Bindable<Track>();
+
             public WaveformRow(bool isMainRow)
             {
                 this.isMainRow = isMainRow;
             }
 
             [BackgroundDependencyLoader]
-            private void load(IBindable<WorkingBeatmap> beatmap)
+            private void load(EditorClock clock)
             {
                 InternalChildren = new Drawable[]
                 {
@@ -332,6 +336,13 @@ namespace osu.Game.Screens.Edit.Timing
                         Colour = colourProvider.Content2
                     }
                 };
+
+                track.BindTo(clock.Track);
+            }
+
+            protected override void LoadComplete()
+            {
+                track.ValueChanged += _ => waveformGraph.Waveform = beatmap.Value.Waveform;
             }
 
             public int BeatIndex { set => beatIndexText.Text = value.ToString(); }

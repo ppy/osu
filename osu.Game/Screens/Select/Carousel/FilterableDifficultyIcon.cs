@@ -8,7 +8,7 @@ using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class FilterableDifficultyIcon : DifficultyIcon
+    public partial class FilterableDifficultyIcon : DifficultyIcon
     {
         private readonly BindableBool filtered = new BindableBool();
 
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Carousel
         public readonly CarouselBeatmap Item;
 
         public FilterableDifficultyIcon(CarouselBeatmap item)
-            : base(item.BeatmapInfo, performBackgroundDifficultyLookup: false)
+            : base(item.BeatmapInfo)
         {
             filtered.BindTo(item.Filtered);
             filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));

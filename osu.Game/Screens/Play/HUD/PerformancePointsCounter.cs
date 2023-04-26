@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +35,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class PerformancePointsCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class PerformancePointsCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -169,7 +171,7 @@ namespace osu.Game.Screens.Play.HUD
             loadCancellationSource?.Cancel();
         }
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {

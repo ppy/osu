@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// The text that appears in the middle of the <see cref="AccuracyCircle"/> displaying the user's rank.
     /// </summary>
-    public class RankText : CompositeDrawable
+    public partial class RankText : CompositeDrawable
     {
         private readonly ScoreRank rank;
 

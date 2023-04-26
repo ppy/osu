@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherOld : CompositeDrawable
+    public partial class LegacyCatcherOld : CompositeDrawable
     {
         public LegacyCatcherOld()
         {
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            InternalChild = skin.GetAnimation(@"fruit-ryuuta", true, true, true).With(d =>
+            InternalChild = (skin.GetAnimation(@"fruit-ryuuta", true, true, true) ?? Empty()).With(d =>
             {
                 d.Anchor = Anchor.TopCentre;
                 d.Origin = Anchor.TopCentre;

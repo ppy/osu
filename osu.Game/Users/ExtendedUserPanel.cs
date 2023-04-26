@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,14 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
-    public abstract class ExtendedUserPanel : UserPanel
+    public abstract partial class ExtendedUserPanel : UserPanel
     {
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -23,7 +24,7 @@ namespace osu.Game.Users
 
         protected TextFlowContainer LastVisitMessage { get; private set; }
 
-        private SpriteIcon statusIcon;
+        private StatusIcon statusIcon;
         private OsuSpriteText statusMessage;
 
         protected ExtendedUserPanel(APIUser user)
@@ -51,17 +52,13 @@ namespace osu.Game.Users
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
-        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
         {
-            Size = new Vector2(39, 26),
+            Size = new Vector2(36, 26),
             Action = Action,
         };
 
-        protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon
-        {
-            Icon = FontAwesome.Regular.Circle,
-            Size = new Vector2(25)
-        };
+        protected Container CreateStatusIcon() => statusIcon = new StatusIcon();
 
         protected FillFlowContainer CreateStatusMessage(bool rightAlignedChildren)
         {
@@ -109,7 +106,7 @@ namespace osu.Game.Users
                 // Set status message based on activity (if we have one) and status is not offline
                 if (activity != null && !(status is UserStatusOffline))
                 {
-                    statusMessage.Text = activity.Status;
+                    statusMessage.Text = activity.GetStatus();
                     statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
                     return;
                 }

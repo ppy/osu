@@ -28,35 +28,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(storyboard.HasDrawable);
                 Assert.AreEqual(6, storyboard.Layers.Count());
 
-                StoryboardLayer background = storyboard.Layers.FirstOrDefault(l => l.Depth == 3);
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
                 Assert.IsNotNull(background);
                 Assert.AreEqual(16, background.Elements.Count);
                 Assert.IsTrue(background.VisibleWhenFailing);
                 Assert.IsTrue(background.VisibleWhenPassing);
                 Assert.AreEqual("Background", background.Name);
 
-                StoryboardLayer fail = storyboard.Layers.FirstOrDefault(l => l.Depth == 2);
+                StoryboardLayer fail = storyboard.Layers.Single(l => l.Depth == 2);
                 Assert.IsNotNull(fail);
                 Assert.AreEqual(0, fail.Elements.Count);
                 Assert.IsTrue(fail.VisibleWhenFailing);
                 Assert.IsFalse(fail.VisibleWhenPassing);
                 Assert.AreEqual("Fail", fail.Name);
 
-                StoryboardLayer pass = storyboard.Layers.FirstOrDefault(l => l.Depth == 1);
+                StoryboardLayer pass = storyboard.Layers.Single(l => l.Depth == 1);
                 Assert.IsNotNull(pass);
                 Assert.AreEqual(0, pass.Elements.Count);
                 Assert.IsFalse(pass.VisibleWhenFailing);
                 Assert.IsTrue(pass.VisibleWhenPassing);
                 Assert.AreEqual("Pass", pass.Name);
 
-                StoryboardLayer foreground = storyboard.Layers.FirstOrDefault(l => l.Depth == 0);
+                StoryboardLayer foreground = storyboard.Layers.Single(l => l.Depth == 0);
                 Assert.IsNotNull(foreground);
                 Assert.AreEqual(151, foreground.Elements.Count);
                 Assert.IsTrue(foreground.VisibleWhenFailing);
                 Assert.IsTrue(foreground.VisibleWhenPassing);
                 Assert.AreEqual("Foreground", foreground.Name);
 
-                StoryboardLayer overlay = storyboard.Layers.FirstOrDefault(l => l.Depth == int.MinValue);
+                StoryboardLayer overlay = storyboard.Layers.Single(l => l.Depth == int.MinValue);
                 Assert.IsNotNull(overlay);
                 Assert.IsEmpty(overlay.Elements);
                 Assert.IsTrue(overlay.VisibleWhenFailing);
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 var sprite = background.Elements.ElementAt(0) as StoryboardSprite;
                 Assert.NotNull(sprite);
-                Assert.IsTrue(sprite.HasCommands);
+                Assert.IsTrue(sprite!.HasCommands);
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
                 Assert.AreEqual(Anchor.Centre, sprite.Origin);
@@ -92,6 +92,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(Anchor.Centre, animation.Origin);
                 Assert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
                 Assert.AreEqual(78993, animation.StartTime);
+            }
+        }
+
+        [Test]
+        public void TestCorrectAnimationStartTime()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("animation-starts-before-alpha.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(1, background.Elements.Count);
+
+                Assert.AreEqual(2000, background.Elements[0].StartTime);
+                // This property should be used in DrawableStoryboardAnimation as a starting point for animation playback.
+                Assert.AreEqual(1000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
             }
         }
 
@@ -116,6 +135,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestEarliestStartTimeWithLoopAlphas()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("loop-containing-earlier-non-zero-fade.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(2, background.Elements.Count);
+
+                Assert.AreEqual(1000, background.Elements[0].StartTime);
+                Assert.AreEqual(1000, background.Elements[1].StartTime);
+
+                Assert.AreEqual(1000, storyboard.EarliestEventTime);
+            }
+        }
+
+        [Test]
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
@@ -127,6 +166,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
                 Assert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+            }
+        }
+
+        [Test]
+        public void TestDecodeImageSpecifiedAsVideo()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("image-specified-as-video.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer foreground = storyboard.Layers.Single(l => l.Name == "Video");
+                Assert.That(foreground.Elements.Count, Is.Zero);
             }
         }
 
@@ -173,7 +227,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(oneTime.EndTime, Is.EqualTo(4000 + loop_duration));
 
                 StoryboardSprite manyTimes = background.Elements.OfType<StoryboardSprite>().Single(s => s.Path == "many-times.png");
-                Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + 40 * loop_duration));
+                // It is intentional that we don't consider the loop count (40) as part of the end time calculation to match stable's handling.
+                // If we were to include the loop count, storyboards which loop for stupid long loop counts would continue playing the outro forever.
+                Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + loop_duration));
             }
         }
     }

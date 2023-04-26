@@ -1,11 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -16,9 +20,12 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircle : OsuSkinnableTestScene
+    public partial class TestSceneHitCircle : OsuSkinnableTestScene
     {
         private int depthIndex;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         [Test]
         public void TestHits()
@@ -54,12 +61,20 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit stream late", () => SetContents(_ => testStream(5, true, 150)));
         }
 
+        [Test]
+        public void TestHitLighting()
+        {
+            AddToggleStep("toggle hit lighting", v => config.SetValue(OsuSetting.HitLighting, v));
+            AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
+        }
+
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            var drawable = createSingle(circleSize, auto, timeOffset, positionOffset);
-
             var playfield = new TestOsuPlayfield();
-            playfield.Add(drawable);
+
+            for (double t = timeOffset; t < timeOffset + 60000; t += 2000)
+                playfield.Add(createSingle(circleSize, auto, t, positionOffset));
+
             return playfield;
         }
 
@@ -102,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Depth = depthIndex++
         };
 
-        protected class TestDrawableHitCircle : DrawableHitCircle
+        protected partial class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
             private readonly double hitOffset;
@@ -128,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        protected class TestOsuPlayfield : OsuPlayfield
+        protected partial class TestOsuPlayfield : OsuPlayfield
         {
             public TestOsuPlayfield()
             {

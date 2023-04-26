@@ -1,33 +1,51 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.OnlinePlay
 {
     [HeadlessTest]
-    public class TestSceneCatchUpSyncManager : OsuTestScene
+    public partial class TestSceneCatchUpSyncManager : OsuTestScene
     {
-        private TestManualClock master;
-        private CatchUpSyncManager syncManager;
+        private GameplayClockContainer master;
+        private SpectatorSyncManager syncManager;
 
-        private TestSpectatorPlayerClock player1;
-        private TestSpectatorPlayerClock player2;
+        private Dictionary<SpectatorPlayerClock, int> clocksById;
+        private SpectatorPlayerClock player1;
+        private SpectatorPlayerClock player2;
 
         [SetUp]
         public void Setup()
         {
-            syncManager = new CatchUpSyncManager(master = new TestManualClock());
-            syncManager.AddPlayerClock(player1 = new TestSpectatorPlayerClock(1));
-            syncManager.AddPlayerClock(player2 = new TestSpectatorPlayerClock(2));
+            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock()));
+            player1 = syncManager.CreateManagedClock();
+            player2 = syncManager.CreateManagedClock();
 
-            Schedule(() => Child = syncManager);
+            clocksById = new Dictionary<SpectatorPlayerClock, int>
+            {
+                { player1, 1 },
+                { player2, 2 }
+            };
+
+            Schedule(() =>
+            {
+                Children = new Drawable[]
+                {
+                    syncManager,
+                    master
+                };
+            });
         }
 
         [Test]
@@ -46,7 +64,7 @@ namespace osu.Game.Tests.OnlinePlay
         public void TestReadyPlayersStartWhenReadyForMaximumDelayTime()
         {
             setWaiting(() => player1, false);
-            AddWaitStep($"wait {CatchUpSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep($"wait {SpectatorSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(SpectatorSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             assertPlayerClockState(() => player1, true);
             assertPlayerClockState(() => player2, false);
         }
@@ -56,7 +74,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(CatchUpSyncManager.SYNC_TARGET + 1);
+            setMasterTime(SpectatorSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => player1, false);
         }
 
@@ -65,7 +83,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(CatchUpSyncManager.MAX_SYNC_OFFSET + 1);
+            setMasterTime(SpectatorSyncManager.MAX_SYNC_OFFSET + 1);
             assertCatchingUp(() => player1, true);
             assertCatchingUp(() => player2, true);
         }
@@ -75,8 +93,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(CatchUpSyncManager.MAX_SYNC_OFFSET + 1);
-            setPlayerClockTime(() => player1, CatchUpSyncManager.SYNC_TARGET + 1);
+            setMasterTime(SpectatorSyncManager.MAX_SYNC_OFFSET + 1);
+            setPlayerClockTime(() => player1, SpectatorSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => player1, true);
         }
 
@@ -85,8 +103,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(CatchUpSyncManager.MAX_SYNC_OFFSET + 2);
-            setPlayerClockTime(() => player1, CatchUpSyncManager.SYNC_TARGET);
+            setMasterTime(SpectatorSyncManager.MAX_SYNC_OFFSET + 2);
+            setPlayerClockTime(() => player1, SpectatorSyncManager.SYNC_TARGET);
             assertCatchingUp(() => player1, false);
             assertCatchingUp(() => player2, true);
         }
@@ -96,7 +114,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setPlayerClockTime(() => player1, -CatchUpSyncManager.SYNC_TARGET);
+            setPlayerClockTime(() => player1, -SpectatorSyncManager.SYNC_TARGET);
             assertCatchingUp(() => player1, false);
             assertPlayerClockState(() => player1, true);
         }
@@ -106,7 +124,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setPlayerClockTime(() => player1, -CatchUpSyncManager.SYNC_TARGET - 1);
+            setPlayerClockTime(() => player1, -SpectatorSyncManager.SYNC_TARGET - 1);
 
             // This is a silent catchup, where IsCatchingUp = false but IsRunning = false also.
             assertCatchingUp(() => player1, false);
@@ -127,13 +145,13 @@ namespace osu.Game.Tests.OnlinePlay
             assertPlayerClockState(() => player1, false);
         }
 
-        private void setWaiting(Func<TestSpectatorPlayerClock> playerClock, bool waiting)
-            => AddStep($"set player clock {playerClock().Id} waiting = {waiting}", () => playerClock().WaitingOnFrames.Value = waiting);
+        private void setWaiting(Func<SpectatorPlayerClock> playerClock, bool waiting)
+            => AddStep($"set player clock {clocksById[playerClock()]} waiting = {waiting}", () => playerClock().WaitingOnFrames = waiting);
 
         private void setAllWaiting(bool waiting) => AddStep($"set all player clocks waiting = {waiting}", () =>
         {
-            player1.WaitingOnFrames.Value = waiting;
-            player2.WaitingOnFrames.Value = waiting;
+            player1.WaitingOnFrames = waiting;
+            player2.WaitingOnFrames = waiting;
         });
 
         private void setMasterTime(double time)
@@ -142,51 +160,14 @@ namespace osu.Game.Tests.OnlinePlay
         /// <summary>
         /// clock.Time = master.Time - offsetFromMaster
         /// </summary>
-        private void setPlayerClockTime(Func<TestSpectatorPlayerClock> playerClock, double offsetFromMaster)
-            => AddStep($"set player clock {playerClock().Id} = master - {offsetFromMaster}", () => playerClock().Seek(master.CurrentTime - offsetFromMaster));
+        private void setPlayerClockTime(Func<SpectatorPlayerClock> playerClock, double offsetFromMaster)
+            => AddStep($"set player clock {clocksById[playerClock()]} = master - {offsetFromMaster}", () => playerClock().Seek(master.CurrentTime - offsetFromMaster));
 
-        private void assertCatchingUp(Func<TestSpectatorPlayerClock> playerClock, bool catchingUp) =>
-            AddAssert($"player clock {playerClock().Id} {(catchingUp ? "is" : "is not")} catching up", () => playerClock().IsCatchingUp == catchingUp);
+        private void assertCatchingUp(Func<SpectatorPlayerClock> playerClock, bool catchingUp) =>
+            AddAssert($"player clock {clocksById[playerClock()]} {(catchingUp ? "is" : "is not")} catching up", () => playerClock().IsCatchingUp == catchingUp);
 
-        private void assertPlayerClockState(Func<TestSpectatorPlayerClock> playerClock, bool running)
-            => AddAssert($"player clock {playerClock().Id} {(running ? "is" : "is not")} running", () => playerClock().IsRunning == running);
-
-        private class TestSpectatorPlayerClock : TestManualClock, ISpectatorPlayerClock
-        {
-            public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
-
-            public bool IsCatchingUp { get; set; }
-
-            public IFrameBasedClock Source
-            {
-                set => throw new NotImplementedException();
-            }
-
-            public readonly int Id;
-
-            public TestSpectatorPlayerClock(int id)
-            {
-                Id = id;
-
-                WaitingOnFrames.BindValueChanged(waiting =>
-                {
-                    if (waiting.NewValue)
-                        Stop();
-                    else
-                        Start();
-                });
-            }
-
-            public void ProcessFrame()
-            {
-            }
-
-            public double ElapsedFrameTime => 0;
-
-            public double FramesPerSecond => 0;
-
-            public FrameTimeInfo TimeInfo => default;
-        }
+        private void assertPlayerClockState(Func<SpectatorPlayerClock> playerClock, bool running)
+            => AddAssert($"player clock {clocksById[playerClock()]} {(running ? "is" : "is not")} running", () => playerClock().IsRunning == running);
 
         private class TestManualClock : ManualClock, IAdjustableClock
         {

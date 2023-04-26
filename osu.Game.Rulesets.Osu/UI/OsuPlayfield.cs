@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,9 +11,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -25,13 +29,14 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.UI
 {
     [Cached]
-    public class OsuPlayfield : Playfield
+    public partial class OsuPlayfield : Playfield
     {
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
 
+        public SmokeContainer Smoke { get; }
         public FollowPointRenderer FollowPoints { get; }
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
@@ -50,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.UI
             InternalChildren = new Drawable[]
             {
                 playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                Smoke = new SmokeContainer { RelativeSizeAxes = Axes.Both },
                 spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
                 FollowPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
@@ -61,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.UI
             HitPolicy = new StartTimeOrderedHitPolicy();
 
             var hitWindows = new OsuHitWindows();
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
@@ -94,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.UI
             // note: `Slider`'s `ProxiedLayer` is added when its nested `DrawableHitCircle` is loaded.
             switch (drawable)
             {
-                case DrawableSpinner _:
+                case DrawableSpinner:
                     spinnerProxies.Add(drawable.CreateProxy());
                     break;
 
@@ -110,21 +116,36 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config)
+        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
+            var osuBeatmap = (OsuBeatmap)beatmap;
 
-            RegisterPool<Slider, DrawableSlider>(10, 100);
-            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
-            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+            RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
+
+            // handle edge cases where a beatmap has a slider with many repeats.
+            int maxRepeatsOnOneSlider = 0;
+            int maxTicksOnOneSlider = 0;
+
+            if (osuBeatmap != null)
+            {
+                foreach (var slider in osuBeatmap.HitObjects.OfType<Slider>())
+                {
+                    maxRepeatsOnOneSlider = Math.Max(maxRepeatsOnOneSlider, slider.RepeatCount);
+                    maxTicksOnOneSlider = Math.Max(maxTicksOnOneSlider, slider.NestedHitObjects.OfType<SliderTick>().Count());
+                }
+            }
+
+            RegisterPool<Slider, DrawableSlider>(20, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
 
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
-            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
@@ -160,18 +181,18 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private class ProxyContainer : LifetimeManagementContainer
+        private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
         }
 
-        private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
+        private partial class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
         {
             private readonly HitResult result;
             private readonly Action<DrawableOsuJudgement> onLoaded;
 
             public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
-                : base(10)
+                : base(20)
             {
                 this.result = result;
                 this.onLoaded = onLoaded;

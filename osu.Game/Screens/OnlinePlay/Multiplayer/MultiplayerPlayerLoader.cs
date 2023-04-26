@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -11,7 +13,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerPlayerLoader : PlayerLoader
+    public partial class MultiplayerPlayerLoader : PlayerLoader
     {
         public bool GameplayPassed => player?.GameplayState.HasPassed == true;
 

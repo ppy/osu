@@ -4,8 +4,6 @@
 using System;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     /// <summary>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +47,7 @@ namespace osu.Game.Beatmaps
             // Shallow clone isn't enough to ensure we don't mutate beatmap info unexpectedly.
             // Can potentially be removed after `Beatmap.Difficulty` doesn't save back to `Beatmap.BeatmapInfo`.
             original.BeatmapInfo = original.BeatmapInfo.Clone();
+            original.ControlPointInfo = original.ControlPointInfo.DeepClone();
 
             return ConvertBeatmap(original, cancellationToken);
         }

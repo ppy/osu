@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
 
@@ -21,6 +23,13 @@ namespace osu.Game.Overlays.Mods
         /// Whether the mod is currently selected.
         /// </summary>
         public BindableBool Active { get; } = new BindableBool();
+
+        /// <summary>
+        /// Whether the mod requires further customisation.
+        /// This flag is read by the <see cref="ModSelectOverlay"/> to determine if the customisation panel should be opened after a mod change
+        /// and cleared after reading.
+        /// </summary>
+        public bool PendingConfiguration { get; set; }
 
         /// <summary>
         /// Whether the mod is currently filtered out due to not matching imposed criteria.

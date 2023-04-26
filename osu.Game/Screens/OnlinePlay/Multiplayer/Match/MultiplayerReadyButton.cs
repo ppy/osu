@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,16 +12,13 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerReadyButton : ReadyButton
+    public partial class MultiplayerReadyButton : ReadyButton
     {
-        public new Triangles Triangles => base.Triangles;
-
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
 
@@ -55,23 +54,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            MultiplayerCountdown newCountdown;
-
-            switch (room?.Countdown)
-            {
-                case MatchStartCountdown _:
-                    newCountdown = room.Countdown;
-                    break;
-
-                // Clear the countdown with any other (including non-null) countdown values.
-                default:
-                    newCountdown = null;
-                    break;
-            }
+            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
 
             if (newCountdown != countdown)
             {
-                countdown = room?.Countdown;
+                countdown = newCountdown;
                 countdownChangeTime = Time.Current;
             }
 
@@ -211,7 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
@@ -222,15 +209,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void setYellow()
             {
                 BackgroundColour = colours.YellowDark;
-                Triangles.ColourDark = colours.YellowDark;
-                Triangles.ColourLight = colours.Yellow;
             }
 
             void setGreen()
             {
                 BackgroundColour = colours.Green;
-                Triangles.ColourDark = colours.Green;
-                Triangles.ColourLight = colours.GreenLight;
             }
         }
 
@@ -246,8 +229,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
+                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
+                    && multiplayerClient.IsHost
+                    && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
+                    && !room.Settings.AutoStartEnabled)
+                {
                     return "Cancel countdown";
+                }
 
                 return base.TooltipText;
             }

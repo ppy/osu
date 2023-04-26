@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarIconButton : SidebarButton
+    public partial class SidebarIconButton : SidebarButton
     {
         private const float selection_indicator_height_active = 18;
         private const float selection_indicator_height_inactive = 4;

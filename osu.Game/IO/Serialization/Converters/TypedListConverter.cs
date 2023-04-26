@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -61,7 +63,7 @@ namespace osu.Game.IO.Serialization.Converters
                     throw new JsonException("Expected $type token.");
 
                 string typeName = lookupTable[(int)tok["$type"]];
-                var instance = (T)Activator.CreateInstance(Type.GetType(typeName).AsNonNull());
+                var instance = (T)Activator.CreateInstance(Type.GetType(typeName).AsNonNull())!;
                 serializer.Populate(itemReader, instance);
 
                 list.Add(instance);

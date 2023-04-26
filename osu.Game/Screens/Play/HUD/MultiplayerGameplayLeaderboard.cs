@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -19,31 +20,33 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
     [LongRunningLoad]
-    public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
+    public partial class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
         public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
+        private UserLookupCache userLookupCache { get; set; } = null!;
+
+        private Bindable<ScoringMode> scoringMode = null!;
 
         private readonly MultiplayerRoomUser[] playingUsers;
-        private Bindable<ScoringMode> scoringMode;
 
         private readonly IBindableList<int> playingUserIds = new BindableList<int>();
 
@@ -123,14 +126,17 @@ namespace osu.Game.Screens.Play.HUD
             playingUserIds.BindCollectionChanged(playingUsersChanged);
         }
 
-        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
+        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked)
         {
             var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
 
-            if (UserScores[user.Id].Team is int team)
+            if (user != null)
             {
-                leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
-                leaderboardScore.TextColour = Color4.White;
+                if (UserScores[user.OnlineID].Team is int team)
+                {
+                    leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
+                    leaderboardScore.TextColour = Color4.White;
+                }
             }
 
             return leaderboardScore;
@@ -148,11 +154,13 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void playingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void playingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (int userId in e.OldItems.OfType<int>())
                     {
                         spectatorClient.StopWatchingUser(userId);
@@ -178,7 +186,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)Math.Round(u.ScoreProcessor.TotalScore.Value);
+                    team.Value += u.ScoreProcessor.TotalScore.Value;
             }
         }
 
@@ -186,7 +194,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (spectatorClient != null)
+            if (spectatorClient.IsNotNull())
             {
                 foreach (var user in playingUsers)
                     spectatorClient.StopWatchingUser(user.UserID);

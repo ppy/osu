@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +20,7 @@ using Realms;
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
-    public class TestRealmKeyBindingStore
+    public partial class TestRealmKeyBindingStore
     {
         private NativeStorage storage;
 
@@ -121,7 +123,7 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        public class TestKeyBindingContainer : KeyBindingContainer
+        public partial class TestKeyBindingContainer : KeyBindingContainer
         {
             public override IEnumerable<IKeyBinding> DefaultKeyBindings =>
                 new[]

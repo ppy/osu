@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +65,7 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
+        public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
             var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
             if (ruleset == null)
@@ -77,7 +79,7 @@ namespace osu.Game.Online.Rooms
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException(),
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {playlistItem.RulesetID} not found locally"),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,
@@ -87,6 +89,8 @@ namespace osu.Game.Online.Rooms
                 Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>(),
                 Position = Position,
             };
+
+            scoreManager.PopulateMaximumStatistics(scoreInfo);
 
             return scoreInfo;
         }

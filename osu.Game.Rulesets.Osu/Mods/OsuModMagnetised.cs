@@ -3,7 +3,10 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -22,11 +25,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "MG";
         public override IconUsage? Icon => FontAwesome.Solid.Magnet;
         public override ModType Type => ModType.Fun;
-        public override string Description => "No need to chase the circles – your cursor is a magnet!";
-        public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax) };
-
-        private IFrameStableClock gameplayClock;
+        public override LocalisableString Description => "No need to chase the circles – your cursor is a magnet!";
+        public override double ScoreMultiplier => 0.5;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel) };
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
         public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)
@@ -38,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            gameplayClock = drawableRuleset.FrameStableClock;
-
             // Hide judgment displays and follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
@@ -48,34 +47,34 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
+            var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
-                        easeTo(circle, cursorPos);
+                        easeTo(playfield.Clock, circle, cursorPos);
                         break;
 
                     case DrawableSlider slider:
 
                         if (!slider.HeadCircle.Result.HasResult)
-                            easeTo(slider, cursorPos);
+                            easeTo(playfield.Clock, slider, cursorPos);
                         else
-                            easeTo(slider, cursorPos - slider.Ball.DrawPosition);
+                            easeTo(playfield.Clock, slider, cursorPos - slider.Ball.DrawPosition);
 
                         break;
                 }
             }
         }
 
-        private void easeTo(DrawableHitObject hitObject, Vector2 destination)
+        private void easeTo(IFrameBasedClock clock, DrawableHitObject hitObject, Vector2 destination)
         {
             double dampLength = Interpolation.Lerp(3000, 40, AttractionStrength.Value);
 
-            float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
-            float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
+            float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, clock.ElapsedFrameTime);
+            float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, clock.ElapsedFrameTime);
 
             hitObject.Position = new Vector2(x, y);
         }

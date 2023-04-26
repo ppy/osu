@@ -15,16 +15,16 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
+    public partial class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Container directionContainer;
-        private Sprite upSprite;
-        private Sprite downSprite;
+        private Container directionContainer = null!;
+        private Sprite upSprite = null!;
+        private Sprite downSprite = null!;
 
         [Resolved]
-        private Column column { get; set; }
+        private Column column { get; set; } = null!;
 
         public LegacyKeyArea()
         {

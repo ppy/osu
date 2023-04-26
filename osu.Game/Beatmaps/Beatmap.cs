@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -12,9 +14,6 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// A Beatmap containing converted HitObjects.
-    /// </summary>
     public class Beatmap<T> : IBeatmap<T>
         where T : HitObject
     {
@@ -82,9 +81,14 @@ namespace osu.Game.Beatmaps
 
         public double GetMostCommonBeatLength()
         {
+            double lastTime;
+
             // The last playable time in the beatmap - the last timing point extends to this time.
             // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
-            double lastTime = HitObjects.LastOrDefault()?.GetEndTime() ?? ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+            if (!HitObjects.Any())
+                lastTime = ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+            else
+                lastTime = this.GetLastObjectTime();
 
             var mostCommon =
                 // Construct a set of (beatLength, duration) tuples for each individual timing point.

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneExpandingContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneExpandingContainer : OsuManualInputManagerTestScene
     {
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
@@ -147,7 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("container still expanded", () => container.Expanded.Value);
         }
 
-        private class TestExpandingContainer : ExpandingContainer
+        private partial class TestExpandingContainer : ExpandingContainer
         {
             public TestExpandingContainer()
                 : base(120, 250)

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckZeroLengthObjectsTest
     {
-        private CheckZeroLengthObjects check;
+        private CheckZeroLengthObjects check = null!;
 
         [SetUp]
         public void Setup()

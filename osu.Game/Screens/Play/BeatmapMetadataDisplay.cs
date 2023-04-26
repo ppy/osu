@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Displays beatmap metadata inside <see cref="PlayerLoader"/>
     /// </summary>
-    public class BeatmapMetadataDisplay : Container
+    public partial class BeatmapMetadataDisplay : Container
     {
         private readonly IWorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
@@ -112,7 +114,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(true)
+                                loading = new LoadingLayer(dimBackground: true, blockInput: false)
                             }
                         },
                         versionFlow = new FillFlowContainer
@@ -195,24 +197,22 @@ namespace osu.Game.Screens.Play
                 starRatingDisplay.Show();
             }
             else
-            {
                 starRatingDisplay.Hide();
 
-                starDifficulty.ValueChanged += d =>
-                {
-                    Debug.Assert(d.NewValue != null);
+            starDifficulty.ValueChanged += d =>
+            {
+                Debug.Assert(d.NewValue != null);
 
-                    starRatingDisplay.Current.Value = d.NewValue.Value;
+                starRatingDisplay.Current.Value = d.NewValue.Value;
 
-                    versionFlow.AutoSizeDuration = 300;
-                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+                versionFlow.AutoSizeDuration = 300;
+                versionFlow.AutoSizeEasing = Easing.OutQuint;
 
-                    starRatingDisplay.FadeIn(300, Easing.InQuint);
-                };
-            }
+                starRatingDisplay.FadeIn(300, Easing.InQuint);
+            };
         }
 
-        private class MetadataLineLabel : OsuSpriteText
+        private partial class MetadataLineLabel : OsuSpriteText
         {
             public MetadataLineLabel(LocalisableString text)
             {
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MetadataLineInfo : OsuSpriteText
+        private partial class MetadataLineInfo : OsuSpriteText
         {
             public MetadataLineInfo(string text)
             {

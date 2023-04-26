@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -36,7 +40,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
+    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -50,7 +54,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        public PassThroughInputManager KeyBindingInputManager;
+        protected PassThroughInputManager KeyBindingInputManager;
 
         public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
@@ -63,9 +67,13 @@ namespace osu.Game.Rulesets.UI
 
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
+        public override IAdjustableAudioComponent Audio => audioContainer;
+
+        private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
+
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override IFrameStableClock FrameStableClock => frameStabilityContainer.FrameStableClock;
+        public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
         private bool frameStablePlayback = true;
 
@@ -100,14 +108,6 @@ namespace osu.Game.Rulesets.UI
         private DrawableRulesetDependencies dependencies;
 
         /// <summary>
-        /// Audio adjustments which are applied to the playfield.
-        /// </summary>
-        /// <remarks>
-        /// Does not affect <see cref="Overlays"/>.
-        /// </remarks>
-        public IAdjustableAudioComponent Audio { get; private set; }
-
-        /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.UI
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
-                p.RevertResult += (_, r) => RevertResult?.Invoke(r);
+                p.RevertResult += r => RevertResult?.Invoke(r);
             }));
         }
 
@@ -169,27 +169,21 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(CancellationToken? cancellationToken)
         {
-            AudioContainer audioContainer;
-
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
-                    audioContainer = new AudioContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = KeyBindingInputManager
-                            .WithChild(CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield)
-                            ),
-                    },
-                    Overlays,
+                    audioContainer.WithChild(KeyBindingInputManager
+                        .WithChildren(new Drawable[]
+                        {
+                            CreatePlayfieldAdjustmentContainer()
+                                .WithChild(Playfield),
+                            Overlays
+                        })),
                 }
             };
-
-            Audio = audioContainer;
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
@@ -227,7 +221,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -336,7 +330,10 @@ namespace osu.Game.Rulesets.UI
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
         public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+
+        public void Attach(ClicksPerSecondCalculator calculator) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
@@ -408,7 +405,7 @@ namespace osu.Game.Rulesets.UI
     /// </remarks>
     /// </summary>
     [Cached(typeof(DrawableRuleset))]
-    public abstract class DrawableRuleset : CompositeDrawable
+    public abstract partial class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -431,12 +428,17 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
+        /// Audio adjustments which are applied to the playfield.
+        /// </summary>
+        public abstract IAdjustableAudioComponent Audio { get; }
+
+        /// <summary>
         /// The playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
 
         /// <summary>
-        /// Content to be placed above hitobjects. Will be affected by frame stability.
+        /// Content to be placed above hitobjects. Will be affected by frame stability and adjustments applied to <see cref="Audio"/>.
         /// </summary>
         public abstract Container Overlays { get; }
 
@@ -493,12 +495,22 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
         public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        /// <summary>
+        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <c>true</c>.
+        /// Even if <c>true</c>, will not have any effect if the ruleset does not have a resume overlay (see <see cref="CreateResumeOverlay"/>).
+        /// </remarks>
+        public bool UseResumeOverlay { get; set; } = true;
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
@@ -524,6 +536,11 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        /// <summary>
+        /// Create an optional resume overlay, which is displayed when a player requests to resume gameplay during non-break time.
+        /// This can be used to force the player to return their hands / cursor to the position they left off, to avoid players
+        /// using pauses as a means of adjusting their inputs (aka "pause buffering").
+        /// </summary>
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>

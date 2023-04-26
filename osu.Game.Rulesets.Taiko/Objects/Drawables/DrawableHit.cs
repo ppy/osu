@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
+    public partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
@@ -88,8 +90,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
-            ? new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
-            : new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
+            ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
+            : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 
         public override IEnumerable<HitSampleInfo> GetSamples()
         {
@@ -199,14 +201,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    // If we're far enough away from the left stage, we should bring outselves in front of it
+                    // If we're far enough away from the left stage, we should bring ourselves in front of it
                     ProxyContent();
-
-                    var flash = (MainPiece.Drawable as CirclePiece)?.FlashBox;
-                    flash?.FadeTo(0.9f).FadeOut(300);
 
                     const float gravity_time = 300;
                     const float gravity_travel_height = 200;
+
+                    if (SnapJudgementLocation)
+                        MainPiece.MoveToX(-X);
 
                     this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
@@ -221,7 +223,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongNestedHit(Hit.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
-        public class StrongNestedHit : DrawableStrongNestedHit
+        public partial class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableHit ParentHitObject => (DrawableHit)base.ParentHitObject;
 

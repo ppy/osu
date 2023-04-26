@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -17,7 +19,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Components
 {
     [HeadlessTest]
-    public class TestScenePollingComponent : OsuTestScene
+    public partial class TestScenePollingComponent : OsuTestScene
     {
         private Container pollBox;
         private TestPoller poller;
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual.Components
 
         protected override double TimePerAction => 500;
 
-        public class TestPoller : PollingComponent
+        public partial class TestPoller : PollingComponent
         {
             public event Action OnPoll;
 
@@ -141,7 +143,7 @@ namespace osu.Game.Tests.Visual.Components
             }
         }
 
-        public class TestSlowPoller : TestPoller
+        public partial class TestSlowPoller : TestPoller
         {
             protected override Task Poll() => Task.Delay((int)(TimeBetweenPolls.Value / 2f / Clock.Rate)).ContinueWith(_ => base.Poll());
         }

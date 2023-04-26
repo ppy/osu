@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -19,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
+    public partial class TestSceneNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>

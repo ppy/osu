@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -26,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectator : ScreenTestScene
+    public partial class TestSceneSpectator : ScreenTestScene
     {
         private readonly APIUser streamingUser = new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
@@ -83,7 +85,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames(startTime: gameplay_start);
 
-            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
+            AddAssert("time is greater than seek target", () => currentFrameStableTime, () => Is.GreaterThan(gameplay_start));
         }
 
         /// <summary>
@@ -117,7 +119,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
 
             AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
-            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
+            AddAssert("time is greater than seek target", () => currentFrameStableTime, () => Is.GreaterThan(gameplay_start));
         }
 
         [Test]
@@ -145,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
-            AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
+            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime));
         }
 
         [Test]
@@ -174,7 +176,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames(300);
 
-            AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
+            AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime, () => Is.GreaterThan(30000));
         }
 
         [Test]
@@ -259,7 +261,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFramesPurgedBeforeEndingPlay()
         {
-            AddStep("begin playing", () => spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), new Score()));
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), new Score()));
 
             AddStep("send frames and finish play", () =>
             {
@@ -361,7 +363,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Player player => Stack.CurrentScreen as Player;
 
         private double currentFrameStableTime
-            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
+            => player.ChildrenOfType<FrameStabilityContainer>().First().CurrentTime;
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 
@@ -386,7 +388,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Used for the sole purpose of adding <see cref="TestSpectatorClient"/> as a resolvable dependency.
         /// </summary>
-        private class DependenciesScreen : OsuScreen
+        private partial class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(SpectatorClient))]
             public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();

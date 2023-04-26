@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -28,7 +30,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    internal class CurrentlyPlayingDisplay : CompositeDrawable
+    internal partial class CurrentlyPlayingDisplay : CompositeDrawable
     {
         private const float search_textbox_height = 40;
         private const float padding = 10;
@@ -58,7 +60,7 @@ namespace osu.Game.Overlays.Dashboard
                 new Container<BasicSearchTextBox>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding(padding),
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = padding },
                     Child = searchTextBox = new BasicSearchTextBox
                     {
                         RelativeSizeAxes = Axes.X,
@@ -151,7 +153,7 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
             });
 
-        public class PlayingUserPanel : CompositeDrawable, IFilterable
+        public partial class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
 
@@ -201,7 +203,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                             },
-                            new PurpleTriangleButton
+                            new PurpleRoundedButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Spectate",

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Testing
     /// provided ruleset below are cached at the base implementation.
     /// </summary>
     [HeadlessTest]
-    public class TestSceneRulesetDependencies : OsuTestScene
+    public partial class TestSceneRulesetDependencies : OsuTestScene
     {
         protected override Ruleset CreateRuleset() => new TestRuleset();
 
@@ -49,9 +49,11 @@ namespace osu.Game.Tests.Testing
         [Test]
         public void TestRetrieveShader()
         {
-            AddAssert("ruleset shaders retrieved", () =>
-                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestVertex.vs") != null &&
-                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestFragment.fs") != null);
+            AddStep("ruleset shaders retrieved without error", () =>
+            {
+                Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestVertex.vs");
+                Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestFragment.fs");
+            });
         }
 
         [Test]
@@ -74,12 +76,12 @@ namespace osu.Game.Tests.Testing
             }
 
             public override IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(TestResources.GetStore(), @"Resources");
-            public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new TestRulesetConfigManager();
+            public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new TestRulesetConfigManager();
 
             public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null;
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => null!;
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null!;
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null!;
         }
 
         private class TestRulesetConfigManager : IRulesetConfigManager

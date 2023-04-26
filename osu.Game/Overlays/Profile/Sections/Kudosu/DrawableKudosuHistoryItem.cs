@@ -13,12 +13,9 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
-    public class DrawableKudosuHistoryItem : CompositeDrawable
+    public partial class DrawableKudosuHistoryItem : CompositeDrawable
     {
         private const int height = 25;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         private readonly APIKudosuHistory historyItem;
         private readonly LinkFlowContainer linkFlowContainer;
@@ -48,9 +45,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            date.Colour = colours.GreySeaFoamLighter;
+            date.Colour = colourProvider.Foreground1;
             var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
         }

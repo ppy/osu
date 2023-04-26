@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -8,7 +10,7 @@ using osu.Game.Screens.Edit.Setup;
 
 namespace osu.Game.Rulesets.Osu.Edit.Setup
 {
-    public class OsuSetupSection : RulesetSetupSection
+    public partial class OsuSetupSection : RulesetSetupSection
     {
         private LabelledSliderBar<float> stackLeniency;
 
@@ -47,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
         private void updateBeatmap()
         {
             Beatmap.BeatmapInfo.StackLeniency = stackLeniency.Current.Value;
+            Beatmap.SaveState();
         }
     }
 }

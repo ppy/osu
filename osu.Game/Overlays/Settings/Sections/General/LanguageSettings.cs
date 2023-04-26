@@ -12,17 +12,19 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LanguageSettings : SettingsSubsection
+    public partial class LanguageSettings : SettingsSubsection
     {
-        private SettingsDropdown<Language> languageSelection;
-        private Bindable<string> frameworkLocale;
+        private SettingsDropdown<Language> languageSelection = null!;
+        private Bindable<string> frameworkLocale = null!;
+        private IBindable<LocalisationParameters> localisationParameters = null!;
 
         protected override LocalisableString Header => GeneralSettingsStrings.LanguageHeader;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager config)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager config, LocalisationManager localisation)
         {
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            localisationParameters = localisation.CurrentParameters.GetBoundCopy();
 
             Children = new Drawable[]
             {
@@ -42,11 +44,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             };
 
-            if (!LanguageExtensions.TryParseCultureCode(frameworkLocale.Value, out var locale))
-                locale = Language.en;
-            languageSelection.Current.Value = locale;
+            frameworkLocale.BindValueChanged(_ => updateSelection());
+            localisationParameters.BindValueChanged(_ => updateSelection(), true);
 
             languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }
+
+        private void updateSelection() =>
+            languageSelection.Current.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
     }
 }

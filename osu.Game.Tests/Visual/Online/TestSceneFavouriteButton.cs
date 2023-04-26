@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -10,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneFavouriteButton : OsuTestScene
+    public partial class TestSceneFavouriteButton : OsuTestScene
     {
         private FavouriteButton favourite;
 

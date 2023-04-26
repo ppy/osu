@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
@@ -84,7 +85,7 @@ namespace osu.Game.Online.API.Requests
                 req.AddParameter("q", query);
 
             if (General != null && General.Any())
-                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().Underscore())));
+                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToSnakeCase())));
 
             if (ruleset.OnlineID >= 0)
                 req.AddParameter("m", ruleset.OnlineID.ToString());
@@ -110,7 +111,8 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("nsfw", ExplicitContent == SearchExplicit.Show ? "true" : "false");
 
-            req.AddCursor(cursor);
+            if (cursor != null)
+                req.AddCursor(cursor);
 
             return req;
         }

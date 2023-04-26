@@ -8,13 +8,12 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// A container which fires a callback when a new beat is reached.
-    /// Consumes a parent <see cref="GameplayClock"/> or <see cref="Beatmap"/> (whichever is first available).
+    /// Consumes a parent <see cref="IBeatSyncProvider"/>.
     /// </summary>
     /// <remarks>
     /// This container does not set its own clock to the source used for beat matching.
@@ -23,10 +22,13 @@ namespace osu.Game.Graphics.Containers
     ///
     /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
-    public class BeatSyncedContainer : Container
+    public partial class BeatSyncedContainer : Container
     {
         private int lastBeat;
-        private TimingControlPoint lastTimingPoint;
+
+        private TimingControlPoint? lastTimingPoint { get; set; }
+
+        protected bool IsKiaiTime { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
@@ -68,12 +70,12 @@ namespace osu.Game.Graphics.Containers
         public double MinimumBeatLength { get; set; }
 
         /// <summary>
-        /// Whether this container is currently tracking a beatmap's timing data.
+        /// Whether this container is currently tracking a beat sync provider.
         /// </summary>
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
         [Resolved]
-        protected IBeatSyncProvider BeatSyncSource { get; private set; }
+        protected IBeatSyncProvider BeatSyncSource { get; private set; } = null!;
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
@@ -84,19 +86,18 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.CheckBeatSyncAvailable() && BeatSyncSource.Clock?.IsRunning == true;
 
             double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                Debug.Assert(BeatSyncSource.ControlPoints != null);
                 Debug.Assert(BeatSyncSource.Clock != null);
 
                 currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
 
-                timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(currentTrackTime);
-                effectPoint = BeatSyncSource.ControlPoints.EffectPointAt(currentTrackTime);
+                timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
+                effectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;
             }
             else
             {
@@ -113,7 +114,7 @@ namespace osu.Game.Graphics.Containers
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
@@ -125,7 +126,7 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
+            if (ReferenceEquals(timingPoint, lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
@@ -133,11 +134,13 @@ namespace osu.Game.Graphics.Containers
             if (AllowMistimedEventFiring || Math.Abs(TimeSinceLastBeat) < MISTIMED_ALLOWANCE)
             {
                 using (BeginDelayedSequence(-TimeSinceLastBeat))
-                    OnNewBeat(beatIndex, timingPoint, effectPoint, BeatSyncSource.Amplitudes ?? ChannelAmplitudes.Empty);
+                    OnNewBeat(beatIndex, timingPoint, effectPoint, BeatSyncSource.CurrentAmplitudes);
             }
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
+
+            IsKiaiTime = effectPoint.KiaiMode;
         }
     }
 }

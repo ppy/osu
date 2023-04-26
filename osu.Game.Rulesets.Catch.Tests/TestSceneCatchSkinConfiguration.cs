@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -21,7 +23,7 @@ using Direction = osu.Game.Rulesets.Catch.UI.Direction;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneCatchSkinConfiguration : OsuTestScene
+    public partial class TestSceneCatchSkinConfiguration : OsuTestScene
     {
         private Catcher catcher;
 
@@ -85,12 +87,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             });
         }
 
-        private class TestSkin : DefaultSkin
+        private class TestSkin : TrianglesSkin
         {
             public bool FlipCatcherPlate { get; set; }
 
             public TestSkin()
-                : base(null)
+                : base(null!)
             {
             }
 

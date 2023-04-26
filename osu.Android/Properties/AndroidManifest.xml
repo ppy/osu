@@ -1,5 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" package="sh.ppy.osulazer" android:installLocation="auto" android:versionName="0.1.0">
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29" />
-	<application android:allowBackup="true" android:supportsRtl="true" android:label="osu!" android:icon="@drawable/lazer" />
-</manifest>

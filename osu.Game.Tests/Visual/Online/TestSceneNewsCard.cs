@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.News;
@@ -12,7 +14,7 @@ using System;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsCard : OsuTestScene
+    public partial class TestSceneNewsCard : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Purple);

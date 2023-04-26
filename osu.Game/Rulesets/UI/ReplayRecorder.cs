@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +14,11 @@ using osu.Framework.Input.Events;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
+    public abstract partial class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
         where T : struct
     {
         private readonly Score target;
@@ -31,9 +32,6 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
-        [Resolved]
-        private GameplayState gameplayState { get; set; }
-
         protected ReplayRecorder(Score target)
         {
             this.target = target;
@@ -46,15 +44,7 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             inputManager = GetContainingInputManager();
-            spectatorClient.BeginPlaying(gameplayState, target);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            spectatorClient?.EndPlaying(gameplayState);
         }
 
         protected override void Update()
@@ -104,7 +94,7 @@ namespace osu.Game.Rulesets.UI
         protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);
     }
 
-    public abstract class ReplayRecorder : Component
+    public abstract partial class ReplayRecorder : Component
     {
         public Func<Vector2, Vector2> ScreenSpaceToGamefield;
     }

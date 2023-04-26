@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
+    public abstract partial class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
         protected override Container<Drawable> Content => blueprints ?? base.Content;
 
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         protected ManiaSelectionBlueprintTestScene(int columns)
         {
-            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = columns } };
+            var stageDefinitions = new List<StageDefinition> { new StageDefinition(columns) };
             base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Up)
             {
                 RelativeSizeAxes = Axes.Both,

@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class FruitSelectionBlueprint : CatchSelectionBlueprint<Fruit>
+    public partial class FruitSelectionBlueprint : CatchSelectionBlueprint<Fruit>
     {
         private readonly FruitOutline outline;
 

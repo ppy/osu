@@ -19,9 +19,23 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotification : Notification, IHasCompletionTarget
+    public partial class ProgressNotification : Notification, IHasCompletionTarget
     {
         private const float loading_spinner_size = 22;
+
+        public Func<bool>? CancelRequested { get; set; }
+
+        protected override bool AllowFlingDismiss => false;
+
+        /// <summary>
+        /// The function to post completion notifications back to.
+        /// </summary>
+        public Action<Notification>? CompletionTarget { get; set; }
+
+        /// <summary>
+        /// An action to complete when the completion notification is clicked. Return true to close.
+        /// </summary>
+        public Func<bool>? CompletionClickAction { get; set; }
 
         private LocalisableString text;
 
@@ -35,7 +49,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public string CompletionText { get; set; } = "Task has completed!";
+        public LocalisableString CompletionText { get; set; } = "Task has completed!";
 
         private float progress;
 
@@ -45,18 +59,21 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 progress = value;
-                Scheduler.AddOnce(updateProgress, progress);
+                Scheduler.AddOnce(p => progressBar.Progress = p, progress);
             }
         }
 
-        private void updateProgress(float progress) => progressBar.Progress = progress;
+        protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             // we may have received changes before we were displayed.
-            updateState();
+            Scheduler.AddOnce(updateState);
         }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -72,8 +89,8 @@ namespace osu.Game.Overlays.Notifications
 
                 state = value;
 
-                if (IsLoaded)
-                    Schedule(updateState);
+                Scheduler.AddOnce(updateState);
+                attemptPostCompletion();
             }
         }
 
@@ -88,7 +105,7 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = false;
                     progressBar.Active = false;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
@@ -97,14 +114,14 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = true;
                     progressBar.Active = true;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
                 case ProgressNotificationState.Cancelled:
                     cancellationTokenSource.Cancel();
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Hide();
 
                     var icon = new SpriteIcon
@@ -126,10 +143,32 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
-                    NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                    this.FadeOut(200).Finally(d => Completed());
+                    attemptPostCompletion();
                     break;
             }
+        }
+
+        private int completionSent;
+
+        /// <summary>
+        /// Attempt to post a completion notification.
+        /// </summary>
+        private void attemptPostCompletion()
+        {
+            if (state != ProgressNotificationState.Completed) return;
+
+            // This notification may not have been posted yet (and thus may not have a target to post the completion to).
+            // Completion posting will be re-attempted in a scheduled invocation.
+            if (CompletionTarget == null)
+                return;
+
+            // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
+            if (Interlocked.Exchange(ref completionSent, 1) == 1)
+                return;
+
+            CompletionTarget.Invoke(CreateCompletionNotification());
+
+            Close(false);
         }
 
         private ProgressNotificationState state;
@@ -140,34 +179,28 @@ namespace osu.Game.Overlays.Notifications
             Text = CompletionText
         };
 
-        protected virtual void Completed()
-        {
-            CompletionTarget?.Invoke(CreateCompletionNotification());
-            base.Close();
-        }
-
         public override bool DisplayOnTop => false;
+
+        public override bool IsImportant => false;
 
         private readonly ProgressBar progressBar;
         private Color4 colourQueued;
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private Box iconBackground;
-        private LoadingSpinner loadingSpinner;
+        private LoadingSpinner loadingSpinner = null!;
 
         private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
         {
-            Content.Add(textDrawable = new OsuTextFlowContainer
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
-                Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             });
 
-            NotificationContent.Add(progressBar = new ProgressBar
+            MainContent.Add(progressBar = new ProgressBar
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -192,10 +225,11 @@ namespace osu.Game.Overlays.Notifications
 
             IconContent.AddRange(new Drawable[]
             {
-                iconBackground = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
+                    Colour = colourProvider.Background5,
+                    Depth = float.MaxValue,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
@@ -204,12 +238,13 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        public override void Close()
+        public override void Close(bool runFlingAnimation)
         {
             switch (State)
             {
+                case ProgressNotificationState.Completed:
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(runFlingAnimation);
                     break;
 
                 case ProgressNotificationState.Active:
@@ -220,19 +255,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public Func<bool> CancelRequested { get; set; }
-
-        /// <summary>
-        /// The function to post completion notifications back to.
-        /// </summary>
-        public Action<Notification> CompletionTarget { get; set; }
-
-        /// <summary>
-        /// An action to complete when the completion notification is clicked. Return true to close.
-        /// </summary>
-        public Func<bool> CompletionClickAction;
-
-        private class ProgressBar : Container
+        private partial class ProgressBar : Container
         {
             private readonly Box box;
 

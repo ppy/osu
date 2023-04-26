@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -16,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class PageTabControl<T> : OsuTabControl<T>
+    public partial class PageTabControl<T> : OsuTabControl<T>
     {
         protected override TabItem<T> CreateTabItem(T value) => new PageTabItem(value);
 
@@ -31,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Yellow;
         }
 
-        public class PageTabItem : TabItem<T>, IHasAccentColour
+        public partial class PageTabItem : TabItem<T>, IHasAccentColour
         {
             private const float transition_duration = 100;
 

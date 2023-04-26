@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneBeatDivisorControl : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatDivisorControl : OsuManualInputManagerTestScene
     {
         private BeatDivisorControl beatDivisorControl;
         private BindableBeatDivisor bindableBeatDivisor;
@@ -102,6 +104,49 @@ namespace osu.Game.Tests.Visual.Editing
 
             switchBeatSnap(-3);
             assertBeatSnap(16);
+        }
+
+        [Test]
+        public void TestKeyboardNavigation()
+        {
+            pressKey(1);
+            assertBeatSnap(1);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(2);
+            assertBeatSnap(2);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(3);
+            assertBeatSnap(3);
+            assertPreset(BeatDivisorType.Triplets);
+
+            pressKey(4);
+            assertBeatSnap(4);
+            assertPreset(BeatDivisorType.Common);
+
+            pressKey(5);
+            assertBeatSnap(5);
+            assertPreset(BeatDivisorType.Custom, 5);
+
+            pressKey(6);
+            assertBeatSnap(6);
+            assertPreset(BeatDivisorType.Triplets);
+
+            pressKey(7);
+            assertBeatSnap(7);
+            assertPreset(BeatDivisorType.Custom, 7);
+
+            pressKey(8);
+            assertBeatSnap(8);
+            assertPreset(BeatDivisorType.Common);
+
+            void pressKey(int key) => AddStep($"press shift+{key}", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Number0 + key);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
         }
 
         [Test]

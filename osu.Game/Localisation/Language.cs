@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using JetBrains.Annotations;
 
 namespace osu.Game.Localisation
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Language
     {
         [Description(@"English")]

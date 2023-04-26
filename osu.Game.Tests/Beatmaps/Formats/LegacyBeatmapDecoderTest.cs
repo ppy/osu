@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -160,6 +161,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeImageSpecifiedAsVideo()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("image-specified-as-video.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                var metadata = beatmap.Metadata;
+
+                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapTimingPoints()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
@@ -179,16 +195,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(48428);
                 Assert.AreEqual(956, timingPoint.Time);
                 Assert.AreEqual(329.67032967033d, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(119637);
                 Assert.AreEqual(119637, timingPoint.Time);
                 Assert.AreEqual(659.340659340659, timingPoint.BeatLength);
                 Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                Assert.IsFalse(timingPoint.OmitFirstBarLine);
 
                 var difficultyPoint = controlPoints.DifficultyPointAt(0);
                 Assert.AreEqual(0, difficultyPoint.Time);
@@ -220,17 +239,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var effectPoint = controlPoints.EffectPointAt(0);
                 Assert.AreEqual(0, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(53703);
                 Assert.AreEqual(53703, effectPoint.Time);
                 Assert.IsTrue(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(116637);
                 Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
-                Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
         }
 
@@ -272,6 +288,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeOmitBarLineEffect()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("omit-barline-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.EffectPoints.Count, Is.EqualTo(0));
+
+                Assert.That(controlPoints.TimingPointAt(500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(1500).OmitFirstBarLine, Is.True);
+                Assert.That(controlPoints.TimingPointAt(2500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(3500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(4500).OmitFirstBarLine, Is.False);
+                Assert.That(controlPoints.TimingPointAt(5500).OmitFirstBarLine, Is.True);
+            }
+        }
+
+        [Test]
         public void TestTimingPointResetsSpeedMultiplier()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
@@ -296,6 +334,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
 
+                Debug.Assert(comboColors != null);
+
                 Color4[] expectedColors =
                 {
                     new Color4(142, 199, 255, 255),
@@ -304,11 +344,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestGetLastObjectTime()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-last-object-not-latest.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                Assert.That(beatmap.HitObjects.Last().StartTime, Is.EqualTo(2494));
+                Assert.That(beatmap.HitObjects.Last().GetEndTime(), Is.EqualTo(2494));
+
+                Assert.That(beatmap.HitObjects.Max(h => h.GetEndTime()), Is.EqualTo(2582));
+                Assert.That(beatmap.GetLastObjectTime(), Is.EqualTo(2582));
             }
         }
 
@@ -373,14 +431,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.IsNotNull(positionData);
                 Assert.IsNotNull(curveData);
-                Assert.AreEqual(new Vector2(192, 168), positionData.Position);
+                Assert.AreEqual(new Vector2(192, 168), positionData!.Position);
                 Assert.AreEqual(956, hitObjects[0].StartTime);
                 Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
                 positionData = hitObjects[1] as IHasPosition;
 
                 Assert.IsNotNull(positionData);
-                Assert.AreEqual(new Vector2(304, 56), positionData.Position);
+                Assert.AreEqual(new Vector2(304, 56), positionData!.Position);
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
                 Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
             }
@@ -536,8 +594,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestFallbackDecoderForCorruptedHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -554,8 +612,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestFallbackDecoderForMissingHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("missing-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -572,8 +630,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithEmptyLinesAtStart()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("empty-lines-at-start.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -590,8 +648,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithEmptyLinesAndNoHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("empty-line-instead-of-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -608,8 +666,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeFileWithContentImmediatelyAfterHeader()
         {
-            Decoder<Beatmap> decoder = null;
-            Beatmap beatmap = null;
+            Decoder<Beatmap> decoder = null!;
+            Beatmap beatmap = null!;
 
             using (var resStream = TestResources.OpenResource("no-empty-line-after-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -636,7 +694,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestAllowFallbackDecoderOverwrite()
         {
-            Decoder<Beatmap> decoder = null;
+            Decoder<Beatmap> decoder = null!;
 
             using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -915,6 +973,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
                 Assert.That(controlPoints[1].Type, Is.Null);
                 Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
+            }
+        }
+
+        [Test]
+        public void TestNaNControlPoints()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("nan-control-points.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(2));
+
+                Assert.That(controlPoints.TimingPointAt(1000).BeatLength, Is.EqualTo(500));
+
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
+                Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
+
+#pragma warning disable 618
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
+                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
+#pragma warning restore 618
             }
         }
     }

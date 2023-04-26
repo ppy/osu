@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Graphics.UserInterface;
@@ -16,7 +18,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamItem<T> : TabItem<T>
+    public abstract partial class OverlayStreamItem<T> : TabItem<T>
     {
         public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
@@ -37,12 +39,14 @@ namespace osu.Game.Overlays
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
+        public const float PADDING = 5;
+
         protected OverlayStreamItem(T value)
             : base(value)
         {
             Height = 50;
             Width = 90;
-            Margin = new MarginPadding(5);
+            Margin = new MarginPadding(PADDING);
         }
 
         [BackgroundDependencyLoader]

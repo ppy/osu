@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +17,10 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
-using osu.Game.Stores;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboard : Container<DrawableStoryboardLayer>
+    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
         [Cached]
         public Storyboard Storyboard { get; }
@@ -84,12 +85,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
+        private void load(IGameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.Renderer, host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {

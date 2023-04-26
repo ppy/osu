@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor.Checks
     [TestFixture]
     public class TestCheckBananaShowerGap
     {
-        private CheckBananaShowerGap check;
+        private CheckBananaShowerGap check = null!;
 
         [SetUp]
         public void Setup()

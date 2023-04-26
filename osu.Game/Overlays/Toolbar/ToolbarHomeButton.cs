@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarHomeButton : ToolbarButton
+    public partial class ToolbarHomeButton : ToolbarButton
     {
         public ToolbarHomeButton()
         {
@@ -17,8 +20,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            TooltipMain = "home";
-            TooltipSub = "return to the main menu";
+            TooltipMain = ToolbarStrings.HomeHeaderTitle;
+            TooltipSub = ToolbarStrings.HomeHeaderDescription;
             SetIcon("Icons/Hexacons/home");
         }
     }

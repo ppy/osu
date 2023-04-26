@@ -118,17 +118,31 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.IsNull(filterCriteria.BPM.Max);
         }
 
-        private static readonly object[] length_query_examples =
+        private static readonly object[] correct_length_query_examples =
         {
-            new object[] { "6ms", TimeSpan.FromMilliseconds(6), TimeSpan.FromMilliseconds(1) },
             new object[] { "23s", TimeSpan.FromSeconds(23), TimeSpan.FromSeconds(1) },
             new object[] { "9m", TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(1) },
             new object[] { "0.25h", TimeSpan.FromHours(0.25), TimeSpan.FromHours(1) },
             new object[] { "70", TimeSpan.FromSeconds(70), TimeSpan.FromSeconds(1) },
+            new object[] { "7m27s", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
+            new object[] { "7:27", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
+            new object[] { "1h2m3s", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
+            new object[] { "1h2m3.5s", TimeSpan.FromSeconds(3723.5), TimeSpan.FromSeconds(1) },
+            new object[] { "1:2:3", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
+            new object[] { "1:02:03", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
+            new object[] { "6", TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1) },
+            new object[] { "6.5", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1) },
+            new object[] { "6.5s", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1) },
+            new object[] { "6.5m", TimeSpan.FromMinutes(6.5), TimeSpan.FromMinutes(1) },
+            new object[] { "6h5m", TimeSpan.FromMinutes(365), TimeSpan.FromMinutes(1) },
+            new object[] { "65m", TimeSpan.FromMinutes(65), TimeSpan.FromMinutes(1) },
+            new object[] { "90s", TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(1) },
+            new object[] { "80m20s", TimeSpan.FromSeconds(4820), TimeSpan.FromSeconds(1) },
+            new object[] { "1h20s", TimeSpan.FromSeconds(3620), TimeSpan.FromSeconds(1) },
         };
 
         [Test]
-        [TestCaseSource(nameof(length_query_examples))]
+        [TestCaseSource(nameof(correct_length_query_examples))]
         public void TestApplyLengthQueries(string lengthQuery, TimeSpan expectedLength, TimeSpan scale)
         {
             string query = $"length={lengthQuery} time";
@@ -138,6 +152,29 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
             Assert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
+        }
+
+        private static readonly object[] incorrect_length_query_examples =
+        {
+            new object[] { "7.5m27s" },
+            new object[] { "7m27" },
+            new object[] { "7m7m7m" },
+            new object[] { "7m70s" },
+            new object[] { "5s6m" },
+            new object[] { "0:" },
+            new object[] { ":0" },
+            new object[] { "0:3:" },
+            new object[] { "3:15.5" },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(incorrect_length_query_examples))]
+        public void TestInvalidLengthQueries(string lengthQuery)
+        {
+            string query = $"length={lengthQuery} time";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.Length.HasFilter);
         }
 
         [Test]
@@ -152,6 +189,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.IsTrue(filterCriteria.BeatDivisor.IsLowerInclusive);
             Assert.AreEqual(12, filterCriteria.BeatDivisor.Max);
             Assert.IsTrue(filterCriteria.BeatDivisor.IsUpperInclusive);
+        }
+
+        [Test]
+        public void TestPartialStatusMatch()
+        {
+            const string query = "status=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
         }
 
         [Test]
@@ -254,7 +301,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
         private class CustomFilterCriteria : IRulesetFilterCriteria
         {
-            public string CustomValue { get; set; }
+            public string? CustomValue { get; set; }
 
             public bool Matches(BeatmapInfo beatmapInfo) => true;
 

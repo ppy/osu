@@ -1,9 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
@@ -14,6 +20,19 @@ namespace osu.Game.Database
     public abstract class LegacyExporter<TModel>
         where TModel : class, IHasNamedFiles
     {
+        /// <summary>
+        /// Max length of filename (including extension).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The filename limit for most OSs is 255. This actual usable length is smaller because <see cref="Storage.CreateFileSafely(string)"/> adds an additional "_<see cref="Guid"/>" to the end of the path.
+        /// </para>
+        /// <para>
+        /// For more information see <see href="https://www.ibm.com/docs/en/spectrum-protect/8.1.9?topic=parameters-file-specification-syntax">file specification syntax</see>, <seealso href="https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits">file systems limitations</seealso>
+        /// </para>
+        /// </remarks>
+        public const int MAX_FILENAME_LENGTH = 255 - (32 + 4 + 2 + 5); //max path - (Guid + Guid "D" format chars + Storage.CreateFileSafely chars + account for ' (99)' suffix)
+
         /// <summary>
         /// The file extension for exports (including the leading '.').
         /// </summary>
@@ -29,13 +48,25 @@ namespace osu.Game.Database
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
+        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
+
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
         {
-            string filename = $"{item.GetDisplayString().GetValidArchiveContentFilename()}{FileExtension}";
+            string itemFilename = GetFilename(item).GetValidFilename();
+
+            if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
+                itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
+
+            IEnumerable<string> existingExports =
+                exportStorage
+                    .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
+                    .Concat(exportStorage.GetDirectories(string.Empty));
+
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
             using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);

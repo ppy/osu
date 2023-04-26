@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
@@ -21,6 +23,26 @@ namespace osu.Game.Screens.Edit
         {
             ValidDivisors.BindValueChanged(_ => updateBindableProperties(), true);
             BindValueChanged(_ => ensureValidDivisor());
+        }
+
+        /// <summary>
+        /// Set a divisor, updating the valid divisor range appropriately.
+        /// </summary>
+        /// <param name="divisor">The intended divisor.</param>
+        public void SetArbitraryDivisor(int divisor)
+        {
+            // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
+            if (!ValidDivisors.Value.Presets.Contains(divisor))
+            {
+                if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                else
+                    ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
+            }
+
+            Value = divisor;
         }
 
         private void updateBindableProperties()

@@ -46,7 +46,7 @@ namespace osu.Game.Skinning
                     // osu!catch section only has colour settings
                     // so no harm in handling the entire section
                     case Section.CatchTheBeat:
-                        HandleColours(skin, line);
+                        HandleColours(skin, line, true);
                         return;
                 }
 

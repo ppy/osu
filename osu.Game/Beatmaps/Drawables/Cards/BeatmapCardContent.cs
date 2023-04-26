@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardContent : CompositeDrawable
+    public partial class BeatmapCardContent : CompositeDrawable
     {
         public Drawable MainContent
         {
@@ -140,9 +138,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             // This avoids depth issues where a hovered (scaled) card to the right of another card would be beneath the card to the left.
             this.ScaleTo(Expanded.Value ? 1.03f : 1, 500, Easing.OutQuint);
 
-            background.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            dropdownContent.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            borderContainer.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            if (Expanded.Value)
+            {
+                background.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                dropdownContent.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                borderContainer.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            }
+            else
+            {
+                background.FadeOut(BeatmapCard.TRANSITION_DURATION / 3f, Easing.OutQuint);
+                dropdownContent.FadeOut(BeatmapCard.TRANSITION_DURATION / 3f, Easing.OutQuint);
+                borderContainer.FadeOut(BeatmapCard.TRANSITION_DURATION / 3f, Easing.OutQuint);
+            }
 
             content.TweenEdgeEffectTo(new EdgeEffectParameters
             {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -20,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckbox : Checkbox
+    public partial class OsuTabControlCheckbox : Checkbox
     {
         private readonly Box box;
         private readonly SpriteText text;
