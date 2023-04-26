@@ -4,12 +4,12 @@
 #nullable disable
 
 using System.Linq;
+using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
