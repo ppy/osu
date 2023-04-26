@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps.Formats
             );
         }
 
-        protected ref struct SpanPair
+        protected ref struct SpanKeyValuePair
         {
             // Use tuple when ref struct in generic parameter is a thing
             public ReadOnlySpan<char> Key;
@@ -156,7 +156,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected SpanPair SplitKeyVal(ReadOnlySpan<char> line, char separator = ':', bool shouldTrim = true)
+        protected SpanKeyValuePair SplitKeyVal(ReadOnlySpan<char> line, char separator = ':', bool shouldTrim = true)
         {
             // https://github.com/dotnet/runtime/issues/934
             int index = line.IndexOf(separator);
@@ -164,12 +164,12 @@ namespace osu.Game.Beatmaps.Formats
             if (shouldTrim)
             {
                 return index == -1
-                    ? new SpanPair
+                    ? new SpanKeyValuePair
                     {
                         Key = line.Trim(),
                         Value = default
                     }
-                    : new SpanPair
+                    : new SpanKeyValuePair
                     {
                         Key = line[0..index].Trim(),
                         Value = line[(index + 1)..].Trim()
@@ -178,12 +178,12 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 return index == -1
-                    ? new SpanPair
+                    ? new SpanKeyValuePair
                     {
                         Key = line,
                         Value = default
                     }
-                    : new SpanPair
+                    : new SpanKeyValuePair
                     {
                         Key = line[0..index],
                         Value = line[(index + 1)..]

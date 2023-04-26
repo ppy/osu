@@ -9,7 +9,7 @@ namespace osu.Game.Extensions
     {
         public static SpanSplitEnumerator<T> Split<T>(this ReadOnlySpan<T> input, T separator)
             where T : IEquatable<T>
-            => new(input, separator);
+            => new SpanSplitEnumerator<T>(input, separator);
     }
 
     public ref struct SpanSplitEnumerator<T>
