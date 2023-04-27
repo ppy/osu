@@ -7,6 +7,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -14,53 +15,31 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class UpdateableCountryText : ModelBackedDrawable<CountryCode>
+    public partial class UpdateableCountryText : OsuHoverContainer
     {
-        public CountryCode CountryCode
-        {
-            get => Model;
-            set => Model = value;
-        }
         
         public bool ShowPlaceholderOnUnknown = true;
 
-        public Action? Action;
-
-        protected override Drawable? CreateDrawable(CountryCode countryCode)
-        {
-            if (countryCode == CountryCode.Unknown && !ShowPlaceholderOnUnknown)
-                return null;
-
-            return new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
-                        Margin = new MarginPadding { Left = 5 },
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        Text = countryCode.GetDescription(),
-                    },
-                    new HoverClickSounds()
-                }
-            };
-        }
-
         [Resolved]
         private RankingsOverlay? rankingsOverlay { get; set; }
-
-        public UpdateableCountryText(CountryCode countryCode = CountryCode.Unknown)
+        public UpdateableCountryText()
         {
-            CountryCode = countryCode;
+            AutoSizeAxes = Axes.Both;
         }
-        protected override bool OnClick(ClickEvent e)
+
+        // [BackgroundDependencyLoader]
+        public void load(CountryCode countryCode)
         {
-            Action?.Invoke();
-            rankingsOverlay?.ShowCountry(CountryCode);
-            return true;
+            Action = () =>
+            {
+                rankingsOverlay?.ShowCountry(countryCode);
+            };
+
+            Child = new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
+                Text = countryCode.GetDescription(),
+            };
         }
     }
     
