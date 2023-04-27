@@ -188,8 +188,8 @@ namespace osu.Game.Overlays.Mods
             {
                 MainAreaContent.Add(new Container
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     AutoSizeAxes = Axes.X,
                     Height = ModsEffectDisplay.HEIGHT,
                     Margin = new MarginPadding { Horizontal = 100 },
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
-                    },
+                    }
                 });
             }
 
