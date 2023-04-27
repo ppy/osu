@@ -110,6 +110,8 @@ namespace osu.Game.Overlays.Mods
 
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
+        private ModSearch? modSearch;
+
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
 
@@ -200,6 +202,16 @@ namespace osu.Game.Overlays.Mods
                     }
                 });
             }
+
+            MainAreaContent.Add(new Container
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.X,
+                Height = ModsEffectDisplay.HEIGHT,
+                Margin = new MarginPadding { Horizontal = 100 },
+                Child = modSearch = new ModSearch()
+            });
 
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
