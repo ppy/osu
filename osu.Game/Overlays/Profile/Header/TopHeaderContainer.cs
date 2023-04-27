@@ -19,6 +19,20 @@ using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 
+
+using System;
+// using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
+// using osu.Framework.Graphics;
+// using osu.Framework.Graphics.Containers;
+// using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+// using osu.Game.Graphics.Sprites;
+// using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osu.Framework.Graphics.Sprites;
+// using osu.Framework.Extensions;
+
 namespace osu.Game.Overlays.Profile.Header
 {
     public partial class TopHeaderContainer : CompositeDrawable
@@ -158,6 +172,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                         },
                                                         userCountryText = new UpdateableCountryText
                                                         {
+                                                            Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
                                                             Margin = new MarginPadding { Left = 5 },
                                                             Origin = Anchor.CentreLeft,
                                                             Anchor = Anchor.CentreLeft,
@@ -226,6 +241,32 @@ namespace osu.Game.Overlays.Profile.Header
             public ProfileCoverBackground()
             {
                 Masking = true;
+            }
+        }
+
+        private partial class UpdateableCountryText : OsuHoverContainer
+        {
+            public bool ShowPlaceholderOnUnknown = true;
+            public FontUsage Font = default;
+            [Resolved]
+            private RankingsOverlay? rankingsOverlay { get; set; }
+            public UpdateableCountryText()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
+            public void load(CountryCode countryCode)
+            {
+                Action = () =>
+                {
+                    rankingsOverlay?.ShowCountry(countryCode);
+                };
+
+                Child = new OsuSpriteText
+                {
+                    Font = Font,
+                    Text = countryCode.GetDescription(),
+                };
             }
         }
     }
