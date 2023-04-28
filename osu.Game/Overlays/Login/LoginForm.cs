@@ -42,10 +42,14 @@ namespace osu.Game.Overlays.Login
         private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
         {
             Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0, 5);
+            Spacing = new Vector2(0, SettingsSection.ITEM_SPACING);
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-
+            Padding = new MarginPadding
+            {
+                Top = 5,
+                Bottom = 24,
+            };
             ErrorTextFlowContainer errorText;
             LinkFlowContainer forgottenPaswordLink;
 
@@ -81,7 +85,11 @@ namespace osu.Game.Overlays.Login
                 },
                 forgottenPaswordLink = new LinkFlowContainer
                 {
-                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
+                    Padding = new MarginPadding
+                    {
+                        Left = SettingsPanel.CONTENT_MARGINS,
+                        Bottom = SettingsSection.ITEM_SPACING
+                    },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
