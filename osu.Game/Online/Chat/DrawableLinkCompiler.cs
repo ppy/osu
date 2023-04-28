@@ -8,11 +8,15 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osuTK;
 
 namespace osu.Game.Online.Chat
@@ -20,7 +24,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// An invisible drawable that brings multiple <see cref="Drawable"/> pieces together to form a consumable clickable link.
     /// </summary>
-    public partial class DrawableLinkCompiler : OsuHoverContainer
+    public partial class DrawableLinkCompiler : OsuHoverContainer, IHasContextMenu
     {
         /// <summary>
         /// Each word part of a chat link (split for word-wrap support).
@@ -29,6 +33,10 @@ namespace osu.Game.Online.Chat
 
         [Resolved(CanBeNull = true)]
         private OverlayColourProvider overlayColourProvider { get; set; }
+        [Resolved]
+        private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
@@ -52,6 +60,36 @@ namespace osu.Game.Online.Chat
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
 
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+                bool hasTooltip = this.TooltipText.ToString() != "";
+                string text;
+                if(hasTooltip)
+                {
+                    text = this.TooltipText.ToString();
+                }
+                else
+                {
+                    text = getUrlFromPart(Parts);
+                }
+                bool isChannelorLobbyLink = text.Contains("osu//chan") || text.Contains("osump//");
+                if(!isChannelorLobbyLink)
+                {
+                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(text)));
+                }
+                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => 
+                {
+                    host.GetClipboard()?.SetText(text);
+                    onScreenDisplay?.Display(new CopyUrlToast());
+                }));
+
+                return items.ToArray();
+            }
+        }
+
         private partial class LinkHoverSounds : HoverClickSounds
         {
             private readonly List<Drawable> parts;
@@ -63,6 +101,13 @@ namespace osu.Game.Online.Chat
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
+        }
+        public string getUrlFromPart (List<Drawable> part)
+        {
+            string url = part[0].ToString();
+            int startIndex = url.IndexOf('"') + 1;
+            int endIndex = url.LastIndexOf('"');
+            return url.Substring(startIndex, endIndex - startIndex);
         }
     }
 }
