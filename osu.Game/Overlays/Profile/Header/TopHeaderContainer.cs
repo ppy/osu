@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -164,16 +163,13 @@ namespace osu.Game.Overlays.Profile.Header
                                                         },
                                                         userCountryContainer = new OsuHoverContainer
                                                         {
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                            Origin = Anchor.CentreLeft,
-                                                            Anchor = Anchor.CentreLeft,
                                                             AutoSizeAxes = Axes.Both,
-                                                            Children = new Drawable[]
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Margin = new MarginPadding { Left = 5 },
+                                                            Child = userCountryText = new OsuSpriteText
                                                             {
-                                                                userCountryText = new OsuSpriteText
-                                                                {
-                                                                    Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
-                                                                },
+                                                                Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
                                                             },
                                                         },
                                                     }
