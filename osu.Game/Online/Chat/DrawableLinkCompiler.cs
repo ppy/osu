@@ -33,8 +33,10 @@ namespace osu.Game.Online.Chat
 
         [Resolved(CanBeNull = true)]
         private OverlayColourProvider overlayColourProvider { get; set; }
+
         [Resolved]
         private OnScreenDisplay onScreenDisplay { get; set; }
+
         [Resolved]
         private GameHost host { get; set; } = null!;
 
@@ -65,22 +67,18 @@ namespace osu.Game.Online.Chat
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
-                bool hasTooltip = this.TooltipText.ToString() != "";
-                string text;
-                if(hasTooltip)
-                {
-                    text = this.TooltipText.ToString();
-                }
-                else
-                {
-                    text = getUrlFromPart(Parts);
-                }
-                bool isChannelorLobbyLink = text.Contains("osu//chan") || text.Contains("osump//");
-                if(!isChannelorLobbyLink)
+                bool hasTooltip = TooltipText.ToString() != "";
+
+                string text = hasTooltip ? TooltipText.ToString() : GetUrlFromPart(Parts);
+
+                bool isChannelorLobbyLink = text.Contains("osu://chan") || text.Contains("osump://");
+
+                if (!isChannelorLobbyLink)
                 {
                     items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(text)));
                 }
-                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => 
+
+                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
                 {
                     host.GetClipboard()?.SetText(text);
                     onScreenDisplay?.Display(new CopyUrlToast());
@@ -102,7 +100,8 @@ namespace osu.Game.Online.Chat
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
         }
-        public string getUrlFromPart (List<Drawable> part)
+
+        public string GetUrlFromPart(List<Drawable> part)
         {
             string url = part[0].ToString();
             int startIndex = url.IndexOf('"') + 1;
