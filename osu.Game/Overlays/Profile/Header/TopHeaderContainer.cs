@@ -21,7 +21,6 @@ using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 
-
 namespace osu.Game.Overlays.Profile.Header
 {
     public partial class TopHeaderContainer : CompositeDrawable
@@ -41,7 +40,6 @@ namespace osu.Game.Overlays.Profile.Header
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
-        private UpdateableCountryText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
 
@@ -204,7 +202,6 @@ namespace osu.Game.Overlays.Profile.Header
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
-            userCountryText.load(user?.CountryCode ?? default);
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
@@ -230,34 +227,6 @@ namespace osu.Game.Overlays.Profile.Header
             public ProfileCoverBackground()
             {
                 Masking = true;
-            }
-        }
-
-        private partial class UpdateableCountryText : OsuHoverContainer
-        {
-
-            public FontUsage Font = default;
-
-            [Resolved]
-            private RankingsOverlay? rankingsOverlay { get; set; }
-
-            public UpdateableCountryText()
-            {
-                AutoSizeAxes = Axes.Both;
-            }
-
-            public void load(CountryCode countryCode)
-            {
-                Action = () =>
-                {
-                    rankingsOverlay?.ShowCountry(countryCode);
-                };
-
-                Child = new OsuSpriteText
-                {
-                    Font = Font,
-                    Text = countryCode.GetDescription(),
-                };
             }
         }
     }
