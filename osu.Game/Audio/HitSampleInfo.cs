@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Utils;
 
 namespace osu.Game.Audio
@@ -33,7 +32,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// The bank to load the sample from.
         /// </summary>
-        public readonly string Bank;
+        public readonly string? Bank;
 
         /// <summary>
         /// An optional suffix to provide priority lookup. Falls back to non-suffixed <see cref="Name"/>.
@@ -48,7 +47,7 @@ namespace osu.Game.Audio
         public HitSampleInfo(string name, string? bank = null, string? suffix = null, int volume = 0)
         {
             Name = name;
-            Bank = bank ?? SampleControlPoint.DEFAULT_BANK;
+            Bank = bank;
             Suffix = suffix;
             Volume = volume;
         }
