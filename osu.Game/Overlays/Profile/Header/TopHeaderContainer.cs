@@ -33,6 +33,9 @@ namespace osu.Game.Overlays.Profile.Header
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
+
         private UserCoverBackground cover = null!;
         private SupporterIcon supporterTag = null!;
         private UpdateableAvatar avatar = null!;
@@ -40,6 +43,8 @@ namespace osu.Game.Overlays.Profile.Header
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
+        private OsuHoverContainer userCountryContainer = null!;
+        private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
 
@@ -157,13 +162,20 @@ namespace osu.Game.Overlays.Profile.Header
                                                             Size = new Vector2(28, 20),
                                                             ShowPlaceholderOnUnknown = false,
                                                         },
-                                                        userCountryText = new UpdateableCountryText
+                                                        userCountryContainer = new OsuHoverContainer
                                                         {
-                                                            Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
                                                             Margin = new MarginPadding { Left = 5 },
                                                             Origin = Anchor.CentreLeft,
                                                             Anchor = Anchor.CentreLeft,
-                                                        }
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                userCountryText = new OsuSpriteText
+                                                                {
+                                                                    Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
+                                                                },
+                                                            },
+                                                        },
                                                     }
                                                 },
                                             }
@@ -202,6 +214,8 @@ namespace osu.Game.Overlays.Profile.Header
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
+            userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
+            userCountryContainer.Action = () => rankingsOverlay?.ShowCountry(user?.CountryCode ?? default);
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
