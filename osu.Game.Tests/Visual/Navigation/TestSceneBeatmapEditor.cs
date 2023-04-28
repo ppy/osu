@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using System.Threading.Tasks;
 using DeepEqual.Syntax;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -18,7 +16,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestCancelNavigationToEditor()
         {
-            BeatmapSetInfo[] beatmapSets = Array.Empty<BeatmapSetInfo>();
+            BeatmapSetInfo[]? beatmapSets = null;
 
             AddStep("Timestamp current beatmapsets", () =>
             {
@@ -28,20 +26,26 @@ namespace osu.Game.Tests.Visual.Navigation
                 });
             });
 
-            AddStep("Open editor and close it while loading", () =>
+            AddStep("Set current beatmap to default", () =>
             {
-                var task = Task.Run(async () =>
-                {
-                    await Task.Delay(100);
-                    Game.ScreenStack.CurrentScreen.Exit();
-                });
+                Game.Beatmap.SetDefault();
+            });
 
+            AddStep("Open editor loader", () =>
+            {
                 Game.ScreenStack.Push(new EditorLoader());
+            });
+
+            AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is EditorLoader);
+
+            AddStep("close editor while loading", () =>
+            {
+                Game.ScreenStack.CurrentScreen.Exit();
             });
 
             AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
-            BeatmapSetInfo[] currentSetInfos = Array.Empty<BeatmapSetInfo>();
+            BeatmapSetInfo[]? currentSetInfos = null;
 
             AddStep("Get current beatmaps", () =>
             {
@@ -51,7 +55,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 });
             });
 
-            AddAssert("dummy beatmap didn't appear", () => currentSetInfos.IsDeepEqual(beatmapSets));
+            AddAssert("dummy beatmap didn't appear", () => currentSetInfos.IsDeepEqual(beatmapSets) && currentSetInfos is not null);
         }
     }
 }
