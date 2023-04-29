@@ -11,7 +11,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public partial class TestSceneBeatmapEditor : OsuGameTestScene
+    public partial class TestSceneBeatmapEditorNavigation : OsuGameTestScene
     {
         [Test]
         public void TestCancelNavigationToEditor()
