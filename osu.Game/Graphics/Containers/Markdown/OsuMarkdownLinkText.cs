@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             InternalChildren = new Drawable[]
             {
                 textDrawable,
-                new OsuMarkdownLinkCompiler(new[] { textDrawable })
+                new OsuMarkdownLinkCompiler(new[] { textDrawable }, new Link(Url, 0, 0, LinkAction.OpenWiki, new object()))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
@@ -56,8 +56,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts)
-                : base(parts)
+            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts, Link link)
+                : base(parts, link)
             {
             }
 

@@ -58,6 +58,12 @@ namespace osu.Game.Online.Chat
         {
         }
 
+        public DrawableLinkCompiler(IEnumerable<Drawable> parts, Link link)
+        {
+            Parts = parts.ToList();
+            this.link = link;
+        }
+
         public DrawableLinkCompiler(IEnumerable<Drawable> parts)
         {
             Parts = parts.ToList();
