@@ -204,6 +204,17 @@ namespace osu.Game.Rulesets.Objects
 
             return slidingSamples;
         }
+
+        /// <summary>
+        /// Create a SampleInfo based on the sample settings of the hit normal sample in <see cref="Samples"/>.
+        /// </summary>
+        /// <param name="sampleName">The name of the sample.</param>
+        /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
+        protected HitSampleInfo GetSampleInfo(string sampleName)
+        {
+            var hitnormalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            return hitnormalSample == null ? new HitSampleInfo(sampleName) : hitnormalSample.With(newName: sampleName);
+        }
     }
 
     public static class HitObjectExtensions

@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
 using osu.Framework.Bindables;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -90,7 +92,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong
+                    IsStrong = IsStrong,
+                    Samples = Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToList()
                 });
 
                 first = false;
