@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Configuration;
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         private readonly Bindable<bool> showRipples = new Bindable<bool>(true);
 
+        private readonly DrawablePool<CursorRipple> ripplePool = new DrawablePool<CursorRipple>(20);
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuRulesetConfigManager? rulesetConfig)
         {
@@ -27,27 +30,44 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
             if (showRipples.Value)
-            {
-                var ripple = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorRipple), _ => new DefaultCursorRipple())
-                {
-                    Blending = BlendingParameters.Additive,
-                    Position = e.MousePosition
-                };
-
-                AddInternal(ripple);
-
-                ripple.ScaleTo(0.05f)
-                      .ScaleTo(0.5f, 700, Easing.Out)
-                      .FadeTo(0.2f)
-                      .FadeOut(700)
-                      .Expire();
-            }
+                AddInternal(ripplePool.Get());
 
             return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
+        }
+
+        private partial class CursorRipple : PoolableDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.Both;
+                Origin = Anchor.Centre;
+
+                InternalChildren = new Drawable[]
+                {
+                    new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorRipple), _ => new DefaultCursorRipple())
+                    {
+                        Blending = BlendingParameters.Additive,
+                    }
+                };
+            }
+
+            protected override void PrepareForUse()
+            {
+                base.PrepareForUse();
+
+                ClearTransforms(true);
+
+                this.ScaleTo(0.05f)
+                    .ScaleTo(0.5f, 700, Easing.Out)
+                    .FadeTo(0.2f)
+                    .FadeOut(700)
+                    .Expire();
+            }
         }
 
         public partial class DefaultCursorRipple : CompositeDrawable
