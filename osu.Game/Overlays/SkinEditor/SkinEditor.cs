@@ -235,10 +235,7 @@ namespace osu.Game.Overlays.SkinEditor
             }, true);
             canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
 
-            SelectedComponents.BindCollectionChanged((_, _) =>
-            {
-                canCopy.Value = canCut.Value = SelectedComponents.Any();
-            }, true);
+            SelectedComponents.BindCollectionChanged((_, _) => canCopy.Value = canCut.Value = SelectedComponents.Any(), true);
 
             clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
 
@@ -345,6 +342,7 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.SaveState();
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -479,12 +477,18 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Cut()
         {
+            if (!canCut.Value)
+                return;
+
             Copy();
             DeleteItems(SelectedComponents.ToArray());
         }
 
         protected void Copy()
         {
+            if (!canCopy.Value)
+                return;
+
             clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
         }
 
@@ -500,6 +504,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Paste()
         {
+            if (!canPaste.Value)
+                return;
+
             changeHandler?.BeginChange();
 
             var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);
