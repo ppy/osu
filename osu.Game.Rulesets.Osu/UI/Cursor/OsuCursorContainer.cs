@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Children = new[]
                 {
                     cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorRipples), confineMode: ConfineMode.NoScaling),
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };

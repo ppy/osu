@@ -100,6 +100,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
+                    case OsuSkinComponents.CursorRipple:
+                        // TODO: resize texture to 0.5?? but that might break skins..
+                        if (GetTexture("cursor-ripple") != null)
+                            return this.GetAnimation("cursor-ripple", false, false);
+
                     case OsuSkinComponents.CursorParticles:
                         if (GetTexture("star2") != null)
                             return new LegacyCursorParticles();
