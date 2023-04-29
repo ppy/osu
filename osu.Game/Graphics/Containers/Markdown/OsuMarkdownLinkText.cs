@@ -39,11 +39,12 @@ namespace osu.Game.Graphics.Containers.Markdown
         private void load()
         {
             var textDrawable = CreateSpriteText().With(t => t.Text = text);
+            var linkDetails = MessageFormatter.GetLinkDetails(Url);
 
             InternalChildren = new Drawable[]
             {
                 textDrawable,
-                new OsuMarkdownLinkCompiler(new[] { textDrawable }, new Link(Url, 0, 0, LinkAction.OpenWiki, new object()))
+                new OsuMarkdownLinkCompiler(new[] { textDrawable }, new Link(Url, 0, 0, linkDetails.Action, linkDetails.Argument))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
