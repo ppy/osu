@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -56,20 +57,64 @@ namespace osu.Game.Overlays.SkinEditor
             if (deserializedContent == null)
                 return;
 
-            SerialisedDrawableInfo[] skinnableInfo = deserializedContent.ToArray();
-            Drawable[] targetComponents = firstTarget.Components.OfType<Drawable>().ToArray();
+            SerialisedDrawableInfo[] skinnableInfos = deserializedContent.ToArray();
+            ISerialisableDrawable[] targetComponents = firstTarget.Components.ToArray();
 
-            if (!skinnableInfo.Select(s => s.Type).SequenceEqual(targetComponents.Select(d => d.GetType())))
+            // Store indexes based on type for later lookup
+
+            var skinnableInfoIndexes = new Dictionary<Type, List<int>>();
+            var targetComponentsIndexes = new Dictionary<Type, List<int>>();
+
+            for (int i = 0; i < skinnableInfos.Length; i++)
             {
-                // Perform a naive full reload for now.
-                firstTarget.Reload(skinnableInfo);
+                Type lookup = skinnableInfos[i].Type;
+
+                if (!skinnableInfoIndexes.TryGetValue(lookup, out List<int>? infoIndexes))
+                    skinnableInfoIndexes.Add(lookup, infoIndexes = new List<int>());
+
+                infoIndexes.Add(i);
             }
-            else
-            {
-                int i = 0;
 
-                foreach (var drawable in targetComponents)
-                    drawable.ApplySerialisedInfo(skinnableInfo[i++]);
+            for (int i = 0; i < targetComponents.Length; i++)
+            {
+                Type lookup = targetComponents[i].GetType();
+
+                if (!targetComponentsIndexes.TryGetValue(lookup, out List<int>? componentIndexes))
+                    targetComponentsIndexes.Add(lookup, componentIndexes = new List<int>());
+
+                componentIndexes.Add(i);
+            }
+
+            foreach ((Type lookup, List<int> infoIndexes) in skinnableInfoIndexes)
+            {
+                if (!targetComponentsIndexes.TryGetValue(lookup, out List<int>? componentIndexes))
+                    componentIndexes = new List<int>(0);
+
+                int j = 0;
+
+                for (int i = 0; i < infoIndexes.Count; i++)
+                {
+                    if (i >= componentIndexes.Count)
+                        // Add new component
+                        firstTarget.Add((ISerialisableDrawable)skinnableInfos[infoIndexes[i]].CreateInstance());
+                    else
+                        // Modify existing component
+                        ((Drawable)targetComponents[componentIndexes[j++]]).ApplySerialisedInfo(skinnableInfos[infoIndexes[i]]);
+                }
+
+                // Remove extra components
+                for (; j < componentIndexes.Count; j++)
+                    firstTarget.Remove(targetComponents[componentIndexes[j]], false);
+            }
+
+            foreach ((Type lookup, List<int> componentIndexes) in targetComponentsIndexes)
+            {
+                if (skinnableInfoIndexes.ContainsKey(lookup))
+                    continue;
+
+                // Remove extra components that weren't removed above
+                for (int i = 0; i < componentIndexes.Count; i++)
+                    firstTarget.Remove(targetComponents[componentIndexes[i]], false);
             }
         }
     }
