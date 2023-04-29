@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (GetTexture("cursor-ripple") != null)
                             return this.GetAnimation("cursor-ripple", false, false);
 
+                        return null;
+
                     case OsuSkinComponents.CursorParticles:
                         if (GetTexture("star2") != null)
                             return new LegacyCursorParticles();
