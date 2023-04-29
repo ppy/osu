@@ -73,7 +73,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case "UseSkinSprites":
-                    storyboard.UseSkinSprites = pair.Value == "1";
+                    storyboard.UseSkinSprites = pair.Value.SequenceEqual("1");
                     break;
             }
         }
@@ -410,7 +410,7 @@ namespace osu.Game.Beatmaps.Formats
                 foreach (var v in variables)
                     line = line.ToString().Replace(v.Key, v.Value);
 
-                if (line == origLine)
+                if (line.SequenceEqual(origLine))
                     break;
             }
         }
