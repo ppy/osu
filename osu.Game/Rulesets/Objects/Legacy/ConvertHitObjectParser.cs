@@ -377,11 +377,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // The first control point must have a definite type.
             vertices[0].Type = type;
 
-            return verticesToPoints();
+            return verticesToPoints(type, endPointLength, vertices);
 
-            // Span can't be used in yield generator methods, even if it does not live accross yields
+            // Span can't be used in yield generator methods, even if it does not live across yields
             // Wrap the yield part into a separated method to workaround this
-            IEnumerable<Memory<PathControlPoint>> verticesToPoints()
+            IEnumerable<Memory<PathControlPoint>> verticesToPoints(PathType type, int endPointLength, PathControlPoint[] vertices)
             {
                 // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
                 // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
