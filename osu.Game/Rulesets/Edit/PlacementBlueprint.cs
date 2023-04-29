@@ -76,7 +76,8 @@ namespace osu.Game.Rulesets.Edit
         {
             // Take the hitnormal sample of the last hit object
             var lastHitNormal = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
-            HitObject.Samples.Add(lastHitNormal);
+            if (lastHitNormal != null)
+                HitObject.Samples[0] = lastHitNormal;
 
             placementHandler.BeginPlacement(HitObject);
             if (commitStart)
