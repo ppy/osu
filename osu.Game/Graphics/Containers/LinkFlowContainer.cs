@@ -28,6 +28,8 @@ namespace osu.Game.Graphics.Containers
         [Resolved(CanBeNull = true)]
         private ILinkHandler linkHandler { get; set; }
 
+        private Link currentLink { get; set; }
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -46,6 +48,7 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
+                currentLink = link;
                 AddText(text[previousLinkEnd..link.Index]);
 
                 string displayText = text.Substring(link.Index, link.Length);
@@ -123,7 +126,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart, currentLink);
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
         // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -31,18 +29,29 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public readonly List<Drawable> Parts;
 
+        private Link link { get; set; } = null!;
+
         [Resolved(CanBeNull = true)]
-        private OverlayColourProvider overlayColourProvider { get; set; }
+        private OverlayColourProvider? overlayColourProvider { get; set; }
 
         [Resolved]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         [Resolved]
         private GameHost host { get; set; } = null!;
 
+        [Resolved(CanBeNull = true)]
+        private ILinkHandler linkHandler { get; set; } = null!;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
+
+        public DrawableLinkCompiler(ITextPart part, Link link)
+            : this(part.Drawables.OfType<SpriteText>())
+        {
+            this.link = link;
+        }
 
         public DrawableLinkCompiler(ITextPart part)
             : this(part.Drawables.OfType<SpriteText>())
@@ -67,20 +76,29 @@ namespace osu.Game.Online.Chat
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
-                bool hasTooltip = TooltipText.ToString() != "";
+                string text;
 
-                string text = hasTooltip ? TooltipText.ToString() : GetUrlFromPart(Parts);
-
-                bool isChannelorLobbyLink = text.Contains("osu://chan") || text.Contains("osump://");
-
-                if (!isChannelorLobbyLink)
+                switch (link.Action)
                 {
-                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(text)));
+                    case LinkAction.OpenChannel:
+                    case LinkAction.JoinMultiplayerMatch:
+                        text = "Join";
+                        break;
+
+                    case LinkAction.External:
+                        text = "Visit";
+                        break;
+
+                    default:
+                        text = "Open";
+                        break;
                 }
+
+                items.Add(new OsuMenuItem(text, MenuItemType.Highlighted, () => linkHandler.HandleLink(link.Url)));
 
                 items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
                 {
-                    host.GetClipboard()?.SetText(text);
+                    host.GetClipboard()?.SetText(link.Url);
                     onScreenDisplay?.Display(new CopyUrlToast());
                 }));
 
