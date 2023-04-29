@@ -12,6 +12,14 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public partial class TestSceneBeatmapEditorNavigation : OsuGameTestScene
     {
+        /// <summary>
+        /// When entering the editor, a new beatmap is created as part of the asynchronous load process.
+        /// This test ensures that in the case of an early exit from the editor (ie. while it's still loading)
+        /// doesn't leave a dangling beatmap behind.
+        ///
+        /// This may not fail 100% due to timing, but has a pretty high chance of hitting a failure so works well enough
+        /// as a test.
+        /// </summary>
         [Test]
         public void TestCancelNavigationToEditor()
         {
