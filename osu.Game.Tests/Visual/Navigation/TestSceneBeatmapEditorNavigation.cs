@@ -16,46 +16,26 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestCancelNavigationToEditor()
         {
-            BeatmapSetInfo[]? beatmapSets = null;
+            BeatmapSetInfo[] beatmapSets = null!;
 
-            AddStep("Timestamp current beatmapsets", () =>
+            AddStep("Fetch initial beatmaps", () =>
             {
-                Game.Realm.Run(realm =>
-                {
-                    beatmapSets = realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray();
-                });
+                beatmapSets = Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
             });
 
-            AddStep("Set current beatmap to default", () =>
+            AddStep("Set current beatmap to default", () => Game.Beatmap.SetDefault());
+
+            AddStep("Push editor loader", () => Game.ScreenStack.Push(new EditorLoader()));
+            AddUntilStep("Wait for loader current", () => Game.ScreenStack.CurrentScreen is EditorLoader);
+            AddStep("Close editor while loading", () => Game.ScreenStack.CurrentScreen.Exit());
+
+            AddUntilStep("Wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+
+            AddAssert("Check no new beatmaps were made", () =>
             {
-                Game.Beatmap.SetDefault();
+                var beatmapSetsAfter = Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
+                return beatmapSetsAfter.SequenceEqual(beatmapSets);
             });
-
-            AddStep("Open editor loader", () =>
-            {
-                Game.ScreenStack.Push(new EditorLoader());
-            });
-
-            AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is EditorLoader);
-
-            AddStep("close editor while loading", () =>
-            {
-                Game.ScreenStack.CurrentScreen.Exit();
-            });
-
-            AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is MainMenu);
-
-            BeatmapSetInfo[]? currentSetInfos = null;
-
-            AddStep("Get current beatmaps", () =>
-            {
-                Game.Realm.Run(realm =>
-                {
-                    currentSetInfos = realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray();
-                });
-            });
-
-            AddAssert("dummy beatmap didn't appear", () => currentSetInfos.IsDeepEqual(beatmapSets) && currentSetInfos is not null);
         }
     }
 }
