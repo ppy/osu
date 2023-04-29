@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using DeepEqual.Syntax;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -18,10 +17,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             BeatmapSetInfo[] beatmapSets = null!;
 
-            AddStep("Fetch initial beatmaps", () =>
-            {
-                beatmapSets = Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
-            });
+            AddStep("Fetch initial beatmaps", () => beatmapSets = allBeatmapSets());
 
             AddStep("Set current beatmap to default", () => Game.Beatmap.SetDefault());
 
@@ -30,12 +26,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Close editor while loading", () => Game.ScreenStack.CurrentScreen.Exit());
 
             AddUntilStep("Wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            AddAssert("Check no new beatmaps were made", () => allBeatmapSets().SequenceEqual(beatmapSets));
 
-            AddAssert("Check no new beatmaps were made", () =>
-            {
-                var beatmapSetsAfter = Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
-                return beatmapSetsAfter.SequenceEqual(beatmapSets);
-            });
+            BeatmapSetInfo[] allBeatmapSets() => Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
         }
     }
 }
