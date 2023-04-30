@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestUndo()
+        public void TestUndoEditHistory()
         {
             SkinComponentsContainer firstTarget = null!;
             TestSkinEditorChangeHandler changeHandler = null!;
@@ -205,17 +205,28 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Click(MouseButton.Left);
                 InputManager.Click(MouseButton.Left);
             });
-            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            revertAndCheckUnchanged();
+
+            AddStep("Move components", () =>
+            {
+                changeHandler.BeginChange();
+                testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One);
+                changeHandler.EndChange();
+            });
+            revertAndCheckUnchanged();
 
             AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
             AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
-            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            revertAndCheckUnchanged();
 
             AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
-            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            revertAndCheckUnchanged();
+
+            void revertAndCheckUnchanged()
+            {
+                AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+                AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            }
         }
 
         [TestCase(false)]
