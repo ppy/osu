@@ -61,17 +61,16 @@ namespace osu.Game.Overlays.SkinEditor
             ISerialisableDrawable[] targetComponents = firstTarget.Components.ToArray();
 
             // Store components based on type for later lookup
-            var typedComponents = new Dictionary<Type, Stack<Drawable>>();
+            var typedComponents = new Dictionary<Type, Queue<Drawable>>();
 
-            for (int i = targetComponents.Length - 1; i >= 0; i--)
+            foreach (ISerialisableDrawable component in targetComponents)
             {
-                Drawable component = (Drawable)targetComponents[i];
                 Type lookup = component.GetType();
 
-                if (!typedComponents.TryGetValue(lookup, out Stack<Drawable>? typeComponents))
-                    typedComponents.Add(lookup, typeComponents = new Stack<Drawable>());
+                if (!typedComponents.TryGetValue(lookup, out Queue<Drawable>? typeComponents))
+                    typedComponents.Add(lookup, typeComponents = new Queue<Drawable>());
 
-                typeComponents.Push(component);
+                typeComponents.Enqueue((Drawable)component);
             }
 
             // Remove all components
@@ -82,13 +81,13 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Type lookup = skinnableInfo.Type;
 
-                if (!typedComponents.TryGetValue(lookup, out Stack<Drawable>? typeComponents))
+                if (!typedComponents.TryGetValue(lookup, out Queue<Drawable>? typeComponents))
                 {
                     firstTarget.Add((ISerialisableDrawable)skinnableInfo.CreateInstance());
                     continue;
                 }
 
-                if (typeComponents.TryPop(out Drawable? component))
+                if (typeComponents.TryDequeue(out Drawable? component))
                 {
                     // Re-use unused component
                     component.ApplySerialisedInfo(skinnableInfo);
@@ -102,7 +101,7 @@ namespace osu.Game.Overlays.SkinEditor
                 firstTarget.Add((ISerialisableDrawable)component);
             }
 
-            foreach ((Type _, Stack<Drawable> typeComponents) in typedComponents)
+            foreach ((Type _, Queue<Drawable> typeComponents) in typedComponents)
             {
                 // Dispose extra components
                 foreach (var component in typeComponents)
