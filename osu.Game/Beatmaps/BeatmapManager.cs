@@ -368,7 +368,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
