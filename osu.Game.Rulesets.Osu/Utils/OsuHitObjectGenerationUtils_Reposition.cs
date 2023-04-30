@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static Vector2 clampHitCircleToPlayfield(WorkingObject workingObject)
         {
             var previousPosition = workingObject.PositionModified;
-            workingObject.EndPositionModified = workingObject.PositionModified = clampToPlayfieldWithPadding(
+            workingObject.EndPositionModified = workingObject.PositionModified = ClampToPlayfieldWithPadding(
                 workingObject.PositionModified,
                 (float)workingObject.HitObject.Radius
             );
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                 // The last object is shifted by a vector slightly larger than zero
                 Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
-                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
+                hitObject.Position = ClampToPlayfieldWithPadding(position, (float)hitObject.Radius);
             }
         }
 
@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="position">The position to be clamped.</param>
         /// <param name="padding">The minimum distance allowed from playfield edges.</param>
         /// <returns>The clamped position.</returns>
-        private static Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        public static Vector2 ClampToPlayfieldWithPadding(Vector2 position, float padding)
         {
             return new Vector2(
                 Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
