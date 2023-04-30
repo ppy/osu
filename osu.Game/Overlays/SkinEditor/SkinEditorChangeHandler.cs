@@ -62,18 +62,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             // Store indexes based on type for later lookup
 
-            var skinnableInfoIndexes = new Dictionary<Type, List<int>>();
             var targetComponentsIndexes = new Dictionary<Type, List<int>>();
-
-            for (int i = 0; i < skinnableInfos.Length; i++)
-            {
-                Type lookup = skinnableInfos[i].Type;
-
-                if (!skinnableInfoIndexes.TryGetValue(lookup, out List<int>? infoIndexes))
-                    skinnableInfoIndexes.Add(lookup, infoIndexes = new List<int>());
-
-                infoIndexes.Add(i);
-            }
 
             for (int i = 0; i < targetComponents.Length; i++)
             {
@@ -85,35 +74,34 @@ namespace osu.Game.Overlays.SkinEditor
                 componentIndexes.Add(i);
             }
 
-            foreach ((Type lookup, List<int> infoIndexes) in skinnableInfoIndexes)
+            var indexCounting = new Dictionary<Type, int>();
+
+            var empty = new List<int>(0);
+
+            for (int i = 0; i < skinnableInfos.Length; i++)
             {
+                Type lookup = skinnableInfos[i].Type;
+
                 if (!targetComponentsIndexes.TryGetValue(lookup, out List<int>? componentIndexes))
-                    componentIndexes = new List<int>(0);
+                    componentIndexes = empty;
 
-                int j = 0;
+                if (!indexCounting.ContainsKey(lookup))
+                    indexCounting.Add(lookup, 0);
 
-                for (int i = 0; i < infoIndexes.Count; i++)
-                {
-                    if (i >= componentIndexes.Count)
-                        // Add new component
-                        firstTarget.Add((ISerialisableDrawable)skinnableInfos[infoIndexes[i]].CreateInstance());
-                    else
-                        // Modify existing component
-                        ((Drawable)targetComponents[componentIndexes[j++]]).ApplySerialisedInfo(skinnableInfos[infoIndexes[i]]);
-                }
-
-                // Remove extra components
-                for (; j < componentIndexes.Count; j++)
-                    firstTarget.Remove(targetComponents[componentIndexes[j]], false);
+                if (i >= componentIndexes.Count)
+                    // Add new component
+                    firstTarget.Add((ISerialisableDrawable)skinnableInfos[i].CreateInstance());
+                else
+                    // Modify existing component
+                    ((Drawable)targetComponents[componentIndexes[indexCounting[lookup]++]]).ApplySerialisedInfo(skinnableInfos[i]);
             }
 
             foreach ((Type lookup, List<int> componentIndexes) in targetComponentsIndexes)
             {
-                if (skinnableInfoIndexes.ContainsKey(lookup))
-                    continue;
+                indexCounting.TryGetValue(lookup, out int i);
 
                 // Remove extra components that weren't removed above
-                for (int i = 0; i < componentIndexes.Count; i++)
+                for (; i < componentIndexes.Count; i++)
                     firstTarget.Remove(targetComponents[componentIndexes[i]], false);
             }
         }
