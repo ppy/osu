@@ -60,49 +60,48 @@ namespace osu.Game.Overlays.SkinEditor
             SerialisedDrawableInfo[] skinnableInfos = deserializedContent.ToArray();
             ISerialisableDrawable[] targetComponents = firstTarget.Components.ToArray();
 
-            // Store indexes based on type for later lookup
+            // Store components based on type for later lookup
+            var typedComponents = new Dictionary<Type, List<ISerialisableDrawable>>();
 
-            var targetComponentsIndexes = new Dictionary<Type, List<int>>();
-
-            for (int i = 0; i < targetComponents.Length; i++)
+            foreach (var component in targetComponents)
             {
-                Type lookup = targetComponents[i].GetType();
+                Type lookup = component.GetType();
 
-                if (!targetComponentsIndexes.TryGetValue(lookup, out List<int>? componentIndexes))
-                    targetComponentsIndexes.Add(lookup, componentIndexes = new List<int>());
+                if (!typedComponents.TryGetValue(lookup, out List<ISerialisableDrawable>? typeComponents))
+                    typedComponents.Add(lookup, typeComponents = new List<ISerialisableDrawable>());
 
-                componentIndexes.Add(i);
+                typeComponents.Add(component);
             }
 
-            var indexCounting = new Dictionary<Type, int>();
+            // Remove all components
+            for (int i = targetComponents.Length - 1; i >= 0; i--)
+                firstTarget.Remove(targetComponents[i], false);
 
-            var empty = new List<int>(0);
+            // Keeps count of how many components for each type were already revived
+            Dictionary<Type, int> typedComponentCounter = typedComponents.Keys.ToDictionary(t => t, _ => 0);
 
-            for (int i = 0; i < skinnableInfos.Length; i++)
+            foreach (var skinnableInfo in skinnableInfos)
             {
-                Type lookup = skinnableInfos[i].Type;
+                Type lookup = skinnableInfo.Type;
 
-                if (!targetComponentsIndexes.TryGetValue(lookup, out List<int>? componentIndexes))
-                    componentIndexes = empty;
+                if (!typedComponents.TryGetValue(lookup, out List<ISerialisableDrawable>? typeComponents))
+                {
+                    firstTarget.Add((ISerialisableDrawable)skinnableInfo.CreateInstance());
+                    continue;
+                }
 
-                if (!indexCounting.ContainsKey(lookup))
-                    indexCounting.Add(lookup, 0);
+                int typeComponentsUsed = typedComponentCounter[lookup]++;
 
-                if (i >= componentIndexes.Count)
-                    // Add new component
-                    firstTarget.Add((ISerialisableDrawable)skinnableInfos[i].CreateInstance());
+                ISerialisableDrawable component;
+
+                if (typeComponentsUsed < typeComponents.Count)
+                    // Re-use unused component
+                    ((Drawable)(component = typeComponents[typeComponentsUsed])).ApplySerialisedInfo(skinnableInfo);
                 else
-                    // Modify existing component
-                    ((Drawable)targetComponents[componentIndexes[indexCounting[lookup]++]]).ApplySerialisedInfo(skinnableInfos[i]);
-            }
+                    // Create new one
+                    component = (ISerialisableDrawable)skinnableInfo.CreateInstance();
 
-            foreach ((Type lookup, List<int> componentIndexes) in targetComponentsIndexes)
-            {
-                indexCounting.TryGetValue(lookup, out int i);
-
-                // Remove extra components that weren't removed above
-                for (; i < componentIndexes.Count; i++)
-                    firstTarget.Remove(targetComponents[componentIndexes[i]], false);
+                firstTarget.Add(component);
             }
         }
     }
