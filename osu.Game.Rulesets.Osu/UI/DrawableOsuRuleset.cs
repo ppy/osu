@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
-        protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
+        protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay(Playfield);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 

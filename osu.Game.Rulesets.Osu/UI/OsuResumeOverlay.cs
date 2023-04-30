@@ -28,8 +28,14 @@ namespace osu.Game.Rulesets.Osu.UI
         private IBindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
+        private OsuPlayfield playfield;
 
         protected override LocalisableString Message => "Click the orange cursor to resume";
+
+        public OsuResumeOverlay(OsuPlayfield playfield)
+        {
+            this.playfield = playfield;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -50,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (localCursorContainer == null)
             {
-                Add(localCursorContainer = new OsuCursorContainer());
+                Add(localCursorContainer = new OsuCursorContainer(playfield, Array.Empty<Rulesets.Mods.Mod>()));
 
                 localCursorScale = new BindableFloat();
                 localCursorScale.BindTo(localCursorContainer.CursorScale);

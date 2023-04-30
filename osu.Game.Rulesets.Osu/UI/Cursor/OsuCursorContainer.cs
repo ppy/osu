@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
@@ -39,8 +41,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
+        private Mod[] mods;
 
-        public OsuCursorContainer()
+        public OsuCursorContainer(Playfield playfield, Mod[] mods) : base(playfield)
         {
             InternalChild = fadeContainer = new Container
             {
@@ -51,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
+            this.mods = mods;
         }
 
         [Resolved(canBeNull: true)]
@@ -85,7 +89,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 cursorTrail.Scale = newScale;
             }, true);
 
+            if (mods.OfType<IHidesCursorTrail>().Any())
+            {
+                cursorTrail.Hide();
+            }
+
             calculateScale();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
         }
 
         /// <summary>

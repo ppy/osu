@@ -5,6 +5,8 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osuTK;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -17,11 +19,24 @@ namespace osu.Game.Rulesets.UI
         /// This holds the true visibility value.
         /// </summary>
         public Visibility LastFrameState;
+        public Vector2 TargetPosition = Vector2.Zero;
+        public Playfield Playfield;
+
+        public GameplayCursorContainer(Playfield playfield)
+        {
+            Playfield = playfield;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            TargetPosition = e.MousePosition;
+            return true;
+        }
 
         protected override void Update()
         {
             base.Update();
-            LastFrameState = State.Value;
+            Position = Playfield.CalculateCursorPosition(TargetPosition);
         }
     }
 }
