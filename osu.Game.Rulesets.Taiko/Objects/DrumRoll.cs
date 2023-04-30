@@ -38,7 +38,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double Velocity { get; private set; }
 
-        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1);
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
 
         public double SliderVelocity
         {
