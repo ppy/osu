@@ -476,16 +476,16 @@ namespace osu.Game.Beatmaps.Formats
 
             if (curveData != null)
             {
-                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                for (int i = 0; i < curveData.SpanCount() + 1; i++)
                 {
-                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
-                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                    writer.Write(FormattableString.Invariant($"{(i < curveData.NodeSamples.Count ? (int)toLegacyHitSoundType(curveData.NodeSamples[i]) : 0)}"));
+                    writer.Write(i != curveData.SpanCount() ? "|" : ",");
                 }
 
-                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                for (int i = 0; i < curveData.SpanCount() + 1; i++)
                 {
-                    writer.Write(getSampleBank(curveData.NodeSamples[i], true));
-                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                    writer.Write(i < curveData.NodeSamples.Count ? getSampleBank(curveData.NodeSamples[i], true) : "0:0");
+                    writer.Write(i != curveData.SpanCount() ? "|" : ",");
                 }
             }
         }
