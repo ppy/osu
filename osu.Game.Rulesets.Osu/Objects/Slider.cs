@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => SliderVelocityBindable.Value = value;
         }
 
-        public bool GenerateTicks { get; set; }
+        public bool GenerateTicks { get; set; } = true;
 
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
