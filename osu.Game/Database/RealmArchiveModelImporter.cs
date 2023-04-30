@@ -163,7 +163,11 @@ namespace osu.Game.Database
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
-                    notification.CompletionText += " Click to view.";
+                    if (HumanisedModelName == "skin")
+                        notification.CompletionText += " Click to apply.";
+                    else
+                        notification.CompletionText += " Click to view.";
+
                     notification.CompletionClickAction = () =>
                     {
                         PresentImport?.Invoke(imported);
