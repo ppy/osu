@@ -73,9 +73,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 ClearTransforms(true);
 
                 this.ScaleTo(0.05f)
-                    .ScaleTo(0.5f, 700, Easing.Out)
-                    .FadeTo(0.2f)
-                    .FadeOut(700)
+                    .ScaleTo(1, 700, Easing.Out)
+                    .FadeOutFromOne(700)
                     .Expire(true);
             }
         }
@@ -91,7 +90,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     new RingPiece(3)
                     {
-                        Size = new Vector2(512),
+                        Size = new Vector2(256),
+                        Alpha = 0.2f,
                     }
                 };
             }
