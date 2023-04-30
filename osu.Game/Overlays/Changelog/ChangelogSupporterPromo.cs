@@ -162,17 +162,19 @@ namespace osu.Game.Overlays.Changelog
 
         private partial class SupporterPromoLinkFlowContainer : LinkFlowContainer
         {
+            private readonly LinkDetails linkDetails = MessageFormatter.GetLinkDetails(@"https://osu.ppy.sh/home/support");
+
             public SupporterPromoLinkFlowContainer(Action<SpriteText> defaultCreationParameters)
                 : base(defaultCreationParameters)
             {
             }
 
-            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new SupporterPromoLinkCompiler(textPart);
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new SupporterPromoLinkCompiler(textPart, new Link(@"https://osu.ppy.sh/home/support", 0, 0, linkDetails.Action, linkDetails.Argument));
 
             private partial class SupporterPromoLinkCompiler : DrawableLinkCompiler
             {
-                public SupporterPromoLinkCompiler(ITextPart part)
-                    : base(part)
+                public SupporterPromoLinkCompiler(ITextPart part, Link link)
+                    : base(part, link)
                 {
                 }
 

@@ -29,9 +29,9 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public readonly List<Drawable> Parts;
 
-        private Link link { get; set; } = null!;
+        private Link? link { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private OverlayColourProvider? overlayColourProvider { get; set; }
 
         [Resolved]
@@ -40,8 +40,8 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
-        private ILinkHandler linkHandler { get; set; } = null!;
+        [Resolved]
+        private ILinkHandler? linkHandler { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
@@ -82,31 +82,35 @@ namespace osu.Game.Online.Chat
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
-                string text;
 
-                switch (link.Action)
+                if (link is not null)
                 {
-                    case LinkAction.OpenChannel:
-                    case LinkAction.JoinMultiplayerMatch:
-                        text = "Join";
-                        break;
+                    string text;
 
-                    case LinkAction.External:
-                        text = "Visit";
-                        break;
+                    switch (link.Action)
+                    {
+                        case LinkAction.OpenChannel:
+                        case LinkAction.JoinMultiplayerMatch:
+                            text = "Join";
+                            break;
 
-                    default:
-                        text = "Open";
-                        break;
+                        case LinkAction.External:
+                            text = "Visit";
+                            break;
+
+                        default:
+                            text = "Open";
+                            break;
+                    }
+
+                    items.Add(new OsuMenuItem(text, MenuItemType.Highlighted, () => linkHandler?.HandleLink(link.Url)));
+
+                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
+                    {
+                        host.GetClipboard()?.SetText(link.Url);
+                        onScreenDisplay?.Display(new CopyUrlToast());
+                    }));
                 }
-
-                items.Add(new OsuMenuItem(text, MenuItemType.Highlighted, () => linkHandler.HandleLink(link.Url)));
-
-                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
-                {
-                    host.GetClipboard()?.SetText(link.Url);
-                    onScreenDisplay?.Display(new CopyUrlToast());
-                }));
 
                 return items.ToArray();
             }
@@ -123,14 +127,6 @@ namespace osu.Game.Online.Chat
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
-        }
-
-        public string GetUrlFromPart(List<Drawable> part)
-        {
-            string url = part[0].ToString();
-            int startIndex = url.IndexOf('"') + 1;
-            int endIndex = url.LastIndexOf('"');
-            return url.Substring(startIndex, endIndex - startIndex);
         }
     }
 }
