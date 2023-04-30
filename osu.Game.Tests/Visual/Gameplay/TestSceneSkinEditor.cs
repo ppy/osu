@@ -100,10 +100,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddStep("Drag to bottom right",
-                () => { InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4)); });
+            AddStep("Drag to bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4));
+            });
 
-            AddStep("Release button", () => { InputManager.ReleaseButton(MouseButton.Left); });
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
 
             AddAssert("First two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box1, box2 }));
 
@@ -113,9 +118,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddStep("Drag to top left", () => { InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4)); });
+            AddStep("Drag to top left", () =>
+            {
+                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+            });
 
-            AddStep("Release button", () => { InputManager.ReleaseButton(MouseButton.Left); });
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
 
             AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
 
@@ -139,7 +150,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
 
-            AddStep("Store black box blueprints", () => { blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray(); });
+            AddStep("Store black box blueprints", () =>
+            {
+                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
+            });
 
             AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
 
@@ -184,7 +198,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
                 changeHandler = new TestSkinEditorChangeHandler(firstTarget);
 
-                changeHandler.SaveState();
                 defaultState = changeHandler.GetCurrentState();
 
                 testComponents = new[]
@@ -225,7 +238,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             void revertAndCheckUnchanged()
             {
                 AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-                AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
             }
         }
 
