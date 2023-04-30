@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             // adding the default hit sample should be the case regardless of the ruleset.
-            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, volume: 100));
 
             RelativeSizeAxes = Axes.Both;
 
