@@ -244,11 +244,11 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(val =>
             {
-                modSettingChangeTracker?.Dispose();
-
                 updateMultiplier();
                 updateFromExternalSelection();
                 updateCustomisation();
+
+                modSettingChangeTracker?.Dispose();
 
                 if (AllowCustomisation)
                 {
