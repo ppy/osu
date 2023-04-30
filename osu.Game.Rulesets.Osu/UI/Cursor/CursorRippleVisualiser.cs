@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly DrawablePool<CursorRipple> ripplePool = new DrawablePool<CursorRipple>(20);
 
+        public CursorRippleVisualiser()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuRulesetConfigManager? rulesetConfig)
         {
@@ -30,7 +35,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
             if (showRipples.Value)
-                AddInternal(ripplePool.Get());
+            {
+                AddInternal(ripplePool.Get(r =>
+                {
+                    r.Position = e.MousePosition;
+                }));
+            }
 
             return false;
         }
@@ -66,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     .ScaleTo(0.5f, 700, Easing.Out)
                     .FadeTo(0.2f)
                     .FadeOut(700)
-                    .Expire();
+                    .Expire(true);
             }
         }
 
@@ -75,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             [BackgroundDependencyLoader]
             private void load()
             {
+                AutoSizeAxes = Axes.Both;
+
                 InternalChildren = new Drawable[]
                 {
                     new RingPiece(3)
