@@ -183,15 +183,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
                 changeHandler = new TestSkinEditorChangeHandler(firstTarget);
+
                 changeHandler.SaveState();
                 defaultState = changeHandler.GetCurrentState();
-                testComponents = new[] { targetContainer.Components.First(), targetContainer.Components[targetContainer.Components.Count / 2], targetContainer.Components.Last() };
+
+                testComponents = new[]
+                {
+                    targetContainer.Components.First(),
+                    targetContainer.Components[targetContainer.Components.Count / 2],
+                    targetContainer.Components.Last()
+                };
             });
 
             AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
             AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
 
-            AddStep("Add big black boxes", () =>
+            AddStep("Add components", () =>
             {
                 InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
                 InputManager.Click(MouseButton.Left);
@@ -203,12 +210,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
             AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
-
             AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
             AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
 
             AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
-
             AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
             AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
         }
