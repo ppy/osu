@@ -210,7 +210,10 @@ namespace osu.Game.Screens.Edit
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
                 // the editor has already been exited.
                 if (!ValidForPush)
+                {
+                    beatmapManager.Delete(loadableBeatmap.BeatmapSetInfo);
                     return;
+                }
             }
 
             try

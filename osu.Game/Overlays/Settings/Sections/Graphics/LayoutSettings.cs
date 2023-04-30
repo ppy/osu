@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 return;
             }
 
-            if (host.Window is WindowsWindow)
+            if (host.Renderer is IWindowsRenderer)
             {
                 switch (fullscreenCapability.Value)
                 {
