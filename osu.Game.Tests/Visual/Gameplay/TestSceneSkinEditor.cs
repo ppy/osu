@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -97,15 +100,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddStep("Drag to bottom right", () =>
-            {
-                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4));
-            });
+            AddStep("Drag to bottom right",
+                () => { InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4)); });
 
-            AddStep("Release button", () =>
-            {
-                InputManager.ReleaseButton(MouseButton.Left);
-            });
+            AddStep("Release button", () => { InputManager.ReleaseButton(MouseButton.Left); });
 
             AddAssert("First two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box1, box2 }));
 
@@ -115,15 +113,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddStep("Drag to top left", () =>
-            {
-                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
-            });
+            AddStep("Drag to top left", () => { InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4)); });
 
-            AddStep("Release button", () =>
-            {
-                InputManager.ReleaseButton(MouseButton.Left);
-            });
+            AddStep("Release button", () => { InputManager.ReleaseButton(MouseButton.Left); });
 
             AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
 
@@ -147,10 +139,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
 
-            AddStep("Store black box blueprints", () =>
-            {
-                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
-            });
+            AddStep("Store black box blueprints", () => { blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray(); });
 
             AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
 
@@ -180,6 +169,48 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
             AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void TestUndo()
+        {
+            SkinComponentsContainer firstTarget = null!;
+            TestSkinEditorChangeHandler changeHandler = null!;
+            byte[] defaultState = null!;
+            IEnumerable<ISerialisableDrawable> testComponents = null!;
+
+            AddStep("Load necessary things", () =>
+            {
+                firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                changeHandler = new TestSkinEditorChangeHandler(firstTarget);
+                changeHandler.SaveState();
+                defaultState = changeHandler.GetCurrentState();
+                testComponents = new[] { targetContainer.Components.First(), targetContainer.Components[targetContainer.Components.Count / 2], targetContainer.Components.Last() };
+            });
+
+            AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Add big black boxes", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
+            AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
+
+            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
+
+            AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
         }
 
         [TestCase(false)]
@@ -269,5 +300,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
+        private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
+        {
+            public TestSkinEditorChangeHandler(Drawable targetScreen)
+                : base(targetScreen)
+            {
+            }
+
+            public byte[] GetCurrentState()
+            {
+                using var stream = new MemoryStream();
+
+                WriteCurrentStateToStream(stream);
+                byte[] newState = stream.ToArray();
+
+                return newState;
+            }
+        }
     }
 }
