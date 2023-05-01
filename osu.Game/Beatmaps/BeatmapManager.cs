@@ -415,6 +415,13 @@ namespace osu.Game.Beatmaps
             // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
             beatmapContent.BeatmapInfo = beatmapInfo;
 
+            // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
+            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
+            // which influences the beatmap checksums.
+            beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
+            beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+            beatmapInfo.ResetOnlineInfo();
+
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -437,10 +444,6 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
-
-                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-                beatmapInfo.ResetOnlineInfo();
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
