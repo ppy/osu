@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -173,9 +172,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleControlPoints(TextWriter writer)
         {
-            if (beatmap.ControlPointInfo.Groups.Count == 0)
-                return;
-
             var legacyControlPoints = new LegacyControlPointInfo();
             foreach (var point in beatmap.ControlPointInfo.AllControlPoints)
                 legacyControlPoints.Add(point.Time, point.DeepClone());
@@ -198,6 +194,8 @@ namespace osu.Game.Beatmaps.Formats
                 foreach (var point in legacyControlPoints.EffectPoints)
                     legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
             }
+
+            int lastCustomSampleIndex = 0;
 
             foreach (var group in legacyControlPoints.Groups)
             {
@@ -227,6 +225,12 @@ namespace osu.Game.Beatmaps.Formats
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
 
+                // Inherit the previous sample bank if the current sample bank is not set
+                int customSampleBank = toLegacyCustomSampleBank(tempHitSample);
+                if (customSampleBank < 0)
+                    customSampleBank = lastCustomSampleIndex;
+                lastCustomSampleIndex = customSampleBank;
+
                 // Convert effect flags to the legacy format
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
                 if (effectPoint.KiaiMode)
@@ -236,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 writer.Write(FormattableString.Invariant($"{timingPoint.TimeSignature.Numerator},"));
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
-                writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
+                writer.Write(FormattableString.Invariant($"{customSampleBank},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
                 writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
@@ -276,7 +280,8 @@ namespace osu.Game.Beatmaps.Formats
                         int volume = hitObject.Samples.Max(o => o.Volume);
                         int customIndex = hitObject.Samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
                             ? hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                            : 0;
+                            : -1;
+
                         yield return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = hitObject.GetEndTime(), SampleVolume = volume, CustomSampleBank = customIndex };
                     }
 
@@ -516,7 +521,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (!banksOnly)
             {
-                string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
+                int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
@@ -524,7 +529,7 @@ namespace osu.Game.Beatmaps.Formats
                 // because they cause unexpected results in the editor and are already satisfied by the control points.
                 if (onlineRulesetID != 3)
                 {
-                    customSampleBank = "0";
+                    customSampleBank = 0;
                     volume = 0;
                 }
 
@@ -580,12 +585,12 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
+        private int toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
         {
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
-                return legacy.CustomSampleBank.ToString(CultureInfo.InvariantCulture);
+                return legacy.CustomSampleBank;
 
-            return "0";
+            return 0;
         }
     }
 }
