@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                AddNested(new Banana
+                AddNested(new Banana(GetSampleInfo().Volume)
                 {
                     StartTime = time,
                     BananaIndex = i,

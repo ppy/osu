@@ -22,11 +22,9 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public override Judgement CreateJudgement() => new CatchBananaJudgement();
 
-        private static readonly List<HitSampleInfo> samples = new List<HitSampleInfo> { new BananaHitSampleInfo() };
-
-        public Banana()
+        public Banana(int volume = 100)
         {
-            Samples = samples;
+            Samples = new List<HitSampleInfo> { new BananaHitSampleInfo(volume) };
         }
 
         // override any external colour changes with banananana
@@ -53,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             public override IEnumerable<string> LookupNames => lookup_names;
 
-            public BananaHitSampleInfo(int volume = 0)
+            public BananaHitSampleInfo(int volume = 100)
                 : base(string.Empty, volume: volume)
             {
             }
