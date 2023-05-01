@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -90,8 +91,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     new RingPiece(3)
                     {
-                        Size = new Vector2(256),
-                        Alpha = 0.2f,
+                        Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2),
+                        Alpha = 0.1f,
                     }
                 };
             }
