@@ -520,6 +520,14 @@ namespace osu.Game.Beatmaps.Formats
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
+                // We want to ignore custom sample banks and volume when not encoding to the mania game mode,
+                // because they cause unexpected results in the editor and are already satisfied by the control points.
+                if (onlineRulesetID != 3)
+                {
+                    customSampleBank = "0";
+                    volume = 0;
+                }
+
                 sb.Append(':');
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
