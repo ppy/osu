@@ -2,20 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using System.Net;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Game.Database;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     public partial class TestSceneLocallyModifyingOnlineBeatmaps : EditorSavingTestScene
     {
-        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
-
         public override void SetUpSteps()
         {
             CreateInitialBeatmap = () =>
@@ -33,20 +28,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("editor beatmap has online ID", () => EditorBeatmap.BeatmapInfo.OnlineID, () => Is.GreaterThan(0));
 
             AddStep("delete first hitobject", () => EditorBeatmap.RemoveAt(0));
-
-            AddStep("mock online lookup failure", () =>
-            {
-                dummyAPI.HandleRequest = req =>
-                {
-                    if (req is GetBeatmapRequest)
-                    {
-                        req.TriggerFailure(new APIException("Beatmap not found", new WebException("NotFound")));
-                        return true;
-                    }
-
-                    return false;
-                };
-            });
             SaveEditor();
 
             ReloadEditorToSameBeatmap();
