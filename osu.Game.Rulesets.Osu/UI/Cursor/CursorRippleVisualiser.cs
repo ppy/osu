@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 ClearTransforms(true);
 
-                this.ScaleTo(0.05f)
+                this.ScaleTo(0.1f)
                     .ScaleTo(1, 700, Easing.Out)
                     .FadeOutFromOne(700)
                     .Expire(true);
