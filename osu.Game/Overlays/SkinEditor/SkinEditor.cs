@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -74,6 +75,9 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
+
+        private readonly List<Action> onComponentsLoadActions = new List<Action>();
+        private ScheduledDelegate? componentsLoadingDelegate;
 
         private bool hasBegunMutating;
 
@@ -346,7 +350,11 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            content.Child = new SkinBlueprintContainer(skinComponentsContainer);
+            waitForComponentsLoad(() => changeHandler?.SaveState());
+
+            var blueprintContainer = new SkinBlueprintContainer(skinComponentsContainer);
+            blueprintContainer.OnComponentsChanged += () => changeHandler?.SaveState();
+            content.Child = blueprintContainer;
 
             componentsSidebar.Children = new[]
             {
@@ -466,6 +474,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void revert()
         {
+            changeHandler?.BeginChange();
+
             SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
@@ -475,6 +485,31 @@ namespace osu.Game.Overlays.SkinEditor
                 // add back default components
                 getTarget(t.Lookup)?.Reload();
             }
+
+            waitForComponentsLoad(() => changeHandler?.EndChange(), 1);
+        }
+
+        private void waitForComponentsLoad(Action onLoaded, int actionPriority = int.MaxValue)
+        {
+            onComponentsLoadActions.Insert(Math.Clamp(actionPriority, 0, onComponentsLoadActions.Count), onLoaded);
+
+            if (componentsLoadingDelegate != null)
+                return;
+
+            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            Scheduler.Add(componentsLoadingDelegate = new ScheduledDelegate(() =>
+            {
+                if (!targetContainers.All(t => t.ComponentsLoaded))
+                    return;
+
+                componentsLoadingDelegate?.Cancel();
+                componentsLoadingDelegate = null;
+
+                foreach (var action in onComponentsLoadActions)
+                    action.Invoke();
+
+                onComponentsLoadActions.Clear();
+            }, Time.Current, 50));
         }
 
         protected void Cut()

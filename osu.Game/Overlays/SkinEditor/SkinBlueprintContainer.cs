@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -22,6 +23,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private readonly List<BindableList<ISerialisableDrawable>> targetComponents = new List<BindableList<ISerialisableDrawable>>();
 
+        public event Action? OnComponentsChanged;
+
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
@@ -39,7 +42,7 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedItems.BindTo(editor.SelectedComponents);
 
             var bindableList = new BindableList<ISerialisableDrawable> { BindTarget = targetContainer.Components };
-            bindableList.BindCollectionChanged(componentsChanged, true);
+            bindableList.BindCollectionChanged(componentsChanged, bindableList.Count != 0);
 
             targetComponents.Add(bindableList);
         }
@@ -74,6 +77,8 @@ namespace osu.Game.Overlays.SkinEditor
                         AddBlueprintFor(item);
                     break;
             }
+
+            OnComponentsChanged?.Invoke();
         });
 
         protected override void AddBlueprintFor(ISerialisableDrawable item)
@@ -138,6 +143,8 @@ namespace osu.Game.Overlays.SkinEditor
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            OnComponentsChanged = null;
 
             foreach (var list in targetComponents)
                 list.UnbindAll();

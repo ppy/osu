@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Screens.Edit;
@@ -19,9 +18,6 @@ namespace osu.Game.Overlays.SkinEditor
     {
         private readonly ISerialisableDrawableContainer? firstTarget;
 
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        private readonly BindableList<ISerialisableDrawable>? components;
-
         public SkinEditorChangeHandler(Drawable targetScreen)
         {
             // To keep things simple, we are currently only handling the current target screen for undo / redo.
@@ -29,12 +25,6 @@ namespace osu.Game.Overlays.SkinEditor
             // We'll also need to consider cases where multiple targets are on screen at the same time.
 
             firstTarget = targetScreen.ChildrenOfType<ISerialisableDrawableContainer>().FirstOrDefault();
-
-            if (firstTarget == null)
-                return;
-
-            components = new BindableList<ISerialisableDrawable> { BindTarget = firstTarget.Components };
-            components.BindCollectionChanged((_, _) => SaveState());
         }
 
         protected override void WriteCurrentStateToStream(MemoryStream stream)
