@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -170,6 +171,24 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
 
+        private struct LegacyControlPointProperties
+        {
+            internal double SliderVelocity { get; set; }
+            internal int TimingSignature { get; init; }
+            internal int SampleBank { get; init; }
+            internal int CustomSampleBank { get; init; }
+            internal int SampleVolume { get; init; }
+            internal LegacyEffectFlags EffectFlags { get; init; }
+
+            internal bool IsRedundant(LegacyControlPointProperties other) =>
+                SliderVelocity == other.SliderVelocity &&
+                TimingSignature == other.TimingSignature &&
+                SampleBank == other.SampleBank &&
+                CustomSampleBank == other.CustomSampleBank &&
+                SampleVolume == other.SampleVolume &&
+                EffectFlags == other.EffectFlags;
+        }
+
         private void handleControlPoints(TextWriter writer)
         {
             var legacyControlPoints = new LegacyControlPointInfo();
@@ -195,41 +214,44 @@ namespace osu.Game.Beatmaps.Formats
                     legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
             }
 
-            int lastCustomSampleIndex = 0;
+            LegacyControlPointProperties lastControlPointProperties = new LegacyControlPointProperties();
 
             foreach (var group in legacyControlPoints.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+                var controlPointProperties = getLegacyControlPointProperties(group, groupTimingPoint != null);
 
                 // If the group contains a timing control point, it needs to be output separately.
                 if (groupTimingPoint != null)
                 {
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
-                    outputControlPointAt(groupTimingPoint.Time, true);
+                    outputControlPointAt(controlPointProperties, true);
+                    lastControlPointProperties = controlPointProperties;
+                    lastControlPointProperties.SliderVelocity = 1;
                 }
 
+                if (controlPointProperties.IsRedundant(lastControlPointProperties))
+                    continue;
+
                 // Output any remaining effects as secondary non-timing control point.
-                var difficultyPoint = legacyControlPoints.DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
-                writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SliderVelocity},"));
-                outputControlPointAt(group.Time, false);
+                writer.Write(FormattableString.Invariant($"{-100 / controlPointProperties.SliderVelocity},"));
+                outputControlPointAt(controlPointProperties, false);
+                lastControlPointProperties = controlPointProperties;
             }
 
-            void outputControlPointAt(double time, bool isTimingPoint)
+            LegacyControlPointProperties getLegacyControlPointProperties(ControlPointGroup group, bool updateSampleBank)
             {
+                double time = group.Time;
+                var timingPoint = legacyControlPoints.TimingPointAt(time);
+                var difficultyPoint = legacyControlPoints.DifficultyPointAt(time);
                 var samplePoint = legacyControlPoints.SamplePointAt(time);
                 var effectPoint = legacyControlPoints.EffectPointAt(time);
-                var timingPoint = legacyControlPoints.TimingPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
-
-                // Inherit the previous sample bank if the current sample bank is not set
                 int customSampleBank = toLegacyCustomSampleBank(tempHitSample);
-                if (customSampleBank < 0)
-                    customSampleBank = lastCustomSampleIndex;
-                lastCustomSampleIndex = customSampleBank;
 
                 // Convert effect flags to the legacy format
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
@@ -238,12 +260,26 @@ namespace osu.Game.Beatmaps.Formats
                 if (timingPoint.OmitFirstBarLine)
                     effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
 
-                writer.Write(FormattableString.Invariant($"{timingPoint.TimeSignature.Numerator},"));
-                writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
-                writer.Write(FormattableString.Invariant($"{customSampleBank},"));
-                writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
-                writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
-                writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
+                return new LegacyControlPointProperties
+                {
+                    SliderVelocity = difficultyPoint.SliderVelocity,
+                    TimingSignature = timingPoint.TimeSignature.Numerator,
+                    SampleBank = updateSampleBank ? (int)toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
+                    // Inherit the previous custom sample bank if the current custom sample bank is not set
+                    CustomSampleBank = customSampleBank >= 0 ? customSampleBank : lastControlPointProperties.CustomSampleBank,
+                    SampleVolume = tempHitSample.Volume,
+                    EffectFlags = effectFlags
+                };
+            }
+
+            void outputControlPointAt(LegacyControlPointProperties controlPoint, bool isTimingPoint)
+            {
+                writer.Write(FormattableString.Invariant($"{controlPoint.TimingSignature.ToString(CultureInfo.InvariantCulture)},"));
+                writer.Write(FormattableString.Invariant($"{controlPoint.SampleBank.ToString(CultureInfo.InvariantCulture)},"));
+                writer.Write(FormattableString.Invariant($"{controlPoint.CustomSampleBank.ToString(CultureInfo.InvariantCulture)},"));
+                writer.Write(FormattableString.Invariant($"{controlPoint.SampleVolume.ToString(CultureInfo.InvariantCulture)},"));
+                writer.Write(FormattableString.Invariant($"{(isTimingPoint ? "1" : "0")},"));
+                writer.Write(FormattableString.Invariant($"{((int)controlPoint.EffectFlags).ToString(CultureInfo.InvariantCulture)}"));
                 writer.WriteLine();
             }
 
