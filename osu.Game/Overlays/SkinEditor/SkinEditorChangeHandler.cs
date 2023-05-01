@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
 
             components = new BindableList<ISerialisableDrawable> { BindTarget = firstTarget.Components };
-            components.BindCollectionChanged((_, _) => SaveState(), true);
+            components.BindCollectionChanged((_, _) => SaveState());
         }
 
         protected override void WriteCurrentStateToStream(MemoryStream stream)

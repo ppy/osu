@@ -198,6 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
                 changeHandler = new TestSkinEditorChangeHandler(firstTarget);
 
+                changeHandler.SaveState();
                 defaultState = changeHandler.GetCurrentState();
 
                 testComponents = new[]
