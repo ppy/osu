@@ -440,6 +440,7 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
                 beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                beatmapInfo.ResetOnlineInfo();
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
