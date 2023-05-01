@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowHitMarkers => new TranslatableString(getKey(@"show_hit_markers"), @"Show hit markers");
 
         /// <summary>
+        /// "Automatically seek after placing objects"
+        /// </summary>
+        public static LocalisableString AutoSeekOnPlacement => new TranslatableString(getKey(@"auto_seek_on_placement"), @"Automatically seek after placing objects");
+
+        /// <summary>
         /// "Timing"
         /// </summary>
         public static LocalisableString Timing => new TranslatableString(getKey(@"timing"), @"Timing");
@@ -93,6 +98,16 @@ namespace osu.Game.Localisation
         /// "Ticks"
         /// </summary>
         public static LocalisableString TimelineTicks => new TranslatableString(getKey(@"timeline_ticks"), @"Ticks");
+
+        /// <summary>
+        /// "{0:0}&#176;"
+        /// </summary>
+        public static LocalisableString RotationUnsnapped(float newRotation) => new TranslatableString(getKey(@"rotation_unsnapped"), @"{0:0}°", newRotation);
+
+        /// <summary>
+        /// "{0:0}&#176; (snapped)"
+        /// </summary>
+        public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

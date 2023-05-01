@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -43,8 +44,6 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
-
-        public const float CONTENT_X_MARGIN = 50;
 
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
@@ -100,17 +99,22 @@ namespace osu.Game.Overlays
                 Origin = Anchor.TopCentre,
             };
 
-            Add(sectionsContainer = new ProfileSectionsContainer
+            Add(new OsuContextMenuContainer
             {
-                ExpandableHeader = Header,
-                FixedHeader = tabs,
-                HeaderBackground = new Box
+                RelativeSizeAxes = Axes.Both,
+                Child = sectionsContainer = new ProfileSectionsContainer
                 {
-                    // this is only visible as the ProfileTabControl background
-                    Colour = ColourProvider.Background5,
-                    RelativeSizeAxes = Axes.Both
-                },
+                    ExpandableHeader = Header,
+                    FixedHeader = tabs,
+                    HeaderBackground = new Box
+                    {
+                        // this is only visible as the ProfileTabControl background
+                        Colour = ColourProvider.Background5,
+                        RelativeSizeAxes = Axes.Both
+                    },
+                }
             });
+
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
                 if (lastSection != section.NewValue)
@@ -178,7 +182,7 @@ namespace osu.Game.Overlays
             public ProfileSectionTabControl()
             {
                 Height = 40;
-                Padding = new MarginPadding { Horizontal = CONTENT_X_MARGIN };
+                Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
                 TabContainer.Spacing = new Vector2(20);
             }
 

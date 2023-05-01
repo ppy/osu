@@ -157,7 +157,16 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity
+        {
+            get
+            {
+                if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
+                    return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+
+                return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
+            }
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -176,6 +185,7 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
+        private Bindable<bool> editorAutoSeekOnPlacement;
 
         public Editor(EditorLoader loader = null)
         {
@@ -200,7 +210,10 @@ namespace osu.Game.Screens.Edit
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
                 // the editor has already been exited.
                 if (!ValidForPush)
+                {
+                    beatmapManager.Delete(loadableBeatmap.BeatmapSetInfo);
                     return;
+                }
             }
 
             try
@@ -240,7 +253,7 @@ namespace osu.Game.Screens.Edit
 
             if (canSave)
             {
-                changeHandler = new EditorChangeHandler(editorBeatmap);
+                changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
@@ -263,6 +276,7 @@ namespace osu.Game.Screens.Edit
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
+            editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -320,6 +334,10 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
                                                 State = { BindTarget = editorHitMarkers },
+                                            },
+                                            new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
+                                            {
+                                                State = { BindTarget = editorAutoSeekOnPlacement },
                                             }
                                         }
                                     },
