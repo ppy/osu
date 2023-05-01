@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
 
+        private readonly CursorRippleVisualiser rippleVisualiser;
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Children = new[]
                 {
                     cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
-                    new CursorRippleVisualiser(),
+                    rippleVisualiser = new CursorRippleVisualiser(),
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
@@ -83,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 var newScale = new Vector2(e.NewValue);
 
                 ActiveCursor.Scale = newScale;
+                rippleVisualiser.CursorScale = newScale;
                 cursorTrail.Scale = newScale;
             }, true);
 
