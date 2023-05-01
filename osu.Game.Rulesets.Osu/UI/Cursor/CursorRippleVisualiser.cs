@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             RelativeSizeAxes = Axes.Both;
         }
 
+        public Vector2 CursorScale { get; set; } = Vector2.One;
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuRulesetConfigManager? rulesetConfig)
         {
@@ -40,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 AddInternal(ripplePool.Get(r =>
                 {
                     r.Position = e.MousePosition;
+                    r.Scale = CursorScale;
                 }));
             }
 
@@ -52,18 +55,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private partial class CursorRipple : PoolableDrawable
         {
+            private Drawable ripple = null!;
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 AutoSizeAxes = Axes.Both;
                 Origin = Anchor.Centre;
 
-                InternalChildren = new Drawable[]
+                InternalChild = ripple = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorRipple), _ => new DefaultCursorRipple())
                 {
-                    new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorRipple), _ => new DefaultCursorRipple())
-                    {
-                        Blending = BlendingParameters.Additive,
-                    }
+                    Blending = BlendingParameters.Additive,
                 };
             }
 
@@ -73,8 +75,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 ClearTransforms(true);
 
-                this.ScaleTo(0.1f)
-                    .ScaleTo(1, 700, Easing.Out)
+                ripple.ScaleTo(0.1f)
+                      .ScaleTo(1, 700, Easing.Out);
+
+                this
                     .FadeOutFromOne(700)
                     .Expire(true);
             }
