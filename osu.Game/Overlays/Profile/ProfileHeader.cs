@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
+            ContentSidePadding = WaveOverlayContainer.HORIZONTAL_PADDING;
 
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
 

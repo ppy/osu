@@ -165,6 +165,36 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestRevertNestedObjects()
+        {
+            ManualClock clock = null;
+
+            var beatmap = new Beatmap();
+            beatmap.HitObjects.Add(new TestHitObjectWithNested { Duration = 40 });
+
+            createTest(beatmap, 10, () => new FramedClock(clock = new ManualClock()));
+
+            AddStep("skip to middle of object", () => clock.CurrentTime = (beatmap.HitObjects[0].StartTime + beatmap.HitObjects[0].GetEndTime()) / 2);
+            AddAssert("2 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(2));
+
+            AddStep("skip to before end of object", () => clock.CurrentTime = beatmap.HitObjects[0].GetEndTime() - 1);
+            AddAssert("3 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
+
+            DrawableHitObject drawableHitObject = null;
+            HashSet<HitObject> revertedHitObjects = new HashSet<HitObject>();
+
+            AddStep("retrieve drawable hit object", () => drawableHitObject = playfield.ChildrenOfType<DrawableTestHitObjectWithNested>().Single());
+            AddStep("set up revert tracking", () =>
+            {
+                revertedHitObjects.Clear();
+                drawableHitObject.OnRevertResult += (ho, _) => revertedHitObjects.Add(ho.HitObject);
+            });
+            AddStep("skip back to object start", () => clock.CurrentTime = beatmap.HitObjects[0].StartTime);
+            AddAssert("3 reverts fired", () => revertedHitObjects, () => Has.Count.EqualTo(3));
+            AddAssert("no objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(0));
+        }
+
+        [Test]
         public void TestApplyHitResultOnKilled()
         {
             ManualClock clock = null;
@@ -258,6 +288,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
                 RegisterPool<TestKilledHitObject, DrawableTestKilledHitObject>(poolSize);
+                RegisterPool<TestHitObjectWithNested, DrawableTestHitObjectWithNested>(poolSize);
+                RegisterPool<NestedHitObject, DrawableNestedHitObject>(poolSize);
             }
 
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
@@ -385,6 +417,120 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.OnKilled();
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
+            }
+        }
+
+        private class TestHitObjectWithNested : TestHitObject
+        {
+            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
+            {
+                base.CreateNestedHitObjects(cancellationToken);
+
+                for (int i = 0; i < 3; ++i)
+                    AddNested(new NestedHitObject { StartTime = (float)Duration * (i + 1) / 4 });
+            }
+        }
+
+        private class NestedHitObject : ConvertHitObject
+        {
+        }
+
+        private partial class DrawableTestHitObjectWithNested : DrawableHitObject<TestHitObjectWithNested>
+        {
+            private Container nestedContainer;
+
+            public DrawableTestHitObjectWithNested()
+                : base(null)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AddRangeInternal(new Drawable[]
+                {
+                    new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Red
+                    },
+                    nestedContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                });
+            }
+
+            protected override void OnApply()
+            {
+                base.OnApply();
+
+                Size = new Vector2(200, 50);
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            protected override void AddNestedHitObject(DrawableHitObject hitObject)
+            {
+                base.AddNestedHitObject(hitObject);
+                nestedContainer.Add(hitObject);
+            }
+
+            protected override void ClearNestedHitObjects()
+            {
+                base.ClearNestedHitObjects();
+                nestedContainer.Clear(false);
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                base.CheckForResult(userTriggered, timeOffset);
+                if (timeOffset >= 0)
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            }
+        }
+
+        private partial class DrawableNestedHitObject : DrawableHitObject<NestedHitObject>
+        {
+            public DrawableNestedHitObject()
+                : this(null)
+            {
+            }
+
+            public DrawableNestedHitObject(NestedHitObject hitObject)
+                : base(hitObject)
+            {
+                Size = new Vector2(15);
+                Colour = Colour4.White;
+                RelativePositionAxes = Axes.Both;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AddInternal(new Circle
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+            }
+
+            protected override void OnApply()
+            {
+                base.OnApply();
+
+                X = (float)((HitObject.StartTime - ParentHitObject!.HitObject.StartTime) / (ParentHitObject.HitObject.GetEndTime() - ParentHitObject.HitObject.StartTime));
+                Y = 0.5f;
+
+                LifetimeStart = ParentHitObject.LifetimeStart;
+                LifetimeEnd = ParentHitObject.LifetimeEnd;
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                base.CheckForResult(userTriggered, timeOffset);
+                if (timeOffset >= 0)
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
         }
 
