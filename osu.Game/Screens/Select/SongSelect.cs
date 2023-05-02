@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -162,6 +163,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = updateVisibleBeatmapCount,
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
@@ -828,6 +830,7 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             bindBindables();
+            updateVisibleBeatmapCount();
 
             Carousel.AllowSelection = true;
 
@@ -855,6 +858,13 @@ namespace osu.Game.Screens.Select
                 // to show the dummy beatmap (we have nothing else to display).
                 performUpdateSelected();
             }
+        }
+
+        private void updateVisibleBeatmapCount()
+        {
+            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+            // but also in this case we want support for formatting a number within a string).
+            FilterControl.InformationalText = $"{"match".ToQuantity(Carousel.CountDisplayed, "#,0")}";
         }
 
         private bool boundLocalBindables;
