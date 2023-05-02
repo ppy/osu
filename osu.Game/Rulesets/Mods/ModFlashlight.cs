@@ -82,8 +82,11 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
+            // Flashlight mods should always draw above any other mod adding overlays.
+            flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
+
             drawableRuleset.Overlays.Add(flashlight);
         }
 
