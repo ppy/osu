@@ -112,6 +112,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                             FillMode = FillMode.Fit,
                             Children = new[]
                             {
+                                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.KiaiGlow), _ => Empty())
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -186,7 +190,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var hitWindows = new TaikoHitWindows();
 
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
             {
                 judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
                 explosionPools.Add(result, new HitExplosionPool(result));

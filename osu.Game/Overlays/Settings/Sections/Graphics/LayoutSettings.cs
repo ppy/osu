@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
-        private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<Size> sizeFullscreen = null!;
@@ -75,7 +74,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             if (window != null)
             {
                 currentDisplay.BindTo(window.CurrentDisplayBindable);
-                windowModes.BindTo(window.SupportedWindowModes);
                 window.DisplaysChanged += onDisplaysChanged;
             }
 
@@ -87,7 +85,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = GraphicsSettingsStrings.ScreenMode,
-                    ItemSource = windowModes,
+                    Items = window?.SupportedWindowModes,
+                    CanBeShown = { Value = window?.SupportedWindowModes.Count() > 1 },
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 displayDropdown = new DisplaySettingsDropdown
@@ -133,6 +132,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.HorizontalPosition,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -140,6 +140,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalPosition,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -147,6 +148,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.HorizontalScale,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -154,6 +156,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalScale,
+                            Keywords = new[] { "screen", "scaling" },
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -176,8 +179,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateDisplaySettingsVisibility();
                 updateScreenModeWarning();
             }, true);
-
-            windowModes.BindCollectionChanged((_, _) => updateDisplaySettingsVisibility());
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
@@ -232,7 +233,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            windowModeDropdown.CanBeShown.Value = windowModes.Count > 1;
             resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
             safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 return;
             }
 
-            if (host.Window is WindowsWindow)
+            if (host.Renderer is IWindowsRenderer)
             {
                 switch (fullscreenCapability.Value)
                 {
@@ -325,7 +325,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private partial class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }

@@ -32,6 +32,7 @@ namespace osu.Game.Online.API.Requests
         Loved,
         Pending,
         Guest,
-        Graveyard
+        Graveyard,
+        Nominated,
     }
 }

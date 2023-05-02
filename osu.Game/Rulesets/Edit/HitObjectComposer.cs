@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -45,8 +46,6 @@ namespace osu.Game.Rulesets.Edit
     {
         protected IRulesetConfigManager Config { get; private set; }
 
-        protected readonly Ruleset Ruleset;
-
         // Provides `Playfield`
         private DependencyContainer dependencies;
 
@@ -59,7 +58,14 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+
+        protected ExpandingToolboxContainer LeftToolbox { get; private set; }
+
+        protected ExpandingToolboxContainer RightToolbox { get; private set; }
 
         private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
@@ -72,18 +78,21 @@ namespace osu.Game.Rulesets.Edit
         private FillFlowContainer togglesCollection;
 
         private IBindable<bool> hasTiming;
+        private Bindable<bool> autoSeekOnPlacement;
 
         protected HitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
         {
-            Ruleset = ruleset;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OsuConfigManager config)
         {
+            autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
@@ -129,7 +138,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new ExpandingToolboxContainer(60, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(60, 200)
                         {
                             Children = new Drawable[]
                             {
@@ -151,6 +160,28 @@ namespace osu.Game.Rulesets.Edit
                         },
                     }
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        RightToolbox = new ExpandingToolboxContainer(130, 250)
+                        {
+                            Child = new EditorToolboxGroup("inspector")
+                            {
+                                Child = new HitObjectInspector()
+                            },
+                        }
+                    }
+                }
             };
 
             toolboxCollection.Items = CompositionTools
@@ -367,7 +398,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                if (EditorClock.CurrentTime < hitObject.StartTime)
+                if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                     EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
@@ -419,8 +450,11 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        protected HitObjectComposer()
+        public readonly Ruleset Ruleset;
+
+        protected HitObjectComposer(Ruleset ruleset)
         {
+            Ruleset = ruleset;
             RelativeSizeAxes = Axes.Both;
         }
 

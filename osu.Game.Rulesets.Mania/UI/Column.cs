@@ -134,6 +134,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the hit explosion pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (skin != null)
@@ -204,18 +207,6 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override void LoadComplete()
             {
                 keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-                base.OnMouseUp(e);
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)

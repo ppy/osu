@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Resources.Localisation.Web;
@@ -24,7 +27,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneBeatmapSetOverlay : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlay : OsuManualInputManagerTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
 
@@ -54,6 +57,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 overlay.ShowBeatmapSet(new APIBeatmapSet
                 {
+                    Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Future genre" },
+                    Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "Future language" },
                     OnlineID = 1235,
                     Title = @"an awesome beatmap",
                     Artist = @"naru narusegawa",
@@ -239,6 +244,60 @@ namespace osu.Game.Tests.Visual.Online
             AddStep(@"show without reload", overlay.Show);
         }
 
+        [TestCase(BeatmapSetLookupType.BeatmapId)]
+        [TestCase(BeatmapSetLookupType.SetId)]
+        public void TestFetchLookupType(BeatmapSetLookupType lookupType)
+        {
+            string type = string.Empty;
+
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetBeatmapSetRequest getBeatmapSet:
+                            type = getBeatmapSet.Type.ToString();
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep(@"fetch", () =>
+            {
+                switch (lookupType)
+                {
+                    case BeatmapSetLookupType.BeatmapId:
+                        overlay.FetchAndShowBeatmap(55);
+                        break;
+
+                    case BeatmapSetLookupType.SetId:
+                        overlay.FetchAndShowBeatmapSet(55);
+                        break;
+                }
+            });
+
+            AddAssert(@"type is correct", () => type == lookupType.ToString());
+        }
+
+        [Test]
+        public void TestBeatmapSetWithGuestDifficulty()
+        {
+            AddStep("show map", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty()));
+            AddStep("move mouse to host difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(0));
+            });
+            AddAssert("guest mapper information not shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().All(s => s.Text != "BanchoBot"));
+            AddStep("move mouse to guest difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+            AddAssert("guest mapper information shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == "BanchoBot"));
+        }
+
         private APIBeatmapSet createManyDifficultiesBeatmapSet()
         {
             var set = getBeatmapSet();
@@ -276,6 +335,60 @@ namespace osu.Game.Tests.Visual.Online
             beatmapSet.OnlineID = nextBeatmapSetId++;
 
             return beatmapSet;
+        }
+
+        private APIBeatmapSet createBeatmapSetWithGuestDifficulty()
+        {
+            var set = getBeatmapSet();
+
+            var beatmaps = new List<APIBeatmap>();
+
+            var guestUser = new APIUser
+            {
+                Username = @"BanchoBot",
+                Id = 3,
+            };
+
+            set.RelatedUsers = new[]
+            {
+                set.Author, guestUser
+            };
+
+            beatmaps.Add(new APIBeatmap
+            {
+                OnlineID = 1145,
+                DifficultyName = "Host Diff",
+                RulesetID = Ruleset.Value.OnlineID,
+                StarRating = 1.4,
+                OverallDifficulty = 3.5f,
+                AuthorID = set.AuthorID,
+                FailTimes = new APIFailTimes
+                {
+                    Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
+                },
+                Status = BeatmapOnlineStatus.Graveyard
+            });
+
+            beatmaps.Add(new APIBeatmap
+            {
+                OnlineID = 1919,
+                DifficultyName = "Guest Diff",
+                RulesetID = Ruleset.Value.OnlineID,
+                StarRating = 8.1,
+                OverallDifficulty = 3.5f,
+                AuthorID = 3,
+                FailTimes = new APIFailTimes
+                {
+                    Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
+                },
+                Status = BeatmapOnlineStatus.Graveyard
+            });
+
+            set.Beatmaps = beatmaps.ToArray();
+
+            return set;
         }
 
         private void downloadAssert(bool shown)

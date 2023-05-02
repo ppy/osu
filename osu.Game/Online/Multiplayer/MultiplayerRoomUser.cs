@@ -54,10 +54,10 @@ namespace osu.Game.Online.Multiplayer
             return UserID == other.UserID;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj?.GetType() != GetType()) return false;
 
             return Equals((MultiplayerRoomUser)obj);
         }

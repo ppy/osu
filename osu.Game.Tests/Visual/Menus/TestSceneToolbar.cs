@@ -116,6 +116,19 @@ namespace osu.Game.Tests.Visual.Menus
 
         [TestCase(OverlayActivation.All)]
         [TestCase(OverlayActivation.Disabled)]
+        public void TestButtonKeyboardInputRespectsOverlayActivation(OverlayActivation mode)
+        {
+            AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
+            AddStep("hide toolbar", () => toolbar.Hide());
+
+            if (mode == OverlayActivation.Disabled)
+                AddAssert("check buttons not accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Zero);
+            else
+                AddAssert("check buttons accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Not.Zero);
+        }
+
+        [TestCase(OverlayActivation.All)]
+        [TestCase(OverlayActivation.Disabled)]
         public void TestRespectsOverlayActivation(OverlayActivation mode)
         {
             AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
@@ -199,6 +212,23 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
             AddRepeatStep("arrow up", () => InputManager.Key(Key.Up), 5);
             AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
+        }
+
+        [Test]
+        public void TestRulesetSelectorOverflow()
+        {
+            AddStep("set toolbar width", () =>
+            {
+                toolbar.RelativeSizeAxes = Axes.None;
+                toolbar.Width = 400;
+            });
+            AddStep("move mouse over news toggle button", () =>
+            {
+                var button = toolbar.ChildrenOfType<ToolbarNewsButton>().Single();
+                InputManager.MoveMouseTo(button);
+            });
+            AddAssert("no ruleset toggle buttons hovered", () => !toolbar.ChildrenOfType<ToolbarRulesetTabButton>().Any(button => button.IsHovered));
+            AddUntilStep("toolbar gradient visible", () => toolbar.ChildrenOfType<Toolbar.ToolbarBackground>().Single().Children.All(d => d.Alpha > 0));
         }
 
         public partial class TestToolbar : Toolbar

@@ -259,7 +259,11 @@ namespace osu.Game.Online.API
 
             var friendsReq = new GetFriendsRequest();
             friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res => friends.AddRange(res);
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
 
             if (!handleRequest(friendsReq))
             {
@@ -325,12 +329,35 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken(@"form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
-                    // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    e.Rethrow();
+                    try
+                    {
+                        // attempt to parse a non-form error message
+                        var response = JObject.Parse(req.GetResponseString().AsNonNull());
+
+                        string redirect = (string)response.SelectToken(@"url", true);
+                        string message = (string)response.SelectToken(@"error", false);
+
+                        if (!string.IsNullOrEmpty(redirect))
+                        {
+                            return new RegistrationRequest.RegistrationRequestErrors
+                            {
+                                Redirect = redirect,
+                                Message = message,
+                            };
+                        }
+
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
+                    catch
+                    {
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
                 }
             }
 

@@ -44,7 +44,9 @@ namespace osu.Game.Scoring
 
         protected override ScoreInfo? CreateModel(ArchiveReader archive)
         {
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
+            string name = archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
+
+            using (var stream = archive.GetStream(name))
             {
                 try
                 {
@@ -52,7 +54,7 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
+                    Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
                     return null;
                 }
             }
@@ -71,8 +73,8 @@ namespace osu.Game.Scoring
 
             // These properties are known to be non-null, but these final checks ensure a null hasn't come from somewhere (or the refetch has failed).
             // Under no circumstance do we want these to be written to realm as null.
-            if (model.BeatmapInfo == null) throw new ArgumentNullException(nameof(model.BeatmapInfo));
-            if (model.Ruleset == null) throw new ArgumentNullException(nameof(model.Ruleset));
+            ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
+            ArgumentNullException.ThrowIfNull(model.Ruleset);
 
             PopulateMaximumStatistics(model);
 
@@ -101,8 +103,7 @@ namespace osu.Game.Scoring
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic())
-                                                      .OrderByDescending(Judgement.ToNumericResult).First();
+                                                      .Where(h => h.IsBasic()).MaxBy(Judgement.ToNumericResult);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {
@@ -145,9 +146,9 @@ namespace osu.Game.Scoring
 #pragma warning restore CS0618
         }
 
-        protected override void PostImport(ScoreInfo model, Realm realm, bool batchImport)
+        protected override void PostImport(ScoreInfo model, Realm realm, ImportParameters parameters)
         {
-            base.PostImport(model, realm, batchImport);
+            base.PostImport(model, realm, parameters);
 
             var userRequest = new GetUserRequest(model.RealmUser.Username);
 
