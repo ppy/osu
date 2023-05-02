@@ -53,6 +53,8 @@ namespace osu.Game.Tests.Testing
             {
                 Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestVertex.vs");
                 Dependencies.Get<ShaderManager>().GetRawData(@"sh_TestFragment.fs");
+                Dependencies.Get<ShaderManager>().Load(@"TestVertex", @"TestFragment");
+                Dependencies.Get<ShaderManager>().Load(VertexShaderDescriptor.TEXTURE_2, @"TestFragment");
             });
         }
 
