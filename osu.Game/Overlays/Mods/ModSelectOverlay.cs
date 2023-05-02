@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.Mods
             if (AllowCustomisation)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
-            SelectedMods.BindValueChanged(val =>
+            SelectedMods.BindValueChanged(_ =>
             {
                 updateMultiplier();
                 updateFromExternalSelection();
@@ -252,6 +252,10 @@ namespace osu.Game.Overlays.Mods
 
                 if (AllowCustomisation)
                 {
+                    // Importantly, use SelectedMods.Value here (and not the ValueChanged NewValue) as the latter can
+                    // potentially be stale, due to complexities in the way change trackers work.
+                    //
+                    // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
                     modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
                 }
