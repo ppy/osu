@@ -1,18 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterAction<T> : KeyCounter
+    public partial class KeyCounterActionTrigger<T> : InputTrigger
         where T : struct
     {
         public T Action { get; }
 
-        public KeyCounterAction(T action)
+        public KeyCounterActionTrigger(T action)
             : base($"B{(int)(object)action + 1}")
         {
             Action = action;
@@ -23,9 +21,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return false;
 
-            IsLit = true;
-            if (forwards)
-                Increment();
+            Activate(forwards);
             return false;
         }
 
@@ -34,9 +30,7 @@ namespace osu.Game.Screens.Play
             if (!EqualityComparer<T>.Default.Equals(action, Action))
                 return;
 
-            IsLit = false;
-            if (!forwards)
-                Decrement();
+            Deactivate(forwards);
         }
     }
 }

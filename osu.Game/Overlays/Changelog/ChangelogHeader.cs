@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Changelog
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding
                     {
-                        Horizontal = 65,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - ChangelogUpdateStreamItem.PADDING,
                         Vertical = 20
                     },
                     Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },

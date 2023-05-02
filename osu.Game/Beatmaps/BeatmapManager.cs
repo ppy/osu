@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
         public override bool PauseImports
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
+            beatmapImporter.ProcessBeatmap = (beatmapSet, scope) => ProcessBeatmap?.Invoke(beatmapSet, scope);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -368,7 +368,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -415,6 +415,13 @@ namespace osu.Game.Beatmaps
             // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
             beatmapContent.BeatmapInfo = beatmapInfo;
 
+            // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
+            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
+            // which influences the beatmap checksums.
+            beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
+            beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+            beatmapInfo.ResetOnlineInfo();
+
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -438,9 +445,6 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
-                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
                 updateHashAndMarkDirty(setInfo);
@@ -454,7 +458,9 @@ namespace osu.Game.Beatmaps
                     if (transferCollections)
                         beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
-                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
+                    // do not look up metadata.
+                    // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
+                    ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
                 });
             }
 
@@ -542,4 +548,11 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
     }
+
+    /// <summary>
+    /// Delegate type for beatmap processing callbacks.
+    /// </summary>
+    /// <param name="beatmapSet">The beatmap set to be processed.</param>
+    /// <param name="lookupScope">The scope to use when looking up metadata.</param>
+    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope);
 }

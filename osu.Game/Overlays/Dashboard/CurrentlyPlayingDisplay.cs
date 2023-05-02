@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Dashboard
                 new Container<BasicSearchTextBox>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding(padding),
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = padding },
                     Child = searchTextBox = new BasicSearchTextBox
                     {
                         RelativeSizeAxes = Axes.X,
