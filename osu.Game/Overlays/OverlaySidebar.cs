@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding
                                 {
                                     Vertical = 20,
-                                    Left = 50,
+                                    Left = WaveOverlayContainer.HORIZONTAL_PADDING,
                                     Right = 30
                                 },
                                 Child = CreateContent()

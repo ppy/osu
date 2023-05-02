@@ -130,6 +130,8 @@ namespace osu.Game.Screens
 
                 loadTargets.Add(manager.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE));
 
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder"));
+
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
