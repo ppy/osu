@@ -105,8 +105,9 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 var blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().Single();
                 InputManager.MoveMouseTo(blueprint.SelectionQuad.TopLeft + new Vector2(100, 0));
-                InputManager.ReleaseButton(MouseButton.Left);
             });
+
+            AddStep("release button", () => InputManager.PressButton(MouseButton.Left));
 
             AddAssert("object has zero repeats", () => EditorBeatmap.HitObjects.OfType<IHasRepeats>().Single().RepeatCount == 0);
         }
