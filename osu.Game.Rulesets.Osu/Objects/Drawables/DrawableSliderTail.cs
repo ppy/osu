@@ -91,7 +91,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
+            bool delayFadeIn = DrawableSlider.SliderBody!.SnakingIn.Value && HitObject.RepeatIndex == 0;
+
+            CirclePiece
+                .FadeOut()
+                .Delay(delayFadeIn ? Slider!.TimePreempt / 3f : 0)
+                .FadeIn(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
