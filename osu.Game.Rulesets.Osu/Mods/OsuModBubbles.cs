@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 BubbleDrawable? lastBubble = bubbleContainer.OfType<BubbleDrawable>().LastOrDefault();
 
                 lastBubble?.ClearTransforms();
-                lastBubble?.Expire();
+                lastBubble?.Expire(true);
             };
         }
 
