@@ -4,7 +4,7 @@
 namespace osu.Game.Rulesets.Objects.Types
 {
     /// <summary>
-    /// A type of <see cref="HitObject"/> which may or may not generate ticks.
+    /// A type of <see cref="HitObject"/> which explicitly specifies whether it should generate ticks.
     /// </summary>
     public interface IHasGenerateTicks
     {
