@@ -185,8 +185,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 content.TransformTo(nameof(BorderColour), colourDarker, duration * 0.3f, Easing.OutQuint);
                 // Ripple effect utilises the border to reduce drawable count
                 content.TransformTo(nameof(BorderThickness), 2f, duration * 0.3f, Easing.OutQuint)
+                       .Then()
                        // Avoids transparency overlap issues during the bubble "pop"
-                       .Then().Schedule(() => content.BorderThickness = 0);
+                       .TransformTo(nameof(BorderThickness), 0f);
             }
 
             private Vector2 getPosition(DrawableOsuHitObject drawableObject)
