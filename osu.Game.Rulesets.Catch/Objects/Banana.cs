@@ -22,9 +22,11 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public override Judgement CreateJudgement() => new CatchBananaJudgement();
 
-        public Banana(int volume = 100)
+        private static readonly List<HitSampleInfo> samples = new List<HitSampleInfo> { new BananaHitSampleInfo() };
+
+        public Banana()
         {
-            Samples = new List<HitSampleInfo> { new BananaHitSampleInfo(volume) };
+            Samples = samples;
         }
 
         // override any external colour changes with banananana
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        private class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
+        public class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
         {
             private static readonly string[] lookup_names = { "Gameplay/metronomelow", "Gameplay/catch-banana" };
 
