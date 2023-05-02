@@ -165,15 +165,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ColourInfo colourDarker = DrawableOsuHitObject.AccentColour.Value.Darken(0.1f);
 
                 // The absolute length of the bubble's animation, can be used in fractions for animations of partial length
-                double getAnimationDuration = 1700 + Math.Pow(FadeTime, 1.07f);
+                double duration = 1700 + Math.Pow(FadeTime, 1.07f);
 
                 // Main bubble scaling based on combo
                 this.FadeTo(1)
-                    .ScaleTo(MaxSize, getAnimationDuration * 0.8f)
+                    .ScaleTo(MaxSize, duration * 0.8f)
                     .Then()
                     // Pop at the end of the bubbles life time
-                    .ScaleTo(MaxSize * 1.5f, getAnimationDuration * 0.2f, Easing.OutQuint)
-                    .FadeOut(getAnimationDuration * 0.2f, Easing.OutCirc).Expire();
+                    .ScaleTo(MaxSize * 1.5f, duration * 0.2f, Easing.OutQuint)
+                    .FadeOut(duration * 0.2f, Easing.OutCirc).Expire();
 
                 if (!DrawableOsuHitObject.IsHit) return;
 
@@ -182,28 +182,28 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 colourBox.FadeColour(colourDarker);
 
-                content.TransformTo(nameof(BorderColour), colourDarker, getAnimationDuration * 0.3f, Easing.OutQuint);
+                content.TransformTo(nameof(BorderColour), colourDarker, duration * 0.3f, Easing.OutQuint);
                 // Ripple effect utilises the border to reduce drawable count
-                content.TransformTo(nameof(BorderThickness), 2f, getAnimationDuration * 0.3f, Easing.OutQuint)
+                content.TransformTo(nameof(BorderThickness), 2f, duration * 0.3f, Easing.OutQuint)
                        // Avoids transparency overlap issues during the bubble "pop"
                        .Then().Schedule(() => content.BorderThickness = 0);
             }
 
-            private Vector2 getPosition(DrawableOsuHitObject drawableOsuHitObject)
+            private Vector2 getPosition(DrawableOsuHitObject drawableObject)
             {
-                switch (drawableOsuHitObject)
+                switch (drawableObject)
                 {
                     // SliderHeads are derived from HitCircles,
                     // so we must handle them before to avoid them using the wrong positioning logic
                     case DrawableSliderHead:
-                        return drawableOsuHitObject.HitObject.Position;
+                        return drawableObject.HitObject.Position;
 
                     // Using hitobject position will cause issues with HitCircle placement due to stack leniency.
                     case DrawableHitCircle:
-                        return drawableOsuHitObject.Position;
+                        return drawableObject.Position;
 
                     default:
-                        return drawableOsuHitObject.HitObject.Position;
+                        return drawableObject.HitObject.Position;
                 }
             }
         }
