@@ -600,9 +600,9 @@ namespace osu.Game.Screens.Edit
             while (Math.Abs(scrollAccumulation) >= precision)
             {
                 if (scrollAccumulation > 0)
-                    seek(e, -1);
+                    seek(e, -1, !e.IsPrecise);
                 else
-                    seek(e, 1);
+                    seek(e, 1, !e.IsPrecise);
 
                 scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
             }
@@ -941,13 +941,13 @@ namespace osu.Game.Screens.Edit
                 clock.Seek(found.Time);
         }
 
-        private void seek(UIEvent e, int direction)
+        private void seek(UIEvent e, int direction, bool accelerateIfTrackPlaying = true)
         {
             double amount = e.ShiftPressed ? 4 : 1;
 
             bool trackPlaying = clock.IsRunning;
 
-            if (trackPlaying)
+            if (trackPlaying && accelerateIfTrackPlaying)
             {
                 // generally users are not looking to perform tiny seeks when the track is playing.
                 // this multiplication undoes the division that will be applied in the underlying seek operation.
