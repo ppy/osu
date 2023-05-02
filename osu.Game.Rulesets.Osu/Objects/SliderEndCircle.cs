@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             else
             {
                 // The first end circle should fade in with the slider.
-                TimePreempt = (StartTime - slider.StartTime) + slider.TimePreempt;
+                TimePreempt += StartTime - slider.StartTime;
             }
         }
 
