@@ -171,7 +171,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                             Current = scalingBackgroundDim,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true,
-                            TransferValueOnCommit = false
                         },
                     }
                 },
