@@ -155,7 +155,7 @@ namespace osu.Game.Graphics.Containers
 
         private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays)
                                                   && (sizeX.Value != 1 || sizeY.Value != 1)
-                                                  && scalingMenuBackgroundDim.Value != 1f;
+                                                  && scalingMenuBackgroundDim.Value < 1;
 
         private void updateSize()
         {
