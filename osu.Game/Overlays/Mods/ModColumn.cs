@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Mods
                 foreach (var mod in availableMods)
                 {
                     mod.Active.BindValueChanged(_ => updateState());
-                    mod.Filtered.BindValueChanged(_ => updateState());
+                    mod.MatchingFilter.BindValueChanged(_ => updateState());
                 }
 
                 updateState();
@@ -145,12 +145,12 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => mod.Filtered.Value) ? 0 : 1;
+            Alpha = availableMods.All(mod => !mod.MatchingFilter.Value) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = availableMods.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = availableMods.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.MatchingFilter.Value) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.MatchingFilter.Value).All(panel => panel.Active.Value);
             }
         }
 
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => !b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && b.MatchingFilter.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => b.Active.Value && b.MatchingFilter.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 

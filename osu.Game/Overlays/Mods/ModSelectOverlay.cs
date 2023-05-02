@@ -108,6 +108,8 @@ namespace osu.Game.Overlays.Mods
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
+        private Container aboveColumnsContent = null!;
+        private ShearedSearchTextBox searchTextBox = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         private ModSearch? modSearch;
@@ -148,6 +150,17 @@ namespace osu.Game.Overlays.Mods
 
             MainAreaContent.AddRange(new Drawable[]
             {
+                aboveColumnsContent = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = ModsEffectDisplay.HEIGHT,
+                    Padding = new MarginPadding { Horizontal = 100 },
+                    Child = searchTextBox = new ShearedSearchTextBox
+                    {
+                        HoldFocus = false,
+                        Width = 300
+                    }
+                },
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -188,18 +201,10 @@ namespace osu.Game.Overlays.Mods
 
             if (ShowTotalMultiplier)
             {
-                MainAreaContent.Add(new Container
+                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    AutoSizeAxes = Axes.X,
-                    Height = ModsEffectDisplay.HEIGHT,
-                    Margin = new MarginPadding { Horizontal = 100 },
-                    Child = multiplierDisplay = new DifficultyMultiplierDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 });
             }
 
@@ -270,6 +275,12 @@ namespace osu.Game.Overlays.Mods
             }, true);
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
+
+            searchTextBox.Current.BindValueChanged(query =>
+            {
+                foreach (var column in columnFlow.Columns)
+                    column.SearchTerm = query.NewValue;
+            }, true);
 
             // Start scrolled slightly to the right to give the user a sense that
             // there is more horizontal content available.
@@ -352,7 +363,7 @@ namespace osu.Game.Overlays.Mods
         private void filterMods()
         {
             foreach (var modState in allAvailableMods)
-                modState.Filtered.Value = !modState.Mod.HasImplementation || !IsValidMod.Invoke(modState.Mod);
+                modState.ValidForSelection.Value = modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
         private void updateMultiplier()
@@ -487,7 +498,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.MatchingFilter.Value);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -549,7 +560,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (column is ModColumn modColumn)
                 {
-                    allFiltered = modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                    allFiltered = modColumn.AvailableMods.All(modState => !modState.MatchingFilter.Value);
                     modColumn.FlushPendingSelections();
                 }
 

@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -11,11 +14,10 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModPanel : ModSelectPanel
+    public partial class ModPanel : ModSelectPanel, IConditionalFilterable
     {
         public Mod Mod => modState.Mod;
         public override BindableBool Active => modState.Active;
-        public BindableBool Filtered => modState.Filtered;
 
         protected override float IdleSwitchWidth => 54;
         protected override float ExpandedSwitchWidth => 70;
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Filtered.BindValueChanged(_ => updateFilterState(), true);
+            canBeShown.BindTo(modState.ValidForSelection);
         }
 
         protected override void Select()
@@ -71,10 +73,28 @@ namespace osu.Game.Overlays.Mods
 
         #region Filtering support
 
-        private void updateFilterState()
+        public override IEnumerable<LocalisableString> FilterTerms => new[]
         {
-            this.FadeTo(Filtered.Value ? 0 : 1);
+            Mod.Name,
+            Mod.Acronym,
+            Mod.Description
+        };
+
+        public override bool MatchingFilter
+        {
+            get => modState.MatchingFilter.Value;
+            set
+            {
+                if (modState.MatchingFilter.Value == value)
+                    return;
+
+                modState.MatchingFilter.Value = value;
+                this.FadeTo(value ? 1 : 0);
+            }
         }
+
+        private readonly BindableBool canBeShown = new BindableBool(true);
+        IBindable<bool> IConditionalFilterable.CanBeShown => canBeShown;
 
         #endregion
     }

@@ -291,7 +291,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void setFilter(Func<Mod, bool>? filter)
         {
             foreach (var modState in this.ChildrenOfType<ModColumn>().Single().AvailableMods)
-                modState.Filtered.Value = filter?.Invoke(modState.Mod) == false;
+                modState.MatchingFilter.Value = filter?.Invoke(modState.Mod) == false;
         }
 
         private partial class TestModColumn : ModColumn

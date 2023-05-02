@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -79,6 +80,16 @@ namespace osu.Game.Overlays.Mods
         {
             Active.Value = new HashSet<Mod>(Preset.Value.Mods).SetEquals(selectedMods.Value);
         }
+
+        #region Filtering support
+
+        public override IEnumerable<LocalisableString> FilterTerms => new LocalisableString[]
+        {
+            Preset.Value.Name,
+            Preset.Value.Description
+        };
+
+        #endregion
 
         #region IHasCustomTooltip
 
