@@ -11,51 +11,52 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Compose.Components.Timeline;
-
-public partial class HitObjectPointPiece : CircularContainer
+namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    protected OsuSpriteText Label { get; private set; }
-
-    [BackgroundDependencyLoader]
-    private void load(OsuColour colours)
+    public partial class HitObjectPointPiece : CircularContainer
     {
-        AutoSizeAxes = Axes.Both;
+        protected OsuSpriteText Label { get; private set; }
 
-        Color4 colour = GetRepresentingColour(colours);
-
-        InternalChildren = new Drawable[]
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            new Container
-            {
-                AutoSizeAxes = Axes.X,
-                Height = 16,
-                Masking = true,
-                CornerRadius = 8,
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colour,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    Label = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Padding = new MarginPadding(5),
-                        Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
-                        Colour = colours.B5,
-                    }
-                }
-            },
-        };
-    }
+            AutoSizeAxes = Axes.Both;
 
-    protected virtual Color4 GetRepresentingColour(OsuColour colours)
-    {
-        return colours.Yellow;
+            Color4 colour = GetRepresentingColour(colours);
+
+            InternalChildren = new Drawable[]
+            {
+                new Container
+                {
+                    AutoSizeAxes = Axes.X,
+                    Height = 16,
+                    Masking = true,
+                    CornerRadius = 8,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colour,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        Label = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Padding = new MarginPadding(5),
+                            Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                            Colour = colours.B5,
+                        }
+                    }
+                },
+            };
+        }
+
+        protected virtual Color4 GetRepresentingColour(OsuColour colours)
+        {
+            return colours.Yellow;
+        }
     }
 }
