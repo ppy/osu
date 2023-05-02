@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Edit
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime <= EditorClock.CurrentTime)?.HitObject;
+            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < EditorClock.CurrentTime)?.HitObject;
 
             if (lastBefore == null)
                 return null;
