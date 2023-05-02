@@ -32,9 +32,16 @@ namespace osu.Game.Overlays.Mods
         public bool PendingConfiguration { get; set; }
 
         /// <summary>
-        /// Whether the mod is currently filtered out due to not matching imposed criteria.
+        /// Whether the mod is currently valid for selection.
+        /// This can be <see langword="false"/> in scenarios such as the free mod select overlay, where not all mods are selectable
+        /// regardless of search criteria imposed by the user selecting.
         /// </summary>
-        public BindableBool Filtered { get; } = new BindableBool();
+        public BindableBool ValidForSelection { get; } = new BindableBool(true);
+
+        /// <summary>
+        /// Whether the mod is matching the current filter, i.e. it is available for user selection.
+        /// </summary>
+        public BindableBool MatchingFilter { get; } = new BindableBool(true);
 
         public ModState(Mod mod)
         {

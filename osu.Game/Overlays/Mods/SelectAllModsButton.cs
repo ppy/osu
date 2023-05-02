@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Mods
         {
             Enabled.Value = availableMods.Value
                                          .SelectMany(pair => pair.Value)
-                                         .Any(modState => !modState.Active.Value && !modState.Filtered.Value);
+                                         .Any(modState => !modState.Active.Value && !modState.MatchingFilter.Value);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
