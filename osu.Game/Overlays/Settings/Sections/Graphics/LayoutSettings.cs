@@ -230,11 +230,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     if (s == dimSlider)
                     {
                         s.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
-                        return;
                     }
-
-                    s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
-                    s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                    else
+                    {
+                        s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
+                        s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                    }
                 });
             }
         }
