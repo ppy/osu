@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Horizontal = 50, Vertical = 20 },
+                            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 20 },
                             Children = new Drawable[]
                             {
                                 avatar = new UpdateableAvatar(api.LocalUser.Value)
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Comments
                                             ShowDeleted = { BindTarget = ShowDeleted },
                                             Margin = new MarginPadding
                                             {
-                                                Horizontal = 70,
+                                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                                                 Vertical = 10
                                             }
                                         },
@@ -393,7 +393,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 50 },
+                        Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Text = CommentsStrings.Empty
                     }
                 });

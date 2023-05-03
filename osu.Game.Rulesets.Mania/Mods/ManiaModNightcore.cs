@@ -8,6 +8,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModNightcore : ModNightcore<ManiaHitObject>
     {
-        public override double ScoreMultiplier => 1;
     }
 }

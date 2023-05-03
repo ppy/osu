@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHalfTime : ModHalfTime
     {
-        public override double ScoreMultiplier => 0.5;
     }
 }

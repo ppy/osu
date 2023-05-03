@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding
             {
                 Vertical = 20,
-                Horizontal = 50,
+                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
             };
         }
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Changelog
                                     Direction = FillDirection.Vertical,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Padding = new MarginPadding { Right = 50 + image_container_width },
+                                    Padding = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING + image_container_width },
                                     Children = new Drawable[]
                                     {
                                         new OsuSpriteText
