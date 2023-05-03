@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Mods
         private ShearedSearchTextBox searchTextBox = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
-        private ModSearch? modSearch;
+        private ModSearchContainer? modSearch;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -215,7 +215,7 @@ namespace osu.Game.Overlays.Mods
                 AutoSizeAxes = Axes.X,
                 Height = ModsEffectDisplay.HEIGHT,
                 Margin = new MarginPadding { Horizontal = 100 },
-                Child = modSearch = new ModSearch()
+                Child = modSearch = new ModSearchContainer()
             });
 
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>

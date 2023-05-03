@@ -45,13 +45,13 @@ namespace osu.Game.Overlays.Mods
 
         public string SearchTerm
         {
-            set => ItemsFlow.SearchTerm = value;
+            set => ItemsFlow.ForcedSearchTerm = value;
         }
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
         protected readonly Container ControlContainer;
-        protected readonly SearchContainer ItemsFlow;
+        protected readonly ModSearchContainer ItemsFlow;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Mods
                                                     RelativeSizeAxes = Axes.Both,
                                                     ClampExtension = 100,
                                                     ScrollbarOverlapsContent = false,
-                                                    Child = ItemsFlow = new SearchContainer
+                                                    Child = ItemsFlow = new ModSearchContainer
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         AutoSizeAxes = Axes.Y,
