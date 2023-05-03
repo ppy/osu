@@ -31,7 +31,7 @@ using ChatStrings = osu.Game.Localisation.ChatStrings;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class DrawableUsername : OsuClickableContainer, IHasContextMenu, IHasPopover
+    public partial class DrawableChatUsername : OsuClickableContainer, IHasContextMenu, IHasPopover
     {
         public Color4 AccentColour { get; }
 
@@ -73,15 +73,15 @@ namespace osu.Game.Overlays.Chat
         private Bindable<Channel?>? currentChannel { get; set; }
 
         private readonly APIUser user;
-        private readonly Message message;
+        private readonly long? messageId;
         private readonly OsuSpriteText drawableText;
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableUsername(Message message)
+        public DrawableChatUsername(APIUser user, long? messageId)
         {
-            this.message = message;
-            user = message.Sender;
+            this.user = user;
+            this.messageId = messageId;
 
             Action = openUserProfile;
 
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.Chat
 
         private void report(ChatReportReason reason, string comments)
         {
-            var request = new ChatReportRequest(message.Id, reason, comments);
+            var request = new ChatReportRequest(messageId, reason, comments);
 
             request.Failure += _ => Schedule(() =>
             {

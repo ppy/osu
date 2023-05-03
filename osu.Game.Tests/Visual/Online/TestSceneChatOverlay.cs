@@ -616,7 +616,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-            AddStep("Show report popover", () => this.ChildrenOfType<DrawableUsername>().First().ShowPopover());
+            AddStep("Show report popover", () => this.ChildrenOfType<DrawableChatUsername>().First().ShowPopover());
 
             AddStep("Set report reason to other", () =>
             {

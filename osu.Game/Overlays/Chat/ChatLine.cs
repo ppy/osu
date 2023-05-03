@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly OsuSpriteText drawableTimestamp;
 
-        private readonly DrawableUsername drawableUsername;
+        private readonly DrawableChatUsername drawableUsername;
 
         private readonly LinkFlowContainer drawableContentFlow;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername = new DrawableUsername(message)
+                        drawableUsername = new DrawableChatUsername(message.Sender, message.Id)
                         {
                             Width = UsernameWidth,
                             FontSize = FontSize,
