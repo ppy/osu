@@ -3,9 +3,12 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
@@ -24,18 +27,27 @@ namespace osu.Game.Tests.Visual
 
         protected EditorBeatmap EditorBeatmap => (EditorBeatmap)Editor.Dependencies.Get(typeof(EditorBeatmap));
 
+        [CanBeNull]
+        protected Func<WorkingBeatmap> CreateInitialBeatmap { get; set; }
+
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
+            if (CreateInitialBeatmap == null)
+                AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
+            else
+            {
+                AddStep("set test beatmap", () => Game.Beatmap.Value = CreateInitialBeatmap?.Invoke());
+            }
 
             PushAndConfirm(() => new EditorLoader());
 
             AddUntilStep("wait for editor load", () => Editor?.IsLoaded == true);
 
-            AddUntilStep("wait for metadata screen load", () => Editor.ChildrenOfType<MetadataSection>().FirstOrDefault()?.IsLoaded == true);
+            if (CreateInitialBeatmap == null)
+                AddUntilStep("wait for metadata screen load", () => Editor.ChildrenOfType<MetadataSection>().FirstOrDefault()?.IsLoaded == true);
 
             // We intentionally switch away from the metadata screen, else there is a feedback loop with the textbox handling which causes metadata changes below to get overwritten.
 
@@ -50,6 +62,14 @@ namespace osu.Game.Tests.Visual
 
         protected void ReloadEditorToSameBeatmap()
         {
+            Guid beatmapSetGuid = Guid.Empty;
+            Guid beatmapGuid = Guid.Empty;
+
+            AddStep("Store beatmap GUIDs", () =>
+            {
+                beatmapSetGuid = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID;
+                beatmapGuid = EditorBeatmap.BeatmapInfo.ID;
+            });
             AddStep("Exit", () => InputManager.Key(Key.Escape));
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
@@ -59,7 +79,8 @@ namespace osu.Game.Tests.Visual
             PushAndConfirm(() => songSelect = new PlaySongSelect());
             AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
 
-            AddUntilStep("Wait for beatmap selected", () => !Game.Beatmap.IsDefault);
+            AddStep("Present same beatmap", () => Game.PresentBeatmap(Game.BeatmapManager.QueryBeatmapSet(set => set.ID == beatmapSetGuid)!.Value, beatmap => beatmap.ID == beatmapGuid));
+            AddUntilStep("Wait for beatmap selected", () => Game.Beatmap.Value.BeatmapInfo.ID == beatmapGuid);
             AddStep("Open options", () => InputManager.Key(Key.F3));
             AddStep("Enter editor", () => InputManager.Key(Key.Number5));
 

@@ -122,19 +122,9 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
-
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
-
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object still has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
         }
 
         [Test]

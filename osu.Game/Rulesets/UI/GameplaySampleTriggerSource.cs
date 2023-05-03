@@ -52,7 +52,6 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             var samples = nextObject.Samples
-                                    .Select(s => nextObject.SampleControlPoint.ApplyTo(s))
                                     .Cast<ISampleInfo>()
                                     .ToArray();
 
