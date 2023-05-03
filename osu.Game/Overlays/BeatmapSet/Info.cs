@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 15, Horizontal = BeatmapSetOverlay.X_PADDING },
+                    Padding = new MarginPadding { Top = 15, Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         new Container

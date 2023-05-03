@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             if (IsStrongBindable.Value != strongSamples.Any())
             {
                 if (IsStrongBindable.Value)
-                    Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
+                    Samples.Add(GetSampleInfo(HitSampleInfo.HIT_FINISH));
                 else
                 {
                     foreach (var sample in strongSamples)

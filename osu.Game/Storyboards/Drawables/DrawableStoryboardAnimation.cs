@@ -85,7 +85,7 @@ namespace osu.Game.Storyboards.Drawables
             Loop = animation.LoopType == AnimationLoopType.LoopForever;
 
             LifetimeStart = animation.StartTime;
-            LifetimeEnd = animation.EndTime;
+            LifetimeEnd = animation.EndTimeForDisplay;
         }
 
         [Resolved]

@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         new OsuSpriteText
                         {
-                            Text = Name,
+                            Text = Trigger.Name,
                             Font = OsuFont.Numeric.With(size: 12),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
