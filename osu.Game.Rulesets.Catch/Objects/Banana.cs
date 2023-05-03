@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public override Judgement CreateJudgement() => new CatchBananaJudgement();
 
-        private static readonly List<HitSampleInfo> samples = new List<HitSampleInfo> { new BananaHitSampleInfo() };
+        private static readonly IList<HitSampleInfo> default_banana_samples = new List<HitSampleInfo> { new BananaHitSampleInfo() }.AsReadOnly();
 
         public Banana()
         {
-            Samples = samples;
+            Samples = default_banana_samples;
         }
 
         // override any external colour changes with banananana
