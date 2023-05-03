@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.SkinEditor
             SerialisedDrawableInfo[] skinnableInfos = deserializedContent.ToArray();
             ISerialisableDrawable[] targetComponents = firstTarget.Components.ToArray();
 
-            // Store components based on type for later lookup
+            // Store components based on type for later reuse
             var componentsPerTypeLookup = new Dictionary<Type, Queue<Drawable>>();
 
             foreach (ISerialisableDrawable component in targetComponents)
@@ -73,7 +73,6 @@ namespace osu.Game.Overlays.SkinEditor
                 componentsOfSameType.Enqueue((Drawable)component);
             }
 
-            // Remove all components
             for (int i = targetComponents.Length - 1; i >= 0; i--)
                 firstTarget.Remove(targetComponents[i], false);
 
@@ -87,23 +86,22 @@ namespace osu.Game.Overlays.SkinEditor
                     continue;
                 }
 
+                // Wherever possible, attempt to reuse existing component instances.
                 if (componentsOfSameType.TryDequeue(out Drawable? component))
                 {
-                    // Re-use unused component
                     component.ApplySerialisedInfo(skinnableInfo);
                 }
                 else
                 {
-                    // Create new one
                     component = skinnableInfo.CreateInstance();
                 }
 
                 firstTarget.Add((ISerialisableDrawable)component);
             }
 
+            // Dispose components which were not reused.
             foreach ((Type _, Queue<Drawable> typeComponents) in componentsPerTypeLookup)
             {
-                // Dispose extra components
                 foreach (var component in typeComponents)
                     component.Dispose();
             }
