@@ -8,7 +8,9 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -39,11 +41,19 @@ namespace osu.Game.Overlays
 
         private bool displayUpdateRequired = true;
 
+        private Bindable<string> languageConfig = null!;
+
         private WikiArticlePage articlePage;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(FrameworkConfigManager frameworkConfig)
+        {
+            languageConfig = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
         }
 
         public void ShowPage(string pagePath = index_path)
@@ -63,8 +73,16 @@ namespace osu.Game.Overlays
             base.LoadComplete();
             path.BindValueChanged(_ => updatePage());
             wikiData.BindTo(Header.WikiPageData);
+
             currentLanguage.BindTo(Header.LanguageDropdown.Current);
             currentLanguage.BindValueChanged(_ => updatePage());
+            languageConfig.BindValueChanged(s =>
+            {
+                if (LanguageExtensions.TryParseCultureCode(s.NewValue, out var language))
+                {
+                    currentLanguage.Value = language;
+                }
+            }, true);
         }
 
         protected override void PopIn()
@@ -107,6 +125,9 @@ namespace osu.Game.Overlays
 
         private void updatePage()
         {
+            if (State.Value == Visibility.Hidden)
+                return;
+
             string[] values = path.Value.Split('/', 2);
             string requestPath;
             Language requestLanguage = currentLanguage.Value;
