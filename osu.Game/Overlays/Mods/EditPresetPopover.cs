@@ -129,8 +129,6 @@ namespace osu.Game.Overlays.Mods
 
             selectedMods.BindValueChanged(_ => updateActiveState(), true);
 
-            scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
-
             nameTextBox.Current.BindValueChanged(s =>
             {
                 editButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
@@ -141,12 +139,12 @@ namespace osu.Game.Overlays.Mods
         {
             saveModAfterClosed = selectedMods.Value.ToList();
             scrollContent.Clear();
-            scrollContent.ChildrenEnumerable = saveModAfterClosed.Select(mod => new ModPresetRow(mod));
             updateActiveState();
         }
 
         private void updateActiveState()
         {
+            scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
             useCurrentModButton.Enabled.Value = checkCanBeSave();
         }
 
