@@ -3,6 +3,8 @@
 
 #nullable disable
 
+#pragma warning disable 618
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -102,9 +104,8 @@ namespace osu.Game.Beatmaps.Formats
             var legacyInfo = beatmap.ControlPointInfo as LegacyControlPointInfo;
 
             DifficultyControlPoint difficultyControlPoint = legacyInfo != null ? legacyInfo.DifficultyPointAt(hitObject.StartTime) : DifficultyControlPoint.DEFAULT;
-#pragma warning disable 618
+
             if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
-#pragma warning restore 618
             {
                 hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
                 if (hitObject is IHasGenerateTicks hasGenerateTicks)
@@ -494,9 +495,7 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-#pragma warning disable 618
             addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
-#pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
             }, timingChange);
