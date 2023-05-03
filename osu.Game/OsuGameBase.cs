@@ -625,40 +625,22 @@ namespace osu.Game
                 return;
             }
 
-            var previouslySelectedCommonMods = new List<Mod>(SelectedMods.Value.Count);
-            var convertedCommonMods = new List<Mod>(SelectedMods.Value.Count);
-
-            foreach (var mod in SelectedMods.Value)
-            {
-                var convertedMod = instance.CreateModFromAcronym(mod.Acronym);
-
-                if (convertedMod == null)
-                    continue;
-
-                previouslySelectedCommonMods.Add(mod);
-
-                convertedMod.CopyCommonSettings(mod);
-                convertedCommonMods.Add(convertedMod);
-            }
-
-            if (!ModUtils.CheckValidForGameplay(convertedCommonMods, out var invalid))
-            {
-                invalid.ForEach(mod =>
-                {
-                    int index = convertedCommonMods.IndexOf(mod);
-                    convertedCommonMods.RemoveAt(index);
-                    previouslySelectedCommonMods.RemoveAt(index);
-                });
-            }
-
-            if (!SelectedMods.Disabled)
-                // Select common mods to play the deselect samples for other mods
-                SelectedMods.Value = previouslySelectedCommonMods;
-
             AvailableMods.Value = dict;
 
-            if (!SelectedMods.Disabled)
-                SelectedMods.Value = convertedCommonMods;
+            if (SelectedMods.Disabled)
+                return;
+
+            var convertedMods = SelectedMods.Value.Select(mod =>
+            {
+                var newMod = instance.CreateModFromAcronym(mod.Acronym);
+                newMod?.CopyCommonSettings(mod);
+                return newMod;
+            }).Where(newMod => newMod != null).ToList();
+
+            if (!ModUtils.CheckValidForGameplay(convertedMods, out var invalid))
+                invalid.ForEach(newMod => convertedMods.Remove(newMod));
+
+            SelectedMods.Value = convertedMods;
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
