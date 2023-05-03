@@ -631,7 +631,6 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddWaitStep("Wait", 3);
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Set report data", () =>
             {
