@@ -116,6 +116,11 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer = new Container
                 {
                     Name = "Content",
+                    Padding = new MarginPadding
+                    {
+                        Left = TOOLBOX_CONTRACTED_SIZE_LEFT,
+                        Right = TOOLBOX_CONTRACTED_SIZE_RIGHT,
+                    },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -138,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        LeftToolbox = new ExpandingToolboxContainer(60, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
                         {
                             Children = new Drawable[]
                             {
@@ -173,7 +178,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(130, 250)
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
@@ -450,6 +455,9 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 130;
+
         public readonly Ruleset Ruleset;
 
         protected HitObjectComposer(Ruleset ruleset)

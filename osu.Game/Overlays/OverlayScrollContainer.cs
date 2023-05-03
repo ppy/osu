@@ -185,6 +185,12 @@ namespace osu.Game.Overlays
                 content.ScaleTo(1, 1000, Easing.OutElastic);
                 base.OnMouseUp(e);
             }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                return true;
+            }
         }
     }
 }
