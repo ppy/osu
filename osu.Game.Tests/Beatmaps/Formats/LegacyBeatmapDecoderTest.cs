@@ -510,7 +510,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]
@@ -528,7 +528,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]
@@ -548,7 +548,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]

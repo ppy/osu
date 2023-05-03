@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -16,7 +17,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchHitObject, IHasPathWithRepeats
+    public class JuiceStream : CatchHitObject, IHasPathWithRepeats, IHasSliderVelocity
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
@@ -27,6 +28,19 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
+
         [JsonIgnore]
         private double velocityFactor;
 
@@ -34,10 +48,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         private double tickDistanceFactor;
 
         [JsonIgnore]
-        public double Velocity => velocityFactor * DifficultyControlPoint.SliderVelocity;
+        public double Velocity => velocityFactor * SliderVelocity;
 
         [JsonIgnore]
-        public double TickDistance => tickDistanceFactor * DifficultyControlPoint.SliderVelocity;
+        public double TickDistance => tickDistanceFactor * SliderVelocity;
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
