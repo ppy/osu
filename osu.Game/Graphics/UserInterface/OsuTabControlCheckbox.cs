@@ -94,14 +94,19 @@ namespace osu.Game.Graphics.UserInterface
 
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+        }
 
-            Current.ValueChanged += selected =>
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(selected =>
             {
                 icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
                 text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
 
                 updateFade();
-            };
+            });
         }
 
         protected override bool OnHover(HoverEvent e)
