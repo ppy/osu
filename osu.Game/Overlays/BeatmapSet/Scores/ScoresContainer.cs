@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Margin = new MarginPadding { Vertical = 20 },
                     Children = new Drawable[]
                     {

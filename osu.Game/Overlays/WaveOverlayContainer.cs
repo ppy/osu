@@ -22,6 +22,8 @@ namespace osu.Game.Overlays
 
         protected override string PopInSampleName => "UI/wave-pop-in";
 
+        public const float HORIZONTAL_PADDING = 50;
+
         protected WaveOverlayContainer()
         {
             AddInternal(Waves = new WaveContainer

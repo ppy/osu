@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorTrail => new TranslatableString(getKey(@"cursor_trail"), @"Cursor trail");
 
         /// <summary>
+        /// "Cursor ripples"
+        /// </summary>
+        public static LocalisableString CursorRipples => new TranslatableString(getKey(@"cursor_ripples"), @"Cursor ripples");
+
+        /// <summary>
         /// "Playfield border style"
         /// </summary>
         public static LocalisableString PlayfieldBorderStyle => new TranslatableString(getKey(@"playfield_border_style"), @"Playfield border style");

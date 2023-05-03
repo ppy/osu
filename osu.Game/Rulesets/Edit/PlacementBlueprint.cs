@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             // adding the default hit sample should be the case regardless of the ruleset.
-            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, volume: 100));
 
             RelativeSizeAxes = Axes.Both;
 
@@ -74,9 +74,10 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
         protected void BeginPlacement(bool commitStart = false)
         {
-            var nearestSampleControlPoint = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.SampleControlPoint?.DeepClone() as SampleControlPoint;
-
-            HitObject.SampleControlPoint = nearestSampleControlPoint ?? new SampleControlPoint();
+            // Take the hitnormal sample of the last hit object
+            var lastHitNormal = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            if (lastHitNormal != null)
+                HitObject.Samples[0] = lastHitNormal;
 
             placementHandler.BeginPlacement(HitObject);
             if (commitStart)

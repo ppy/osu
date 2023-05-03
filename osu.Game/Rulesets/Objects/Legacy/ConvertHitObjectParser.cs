@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo);
+                    readCustomSampleBanks(split[10], bankInfo, true);
 
                 // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             return result;
         }
 
-        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false)
         {
             if (string.IsNullOrEmpty(str))
                 return;
@@ -201,6 +201,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             bankInfo.BankForNormal = stringBank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
+
+            if (banksOnly) return;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);

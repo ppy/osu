@@ -242,7 +242,6 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     length = value;
                     mask.Width = value * DrawWidth;
-                    fill.Width = value * DrawWidth;
                 }
             }
 

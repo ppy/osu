@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
                 }
             });
 
-            ContentSidePadding = 50;
+            ContentSidePadding = WaveOverlayContainer.HORIZONTAL_PADDING;
         }
 
         [BackgroundDependencyLoader]
