@@ -43,13 +43,13 @@ public partial class WikiLanguageDropdown : OsuDropdown<Language>
         }, true);
     }
 
-    public void UpdateDropDown(APIWikiPage page)
+    public void UpdateDropdown(APIWikiPage page)
     {
         AvailableLanguages.Clear();
 
-        foreach (string langString in page.AvailableLocales)
+        foreach (string locale in page.AvailableLocales)
         {
-            if (LanguageExtensions.TryParseCultureCode(langString, out var language))
+            if (LanguageExtensions.TryParseCultureCode(locale, out var language))
             {
                 AvailableLanguages.Add(language);
             }
