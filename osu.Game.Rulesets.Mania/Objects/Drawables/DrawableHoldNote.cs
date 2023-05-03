@@ -219,6 +219,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < releaseTime)
                 releaseTime = null;
 
+            if (Time.Current < HoldStartTime)
+                endHold();
+
             // Pad the full size container so its contents (i.e. the masking container) reach under the tail.
             // This is required for the tail to not be masked away, since it lies outside the bounds of the hold note.
             sizingContainer.Padding = new MarginPadding
@@ -321,15 +324,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (e.Action != Action.Value)
                 return;
-
-            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if (Time.Elapsed < 0)
-            {
-                // Except for the IsHitting state, as this handles animations that need to be reapplied
-                // after rewind.
-                isHitting.Value = false;
-                return;
-            }
 
             // Make sure a hold was started
             if (HoldStartTime == null)
