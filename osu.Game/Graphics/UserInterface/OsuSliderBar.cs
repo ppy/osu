@@ -97,7 +97,9 @@ namespace osu.Game.Graphics.UserInterface
             // Find the number of significant digits (we could have less than 5 after normalize())
             int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
 
-            return floatValue.ToString($"N{significantDigits}");
+            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
+
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}";
         }
 
         /// <summary>
