@@ -10,7 +10,7 @@
         ["Gameplay/soft-hitnormal"],
         ["Gameplay/drum-hitnormal"]
       ],
-      "Samples": ["Gameplay/-hitnormal"]
+      "Samples": ["Gameplay/normal-hitnormal"]
     }, {
       "StartTime": 1875.0,
       "EndTime": 2750.0,
@@ -19,7 +19,7 @@
         ["Gameplay/soft-hitnormal"],
         ["Gameplay/drum-hitnormal"]
       ],
-      "Samples": ["Gameplay/-hitnormal"]
+      "Samples": ["Gameplay/normal-hitnormal"]
     }]
   }, {
     "StartTime": 3750.0,
