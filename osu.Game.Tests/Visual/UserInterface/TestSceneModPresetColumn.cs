@@ -301,7 +301,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddWaitStep("wait some", 3);
             AddAssert("present is not changed", () => panel.Preset.Value.Name == presetName);
             AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
             AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
@@ -357,8 +356,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddWaitStep("wait some", 3);
-            AddAssert("present mod not changed", () =>
+
+            AddUntilStep("present mod not changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(previousMod));
 
             AddStep("select mods", () => SelectedMods.Value = mods);
@@ -388,8 +387,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddWaitStep("wait some", 3);
-            AddAssert("present mod is changed", () =>
+
+            AddUntilStep("present mod is changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
         }
 
