@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
         /// The osu! logo sprite has a shadow included in its texture.
         /// This adjustment vector is used to match the precise edge of the border of the logo.
         /// </summary>
-        private static readonly Vector2 scale_adjust = new Vector2(0.96f);
+        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.96f);
 
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Alpha = visualizer_default_alpha,
-                                                    Size = scale_adjust
+                                                    Size = SCALE_ADJUST
                                                 },
                                                 new Container
                                                 {
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Scale = scale_adjust,
+                                                            Scale = SCALE_ADJUST,
                                                             Masking = true,
                                                             Children = new Drawable[]
                                                             {
@@ -412,7 +412,7 @@ namespace osu.Game.Screens.Menu
         public void Impact()
         {
             impactContainer.FadeOutFromOne(250, Easing.In);
-            impactContainer.ScaleTo(0.96f);
+            impactContainer.ScaleTo(SCALE_ADJUST);
             impactContainer.ScaleTo(1.12f, 250);
         }
 
