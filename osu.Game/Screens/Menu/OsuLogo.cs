@@ -35,6 +35,12 @@ namespace osu.Game.Screens.Menu
 
         private const double transition_length = 300;
 
+        /// <summary>
+        /// The osu! logo sprite has a shadow included in its texture.
+        /// This adjustment vector is used to match the precise edge of the border of the logo.
+        /// </summary>
+        private static readonly Vector2 scale_adjust = new Vector2(0.96f);
+
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
         private readonly Container logoBounceContainer;
@@ -150,7 +156,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Alpha = visualizer_default_alpha,
-                                                    Size = new Vector2(0.96f)
+                                                    Size = scale_adjust
                                                 },
                                                 new Container
                                                 {
@@ -162,7 +168,7 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Scale = new Vector2(0.88f),
+                                                            Scale = scale_adjust,
                                                             Masking = true,
                                                             Children = new Drawable[]
                                                             {
