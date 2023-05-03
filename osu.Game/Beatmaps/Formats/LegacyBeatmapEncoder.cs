@@ -92,7 +92,8 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
-            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints?.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+            writer.WriteLine(FormattableString.Invariant(
+                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints?.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -171,24 +172,6 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
 
-        private struct LegacyControlPointProperties
-        {
-            internal double SliderVelocity { get; set; }
-            internal int TimingSignature { get; init; }
-            internal int SampleBank { get; init; }
-            internal int CustomSampleBank { get; init; }
-            internal int SampleVolume { get; init; }
-            internal LegacyEffectFlags EffectFlags { get; init; }
-
-            internal bool IsRedundant(LegacyControlPointProperties other) =>
-                SliderVelocity == other.SliderVelocity &&
-                TimingSignature == other.TimingSignature &&
-                SampleBank == other.SampleBank &&
-                CustomSampleBank == other.CustomSampleBank &&
-                SampleVolume == other.SampleVolume &&
-                EffectFlags == other.EffectFlags;
-        }
-
         private void handleControlPoints(TextWriter writer)
         {
             var legacyControlPoints = new LegacyControlPointInfo();
@@ -243,11 +226,10 @@ namespace osu.Game.Beatmaps.Formats
 
             LegacyControlPointProperties getLegacyControlPointProperties(ControlPointGroup group, bool updateSampleBank)
             {
-                double time = group.Time;
-                var timingPoint = legacyControlPoints.TimingPointAt(time);
-                var difficultyPoint = legacyControlPoints.DifficultyPointAt(time);
-                var samplePoint = legacyControlPoints.SamplePointAt(time);
-                var effectPoint = legacyControlPoints.EffectPointAt(time);
+                var timingPoint = legacyControlPoints.TimingPointAt(group.Time);
+                var difficultyPoint = legacyControlPoints.DifficultyPointAt(group.Time);
+                var samplePoint = legacyControlPoints.SamplePointAt(group.Time);
+                var effectPoint = legacyControlPoints.EffectPointAt(group.Time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
@@ -627,6 +609,24 @@ namespace osu.Game.Beatmaps.Formats
                 return legacy.CustomSampleBank;
 
             return 0;
+        }
+
+        private struct LegacyControlPointProperties
+        {
+            internal double SliderVelocity { get; set; }
+            internal int TimingSignature { get; init; }
+            internal int SampleBank { get; init; }
+            internal int CustomSampleBank { get; init; }
+            internal int SampleVolume { get; init; }
+            internal LegacyEffectFlags EffectFlags { get; init; }
+
+            internal bool IsRedundant(LegacyControlPointProperties other) =>
+                SliderVelocity == other.SliderVelocity &&
+                TimingSignature == other.TimingSignature &&
+                SampleBank == other.SampleBank &&
+                CustomSampleBank == other.CustomSampleBank &&
+                SampleVolume == other.SampleVolume &&
+                EffectFlags == other.EffectFlags;
         }
     }
 }
