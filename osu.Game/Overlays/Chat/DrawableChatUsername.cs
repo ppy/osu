@@ -180,6 +180,11 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        public Popover GetPopover() => new ReportChatPopover(user)
+        {
+            Action = report
+        };
+
         private void report(ChatReportReason reason, string comments)
         {
             var request = new ChatReportRequest(messageId, reason, comments);
@@ -259,11 +264,6 @@ namespace osu.Game.Overlays.Chat
             Color4Extensions.FromHex("4335a5"),
             Color4Extensions.FromHex("812a96"),
             Color4Extensions.FromHex("992861"),
-        };
-
-        public Popover GetPopover() => new ReportChatPopover(user)
-        {
-            Action = report
         };
     }
 }

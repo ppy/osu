@@ -24,11 +24,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private OsuEnumDropdown<T> reasonDropdown = null!;
         private OsuTextBox commentsTextBox = null!;
         private RoundedButton submitButton = null!;
-        public LocalisableString Header;
+
+        private readonly LocalisableString header;
 
         protected ReportPopover(LocalisableString headerString)
         {
-            Header = headerString;
+            header = headerString;
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +54,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Text = Header,
+                        Text = header,
                         Font = OsuFont.Torus.With(size: 25),
                         Margin = new MarginPadding { Bottom = 10 }
                     },
