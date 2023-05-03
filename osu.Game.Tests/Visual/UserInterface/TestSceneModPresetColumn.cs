@@ -392,50 +392,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
         }
 
-        [Test]
-        public void TestEditPresetModInContextMenu()
-        {
-            ModPresetColumn modPresetColumn = null!;
-            var mods = new Mod[] { new OsuModHidden() };
-
-            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
-
-            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
-
-            AddStep("right click first panel", () =>
-            {
-                var panel = this.ChildrenOfType<ModPresetPanel>().First();
-                InputManager.MoveMouseTo(panel);
-                InputManager.Click(MouseButton.Right);
-            });
-            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
-            AddAssert("No Use Current Mods", () => this.ChildrenOfType<DrawableOsuMenuItem>().Count() == 2);
-
-            AddStep("select mods", () => SelectedMods.Value = mods);
-            AddStep("right click second panel", () =>
-            {
-                var panel = this.ChildrenOfType<ModPresetPanel>().ElementAt(1);
-                InputManager.MoveMouseTo(panel);
-                InputManager.Click(MouseButton.Right);
-            });
-
-            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
-            AddAssert("Have Use Current Mods", () => this.ChildrenOfType<DrawableOsuMenuItem>().Count() == 3);
-            AddStep("Click Use Current Mods", () =>
-            {
-                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1);
-                InputManager.MoveMouseTo(editItem);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("present mod is changed", () =>
-                new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().ElementAt(1).Preset.Value.Mods).SetEquals(mods));
-        }
-
         private ICollection<ModPreset> createTestPresets() => new[]
         {
             new ModPreset
