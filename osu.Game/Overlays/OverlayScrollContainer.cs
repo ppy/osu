@@ -186,7 +186,11 @@ namespace osu.Game.Overlays
                 base.OnMouseUp(e);
             }
 
-            protected override bool OnHover(HoverEvent e) => true;
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                return true;
+            }
         }
     }
 }
