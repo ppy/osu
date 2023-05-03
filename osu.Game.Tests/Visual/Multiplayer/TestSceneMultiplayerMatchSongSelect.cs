@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()
-                          .Where(panel => !panel.Filtered.Value)
+                          .Where(panel => panel.MatchingFilter)
                           .All(b => b.Mod.GetType() != type));
         }
 
