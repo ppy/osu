@@ -4,11 +4,12 @@
 #nullable disable
 
 using System.Linq;
+using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
@@ -39,10 +40,9 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     StartTime = 0,
                     Position = (OsuPlayfield.BASE_SIZE - new Vector2(100, 0)) / 2,
-                    SampleControlPoint = new SampleControlPoint
+                    Samples = new List<HitSampleInfo>
                     {
-                        SampleBank = "normal",
-                        SampleVolume = 80
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 80)
                     }
                 });
 
@@ -50,10 +50,9 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     StartTime = 500,
                     Position = (OsuPlayfield.BASE_SIZE + new Vector2(100, 0)) / 2,
-                    SampleControlPoint = new SampleControlPoint
+                    Samples = new List<HitSampleInfo>
                     {
-                        SampleBank = "soft",
-                        SampleVolume = 60
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft", volume: 60)
                     }
                 });
             });
@@ -96,7 +95,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("unify sample volume", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects)
-                    h.SampleControlPoint.SampleVolume = 50;
+                {
+                    for (int i = 0; i < h.Samples.Count; i++)
+                    {
+                        h.Samples[i] = h.Samples[i].With(newVolume: 50);
+                    }
+                }
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -136,7 +140,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("unify sample bank", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects)
-                    h.SampleControlPoint.SampleBank = "soft";
+                {
+                    for (int i = 0; i < h.Samples.Count; i++)
+                    {
+                        h.Samples[i] = h.Samples[i].With(newBank: "soft");
+                    }
+                }
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -248,7 +257,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void hitObjectHasSampleVolume(int objectIndex, int volume) => AddAssert($"{objectIndex.ToOrdinalWords()} has volume {volume}", () =>
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
-            return h.SampleControlPoint.SampleVolume == volume;
+            return h.Samples.All(o => o.Volume == volume);
         });
 
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
@@ -265,7 +274,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void hitObjectHasSampleBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has bank {bank}", () =>
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
-            return h.SampleControlPoint.SampleBank == bank;
+            return h.Samples.All(o => o.Bank == bank);
         });
     }
 }

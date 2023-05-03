@@ -19,7 +19,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
                                                    .OrderBy(action => action)
-                                                   .Select(action => new KeyCounterAction<T>(action)));
+                                                   .Select(action => new KeyCounterActionTrigger<T>(action)));
         }
 
         private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
@@ -179,11 +179,14 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>)
+                                                                      .Select(c => (KeyCounterActionTrigger<T>)c.Trigger)
+                                                                      .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
-                foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
+                foreach (var c
+                         in Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>).Select(c => (KeyCounterActionTrigger<T>)c.Trigger))
                     c.OnReleased(e.Action, Clock.Rate >= 0);
             }
         }

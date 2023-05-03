@@ -16,7 +16,6 @@ using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -77,8 +76,11 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
-        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
-        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
+        /// <summary>
+        /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+        /// DO NOT USE THIS UNLESS 100% SURE.
+        /// </summary>
+        public double? LegacyBpmMultiplier { get; set; }
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -105,24 +107,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
-            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
-
-            if (legacyInfo != null)
-                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-            else if (ReferenceEquals(DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
-                DifficultyControlPoint = new DifficultyControlPoint();
-
-            DifficultyControlPoint.Time = StartTime;
-
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
-            if (legacyInfo != null)
-                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-            else if (ReferenceEquals(SampleControlPoint, SampleControlPoint.DEFAULT))
-                SampleControlPoint = new SampleControlPoint();
-
-            SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
 
             nestedHitObjects.Clear();
 
@@ -164,9 +149,6 @@ namespace osu.Game.Rulesets.Objects
 
                 foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
-
-                DifficultyControlPoint.Time = time.NewValue;
-                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             }
         }
 
@@ -221,6 +203,17 @@ namespace osu.Game.Rulesets.Objects
                 slidingSamples.Add(whistleSample.With("sliderwhistle"));
 
             return slidingSamples;
+        }
+
+        /// <summary>
+        /// Create a SampleInfo based on the sample settings of the hit normal sample in <see cref="Samples"/>.
+        /// </summary>
+        /// <param name="sampleName">The name of the sample.</param>
+        /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
+        protected HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
+        {
+            var hitnormalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            return hitnormalSample == null ? new HitSampleInfo(sampleName) : hitnormalSample.With(newName: sampleName);
         }
     }
 

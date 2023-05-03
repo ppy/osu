@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The default sample bank at this control point.
         /// </summary>
         public string SampleBank
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         /// <summary>
-        /// The default sample bank at this control point.
+        /// The default sample volume at this control point.
         /// </summary>
         public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
         {
