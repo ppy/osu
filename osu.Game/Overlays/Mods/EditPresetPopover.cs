@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Mods
         private readonly LabelledTextBox nameTextBox;
         private readonly LabelledTextBox descriptionTextBox;
         private readonly ShearedButton useCurrentModButton;
-        private readonly ShearedButton createButton;
+        private readonly ShearedButton editButton;
         private readonly FillFlowContainer scrollContent;
 
         private readonly ModPreset preset;
@@ -97,12 +97,12 @@ namespace osu.Game.Overlays.Mods
                                 Text = "Use Current Mods",
                                 Action = saveCurrentMod
                             },
-                            createButton = new ShearedButton
+                            editButton = new ShearedButton
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
-                                Action = tryEditPreset
+                                Action = editPreset
                             },
                         }
                     }
@@ -119,9 +119,9 @@ namespace osu.Game.Overlays.Mods
             nameTextBox.Current.Value = preset.Name;
             descriptionTextBox.Current.Value = preset.Description;
 
-            createButton.DarkerColour = colours.Orange1;
-            createButton.LighterColour = colours.Orange0;
-            createButton.TextColour = colourProvider.Background6;
+            editButton.DarkerColour = colours.Orange1;
+            editButton.LighterColour = colours.Orange0;
+            editButton.TextColour = colourProvider.Background6;
 
             useCurrentModButton.DarkerColour = colours.Blue1;
             useCurrentModButton.LighterColour = colours.Blue0;
@@ -130,6 +130,11 @@ namespace osu.Game.Overlays.Mods
             selectedMods.BindValueChanged(_ => updateActiveState(), true);
 
             scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
+
+            nameTextBox.Current.BindValueChanged(s =>
+            {
+                editButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
+            }, true);
         }
 
         private void saveCurrentMod()
@@ -165,14 +170,8 @@ namespace osu.Game.Overlays.Mods
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
         }
 
-        private void tryEditPreset()
+        private void editPreset()
         {
-            if (string.IsNullOrWhiteSpace(nameTextBox.Current.Value))
-            {
-                Body.Shake();
-                return;
-            }
-
             button.Preset.PerformWrite(s =>
             {
                 s.Name = nameTextBox.Current.Value;

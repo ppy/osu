@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = ModSelectOverlayStrings.AddPreset,
-                        Action = tryCreatePreset
+                        Action = createPreset
                     }
                 }
             };
@@ -89,16 +89,15 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+
+            nameTextBox.Current.BindValueChanged(s =>
+            {
+                createButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
+            }, true);
         }
 
-        private void tryCreatePreset()
+        private void createPreset()
         {
-            if (string.IsNullOrWhiteSpace(nameTextBox.Current.Value))
-            {
-                Body.Shake();
-                return;
-            }
-
             realm.Write(r => r.Add(new ModPreset
             {
                 Name = nameTextBox.Current.Value,
