@@ -106,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
                 text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
 
                 updateFade();
-            });
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
