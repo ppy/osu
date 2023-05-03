@@ -250,9 +250,6 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Dispose(isDisposing);
             starDifficultyCancellationSource?.Cancel();
-
-            // This is important to clean up event subscriptions.
-            Item = null;
         }
     }
 }
