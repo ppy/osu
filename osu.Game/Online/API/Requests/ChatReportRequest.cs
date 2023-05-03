@@ -5,33 +5,34 @@ using System.Net.Http;
 using osu.Framework.IO.Network;
 using osu.Game.Overlays.Chat;
 
-namespace osu.Game.Online.API.Requests;
-
-public class ChatReportRequest : APIRequest
+namespace osu.Game.Online.API.Requests
 {
-    public readonly long? MessageId;
-    public readonly ChatReportReason Reason;
-    public readonly string Comment;
-
-    public ChatReportRequest(long? id, ChatReportReason reason, string comment)
+    public class ChatReportRequest : APIRequest
     {
-        MessageId = id;
-        Reason = reason;
-        Comment = comment;
+        public readonly long? MessageId;
+        public readonly ChatReportReason Reason;
+        public readonly string Comment;
+
+        public ChatReportRequest(long? id, ChatReportReason reason, string comment)
+        {
+            MessageId = id;
+            Reason = reason;
+            Comment = comment;
+        }
+
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+            req.Method = HttpMethod.Post;
+
+            req.AddParameter(@"reportable_type", @"message");
+            req.AddParameter(@"reportable_id", $"{MessageId}");
+            req.AddParameter(@"reason", Reason.ToString());
+            req.AddParameter(@"comments", Comment);
+
+            return req;
+        }
+
+        protected override string Target => @"reports";
     }
-
-    protected override WebRequest CreateWebRequest()
-    {
-        var req = base.CreateWebRequest();
-        req.Method = HttpMethod.Post;
-
-        req.AddParameter(@"reportable_type", @"message");
-        req.AddParameter(@"reportable_id", $"{MessageId}");
-        req.AddParameter(@"reason", Reason.ToString());
-        req.AddParameter(@"comments", Comment);
-
-        return req;
-    }
-
-    protected override string Target => @"reports";
 }
