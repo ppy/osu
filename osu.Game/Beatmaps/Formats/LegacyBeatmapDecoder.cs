@@ -101,9 +101,14 @@ namespace osu.Game.Beatmaps.Formats
 
         private void applyLegacyInfoAndDefaults(HitObject hitObject)
         {
-            var legacyInfo = beatmap.ControlPointInfo as LegacyControlPointInfo;
+            DifficultyControlPoint difficultyControlPoint = DifficultyControlPoint.DEFAULT;
+            SampleControlPoint sampleControlPoint = SampleControlPoint.DEFAULT;
 
-            DifficultyControlPoint difficultyControlPoint = legacyInfo != null ? legacyInfo.DifficultyPointAt(hitObject.StartTime) : DifficultyControlPoint.DEFAULT;
+            if (beatmap.ControlPointInfo is LegacyControlPointInfo legacyInfo)
+            {
+                difficultyControlPoint = legacyInfo.DifficultyPointAt(hitObject.StartTime);
+                sampleControlPoint = legacyInfo.SamplePointAt(hitObject.GetEndTime() + control_point_leniency);
+            }
 
             if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
             {
@@ -117,18 +122,17 @@ namespace osu.Game.Beatmaps.Formats
 
             hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
 
-            SampleControlPoint sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(hitObject.GetEndTime() + control_point_leniency) : SampleControlPoint.DEFAULT;
-
             hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
 
-            if (hitObject is not IHasRepeats hasRepeats) return;
-
-            for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
+            if (hitObject is IHasRepeats hasRepeats)
             {
-                double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + control_point_leniency;
-                sampleControlPoint = legacyInfo != null ? legacyInfo.SamplePointAt(time) : SampleControlPoint.DEFAULT;
+                for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
+                {
+                    double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + control_point_leniency;
+                    sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(time) ?? SampleControlPoint.DEFAULT;
 
-                hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+                    hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+                }
             }
         }
 
