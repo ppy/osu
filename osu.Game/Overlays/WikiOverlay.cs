@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
-            Header.LanguageDropdown.UpdateDropdown(response);
+            Header.LanguageDropdown.UpdateDropdown(response.AvailableLocales);
             path.Value = response.Path;
 
             if (LanguageExtensions.TryParseCultureCode(response.Locale, out var pageLanguage))
