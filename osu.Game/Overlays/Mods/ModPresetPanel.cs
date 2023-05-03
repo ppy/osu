@@ -90,24 +90,11 @@ namespace osu.Game.Overlays.Mods
 
         #region IHasContextMenu
 
-        public MenuItem[] ContextMenuItems
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            get
-            {
-                var menu = new List<MenuItem>
-                {
-                    new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Highlighted, this.ShowPopover),
-                    new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new DeleteModPresetDialog(Preset))),
-                };
-
-                if (CheckCurrentModCanBeSave())
-                {
-                    menu.Insert(1, new OsuMenuItem("Use Current Mods", MenuItemType.Destructive, () => SaveCurrentMod()));
-                }
-
-                return menu.ToArray();
-            }
-        }
+            new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Highlighted, this.ShowPopover),
+            new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new DeleteModPresetDialog(Preset))),
+        };
 
         #endregion
 
