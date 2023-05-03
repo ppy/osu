@@ -106,26 +106,26 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddStep("set filter", () => setFilter(mod => mod.Name.Contains("Wind", StringComparison.CurrentCultureIgnoreCase)));
-            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => !panel.Filtered.Value) == 2);
+            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => panel.MatchingFilter) == 2);
 
             clickToggle();
             AddUntilStep("wait for animation", () => !column.SelectionAnimationRunning);
-            AddAssert("only visible items selected", () => column.ChildrenOfType<ModPanel>().Where(panel => panel.Active.Value).All(panel => !panel.Filtered.Value));
+            AddAssert("only visible items selected", () => column.ChildrenOfType<ModPanel>().Where(panel => panel.Active.Value).All(panel => panel.MatchingFilter));
 
             AddStep("unset filter", () => setFilter(null));
-            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
+            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => panel.MatchingFilter));
             AddAssert("checkbox not selected", () => !column.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
 
             AddStep("set filter", () => setFilter(mod => mod.Name.Contains("Wind", StringComparison.CurrentCultureIgnoreCase)));
-            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => !panel.Filtered.Value) == 2);
+            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => panel.MatchingFilter) == 2);
             AddAssert("checkbox selected", () => column.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
 
             AddStep("filter out everything", () => setFilter(_ => false));
-            AddUntilStep("no panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => panel.Filtered.Value));
+            AddUntilStep("no panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.MatchingFilter));
             AddUntilStep("checkbox hidden", () => !column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
 
             AddStep("inset filter", () => setFilter(null));
-            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
+            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => panel.MatchingFilter));
             AddUntilStep("checkbox visible", () => column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
 
             void clickToggle() => AddStep("click toggle", () =>
