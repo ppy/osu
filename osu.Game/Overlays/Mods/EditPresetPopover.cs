@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Mods
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = "Use Current Mods",
-                                Action = trySaveCurrentMod
+                                Action = saveCurrentMod
                             },
                             createButton = new ShearedButton
                             {
@@ -123,19 +123,17 @@ namespace osu.Game.Overlays.Mods
             createButton.LighterColour = colours.Orange0;
             createButton.TextColour = colourProvider.Background6;
 
+            useCurrentModButton.DarkerColour = colours.Blue1;
+            useCurrentModButton.LighterColour = colours.Blue0;
+            useCurrentModButton.TextColour = colourProvider.Background6;
+
             selectedMods.BindValueChanged(_ => updateActiveState(), true);
 
             scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
         }
 
-        private void trySaveCurrentMod()
+        private void saveCurrentMod()
         {
-            if (!checkCanBeSave())
-            {
-                Body.Shake();
-                return;
-            }
-
             saveModAfterClosed = selectedMods.Value.ToList();
             scrollContent.Clear();
             scrollContent.ChildrenEnumerable = saveModAfterClosed.Select(mod => new ModPresetRow(mod));
@@ -144,18 +142,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateActiveState()
         {
-            if (checkCanBeSave())
-            {
-                useCurrentModButton.DarkerColour = colours.Blue1;
-                useCurrentModButton.LighterColour = colours.Blue0;
-                useCurrentModButton.TextColour = colourProvider.Background6;
-            }
-            else
-            {
-                useCurrentModButton.DarkerColour = colours.Blue3;
-                useCurrentModButton.LighterColour = colours.Blue4;
-                useCurrentModButton.TextColour = colourProvider.Background2;
-            }
+            useCurrentModButton.Enabled.Value = checkCanBeSave();
         }
 
         private bool checkCanBeSave()
