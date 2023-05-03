@@ -3,6 +3,8 @@
 
 #nullable disable
 
+#pragma warning disable 618
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +17,9 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -25,6 +29,11 @@ namespace osu.Game.Beatmaps.Formats
         /// An offset which needs to be applied to old beatmaps (v4 and lower) to correct timing changes that were applied at a game client level.
         /// </summary>
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
+
+        /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
 
         internal static RulesetStore RulesetStore;
 
@@ -85,7 +94,45 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+            {
+                applyDefaults(hitObject);
+                applySamples(hitObject);
+            }
+        }
+
+        private void applyDefaults(HitObject hitObject)
+        {
+            DifficultyControlPoint difficultyControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(hitObject.StartTime) ?? DifficultyControlPoint.DEFAULT;
+
+            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
+            {
+                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
+                if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
+            }
+
+            if (hitObject is IHasSliderVelocity hasSliderVelocity)
+                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+
+            hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+        }
+
+        private void applySamples(HitObject hitObject)
+        {
+            SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.GetEndTime() + control_point_leniency) ?? SampleControlPoint.DEFAULT;
+
+            hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+
+            if (hitObject is IHasRepeats hasRepeats)
+            {
+                for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
+                {
+                    double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + control_point_leniency;
+                    var nodeSamplePoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(time) ?? SampleControlPoint.DEFAULT;
+
+                    hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(o => nodeSamplePoint.ApplyTo(o)).ToList();
+                }
+            }
         }
 
         /// <summary>
@@ -369,7 +416,7 @@ namespace osu.Game.Beatmaps.Formats
                     // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                     // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
                     // video extensions and handle similar to a background if it doesn't match.
-                    if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename)))
+                    if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
                     {
                         beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
                     }
@@ -451,9 +498,7 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-#pragma warning disable 618
             addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
-#pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
             }, timingChange);

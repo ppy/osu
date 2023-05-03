@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -102,6 +101,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
+                new SamplePointPiece(Item)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre
+                },
             });
 
             if (item is IHasDuration)
@@ -109,6 +113,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 colouredComponents.Add(new DragArea(item)
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
+                });
+            }
+
+            if (item is IHasSliderVelocity)
+            {
+                AddInternal(new DifficultyPointPiece(Item)
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.BottomCentre
                 });
             }
         }
@@ -187,12 +200,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(averageColour);
         }
 
-        private SamplePointPiece? sampleOverrideDisplay;
-        private DifficultyPointPiece? difficultyOverrideDisplay;
-
-        private DifficultyControlPoint difficultyControlPoint = null!;
-        private SampleControlPoint sampleControlPoint = null!;
-
         protected override void Update()
         {
             base.Update();
@@ -207,36 +214,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // kind of haphazard but yeah, no bindables.
                 if (Item is IHasRepeats repeats)
                     updateRepeats(repeats);
-            }
-
-            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
-            {
-                difficultyControlPoint = Item.DifficultyControlPoint;
-                difficultyOverrideDisplay?.Expire();
-
-                if (Item.DifficultyControlPoint != null && Item is IHasDistance)
-                {
-                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.BottomCentre
-                    });
-                }
-            }
-
-            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
-            {
-                sampleControlPoint = Item.SampleControlPoint;
-                sampleOverrideDisplay?.Expire();
-
-                if (Item.SampleControlPoint != null)
-                {
-                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item)
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.TopCentre
-                    });
-                }
             }
         }
 
@@ -395,17 +372,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             case IHasRepeats repeatHitObject:
                                 double proposedDuration = time - hitObject.StartTime;
 
-                                if (e.CurrentState.Keyboard.ShiftPressed)
+                                if (e.CurrentState.Keyboard.ShiftPressed && hitObject is IHasSliderVelocity hasSliderVelocity)
                                 {
-                                    if (ReferenceEquals(hitObject.DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
-                                        hitObject.DifficultyControlPoint = new DifficultyControlPoint();
+                                    double newVelocity = hasSliderVelocity.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
 
-                                    double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
-
-                                    if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
+                                    if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocity))
                                         return;
 
-                                    hitObject.DifficultyControlPoint.SliderVelocity = newVelocity;
+                                    hasSliderVelocity.SliderVelocity = newVelocity;
                                     beatmap.Update(hitObject);
                                 }
                                 else
@@ -414,7 +388,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
                                     int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                                    if (proposedCount == repeatHitObject.RepeatCount)
+                                    if (proposedCount == repeatHitObject.RepeatCount || lengthOfOneRepeat == 0)
                                         return;
 
                                     repeatHitObject.RepeatCount = proposedCount;

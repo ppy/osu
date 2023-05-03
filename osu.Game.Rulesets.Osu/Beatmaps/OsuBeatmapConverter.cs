@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         {
             var positionData = original as IHasPosition;
             var comboData = original as IHasCombo;
+            var sliderVelocityData = original as IHasSliderVelocity;
+            var generateTicksData = original as IHasGenerateTicks;
 
             switch (original)
             {
@@ -47,7 +49,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         LegacyLastTickOffset = (original as IHasLegacyLastTickOffset)?.LegacyLastTickOffset,
                         // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
-                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1
+                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1,
+                        GenerateTicks = generateTicksData?.GenerateTicks ?? true,
+                        SliderVelocity = sliderVelocityData?.SliderVelocity ?? 1,
                     }.Yield();
 
                 case IHasDuration endTimeData:

@@ -98,6 +98,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
 
             AddAssert("freemods empty", () => songSelect.FreeMods.Value.Count == 0);
+
+            // A previous test's mod overlay could still be fading out.
+            AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
+
             assertHasFreeModButton(allowedMod, false);
             assertHasFreeModButton(requiredMod, false);
         }

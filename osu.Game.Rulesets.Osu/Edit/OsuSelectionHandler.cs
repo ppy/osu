@@ -362,7 +362,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartTime = firstHitObject.StartTime,
                 Position = firstHitObject.Position,
                 NewCombo = firstHitObject.NewCombo,
-                SampleControlPoint = firstHitObject.SampleControlPoint,
                 Samples = firstHitObject.Samples,
             };
 
