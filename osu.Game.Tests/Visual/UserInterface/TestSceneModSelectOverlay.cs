@@ -14,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
@@ -64,6 +65,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                             new OsuModDifficultyAdjust
                             {
                                 ApproachRate = { Value = 0 }
+                            }
+                        }
+                    });
+                    r.Add(new ModPreset
+                    {
+                        Name = "Half Time 0.5x",
+                        Description = "Very slow",
+                        Ruleset = r.Find<RulesetInfo>(OsuRuleset.SHORT_NAME),
+                        Mods = new[]
+                        {
+                            new OsuModHalfTime
+                            {
+                                SpeedChange = { Value = 0.5 }
                             }
                         }
                     });
@@ -564,6 +578,28 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             changeRuleset(0);
             AddAssert("5 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 5);
+        }
+
+        [Test]
+        public void TestModMultiplierUpdates()
+        {
+            createScreen();
+
+            AddStep("select mod preset with half time", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().Single(preset => preset.Preset.Value.Name == "Half Time 0.5x"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.5));
+
+            // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
+            // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
+            AddStep("force collection", GC.Collect);
+
+            AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
+            AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
+                                                                              .ChildrenOfType<RestoreDefaultValueButton<double>>().Single().TriggerClick());
+            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
