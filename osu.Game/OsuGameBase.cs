@@ -633,7 +633,7 @@ namespace osu.Game
             var convertedMods = SelectedMods.Value.Select(mod =>
             {
                 var newMod = instance.CreateModFromAcronym(mod.Acronym);
-                newMod?.CopyCommonSettings(mod);
+                newMod?.CopyCommonSettingsFrom(mod);
                 return newMod;
             }).Where(newMod => newMod != null).ToList();
 
