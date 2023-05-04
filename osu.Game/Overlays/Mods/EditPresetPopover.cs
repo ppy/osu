@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Live<ModPreset> preset;
 
-        private HashSet<Mod>? newMods;
+        private HashSet<Mod> saveableMods;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Mods
         public EditPresetPopover(Live<ModPreset> preset)
         {
             this.preset = preset;
+            saveableMods = preset.PerformRead(p => p.Mods).ToHashSet();
         }
 
         [BackgroundDependencyLoader]
@@ -122,7 +123,7 @@ namespace osu.Game.Overlays.Mods
             Body.BorderThickness = 3;
             Body.BorderColour = colours.Orange1;
 
-            selectedMods.BindValueChanged(_ => updateActiveState(), true);
+            selectedMods.BindValueChanged(_ => updateState(), true);
             nameTextBox.Current.BindValueChanged(s =>
             {
                 saveButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
@@ -131,14 +132,14 @@ namespace osu.Game.Overlays.Mods
 
         private void useCurrentMods()
         {
-            newMods = selectedMods.Value.ToHashSet();
+            saveableMods = selectedMods.Value.ToHashSet();
             scrollContent.Clear();
-            updateActiveState();
+            updateState();
         }
 
-        private void updateActiveState()
+        private void updateState()
         {
-            scrollContent.ChildrenEnumerable = preset.PerformRead(p => p.Mods.Select(mod => new ModPresetRow(mod)));
+            scrollContent.ChildrenEnumerable = saveableMods.Select(mod => new ModPresetRow(mod));
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
@@ -147,7 +148,7 @@ namespace osu.Game.Overlays.Mods
             if (!selectedMods.Value.Any())
                 return false;
 
-            return newMods?.SetEquals(selectedMods.Value) == false;
+            return !saveableMods.SetEquals(selectedMods.Value);
         }
 
         protected override void LoadComplete()
@@ -163,9 +164,7 @@ namespace osu.Game.Overlays.Mods
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
-
-                if (newMods != null)
-                    s.Mods = newMods;
+                s.Mods = saveableMods;
             });
 
             this.HidePopover();
