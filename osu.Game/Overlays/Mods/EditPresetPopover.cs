@@ -24,8 +24,8 @@ namespace osu.Game.Overlays.Mods
 
         private readonly LabelledTextBox nameTextBox;
         private readonly LabelledTextBox descriptionTextBox;
-        private readonly ShearedButton useCurrentModButton;
-        private readonly ShearedButton editButton;
+        private readonly ShearedButton useCurrentModsButton;
+        private readonly ShearedButton saveButton;
         private readonly FillFlowContainer scrollContent;
 
         private readonly ModPreset preset;
@@ -90,19 +90,19 @@ namespace osu.Game.Overlays.Mods
                         Spacing = new Vector2(7),
                         Children = new Drawable[]
                         {
-                            useCurrentModButton = new ShearedButton
+                            useCurrentModsButton = new ShearedButton
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = "Use Current Mods",
-                                Action = saveCurrentMod
+                                Action = useCurrentMods
                             },
-                            editButton = new ShearedButton
+                            saveButton = new ShearedButton
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
-                                Action = editPreset
+                                Action = save
                             },
                         }
                     }
@@ -119,23 +119,23 @@ namespace osu.Game.Overlays.Mods
             nameTextBox.Current.Value = preset.Name;
             descriptionTextBox.Current.Value = preset.Description;
 
-            editButton.DarkerColour = colours.Orange1;
-            editButton.LighterColour = colours.Orange0;
-            editButton.TextColour = colourProvider.Background6;
+            saveButton.DarkerColour = colours.Orange1;
+            saveButton.LighterColour = colours.Orange0;
+            saveButton.TextColour = colourProvider.Background6;
 
-            useCurrentModButton.DarkerColour = colours.Blue1;
-            useCurrentModButton.LighterColour = colours.Blue0;
-            useCurrentModButton.TextColour = colourProvider.Background6;
+            useCurrentModsButton.DarkerColour = colours.Blue1;
+            useCurrentModsButton.LighterColour = colours.Blue0;
+            useCurrentModsButton.TextColour = colourProvider.Background6;
 
             selectedMods.BindValueChanged(_ => updateActiveState(), true);
 
             nameTextBox.Current.BindValueChanged(s =>
             {
-                editButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
+                saveButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
             }, true);
         }
 
-        private void saveCurrentMod()
+        private void useCurrentMods()
         {
             newMods = selectedMods.Value.ToHashSet();
             scrollContent.Clear();
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Mods
         private void updateActiveState()
         {
             scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
-            useCurrentModButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
+            useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
         private bool checkSelectedModsDiffersFromSaved()
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Mods
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
         }
 
-        private void editPreset()
+        private void save()
         {
             button.Preset.PerformWrite(s =>
             {
