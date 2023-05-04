@@ -387,7 +387,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("change mod settings", () =>
             {
-                var osuMod = getMod<OsuModDifficultyAdjust>();
+                var osuMod = getSelectedMod<OsuModDifficultyAdjust>();
 
                 osuMod.ExtendedLimits.Value = true;
                 osuMod.CircleSize.Value = setting_change;
@@ -401,7 +401,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("shared settings preserved", () =>
             {
-                var taikoMod = getMod<TaikoModDifficultyAdjust>();
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
 
                 return taikoMod.ExtendedLimits.Value &&
                        taikoMod.DrainRate.Value == setting_change &&
@@ -410,7 +410,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("non-shared settings remain default", () =>
             {
-                var taikoMod = getMod<TaikoModDifficultyAdjust>();
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
 
                 return taikoMod.ScrollSpeed.IsDefault;
             });
@@ -626,7 +626,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Value == active);
         }
 
-        private T getMod<T>() where T : Mod => (T)SelectedMods.Value.Single();
+        private T getSelectedMod<T>() where T : Mod => SelectedMods.Value.OfType<T>().Single();
 
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
