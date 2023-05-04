@@ -112,8 +112,6 @@ namespace osu.Game.Overlays.Mods
         private ShearedSearchTextBox searchTextBox = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
-        private ModSearchContainer? modSearch;
-
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
 
@@ -215,7 +213,7 @@ namespace osu.Game.Overlays.Mods
                 AutoSizeAxes = Axes.X,
                 Height = ModsEffectDisplay.HEIGHT,
                 Margin = new MarginPadding { Horizontal = 100 },
-                Child = modSearch = new ModSearchContainer()
+                Child = new ModSearchContainer()
             });
 
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
@@ -241,6 +239,14 @@ namespace osu.Game.Overlays.Mods
             };
 
             globalAvailableMods.BindTo(game.AvailableMods);
+        }
+
+        public override void Hide()
+        {
+            base.Hide();
+
+            //We want to clear search for next user iteraction with mod overlay
+            searchTextBox.Current.Value = string.Empty;
         }
 
         private ModSettingChangeTracker? modSettingChangeTracker;
