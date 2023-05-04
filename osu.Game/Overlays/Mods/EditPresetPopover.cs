@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Mods
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = "Use Current Mods",
+                                Text = ModSelectOverlayStrings.UseCurrentMods,
                                 Action = useCurrentMods
                             },
                             saveButton = new ShearedButton
