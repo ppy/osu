@@ -119,7 +119,11 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// All <see cref="IBindable"/> settings within this mod.
         /// </summary>
-        internal IEnumerable<IBindable> SettingsBindables => Settings.Values;
+        /// <remarks>
+        /// The settings are returned in ascending key order as per <see cref="Settings"/>.
+        /// The ordering is intentionally enforced manually, as ordering of <see cref="Dictionary{TKey,TValue}.Values"/> is unspecified.
+        /// </remarks>
+        internal IEnumerable<IBindable> SettingsBindables => Settings.OrderBy(pair => pair.Key).Select(pair => pair.Value);
 
         /// <summary>
         /// Provides mapping of names to <see cref="IBindable"/>s of all settings within this mod.
