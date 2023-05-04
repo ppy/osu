@@ -262,7 +262,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestEditPresentName()
+        public void TestEditPresetName()
         {
             ModPresetColumn modPresetColumn = null!;
             string presetName = null!;
@@ -301,7 +301,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("present is not changed", () => panel.Preset.Value.Name == presetName);
+            AddAssert("preset is not changed", () => panel.Preset.Value.Name == presetName);
             AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
             AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
             AddStep("attempt preset edit", () =>
@@ -310,7 +310,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
-            AddAssert("present is changed", () => panel.Preset.Value.Name != presetName);
+            AddAssert("preset is changed", () => panel.Preset.Value.Name != presetName);
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("present mod not changed", () =>
+            AddUntilStep("preset mod not changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(previousMod));
 
             AddStep("select mods", () => SelectedMods.Value = mods);
@@ -388,7 +388,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("present mod is changed", () =>
+            AddUntilStep("preset mod is changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
         }
 
