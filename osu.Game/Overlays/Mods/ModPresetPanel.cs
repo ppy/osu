@@ -98,8 +98,6 @@ namespace osu.Game.Overlays.Mods
 
         #endregion
 
-        public bool CheckCurrentModCanBeSave() => (!Active.Value && selectedMods.Value.Any());
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -107,6 +105,6 @@ namespace osu.Game.Overlays.Mods
             settingChangeTracker?.Dispose();
         }
 
-        public Popover GetPopover() => new EditPresetPopover(this);
+        public Popover GetPopover() => new EditPresetPopover(Preset);
     }
 }
