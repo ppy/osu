@@ -416,6 +416,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             skins.EnsureMutableSkin();
             hasBegunMutating = true;
+
+            waitForComponentsLoad(() => changeHandler?.ClearHistory(), 0);
         }
 
         /// <summary>

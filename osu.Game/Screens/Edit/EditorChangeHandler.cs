@@ -111,6 +111,14 @@ namespace osu.Game.Screens.Edit
             updateBindables();
         }
 
+        public void ClearHistory()
+        {
+            savedStates.Clear();
+            currentState = -1;
+
+            updateBindables();
+        }
+
         /// <summary>
         /// Write a serialised copy of the currently tracked state to the provided stream.
         /// This will be stored as a state which can be restored in the future.
