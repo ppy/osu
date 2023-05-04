@@ -645,8 +645,7 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddWaitStep("Wait", 3);
-            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
+            AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
         }
