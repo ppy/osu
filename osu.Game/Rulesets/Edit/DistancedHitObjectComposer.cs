@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -239,7 +240,7 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
         {
-            return (float)(100 * (useReferenceSliderVelocity ? referenceObject.DifficultyControlPoint.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
+            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
                            / BeatSnapProvider.BeatDivisor);
         }
 

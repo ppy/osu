@@ -13,12 +13,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -29,12 +31,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly BindableNumber<double> speedMultiplier;
 
         public DifficultyPointPiece(HitObject hitObject)
-            : base(hitObject.DifficultyControlPoint)
         {
             HitObject = hitObject;
 
-            speedMultiplier = hitObject.DifficultyControlPoint.SliderVelocityBindable.GetBoundCopy();
+            speedMultiplier = (hitObject as IHasSliderVelocity)?.SliderVelocityBindable.GetBoundCopy();
         }
+
+        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         protected override void LoadComplete()
         {
@@ -78,7 +81,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Spacing = new Vector2(0, 15),
                         Children = new Drawable[]
                         {
-                            sliderVelocitySlider = new IndeterminateSliderWithTextBoxInput<double>("Velocity", new DifficultyControlPoint().SliderVelocityBindable)
+                            sliderVelocitySlider = new IndeterminateSliderWithTextBoxInput<double>("Velocity", new BindableDouble(1)
+                            {
+                                Precision = 0.01,
+                                MinValue = 0.1,
+                                MaxValue = 10
+                            })
                             {
                                 KeyboardStep = 0.1f
                             },
@@ -94,11 +102,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
-                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                var relevantControlPoints = relevantObjects.Select(h => h.DifficultyControlPoint).ToArray();
+                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
                 // even if there are multiple objects selected, we can still display a value if they all have the same value.
-                var selectedPointBindable = relevantControlPoints.Select(point => point.SliderVelocity).Distinct().Count() == 1 ? relevantControlPoints.First().SliderVelocityBindable : null;
+                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocity).Distinct().Count() == 1 ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityBindable : null;
 
                 if (selectedPointBindable != null)
                 {
@@ -117,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     foreach (var h in relevantObjects)
                     {
-                        h.DifficultyControlPoint.SliderVelocity = val.NewValue.Value;
+                        ((IHasSliderVelocity)h).SliderVelocity = val.NewValue.Value;
                         beatmap.Update(h);
                     }
 
