@@ -29,7 +29,8 @@ namespace osu.Game.Overlays.Mods
         private readonly FillFlowContainer scrollContent;
 
         private readonly ModPreset preset;
-        private List<Mod> saveModAfterClosed = new List<Mod>();
+
+        private HashSet<Mod>? newMods;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
@@ -136,7 +137,7 @@ namespace osu.Game.Overlays.Mods
 
         private void saveCurrentMod()
         {
-            saveModAfterClosed = selectedMods.Value.ToList();
+            newMods = selectedMods.Value.ToHashSet();
             scrollContent.Clear();
             updateActiveState();
         }
@@ -144,18 +145,16 @@ namespace osu.Game.Overlays.Mods
         private void updateActiveState()
         {
             scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
-            useCurrentModButton.Enabled.Value = checkCanBeSave();
+            useCurrentModButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
-        private bool checkCanBeSave()
+        private bool checkSelectedModsDiffersFromSaved()
         {
             if (!selectedMods.Value.Any())
                 return false;
 
-            if (saveModAfterClosed.Any())
-            {
-                return !new HashSet<Mod>(saveModAfterClosed).SetEquals(selectedMods.Value);
-            }
+            if (newMods?.SetEquals(selectedMods.Value) == false)
+                return true;
 
             return button.CheckCurrentModCanBeSave();
         }
@@ -174,10 +173,8 @@ namespace osu.Game.Overlays.Mods
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
 
-                if (saveModAfterClosed.Any())
-                {
-                    s.Mods = saveModAfterClosed;
-                }
+                if (newMods != null)
+                    s.Mods = newMods;
             });
 
             this.HidePopover();
