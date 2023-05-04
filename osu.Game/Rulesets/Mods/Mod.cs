@@ -188,10 +188,13 @@ namespace osu.Game.Rulesets.Mods
                 if (sourceSetting.IsDefault)
                     continue;
 
-                var targetType = targetSetting.GetType();
-                var sourceType = sourceSetting.GetType();
+                var targetBindableType = targetSetting.GetType();
+                var sourceBindableType = sourceSetting.GetType();
 
-                if (!targetType.IsAssignableFrom(sourceType) && !sourceType.IsAssignableFrom(targetType))
+                // if either the target is assignable to the source or the source is assignable to the target,
+                // then we presume that the data types contained in both bindables are compatible and we can proceed with the copy.
+                // this handles cases like `Bindable<int>` and `BindableInt`.
+                if (!targetBindableType.IsAssignableFrom(sourceBindableType) && !sourceBindableType.IsAssignableFrom(targetBindableType))
                     continue;
 
                 // TODO: special case for handling number types
