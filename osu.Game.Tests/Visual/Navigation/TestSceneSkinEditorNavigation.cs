@@ -5,19 +5,25 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -29,6 +35,59 @@ namespace osu.Game.Tests.Visual.Navigation
     {
         private TestPlaySongSelect songSelect;
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
+
+        [Test]
+        public void TestChangeStatesSavedCorrectly()
+        {
+            ActualValueDelegate<int> componentsCount = () => ((Drawable)Game.ScreenStack.CurrentScreen).ChildrenOfType<SkinComponentsContainer>().First().Components.Count;
+            int lastStateComponentsCount = -1;
+
+            advanceToSongSelect();
+            openSkinEditor();
+
+            AddStep("add skinnable component", () => skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddAssert("component added", componentsCount, () => Is.EqualTo(1));
+
+            AddStep("revert changes", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("component removed", componentsCount, () => Is.Zero);
+
+            switchToGameplayScene();
+            AddUntilStep("components loaded", componentsCount, () => Is.Not.Zero);
+
+            AddStep("try reverting changes", () =>
+            {
+                lastStateComponentsCount = componentsCount();
+                InputManager.Keys(PlatformAction.Undo);
+            });
+            AddAssert("nothing changed", componentsCount, () => Is.EqualTo(lastStateComponentsCount));
+
+            AddStep("add skinnable component", () => skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddAssert("component added", componentsCount, () => Is.EqualTo(lastStateComponentsCount + 1));
+
+            AddStep("revert changes", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("component removed", componentsCount, () => Is.EqualTo(lastStateComponentsCount));
+
+            // Change skin
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+                lastStateComponentsCount = componentsCount();
+            });
+            AddStep("open settings", () => Game.Settings.Show());
+            AddStep("set filter", () => Game.Settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "skin");
+            AddUntilStep("wait for items to load", () => Game.Settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+            AddStep("hover skin dropdown", () => InputManager.MoveMouseTo(Game.Settings.SectionsContainer.ChildrenOfType<SkinSection>().First().Children.First()));
+            AddStep("change skin", () => InputManager.Key(Key.Up));
+            AddStep("hide settings", () => Game.Settings.Hide());
+            AddAssert("different component count", componentsCount, () => Is.Not.EqualTo(lastStateComponentsCount));
+
+            AddStep("try reverting changes", () =>
+            {
+                lastStateComponentsCount = componentsCount();
+                InputManager.Keys(PlatformAction.Undo);
+            });
+            AddAssert("nothing changed", componentsCount, () => Is.EqualTo(lastStateComponentsCount));
+        }
 
         [Test]
         public void TestEditComponentDuringGameplay()
