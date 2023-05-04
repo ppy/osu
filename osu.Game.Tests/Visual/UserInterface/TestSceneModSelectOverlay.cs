@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             changeRuleset(1);
             AddAssert("taiko variant selected", () => SelectedMods.Value.SingleOrDefault() is TaikoModDifficultyAdjust);
 
-            AddAssert("shared settings didn't change", () =>
+            AddAssert("shared settings preserved", () =>
             {
                 var taikoMod = getMod<TaikoModDifficultyAdjust>();
 
@@ -408,7 +408,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                        taikoMod.OverallDifficulty.Value == setting_change;
             });
 
-            AddAssert("non-shared settings unchanged", () =>
+            AddAssert("non-shared settings remain default", () =>
             {
                 var taikoMod = getMod<TaikoModDifficultyAdjust>();
 
