@@ -221,12 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             revertAndCheckUnchanged();
 
-            AddStep("Move components", () =>
-            {
-                changeHandler.BeginChange();
-                testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One);
-                changeHandler.EndChange();
-            });
+            AddStep("Move components", () => testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One));
             revertAndCheckUnchanged();
 
             AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
@@ -238,7 +233,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             void revertAndCheckUnchanged()
             {
-                AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+                AddStep("Revert changes", () =>
+                {
+                    changeHandler.SaveState();
+                    changeHandler.RestoreState(int.MinValue);
+                });
                 AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
             }
         }
