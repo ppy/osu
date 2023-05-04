@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -20,15 +21,13 @@ namespace osu.Game.Overlays.Mods
 {
     internal partial class EditPresetPopover : OsuPopover
     {
-        private readonly ModPresetPanel presetPanel;
-
         private LabelledTextBox nameTextBox = null!;
         private LabelledTextBox descriptionTextBox = null!;
         private ShearedButton useCurrentModsButton = null!;
         private ShearedButton saveButton = null!;
         private FillFlowContainer scrollContent = null!;
 
-        private readonly ModPreset preset;
+        private readonly Live<ModPreset> preset;
 
         private HashSet<Mod>? newMods;
 
@@ -41,10 +40,9 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public EditPresetPopover(ModPresetPanel presetPanel)
+        public EditPresetPopover(Live<ModPreset> preset)
         {
-            this.presetPanel = presetPanel;
-            preset = presetPanel.Preset.Value;
+            this.preset = preset;
         }
 
         [BackgroundDependencyLoader]
@@ -64,7 +62,7 @@ namespace osu.Game.Overlays.Mods
                         Origin = Anchor.TopCentre,
                         Label = CommonStrings.Name,
                         TabbableContentContainer = this,
-                        Current = { Value = preset.Name },
+                        Current = { Value = preset.PerformRead(p => p.Name) },
                     },
                     descriptionTextBox = new LabelledTextBox
                     {
@@ -72,7 +70,7 @@ namespace osu.Game.Overlays.Mods
                         Origin = Anchor.TopCentre,
                         Label = CommonStrings.Description,
                         TabbableContentContainer = this,
-                        Current = { Value = preset.Description },
+                        Current = { Value = preset.PerformRead(p => p.Description) },
                     },
                     new OsuScrollContainer
                     {
@@ -140,7 +138,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateActiveState()
         {
-            scrollContent.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
+            scrollContent.ChildrenEnumerable = preset.PerformRead(p => p.Mods.Select(mod => new ModPresetRow(mod)));
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
@@ -149,10 +147,7 @@ namespace osu.Game.Overlays.Mods
             if (!selectedMods.Value.Any())
                 return false;
 
-            if (newMods?.SetEquals(selectedMods.Value) == false)
-                return true;
-
-            return presetPanel.CheckCurrentModCanBeSave();
+            return newMods?.SetEquals(selectedMods.Value) == false;
         }
 
         protected override void LoadComplete()
@@ -164,7 +159,7 @@ namespace osu.Game.Overlays.Mods
 
         private void save()
         {
-            presetPanel.Preset.PerformWrite(s =>
+            preset.PerformWrite(s =>
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
