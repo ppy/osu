@@ -167,10 +167,13 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// When converting mods from one ruleset to the other, this method makes sure
-        /// to also copy the values of all settings sharing same <see cref="MemberInfo.Name"/> between the two instances.
+        /// This method copies the values of all settings from <paramref name="source"/> that share the same names with this mod instance.
+        /// The most frequent use of this is when switching rulesets, in order to preserve values of common settings during the switch.
         /// </summary>
-        /// <remarks>Copied values are unchanged, even if they have different clamping ranges.</remarks>
+        /// <remarks>
+        /// The values are copied directly, without adjusting for possibly different allowed ranges of values.
+        /// If the value of a setting is not valid for this instance due to not falling inside of the allowed range, it will be clamped accordingly.
+        /// </remarks>
         /// <param name="source">The mod to extract settings from.</param>
         public void CopyCommonSettingsFrom(Mod source)
         {
