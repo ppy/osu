@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Mods
             modInt.CopyCommonSettingsFrom(modBool);
 
             Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
-            Assert.That(modBool.TestSetting.Value, Is.EqualTo(!modBool.TestSetting.Default));
+            Assert.That(modBool.TestSetting.Value, Is.EqualTo(true));
             Assert.That(modInt.TestSetting.Value, Is.EqualTo((int)setting_change / 2));
         }
 
