@@ -98,18 +98,6 @@ namespace osu.Game.Overlays.Mods
 
         #endregion
 
-        public bool SaveCurrentMod()
-        {
-            if (!CheckCurrentModCanBeSave())
-                return false;
-
-            Preset.PerformWrite(s =>
-            {
-                s.Mods = selectedMods.Value.ToArray();
-            });
-            return true;
-        }
-
         public bool CheckCurrentModCanBeSave() => (!Active.Value && selectedMods.Value.Any());
 
         protected override void Dispose(bool isDisposing)
