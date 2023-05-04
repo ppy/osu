@@ -20,13 +20,13 @@ namespace osu.Game.Overlays.Mods
 {
     internal partial class EditPresetPopover : OsuPopover
     {
-        private readonly ModPresetPanel button;
+        private readonly ModPresetPanel presetPanel;
 
-        private readonly LabelledTextBox nameTextBox;
-        private readonly LabelledTextBox descriptionTextBox;
-        private readonly ShearedButton useCurrentModsButton;
-        private readonly ShearedButton saveButton;
-        private readonly FillFlowContainer scrollContent;
+        private LabelledTextBox nameTextBox = null!;
+        private LabelledTextBox descriptionTextBox = null!;
+        private ShearedButton useCurrentModsButton = null!;
+        private ShearedButton saveButton = null!;
+        private FillFlowContainer scrollContent = null!;
 
         private readonly ModPreset preset;
 
@@ -41,11 +41,15 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public EditPresetPopover(ModPresetPanel modPresetPanel)
+        public EditPresetPopover(ModPresetPanel presetPanel)
         {
-            button = modPresetPanel;
-            preset = button.Preset.Value;
+            this.presetPanel = presetPanel;
+            preset = presetPanel.Preset.Value;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Child = new FillFlowContainer
             {
                 Width = 300,
@@ -59,14 +63,16 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Label = CommonStrings.Name,
-                        TabbableContentContainer = this
+                        TabbableContentContainer = this,
+                        Current = { Value = preset.Name },
                     },
                     descriptionTextBox = new LabelledTextBox
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Label = CommonStrings.Description,
-                        TabbableContentContainer = this
+                        TabbableContentContainer = this,
+                        Current = { Value = preset.Description },
                     },
                     new OsuScrollContainer
                     {
@@ -95,40 +101,30 @@ namespace osu.Game.Overlays.Mods
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = ModSelectOverlayStrings.UseCurrentMods,
-                                Action = useCurrentMods
+                                DarkerColour = colours.Blue1,
+                                LighterColour = colours.Blue0,
+                                TextColour = colourProvider.Background6,
+                                Action = useCurrentMods,
                             },
                             saveButton = new ShearedButton
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
-                                Action = save
+                                DarkerColour = colours.Orange1,
+                                LighterColour = colours.Orange0,
+                                TextColour = colourProvider.Background6,
+                                Action = save,
                             },
                         }
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Body.BorderThickness = 3;
             Body.BorderColour = colours.Orange1;
 
-            nameTextBox.Current.Value = preset.Name;
-            descriptionTextBox.Current.Value = preset.Description;
-
-            saveButton.DarkerColour = colours.Orange1;
-            saveButton.LighterColour = colours.Orange0;
-            saveButton.TextColour = colourProvider.Background6;
-
-            useCurrentModsButton.DarkerColour = colours.Blue1;
-            useCurrentModsButton.LighterColour = colours.Blue0;
-            useCurrentModsButton.TextColour = colourProvider.Background6;
-
             selectedMods.BindValueChanged(_ => updateActiveState(), true);
-
             nameTextBox.Current.BindValueChanged(s =>
             {
                 saveButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
@@ -156,7 +152,7 @@ namespace osu.Game.Overlays.Mods
             if (newMods?.SetEquals(selectedMods.Value) == false)
                 return true;
 
-            return button.CheckCurrentModCanBeSave();
+            return presetPanel.CheckCurrentModCanBeSave();
         }
 
         protected override void LoadComplete()
@@ -168,7 +164,7 @@ namespace osu.Game.Overlays.Mods
 
         private void save()
         {
-            button.Preset.PerformWrite(s =>
+            presetPanel.Preset.PerformWrite(s =>
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
