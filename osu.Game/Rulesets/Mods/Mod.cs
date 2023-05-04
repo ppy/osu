@@ -120,15 +120,15 @@ namespace osu.Game.Rulesets.Mods
         /// All <see cref="IBindable"/> settings within this mod.
         /// </summary>
         /// <remarks>
-        /// The settings are returned in ascending key order as per <see cref="Settings"/>.
+        /// The settings are returned in ascending key order as per <see cref="SettingsMap"/>.
         /// The ordering is intentionally enforced manually, as ordering of <see cref="Dictionary{TKey,TValue}.Values"/> is unspecified.
         /// </remarks>
-        internal IEnumerable<IBindable> SettingsBindables => Settings.OrderBy(pair => pair.Key).Select(pair => pair.Value);
+        internal IEnumerable<IBindable> SettingsBindables => SettingsMap.OrderBy(pair => pair.Key).Select(pair => pair.Value);
 
         /// <summary>
         /// Provides mapping of names to <see cref="IBindable"/>s of all settings within this mod.
         /// </summary>
-        internal IReadOnlyDictionary<string, IBindable> Settings =>
+        internal IReadOnlyDictionary<string, IBindable> SettingsMap =>
             settingsBacking ??= this.GetSettingsSourceProperties()
                                     .Select(p => p.Item2)
                                     .ToDictionary(property => property.Name.ToSnakeCase(), property => (IBindable)property.GetValue(this)!);
@@ -177,9 +177,9 @@ namespace osu.Game.Rulesets.Mods
             if (source.UsesDefaultConfiguration)
                 return;
 
-            foreach (var (name, targetSetting) in Settings)
+            foreach (var (name, targetSetting) in SettingsMap)
             {
-                if (!source.Settings.TryGetValue(name, out IBindable? sourceSetting))
+                if (!source.SettingsMap.TryGetValue(name, out IBindable? sourceSetting))
                     continue;
 
                 if (sourceSetting.IsDefault)
