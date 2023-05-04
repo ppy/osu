@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <remarks>Copied values are unchanged, even if they have different clamping ranges.</remarks>
         /// <param name="source">The mod to extract settings from.</param>
-        public void CopyCommonSettings(Mod source)
+        public void CopyCommonSettingsFrom(Mod source)
         {
             if (source.UsesDefaultConfiguration)
                 return;

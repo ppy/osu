@@ -45,12 +45,12 @@ namespace osu.Game.Tests.Mods
             var modBool = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
             var modInt = new TestNonMatchingSettingTypeModInt { TestSetting = { Value = (int)setting_change / 2 } };
 
-            modDouble.CopyCommonSettings(modBool);
-            modDouble.CopyCommonSettings(modInt);
-            modBool.CopyCommonSettings(modDouble);
-            modBool.CopyCommonSettings(modInt);
-            modInt.CopyCommonSettings(modDouble);
-            modInt.CopyCommonSettings(modBool);
+            modDouble.CopyCommonSettingsFrom(modBool);
+            modDouble.CopyCommonSettingsFrom(modInt);
+            modBool.CopyCommonSettingsFrom(modDouble);
+            modBool.CopyCommonSettingsFrom(modInt);
+            modInt.CopyCommonSettingsFrom(modDouble);
+            modInt.CopyCommonSettingsFrom(modBool);
 
             Assert.That(modDouble.TestSetting.Value, Is.EqualTo(setting_change));
             Assert.That(modBool.TestSetting.Value, Is.EqualTo(!modBool.TestSetting.Default));
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Mods
             var modBoolTrue = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = true, Value = false } };
             var modBoolFalse = new TestNonMatchingSettingTypeModBool { TestSetting = { Default = false, Value = true } };
 
-            modBoolFalse.CopyCommonSettings(modBoolTrue);
+            modBoolFalse.CopyCommonSettingsFrom(modBoolTrue);
 
             Assert.That(modBoolFalse.TestSetting.Default, Is.EqualTo(false));
             Assert.That(modBoolFalse.TestSetting.Value, Is.EqualTo(modBoolTrue.TestSetting.Value));
