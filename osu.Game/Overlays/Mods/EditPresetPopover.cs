@@ -133,7 +133,6 @@ namespace osu.Game.Overlays.Mods
         private void useCurrentMods()
         {
             saveableMods = selectedMods.Value.ToHashSet();
-            scrollContent.Clear();
             updateState();
         }
 
