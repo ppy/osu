@@ -98,6 +98,12 @@ namespace osu.Game.Rulesets.Edit
                         addValue($"{distance.Distance:#,0.##}px");
                     }
 
+                    if (selected is IHasSliderVelocity sliderVelocity)
+                    {
+                        addHeader("Slider Velocity");
+                        addValue($"{sliderVelocity.SliderVelocity:#,0.00}x");
+                    }
+
                     if (selected is IHasRepeats repeats)
                     {
                         addHeader("Repeats");
