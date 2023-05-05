@@ -174,5 +174,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AddHeader("Velocity range");
             AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            EditorBeatmap.TransactionBegan -= updateInspectorText;
+            EditorBeatmap.TransactionEnded -= updateInspectorText;
+        }
     }
 }
