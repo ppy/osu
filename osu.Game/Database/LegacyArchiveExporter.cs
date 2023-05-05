@@ -69,7 +69,6 @@ namespace osu.Game.Database
                     i++;
                 }
 
-                // Only pop up once to prevent spam.
                 if (fileMissing)
                 {
                     Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
