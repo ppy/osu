@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void ExportFileWithNormalNameTest()
         {
-            var item = new TestRealmObject(short_filename);
+            var item = new TestModel(short_filename);
 
             Assert.That(item.Filename.Length, Is.LessThan(TestLegacyModelExporter.MAX_FILENAME_LENGTH));
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void ExportFileWithNormalNameMultipleTimesTest()
         {
-            var item = new TestRealmObject(short_filename);
+            var item = new TestModel(short_filename);
 
             Assert.That(item.Filename.Length, Is.LessThan(TestLegacyModelExporter.MAX_FILENAME_LENGTH));
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Database
             int expectedLength = TestLegacyModelExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
             string expectedName = long_filename.Remove(expectedLength);
 
-            var item = new TestRealmObject(long_filename);
+            var item = new TestModel(long_filename);
 
             Assert.That(item.Filename.Length, Is.GreaterThan(TestLegacyModelExporter.MAX_FILENAME_LENGTH));
             exportItemAndAssert(item, expectedName);
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Database
             int expectedLength = TestLegacyModelExporter.MAX_FILENAME_LENGTH - (legacyExporter.GetExtension().Length);
             string expectedName = long_filename.Remove(expectedLength);
 
-            var item = new TestRealmObject(long_filename);
+            var item = new TestModel(long_filename);
 
             Assert.That(item.Filename.Length, Is.GreaterThan(TestLegacyModelExporter.MAX_FILENAME_LENGTH));
 
@@ -90,11 +90,11 @@ namespace osu.Game.Tests.Database
             }
         }
 
-        private void exportItemAndAssert(TestRealmObject item, string expectedName)
+        private void exportItemAndAssert(TestModel item, string expectedName)
         {
             Assert.DoesNotThrow(() =>
             {
-                Task t = Task.Run(() => legacyExporter.ExportAsync(new TestRealmLive(item)));
+                Task t = Task.Run(() => legacyExporter.ExportAsync(new RealmLiveUnmanaged<TestModel>(item)));
                 t.WaitSafely();
             });
             Assert.That(storage.Exists($"exports/{expectedName}{legacyExporter.GetExtension()}"), Is.True);
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Database
                 storage.Dispose();
         }
 
-        private class TestLegacyModelExporter : LegacyExporter<TestRealmObject>
+        private class TestLegacyModelExporter : LegacyExporter<TestModel>
         {
             public TestLegacyModelExporter(Storage storage)
                 : base(storage)
@@ -116,45 +116,27 @@ namespace osu.Game.Tests.Database
 
             public string GetExtension() => FileExtension;
 
-            protected override void ExportToStream(TestRealmObject model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
+            protected override void ExportToStream(TestModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
             {
             }
 
             protected override string FileExtension => ".test";
         }
 
-        private class TestRealmObject : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
+        private class TestModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
         {
-            public Guid ID => throw new NotImplementedException();
+            public Guid ID => Guid.Empty;
+
             public string Filename { get; }
 
             public IEnumerable<INamedFileUsage> Files { get; } = new List<INamedFileUsage>();
 
-            public TestRealmObject(string filename)
+            public TestModel(string filename)
             {
                 Filename = filename;
             }
 
             public override string ToString() => Filename;
-        }
-
-        private class TestRealmLive : Live<TestRealmObject>
-        {
-            public override void PerformRead(Action<TestRealmObject> perform) => perform(Value);
-
-            public override TReturn PerformRead<TReturn>(Func<TestRealmObject, TReturn> perform) => perform(Value);
-
-            public override void PerformWrite(Action<TestRealmObject> perform) => throw new NotImplementedException();
-
-            public override bool IsManaged => throw new NotImplementedException();
-
-            public override TestRealmObject Value { get; }
-
-            public TestRealmLive(TestRealmObject model)
-                : base(Guid.Empty)
-            {
-                Value = model;
-            }
         }
     }
 }
