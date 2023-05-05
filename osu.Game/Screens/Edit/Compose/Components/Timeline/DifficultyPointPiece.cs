@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             double? modeSliderVelocity = sliderVelocities.GroupBy(v => v).MaxBy(v => v.Count())?.Key;
             double? medianSliderVelocity = sliderVelocities[sliderVelocities.Length / 2];
 
-            AddHeader("Beatmap average velocity");
+            AddHeader("Average velocity");
             AddValue($"{medianSliderVelocity:#,0.00}x");
 
             AddHeader("Most used velocity");
