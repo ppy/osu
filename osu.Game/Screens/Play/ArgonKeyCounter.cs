@@ -69,8 +69,19 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            IsActive.BindValueChanged(e => inputIndicator.Alpha = e.NewValue ? 1 : 0.5f, true);
             CountPresses.BindValueChanged(e => countText.Text = e.NewValue.ToString(@"#,0"), true);
+        }
+
+        protected override void Activate(bool forwardPlayback = true)
+        {
+            base.Activate(forwardPlayback);
+            inputIndicator.FadeIn().MoveToY(0).Then().MoveToY(3, 100, Easing.OutQuart);
+        }
+
+        protected override void Deactivate(bool forwardPlayback = true)
+        {
+            base.Deactivate(forwardPlayback);
+            inputIndicator.MoveToY(0, 200, Easing.OutQuart).FadeTo(0.5f, 200, Easing.OutQuart);
         }
     }
 }
