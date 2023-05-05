@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -40,10 +39,8 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">The cancellation token.</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
-            try
+            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
             {
-                using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
-
                 int i = 0;
                 int fileCount = model.Files.Count();
                 bool fileMissing = false;
@@ -77,14 +74,6 @@ namespace osu.Game.Database
                 {
                     Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
                 }
-            }
-            catch (ObjectDisposedException)
-            {
-                // outputStream may close before writing when request cancel.
-                if (cancellationToken.IsCancellationRequested)
-                    return;
-
-                throw;
             }
         }
     }
