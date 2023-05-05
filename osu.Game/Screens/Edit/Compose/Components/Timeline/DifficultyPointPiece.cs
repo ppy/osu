@@ -95,7 +95,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
-                            }
+                            },
+                            new SliderVelocityInspector(),
                         }
                     }
                 };
@@ -105,7 +106,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
                 // even if there are multiple objects selected, we can still display a value if they all have the same value.
-                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocity).Distinct().Count() == 1 ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityBindable : null;
+                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocity).Distinct().Count() == 1
+                    ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityBindable
+                    : null;
 
                 if (selectedPointBindable != null)
                 {
@@ -137,6 +140,39 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 base.LoadComplete();
                 ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(sliderVelocitySlider));
             }
+        }
+    }
+
+    internal partial class SliderVelocityInspector : EditorInspector
+    {
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            EditorBeatmap.TransactionBegan += updateInspectorText;
+            EditorBeatmap.TransactionEnded += updateInspectorText;
+            updateInspectorText();
+        }
+
+        private void updateInspectorText()
+        {
+            InspectorText.Clear();
+
+            double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocity).OrderBy(v => v).ToArray();
+
+            if (sliderVelocities.Length < 2)
+                return;
+
+            double? modeSliderVelocity = sliderVelocities.GroupBy(v => v).MaxBy(v => v.Count())?.Key;
+            double? medianSliderVelocity = sliderVelocities[sliderVelocities.Length / 2];
+
+            AddHeader("Beatmap average velocity");
+            AddValue($"{medianSliderVelocity:#,0.00}x");
+
+            AddHeader("Most used velocity");
+            AddValue($"{modeSliderVelocity:#,0.00}x");
+
+            AddHeader("Velocity range");
+            AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
         }
     }
 }
