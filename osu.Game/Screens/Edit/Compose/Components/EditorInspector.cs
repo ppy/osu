@@ -7,9 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit;
 
-namespace osu.Game.Rulesets.Edit
+namespace osu.Game.Screens.Edit.Compose.Components
 {
     internal partial class EditorInspector : CompositeDrawable
     {
