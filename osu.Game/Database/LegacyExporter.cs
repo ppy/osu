@@ -140,6 +140,6 @@ namespace osu.Game.Database
         /// <param name="outputStream">The output stream to export to.</param>
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
-        protected abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default);
+        public abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default);
     }
 }

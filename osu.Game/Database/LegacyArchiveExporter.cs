@@ -27,7 +27,7 @@ namespace osu.Game.Database
         {
         }
 
-        protected override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
+        public override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
             => exportZipArchive(model, outputStream, notification, cancellationToken);
 
         /// <summary>
