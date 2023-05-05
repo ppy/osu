@@ -3,17 +3,18 @@
 
 using osu.Framework.Bindables;
 
-namespace osu.Game.Rulesets.Objects.Types;
-
-/// <summary>
-/// A HitObject that has a slider velocity multiplier.
-/// </summary>
-public interface IHasSliderVelocity
+namespace osu.Game.Rulesets.Objects.Types
 {
     /// <summary>
-    /// The slider velocity multiplier.
+    /// A HitObject that has a slider velocity multiplier.
     /// </summary>
-    double SliderVelocity { get; set; }
+    public interface IHasSliderVelocity
+    {
+        /// <summary>
+        /// The slider velocity multiplier.
+        /// </summary>
+        double SliderVelocity { get; set; }
 
-    BindableNumber<double> SliderVelocityBindable { get; }
+        BindableNumber<double> SliderVelocityBindable { get; }
+    }
 }
