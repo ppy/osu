@@ -191,6 +191,8 @@ csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_range_operator = false:silent
 csharp_style_prefer_switch_expression = false:none
 
+csharp_style_namespace_declarations = block_scoped:warning
+
 [*.{yaml,yml}]
 insert_final_newline = true
 indent_style = space
