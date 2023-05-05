@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.Break
             set
             {
                 icon.Size = value;
-                base.Size = value + BlurSigma * 2.5f;
+                base.Size = value + BlurSigma * 5;
                 ForceRedraw();
             }
             get => base.Size;
