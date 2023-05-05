@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays.Notifications;
@@ -159,30 +158,8 @@ namespace osu.Game.Database
         /// <param name="notification">The notification will displayed to the user</param>
         /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
         /// <returns>Whether the export was successful</returns>
-        public Task<bool> ExportToStreamAsync(Live<TModel> model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                model.PerformRead(s =>
-                {
-                    ExportToStream(s, stream, notification, cancellationToken);
-                });
-            }, cancellationToken).ContinueWith(t =>
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                if (t.IsFaulted)
-                {
-                    Logger.Error(t.Exception, "An error occurred while exporting", LoggingTarget.Database);
-                    throw t.Exception!;
-                }
-
-                return true;
-            }, CancellationToken.None);
-        }
+        public Task ExportToStreamAsync(Live<TModel> model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default) =>
+            Task.Run(() => { model.PerformRead(s => ExportToStream(s, stream, notification, cancellationToken)); }, cancellationToken);
 
         /// <summary>
         /// Exports model to Stream.
