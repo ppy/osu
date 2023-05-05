@@ -112,7 +112,7 @@ namespace osu.Game.Database
             ProgressNotification notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = "Exporting...",
+                Text = $"Exporting {itemFilename}...",
             };
             PostNotification?.Invoke(notification);
 
