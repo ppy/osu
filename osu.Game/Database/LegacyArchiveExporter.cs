@@ -54,20 +54,14 @@ namespace osu.Game.Database
 
                     using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                     {
-                        // Sometimes we cannot find the file(probably deleted by the user), so we handle this and post a error.
                         if (stream == null)
                         {
-                            // Only pop up once to prevent spam.
-                            if (!fileMissing)
-                            {
-                                Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
-                                fileMissing = true;
-                            }
+                            Logger.Log($"File {file.Filename} is missing in local storage and will not be included in the export", LoggingTarget.Database);
+                            fileMissing = true;
+                            continue;
                         }
-                        else
-                        {
-                            writer.Write(file.Filename, stream);
-                        }
+
+                        writer.Write(file.Filename, stream);
                     }
 
                     if (notification != null)
@@ -76,6 +70,12 @@ namespace osu.Game.Database
                     }
 
                     i++;
+                }
+
+                // Only pop up once to prevent spam.
+                if (fileMissing)
+                {
+                    Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
                 }
             }
             catch (ObjectDisposedException)
