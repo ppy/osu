@@ -17,6 +17,9 @@ using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// An exporter which handles the common scenario of exporting a model to a zip-based archive, usually with a custom file extension.
+    /// </summary>
     public abstract class LegacyArchiveExporter<TModel> : LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
@@ -31,17 +34,18 @@ namespace osu.Game.Database
         /// <summary>
         /// Exports an item to Stream as a legacy (.zip based) package.
         /// </summary>
-        /// <param name="model">The model will be exported.</param>
+        /// <param name="model">The model to be exported.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        /// <param name="notification">The notification will displayed to the user</param>
-        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
+        /// <param name="notification">An optional target notification to update with ongoing export progress.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
             try
             {
                 using var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate));
 
-                float i = 0;
+                int i = 0;
+                int fileCount = model.Files.Count();
                 bool fileMissing = false;
 
                 foreach (var file in model.Files)
@@ -66,13 +70,12 @@ namespace osu.Game.Database
                         }
                     }
 
-                    i++;
-
                     if (notification != null)
                     {
-                        notification.Progress = i / model.Files.Count();
-                        notification.Text = $"Exporting... ({i}/{model.Files.Count()})";
+                        notification.Progress = (float)(i + 1) / fileCount;
                     }
+
+                    i++;
                 }
             }
             catch (ObjectDisposedException)
