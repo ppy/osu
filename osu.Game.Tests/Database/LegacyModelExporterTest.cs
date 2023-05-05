@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Database
                 storage.Dispose();
         }
 
-        private class TestLegacyModelExporter : LegacyModelExporter<TestRealmObject>
+        private class TestLegacyModelExporter : LegacyExporter<TestRealmObject>
         {
             public TestLegacyModelExporter(Storage storage)
                 : base(storage)

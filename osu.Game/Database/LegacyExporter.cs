@@ -19,7 +19,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A class which handles exporting legacy user data of a single type from osu-stable.
     /// </summary>
-    public abstract class LegacyModelExporter<TModel>
+    public abstract class LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace osu.Game.Database
         /// Create a new exporter for each export, otherwise it will cause confusing notifications.
         /// </summary>
         /// <param name="storage">Storage for storing exported files. Basically it is used to provide export stream</param>
-        protected LegacyModelExporter(Storage storage)
+        protected LegacyExporter(Storage storage)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
