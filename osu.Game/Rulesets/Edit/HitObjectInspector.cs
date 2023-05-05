@@ -2,43 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Edit
 {
-    internal partial class HitObjectInspector : CompositeDrawable
+    internal partial class HitObjectInspector : EditorInspector
     {
-        private OsuTextFlowContainer inspectorText = null!;
-
-        [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
-
-            InternalChild = inspectorText = new OsuTextFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            };
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -53,69 +25,69 @@ namespace osu.Game.Rulesets.Edit
 
         private void updateInspectorText()
         {
-            inspectorText.Clear();
+            InspectorText.Clear();
             rollingTextUpdate?.Cancel();
             rollingTextUpdate = null;
 
             switch (EditorBeatmap.SelectedHitObjects.Count)
             {
                 case 0:
-                    addValue("No selection");
+                    AddValue("No selection");
                     break;
 
                 case 1:
                     var selected = EditorBeatmap.SelectedHitObjects.Single();
 
-                    addHeader("Type");
-                    addValue($"{selected.GetType().ReadableName()}");
+                    AddHeader("Type");
+                    AddValue($"{selected.GetType().ReadableName()}");
 
-                    addHeader("Time");
-                    addValue($"{selected.StartTime:#,0.##}ms");
+                    AddHeader("Time");
+                    AddValue($"{selected.StartTime:#,0.##}ms");
 
                     switch (selected)
                     {
                         case IHasPosition pos:
-                            addHeader("Position");
-                            addValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                            AddHeader("Position");
+                            AddValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
                             break;
 
                         case IHasXPosition x:
-                            addHeader("Position");
+                            AddHeader("Position");
 
-                            addValue($"x:{x.X:#,0.##} ");
+                            AddValue($"x:{x.X:#,0.##} ");
                             break;
 
                         case IHasYPosition y:
-                            addHeader("Position");
+                            AddHeader("Position");
 
-                            addValue($"y:{y.Y:#,0.##}");
+                            AddValue($"y:{y.Y:#,0.##}");
                             break;
                     }
 
                     if (selected is IHasDistance distance)
                     {
-                        addHeader("Distance");
-                        addValue($"{distance.Distance:#,0.##}px");
+                        AddHeader("Distance");
+                        AddValue($"{distance.Distance:#,0.##}px");
                     }
 
                     if (selected is IHasSliderVelocity sliderVelocity)
                     {
-                        addHeader("Slider Velocity");
-                        addValue($"{sliderVelocity.SliderVelocity:#,0.00}x");
+                        AddHeader("Slider Velocity");
+                        AddValue($"{sliderVelocity.SliderVelocity:#,0.00}x");
                     }
 
                     if (selected is IHasRepeats repeats)
                     {
-                        addHeader("Repeats");
-                        addValue($"{repeats.RepeatCount:#,0.##}");
+                        AddHeader("Repeats");
+                        AddValue($"{repeats.RepeatCount:#,0.##}");
                     }
 
                     if (selected is IHasDuration duration)
                     {
-                        addHeader("End Time");
-                        addValue($"{duration.EndTime:#,0.##}ms");
-                        addHeader("Duration");
-                        addValue($"{duration.Duration:#,0.##}ms");
+                        AddHeader("End Time");
+                        AddValue($"{duration.EndTime:#,0.##}ms");
+                        AddHeader("Duration");
+                        AddValue($"{duration.Duration:#,0.##}ms");
                     }
 
                     // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
@@ -124,29 +96,16 @@ namespace osu.Game.Rulesets.Edit
                     break;
 
                 default:
-                    addHeader("Selected Objects");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
+                    AddHeader("Selected Objects");
+                    AddValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
 
-                    addHeader("Start Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}ms");
+                    AddHeader("Start Time");
+                    AddValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}ms");
 
-                    addHeader("End Time");
-                    addValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}ms");
+                    AddHeader("End Time");
+                    AddValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}ms");
                     break;
             }
-
-            void addHeader(string header) => inspectorText.AddParagraph($"{header}: ", s =>
-            {
-                s.Padding = new MarginPadding { Top = 2 };
-                s.Font = s.Font.With(size: 12);
-                s.Colour = colourProvider.Content2;
-            });
-
-            void addValue(string value) => inspectorText.AddParagraph(value, s =>
-            {
-                s.Font = s.Font.With(weight: FontWeight.SemiBold);
-                s.Colour = colourProvider.Content1;
-            });
         }
     }
 }
