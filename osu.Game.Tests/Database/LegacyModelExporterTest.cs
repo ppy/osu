@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Database
 
             public string GetExtension() => FileExtension;
 
-            protected override void ExportToStream(TestModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
+            public override void ExportToStream(TestModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
             {
             }
 
