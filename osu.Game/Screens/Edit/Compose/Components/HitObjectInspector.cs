@@ -7,7 +7,7 @@ using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Edit
+namespace osu.Game.Screens.Edit.Compose.Components
 {
     internal partial class HitObjectInspector : EditorInspector
     {
