@@ -83,11 +83,20 @@ namespace osu.Game.Overlays.Mods
 
         #region Filtering support
 
-        public override IEnumerable<LocalisableString> FilterTerms => new LocalisableString[]
+        public override IEnumerable<LocalisableString> FilterTerms => getFilterTerms();
+
+        private IEnumerable<LocalisableString> getFilterTerms()
         {
-            Preset.Value.Name,
-            Preset.Value.Description
-        };
+            yield return Preset.Value.Name;
+            yield return Preset.Value.Description;
+
+            foreach (Mod mod in Preset.Value.Mods)
+            {
+                yield return mod.Name;
+                yield return mod.Acronym;
+                yield return mod.Description;
+            }
+        }
 
         #endregion
 
