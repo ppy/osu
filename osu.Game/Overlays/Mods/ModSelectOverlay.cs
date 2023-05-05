@@ -206,16 +206,6 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            MainAreaContent.Add(new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.X,
-                Height = ModsEffectDisplay.HEIGHT,
-                Margin = new MarginPadding { Horizontal = 100 },
-                Child = new ModSearchContainer()
-            });
-
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
