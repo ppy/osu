@@ -17,7 +17,7 @@ using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game.Database
 {
-    public abstract class LegacyArchiveExporter<TModel> : LegacyModelExporter<TModel>
+    public abstract class LegacyArchiveExporter<TModel> : LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         protected LegacyArchiveExporter(Storage storage)

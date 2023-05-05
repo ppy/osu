@@ -11,7 +11,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Database
 {
-    public class LegacyScoreExporter : LegacyModelExporter<ScoreInfo>
+    public class LegacyScoreExporter : LegacyExporter<ScoreInfo>
     {
         public LegacyScoreExporter(Storage storage)
             : base(storage)
