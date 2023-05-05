@@ -99,11 +99,13 @@ namespace osu.Game.Database
 
             PostNotification?.Invoke(notification);
 
+            using var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, notification.CancellationToken);
+
             try
             {
                 using (var stream = exportStorage.CreateFileSafely(filename))
                 {
-                    await ExportToStreamAsync(model, stream, notification, cancellationToken == CancellationToken.None ? notification.CancellationToken : cancellationToken).ConfigureAwait(false);
+                    await ExportToStreamAsync(model, stream, notification, linkedSource.Token).ConfigureAwait(false);
                 }
             }
             catch
