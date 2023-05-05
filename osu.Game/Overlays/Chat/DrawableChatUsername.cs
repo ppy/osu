@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +20,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
@@ -31,8 +29,10 @@ using ChatStrings = osu.Game.Localisation.ChatStrings;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class DrawableChatUsername : OsuClickableContainer, IHasContextMenu, IHasPopover
+    public partial class DrawableChatUsername : OsuClickableContainer, IHasContextMenu
     {
+        public Action? ReportRequested;
+
         public Color4 AccentColour { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -73,15 +73,13 @@ namespace osu.Game.Overlays.Chat
         private Bindable<Channel?>? currentChannel { get; set; }
 
         private readonly APIUser user;
-        private readonly long? messageId;
         private readonly OsuSpriteText drawableText;
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableChatUsername(APIUser user, long? messageId)
+        public DrawableChatUsername(APIUser user)
         {
             this.user = user;
-            this.messageId = messageId;
 
             Action = openUserProfile;
 
@@ -174,32 +172,10 @@ namespace osu.Game.Overlays.Chat
                 }
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, this.ShowPopover));
+                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, ReportRequested));
 
                 return items.ToArray();
             }
-        }
-
-        public Popover GetPopover() => new ReportChatPopover(user)
-        {
-            Action = report
-        };
-
-        private void report(ChatReportReason reason, string comments)
-        {
-            var request = new ChatReportRequest(messageId, reason, comments);
-
-            request.Failure += _ => Schedule(() =>
-            {
-                currentChannel?.Value?.AddNewMessages(new ErrorMessage("Report failed to send, please retry"));
-            });
-
-            request.Success += () => Schedule(() =>
-            {
-                currentChannel?.Value?.AddNewMessages(new InfoMessage("Report has been sent"));
-            });
-
-            api.Queue(request);
         }
 
         private void openUserChannel()
