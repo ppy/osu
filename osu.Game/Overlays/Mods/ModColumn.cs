@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     mod.Active.BindValueChanged(_ => updateState());
                     mod.MatchingFilter.BindValueChanged(_ => updateState());
+                    mod.ValidForSelection.BindValueChanged(_ => updateState());
                 }
 
                 updateState();
@@ -145,7 +146,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => !mod.MatchingFilter.Value) ? 0 : 1;
+            Alpha = availableMods.All(mod => !mod.MatchingFilter.Value || !mod.ValidForSelection.Value) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {

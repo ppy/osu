@@ -56,7 +56,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            canBeShown.BindTo(modState.ValidForSelection);
+            modState.ValidForSelection.BindValueChanged(_ => updateFilterState());
+            modState.MatchingFilter.BindValueChanged(_ => updateFilterState(), true);
         }
 
         protected override void Select()
@@ -69,6 +70,23 @@ namespace osu.Game.Overlays.Mods
         {
             modState.PendingConfiguration = false;
             Active.Value = false;
+        }
+
+        /// <summary>
+        /// Determine if <see cref="ModPanel"/> is valid and can be shown
+        /// </summary>
+        public bool IsValid => modState.IsValid;
+
+        public bool ValidForSelection
+        {
+            get => modState.ValidForSelection.Value;
+            set
+            {
+                if (modState.ValidForSelection.Value == value)
+                    return;
+
+                modState.ValidForSelection.Value = value;
+            }
         }
 
         #region Filtering support
@@ -89,12 +107,20 @@ namespace osu.Game.Overlays.Mods
                     return;
 
                 modState.MatchingFilter.Value = value;
-                this.FadeTo(value ? 1 : 0);
             }
         }
 
+        /// <summary>
+        /// This property is always <see langword="true"/> because it affects search result
+        /// </summary>
         private readonly BindableBool canBeShown = new BindableBool(true);
+
         IBindable<bool> IConditionalFilterable.CanBeShown => canBeShown;
+
+        private void updateFilterState()
+        {
+            this.FadeTo(IsValid ? 1 : 0);
+        }
 
         #endregion
     }
