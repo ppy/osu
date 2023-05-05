@@ -45,9 +45,6 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
-        // Store the model being exporting.
-        private static readonly List<Live<TModel>> exporting_models = new List<Live<TModel>>();
-
         /// <summary>
         /// Construct exporter.
         /// Create a new exporter for each export, otherwise it will cause confusing notifications.
@@ -69,10 +66,8 @@ namespace osu.Game.Database
         /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
         /// </param>
         /// <returns></returns>
-        public Task<bool> ExportAsync(TModel model, RealmAccess realm, CancellationToken cancellationToken = default)
-        {
-            return ExportAsync(model.ToLive(realm), cancellationToken);
-        }
+        public Task ExportAsync(TModel model, RealmAccess realm, CancellationToken cancellationToken = default) =>
+            ExportAsync(model.ToLive(realm), cancellationToken);
 
         /// <summary>
         /// Export the model to default folder.
@@ -83,71 +78,46 @@ namespace osu.Game.Database
         /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
         /// </param>
         /// <returns></returns>
-        public async Task<bool> ExportAsync(Live<TModel> model, CancellationToken cancellationToken = default)
+        public async Task ExportAsync(Live<TModel> model, CancellationToken cancellationToken = default)
         {
-            // check if the model is being exporting already
-            if (!exporting_models.Contains(model))
-            {
-                exporting_models.Add(model);
-            }
-            else
-            {
-                // model is being exported
-                return false;
-            }
-
             string itemFilename = model.PerformRead(s => GetFilename(s).GetValidFilename());
 
             if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
                 itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
 
-            IEnumerable<string> existingExports =
-                exportStorage
-                    .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
-                    .Concat(exportStorage.GetDirectories(string.Empty));
+            IEnumerable<string> existingExports = exportStorage
+                                                  .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
+                                                  .Concat(exportStorage.GetDirectories(string.Empty));
+
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
-            bool success;
 
             ProgressNotification notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
                 Text = $"Exporting {itemFilename}...",
             };
+
             PostNotification?.Invoke(notification);
 
             try
             {
                 using (var stream = exportStorage.CreateFileSafely(filename))
                 {
-                    success = await ExportToStreamAsync(model, stream, notification,
-                        cancellationToken == CancellationToken.None ? notification.CancellationToken : cancellationToken).ConfigureAwait(false);
+                    await ExportToStreamAsync(model, stream, notification, cancellationToken == CancellationToken.None ? notification.CancellationToken : cancellationToken).ConfigureAwait(false);
                 }
             }
             catch
             {
                 notification.State = ProgressNotificationState.Cancelled;
+
+                // cleanup if export is failed or canceled.
+                exportStorage.Delete(filename);
                 throw;
             }
-            finally
-            {
-                // Determines whether to export repeatedly, so he must be removed from the list at the end whether there is a error.
-                exporting_models.Remove(model);
-            }
 
-            // cleanup if export is failed or canceled.
-            if (!success)
-            {
-                notification.State = ProgressNotificationState.Cancelled;
-                exportStorage.Delete(filename);
-            }
-            else
-            {
-                notification.CompletionText = $"Exported {itemFilename}! Click to view.";
-                notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
-                notification.State = ProgressNotificationState.Completed;
-            }
-
-            return success;
+            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
+            notification.State = ProgressNotificationState.Completed;
         }
 
         /// <summary>
