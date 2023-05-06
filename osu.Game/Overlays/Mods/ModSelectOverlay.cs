@@ -65,6 +65,21 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
+        /// Search term applied on mod overlay
+        /// </summary>
+        public string SearchTerm
+        {
+            get => searchTextBox.Current.Value;
+            set
+            {
+                if (searchTextBox.Current.Value == value)
+                    return;
+
+                searchTextBox.Current.Value = value;
+            }
+        }
+
+        /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
         /// </summary>
         protected virtual bool ShowTotalMultiplier => true;
@@ -494,7 +509,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.MatchingFilter.Value);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.IsValid);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -556,7 +571,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (column is ModColumn modColumn)
                 {
-                    allFiltered = modColumn.AvailableMods.All(modState => !modState.MatchingFilter.Value);
+                    allFiltered = modColumn.AvailableMods.All(modState => !modState.IsValid);
                     modColumn.FlushPendingSelections();
                 }
 
