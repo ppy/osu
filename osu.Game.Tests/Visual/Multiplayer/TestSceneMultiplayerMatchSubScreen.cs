@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contains only double time mod",
                 () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay
                           .ChildrenOfType<ModPanel>()
-                          .SingleOrDefault(panel => panel.MatchingFilter)?.Mod is OsuModDoubleTime);
+                          .SingleOrDefault(panel => panel.IsValid)?.Mod is OsuModDoubleTime);
         }
 
         [Test]
