@@ -61,7 +61,7 @@ namespace osu.Game.Database
 
                 if (fileMissing)
                 {
-                    Logger.Log("Some of model files are missing, they will not be included in the archive", LoggingTarget.Database, LogLevel.Error);
+                    Logger.Log("Some files are missing in local storage and will not be included in the export", LoggingTarget.Database, LogLevel.Error);
                 }
             }
         }
