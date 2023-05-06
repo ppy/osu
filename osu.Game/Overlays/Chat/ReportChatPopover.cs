@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Chat
             Action = report;
         }
 
-        protected override bool IsCommentRequired(ChatReportReason reason) => reason != ChatReportReason.Other;
+        protected override bool IsCommentRequired(ChatReportReason reason) => reason == ChatReportReason.Other;
 
         private void report(ChatReportReason reason, string comments)
         {
