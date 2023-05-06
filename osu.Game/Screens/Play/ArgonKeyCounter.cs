@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Play
     public partial class ArgonKeyCounter : KeyCounter
     {
         private Circle inputIndicator = null!;
+        private OsuSpriteText keyNameText = null!;
         private OsuSpriteText countText = null!;
 
         // These values were taken from Figma
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Play
                     Height = line_height * scale_factor,
                     Alpha = 0.5f
                 },
-                new OsuSpriteText
+                keyNameText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -75,6 +76,7 @@ namespace osu.Game.Screens.Play
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
+            keyNameText.FlashColour(Colour4.White, 200);
             inputIndicator.FadeIn().MoveToY(0).Then().MoveToY(3, 100, Easing.OutQuart);
         }
 
