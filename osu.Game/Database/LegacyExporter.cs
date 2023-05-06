@@ -55,19 +55,6 @@ namespace osu.Game.Database
         /// Export the model to default folder.
         /// </summary>
         /// <param name="model">The model should export.</param>
-        /// <param name="realm">Realm that convert model to Live.</param>
-        /// <param name="cancellationToken">
-        /// The Cancellation token that can cancel the exporting.
-        /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
-        /// </param>
-        /// <returns></returns>
-        public Task ExportAsync(TModel model, RealmAccess realm, CancellationToken cancellationToken = default) =>
-            ExportAsync(model.ToLive(realm), cancellationToken);
-
-        /// <summary>
-        /// Export the model to default folder.
-        /// </summary>
-        /// <param name="model">The model should export.</param>
         /// <param name="cancellationToken">
         /// The Cancellation token that can cancel the exporting.
         /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
