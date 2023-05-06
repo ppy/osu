@@ -28,14 +28,14 @@ namespace osu.Game.Database
 
         protected override string FileExtension => ".osr";
 
-        public override void ExportToStream(ScoreInfo model, Stream stream, ProgressNotification? notification, CancellationToken cancellationToken = default)
+        public override void ExportToStream(ScoreInfo model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
             var file = model.Files.SingleOrDefault();
             if (file == null)
                 return;
 
             using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
-                inputStream.CopyTo(stream);
+                inputStream.CopyTo(outputStream);
         }
     }
 }
