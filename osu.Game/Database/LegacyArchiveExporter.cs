@@ -33,7 +33,7 @@ namespace osu.Game.Database
             {
                 int i = 0;
                 int fileCount = model.Files.Count();
-                bool fileMissing = false;
+                bool anyFileMissing = false;
 
                 foreach (var file in model.Files)
                 {
@@ -44,7 +44,7 @@ namespace osu.Game.Database
                         if (stream == null)
                         {
                             Logger.Log($"File {file.Filename} is missing in local storage and will not be included in the export", LoggingTarget.Database);
-                            fileMissing = true;
+                            anyFileMissing = true;
                             continue;
                         }
 
@@ -59,7 +59,7 @@ namespace osu.Game.Database
                     i++;
                 }
 
-                if (fileMissing)
+                if (anyFileMissing)
                 {
                     Logger.Log("Some files are missing in local storage and will not be included in the export", LoggingTarget.Database, LogLevel.Error);
                 }
