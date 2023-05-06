@@ -178,7 +178,11 @@ namespace osu.Game.Screens.Edit
 
         public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;
 
-        public int[] Bookmarks => PlayableBeatmap.Bookmarks;
+        public int[] Bookmarks
+        {
+            get => PlayableBeatmap.Bookmarks;
+            set => PlayableBeatmap.Bookmarks = value;
+        }
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 

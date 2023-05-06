@@ -79,7 +79,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var beatmapInfo = decoder.Decode(stream).BeatmapInfo;
+                var beatmap = decoder.Decode(stream);
+                var beatmapInfo = beatmap.BeatmapInfo;
 
                 int[] expectedBookmarks =
                 {
@@ -87,9 +88,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     95901, 106450, 116999, 119637, 130186, 140735, 151285,
                     161834, 164471, 175020, 185570, 196119, 206669, 209306
                 };
-                Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
+                Assert.AreEqual(expectedBookmarks.Length, beatmap.Bookmarks.Length);
                 for (int i = 0; i < expectedBookmarks.Length; i++)
-                    Assert.AreEqual(expectedBookmarks[i], beatmapInfo.Bookmarks[i]);
+                    Assert.AreEqual(expectedBookmarks[i], beatmap.Bookmarks[i]);
                 Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
                 Assert.AreEqual(4, beatmapInfo.BeatDivisor);
                 Assert.AreEqual(4, beatmapInfo.GridSize);
