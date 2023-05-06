@@ -16,7 +16,7 @@ using Realms;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// A class which handles exporting legacy user data of a single type from osu-stable.
+    /// Handles exporting models to files for sharing / consumption outside the game.
     /// </summary>
     public abstract class LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
@@ -45,11 +45,6 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
-        /// <summary>
-        /// Construct exporter.
-        /// Create a new exporter for each export, otherwise it will cause confusing notifications.
-        /// </summary>
-        /// <param name="storage">Storage for storing exported files. Basically it is used to provide export stream</param>
         protected LegacyExporter(Storage storage)
         {
             exportStorage = storage.GetStorageForDirectory(@"exports");
