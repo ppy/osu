@@ -146,12 +146,12 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => !mod.MatchingFilter.Value || !mod.ValidForSelection.Value) ? 0 : 1;
+            Alpha = availableMods.All(mod => !mod.IsValid) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.MatchingFilter.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.MatchingFilter.Value).All(panel => panel.Active.Value);
+                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.IsValid) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.IsValid).All(panel => panel.Active.Value);
             }
         }
 
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => !b.Active.Value && b.MatchingFilter.Value))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && b.IsValid))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
