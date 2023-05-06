@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Setup
                 EnableCountdown = new LabelledSwitchButton
                 {
                     Label = EditorSetupStrings.EnableCountdown,
-                    Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
+                    Current = { Value = Beatmap.Countdown != CountdownType.None },
                     Description = EditorSetupStrings.CountdownDescription
                 },
                 CountdownSettings = new FillFlowContainer
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Setup
                         CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
                             Label = EditorSetupStrings.CountdownSpeed,
-                            Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
+                            Current = { Value = Beatmap.Countdown != CountdownType.None ? Beatmap.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updateBeatmap()
         {
-            Beatmap.BeatmapInfo.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
+            Beatmap.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
             Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
             Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;

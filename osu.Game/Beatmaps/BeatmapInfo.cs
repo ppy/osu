@@ -173,9 +173,6 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
-        [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
-
         /// <summary>
         /// The number of beats to move the countdown backwards (compared to its default location).
         /// </summary>

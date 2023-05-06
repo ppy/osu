@@ -184,6 +184,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.Bookmarks = value;
         }
 
+        public CountdownType Countdown
+        {
+            get => PlayableBeatmap.Countdown;
+            set => PlayableBeatmap.Countdown = value;
+        }
+
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();

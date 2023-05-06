@@ -75,6 +75,8 @@ namespace osu.Game.Beatmaps
 
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
         IReadOnlyList<T> IBeatmap<T>.HitObjects => HitObjects;
 
         IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;

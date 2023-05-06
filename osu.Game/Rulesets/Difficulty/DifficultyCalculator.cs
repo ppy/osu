@@ -303,6 +303,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Bookmarks = value;
             }
 
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
             #region Delegated IBeatmap implementation
 
             public BeatmapInfo BeatmapInfo
