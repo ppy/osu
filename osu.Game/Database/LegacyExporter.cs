@@ -41,7 +41,6 @@ namespace osu.Game.Database
 
         protected readonly Storage UserFileStorage;
         private readonly Storage exportStorage;
-        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
         public Action<Notification>? PostNotification { get; set; }
 
@@ -50,6 +49,16 @@ namespace osu.Game.Database
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
+
+        /// <summary>
+        /// Returns the baseline name of the file to which the <paramref name="item"/> will be exported.
+        /// </summary>
+        /// <remarks>
+        /// The name of the file will be run through <see cref="ModelExtensions.GetValidFilename"/> to eliminate characters
+        /// which are not permitted by various filesystems.
+        /// </remarks>
+        /// <param name="item">The item being exported.</param>
+        protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
         /// <summary>
         /// Exports a model to the default export location.
