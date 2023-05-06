@@ -122,12 +122,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateStatus()
         {
-            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || IsCommentRequired(reasonDropdown.Current.Value);
+            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || !IsCommentRequired(reasonDropdown.Current.Value);
         }
 
         /// <summary>
         /// Determines whether an additional comment is required for submitting the report with the supplied <paramref name="reason"/>.
         /// </summary>
-        protected virtual bool IsCommentRequired(TReportReason reason) => false;
+        protected virtual bool IsCommentRequired(TReportReason reason) => true;
     }
 }
