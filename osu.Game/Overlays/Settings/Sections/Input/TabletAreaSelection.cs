@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Container usableAreaContainer;
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
-        private readonly Bindable<bool> dragConfine;
+        private readonly Bindable<bool> dragOutOfBounds;
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float>();
@@ -43,10 +43,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Box usableFill;
         private OsuSpriteText usableAreaText;
 
-        public TabletAreaSelection(ITabletHandler handler, Bindable<bool> dragConfine)
+        public TabletAreaSelection(ITabletHandler handler, Bindable<bool> dragOutOfBounds)
         {
             this.handler = handler;
-            this.dragConfine = dragConfine.GetBoundCopy();
+            this.dragOutOfBounds = dragOutOfBounds.GetBoundCopy();
 
             Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         RelativeSizeAxes = Axes.Both,
                         Colour = colour.Gray1,
                     },
-                    usableAreaContainer = new UsableAreaContainer(handler, dragConfine)
+                    usableAreaContainer = new UsableAreaContainer(handler, dragOutOfBounds)
                     {
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
@@ -232,12 +232,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     public partial class UsableAreaContainer : Container
     {
         private readonly Bindable<Vector2> areaOffset;
-        private readonly Bindable<bool> dragConfine;
+        private readonly Bindable<bool> dragOutOfBounds;
 
-        public UsableAreaContainer(ITabletHandler tabletHandler, Bindable<bool> dragConfine)
+        public UsableAreaContainer(ITabletHandler tabletHandler, Bindable<bool> dragOutOfBounds)
         {
             areaOffset = tabletHandler.AreaOffset.GetBoundCopy();
-            this.dragConfine = dragConfine.GetBoundCopy();
+            this.dragOutOfBounds = dragOutOfBounds.GetBoundCopy();
         }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
@@ -246,15 +246,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             var newPos = Position + e.Delta;
 
-            if (dragConfine.Value)
+            if (!dragOutOfBounds.Value)
             {
                 Vector2 halfSize = Size / 2;
 
                 if ((Parent.Rotation < -45 && Parent.Rotation > -135) || (Parent.Rotation < -225 && Parent.Rotation > -315))
                 {
-                    halfSize = new Vector2(halfSize.Y, halfSize.X);
+                    halfSize = halfSize.Yx;
                 }
-                this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero + halfSize, Parent.Size - halfSize));
+
+                this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero + halfSize, (Parent.Size - halfSize)));
             }
             else
             {
