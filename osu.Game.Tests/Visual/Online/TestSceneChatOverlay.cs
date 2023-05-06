@@ -648,6 +648,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
+            AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
         }
 
         private void joinTestChannel(int i)
