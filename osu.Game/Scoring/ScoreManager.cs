@@ -27,6 +27,7 @@ namespace osu.Game.Scoring
     {
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
+        private readonly LegacyScoreExporter scoreExporter;
 
         public override bool PauseImports
         {
@@ -45,6 +46,11 @@ namespace osu.Game.Scoring
             this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
+
+            scoreExporter = new LegacyScoreExporter(storage)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -186,6 +192,8 @@ namespace osu.Game.Scoring
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
+
+        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score.ToLive(Realm));
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 
