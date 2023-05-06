@@ -52,14 +52,11 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Export the model to default folder.
+        /// Exports a model to the default export location.
+        /// This will create a notification tracking the progress of the export, visible to the user.
         /// </summary>
-        /// <param name="model">The model should export.</param>
-        /// <param name="cancellationToken">
-        /// The Cancellation token that can cancel the exporting.
-        /// If specified CancellationToken, then use it. Otherwise use PostNotification's CancellationToken.
-        /// </param>
-        /// <returns></returns>
+        /// <param name="model">The model to export.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         public async Task ExportAsync(Live<TModel> model, CancellationToken cancellationToken = default)
         {
             string itemFilename = model.PerformRead(s => GetFilename(s).GetValidFilename());
@@ -105,23 +102,22 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Export model to stream.
-        /// </summary>
-        /// <param name="model">The model which have <see cref="IHasGuidPrimaryKey"/>.</param>
-        /// <param name="stream">The stream to export.</param>
-        /// <param name="notification">The notification will displayed to the user</param>
-        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
-        /// <returns>Whether the export was successful</returns>
-        public Task ExportToStreamAsync(Live<TModel> model, Stream stream, ProgressNotification? notification = null, CancellationToken cancellationToken = default) =>
-            Task.Run(() => { model.PerformRead(s => ExportToStream(s, stream, notification, cancellationToken)); }, cancellationToken);
-
-        /// <summary>
-        /// Exports model to Stream.
+        /// Exports a model to a provided stream.
         /// </summary>
         /// <param name="model">The model to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        /// <param name="notification">The notification will displayed to the user</param>
-        /// <param name="cancellationToken">The Cancellation token that can cancel the exporting.</param>
+        /// <param name="notification">An optional notification to be updated with export progress.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        public Task ExportToStreamAsync(Live<TModel> model, Stream outputStream, ProgressNotification? notification = null, CancellationToken cancellationToken = default) =>
+            Task.Run(() => { model.PerformRead(s => ExportToStream(s, outputStream, notification, cancellationToken)); }, cancellationToken);
+
+        /// <summary>
+        /// Exports a model to a provided stream.
+        /// </summary>
+        /// <param name="model">The model to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        /// <param name="notification">An optional notification to be updated with export progress.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         public abstract void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default);
     }
 }

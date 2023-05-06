@@ -17,7 +17,7 @@ using Logger = osu.Framework.Logging.Logger;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An exporter which handles the common scenario of exporting a model to a zip-based archive, usually with a custom file extension.
+    /// Handles the common scenario of exporting a model to a zip-based archive, usually with a custom file extension.
     /// </summary>
     public abstract class LegacyArchiveExporter<TModel> : LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
@@ -30,13 +30,6 @@ namespace osu.Game.Database
         public override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
             => exportZipArchive(model, outputStream, notification, cancellationToken);
 
-        /// <summary>
-        /// Exports an item to Stream as a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="model">The model to be exported.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        /// <param name="notification">An optional target notification to update with ongoing export progress.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
         private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
             using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
