@@ -16,17 +16,29 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract partial class ReportPopover<T> : OsuPopover
-        where T : struct, Enum
+    /// <summary>
+    /// A generic popover for sending an online report about something.
+    /// </summary>
+    /// <typeparam name="TReportReason">An enumeration type with all valid reasons for the report.</typeparam>
+    public abstract partial class ReportPopover<TReportReason> : OsuPopover
+        where TReportReason : struct, Enum
     {
-        public Action<T, string>? Action;
+        /// <summary>
+        /// The action to run when the report is finalised.
+        /// The arguments to this action are: the reason for the report, and an optional additional comment.
+        /// </summary>
+        public Action<TReportReason, string>? Action;
 
-        private OsuEnumDropdown<T> reasonDropdown = null!;
+        private OsuEnumDropdown<TReportReason> reasonDropdown = null!;
         private OsuTextBox commentsTextBox = null!;
         private RoundedButton submitButton = null!;
 
         private readonly LocalisableString header;
 
+        /// <summary>
+        /// Creates a new <see cref="ReportPopover{TReportReason}"/>.
+        /// </summary>
+        /// <param name="headerString">The text to display in the header of the popover.</param>
         protected ReportPopover(LocalisableString headerString)
         {
             header = headerString;
@@ -68,7 +80,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 40,
-                        Child = reasonDropdown = new OsuEnumDropdown<T>
+                        Child = reasonDropdown = new OsuEnumDropdown<TReportReason>
                         {
                             RelativeSizeAxes = Axes.X
                         }
@@ -110,12 +122,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateStatus()
         {
-            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || CheckCanSubmitEmptyComment(reasonDropdown.Current.Value);
+            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || IsCommentRequired(reasonDropdown.Current.Value);
         }
 
-        protected virtual bool CheckCanSubmitEmptyComment(T reason)
-        {
-            return false;
-        }
+        /// <summary>
+        /// Determines whether an additional comment is required for submitting the report with the supplied <paramref name="reason"/>.
+        /// </summary>
+        protected virtual bool IsCommentRequired(TReportReason reason) => false;
     }
 }

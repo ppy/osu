@@ -27,10 +27,7 @@ namespace osu.Game.Overlays.Chat
             Action = report;
         }
 
-        protected override bool CheckCanSubmitEmptyComment(ChatReportReason reason)
-        {
-            return reason != ChatReportReason.Other;
-        }
+        protected override bool IsCommentRequired(ChatReportReason reason) => reason != ChatReportReason.Other;
 
         private void report(ChatReportReason reason, string comments)
         {
