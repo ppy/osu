@@ -16,11 +16,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.LoadBeatmap(beatmap);
 
-            if (beatmap.Bookmarks != null)
-            {
-                foreach (int bookmark in beatmap.Bookmarks)
-                    Add(new BookmarkVisualisation(bookmark));
-            }
+            foreach (int bookmark in beatmap.Bookmarks)
+                Add(new BookmarkVisualisation(bookmark));
         }
 
         private partial class BookmarkVisualisation : PointVisualisation

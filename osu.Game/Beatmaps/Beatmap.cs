@@ -73,7 +73,7 @@ namespace osu.Game.Beatmaps
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public List<T> HitObjects { get; set; } = new List<T>();
 
-        public int[] Bookmarks { get; set; }
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         IReadOnlyList<T> IBeatmap<T>.HitObjects => HitObjects;
 
