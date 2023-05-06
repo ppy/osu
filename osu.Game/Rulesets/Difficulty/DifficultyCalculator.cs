@@ -297,6 +297,8 @@ namespace osu.Game.Rulesets.Difficulty
 
             IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
 
+            public int[] Bookmarks => baseBeatmap.Bookmarks;
+
             #region Delegated IBeatmap implementation
 
             public BeatmapInfo BeatmapInfo

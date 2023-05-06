@@ -15,8 +15,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            foreach (int bookmark in beatmap.BeatmapInfo.Bookmarks)
-                Add(new BookmarkVisualisation(bookmark));
+
+            if (beatmap.Bookmarks != null)
+            {
+                foreach (int bookmark in beatmap.Bookmarks)
+                    Add(new BookmarkVisualisation(bookmark));
+            }
         }
 
         private partial class BookmarkVisualisation : PointVisualisation
