@@ -33,10 +33,7 @@ namespace osu.Game.Overlays.Chat
         {
             var request = new ChatReportRequest(message.Id, reason, comments);
 
-            request.Success += () => Schedule(() =>
-            {
-                channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(UsersStrings.ReportThanks.ToString()));
-            });
+            request.Success += () => channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(UsersStrings.ReportThanks.ToString()));
 
             api.Queue(request);
         }
