@@ -26,7 +26,7 @@ namespace osu.Game.Database
             return filename;
         }
 
-        protected override string FileExtension => ".osr";
+        protected override string FileExtension => @".osr";
 
         public override void ExportToStream(ScoreInfo model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
