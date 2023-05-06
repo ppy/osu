@@ -39,7 +39,7 @@ namespace osu.Game.Database
         /// </summary>
         protected abstract string FileExtension { get; }
 
-        protected Storage UserFileStorage;
+        protected readonly Storage UserFileStorage;
         private readonly Storage exportStorage;
         protected virtual string GetFilename(TModel item) => item.GetDisplayString();
 
