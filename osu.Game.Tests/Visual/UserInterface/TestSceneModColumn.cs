@@ -288,6 +288,49 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
         }
 
+        [Test]
+        public void TestApplySearchTerms()
+        {
+            Mod hidden = getExampleModsFor(ModType.DifficultyIncrease).Where(modState => modState.Mod is ModHidden).Select(modState => modState.Mod).Single();
+
+            ModColumn column = null!;
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = column = new ModColumn(ModType.DifficultyIncrease, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AvailableMods = getExampleModsFor(ModType.DifficultyIncrease)
+                }
+            });
+
+            applySearchAndAssert(hidden.Name);
+
+            clearSearch();
+
+            applySearchAndAssert(hidden.Acronym);
+
+            clearSearch();
+
+            applySearchAndAssert(hidden.Description.ToString());
+
+            void applySearchAndAssert(string searchTerm)
+            {
+                AddStep("search by mod name", () => column.SearchTerm = searchTerm);
+
+                AddAssert("only hidden is visible", () => column.ChildrenOfType<ModPanel>().Where(panel => panel.IsValid).All(panel => panel.Mod is ModHidden));
+            }
+
+            void clearSearch()
+            {
+                AddStep("clear search", () => column.SearchTerm = string.Empty);
+
+                AddAssert("all mods are visible", () => column.ChildrenOfType<ModPanel>().All(panel => panel.IsValid));
+            }
+        }
+
         private void setFilter(Func<Mod, bool>? filter)
         {
             foreach (var modState in this.ChildrenOfType<ModColumn>().Single().AvailableMods)

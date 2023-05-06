@@ -521,8 +521,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
         }
 
+        /// <summary>
+        /// Internal search applies from code by setting <see cref="ModSelectOverlay.IsValidMod"/>
+        /// </summary>
         [Test]
-        public void TestColumnHiding()
+        public void TestColumnHidingOnInternalSearch()
         {
             AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
@@ -549,6 +552,56 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => modSelectOverlay.Show());
             AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
+        }
+
+        /// <summary>
+        /// External search applies by user by entering search term into search bar
+        /// </summary>
+        [Test]
+        public void TestColumnHidingOnExternalSearch()
+        {
+            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
+            {
+                RelativeSizeAxes = Axes.Both,
+                State = { Value = Visibility.Visible },
+                SelectedMods = { BindTarget = SelectedMods }
+            });
+            waitForColumnLoad();
+            changeRuleset(0);
+
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
+
+            AddStep("set search", () => modSelectOverlay.SearchTerm = "HD");
+            AddAssert("one column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 1);
+
+            AddStep("filter out everything", () => modSelectOverlay.SearchTerm = "Some long search term with no matches");
+            AddAssert("no columns visible", () => this.ChildrenOfType<ModColumn>().All(col => !col.IsPresent));
+
+            AddStep("clear search bar", () => modSelectOverlay.SearchTerm = "");
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
+        }
+
+        [Test]
+        public void TestHidingOverlayClearsSearch()
+        {
+            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
+            {
+                RelativeSizeAxes = Axes.Both,
+                State = { Value = Visibility.Visible },
+                SelectedMods = { BindTarget = SelectedMods }
+            });
+            waitForColumnLoad();
+            changeRuleset(0);
+
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
+
+            AddStep("set search", () => modSelectOverlay.SearchTerm = "fail");
+            AddAssert("one column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
+
+            AddStep("hide", () => modSelectOverlay.Hide());
+            AddStep("show", () => modSelectOverlay.Show());
+
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
         }
 
         [Test]
@@ -605,12 +658,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public override string ShortName => "unimplemented";
 
-            public override IEnumerable<Mod> GetModsFor(ModType type)
-            {
-                if (type == ModType.Conversion) return base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() });
-
-                return base.GetModsFor(type);
-            }
+            public override IEnumerable<Mod> GetModsFor(ModType type) =>
+                type == ModType.Conversion
+                    ? base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() })
+                    : base.GetModsFor(type);
         }
     }
 }
