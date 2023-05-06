@@ -28,9 +28,6 @@ namespace osu.Game.Database
         }
 
         public override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
-            => exportZipArchive(model, outputStream, notification, cancellationToken);
-
-        private void exportZipArchive(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
             using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
             {
