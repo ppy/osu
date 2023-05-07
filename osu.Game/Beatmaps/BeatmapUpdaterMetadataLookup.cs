@@ -93,18 +93,12 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         private bool tryLookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch, out OnlineBeatmapMetadata? result)
         {
-            if (localCachedMetadataSource.Available && (!apiMetadataSource.Available || !preferOnlineFetch))
-            {
-                result = localCachedMetadataSource.Lookup(beatmapInfo);
-                if (result != null)
-                    return true;
-            }
-
-            if (apiMetadataSource.Available)
-            {
-                result = apiMetadataSource.Lookup(beatmapInfo);
+            bool useLocalCache = !apiMetadataSource.Available || !preferOnlineFetch;
+            if (useLocalCache && localCachedMetadataSource.TryLookup(beatmapInfo, out result))
                 return true;
-            }
+
+            if (apiMetadataSource.TryLookup(beatmapInfo, out result))
+                return true;
 
             result = null;
             return false;

@@ -108,15 +108,21 @@ namespace osu.Game.Beatmaps
             // cached database exists on disk.
             && storage.Exists(cache_database_name);
 
-        public OnlineBeatmapMetadata? Lookup(BeatmapInfo beatmapInfo)
+        public bool TryLookup(BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
         {
             if (!Available)
-                return null;
+            {
+                onlineMetadata = null;
+                return false;
+            }
 
             if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
                 && string.IsNullOrEmpty(beatmapInfo.Path)
                 && beatmapInfo.OnlineID <= 0)
-                return null;
+            {
+                onlineMetadata = null;
+                return false;
+            }
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
@@ -141,7 +147,7 @@ namespace osu.Game.Beatmaps
                             {
                                 logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo}.");
 
-                                return new OnlineBeatmapMetadata
+                                onlineMetadata = new OnlineBeatmapMetadata
                                 {
                                     BeatmapSetID = reader.GetInt32(0),
                                     BeatmapID = reader.GetInt32(1),
@@ -152,6 +158,7 @@ namespace osu.Game.Beatmaps
                                     LastUpdated = reader.GetDateTimeOffset(5),
                                     // TODO: DateSubmitted and DateRanked are not provided by local cache.
                                 };
+                                return true;
                             }
                         }
                     }
@@ -160,9 +167,12 @@ namespace osu.Game.Beatmaps
             catch (Exception ex)
             {
                 logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with {ex}.");
+                onlineMetadata = null;
+                return false;
             }
 
-            return null;
+            onlineMetadata = null;
+            return false;
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
