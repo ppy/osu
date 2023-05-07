@@ -5,7 +5,7 @@
 
 using osuTK;
 using osu.Game.Audio;
-using System.Collections.Generic;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Catch
 {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  IList<IList<HitSampleInfo>> nodeSamples)
+                                                  BindableList<BindableList<HitSampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;

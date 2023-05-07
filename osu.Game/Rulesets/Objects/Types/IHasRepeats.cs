@@ -4,7 +4,7 @@
 #nullable disable
 
 using osu.Game.Audio;
-using System.Collections.Generic;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// n-1: The last repeat.<br />
         /// n: The last node.
         /// </summary>
-        IList<IList<HitSampleInfo>> NodeSamples { get; }
+        BindableList<BindableList<HitSampleInfo>> NodeSamples { get; }
     }
 
     public static class HasRepeatsExtensions
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <param name="obj">The <see cref="HitObject"/>.</param>
         /// <param name="nodeIndex">The node to attempt to retrieve the samples at.</param>
         /// <returns>The samples at the given node index, or <paramref name="obj"/>'s default samples if the given node doesn't exist.</returns>
-        public static IList<HitSampleInfo> GetNodeSamples<T>(this T obj, int nodeIndex)
+        public static BindableList<HitSampleInfo> GetNodeSamples<T>(this T obj, int nodeIndex)
             where T : HitObject, IHasRepeats
-            => nodeIndex < obj.NodeSamples.Count ? obj.NodeSamples[nodeIndex] : obj.Samples;
+            => nodeIndex < obj.NodeSamples.Count ? obj.NodeSamples[nodeIndex] : obj.SamplesBindable;
     }
 }

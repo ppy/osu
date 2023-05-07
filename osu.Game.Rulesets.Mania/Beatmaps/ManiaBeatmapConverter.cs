@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -274,11 +275,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             /// <remarks>
             /// osu!mania-specific beatmaps in stable only play samples at the start of the hold note.
             /// </remarks>
-            private List<IList<HitSampleInfo>> defaultNodeSamples
-                => new List<IList<HitSampleInfo>>
+            private BindableList<BindableList<HitSampleInfo>> defaultNodeSamples
+                => new BindableList<BindableList<HitSampleInfo>>
                 {
-                    HitObject.Samples,
-                    new List<HitSampleInfo>()
+                    HitObject.SamplesBindable,
+                    new BindableList<HitSampleInfo>()
                 };
         }
     }

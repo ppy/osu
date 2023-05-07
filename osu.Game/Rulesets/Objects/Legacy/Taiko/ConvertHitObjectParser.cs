@@ -4,7 +4,7 @@
 #nullable disable
 
 using osuTK;
-using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Taiko
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  IList<IList<HitSampleInfo>> nodeSamples)
+                                                  BindableList<BindableList<HitSampleInfo>> nodeSamples)
         {
             return new ConvertSlider
             {

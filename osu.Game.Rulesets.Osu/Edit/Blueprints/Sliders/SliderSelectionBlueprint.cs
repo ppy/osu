@@ -318,7 +318,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList(),
                     RepeatCount = HitObject.RepeatCount,
-                    NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
+                    NodeSamples = new BindableList<BindableList<HitSampleInfo>>(HitObject.NodeSamples.Select(n => new BindableList<HitSampleInfo>(n.Select(s => s.With())))),
                     Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
                 };
 

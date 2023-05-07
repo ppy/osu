@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
@@ -161,7 +160,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Distance => Path.Distance;
 
-        public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        public BindableList<BindableList<HitSampleInfo>> NodeSamples { get; set; } = new BindableList<BindableList<HitSampleInfo>>();
 
         public double? LegacyLastTickOffset { get; set; }
     }

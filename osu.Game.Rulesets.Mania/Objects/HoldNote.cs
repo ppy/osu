@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<BindableList<HitSampleInfo>> NodeSamples { get; set; }
 
         /// <summary>
         /// The head note of the hold.
@@ -138,7 +139,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
+        public BindableList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
+            nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : SamplesBindable;
     }
 }

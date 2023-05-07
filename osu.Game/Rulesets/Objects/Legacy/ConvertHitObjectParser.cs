@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
@@ -138,7 +139,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // Generate the final per-node samples
-                var nodeSamples = new List<IList<HitSampleInfo>>(nodes);
+                var nodeSamples = new BindableList<BindableList<HitSampleInfo>>();
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
@@ -418,7 +419,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  IList<IList<HitSampleInfo>> nodeSamples);
+                                                  BindableList<BindableList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -439,9 +440,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="duration">The hold duration.</param>
         protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration);
 
-        private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
+        private BindableList<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
-            var soundTypes = new List<HitSampleInfo>();
+            var soundTypes = new BindableList<HitSampleInfo>();
 
             if (string.IsNullOrEmpty(bankInfo.Filename))
             {

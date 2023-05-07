@@ -13,6 +13,7 @@ using System.Linq;
 using osu.Framework.Utils;
 using System.Threading;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -98,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap, CancellationToken cancellationToken)
         {
             // Old osu! used hit sounding to determine various hit type information
-            IList<HitSampleInfo> samples = obj.Samples;
+            BindableList<HitSampleInfo> samples = obj.SamplesBindable;
 
             switch (obj)
             {
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     if (shouldConvertSliderToHits(obj, beatmap, distanceData, out int taikoDuration, out double tickSpacing))
                     {
-                        IList<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+                        IList<BindableList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<BindableList<HitSampleInfo>>(new[] { samples });
 
                         int i = 0;
 

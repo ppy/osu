@@ -5,7 +5,7 @@
 
 using osuTK;
 using osu.Game.Audio;
-using System.Collections.Generic;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  IList<IList<HitSampleInfo>> nodeSamples)
+                                                  BindableList<BindableList<HitSampleInfo>> nodeSamples)
         {
             return new ConvertSlider
             {

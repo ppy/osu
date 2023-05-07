@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -165,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 slider = (DrawableSlider)createSlider(repeats: 1);
 
                 for (int i = 0; i < 2; i++)
-                    slider.HitObject.NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) });
+                    slider.HitObject.NodeSamples.Add(new BindableList<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) });
 
                 Add(slider);
             });
@@ -333,9 +332,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable createCatmull(int repeats = 0)
         {
-            var repeatSamples = new List<IList<HitSampleInfo>>();
+            var repeatSamples = new BindableList<BindableList<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<HitSampleInfo>());
+                repeatSamples.Add(new BindableList<HitSampleInfo>());
 
             var slider = new Slider
             {

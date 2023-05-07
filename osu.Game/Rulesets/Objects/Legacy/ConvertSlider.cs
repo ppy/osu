@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Game.Rulesets.Objects.Types;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Distance => Path.Distance;
 
-        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public BindableList<BindableList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
         [JsonIgnore]

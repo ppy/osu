@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -488,7 +489,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Retrieves the list of node samples that occur at time greater than or equal to <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to retrieve node samples at.</param>
-        private IList<IList<HitSampleInfo>> nodeSamplesAt(int time)
+        private IList<BindableList<HitSampleInfo>> nodeSamplesAt(int time)
         {
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;

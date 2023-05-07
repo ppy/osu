@@ -6,6 +6,7 @@
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
@@ -90,10 +91,20 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal double LazyTravelTime;
 
-        public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        private readonly BindableList<BindableList<HitSampleInfo>> nodeSamples = new BindableList<BindableList<HitSampleInfo>>();
+
+        public BindableList<BindableList<HitSampleInfo>> NodeSamples
+        {
+            get => nodeSamples;
+            init
+            {
+                nodeSamples.Clear();
+                nodeSamples.AddRange(value);
+            }
+        }
 
         [JsonIgnore]
-        public IList<HitSampleInfo> TailSamples { get; private set; }
+        public BindableList<HitSampleInfo> TailSamples { get; private set; }
 
         private int repeatCount;
 
@@ -157,8 +168,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedTickSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
+            nodeSamples.CollectionChanged += NodeSamplesOnCollectionChanged;
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
@@ -246,6 +258,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
+            UpdateNestedTickSamples();
+
+            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
+                repeat.SamplesBindable.BindTo(this.GetNodeSamples(repeat.RepeatIndex + 1));
+
+            HeadCircle?.SamplesBindable.BindTo(this.GetNodeSamples(0));
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are played by the slider itself at the correct end time.
+            TailSamples = this.GetNodeSamples(repeatCount + 1).GetBoundCopy();
+        }
+
+        protected void UpdateNestedTickSamples()
+        {
             var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
                               ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
             var sampleList = new List<HitSampleInfo>();
@@ -255,16 +281,61 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
+        }
 
-            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+        private void NodeSamplesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems is not null)
+            {
+                foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
+                {
+                    if (repeat.RepeatIndex + 1 < e.OldStartingIndex || repeat.RepeatIndex + 1 >= e.OldStartingIndex + e.OldItems.Count) continue;
 
-            if (HeadCircle != null)
-                HeadCircle.Samples = this.GetNodeSamples(0);
+                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[repeat.RepeatIndex + 1 - e.OldStartingIndex];
+                    repeat.SamplesBindable.UnbindFrom(oldSamples);
+                    repeat.SamplesBindable.BindTo(SamplesBindable);
+                }
 
-            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
-            // For now, the samples are played by the slider itself at the correct end time.
-            TailSamples = this.GetNodeSamples(repeatCount + 1);
+                if (HeadCircle is not null && e.OldStartingIndex == 0 && e.OldItems.Count > 0)
+                {
+                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[0];
+                    HeadCircle.SamplesBindable.UnbindFrom(oldSamples);
+                    HeadCircle.SamplesBindable.BindTo(SamplesBindable);
+                }
+
+                if (TailSamples is not null && repeatCount + 1 >= e.OldStartingIndex && repeatCount + 1 < e.OldStartingIndex + e.OldItems.Count)
+                {
+                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[repeatCount + 1 - e.OldStartingIndex];
+                    TailSamples.UnbindFrom(oldSamples);
+                    TailSamples.BindTo(SamplesBindable);
+                }
+            }
+
+            if (e.NewItems is not null)
+            {
+                foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
+                {
+                    if (repeat.RepeatIndex + 1 < e.NewStartingIndex || repeat.RepeatIndex + 1 >= e.NewStartingIndex + e.NewItems.Count) continue;
+
+                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[repeat.RepeatIndex + 1 - e.NewStartingIndex];
+                    repeat.SamplesBindable.UnbindFrom(SamplesBindable);
+                    repeat.SamplesBindable.BindTo(newSamples);
+                }
+
+                if (HeadCircle is not null && e.NewStartingIndex == 0 && e.NewItems.Count > 0)
+                {
+                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[0];
+                    HeadCircle.SamplesBindable.UnbindFrom(SamplesBindable);
+                    HeadCircle.SamplesBindable.BindTo(newSamples);
+                }
+
+                if (TailSamples is not null && repeatCount + 1 >= e.NewStartingIndex && repeatCount + 1 < e.NewStartingIndex + e.NewItems.Count)
+                {
+                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[repeatCount + 1 - e.NewStartingIndex];
+                    TailSamples.UnbindFrom(SamplesBindable);
+                    TailSamples.BindTo(newSamples);
+                }
+            }
         }
 
         public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Mania.Objects;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private IList<string> getSampleNames(IList<HitSampleInfo> hitSampleInfo)
             => hitSampleInfo.Select(sample => sample.LookupNames.First()).ToList();
 
-        private IList<IList<string>> getNodeSampleNames(IList<IList<HitSampleInfo>> hitSampleInfo)
+        private IList<IList<string>> getNodeSampleNames(IList<BindableList<HitSampleInfo>> hitSampleInfo)
             => hitSampleInfo?.Select(getSampleNames)
                             .ToList();
 

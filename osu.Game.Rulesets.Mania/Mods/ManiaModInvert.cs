@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Audio;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 var newColumnObjects = new List<ManiaHitObject>();
 
-                var locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples))
+                var locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.SamplesBindable))
                                       .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                                       {
                                           (startTime: h.StartTime, samples: h.GetNodeSamples(0)),
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         Column = column.Key,
                         StartTime = locations[i].startTime,
                         Duration = duration,
-                        NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
+                        NodeSamples = new List<BindableList<HitSampleInfo>> { locations[i].samples, new BindableList<HitSampleInfo>() }
                     });
                 }
 
