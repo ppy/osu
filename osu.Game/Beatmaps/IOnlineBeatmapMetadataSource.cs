@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
         /// Looks up the online metadata for the supplied <paramref name="beatmapInfo"/>.
         /// </summary>
         /// <returns>
-        /// An <see cref="OnlineBeatmapMetadata"/> instance if the lookup is successful, or <see langword="null"/> if the lookup failed.
+        /// An <see cref="OnlineBeatmapMetadata"/> instance if the lookup is successful, or <see langword="null"/> if the lookup did not return a matching beatmap.
         /// </returns>
         OnlineBeatmapMetadata? Lookup(BeatmapInfo beatmapInfo);
     }
