@@ -18,11 +18,9 @@ using SQLitePCL;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    ///
+    /// Performs online metadata lookups using a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>).
+    /// The database will be asynchronously downloaded - if not already present locally - when this component is constructed.
     /// </summary>
-    /// <remarks>
-    /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>) will be downloaded if not already present locally.
-    /// </remarks>
     public class LocalCachedBeatmapMetadataSource : IOnlineBeatmapMetadataSource
     {
         private readonly Storage storage;
