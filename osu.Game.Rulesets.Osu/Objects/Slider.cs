@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedTickSamples();
+            SamplesBindable.CollectionChanged += (_, _) => updateNestedTickSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
             nodeSamples.CollectionChanged += NodeSamplesOnCollectionChanged;
         }
@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
-            UpdateNestedTickSamples();
+            updateNestedTickSamples();
 
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
                 repeat.SamplesBindable.BindTo(this.GetNodeSamples(repeat.RepeatIndex + 1));
@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             TailSamples = this.GetNodeSamples(repeatCount + 1).GetBoundCopy();
         }
 
-        protected void UpdateNestedTickSamples()
+        private void updateNestedTickSamples()
         {
             var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
                               ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
@@ -285,56 +285,33 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void NodeSamplesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.OldItems is not null)
+            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
             {
-                foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                {
-                    if (repeat.RepeatIndex + 1 < e.OldStartingIndex || repeat.RepeatIndex + 1 >= e.OldStartingIndex + e.OldItems.Count) continue;
-
-                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[repeat.RepeatIndex + 1 - e.OldStartingIndex];
-                    repeat.SamplesBindable.UnbindFrom(oldSamples);
-                    repeat.SamplesBindable.BindTo(SamplesBindable);
-                }
-
-                if (HeadCircle is not null && e.OldStartingIndex == 0 && e.OldItems.Count > 0)
-                {
-                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[0];
-                    HeadCircle.SamplesBindable.UnbindFrom(oldSamples);
-                    HeadCircle.SamplesBindable.BindTo(SamplesBindable);
-                }
-
-                if (TailSamples is not null && repeatCount + 1 >= e.OldStartingIndex && repeatCount + 1 < e.OldStartingIndex + e.OldItems.Count)
-                {
-                    var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[repeatCount + 1 - e.OldStartingIndex];
-                    TailSamples.UnbindFrom(oldSamples);
-                    TailSamples.BindTo(SamplesBindable);
-                }
+                unbindOld(repeat.SamplesBindable, repeat.RepeatIndex + 1);
+                bindNew(repeat.SamplesBindable, repeat.RepeatIndex + 1);
             }
 
-            if (e.NewItems is not null)
+            unbindOld(HeadCircle.SamplesBindable, 0);
+            bindNew(HeadCircle.SamplesBindable, 0);
+            unbindOld(TailSamples, repeatCount + 1);
+            bindNew(TailSamples, repeatCount + 1);
+
+            void bindNew(BindableList<HitSampleInfo> bindableList, int index)
             {
-                foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                {
-                    if (repeat.RepeatIndex + 1 < e.NewStartingIndex || repeat.RepeatIndex + 1 >= e.NewStartingIndex + e.NewItems.Count) continue;
+                if (bindableList is null || e.NewItems is null || index < e.NewStartingIndex || index >= e.NewStartingIndex + e.NewItems.Count) return;
 
-                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[repeat.RepeatIndex + 1 - e.NewStartingIndex];
-                    repeat.SamplesBindable.UnbindFrom(SamplesBindable);
-                    repeat.SamplesBindable.BindTo(newSamples);
-                }
+                var newSamples = (BindableList<HitSampleInfo>)e.NewItems[index - e.NewStartingIndex];
+                bindableList.UnbindFrom(SamplesBindable);
+                bindableList.BindTo(newSamples);
+            }
 
-                if (HeadCircle is not null && e.NewStartingIndex == 0 && e.NewItems.Count > 0)
-                {
-                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[0];
-                    HeadCircle.SamplesBindable.UnbindFrom(SamplesBindable);
-                    HeadCircle.SamplesBindable.BindTo(newSamples);
-                }
+            void unbindOld(BindableList<HitSampleInfo> bindableList, int index)
+            {
+                if (bindableList is null || e.OldItems is null || index < e.OldStartingIndex || index >= e.OldStartingIndex + e.OldItems.Count) return;
 
-                if (TailSamples is not null && repeatCount + 1 >= e.NewStartingIndex && repeatCount + 1 < e.NewStartingIndex + e.NewItems.Count)
-                {
-                    var newSamples = (BindableList<HitSampleInfo>)e.NewItems[repeatCount + 1 - e.NewStartingIndex];
-                    TailSamples.UnbindFrom(SamplesBindable);
-                    TailSamples.BindTo(newSamples);
-                }
+                var oldSamples = (BindableList<HitSampleInfo>)e.OldItems[index - e.OldStartingIndex];
+                bindableList.UnbindFrom(oldSamples);
+                bindableList.BindTo(SamplesBindable);
             }
         }
 
