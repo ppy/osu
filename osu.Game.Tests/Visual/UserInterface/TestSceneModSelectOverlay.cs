@@ -503,6 +503,31 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestDeselectAllViaButton_WithSearchApplied()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("select DT + HD + RD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModRandom() });
+            AddAssert("DT + HD + RD selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 3);
+            AddAssert("deselect all button enabled", () => this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("apply search", () => modSelectOverlay.SearchTerm = "Easy");
+            AddAssert("DT + HD + RD are hidden and selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.IsValid && panel.Active.Value) == 3);
+            AddAssert("deselect all button enabled", () => this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+        }
+
+        [Test]
         public void TestCloseViaBackButton()
         {
             createScreen();
