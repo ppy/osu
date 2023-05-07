@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             SamplesBindable.CollectionChanged += (_, _) => updateNestedTickSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
-            nodeSamples.CollectionChanged += NodeSamplesOnCollectionChanged;
+            nodeSamples.CollectionChanged += nodeSamplesOnCollectionChanged;
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
@@ -283,7 +283,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 tick.Samples = sampleList;
         }
 
-        private void NodeSamplesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void nodeSamplesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
             {
