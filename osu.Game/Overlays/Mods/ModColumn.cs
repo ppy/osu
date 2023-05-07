@@ -208,11 +208,12 @@ namespace osu.Game.Overlays.Mods
             pendingSelectionOperations.Clear();
 
             foreach (var button in availableMods.Where(b => b.Active.Value))
-                pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
-
-            //If column is hidden trigger selection manually
-            if (Alpha == 0f)
-                Update();
+            {
+                if (Alpha == 0f)
+                    button.Active.Value = false; //If column is hidden change state manually without any animation
+                else
+                    pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
+            }
         }
 
         /// <summary>
