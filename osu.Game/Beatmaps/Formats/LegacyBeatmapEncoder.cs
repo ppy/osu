@@ -155,8 +155,8 @@ namespace osu.Game.Beatmaps.Formats
 
             // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
             writer.WriteLine(onlineRulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
-                : FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
+                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.BaseSliderVelocity / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
+                : FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.BaseSliderVelocity}"));
 
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.Difficulty.SliderTickRate}"));
         }

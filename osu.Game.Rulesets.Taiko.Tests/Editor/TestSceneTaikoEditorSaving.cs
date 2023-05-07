@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         [Test]
         public void TestTaikoSliderMultiplier()
         {
-            AddStep("Set slider multiplier", () => EditorBeatmap.Difficulty.SliderMultiplier = 2);
+            AddStep("Set slider multiplier", () => EditorBeatmap.Difficulty.BaseSliderVelocity = 2);
 
             SaveEditor();
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 // therefore, ensure that we have that difficulty type by calling .CopyFrom(), which is a no-op if the type is already correct.
                 var taikoDifficulty = new TaikoBeatmapConverter.TaikoMultiplierAppliedDifficulty();
                 taikoDifficulty.CopyFrom(EditorBeatmap.Difficulty);
-                return Precision.AlmostEquals(taikoDifficulty.SliderMultiplier, 2);
+                return Precision.AlmostEquals(taikoDifficulty.BaseSliderVelocity, 2);
             }
         }
     }
