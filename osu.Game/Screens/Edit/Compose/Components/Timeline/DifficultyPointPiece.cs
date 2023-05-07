@@ -165,6 +165,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
             }
 
+            AddHeader("Beatmap base velocity");
+            AddValue($"{EditorBeatmap.Difficulty.BaseSliderVelocity:#,0.00}x");
         }
 
         protected override void Dispose(bool isDisposing)
