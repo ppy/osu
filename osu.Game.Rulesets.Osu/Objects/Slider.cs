@@ -291,8 +291,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                 bindNew(repeat.SamplesBindable, repeat.RepeatIndex + 1);
             }
 
-            unbindOld(HeadCircle.SamplesBindable, 0);
-            bindNew(HeadCircle.SamplesBindable, 0);
+            unbindOld(HeadCircle?.SamplesBindable, 0);
+            bindNew(HeadCircle?.SamplesBindable, 0);
             unbindOld(TailSamples, repeatCount + 1);
             bindNew(TailSamples, repeatCount + 1);
 
