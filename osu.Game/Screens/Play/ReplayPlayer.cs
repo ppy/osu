@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
@@ -56,7 +57,20 @@ namespace osu.Game.Screens.Play
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
 
         // Don't re-import replay scores as they're already present in the database.
-        protected override Task ImportScore(Score score, bool haveDanceMod = false) => Task.CompletedTask;
+        protected override Task ImportScore(Score score, bool haveDanceMod = false)
+        {
+            var danceMod = (ModDance)Mods.Value.FirstOrDefault(m => m is ModDance);
+
+            if (danceMod?.SaveScore.Value ?? false)
+            {
+                if (!score.ScoreInfo.User.Username.EndsWith(danceMod.ENDCHAR, StringComparison.Ordinal)) return Task.CompletedTask;
+
+                score.ScoreInfo.User.Username = score.ScoreInfo.User.Username.Replace(danceMod.ENDCHAR, danceMod.ENDCHARREPLACE);
+                base.ImportScore(score, true);
+            }
+
+            return Task.CompletedTask;
+        }
 
         public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
 
