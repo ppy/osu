@@ -63,9 +63,11 @@ namespace osu.Game.Screens.Play
 
             if (danceMod?.SaveScore.Value ?? false)
             {
-                if (!score.ScoreInfo.User.Username.EndsWith(danceMod.ENDCHAR, StringComparison.Ordinal)) return Task.CompletedTask;
+                List<Mod> modList = new List<Mod>(score.ScoreInfo.Mods);
 
-                score.ScoreInfo.User.Username = score.ScoreInfo.User.Username.Replace(danceMod.ENDCHAR, danceMod.ENDCHARREPLACE);
+                modList.Remove(danceMod);
+                score.ScoreInfo.Mods = modList.ToArray();
+
                 base.ImportScore(score, true);
             }
 

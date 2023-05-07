@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = new APIUser { Username = $"lazer!dance{ENDCHAR}", IsBot = true } },
+            ScoreInfo = new ScoreInfo { User = new APIUser { Username = $"lazer!dance", IsBot = true } },
             Replay = new OsuDanceAutoGenerator(beatmap, mods).Generate()
         };
     }
