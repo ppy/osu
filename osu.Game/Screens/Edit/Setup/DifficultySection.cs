@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSliderBar<float> healthDrainSlider = null!;
         private LabelledSliderBar<float> approachRateSlider = null!;
         private LabelledSliderBar<float> overallDifficultySlider = null!;
+        private LabelledSliderBar<double> baseVelocitySlider = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
@@ -79,6 +80,19 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
+                baseVelocitySlider = new LabelledSliderBar<double>
+                {
+                    Label = EditorSetupStrings.BaseVelocity,
+                    FixedLabelWidth = LABEL_WIDTH,
+                    Description = EditorSetupStrings.BaseVelocityDescription,
+                    Current = new BindableDouble(Beatmap.Difficulty.BaseSliderVelocity)
+                    {
+                        Default = 1,
+                        MinValue = 0.01,
+                        MaxValue = 10,
+                        Precision = 0.1f,
+                    }
+                },
             };
 
             foreach (var item in Children.OfType<LabelledSliderBar<float>>())
@@ -93,6 +107,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.ApproachRate = approachRateSlider.Current.Value;
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
+            Beatmap.Difficulty.BaseSliderVelocity = baseVelocitySlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
             Beatmap.SaveState();
