@@ -40,7 +40,8 @@ namespace osu.Game.Beatmaps
         {
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
-                var res = lookup(beatmapInfo, preferOnlineFetch);
+                if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
+                    continue;
 
                 if (res == null)
                 {
@@ -71,22 +72,42 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private OnlineBeatmapMetadata? lookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch)
+        /// <summary>
+        /// Attempts to retrieve the <see cref="OnlineBeatmapMetadata"/> for the given <paramref name="beatmapInfo"/>.
+        /// </summary>
+        /// <param name="beatmapInfo">The beatmap to perform the online lookup for.</param>
+        /// <param name="preferOnlineFetch">Whether online sources should be preferred for the lookup.</param>
+        /// <param name="result">The result of the lookup. Can be <see langword="null"/> if no matching beatmap was found (or the lookup failed).</param>
+        /// <returns>
+        /// <see langword="true"/> if any of the metadata sources were available and returned a valid <paramref name="result"/>.
+        /// <see langword="false"/> if none of the metadata sources were available, or if there was insufficient data to return a valid <paramref name="result"/>.
+        /// </returns>
+        /// <remarks>
+        /// There are two cases wherein this method will return <see langword="false"/>:
+        /// <list type="bullet">
+        /// <item>If neither the local cache or the API are available to query.</item>
+        /// <item>If the API is not available to query, and a positive match was not made in the local cache.</item>
+        /// </list>
+        /// In either case, the online ID read from the .osu file will be preserved, which may not necessarily be what we want.
+        /// TODO: reconsider this if/when a better flow for queueing online retrieval is implemented.
+        /// </remarks>
+        private bool tryLookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch, out OnlineBeatmapMetadata? result)
         {
-            OnlineBeatmapMetadata? result = null;
-
-            bool useLocalCache = !apiMetadataSource.Available || !preferOnlineFetch;
-
-            if (useLocalCache)
+            if (localCachedMetadataSource.Available && (!apiMetadataSource.Available || !preferOnlineFetch))
+            {
                 result = localCachedMetadataSource.Lookup(beatmapInfo);
-
-            if (result != null)
-                return result;
+                if (result != null)
+                    return true;
+            }
 
             if (apiMetadataSource.Available)
+            {
                 result = apiMetadataSource.Lookup(beatmapInfo);
+                return true;
+            }
 
-            return result;
+            result = null;
+            return false;
         }
 
         /// <summary>
