@@ -159,20 +159,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocity).OrderBy(v => v).ToArray();
 
-            if (sliderVelocities.Length < 2)
-                return;
+            if (sliderVelocities.First() != sliderVelocities.Last())
+            {
+                AddHeader("Used velocity range");
+                AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
+            }
 
-            double? modeSliderVelocity = sliderVelocities.GroupBy(v => v).MaxBy(v => v.Count())?.Key;
-            double? medianSliderVelocity = sliderVelocities[sliderVelocities.Length / 2];
-
-            AddHeader("Average velocity");
-            AddValue($"{medianSliderVelocity:#,0.00}x");
-
-            AddHeader("Most used velocity");
-            AddValue($"{modeSliderVelocity:#,0.00}x");
-
-            AddHeader("Velocity range");
-            AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
         }
 
         protected override void Dispose(bool isDisposing)
