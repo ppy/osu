@@ -20,10 +20,13 @@ namespace osu.Game.Beatmaps
 
         public bool Available => api.State.Value == APIState.Online;
 
-        public OnlineBeatmapMetadata? Lookup(BeatmapInfo beatmapInfo)
+        public bool TryLookup(BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
         {
             if (!Available)
-                return null;
+            {
+                onlineMetadata = null;
+                return false;
+            }
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
@@ -37,7 +40,8 @@ namespace osu.Game.Beatmaps
                 if (req.CompletionState == APIRequestCompletionState.Failed)
                 {
                     logForModel(beatmapInfo.BeatmapSet, $@"Online retrieval failed for {beatmapInfo}");
-                    return null;
+                    onlineMetadata = null;
+                    return true;
                 }
 
                 var res = req.Response;
@@ -46,7 +50,7 @@ namespace osu.Game.Beatmaps
                 {
                     logForModel(beatmapInfo.BeatmapSet, $@"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
 
-                    return new OnlineBeatmapMetadata
+                    onlineMetadata = new OnlineBeatmapMetadata
                     {
                         BeatmapID = res.OnlineID,
                         BeatmapSetID = res.OnlineBeatmapSetID,
@@ -58,14 +62,18 @@ namespace osu.Game.Beatmaps
                         MD5Hash = res.MD5Hash,
                         LastUpdated = res.LastUpdated
                     };
+                    return true;
                 }
             }
             catch (Exception e)
             {
                 logForModel(beatmapInfo.BeatmapSet, $@"Online retrieval failed for {beatmapInfo} ({e.Message})");
+                onlineMetadata = null;
+                return false;
             }
 
-            return null;
+            onlineMetadata = null;
+            return false;
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
