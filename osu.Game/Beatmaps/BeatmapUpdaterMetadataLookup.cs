@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
         {
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
-                var res = lookup(beatmapSet, beatmapInfo, preferOnlineFetch);
+                var res = lookup(beatmapInfo, preferOnlineFetch);
 
                 if (res == null)
                 {
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private OnlineBeatmapMetadata? lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool preferOnlineFetch)
+        private OnlineBeatmapMetadata? lookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch)
         {
             OnlineBeatmapMetadata? result = null;
 
