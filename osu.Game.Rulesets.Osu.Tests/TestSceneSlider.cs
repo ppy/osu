@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -183,6 +184,39 @@ namespace osu.Game.Rulesets.Osu.Tests
             static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
 
             static bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
+        }
+
+        [Test]
+        public void TestChangeNodeSamples()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+
+                for (int i = 0; i < 3; i++)
+                    slider.HitObject.NodeSamples.Add(new BindableList<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) });
+
+                Add(slider);
+            });
+
+            AddStep("change node samples", () =>
+            {
+                slider.HitObject.NodeSamples[0][0] = new HitSampleInfo(HitSampleInfo.HIT_WHISTLE);
+                slider.HitObject.NodeSamples[2][0] = new HitSampleInfo(HitSampleInfo.HIT_CLAP);
+                slider.HitObject.NodeSamples[1] = new BindableList<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) };
+            });
+
+            AddAssert("head samples updated", () => assertWhistleSamples(slider.HitObject.HeadCircle));
+            AddAssert("repeat samples updated", () => slider.HitObject.NestedHitObjects.OfType<SliderRepeat>().All(assertFinishSamples));
+            AddAssert("tail samples updated", () => assertClapSamples(slider.HitObject.TailSamples));
+
+            static bool assertWhistleSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+
+            static bool assertFinishSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name == HitSampleInfo.HIT_FINISH);
+
+            static bool assertClapSamples(IEnumerable<HitSampleInfo> samples) => samples.All(s => s.Name == HitSampleInfo.HIT_CLAP);
         }
 
         private Drawable testSimpleBig(int repeats = 0) => createSlider(repeats: repeats);
