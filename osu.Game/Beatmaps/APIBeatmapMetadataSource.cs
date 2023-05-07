@@ -9,6 +9,9 @@ using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// Performs online metadata lookups using the osu-web API.
+    /// </summary>
     public class APIBeatmapMetadataSource : IOnlineBeatmapMetadataSource
     {
         private readonly IAPIProvider api;

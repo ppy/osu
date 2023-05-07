@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Unifying interface for sources of online beatmap metadata.
+    /// Unifying interface for sources of <see cref="OnlineBeatmapMetadata"/>.
     /// </summary>
     public interface IOnlineBeatmapMetadataSource : IDisposable
     {
