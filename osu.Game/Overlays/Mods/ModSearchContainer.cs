@@ -3,23 +3,24 @@
 
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Overlays.Mods;
-
-public partial class ModSearchContainer : SearchContainer
+namespace osu.Game.Overlays.Mods
 {
-    /// <summary>
-    /// A string that should match the <see cref="IFilterable"/> children
-    /// </summary>
-    public string ForcedSearchTerm
+    public partial class ModSearchContainer : SearchContainer
     {
-        get => SearchTerm;
-        set
+        /// <summary>
+        /// A string that should match the <see cref="IFilterable"/> children
+        /// </summary>
+        public string ForcedSearchTerm
         {
-            if (value == SearchTerm)
-                return;
+            get => SearchTerm;
+            set
+            {
+                if (value == SearchTerm)
+                    return;
 
-            SearchTerm = value;
-            Update();
+                SearchTerm = value;
+                Update();
+            }
         }
     }
 }
