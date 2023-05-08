@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -177,26 +178,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private static string? getCommonBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
             private static int? getCommonVolume(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(relevantSamples.First()) : null;
 
-            private void updateBankFor(IEnumerable<HitObject> objects, string? newBank)
+            private void updateFor(IEnumerable<HitObject> objects, Action<HitObject, IList<HitSampleInfo>> updateAction)
             {
-                if (string.IsNullOrEmpty(newBank))
-                    return;
-
                 beatmap.BeginChange();
 
                 foreach (var h in objects)
                 {
                     var samples = GetSamples(h);
-
-                    for (int i = 0; i < samples.Count; i++)
-                    {
-                        samples[i] = samples[i].With(newBank: newBank);
-                    }
-
+                    updateAction(h, samples);
                     beatmap.Update(h);
                 }
 
                 beatmap.EndChange();
+            }
+
+            private void updateBankFor(IEnumerable<HitObject> objects, string? newBank)
+            {
+                if (string.IsNullOrEmpty(newBank))
+                    return;
+
+                updateFor(objects, (_, samples) =>
+                {
+                    for (int i = 0; i < samples.Count; i++)
+                    {
+                        samples[i] = samples[i].With(newBank: newBank);
+                    }
+                });
             }
 
             private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
@@ -210,21 +217,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (newVolume == null)
                     return;
 
-                beatmap.BeginChange();
-
-                foreach (var h in objects)
+                updateFor(objects, (_, samples) =>
                 {
-                    var samples = GetSamples(h);
-
                     for (int i = 0; i < samples.Count; i++)
                     {
                         samples[i] = samples[i].With(newVolume: newVolume.Value);
                     }
-
-                    beatmap.Update(h);
-                }
-
-                beatmap.EndChange();
+                });
             }
 
             #region hitsound toggles
@@ -277,21 +276,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                beatmap.BeginChange();
-
-                foreach (var h in objects)
+                updateFor(objects, (h, samples) =>
                 {
-                    var samples = GetSamples(h);
-
                     // Make sure there isn't already an existing sample
                     if (samples.Any(s => s.Name == sampleName))
                         return;
 
                     samples.Add(h.GetSampleInfo(sampleName));
-                    beatmap.Update(h);
-                }
-
-                beatmap.EndChange();
+                });
             }
 
             private void removeHitSampleFor(IEnumerable<HitObject> objects, string sampleName)
@@ -299,22 +291,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                beatmap.BeginChange();
-
-                foreach (var h in objects)
+                updateFor(objects, (_, samples) =>
                 {
-                    var samples = GetSamples(h);
-
                     for (int i = 0; i < samples.Count; i++)
                     {
                         if (samples[i].Name == sampleName)
                             samples.RemoveAt(i--);
                     }
-
-                    beatmap.Update(h);
-                }
-
-                beatmap.EndChange();
+                });
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
