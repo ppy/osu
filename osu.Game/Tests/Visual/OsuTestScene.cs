@@ -36,7 +36,6 @@ using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
-    [ExcludeFromDynamicCompile]
     public abstract partial class OsuTestScene : TestScene
     {
         [Cached]
