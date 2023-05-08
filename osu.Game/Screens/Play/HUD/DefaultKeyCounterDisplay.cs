@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
@@ -13,13 +13,11 @@ namespace osu.Game.Screens.Play.HUD
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        private readonly FillFlowContainer<DefaultKeyCounter> keyFlow;
-
-        public override IEnumerable<KeyCounter> Counters => keyFlow;
+        protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
 
         public DefaultKeyCounterDisplay()
         {
-            InternalChild = keyFlow = new FillFlowContainer<DefaultKeyCounter>
+            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
@@ -33,20 +31,19 @@ namespace osu.Game.Screens.Play.HUD
 
             // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
             // In turn this can cause the display to be masked off screen and never become visible again.
-            Size = keyFlow.Size;
+            Size = KeyFlow.Size;
         }
 
-        public override void Add(InputTrigger trigger) =>
-            keyFlow.Add(new DefaultKeyCounter(trigger)
-            {
-                FadeTime = key_fade_time,
-                KeyDownTextColor = KeyDownTextColor,
-                KeyUpTextColor = KeyUpTextColor,
-            });
+        protected override KeyCounter CreateCounter(InputTrigger trigger) => new DefaultKeyCounter(trigger)
+        {
+            FadeTime = key_fade_time,
+            KeyDownTextColor = KeyDownTextColor,
+            KeyUpTextColor = KeyUpTextColor,
+        };
 
         protected override void UpdateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
-            keyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
+            KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
 
         private Color4 keyDownTextColor = Color4.DarkGray;
 
@@ -58,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (value != keyDownTextColor)
                 {
                     keyDownTextColor = value;
-                    foreach (var child in keyFlow)
+                    foreach (var child in KeyFlow.Cast<DefaultKeyCounter>())
                         child.KeyDownTextColor = value;
                 }
             }
@@ -74,7 +71,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (value != keyUpTextColor)
                 {
                     keyUpTextColor = value;
-                    foreach (var child in keyFlow)
+                    foreach (var child in KeyFlow.Cast<DefaultKeyCounter>())
                         child.KeyUpTextColor = value;
                 }
             }

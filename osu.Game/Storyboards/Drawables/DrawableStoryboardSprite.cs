@@ -82,7 +82,7 @@ namespace osu.Game.Storyboards.Drawables
             Position = sprite.InitialPosition;
 
             LifetimeStart = sprite.StartTime;
-            LifetimeEnd = sprite.EndTime;
+            LifetimeEnd = sprite.EndTimeForDisplay;
         }
 
         [Resolved]

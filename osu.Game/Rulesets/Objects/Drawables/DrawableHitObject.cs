@@ -357,13 +357,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (samples.Length <= 0)
                 return;
 
-            if (HitObject.SampleControlPoint == null)
-            {
-                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-            }
-
-            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            Samples.Samples = samples.Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();

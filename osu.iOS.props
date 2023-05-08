@@ -16,6 +16,6 @@
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2023.418.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2023.506.0" />
   </ItemGroup>
 </Project>
