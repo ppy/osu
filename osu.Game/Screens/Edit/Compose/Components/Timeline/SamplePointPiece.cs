@@ -82,10 +82,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 label = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.CentreLeft,
-                    X = 9,
-                    Rotation = -90,
-                    Width = 28,
+                    Origin = Anchor.BottomLeft,
+                    X = 6,
                     Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
                     Colour = colours.GrayF,
                     Truncate = true,
@@ -127,7 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var samples = GetSamples();
             int i = 0;
 
-            label.Text = $"{GetBankValue(samples)}";
+            label.Text = $"{abbreviateBank(GetBankValue(samples))}";
             volumeBar.ResizeHeightTo(GetVolumeValue(samples) / 100f, 200, Easing.OutQuint);
 
             foreach (string sampleName in HitSampleInfo.AllAdditions)
