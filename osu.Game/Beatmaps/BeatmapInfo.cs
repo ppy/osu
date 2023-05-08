@@ -173,9 +173,6 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
-        [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
-
         /// <summary>
         /// The number of beats to move the countdown backwards (compared to its default location).
         /// </summary>
@@ -251,9 +248,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
-
-        [Ignored]
-        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public int BeatmapVersion;
 
