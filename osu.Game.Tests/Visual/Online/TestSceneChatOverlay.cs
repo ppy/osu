@@ -8,10 +8,12 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -30,6 +32,7 @@ using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -52,6 +55,9 @@ namespace osu.Game.Tests.Visual.Online
         private OsuConfigManager config { get; set; } = null!;
 
         private int currentMessageId;
+
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+        private readonly ManualResetEventSlim requestLock = new ManualResetEventSlim();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -574,6 +580,75 @@ namespace osu.Game.Tests.Visual.Online
                                                                           .Where(item => item.IsPresent);
                 return listingItems.Count() == 1 && listingItems.Single().Channel == testChannel2;
             });
+        }
+
+        [Test]
+        public void TestChatReport()
+        {
+            ChatReportRequest request = null;
+
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            AddStep("Setup request handling", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest = r =>
+                {
+                    if (!(r is ChatReportRequest req))
+                        return false;
+
+                    Task.Run(() =>
+                    {
+                        request = req;
+                        requestLock.Wait(10000);
+                        req.TriggerSuccess();
+                    });
+
+                    return true;
+                };
+            });
+
+            AddStep("Show report popover", () => this.ChildrenOfType<ChatLine>().First().ShowPopover());
+
+            AddStep("Set report reason to other", () =>
+            {
+                var reason = this.ChildrenOfType<OsuEnumDropdown<ChatReportReason>>().Single();
+                reason.Current.Value = ChatReportReason.Other;
+            });
+
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
+            AddStep("Set report data", () =>
+            {
+                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
+                field.Current.Value = "test other";
+            });
+
+            AddStep("Try to report", () =>
+            {
+                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                InputManager.MoveMouseTo(btn);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("Request sent", () => request != null);
+            AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
         }
 
         private void joinTestChannel(int i)
