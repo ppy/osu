@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -182,6 +185,64 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
         }
 
+        [Test]
+        public void TestUndoEditHistory()
+        {
+            SkinComponentsContainer firstTarget = null!;
+            TestSkinEditorChangeHandler changeHandler = null!;
+            byte[] defaultState = null!;
+            IEnumerable<ISerialisableDrawable> testComponents = null!;
+
+            AddStep("Load necessary things", () =>
+            {
+                firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                changeHandler = new TestSkinEditorChangeHandler(firstTarget);
+
+                changeHandler.SaveState();
+                defaultState = changeHandler.GetCurrentState();
+
+                testComponents = new[]
+                {
+                    targetContainer.Components.First(),
+                    targetContainer.Components[targetContainer.Components.Count / 2],
+                    targetContainer.Components.Last()
+                };
+            });
+
+            AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Add components", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Move components", () =>
+            {
+                changeHandler.BeginChange();
+                testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One);
+                changeHandler.EndChange();
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
+            AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
+            revertAndCheckUnchanged();
+
+            AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
+            revertAndCheckUnchanged();
+
+            void revertAndCheckUnchanged()
+            {
+                AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            }
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestBringToFront(bool alterSelectionOrder)
@@ -269,5 +330,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
+        private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
+        {
+            public TestSkinEditorChangeHandler(Drawable targetScreen)
+                : base(targetScreen)
+            {
+            }
+
+            public byte[] GetCurrentState()
+            {
+                using var stream = new MemoryStream();
+
+                WriteCurrentStateToStream(stream);
+                byte[] newState = stream.ToArray();
+
+                return newState;
+            }
+        }
     }
 }
