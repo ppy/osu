@@ -329,6 +329,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (HoldStartTime == null)
                 return;
 
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
+                return;
+
             Tail.UpdateResult();
             endHold();
 
