@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateText()
         {
-            Label.Text = $"{GetBankValue(HitObject.Samples)} {GetVolumeValue(HitObject.Samples)}";
+            Label.Text = $"{GetBankValue(GetSamples())} {GetVolumeValue(GetSamples())}";
         }
 
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
@@ -61,7 +61,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return samples.Count == 0 ? 0 : samples.Max(o => o.Volume);
         }
 
-        public Popover GetPopover() => new SampleEditPopover(HitObject);
+        protected virtual IList<HitSampleInfo> GetSamples() => HitObject.Samples;
+
+        public virtual Popover GetPopover() => new SampleEditPopover(HitObject);
 
         public partial class SampleEditPopover : OsuPopover
         {
@@ -69,6 +71,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private LabelledTextBox bank = null!;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
+
+            protected virtual IList<HitSampleInfo> GetSamples(HitObject ho) => ho.Samples;
 
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; } = null!;
@@ -112,7 +116,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                var relevantSamples = relevantObjects.Select(h => h.Samples).ToArray();
+                var relevantSamples = relevantObjects.Select(GetSamples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
                 string? commonBank = getCommonBank(relevantSamples);

@@ -1,0 +1,54 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Generic;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Audio;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
+using osuTK.Graphics;
+
+namespace osu.Game.Screens.Edit.Compose.Components.Timeline
+{
+    public partial class NodeSamplePointPiece : SamplePointPiece
+    {
+        public readonly int NodeIndex;
+
+        public NodeSamplePointPiece(HitObject hitObject, int nodeIndex)
+            : base(hitObject)
+        {
+            if (hitObject is not IHasRepeats)
+                throw new System.ArgumentException($"HitObject must implement {nameof(IHasRepeats)}", nameof(hitObject));
+
+            NodeIndex = nodeIndex;
+        }
+
+        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
+
+        protected override IList<HitSampleInfo> GetSamples()
+        {
+            var hasRepeats = (IHasRepeats)HitObject;
+            return NodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[NodeIndex] : HitObject.Samples;
+        }
+
+        public override Popover GetPopover() => new NodeSampleEditPopover(HitObject);
+
+        public partial class NodeSampleEditPopover : SampleEditPopover
+        {
+            private readonly int nodeIndex;
+
+            protected override IList<HitSampleInfo> GetSamples(HitObject ho)
+            {
+                var hasRepeats = (IHasRepeats)ho;
+                return nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : ho.Samples;
+            }
+
+            public NodeSampleEditPopover(HitObject hitObject, int nodeIndex = 0)
+                : base(hitObject)
+            {
+                this.nodeIndex = nodeIndex;
+            }
+        }
+    }
+}
