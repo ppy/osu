@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // 2. The head note will move along with the new "head position" in the container.
             if (Head.IsHit && releaseTime == null && DrawHeight > 0)
             {
-                // How far past the hit target this hold note is. Always a positive value.
+                // How far past the hit target this hold note is.
                 float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
                 sizingContainer.Height = 1 - yOffset / DrawHeight;
             }
