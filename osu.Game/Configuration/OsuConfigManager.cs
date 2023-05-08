@@ -12,7 +12,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -26,7 +25,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
-    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
         public OsuConfigManager(Storage storage)
