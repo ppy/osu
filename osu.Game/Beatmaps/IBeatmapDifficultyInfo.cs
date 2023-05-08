@@ -34,9 +34,12 @@ namespace osu.Game.Beatmaps
         float ApproachRate { get; }
 
         /// <summary>
-        /// The base slider velocity of the associated beatmap.
-        /// This was known as "SliderMultiplier" in the .osu format and stable editor.
+        /// The base velocity of the associated beatmap.
         /// </summary>
+        /// <remarks>
+        /// This was known as "SliderMultiplier" in the .osu format and stable editor.
+        /// It is used for things like velocity of objects with paths and scrolling speed in some rulesets.
+        /// </remarks>
         double BaseVelocity { get; }
 
         /// <summary>
@@ -44,6 +47,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <remarks>
         /// This is used by objects with "ticks" to decide how often the ticks are spawned.
+        /// A tick rate of 1 will spawn ticks on each beat, 2 would be twice per beat, etc.
         /// </remarks>
         double TickRate { get; }
 
