@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
-                    OriginPosition = Item is IHasRepeats ? new Vector2(11, 0) : new Vector2(2, 0),
+                    OriginPosition = Item is IHasRepeats ? new Vector2(10, 0) : new Vector2(2, 0),
                     Y = 17
                 },
             });
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     Anchor = Anchor.BottomLeft,
                     RelativePositionAxes = Axes.X,
-                    OriginPosition = i == 0 ? new Vector2(-7, 0) : new Vector2(2, 0),
+                    OriginPosition = i == 0 ? new Vector2(-6, 0) : new Vector2(2, 0),
                     X = (float)i / (repeats.RepeatCount + 1),
                     Y = 17,
                 });
