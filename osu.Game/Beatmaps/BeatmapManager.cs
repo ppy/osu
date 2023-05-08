@@ -15,7 +15,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -33,7 +32,6 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles general operations related to global beatmap management.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
