@@ -96,10 +96,13 @@ namespace osu.Game.Screens.Edit.Setup
             };
 
             foreach (var item in Children.OfType<LabelledSliderBar<float>>())
-                item.Current.ValueChanged += onValueChanged;
+                item.Current.ValueChanged += _ => updateValues();
+
+            foreach (var item in Children.OfType<LabelledSliderBar<double>>())
+                item.Current.ValueChanged += _ => updateValues();
         }
 
-        private void onValueChanged(ValueChangedEvent<float> args)
+        private void updateValues()
         {
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
