@@ -27,13 +27,13 @@ namespace osu.Game.Tests.Visual.Online
         public void TestMainPage()
         {
             setUpWikiResponse(responseMainPage);
-            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show main page", () => wiki.ShowPage());
         }
 
         [Test]
         public void TestCancellationDoesntShowError()
         {
-            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show main page", () => wiki.ShowPage());
             AddStep("Show another page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
 
             AddUntilStep("Current path is not error", () => wiki.CurrentPath != "error");
