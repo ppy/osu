@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -27,7 +26,6 @@ namespace osu.Game.Beatmaps
     /// <remarks>
     /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
