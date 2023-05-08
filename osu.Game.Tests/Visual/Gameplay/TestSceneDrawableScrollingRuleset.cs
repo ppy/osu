@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.Difficulty.BaseSliderVelocity = 2;
+            beatmap.Difficulty.BaseVelocity = 2;
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 5000);
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.Difficulty.BaseSliderVelocity = 2;
+            beatmap.Difficulty.BaseVelocity = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);

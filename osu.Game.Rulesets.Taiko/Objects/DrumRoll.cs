@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.BaseSliderVelocity * SliderVelocity;
+            double scoringDistance = base_distance * difficulty.BaseVelocity * SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;

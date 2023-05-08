@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
+            tickSpacing = timingPoint.BeatLength / difficulty.TickRate;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
     {
         /// <summary>
-        /// The default value used for all difficulty settings except <see cref="BaseSliderVelocity"/> and <see cref="SliderTickRate"/>.
+        /// The default value used for all difficulty settings except <see cref="BaseVelocity"/> and <see cref="TickRate"/>.
         /// </summary>
         public const float DEFAULT_DIFFICULTY = 5;
 
@@ -20,8 +20,8 @@ namespace osu.Game.Beatmaps
         public float OverallDifficulty { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float ApproachRate { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
 
-        public double BaseSliderVelocity { get; set; } = 1;
-        public double SliderTickRate { get; set; } = 1;
+        public double BaseVelocity { get; set; } = 1;
+        public double TickRate { get; set; } = 1;
 
         public BeatmapDifficulty()
         {
@@ -44,8 +44,8 @@ namespace osu.Game.Beatmaps
             difficulty.CircleSize = CircleSize;
             difficulty.OverallDifficulty = OverallDifficulty;
 
-            difficulty.BaseSliderVelocity = BaseSliderVelocity;
-            difficulty.SliderTickRate = SliderTickRate;
+            difficulty.BaseVelocity = BaseVelocity;
+            difficulty.TickRate = TickRate;
         }
 
         public virtual void CopyFrom(IBeatmapDifficultyInfo other)
@@ -55,8 +55,8 @@ namespace osu.Game.Beatmaps
             CircleSize = other.CircleSize;
             OverallDifficulty = other.OverallDifficulty;
 
-            BaseSliderVelocity = other.BaseSliderVelocity;
-            SliderTickRate = other.SliderTickRate;
+            BaseVelocity = other.BaseVelocity;
+            TickRate = other.TickRate;
         }
     }
 }

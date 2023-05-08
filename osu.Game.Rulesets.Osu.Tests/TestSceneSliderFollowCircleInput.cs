@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Difficulty = new BeatmapDifficulty
                     {
                         CircleSize = circleSize,
-                        SliderTickRate = 1
+                        TickRate = 1
                     },
                     Ruleset = new OsuRuleset().RulesetInfo
                 },

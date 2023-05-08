@@ -384,11 +384,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SliderMultiplier":
-                    difficulty.BaseSliderVelocity = Parsing.ParseDouble(pair.Value);
+                    difficulty.BaseVelocity = Parsing.ParseDouble(pair.Value);
                     break;
 
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = Parsing.ParseDouble(pair.Value);
+                    difficulty.TickRate = Parsing.ParseDouble(pair.Value);
                     break;
             }
         }

@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateInspectorText()
         {
-            double beatmapVelocity = EditorBeatmap.Difficulty.BaseSliderVelocity;
+            double beatmapVelocity = EditorBeatmap.Difficulty.BaseVelocity;
 
             InspectorText.Clear();
 

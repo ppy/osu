@@ -91,8 +91,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(4, difficulty.CircleSize);
             Assert.AreEqual(8, difficulty.OverallDifficulty);
             Assert.AreEqual(9, difficulty.ApproachRate);
-            Assert.AreEqual(1.8, difficulty.BaseSliderVelocity);
-            Assert.AreEqual(2, difficulty.SliderTickRate);
+            Assert.AreEqual(1.8, difficulty.BaseVelocity);
+            Assert.AreEqual(2, difficulty.TickRate);
         }
 
         [Test]

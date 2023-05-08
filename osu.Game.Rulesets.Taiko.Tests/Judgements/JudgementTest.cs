@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 HitObjects = hitObjects.ToList(),
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
             };

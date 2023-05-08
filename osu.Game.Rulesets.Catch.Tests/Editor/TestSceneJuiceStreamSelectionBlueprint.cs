@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 X = x,
                 Path = sliderPath,
             };
-            EditorBeatmap.Difficulty.BaseSliderVelocity = velocity;
+            EditorBeatmap.Difficulty.BaseVelocity = velocity;
             EditorBeatmap.Add(hitObject);
             EditorBeatmap.Update(hitObject);
             Assert.That(hitObject.Velocity, Is.EqualTo(velocity));

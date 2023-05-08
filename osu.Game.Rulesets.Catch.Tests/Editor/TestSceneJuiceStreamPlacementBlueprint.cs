@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         protected override IBeatmap GetPlayableBeatmap()
         {
             var playable = base.GetPlayableBeatmap();
-            playable.Difficulty.SliderTickRate = 5;
-            playable.Difficulty.BaseSliderVelocity = velocity_factor * 10;
+            playable.Difficulty.TickRate = 5;
+            playable.Difficulty.BaseVelocity = velocity_factor * 10;
             return playable;
         }
 

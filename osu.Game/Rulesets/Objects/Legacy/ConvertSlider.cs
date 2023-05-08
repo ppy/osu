@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.BaseSliderVelocity * SliderVelocity;
+            double scoringDistance = base_scoring_distance * difficulty.BaseVelocity * SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }

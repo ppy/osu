@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            velocityFactor = base_scoring_distance * difficulty.BaseSliderVelocity / timingPoint.BeatLength;
-            tickDistanceFactor = base_scoring_distance * difficulty.BaseSliderVelocity / difficulty.SliderTickRate;
+            velocityFactor = base_scoring_distance * difficulty.BaseVelocity / timingPoint.BeatLength;
+            tickDistanceFactor = base_scoring_distance * difficulty.BaseVelocity / difficulty.TickRate;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
