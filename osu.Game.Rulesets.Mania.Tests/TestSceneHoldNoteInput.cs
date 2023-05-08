@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -40,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const double time_tail = 4000;
         private const double time_after_tail = 5250;
 
-        private List<JudgementResult> judgementResults;
+        private List<JudgementResult> judgementResults = new List<JudgementResult>();
 
         /// <summary>
         ///     -----[           ]-----
@@ -521,9 +519,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         private void assertLastTickJudgement(HitResult result)
             => AddAssert($"last tick judged as {result}", () => judgementResults.Last(j => j.HitObject is HoldNoteTick).Type, () => Is.EqualTo(result));
 
-        private ScoreAccessibleReplayPlayer currentPlayer;
+        private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
-        private void performTest(List<ReplayFrame> frames, Beatmap<ManiaHitObject> beatmap = null)
+        private void performTest(List<ReplayFrame> frames, Beatmap<ManiaHitObject>? beatmap = null)
         {
             if (beatmap == null)
             {
@@ -569,14 +567,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
 
-            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor?.HasCompleted.Value == true);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
         private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-
-            public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
             protected override bool PauseOnFocusLost => false;
 
