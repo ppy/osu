@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -25,7 +24,6 @@ namespace osu.Game.Scoring
     /// <summary>
     /// A realm model containing metadata for a single score.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
