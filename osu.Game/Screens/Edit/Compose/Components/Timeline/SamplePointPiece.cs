@@ -26,9 +26,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
-        [Resolved(canBeNull: true)]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
-
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
