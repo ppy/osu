@@ -40,7 +40,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             protected override IList<HitSampleInfo> GetSamples(HitObject ho)
             {
-                var hasRepeats = (IHasRepeats)ho;
+                if (ho is not IHasRepeats hasRepeats)
+                    return ho.Samples;
+
                 return nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : ho.Samples;
             }
 
