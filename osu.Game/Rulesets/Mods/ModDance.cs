@@ -45,14 +45,5 @@ namespace osu.Game.Rulesets.Mods
         public bool PerformFail() => false;
 
         public bool RestartOnFail => false;
-
-        /// <summary>
-        /// 表示是否是事实生成的回放<br/>
-        /// 如果是，去除ENDCHAR并记录<br/>
-        /// 如果不是，则不要记录
-        /// </summary>
-        public readonly string ENDCHAR = "　";
-
-        public readonly string ENDCHARREPLACE = "";
     }
 }
