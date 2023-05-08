@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Container volumeBar = null!;
         private OsuSpriteText label = null!;
+        private OsuSpriteText additionLabel = null!;
         private Container additionsContainer = null!;
 
         protected virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
@@ -78,6 +79,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             RelativeSizeAxes = Axes.Both
                         }
                     }
+                },
+                additionLabel = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(6, -12),
+                    Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                    Colour = colours.GrayF,
+                    Truncate = true,
                 },
                 label = new OsuSpriteText
                 {
@@ -124,8 +134,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             var samples = GetSamples();
             int i = 0;
+            string? bank = abbreviateBank(GetBankValue(samples));
+            string? additionBank = abbreviateBank(GetAdditionBankValue(samples));
 
-            label.Text = $"{abbreviateBank(GetBankValue(samples))}";
+            label.Text = bank ?? string.Empty;
+            additionLabel.Text = additionBank != bank && additionBank is not null ? additionBank : string.Empty;
             volumeBar.ResizeHeightTo(GetVolumeValue(samples) / 100f, 200, Easing.OutQuint);
 
             foreach (string sampleName in HitSampleInfo.AllAdditions)
