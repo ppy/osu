@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// <summary>
     /// A container to be used in a <see cref="ManiaSkinnableTestScene"/> to provide a resolvable <see cref="Column"/> dependency.
     /// </summary>
-    public class ColumnTestContainer : Container
+    public partial class ColumnTestContainer : Container
     {
         protected override Container<Drawable> Content => content;
 

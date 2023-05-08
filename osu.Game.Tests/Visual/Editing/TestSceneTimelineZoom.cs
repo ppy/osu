@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneTimelineZoom : TimelineTestScene
+    public partial class TestSceneTimelineZoom : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => Empty();
 

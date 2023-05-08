@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Database
         private class TestLegacyBeatmapImporter : LegacyBeatmapImporter
         {
             public TestLegacyBeatmapImporter()
-                : base(null)
+                : base(null!)
             {
             }
 

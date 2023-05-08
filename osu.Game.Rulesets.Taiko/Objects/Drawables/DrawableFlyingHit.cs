@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// <summary>
     /// A hit used specifically for drum rolls, where spawning flying hits is required.
     /// </summary>
-    public class DrawableFlyingHit : DrawableHit
+    public partial class DrawableFlyingHit : DrawableHit
     {
         public DrawableFlyingHit(DrawableDrumRollTick drumRollTick)
             : base(new IgnoreHit

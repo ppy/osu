@@ -13,7 +13,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Online.Chat
 {
-    public class ExternalLinkOpener : Component
+    public partial class ExternalLinkOpener : Component
     {
         [Resolved]
         private GameHost host { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace osu.Game.Online.Chat
                 host.OpenUrlExternally(url);
         }
 
-        public class ExternalLinkDialog : PopupDialog
+        public partial class ExternalLinkDialog : PopupDialog
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {

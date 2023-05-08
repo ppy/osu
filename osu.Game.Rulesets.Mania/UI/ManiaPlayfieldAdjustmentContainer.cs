@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class ManiaPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         public ManiaPlayfieldAdjustmentContainer()
         {

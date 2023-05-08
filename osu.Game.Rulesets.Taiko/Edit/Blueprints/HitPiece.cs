@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public class HitPiece : CompositeDrawable
+    public partial class HitPiece : CompositeDrawable
     {
         public HitPiece()
         {

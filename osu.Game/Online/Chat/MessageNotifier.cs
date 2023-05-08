@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
@@ -23,7 +24,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Component that handles creating and posting notifications for incoming messages.
     /// </summary>
-    public class MessageNotifier : Component
+    public partial class MessageNotifier : Component
     {
         [Resolved]
         private INotificationOverlay notifications { get; set; }
@@ -61,12 +62,16 @@ namespace osu.Game.Online.Chat
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
                     foreach (var channel in e.NewItems.Cast<Channel>())
                         channel.NewMessagesArrived += checkNewMessages;
 
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (var channel in e.OldItems.Cast<Channel>())
                         channel.NewMessagesArrived -= checkNewMessages;
 
@@ -138,7 +143,7 @@ namespace osu.Game.Online.Chat
             return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
-        public class PrivateMessageNotification : HighlightMessageNotification
+        public partial class PrivateMessageNotification : HighlightMessageNotification
         {
             public PrivateMessageNotification(Message message, Channel channel)
                 : base(message, channel)
@@ -148,7 +153,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public class MentionNotification : HighlightMessageNotification
+        public partial class MentionNotification : HighlightMessageNotification
         {
             public MentionNotification(Message message, Channel channel)
                 : base(message, channel)
@@ -158,7 +163,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public abstract class HighlightMessageNotification : SimpleNotification
+        public abstract partial class HighlightMessageNotification : SimpleNotification
         {
             protected HighlightMessageNotification(Message message, Channel channel)
             {

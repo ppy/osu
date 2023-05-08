@@ -8,7 +8,7 @@ using osuTK.Input;
 
 namespace osu.Game.Input
 {
-    public class OsuUserInputManager : UserInputManager
+    public partial class OsuUserInputManager : UserInputManager
     {
         internal OsuUserInputManager()
         {

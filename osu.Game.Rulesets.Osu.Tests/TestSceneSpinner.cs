@@ -20,7 +20,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinner : OsuSkinnableTestScene
+    public partial class TestSceneSpinner : OsuSkinnableTestScene
     {
         private int depthIndex;
 
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return drawableSpinner;
         }
 
-        private class TestDrawableSpinner : DrawableSpinner
+        private partial class TestDrawableSpinner : DrawableSpinner
         {
             private readonly bool auto;
 

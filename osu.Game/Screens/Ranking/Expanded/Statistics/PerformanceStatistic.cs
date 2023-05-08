@@ -15,7 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatistic : StatisticDisplay
+    public partial class PerformanceStatistic : StatisticDisplay
     {
         private readonly ScoreInfo score;
 

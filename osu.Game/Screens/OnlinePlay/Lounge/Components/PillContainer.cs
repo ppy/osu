@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     /// <summary>
     /// Displays contents in a "pill".
     /// </summary>
-    public class PillContainer : Container
+    public partial class PillContainer : Container
     {
         private const float padding = 8;
 

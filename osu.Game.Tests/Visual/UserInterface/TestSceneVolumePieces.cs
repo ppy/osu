@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneVolumePieces : OsuTestScene
+    public partial class TestSceneVolumePieces : OsuTestScene
     {
         protected override void LoadComplete()
         {

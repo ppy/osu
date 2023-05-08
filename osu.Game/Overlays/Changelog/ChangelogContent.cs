@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
@@ -10,9 +8,9 @@ using System;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogContent : FillFlowContainer
+    public partial class ChangelogContent : FillFlowContainer
     {
-        public Action<APIChangelogBuild> BuildSelected;
+        public Action<APIChangelogBuild>? BuildSelected;
 
         public void SelectBuild(APIChangelogBuild build) => BuildSelected?.Invoke(build);
 

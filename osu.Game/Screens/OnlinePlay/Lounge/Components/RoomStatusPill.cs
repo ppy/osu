@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     /// <summary>
     /// A pill that displays the room's current status.
     /// </summary>
-    public class RoomStatusPill : OnlinePlayComposite
+    public partial class RoomStatusPill : OnlinePlayComposite
     {
         [Resolved]
         private OsuColour colours { get; set; }

@@ -8,7 +8,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public abstract class AccountCreationScreen : Screen
+    public abstract partial class AccountCreationScreen : Screen
     {
         public override void OnEntering(ScreenTransitionEvent e)
         {

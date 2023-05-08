@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public abstract class ManiaInputTestScene : OsuTestScene
+    public abstract partial class ManiaInputTestScene : OsuTestScene
     {
         private readonly Container<Drawable> content;
         protected override Container<Drawable> Content => content ?? base.Content;
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             base.Content.Add(content = new LocalInputManager(keys));
         }
 
-        private class LocalInputManager : ManiaInputManager
+        private partial class LocalInputManager : ManiaInputManager
         {
             public LocalInputManager(int variant)
                 : base(new ManiaRuleset().RulesetInfo, variant)
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             protected override KeyBindingContainer<ManiaAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 => new LocalKeyBindingContainer(ruleset, variant, unique);
 
-            private class LocalKeyBindingContainer : RulesetKeyBindingContainer
+            private partial class LocalKeyBindingContainer : RulesetKeyBindingContainer
             {
                 public LocalKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                     : base(ruleset, variant, unique)

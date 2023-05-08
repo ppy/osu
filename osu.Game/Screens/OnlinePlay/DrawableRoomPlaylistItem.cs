@@ -42,7 +42,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>, IHasContextMenu
+    public partial class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>, IHasContextMenu
     {
         public const float HEIGHT = 50;
 
@@ -512,7 +512,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        public class PlaylistEditButton : GrayButton
+        public partial class PlaylistEditButton : GrayButton
         {
             public PlaylistEditButton()
                 : base(FontAwesome.Solid.Edit)
@@ -520,7 +520,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        public class PlaylistRemoveButton : GrayButton
+        public partial class PlaylistRemoveButton : GrayButton
         {
             public PlaylistRemoveButton()
                 : base(FontAwesome.Solid.MinusSquare)
@@ -528,7 +528,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private sealed class PlaylistDownloadButton : BeatmapDownloadButton
+        private sealed partial class PlaylistDownloadButton : BeatmapDownloadButton
         {
             private readonly IBeatmapInfo beatmap;
 
@@ -586,7 +586,7 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
-        private class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
+        private partial class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
             public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 
@@ -641,7 +641,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private class OwnerAvatar : UpdateableAvatar, IHasTooltip
+        private partial class OwnerAvatar : UpdateableAvatar, IHasTooltip
         {
             public OwnerAvatar()
             {
@@ -654,7 +654,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             public LocalisableString TooltipText => User == null ? string.Empty : $"queued by {User.Username}";
 
-            private class TooltipArea : Component, IHasTooltip
+            private partial class TooltipArea : Component, IHasTooltip
             {
                 private readonly OwnerAvatar avatar;
 

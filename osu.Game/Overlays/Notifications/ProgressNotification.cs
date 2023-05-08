@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotification : Notification, IHasCompletionTarget
+    public partial class ProgressNotification : Notification, IHasCompletionTarget
     {
         private const float loading_spinner_size = 22;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public string CompletionText { get; set; } = "Task has completed!";
+        public LocalisableString CompletionText { get; set; } = "Task has completed!";
 
         private float progress;
 
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private bool completionSent;
+        private int completionSent;
 
         /// <summary>
         /// Attempt to post a completion notification.
@@ -162,11 +162,11 @@ namespace osu.Game.Overlays.Notifications
             if (CompletionTarget == null)
                 return;
 
-            if (completionSent)
+            // Thread-safe barrier, as this may be called by a web request and also scheduled to the update thread at the same time.
+            if (Interlocked.Exchange(ref completionSent, 1) == 1)
                 return;
 
             CompletionTarget.Invoke(CreateCompletionNotification());
-            completionSent = true;
 
             Close(false);
         }
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private class ProgressBar : Container
+        private partial class ProgressBar : Container
         {
             private readonly Box box;
 

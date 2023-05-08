@@ -14,7 +14,7 @@ using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneMigrationScreens : ScreenTestScene
+    public partial class TestSceneMigrationScreens : ScreenTestScene
     {
         [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notifications;
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen(false)));
         }
 
-        private class TestMigrationSelectScreen : MigrationSelectScreen
+        private partial class TestMigrationSelectScreen : MigrationSelectScreen
         {
             private readonly bool deleteSuccess;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             protected override void BeginMigration(DirectoryInfo target) => this.Push(new TestMigrationRunScreen(deleteSuccess));
 
-            private class TestMigrationRunScreen : MigrationRunScreen
+            private partial class TestMigrationRunScreen : MigrationRunScreen
             {
                 private readonly bool success;
 

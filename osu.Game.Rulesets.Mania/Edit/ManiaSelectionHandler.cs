@@ -13,7 +13,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaSelectionHandler : EditorSelectionHandler
+    public partial class ManiaSelectionHandler : EditorSelectionHandler
     {
         [Resolved]
         private HitObjectComposer composer { get; set; }

@@ -17,7 +17,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
+    public partial class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/settings";
         public LocalisableString Title => SettingsStrings.HeaderTitle;

@@ -22,7 +22,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneManiaComposeScreen : EditorClockTestScene
+    public partial class TestSceneManiaComposeScreen : EditorClockTestScene
     {
         [Resolved]
         private SkinManager skins { get; set; }

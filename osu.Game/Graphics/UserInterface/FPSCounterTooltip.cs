@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class FPSCounterTooltip : CompositeDrawable, ITooltip
+    public partial class FPSCounterTooltip : CompositeDrawable, ITooltip
     {
         private OsuTextFlowContainer textFlow = null!;
 

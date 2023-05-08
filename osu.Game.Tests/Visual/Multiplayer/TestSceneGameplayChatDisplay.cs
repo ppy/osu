@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneGameplayChatDisplay : OsuManualInputManagerTestScene
+    public partial class TestSceneGameplayChatDisplay : OsuManualInputManagerTestScene
     {
         private GameplayChatDisplay chatDisplay;
 

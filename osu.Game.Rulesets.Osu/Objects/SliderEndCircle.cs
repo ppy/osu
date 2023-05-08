@@ -39,11 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
             else
             {
-                // taken from osu-stable
-                const float first_end_circle_preempt_adjust = 2 / 3f;
-
                 // The first end circle should fade in with the slider.
-                TimePreempt = (StartTime - slider.StartTime) + slider.TimePreempt * first_end_circle_preempt_adjust;
+                TimePreempt += StartTime - slider.StartTime;
             }
         }
 

@@ -16,7 +16,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    internal class OsuDirectorySelectorDirectory : DirectorySelectorDirectory
+    internal partial class OsuDirectorySelectorDirectory : DirectorySelectorDirectory
     {
         public OsuDirectorySelectorDirectory(DirectoryInfo directory, string displayName = null)
             : base(directory, displayName)
@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             ? FontAwesome.Solid.Database
             : FontAwesome.Regular.Folder;
 
-        internal class Background : CompositeDrawable
+        internal partial class Background : CompositeDrawable
         {
             [BackgroundDependencyLoader(true)]
             private void load(OverlayColourProvider overlayColourProvider, OsuColour colours)

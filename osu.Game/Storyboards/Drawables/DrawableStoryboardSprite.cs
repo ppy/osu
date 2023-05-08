@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -82,7 +82,7 @@ namespace osu.Game.Storyboards.Drawables
             Position = sprite.InitialPosition;
 
             LifetimeStart = sprite.StartTime;
-            LifetimeEnd = sprite.EndTime;
+            LifetimeEnd = sprite.EndTimeForDisplay;
         }
 
         [Resolved]

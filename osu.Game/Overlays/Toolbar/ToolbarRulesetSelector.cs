@@ -21,7 +21,7 @@ using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetSelector : RulesetSelector
+    public partial class ToolbarRulesetSelector : RulesetSelector
     {
         protected Drawable ModeButtonLine { get; private set; }
 

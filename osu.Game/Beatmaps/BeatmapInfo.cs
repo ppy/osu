@@ -167,7 +167,7 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         public double DistanceSpacing { get; set; } = 1.0;
 
-        public int BeatDivisor { get; set; }
+        public int BeatDivisor { get; set; } = 4;
 
         public int GridSize { get; set; }
 
@@ -237,14 +237,6 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
 
         [Ignored]
         public string? Path => File?.Filename;

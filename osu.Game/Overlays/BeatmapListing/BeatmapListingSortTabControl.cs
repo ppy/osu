@@ -13,22 +13,27 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
+    public partial class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
-        private SearchCategory? lastCategory;
-        private bool? lastHasQuery;
+        private (SearchCategory category, bool hasQuery)? currentParameters;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Reset(SearchCategory.Leaderboard, false);
+
+            if (currentParameters == null)
+                Reset(SearchCategory.Leaderboard, false);
+
+            Current.BindValueChanged(_ => SortDirection.Value = Overlays.SortDirection.Descending);
         }
 
         public void Reset(SearchCategory category, bool hasQuery)
         {
-            if (category != lastCategory || hasQuery != lastHasQuery)
+            var newParameters = (category, hasQuery);
+
+            if (currentParameters != newParameters)
             {
                 TabControl.Clear();
 
@@ -63,8 +68,7 @@ namespace osu.Game.Overlays.BeatmapListing
             // see: https://github.com/ppy/osu-framework/issues/5412
             TabControl.Current.TriggerChange();
 
-            lastCategory = category;
-            lastHasQuery = hasQuery;
+            currentParameters = newParameters;
         }
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl
@@ -72,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapListing
             SortDirection = { BindTarget = SortDirection },
         };
 
-        private class BeatmapSortTabControl : SortTabControl
+        private partial class BeatmapSortTabControl : SortTabControl
         {
             protected override bool AddEnumEntriesAutomatically => false;
 
@@ -84,7 +88,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapSortTabItem : SortTabItem
+        private partial class BeatmapSortTabItem : SortTabItem
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
@@ -100,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private class BeatmapTabButton : TabButton
+        public partial class BeatmapTabButton : TabButton
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
@@ -134,7 +138,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 SortDirection.BindValueChanged(direction =>
                 {
-                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
+                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending && Active.Value ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
                 }, true);
             }
 

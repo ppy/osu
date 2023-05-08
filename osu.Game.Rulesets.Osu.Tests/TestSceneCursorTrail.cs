@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneCursorTrail : OsuTestScene
+    public partial class TestSceneCursorTrail : OsuTestScene
     {
         [Resolved]
         private IRenderer renderer { get; set; }
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         });
 
         [Cached(typeof(ISkinSource))]
-        private class LegacySkinContainer : Container, ISkinSource
+        private partial class LegacySkinContainer : Container, ISkinSource
         {
             private readonly IRenderer renderer;
             private readonly bool disjoint;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => null;
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => null;
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class MovingCursorInputManager : ManualInputManager
+        private partial class MovingCursorInputManager : ManualInputManager
         {
             public MovingCursorInputManager()
             {

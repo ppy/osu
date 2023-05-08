@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Framework.Testing;
@@ -13,12 +11,12 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneProfileSubsectionHeader : OsuTestScene
+    public partial class TestSceneProfileSubsectionHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private ProfileSubsectionHeader header;
+        private ProfileSubsectionHeader header = null!;
 
         [Test]
         public void TestHiddenCounter()

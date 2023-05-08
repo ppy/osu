@@ -13,7 +13,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Users.Drawables
 {
-    public class DrawableFlag : Sprite, IHasTooltip
+    public partial class DrawableFlag : Sprite, IHasTooltip
     {
         private readonly CountryCode countryCode;
 
@@ -27,8 +27,7 @@ namespace osu.Game.Users.Drawables
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
         {
-            if (ts == null)
-                throw new ArgumentNullException(nameof(ts));
+            ArgumentNullException.ThrowIfNull(ts);
 
             string textureName = countryCode == CountryCode.Unknown ? "__" : countryCode.ToString();
             Texture = ts.Get($@"Flags/{textureName}") ?? ts.Get(@"Flags/__");

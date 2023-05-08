@@ -15,7 +15,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSkipOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneSkipOverlay : OsuManualInputManagerTestScene
     {
         private TestSkipOverlay skip;
         private int requestCount;
@@ -94,6 +94,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestAutomaticSkipActuatesOnce()
+        {
+            createTest();
+            AddStep("start automated skip", () => skip.SkipWhenReady());
+            AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
+            checkRequestCount(1);
+        }
+
+        [Test]
         public void TestClickOnlyActuatesOnce()
         {
             createTest();
@@ -108,6 +117,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
+        }
+
+        [Test]
+        public void TestAutomaticSkipActuatesMultipleTimes()
+        {
+            createTest();
+            AddStep("set increment lower", () => increment = 3000);
+            AddStep("start automated skip", () => skip.SkipWhenReady());
+            AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
+            checkRequestCount(2);
         }
 
         [Test]
@@ -137,10 +156,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkRequestCount(0);
         }
 
-        private void checkRequestCount(int expected) =>
-            AddAssert($"request count is {expected}", () => requestCount == expected);
+        private void checkRequestCount(int expected)
+        {
+            AddAssert($"skip count is {expected}", () => skip.SkipCount, () => Is.EqualTo(expected));
+            AddAssert($"request count is {expected}", () => requestCount, () => Is.EqualTo(expected));
+        }
 
-        private class TestSkipOverlay : SkipOverlay
+        private partial class TestSkipOverlay : SkipOverlay
         {
             public TestSkipOverlay(double startTime)
                 : base(startTime)

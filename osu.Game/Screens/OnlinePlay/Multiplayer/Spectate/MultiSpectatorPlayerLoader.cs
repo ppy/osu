@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// Used to load a single <see cref="MultiSpectatorPlayer"/> in a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class MultiSpectatorPlayerLoader : SpectatorPlayerLoader
+    public partial class MultiSpectatorPlayerLoader : SpectatorPlayerLoader
     {
         public MultiSpectatorPlayerLoader([NotNull] Score score, [NotNull] Func<MultiSpectatorPlayer> createPlayer)
             : base(score, createPlayer)

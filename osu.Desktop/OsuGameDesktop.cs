@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -18,25 +17,18 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
-using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Joystick;
-using osu.Framework.Input.Handlers.Mouse;
-using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
-using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
-using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Utils;
 using SDL2;
 
 namespace osu.Desktop
 {
-    internal class OsuGameDesktop : OsuGame
+    internal partial class OsuGameDesktop : OsuGame
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+        private ArchiveImportIPCChannel? archiveImportIPCChannel;
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -131,6 +123,7 @@ namespace osu.Desktop
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+            archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
@@ -145,28 +138,17 @@ namespace osu.Desktop
 
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
-            desktopWindow.DragDrop += f => fileDrop(new[] { f });
-        }
-
-        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
-        {
-            switch (handler)
+            desktopWindow.DragDrop += f =>
             {
-                case ITabletHandler th:
-                    return new TabletSettings(th);
+                // on macOS, URL associations are handled via SDL_DROPFILE events.
+                if (f.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                {
+                    HandleLink(f);
+                    return;
+                }
 
-                case MouseHandler mh:
-                    return new MouseSettings(mh);
-
-                case JoystickHandler jh:
-                    return new JoystickSettings(jh);
-
-                case TouchHandler th:
-                    return new InputSection.HandlerSection(th);
-
-                default:
-                    return base.CreateSettingsSubsectionFor(handler);
-            }
+                fileDrop(new[] { f });
+            };
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
@@ -178,10 +160,6 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                string firstExtension = Path.GetExtension(filePaths.First());
-
-                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
                 importableFiles.AddRange(filePaths);
 
                 Logger.Log($"Adding {filePaths.Length} files for import");
@@ -210,6 +188,7 @@ namespace osu.Desktop
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
+            archiveImportIPCChannel?.Dispose();
         }
 
         private class SDL2BatteryInfo : BatteryInfo

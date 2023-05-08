@@ -17,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneProxyContainer : OsuTestScene
+    public partial class TestSceneProxyContainer : OsuTestScene
     {
         private HitObjectContainer hitObjectContainer;
         private ProxyContainer proxyContainer;
@@ -62,14 +62,14 @@ namespace osu.Game.Tests.Gameplay
             proxyContainer.AddProxy(drawableHitObject);
         }
 
-        private class ProxyContainer : LifetimeManagementContainer
+        private partial class ProxyContainer : LifetimeManagementContainer
         {
             public IReadOnlyList<Drawable> AliveChildren => AliveInternalChildren;
 
             public void AddProxy(Drawable d) => AddInternal(d.CreateProxy());
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private partial class TestDrawableHitObject : DrawableHitObject
         {
             protected override double InitialLifetimeOffset => 100;
 

@@ -7,13 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class ReadyButton : TriangleButton, IHasTooltip
+    public abstract partial class ReadyButton : RoundedButton, IHasTooltip
     {
         public new readonly BindableBool Enabled = new BindableBool();
 

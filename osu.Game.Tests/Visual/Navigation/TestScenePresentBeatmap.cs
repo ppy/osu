@@ -7,16 +7,20 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePresentBeatmap : OsuGameTestScene
+    public partial class TestScenePresentBeatmap : OsuGameTestScene
     {
         [Test]
         public void TestFromMainMenu()
@@ -55,6 +59,7 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(firstImport);
 
             var secondImport = importBeatmap(3);
+            confirmBeatmapInSongSelect(secondImport);
             presentAndConfirm(secondImport);
 
             // Test presenting same beatmap more than once
@@ -68,16 +73,51 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestFromSongSelectDifferentRuleset()
+        public void TestFromSongSelectDifferentRulesetWithConvertDisallowed()
         {
-            var firstImport = importBeatmap(1);
-            presentAndConfirm(firstImport);
+            AddStep("Set converts disallowed", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
 
-            var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondImport);
+            var osuImport = importBeatmap(1);
+            presentAndConfirm(osuImport);
 
-            presentSecondDifficultyAndConfirm(firstImport, 1);
-            presentSecondDifficultyAndConfirm(secondImport, 3);
+            var maniaImport = importBeatmap(2, new ManiaRuleset().RulesetInfo);
+            confirmBeatmapInSongSelect(maniaImport);
+            presentAndConfirm(maniaImport);
+
+            var catchImport = importBeatmap(3, new CatchRuleset().RulesetInfo);
+            confirmBeatmapInSongSelect(catchImport);
+            presentAndConfirm(catchImport);
+
+            // Ruleset is always changed.
+            presentSecondDifficultyAndConfirm(maniaImport, 2);
+            presentSecondDifficultyAndConfirm(osuImport, 1);
+            presentSecondDifficultyAndConfirm(catchImport, 3);
+        }
+
+        [Test]
+        public void TestFromSongSelectDifferentRulesetWithConvertAllowed()
+        {
+            AddStep("Set converts allowed", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+
+            var osuImport = importBeatmap(1);
+            presentAndConfirm(osuImport);
+
+            var maniaImport = importBeatmap(2, new ManiaRuleset().RulesetInfo);
+            confirmBeatmapInSongSelect(maniaImport);
+            presentAndConfirm(maniaImport);
+
+            var catchImport = importBeatmap(3, new CatchRuleset().RulesetInfo);
+            confirmBeatmapInSongSelect(catchImport);
+            presentAndConfirm(catchImport);
+
+            // force ruleset to osu!mania
+            presentSecondDifficultyAndConfirm(maniaImport, 2);
+
+            // ruleset is not changed as we can convert osu! beatmap.
+            presentSecondDifficultyAndConfirm(osuImport, 1, expectedRulesetOnlineID: 3);
+
+            // ruleset is changed as we cannot convert.
+            presentSecondDifficultyAndConfirm(catchImport, 3);
         }
 
         private void returnToMenu()
@@ -108,19 +148,19 @@ namespace osu.Game.Tests.Visual.Navigation
                 imported = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineID = i,
+                    OnlineID = i * 1024,
                     Beatmaps =
                     {
                         new BeatmapInfo
                         {
-                            OnlineID = i * 1024,
+                            OnlineID = i * 1024 + 1,
                             Metadata = metadata,
                             Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
-                            OnlineID = i * 2048,
+                            OnlineID = i * 1024 + 2,
                             Metadata = metadata,
                             Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
@@ -134,23 +174,32 @@ namespace osu.Game.Tests.Visual.Navigation
             return () => imported;
         }
 
+        private void confirmBeatmapInSongSelect(Func<BeatmapSetInfo> getImport)
+        {
+            AddUntilStep("beatmap in song select", () =>
+            {
+                var songSelect = (Screens.Select.SongSelect)Game.ScreenStack.CurrentScreen;
+                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().BeatmapSets.Any(b => b.MatchesOnlineID(getImport()));
+            });
+        }
+
         private void presentAndConfirm(Func<BeatmapSetInfo> getImport)
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.MatchesOnlineID(getImport()));
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID, () => Is.EqualTo(getImport().OnlineID));
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value, () => Is.EqualTo(getImport().Beatmaps.First().Ruleset));
         }
 
-        private void presentSecondDifficultyAndConfirm(Func<BeatmapSetInfo> getImport, int importedID)
+        private void presentSecondDifficultyAndConfirm(Func<BeatmapSetInfo> getImport, int importedID, int? expectedRulesetOnlineID = null)
         {
-            Predicate<BeatmapInfo> pred = b => b.OnlineID == importedID * 2048;
+            Predicate<BeatmapInfo> pred = b => b.OnlineID == importedID * 1024 + 2;
             AddStep("present difficulty", () => Game.PresentBeatmap(getImport(), pred));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID == importedID * 2048);
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(importedID * 1024 + 2));
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.OnlineID, () => Is.EqualTo(expectedRulesetOnlineID ?? getImport().Beatmaps.First().Ruleset.OnlineID));
         }
     }
 }

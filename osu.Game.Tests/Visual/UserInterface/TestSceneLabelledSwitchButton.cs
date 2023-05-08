@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledSwitchButton : OsuTestScene
+    public partial class TestSceneLabelledSwitchButton : OsuTestScene
     {
         [TestCase(false)]
         [TestCase(true)]

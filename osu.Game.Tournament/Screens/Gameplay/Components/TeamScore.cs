@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class TeamScore : CompositeDrawable
+    public partial class TeamScore : CompositeDrawable
     {
         private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
         private readonly StarCounter counter;
@@ -41,7 +41,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private void scoreChanged(ValueChangedEvent<int?> score) => counter.Current = score.NewValue ?? 0;
 
-        public class TeamScoreStarCounter : StarCounter
+        public partial class TeamScoreStarCounter : StarCounter
         {
             public TeamScoreStarCounter(int count)
                 : base(count)
@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             public override Star CreateStar() => new LightSquare();
 
-            public class LightSquare : Star
+            public partial class LightSquare : Star
             {
                 private readonly Box box;
 

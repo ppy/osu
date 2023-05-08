@@ -18,7 +18,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
-    public class FailOverlay : GameplayMenuOverlay
+    public partial class FailOverlay : GameplayMenuOverlay
     {
         public Func<Task<ScoreInfo>> SaveReplay;
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -12,11 +10,11 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public sealed class LegacySpriteText : OsuSpriteText
+    public sealed partial class LegacySpriteText : OsuSpriteText
     {
         private readonly LegacyFont font;
 
-        private LegacyGlyphStore glyphStore;
+        private LegacyGlyphStore glyphStore = null!;
 
         protected override char FixedWidthReferenceCharacter => '5';
 
@@ -49,7 +47,7 @@ namespace osu.Game.Skinning
                 this.skin = skin;
             }
 
-            public ITexturedCharacterGlyph Get(string fontName, char character)
+            public ITexturedCharacterGlyph? Get(string fontName, char character)
             {
                 string lookup = getLookupName(character);
 
@@ -79,7 +77,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
+            public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
         }
     }
 }

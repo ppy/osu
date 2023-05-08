@@ -36,12 +36,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         public readonly bool RequiresHitEvents;
 
-        [Obsolete("Use constructor which takes creation function instead.")] // Can be removed 20220803.
-        public StatisticItem([NotNull] string name, [NotNull] Drawable content, [CanBeNull] Dimension dimension = null)
-            : this(name, () => content, true, dimension)
-        {
-        }
-
         /// <summary>
         /// Creates a new <see cref="StatisticItem"/>, to be displayed inside a <see cref="StatisticRow"/> in the results screen.
         /// </summary>

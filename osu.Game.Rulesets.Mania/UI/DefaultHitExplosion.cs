@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
         private const float default_large_faint_size = 0.8f;
 

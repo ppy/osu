@@ -20,7 +20,7 @@ namespace osu.Game.Updater
     /// An update manager that shows notifications if a newer release is detected.
     /// Installation is left up to the user.
     /// </summary>
-    public class SimpleUpdateManager : UpdateManager
+    public partial class SimpleUpdateManager : UpdateManager
     {
         private string version;
 

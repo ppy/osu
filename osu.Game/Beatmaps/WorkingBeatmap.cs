@@ -34,8 +34,6 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        public Waveform Waveform => waveform.Value;
-
         public Storyboard Storyboard => storyboard.Value;
 
         public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
@@ -48,10 +46,11 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -60,7 +59,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
@@ -108,7 +106,16 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+        public Track LoadTrack()
+        {
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+            // the track may have changed, recycle the current waveform.
+            waveform?.Dispose();
+            waveform = null;
+
+            return track;
+        }
 
         public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
@@ -168,6 +175,12 @@ namespace osu.Game.Beatmaps
 
             return audioManager.Tracks.GetVirtual(length);
         }
+
+        #endregion
+
+        #region Waveform
+
+        public Waveform Waveform => waveform ??= GetWaveform();
 
         #endregion
 

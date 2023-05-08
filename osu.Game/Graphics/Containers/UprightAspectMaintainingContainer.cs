@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that reverts any rotation (and optionally scale) applied by its direct parent.
     /// </summary>
-    public class UprightAspectMaintainingContainer : Container
+    public partial class UprightAspectMaintainingContainer : Container
     {
         /// <summary>
         /// Controls how much this container scales compared to its parent (default is 1.0f).

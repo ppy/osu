@@ -60,6 +60,6 @@ namespace osu.Game.Tests.Mods
         /// This local helper is used rather than <see cref="Ruleset.CreateAllMods"/>, because the aforementioned method flattens multi mods.
         /// </remarks>>
         private static IEnumerable<MultiMod> getMultiMods(Ruleset ruleset)
-            => Enum.GetValues(typeof(ModType)).Cast<ModType>().SelectMany(ruleset.GetModsFor).OfType<MultiMod>();
+            => Enum.GetValues<ModType>().SelectMany(ruleset.GetModsFor).OfType<MultiMod>();
     }
 }

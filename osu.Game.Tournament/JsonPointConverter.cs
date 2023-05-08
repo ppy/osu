@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace osu.Game.Tournament
@@ -31,7 +32,9 @@ namespace osu.Game.Tournament
 
                 Debug.Assert(str != null);
 
-                return new PointConverter().ConvertFromString(str) as Point? ?? new Point();
+                // Null check suppression is required due to .NET standard expecting a non-null context.
+                // Seems to work fine at a runtime level (and the parameter is nullable in .NET 6+).
+                return new PointConverter().ConvertFromString(null!, CultureInfo.InvariantCulture, str) as Point? ?? new Point();
             }
 
             var point = new Point();

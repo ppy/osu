@@ -11,7 +11,7 @@ using osu.Game;
 
 namespace osu.Android
 {
-    public class GameplayScreenRotationLocker : Component
+    public partial class GameplayScreenRotationLocker : Component
     {
         private Bindable<bool> localUserPlaying;
 

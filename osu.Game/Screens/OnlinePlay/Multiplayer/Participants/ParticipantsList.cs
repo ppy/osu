@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public class ParticipantsList : MultiplayerRoomComposite
+    public partial class ParticipantsList : MultiplayerRoomComposite
     {
         private FillFlowContainer<ParticipantPanel> panels;
 

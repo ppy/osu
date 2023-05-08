@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneToggleMenuItem : OsuTestScene
+    public partial class TestSceneToggleMenuItem : OsuTestScene
     {
         public TestSceneToggleMenuItem()
         {

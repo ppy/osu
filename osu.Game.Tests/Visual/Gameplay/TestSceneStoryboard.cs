@@ -20,7 +20,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneStoryboard : OsuTestScene
+    public partial class TestSceneStoryboard : OsuTestScene
     {
         private Container<DrawableStoryboard> storyboardContainer = null!;
 

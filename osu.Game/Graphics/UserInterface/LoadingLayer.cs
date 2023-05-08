@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
-    public class LoadingLayer : LoadingSpinner
+    public partial class LoadingLayer : LoadingSpinner
     {
         private readonly bool blockInput;
 

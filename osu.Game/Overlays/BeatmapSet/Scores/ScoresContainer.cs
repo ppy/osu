@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : BeatmapSetLayoutSection
+    public partial class ScoresContainer : BeatmapSetLayoutSection
     {
         private const int spacing = 15;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Margin = new MarginPadding { Vertical = 20 },
                     Children = new Drawable[]
                     {

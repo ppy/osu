@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneHoldNote : ManiaHitObjectTestScene
+    public partial class TestSceneHoldNote : ManiaHitObjectTestScene
     {
         [Test]
         public void TestHoldNote()

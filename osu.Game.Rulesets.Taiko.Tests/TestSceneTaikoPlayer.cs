@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoPlayer : PlayerTestScene
+    public partial class TestSceneTaikoPlayer : PlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
     }

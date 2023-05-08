@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
+    public partial class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
         private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;

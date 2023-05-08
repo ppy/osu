@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// <summary>
     /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoStrongableHitObject{TObject,TStrongNestedObject}"/>s.
     /// </summary>
-    public abstract class DrawableStrongNestedHit : DrawableTaikoHitObject
+    public abstract partial class DrawableStrongNestedHit : DrawableTaikoHitObject
     {
         public new DrawableTaikoHitObject ParentHitObject => (DrawableTaikoHitObject)base.ParentHitObject;
 

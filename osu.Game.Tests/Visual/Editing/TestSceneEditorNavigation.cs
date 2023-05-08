@@ -17,7 +17,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorNavigation : OsuGameTestScene
+    public partial class TestSceneEditorNavigation : OsuGameTestScene
     {
         [Test]
         public void TestEditorGameplayTestAlwaysUsesOriginalRuleset()

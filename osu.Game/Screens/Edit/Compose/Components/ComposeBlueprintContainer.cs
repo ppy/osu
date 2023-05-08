@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 using osuTK.Input;
@@ -29,13 +30,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public class ComposeBlueprintContainer : EditorBlueprintContainer
+    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
-        private PlacementBlueprint currentPlacement;
+        public PlacementBlueprint CurrentPlacement { get; private set; }
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -57,7 +58,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             TernaryStates = CreateTernaryButtons().ToArray();
 
-            AddInternal(placementBlueprintContainer);
+            AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
+            {
+                Child = placementBlueprintContainer
+            });
         }
 
         protected override void LoadComplete()
@@ -87,6 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.DrawableObject = drawableObject;
         }
 
+        private bool nudgeMovementActive;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.ControlPressed)
@@ -94,19 +100,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Left:
-                        moveSelection(new Vector2(-1, 0));
+                        nudgeSelection(new Vector2(-1, 0));
                         return true;
 
                     case Key.Right:
-                        moveSelection(new Vector2(1, 0));
+                        nudgeSelection(new Vector2(1, 0));
                         return true;
 
                     case Key.Up:
-                        moveSelection(new Vector2(0, -1));
+                        nudgeSelection(new Vector2(0, -1));
                         return true;
 
                     case Key.Down:
-                        moveSelection(new Vector2(0, 1));
+                        nudgeSelection(new Vector2(0, 1));
                         return true;
                 }
             }
@@ -114,12 +120,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (nudgeMovementActive && !e.ControlPressed)
+            {
+                Beatmap.EndChange();
+                nudgeMovementActive = false;
+            }
+        }
+
         /// <summary>
         /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
         /// </summary>
         /// <param name="delta"></param>
-        private void moveSelection(Vector2 delta)
+        private void nudgeSelection(Vector2 delta)
         {
+            if (!nudgeMovementActive)
+            {
+                nudgeMovementActive = true;
+                Beatmap.BeginChange();
+            }
+
             var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
 
             if (firstBlueprint == null)
@@ -133,13 +156,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (currentPlacement?.HitObject is IHasComboInformation c)
+            if (CurrentPlacement?.HitObject is IHasComboInformation c)
                 c.NewCombo = NewCombo.Value == TernaryState.True;
         }
 
         private void updatePlacementSamples()
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 sampleChanged(kvp.Key, kvp.Value.Value);
@@ -147,9 +170,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void sampleChanged(string sampleName, TernaryState state)
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
-            var samples = currentPlacement.HitObject.Samples;
+            var samples = CurrentPlacement.HitObject.Samples;
 
             var existingSample = samples.FirstOrDefault(s => s.Name == sampleName);
 
@@ -221,7 +244,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
 
-            currentPlacement.UpdateTimeAndPosition(snapResult);
+            CurrentPlacement.UpdateTimeAndPosition(snapResult);
         }
 
         #endregion
@@ -230,9 +253,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (currentPlacement != null)
+            if (CurrentPlacement != null)
             {
-                switch (currentPlacement.PlacementActive)
+                switch (CurrentPlacement.PlacementActive)
                 {
                     case PlacementBlueprint.PlacementState.Waiting:
                         if (!Composer.CursorInPlacementArea)
@@ -248,7 +271,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (Composer.CursorInPlacementArea)
                 ensurePlacementCreated();
 
-            if (currentPlacement != null)
+            if (CurrentPlacement != null)
                 updatePlacementPosition();
         }
 
@@ -277,13 +300,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void ensurePlacementCreated()
         {
-            if (currentPlacement != null) return;
+            if (CurrentPlacement != null) return;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
 
             if (blueprint != null)
             {
-                placementBlueprintContainer.Child = currentPlacement = blueprint;
+                placementBlueprintContainer.Child = CurrentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
                 updatePlacementPosition();
@@ -296,11 +319,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removePlacement()
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
-            currentPlacement.EndPlacement(false);
-            currentPlacement.Expire();
-            currentPlacement = null;
+            CurrentPlacement.EndPlacement(false);
+            CurrentPlacement.Expire();
+            CurrentPlacement = null;
         }
 
         private HitObjectCompositionTool currentTool;

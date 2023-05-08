@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Ranking
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which tracks the size of a <see cref="ScorePanel"/>, to which the <see cref="ScorePanel"/> can be added or removed.
     /// </summary>
-    public class ScorePanelTrackingContainer : CompositeDrawable
+    public partial class ScorePanelTrackingContainer : CompositeDrawable
     {
         /// <summary>
         /// The <see cref="ScorePanel"/> that created this <see cref="ScorePanelTrackingContainer"/>.

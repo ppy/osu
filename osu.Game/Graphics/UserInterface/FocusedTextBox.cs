@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A textbox which holds focus eagerly.
     /// </summary>
-    public class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
+    public partial class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
     {
         private bool focus;
 

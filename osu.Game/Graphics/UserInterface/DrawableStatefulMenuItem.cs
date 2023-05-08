@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DrawableStatefulMenuItem : DrawableOsuMenuItem
+    public partial class DrawableStatefulMenuItem : DrawableOsuMenuItem
     {
         protected new StatefulMenuItem Item => (StatefulMenuItem)base.Item;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
-        private class ToggleTextContainer : TextContainer
+        private partial class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
             private readonly Bindable<object> state;

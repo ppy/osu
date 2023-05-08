@@ -28,8 +28,7 @@ namespace osu.Game.Storyboards
         {
             if (endTime < startTime)
             {
-                (startTime, endTime) = (endTime, startTime);
-                (startValue, endValue) = (endValue, startValue);
+                endTime = startTime;
             }
 
             commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue });

@@ -33,7 +33,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapInfoWedge : VisibilityContainer
+    public partial class BeatmapInfoWedge : VisibilityContainer
     {
         public const float BORDER_THICKNESS = 2.5f;
         private const float shear_width = 36.75f;
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public class WedgeInfoText : Container
+        public partial class WedgeInfoText : Container
         {
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
@@ -456,7 +456,7 @@ namespace osu.Game.Screens.Select
                 cancellationSource?.Cancel();
             }
 
-            public class InfoLabel : Container, IHasTooltip
+            public partial class InfoLabel : Container, IHasTooltip
             {
                 public LocalisableString TooltipText { get; }
 

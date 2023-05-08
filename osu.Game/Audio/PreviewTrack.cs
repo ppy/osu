@@ -10,7 +10,7 @@ using osu.Framework.Threading;
 namespace osu.Game.Audio
 {
     [LongRunningLoad]
-    public abstract class PreviewTrack : Component
+    public abstract partial class PreviewTrack : Component
     {
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
@@ -98,6 +98,9 @@ namespace osu.Game.Audio
 
             Track.Stop();
 
+            // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
+            Track.Seek(0);
+
             Stopped?.Invoke();
         }
 
@@ -109,6 +112,8 @@ namespace osu.Game.Audio
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            Stop();
             Track?.Dispose();
         }
     }

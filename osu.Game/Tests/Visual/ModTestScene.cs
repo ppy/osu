@@ -16,7 +16,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class ModTestScene : PlayerTestScene
+    public abstract partial class ModTestScene : PlayerTestScene
     {
         protected sealed override bool HasCustomSteps => true;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(currentTestData, AllowFail);
 
-        protected class ModTestPlayer : TestPlayer
+        protected partial class ModTestPlayer : TestPlayer
         {
             private readonly bool allowFail;
             private readonly ModTestData currentTestData;
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
             protected override bool CheckModsAllowFailure() => allowFail;
 
             public ModTestPlayer(ModTestData data, bool allowFail)
-                : base(false, false)
+                : base(true, false)
             {
                 this.allowFail = allowFail;
                 currentTestData = data;

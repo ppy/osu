@@ -27,11 +27,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
+    public partial class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
+        public readonly BindableBool LockPlayfieldAspectRange = new BindableBool(true);
+
+        public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
@@ -43,7 +45,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
-            TimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
@@ -51,13 +52,28 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
-            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
+            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
             {
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue
             });
 
             KeyBindingInputManager.Add(new DrumTouchInputArea());
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
+            const float scroll_rate = 10;
+
+            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
+            // Width is used because it defines how many notes fit on the playfield.
+            // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
+            float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
+
+            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
         }
 
         protected override void UpdateAfterChildren()
@@ -78,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect }
+            LockPlayfieldAspectRange = { BindTarget = LockPlayfieldAspectRange }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
