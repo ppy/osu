@@ -33,8 +33,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
-        protected Container VolumeBar { get; private set; } = null!;
-        protected OsuSpriteText Label { get; private set; } = null!;
+        private Container volumeBar = null!;
+        private OsuSpriteText label = null!;
+        private Container additionsContainer = null!;
 
         protected virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
 
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Height = 40;
             InternalChildren = new Drawable[]
             {
-                VolumeBar = new Container
+                volumeBar = new Container
                 {
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.BottomLeft,
@@ -72,16 +73,38 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         }
                     }
                 },
-                Label = new OsuSpriteText
+                label = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.CentreLeft,
                     X = 9,
                     Rotation = -90,
+                    Width = 28,
                     Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
                     Colour = colours.GrayF,
+                    Truncate = true,
+                },
+                additionsContainer = new Container
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopCentre,
+                    X = 9,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                 }
             };
+
+            for (int i = 0; i < 3; i++)
+            {
+                additionsContainer.Add(new Circle
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Size = new Vector2(4),
+                    Colour = colour,
+                    Y = i * 5,
+                });
+            }
 
             HitObject.DefaultsApplied += _ => updateVisual();
             updateVisual();
@@ -95,8 +118,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateVisual()
         {
-            Label.Text = $"{GetBankValue(GetSamples())}";
-            VolumeBar.ResizeHeightTo(GetVolumeValue(GetSamples()) / 100f, 200, Easing.OutQuint);
+            var samples = GetSamples();
+            int i = 0;
+
+            label.Text = $"{GetBankValue(samples)}";
+            volumeBar.ResizeHeightTo(GetVolumeValue(samples) / 100f, 200, Easing.OutQuint);
+
+            foreach (string sampleName in HitSampleInfo.AllAdditions)
+            {
+                if (samples.Any(s => s.Name == sampleName))
+                {
+                    additionsContainer.Children[i++].Show();
+                }
+                else
+                {
+                    additionsContainer.Children[i++].Hide();
+                }
+            }
         }
 
         private static string? abbreviateBank(string? bank)
