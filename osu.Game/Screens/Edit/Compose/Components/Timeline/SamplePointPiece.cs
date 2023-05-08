@@ -48,7 +48,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateText()
         {
-            Label.Text = $"{GetBankValue(GetSamples())} {GetVolumeValue(GetSamples())}";
+            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+        }
+
+        private static string? abbreviateBank(string? bank)
+        {
+            return bank switch
+            {
+                "normal" => "N",
+                "soft" => "S",
+                "drum" => "D",
+                _ => bank
+            };
         }
 
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
