@@ -12,10 +12,12 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
@@ -27,22 +29,62 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public partial class SamplePointPiece : HitObjectPointPiece, IHasPopover
+    public partial class SamplePointPiece : Container, IHasPopover
     {
         public readonly HitObject HitObject;
+
+        protected Container VolumeBar { get; private set; } = null!;
+        protected OsuSpriteText Label { get; private set; } = null!;
+
+        protected virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
 
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
         }
 
-        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            HitObject.DefaultsApplied += _ => updateText();
-            updateText();
+            Color4 colour = GetRepresentingColour(colours);
+
+            AutoSizeAxes = Axes.X;
+            Height = 40;
+            InternalChildren = new Drawable[]
+            {
+                VolumeBar = new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomCentre,
+                    Width = 4,
+                    Height = GetVolumeValue(GetSamples()) / 100f,
+                    X = 2,
+                    CornerRadius = 2,
+                    CornerExponent = 2,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colour,
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
+                },
+                Label = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                    X = 9,
+                    Rotation = -90,
+                    Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                    Colour = colours.GrayF,
+                }
+            };
+
+            HitObject.DefaultsApplied += _ => updateVisual();
+            updateVisual();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -51,9 +93,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return true;
         }
 
-        private void updateText()
+        private void updateVisual()
         {
-            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+            Label.Text = $"{GetBankValue(GetSamples())}";
+            VolumeBar.ResizeHeightTo(GetVolumeValue(GetSamples()) / 100f, 200, Easing.OutQuint);
         }
 
         private static string? abbreviateBank(string? bank)

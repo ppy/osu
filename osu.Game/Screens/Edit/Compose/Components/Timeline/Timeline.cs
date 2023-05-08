@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         private const float timeline_height = 72;
         private const float timeline_expanded_height = 94;
+        private const float timeline_samples_height = 42;
 
         private readonly Drawable userContent;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             this.userContent = userContent;
 
             RelativeSizeAxes = Axes.X;
-            Height = timeline_height;
+            Height = timeline_height + timeline_samples_height;
 
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
@@ -112,6 +113,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_height,
+                    Margin = new MarginPadding { Bottom = timeline_samples_height },
                     Depth = float.MaxValue,
                     Children = new[]
                     {
@@ -136,6 +138,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         userContent,
                     }
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_expanded_height + timeline_samples_height,
+                }
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
@@ -159,7 +166,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 if (visible.NewValue)
                 {
-                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
+                    this.ResizeHeightTo(timeline_expanded_height + timeline_samples_height, 200, Easing.OutQuint);
                     mainContent.MoveToY(20, 200, Easing.OutQuint);
 
                     // delay the fade in else masking looks weird.
@@ -170,7 +177,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     controlPoints.FadeOut(200, Easing.OutQuint);
 
                     // likewise, delay the resize until the fade is complete.
-                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    this.Delay(180).ResizeHeightTo(timeline_height + timeline_samples_height, 200, Easing.OutQuint);
                     mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
                 }
             }, true);
