@@ -158,9 +158,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 foreach (var h in objects)
                 {
-                    for (int i = 0; i < h.Samples.Count; i++)
+                    var samples = GetSamples(h);
+
+                    for (int i = 0; i < samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newBank: newBank);
+                        samples[i] = samples[i].With(newBank: newBank);
                     }
 
                     beatmap.Update(h);
@@ -171,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
             {
-                string? commonBank = getCommonBank(objects.Select(h => h.Samples).ToArray());
+                string? commonBank = getCommonBank(objects.Select(GetSamples).ToArray());
                 bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
             }
 
@@ -184,9 +186,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 foreach (var h in objects)
                 {
-                    for (int i = 0; i < h.Samples.Count; i++)
+                    var samples = GetSamples(h);
+
+                    for (int i = 0; i < samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newVolume: newVolume.Value);
+                        samples[i] = samples[i].With(newVolume: newVolume.Value);
                     }
 
                     beatmap.Update(h);
