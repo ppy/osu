@@ -69,7 +69,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
         {
-            return samples.FirstOrDefault()?.Bank;
+            return samples.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+        }
+
+        public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
+        {
+            return samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL)?.Bank ?? GetBankValue(samples);
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -86,6 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly HitObject hitObject;
 
             private LabelledTextBox bank = null!;
+            private LabelledTextBox additionBank = null!;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
 
             private FillFlowContainer togglesCollection = null!;
@@ -126,6 +132,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 Label = "Bank Name",
                             },
+                            additionBank = new LabelledTextBox
+                            {
+                                Label = "Addition Bank",
+                            },
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
                                 MinValue = 0,
@@ -136,6 +146,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 };
 
                 bank.TabbableContentContainer = flow;
+                additionBank.TabbableContentContainer = flow;
                 volume.TabbableContentContainer = flow;
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
@@ -147,6 +158,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 string? commonBank = getCommonBank(relevantSamples);
                 if (!string.IsNullOrEmpty(commonBank))
                     bank.Current.Value = commonBank;
+
+                string? commonAdditionBank = getCommonAdditionBank(relevantSamples);
+                if (!string.IsNullOrEmpty(commonAdditionBank))
+                    additionBank.Current.Value = commonAdditionBank;
 
                 int? commonVolume = getCommonVolume(relevantSamples);
                 if (commonVolume != null)
@@ -162,6 +177,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // this ensures that committing empty text causes a revert to the previous value.
                 bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank(relevantSamples);
 
+                updateAdditionBankPlaceholderText(relevantObjects);
+                additionBank.Current.BindValueChanged(val =>
+                {
+                    updateAdditionBankFor(relevantObjects, val.NewValue);
+                    updateAdditionBankPlaceholderText(relevantObjects);
+                });
+                additionBank.OnCommit += (_, _) => additionBank.Current.Value = getCommonAdditionBank(relevantSamples);
+
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
 
                 createStateBindables(relevantObjects);
@@ -176,6 +199,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             private static string? getCommonBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
+            private static string? getCommonAdditionBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(relevantSamples.First()) : null;
             private static int? getCommonVolume(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(relevantSamples.First()) : null;
 
             private void updateFor(IEnumerable<HitObject> objects, Action<HitObject, IList<HitSampleInfo>> updateAction)
@@ -201,6 +225,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     for (int i = 0; i < samples.Count; i++)
                     {
+                        if (samples[i].Name != HitSampleInfo.HIT_NORMAL) continue;
+
+                        samples[i] = samples[i].With(newBank: newBank);
+                    }
+                });
+            }
+
+            private void updateAdditionBankFor(IEnumerable<HitObject> objects, string? newBank)
+            {
+                if (string.IsNullOrEmpty(newBank))
+                    return;
+
+                updateFor(objects, (_, samples) =>
+                {
+                    for (int i = 0; i < samples.Count; i++)
+                    {
+                        if (samples[i].Name == HitSampleInfo.HIT_NORMAL) continue;
+
                         samples[i] = samples[i].With(newBank: newBank);
                     }
                 });
@@ -210,6 +252,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 string? commonBank = getCommonBank(objects.Select(GetSamples).ToArray());
                 bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
+            }
+
+            private void updateAdditionBankPlaceholderText(IEnumerable<HitObject> objects)
+            {
+                string? commonAdditionBank = getCommonAdditionBank(objects.Select(GetSamples).ToArray());
+                additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
             }
 
             private void updateVolumeFor(IEnumerable<HitObject> objects, int? newVolume)
@@ -282,7 +330,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (samples.Any(s => s.Name == sampleName))
                         return;
 
-                    samples.Add(h.GetSampleInfo(sampleName));
+                    var relevantSample = samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? samples.FirstOrDefault();
+                    samples.Add(relevantSample?.With(sampleName) ?? h.GetSampleInfo(sampleName));
                 });
             }
 

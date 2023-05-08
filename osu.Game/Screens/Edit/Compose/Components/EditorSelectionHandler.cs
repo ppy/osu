@@ -122,7 +122,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (h.Samples.Any(s => s.Name == sampleName))
                     return;
 
-                h.Samples.Add(h.GetSampleInfo(sampleName));
+                var relevantSample = h.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
+                h.Samples.Add(relevantSample?.With(sampleName) ?? h.GetSampleInfo(sampleName));
                 EditorBeatmap.Update(h);
             });
         }
