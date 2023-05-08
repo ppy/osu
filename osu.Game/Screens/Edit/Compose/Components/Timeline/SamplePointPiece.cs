@@ -48,6 +48,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void load(OsuColour colours)
         {
             Color4 colour = GetRepresentingColour(colours);
+            var additionColours = new[]
+            {
+                colours.Yellow,
+                colours.Blue,
+                colours.Purple,
+            };
 
             AutoSizeAxes = Axes.X;
             Height = 40;
@@ -101,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Size = new Vector2(4),
-                    Colour = colour,
+                    Colour = additionColours[i],
                     Y = i * 5,
                 });
             }
