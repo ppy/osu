@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
             Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
             Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
-            Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
-            Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+            Assert.AreEqual(CountdownType.None, beatmap.Settings.Countdown);
+            Assert.AreEqual(0, beatmap.Settings.CountdownOffset);
         }
 
         [Test]
@@ -73,9 +73,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 95901, 106450, 116999, 119637, 130186, 140735, 151285,
                 161834, 164471, 175020, 185570, 196119, 206669, 209306
             };
-            Assert.AreEqual(expectedBookmarks.Length, beatmap.Bookmarks.Length);
+            Assert.AreEqual(expectedBookmarks.Length, beatmap.Settings.Bookmarks.Length);
             for (int i = 0; i < expectedBookmarks.Length; i++)
-                Assert.AreEqual(expectedBookmarks[i], beatmap.Bookmarks[i]);
+                Assert.AreEqual(expectedBookmarks[i], beatmap.Settings.Bookmarks[i]);
             Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
             Assert.AreEqual(4, beatmapInfo.BeatDivisor);
             Assert.AreEqual(4, beatmapInfo.GridSize);

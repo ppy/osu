@@ -66,8 +66,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
                 Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
-                Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
-                Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+                Assert.AreEqual(CountdownType.None, beatmap.Settings.Countdown);
+                Assert.AreEqual(0, beatmap.Settings.CountdownOffset);
             }
         }
 
@@ -88,9 +88,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     95901, 106450, 116999, 119637, 130186, 140735, 151285,
                     161834, 164471, 175020, 185570, 196119, 206669, 209306
                 };
-                Assert.AreEqual(expectedBookmarks.Length, beatmap.Bookmarks.Length);
+                Assert.AreEqual(expectedBookmarks.Length, beatmap.Settings.Bookmarks.Length);
                 for (int i = 0; i < expectedBookmarks.Length; i++)
-                    Assert.AreEqual(expectedBookmarks[i], beatmap.Bookmarks[i]);
+                    Assert.AreEqual(expectedBookmarks[i], beatmap.Settings.Bookmarks[i]);
                 Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
                 Assert.AreEqual(4, beatmapInfo.BeatDivisor);
                 Assert.AreEqual(4, beatmapInfo.GridSize);
@@ -903,8 +903,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
                     Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
                     Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
-                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
-                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.Settings.Countdown, Is.EqualTo(CountdownType.Normal));
+                    Assert.That(decoded.Settings.CountdownOffset, Is.EqualTo(0));
                     Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
                     Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
                 });
