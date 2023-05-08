@@ -178,16 +178,10 @@ namespace osu.Game.Screens.Edit
 
         public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;
 
-        public int[] Bookmarks
+        public IBeatmapSettings Settings
         {
-            get => PlayableBeatmap.Bookmarks;
-            set => PlayableBeatmap.Bookmarks = value;
-        }
-
-        public CountdownType Countdown
-        {
-            get => PlayableBeatmap.Countdown;
-            set => PlayableBeatmap.Countdown = value;
+            get => PlayableBeatmap.Settings;
+            set => PlayableBeatmap.Settings = value;
         }
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();

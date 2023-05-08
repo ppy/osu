@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Setup
                 EnableCountdown = new LabelledSwitchButton
                 {
                     Label = EditorSetupStrings.EnableCountdown,
-                    Current = { Value = Beatmap.Countdown != CountdownType.None },
+                    Current = { Value = Beatmap.Settings.Countdown != CountdownType.None },
                     Description = EditorSetupStrings.CountdownDescription
                 },
                 CountdownSettings = new FillFlowContainer
@@ -52,13 +52,13 @@ namespace osu.Game.Screens.Edit.Setup
                         CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
                             Label = EditorSetupStrings.CountdownSpeed,
-                            Current = { Value = Beatmap.Countdown != CountdownType.None ? Beatmap.Countdown : CountdownType.Normal },
+                            Current = { Value = Beatmap.Settings.Countdown != CountdownType.None ? Beatmap.Settings.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {
                             Label = EditorSetupStrings.CountdownOffset,
-                            Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
+                            Current = { Value = Beatmap.Settings.CountdownOffset.ToString() },
                             Description = EditorSetupStrings.CountdownOffsetDescription,
                         }
                     }
@@ -113,13 +113,13 @@ namespace osu.Game.Screens.Edit.Setup
         {
             updateBeatmap();
             // update displayed text to ensure parsed value matches display (i.e. if empty string was provided).
-            CountdownOffset.Current.Value = Beatmap.BeatmapInfo.CountdownOffset.ToString(CultureInfo.InvariantCulture);
+            CountdownOffset.Current.Value = Beatmap.Settings.CountdownOffset.ToString(CultureInfo.InvariantCulture);
         }
 
         private void updateBeatmap()
         {
-            Beatmap.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
-            Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
+            Beatmap.Settings.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
+            Beatmap.Settings.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
             Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;

@@ -53,9 +53,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         IReadOnlyList<HitObject> HitObjects { get; }
 
-        int[] Bookmarks { get; set; }
-
-        CountdownType Countdown { get; set; }
+        IBeatmapSettings Settings { get; set; }
 
         /// <summary>
         /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.

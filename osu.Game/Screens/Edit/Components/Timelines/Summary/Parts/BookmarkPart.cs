@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.LoadBeatmap(beatmap);
 
-            foreach (int bookmark in beatmap.Bookmarks)
+            foreach (int bookmark in beatmap.Settings.Bookmarks)
                 Add(new BookmarkVisualisation(bookmark));
         }
 

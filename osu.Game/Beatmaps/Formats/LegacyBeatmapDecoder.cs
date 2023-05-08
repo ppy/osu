@@ -265,11 +265,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Countdown":
-                    beatmap.Countdown = Enum.Parse<CountdownType>(pair.Value);
+                    beatmap.Settings.Countdown = Enum.Parse<CountdownType>(pair.Value);
                     break;
 
                 case @"CountdownOffset":
-                    beatmap.BeatmapInfo.CountdownOffset = Parsing.ParseInt(pair.Value);
+                    beatmap.Settings.CountdownOffset = Parsing.ParseInt(pair.Value);
                     break;
             }
         }
@@ -281,7 +281,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.Bookmarks = pair.Value.Split(',').Select(v =>
+                    beatmap.Settings.Bookmarks = pair.Value.Split(',').Select(v =>
                     {
                         bool result = int.TryParse(v, out int val);
                         return new { result, val };

@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!string.IsNullOrEmpty(beatmap.Metadata.AudioFile)) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
-            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
+            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Settings.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
                 $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints?.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
@@ -107,8 +107,8 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
             if (beatmap.BeatmapInfo.EpilepsyWarning)
                 writer.WriteLine(@"EpilepsyWarning: 1");
-            if (beatmap.BeatmapInfo.CountdownOffset > 0)
-                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));
+            if (beatmap.Settings.CountdownOffset > 0)
+                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.Settings.CountdownOffset}"));
             if (onlineRulesetID == 3)
                 writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? '1' : '0')}"));
             writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? '1' : '0')}"));
@@ -120,8 +120,8 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Editor]");
 
-            if (beatmap.Bookmarks.Length > 0)
-                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
+            if (beatmap.Settings.Bookmarks.Length > 0)
+                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Settings.Bookmarks)}"));
             writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.BeatmapInfo.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.BeatmapInfo.GridSize}"));

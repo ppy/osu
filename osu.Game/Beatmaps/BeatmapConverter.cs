@@ -65,9 +65,7 @@ namespace osu.Game.Beatmaps
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
-            beatmap.Bookmarks = original.Bookmarks;
-            beatmap.Breaks = original.Breaks;
-            beatmap.Countdown = original.Countdown;
+            beatmap.Settings = original.Settings;
 
             return beatmap;
         }
