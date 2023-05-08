@@ -26,12 +26,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
-        private readonly BindableList<HitSampleInfo> samplesBindable;
+        [Resolved(canBeNull: true)]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
-            samplesBindable = hitObject.SamplesBindable.GetBoundCopy();
         }
 
         protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
@@ -39,7 +39,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            samplesBindable.BindCollectionChanged((_, _) => updateText(), true);
+            HitObject.DefaultsApplied += _ => updateText();
+            updateText();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateText()
         {
-            Label.Text = $"{GetBankValue(samplesBindable)} {GetVolumeValue(samplesBindable)}";
+            Label.Text = $"{GetBankValue(HitObject.Samples)} {GetVolumeValue(HitObject.Samples)}";
         }
 
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
