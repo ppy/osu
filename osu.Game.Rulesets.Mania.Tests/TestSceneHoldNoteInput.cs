@@ -61,6 +61,44 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         /// <summary>
         ///     -----[           ]-----
+        ///          x           o
+        /// </summary>
+        [Test]
+        public void TestCorrectInput()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_tail),
+            });
+
+            assertHeadJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.Perfect);
+            assertNoteJudgement(HitResult.IgnoreHit);
+        }
+
+        /// <summary>
+        ///     -----[           ]-----
+        ///          x                   o
+        /// </summary>
+        [Test]
+        public void TestLateRelease()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_after_tail),
+            });
+
+            assertHeadJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.Miss);
+            assertNoteJudgement(HitResult.IgnoreMiss);
+        }
+
+        /// <summary>
+        ///     -----[           ]-----
         ///  x                           o
         /// </summary>
         [Test]
