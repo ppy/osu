@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -14,11 +15,14 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -83,6 +87,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private LabelledTextBox bank = null!;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
 
+            private FillFlowContainer togglesCollection = null!;
+
             protected virtual IList<HitSampleInfo> GetSamples(HitObject ho) => ho.Samples;
 
             [Resolved(canBeNull: true)]
@@ -108,6 +114,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Spacing = new Vector2(0, 10),
                         Children = new Drawable[]
                         {
+                            togglesCollection = new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(5, 5),
+                            },
                             bank = new LabelledTextBox
                             {
                                 Label = "Bank Name",
@@ -149,6 +162,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank(relevantSamples);
 
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
+
+                createStateBindables(relevantObjects);
+                updateTernaryStates(relevantObjects);
+                togglesCollection.AddRange(createTernaryButtons().Select(b => new DrawableTernaryButton(b) { RelativeSizeAxes = Axes.None, Size = new Vector2(40, 40) }));
             }
 
             protected override void LoadComplete()
@@ -209,6 +226,135 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 beatmap.EndChange();
             }
+
+            #region hitsound toggles
+
+            private readonly Dictionary<string, Bindable<TernaryState>> selectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
+
+            private void createStateBindables(IEnumerable<HitObject> objects)
+            {
+                foreach (string sampleName in HitSampleInfo.AllAdditions)
+                {
+                    var bindable = new Bindable<TernaryState>
+                    {
+                        Description = sampleName.Replace("hit", string.Empty).Titleize()
+                    };
+
+                    bindable.ValueChanged += state =>
+                    {
+                        switch (state.NewValue)
+                        {
+                            case TernaryState.False:
+                                removeHitSampleFor(objects, sampleName);
+                                break;
+
+                            case TernaryState.True:
+                                addHitSampleFor(objects, sampleName);
+                                break;
+                        }
+                    };
+
+                    selectionSampleStates[sampleName] = bindable;
+                }
+            }
+
+            private void updateTernaryStates(IEnumerable<HitObject> objects)
+            {
+                foreach ((string sampleName, var bindable) in selectionSampleStates)
+                {
+                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(objects, h => GetSamples(h).Any(s => s.Name == sampleName));
+                }
+            }
+
+            private IEnumerable<TernaryButton> createTernaryButtons()
+            {
+                foreach ((string sampleName, var bindable) in selectionSampleStates)
+                    yield return new TernaryButton(bindable, string.Empty, () => ComposeBlueprintContainer.GetIconForSample(sampleName));
+            }
+
+            private void addHitSampleFor(IEnumerable<HitObject> objects, string sampleName)
+            {
+                if (string.IsNullOrEmpty(sampleName))
+                    return;
+
+                beatmap.BeginChange();
+
+                foreach (var h in objects)
+                {
+                    var samples = GetSamples(h);
+
+                    // Make sure there isn't already an existing sample
+                    if (samples.Any(s => s.Name == sampleName))
+                        return;
+
+                    samples.Add(h.GetSampleInfo(sampleName));
+                    beatmap.Update(h);
+                }
+
+                beatmap.EndChange();
+            }
+
+            private void removeHitSampleFor(IEnumerable<HitObject> objects, string sampleName)
+            {
+                if (string.IsNullOrEmpty(sampleName))
+                    return;
+
+                beatmap.BeginChange();
+
+                foreach (var h in objects)
+                {
+                    var samples = GetSamples(h);
+
+                    for (int i = 0; i < samples.Count; i++)
+                    {
+                        if (samples[i].Name == sampleName)
+                            samples.RemoveAt(i--);
+                    }
+
+                    beatmap.Update(h);
+                }
+
+                beatmap.EndChange();
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
+                    return base.OnKeyDown(e);
+
+                var item = togglesCollection.ElementAtOrDefault(rightIndex);
+
+                if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
+
+                button.Button.Toggle();
+                return true;
+            }
+
+            private bool checkRightToggleFromKey(Key key, out int index)
+            {
+                switch (key)
+                {
+                    case Key.W:
+                        index = 0;
+                        break;
+
+                    case Key.E:
+                        index = 1;
+                        break;
+
+                    case Key.R:
+                        index = 2;
+                        break;
+
+                    default:
+                        index = -1;
+                        break;
+                }
+
+                return index >= 0;
+            }
+
+            #endregion
         }
     }
 }
