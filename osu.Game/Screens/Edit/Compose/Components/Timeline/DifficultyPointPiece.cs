@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
                             },
-                            new SliderVelocityInspector(),
+                            new SliderVelocityInspector(sliderVelocitySlider.Current),
                         }
                     }
                 };
@@ -145,28 +145,48 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
     internal partial class SliderVelocityInspector : EditorInspector
     {
+        private readonly Bindable<double?> current;
+
+        public SliderVelocityInspector(Bindable<double?> current)
+        {
+            this.current = current;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             EditorBeatmap.TransactionBegan += updateInspectorText;
             EditorBeatmap.TransactionEnded += updateInspectorText;
+            EditorBeatmap.BeatmapReprocessed += updateInspectorText;
+            current.ValueChanged += _ => updateInspectorText();
+
             updateInspectorText();
         }
 
         private void updateInspectorText()
         {
+            double beatmapVelocity = EditorBeatmap.Difficulty.BaseSliderVelocity;
+
             InspectorText.Clear();
 
             double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocity).OrderBy(v => v).ToArray();
 
+            AddHeader("Base velocity (from beatmap setup)");
+            AddValue($"{beatmapVelocity:#,0.00}x");
+
+            AddHeader("Final velocity");
+            AddValue($"{beatmapVelocity * current.Value:#,0.00}x");
+
             if (sliderVelocities.First() != sliderVelocities.Last())
             {
-                AddHeader("Used velocity range");
-                AddValue($"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x");
-            }
+                AddHeader("Beatmap velocity range");
 
-            AddHeader("Beatmap base velocity");
-            AddValue($"{EditorBeatmap.Difficulty.BaseSliderVelocity:#,0.00}x");
+                string range = $"{sliderVelocities.First():#,0.00}x - {sliderVelocities.Last():#,0.00}x";
+                if (beatmapVelocity != 1)
+                    range += $" ({beatmapVelocity * sliderVelocities.First():#,0.00}x - {beatmapVelocity * sliderVelocities.Last():#,0.00}x)";
+
+                AddValue(range);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
