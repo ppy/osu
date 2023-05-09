@@ -75,18 +75,28 @@ namespace osu.Game.Screens.Play
 
         private Vector2 previousDrawSize;
 
+        private Vector2 previousParentScale;
+
         protected override void Update()
         {
             base.Update();
 
-            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize))
+            bool hasFlipped = previousParentScale != Parent.Scale;
+            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize) || hasFlipped)
             {
-                columns?.FadeOut(500, Easing.OutQuint).Expire();
-
                 scheduledCreate?.Cancel();
-                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+
+                if (!hasFlipped)
+                {
+                    scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+                }
+                else
+                {
+                    RecreateGraph();
+                }
 
                 previousDrawSize = DrawSize;
+                previousParentScale = Parent.Scale;
                 graphNeedsUpdate = false;
             }
         }
