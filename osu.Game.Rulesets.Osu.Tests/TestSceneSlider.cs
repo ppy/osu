@@ -363,7 +363,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider.ApplyDefaults(cpi, new BeatmapDifficulty
             {
                 CircleSize = circleSize,
-                SliderTickRate = 3
+                TickRate = 3
             });
 
             var drawable = CreateDrawableSlider(slider);

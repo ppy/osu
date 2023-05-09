@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Difficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
+                    Difficulty = new BeatmapDifficulty { CircleSize = 6, BaseVelocity = 3 },
                     Ruleset = ruleset
                 },
                 ControlPointInfo = controlPointInfo

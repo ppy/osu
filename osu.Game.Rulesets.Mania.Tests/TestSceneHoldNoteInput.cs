@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
@@ -346,7 +346,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
@@ -393,7 +393,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
@@ -456,7 +456,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                     Difficulty = new BeatmapDifficulty
                     {
-                        SliderTickRate = 4,
+                        TickRate = 4,
                         OverallDifficulty = 10,
                     },
                     Ruleset = new ManiaRuleset().RulesetInfo
@@ -496,7 +496,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
+                    Difficulty = new BeatmapDifficulty { TickRate = tick_rate },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
@@ -576,7 +576,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     },
                     BeatmapInfo =
                     {
-                        Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                        Difficulty = new BeatmapDifficulty { TickRate = 4 },
                         Ruleset = new ManiaRuleset().RulesetInfo
                     },
                 };

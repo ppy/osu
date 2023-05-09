@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            TickRate = beatmap.Difficulty.SliderTickRate == 3 ? 3 : 4,
+                            TickRate = beatmap.Difficulty.TickRate == 3 ? 3 : 4,
                             SliderVelocity = obj is IHasSliderVelocity velocityData ? velocityData.SliderVelocity : 1
                         };
                     }
@@ -189,10 +189,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             else
                 beatLength = timingPoint.BeatLength;
 
-            double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.SliderMultiplier / beatmap.Difficulty.SliderTickRate;
+            double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.BaseVelocity / beatmap.Difficulty.TickRate;
 
             // The velocity and duration of the taiko hit object - calculated as the velocity of a drum roll.
-            double taikoVelocity = sliderScoringPointDistance * beatmap.Difficulty.SliderTickRate;
+            double taikoVelocity = sliderScoringPointDistance * beatmap.Difficulty.TickRate;
             taikoDuration = (int)(distance / taikoVelocity * beatLength);
 
             if (isForCurrentRuleset)
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 beatLength = timingPoint.BeatLength;
 
             // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
-            tickSpacing = Math.Min(beatLength / beatmap.Difficulty.SliderTickRate, (double)taikoDuration / spans);
+            tickSpacing = Math.Min(beatLength / beatmap.Difficulty.TickRate, (double)taikoDuration / spans);
 
             return tickSpacing > 0
                    && distance / osuVelocity * 1000 < 2 * beatLength;
@@ -239,14 +239,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 base.CopyTo(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    other.SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    other.BaseVelocity /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             public override void CopyFrom(IBeatmapDifficultyInfo other)
             {
                 base.CopyFrom(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    BaseVelocity *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             #endregion

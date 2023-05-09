@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             StartTime = (int)Math.Round(hitObject.StartTime);
 
             // This matches stable's calculation.
-            EndTime = (int)Math.Floor(StartTime + distanceData.Distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.SliderMultiplier);
+            EndTime = (int)Math.Floor(StartTime + distanceData.Distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.BaseVelocity);
 
             SegmentDuration = (EndTime - StartTime) / SpanCount;
         }

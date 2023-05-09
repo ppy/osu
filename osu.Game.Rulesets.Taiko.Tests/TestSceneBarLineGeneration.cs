@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
             };
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
             };
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 },
                 BeatmapInfo =
                 {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Difficulty = new BeatmapDifficulty { TickRate = 4 },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
             };

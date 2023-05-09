@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps
     public interface IBeatmapDifficultyInfo
     {
         /// <summary>
-        /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
+        /// The default value used for all difficulty settings except <see cref="BaseVelocity"/> and <see cref="TickRate"/>.
         /// </summary>
         const float DEFAULT_DIFFICULTY = 5;
 
@@ -34,14 +34,22 @@ namespace osu.Game.Beatmaps
         float ApproachRate { get; }
 
         /// <summary>
-        /// The slider multiplier of the associated beatmap.
+        /// The base velocity of the associated beatmap.
         /// </summary>
-        double SliderMultiplier { get; }
+        /// <remarks>
+        /// This was known as "SliderMultiplier" in the .osu format and stable editor.
+        /// It is used for things like velocity of objects with paths and scrolling speed in some rulesets.
+        /// </remarks>
+        double BaseVelocity { get; }
 
         /// <summary>
-        /// The slider tick rate of the associated beatmap.
+        /// The tick rate of the associated beatmap.
         /// </summary>
-        double SliderTickRate { get; }
+        /// <remarks>
+        /// This is used by objects with "ticks" to decide how often the ticks are spawned.
+        /// A tick rate of 1 will spawn ticks on each beat, 2 would be twice per beat, etc.
+        /// </remarks>
+        double TickRate { get; }
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.

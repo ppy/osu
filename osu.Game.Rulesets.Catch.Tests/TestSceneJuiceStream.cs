@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             BeatmapInfo = new BeatmapInfo
             {
-                Difficulty = new BeatmapDifficulty { CircleSize = 5, SliderMultiplier = 2 },
+                Difficulty = new BeatmapDifficulty { CircleSize = 5, BaseVelocity = 2 },
                 Ruleset = ruleset
             },
             HitObjects = new List<HitObject>

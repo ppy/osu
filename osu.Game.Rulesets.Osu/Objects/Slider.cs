@@ -167,10 +167,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocity;
+            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.BaseVelocity * SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
+            TickDistance = GenerateTicks ? (scoringDistance / difficulty.TickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

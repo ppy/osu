@@ -127,6 +127,16 @@ namespace osu.Game.Localisation
             new TranslatableString(getKey(@"overall_difficulty_description"), @"The harshness of hit windows and difficulty of special objects (ie. spinners)");
 
         /// <summary>
+        /// "Base Velocity"
+        /// </summary>
+        public static LocalisableString BaseVelocity => new TranslatableString(getKey(@"base_velocity"), @"Base Velocity");
+
+        /// <summary>
+        /// "The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets."
+        /// </summary>
+        public static LocalisableString BaseVelocityDescription => new TranslatableString(getKey(@"base_velocity_description"), @"The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets.");
+
+        /// <summary>
         /// "Metadata"
         /// </summary>
         public static LocalisableString MetadataHeader => new TranslatableString(getKey(@"metadata_header"), @"Metadata");
