@@ -195,6 +195,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             EditorBeatmap.TransactionBegan -= updateInspectorText;
             EditorBeatmap.TransactionEnded -= updateInspectorText;
+            EditorBeatmap.BeatmapReprocessed -= updateInspectorText;
         }
     }
 }
