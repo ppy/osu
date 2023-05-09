@@ -20,13 +20,11 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override double ComputeTotalScore()
         {
-            return
-                (int)Math.Round
-                ((
-                    200000 * ComboPortion / MaxComboPortion +
-                    800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
-                    BonusPortion
-                ) * ScoreMultiplier);
+            return (
+                200000 * ComboPortion / MaxComboPortion +
+                800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                BonusPortion
+            ) * ScoreMultiplier;
         }
 
         protected override void AddScoreChange(JudgementResult result)

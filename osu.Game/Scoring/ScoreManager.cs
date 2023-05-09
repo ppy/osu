@@ -107,17 +107,15 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
         {
-            // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
-            if (string.IsNullOrEmpty(score.BeatmapInfo.MD5Hash))
+            if (mode == ScoringMode.Standardised)
                 return score.TotalScore;
 
             var ruleset = score.Ruleset.CreateInstance();
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
 
-            // Todo:
-            return 0;
-            // return scoreProcessor.ComputeScore(mode, score);
+            // Todo: This loses precision because we're dealing with pre-rounded total scores.
+            return scoreProcessor.ConvertToClassic(score.TotalScore);
         }
 
         /// <summary>

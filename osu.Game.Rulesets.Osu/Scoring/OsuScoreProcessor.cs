@@ -17,13 +17,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override double ComputeTotalScore()
         {
-            return
-                (int)Math.Round
-                ((
-                    700000 * ComboPortion / MaxComboPortion +
-                    300000 * Math.Pow(Accuracy.Value, 10) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
-                    BonusPortion
-                ) * ScoreMultiplier);
+            return (
+                700000 * ComboPortion / MaxComboPortion +
+                300000 * Math.Pow(Accuracy.Value, 10) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                BonusPortion
+            ) * ScoreMultiplier;
         }
     }
 }

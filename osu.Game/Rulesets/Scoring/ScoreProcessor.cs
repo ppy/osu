@@ -274,8 +274,20 @@ namespace osu.Game.Rulesets.Scoring
         {
             Accuracy.Value = currentMaxBasicScore > 0 ? currentBasicScore / currentMaxBasicScore : 1;
 
-            // Todo: Classic/Standardised
-            TotalScore.Value = (long)Math.Round(ComputeTotalScore());
+            double standardisedScore = ComputeTotalScore();
+
+            if (Mode.Value == ScoringMode.Standardised)
+                TotalScore.Value = (long)Math.Round(standardisedScore);
+            else
+                TotalScore.Value = ConvertToClassic(standardisedScore);
+        }
+
+        public long ConvertToClassic(double standardised)
+        {
+            // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
+            // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
+            double scaledRawScore = standardised / MAX_SCORE;
+            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, MaxBasicJudgements), 2) * ClassicScoreMultiplier);
         }
 
         protected abstract double ComputeTotalScore();
