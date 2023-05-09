@@ -157,7 +157,8 @@ namespace osu.Game.Online.Spectator
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
 
-            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
+            // Todo:
+            // TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
         }
 
         protected override void Dispose(bool isDisposing)

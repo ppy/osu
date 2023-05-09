@@ -115,7 +115,9 @@ namespace osu.Game.Scoring
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
 
-            return scoreProcessor.ComputeScore(mode, score);
+            // Todo:
+            return 0;
+            // return scoreProcessor.ComputeScore(mode, score);
         }
 
         /// <summary>

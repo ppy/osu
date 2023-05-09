@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
