@@ -72,10 +72,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this) { StartTime = startTime };
 
         public class StrongNestedHit : StrongNestedHitObject
         {
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
     }
 }

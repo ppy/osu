@@ -109,12 +109,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this) { StartTime = startTime };
 
         public class StrongNestedHit : StrongNestedHitObject
         {
             // The strong hit of the drum roll doesn't actually provide any score.
             public override Judgement CreateJudgement() => new IgnoreJudgement();
+
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
 
         #region LegacyBeatmapEncoder
