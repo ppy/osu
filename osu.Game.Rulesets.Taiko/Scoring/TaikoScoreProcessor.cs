@@ -21,13 +21,11 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override double ComputeTotalScore()
         {
-            return
-                (int)Math.Round
-                ((
-                    250000 * ComboPortion / MaxComboPortion +
-                    750000 * Math.Pow(Accuracy.Value, 3.6) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
-                    BonusPortion
-                ) * ScoreMultiplier);
+            return (
+                250000 * ComboPortion / MaxComboPortion +
+                750000 * Math.Pow(Accuracy.Value, 3.6) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                BonusPortion
+            ) * ScoreMultiplier;
         }
 
         protected override void AddScoreChange(JudgementResult result)

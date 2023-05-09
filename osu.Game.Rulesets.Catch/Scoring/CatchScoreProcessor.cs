@@ -31,13 +31,11 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
             const int tiny_droplets_portion = 400000;
 
-            return
-                (int)Math.Round
-                ((
-                    ((1000000 - tiny_droplets_portion) + tiny_droplets_portion * (1 - tinyDropletScale)) * ComboPortion / MaxComboPortion +
-                    tiny_droplets_portion * tinyDropletScale * fruitHitsRatio +
-                    BonusPortion
-                ) * ScoreMultiplier);
+            return (
+                ((1000000 - tiny_droplets_portion) + tiny_droplets_portion * (1 - tinyDropletScale)) * ComboPortion / MaxComboPortion +
+                tiny_droplets_portion * tinyDropletScale * fruitHitsRatio +
+                BonusPortion
+            ) * ScoreMultiplier;
         }
 
         protected override void AddScoreChange(JudgementResult result)
