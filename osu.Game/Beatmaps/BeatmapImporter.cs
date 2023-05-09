@@ -353,7 +353,7 @@ namespace osu.Game.Beatmaps
                         CircleSize = decodedDifficulty.CircleSize,
                         OverallDifficulty = decodedDifficulty.OverallDifficulty,
                         ApproachRate = decodedDifficulty.ApproachRate,
-                        BaseSliderVelocity = decodedDifficulty.BaseSliderVelocity,
+                        SliderMultiplier = decodedDifficulty.SliderMultiplier,
                         SliderTickRate = decodedDifficulty.SliderTickRate,
                     };
 

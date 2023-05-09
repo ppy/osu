@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            editorBeatmap.Difficulty.BaseSliderVelocity = 1;
+            editorBeatmap.Difficulty.SliderMultiplier = 1;
             editorBeatmap.ControlPointInfo.Clear();
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
             snapProvider.DistanceSpacingMultiplier.Value = 1;

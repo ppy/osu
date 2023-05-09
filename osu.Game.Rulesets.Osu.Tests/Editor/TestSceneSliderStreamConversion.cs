@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("change to these specific circumstances", () =>
             {
-                EditorBeatmap.Difficulty.BaseSliderVelocity = 1;
+                EditorBeatmap.Difficulty.SliderMultiplier = 1;
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(slider.StartTime);
                 timingPoint.BeatLength = 352.941176470588;
                 slider.Path.ControlPoints[^1].Position = new Vector2(-110, 16);

@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Label = EditorSetupStrings.BaseVelocity,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = EditorSetupStrings.BaseVelocityDescription,
-                    Current = new BindableDouble(Beatmap.Difficulty.BaseSliderVelocity)
+                    Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
                         Default = 1,
                         MinValue = 0.4,
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.ApproachRate = approachRateSlider.Current.Value;
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
-            Beatmap.Difficulty.BaseSliderVelocity = baseVelocitySlider.Current.Value;
+            Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
             Beatmap.SaveState();
