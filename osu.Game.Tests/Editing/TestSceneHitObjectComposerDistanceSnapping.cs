@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Editing
 
             BeatDivisor.Value = 1;
 
-            composer.EditorBeatmap.Difficulty.BaseSliderVelocity = 1;
+            composer.EditorBeatmap.Difficulty.SliderMultiplier = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSliderMultiplier(float multiplier)
         {
-            AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.BaseSliderVelocity = multiplier);
+            AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
             assertSnapDistance(100 * multiplier, null, true);
         }
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Editing
             assertDurationToDistance(500, 50);
             assertDurationToDistance(1000, 100);
 
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.BaseSliderVelocity = 2);
+            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
 
             assertDurationToDistance(500, 100);
             assertDurationToDistance(1000, 200);
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Editing
             assertDistanceToDuration(50, 500);
             assertDistanceToDuration(100, 1000);
 
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.BaseSliderVelocity = 2);
+            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
 
             assertDistanceToDuration(100, 500);
             assertDistanceToDuration(200, 1000);
@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Editing
             assertSnappedDuration(200, 2000);
             assertSnappedDuration(250, 3000);
 
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.BaseSliderVelocity = 2);
+            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
 
             assertSnappedDuration(0, 0);
             assertSnappedDuration(50, 0);
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(200, 200);
             assertSnappedDistance(250, 200);
 
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.BaseSliderVelocity = 2);
+            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
 
             assertSnappedDistance(50, 0);
             assertSnappedDistance(100, 0);

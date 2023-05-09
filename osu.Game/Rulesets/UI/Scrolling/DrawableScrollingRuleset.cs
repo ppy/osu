@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
                 // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
-                baseBeatLength /= Beatmap.Difficulty.BaseSliderVelocity;
+                baseBeatLength /= Beatmap.Difficulty.SliderMultiplier;
             }
 
             // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 return new MultiplierControlPoint(c.Time)
                 {
-                    Velocity = Beatmap.Difficulty.BaseSliderVelocity,
+                    Velocity = Beatmap.Difficulty.SliderMultiplier,
                     BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
                     EffectPoint = lastEffectPoint
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             ControlPoints.AddRange(timingChanges);
 
             if (ControlPoints.Count == 0)
-                ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.Difficulty.BaseSliderVelocity });
+                ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.Difficulty.SliderMultiplier });
         }
 
         protected override void LoadComplete()

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             base.ApplyToDifficulty(difficulty);
-            difficulty.BaseSliderVelocity *= slider_multiplier;
+            difficulty.SliderMultiplier *= slider_multiplier;
         }
     }
 }

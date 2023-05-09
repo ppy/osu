@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps
     public interface IBeatmapDifficultyInfo
     {
         /// <summary>
-        /// The default value used for all difficulty settings except <see cref="BaseSliderVelocity"/> and <see cref="SliderTickRate"/>.
+        /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
         /// </summary>
         const float DEFAULT_DIFFICULTY = 5;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
         /// The base slider velocity of the associated beatmap.
         /// This was known as "SliderMultiplier" in the .osu format and stable editor.
         /// </summary>
-        double BaseSliderVelocity { get; }
+        double SliderMultiplier { get; }
 
         /// <summary>
         /// The slider tick rate of the associated beatmap.

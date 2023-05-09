@@ -384,7 +384,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SliderMultiplier":
-                    difficulty.BaseSliderVelocity = Parsing.ParseDouble(pair.Value);
+                    difficulty.SliderMultiplier = Parsing.ParseDouble(pair.Value);
                     break;
 
                 case @"SliderTickRate":

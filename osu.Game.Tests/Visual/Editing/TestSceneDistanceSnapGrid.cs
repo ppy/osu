@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
-            editorBeatmap.Difficulty.BaseSliderVelocity = 1;
+            editorBeatmap.Difficulty.SliderMultiplier = 1;
         }
 
         [SetUp]

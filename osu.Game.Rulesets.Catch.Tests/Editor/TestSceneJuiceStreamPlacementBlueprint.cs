@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         {
             var playable = base.GetPlayableBeatmap();
             playable.Difficulty.SliderTickRate = 5;
-            playable.Difficulty.BaseSliderVelocity = velocity_factor * 10;
+            playable.Difficulty.SliderMultiplier = velocity_factor * 10;
             return playable;
         }
 

@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             else
                 beatLength = timingPoint.BeatLength;
 
-            double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.BaseSliderVelocity / beatmap.Difficulty.SliderTickRate;
+            double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.SliderMultiplier / beatmap.Difficulty.SliderTickRate;
 
             // The velocity and duration of the taiko hit object - calculated as the velocity of a drum roll.
             double taikoVelocity = sliderScoringPointDistance * beatmap.Difficulty.SliderTickRate;
@@ -239,14 +239,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 base.CopyTo(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    other.BaseSliderVelocity /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    other.SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             public override void CopyFrom(IBeatmapDifficultyInfo other)
             {
                 base.CopyFrom(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    BaseSliderVelocity *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             #endregion
