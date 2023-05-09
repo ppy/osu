@@ -81,19 +81,30 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            bool hasFlipped = previousParentScale != Parent.Scale;
-            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize) || hasFlipped)
+            bool extraUpdateConditions =
+                DrawSize != previousDrawSize ||
+                previousParentScale != Parent.Scale;
+
+            if (graphNeedsUpdate || (values != null && extraUpdateConditions))
             {
-                scheduledCreate?.Cancel();
+                bool hasFlipped =
+                    previousParentScale.X == -Parent.Scale.X ||
+                    previousParentScale.Y == -Parent.Scale.Y;
 
                 if (!hasFlipped)
                 {
-                    scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+                    columns?.FadeOut(500, Easing.OutQuint).Expire();
                 }
                 else
                 {
-                    RecreateGraph();
+                    if (columns != null)
+                    {
+                        columns.Alpha = 0.0f;
+                    }
                 }
+
+                scheduledCreate?.Cancel();
+                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
 
                 previousDrawSize = DrawSize;
                 previousParentScale = Parent.Scale;
