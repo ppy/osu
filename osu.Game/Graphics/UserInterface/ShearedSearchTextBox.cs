@@ -37,6 +37,8 @@ namespace osu.Game.Graphics.UserInterface
             set => textBox.HoldFocus = value;
         }
 
+        public new bool HasFocus => textBox.HasFocus;
+
         public void TakeFocus() => textBox.TakeFocus();
 
         public void KillFocus() => textBox.KillFocus();

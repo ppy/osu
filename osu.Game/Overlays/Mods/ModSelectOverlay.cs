@@ -69,15 +69,20 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public string SearchTerm
         {
-            get => searchTextBox.Current.Value;
+            get => SearchTextBox.Current.Value;
             set
             {
-                if (searchTextBox.Current.Value == value)
+                if (SearchTextBox.Current.Value == value)
                     return;
 
-                searchTextBox.Current.Value = value;
+                SearchTextBox.Current.Value = value;
             }
         }
+
+        /// <summary>
+        /// Search box applied on mod overlay
+        /// </summary>
+        public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
 
         /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
@@ -124,7 +129,6 @@ namespace osu.Game.Overlays.Mods
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
         private Container aboveColumnsContent = null!;
-        private ShearedSearchTextBox searchTextBox = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
@@ -168,7 +172,7 @@ namespace osu.Game.Overlays.Mods
                     RelativeSizeAxes = Axes.X,
                     Height = ModsEffectDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
-                    Child = searchTextBox = new ShearedSearchTextBox
+                    Child = SearchTextBox = new ShearedSearchTextBox
                     {
                         HoldFocus = false,
                         Width = 300
@@ -250,8 +254,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.Hide();
 
-            //We want to clear search for next user iteraction with mod overlay
-            searchTextBox.Current.Value = string.Empty;
+            //We want to clear search for next user interaction with mod overlay
+            SearchTextBox.Current.Value = string.Empty;
         }
 
         private ModSettingChangeTracker? modSettingChangeTracker;
@@ -287,7 +291,7 @@ namespace osu.Game.Overlays.Mods
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
-            searchTextBox.Current.BindValueChanged(query =>
+            SearchTextBox.Current.BindValueChanged(query =>
             {
                 foreach (var column in columnFlow.Columns)
                     column.SearchTerm = query.NewValue;
