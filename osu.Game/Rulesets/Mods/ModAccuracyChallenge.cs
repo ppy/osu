@@ -65,7 +65,9 @@ namespace osu.Game.Rulesets.Mods
             scoreProcessor.PopulateScore(score);
             score.Statistics[result.Type]++;
 
-            return scoreProcessor.ComputeAccuracy(score);
+            // Todo:
+            return 0;
+            // return scoreProcessor.ComputeAccuracy(score);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
 

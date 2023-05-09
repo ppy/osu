@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
-        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
+        public virtual ScoreProcessor CreateScoreProcessor() => new DefaultScoreProcessor(this);
 
         /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
@@ -380,5 +380,24 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
+    }
+
+    public partial class DefaultScoreProcessor : ScoreProcessor
+    {
+        public DefaultScoreProcessor(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
+        protected override double ComputeTotalScore()
+        {
+            return
+                (int)Math.Round
+                ((
+                    700000 * ComboPortion / MaxComboPortion +
+                    300000 * Math.Pow(Accuracy.Value, 10) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                    BonusPortion
+                ) * ScoreMultiplier);
+        }
     }
 }
