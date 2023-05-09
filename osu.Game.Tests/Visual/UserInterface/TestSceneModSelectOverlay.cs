@@ -482,6 +482,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestDeselectAllViaKey_WithSearchApplied()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddStep("focus on search", () => modSelectOverlay.SearchTextBox.TakeFocus());
+            AddStep("apply search", () => modSelectOverlay.SearchTerm = "Easy");
+            AddAssert("DT + HD selected and hidden", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.IsValid && panel.Active.Value) == 2);
+
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddAssert("DT + HD still selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+            AddAssert("search term changed", () => modSelectOverlay.SearchTerm == "Eas");
+
+            AddStep("kill focus", () => modSelectOverlay.SearchTextBox.KillFocus());
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
+        }
+
+        [Test]
         public void TestDeselectAllViaButton()
         {
             createScreen();
