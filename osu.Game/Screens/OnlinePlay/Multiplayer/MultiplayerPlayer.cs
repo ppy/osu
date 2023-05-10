@@ -57,6 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 AllowRestart = false,
                 AllowSkipping = room.AutoSkip.Value,
                 AutomaticallySkipIntro = room.AutoSkip.Value,
+                ShowScoreWithoutMultiplier = room.NoScoreMultiplier.Value,
                 AlwaysShowLeaderboard = true,
             })
         {

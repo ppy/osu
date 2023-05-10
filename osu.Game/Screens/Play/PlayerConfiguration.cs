@@ -41,5 +41,10 @@ namespace osu.Game.Screens.Play
         /// Whether the gameplay leaderboard should always be shown (usually in a contracted state).
         /// </summary>
         public bool AlwaysShowLeaderboard { get; set; }
+
+        /// <summary>
+        /// Whether all displayed scores during gameplay should be shown without score multiplier applied.
+        /// </summary>
+        public bool ShowScoreWithoutMultiplier { get; set; }
     }
 }
