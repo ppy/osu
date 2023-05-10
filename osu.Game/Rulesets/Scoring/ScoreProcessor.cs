@@ -42,6 +42,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
+        /// The current total score without score multiplier applied.
+        /// </summary>
+        public readonly BindableLong TotalScoreWithoutScoreMultiplier = new BindableLong { MinValue = 0 };
+
+        /// <summary>
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -140,7 +145,7 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// The maximum <see cref="HitResult"/> of a basic (non-tick and non-bonus) hitobject.
-        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo)"/> or <see cref="ResetFromReplayFrame"/>.
+        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo,bool)"/> or <see cref="ResetFromReplayFrame"/>.
         /// </summary>
         private HitResult? maxBasicResult;
 
@@ -291,7 +296,8 @@ namespace osu.Game.Rulesets.Scoring
             MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
                 ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
                 : 1;
-            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
+            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, true);
+            TotalScoreWithoutScoreMultiplier.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, false);
         }
 
         /// <summary>
@@ -319,16 +325,17 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
+        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         [Pure]
-        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
+        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo, bool applyScoreMultiplier = true)
         {
             if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
-            return computeScore(mode, current, maximum);
+            return computeScore(mode, current, maximum, applyScoreMultiplier);
         }
 
         /// <summary>
@@ -337,13 +344,14 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="current">The current scoring values.</param>
         /// <param name="maximum">The maximum scoring values.</param>
+        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score computed from the given scoring values.</returns>
         [Pure]
-        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
+        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum, bool applyScoreMultiplier)
         {
             double accuracyRatio = maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects, applyScoreMultiplier);
         }
 
         /// <summary>
@@ -354,13 +362,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="comboRatio">The portion of the max combo achieved by the player.</param>
         /// <param name="bonusScore">The total bonus score.</param>
         /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
+        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score computed from the given scoring component ratios.</returns>
         [Pure]
-        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects)
+        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects, bool applyScoreMultiplier)
         {
             double accuracyScore = accuracyPortion * accuracyRatio;
             double comboScore = comboPortion * comboRatio;
-            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
+            double rawScore = max_score * (accuracyScore + comboScore) + bonusScore;
+
+            if (applyScoreMultiplier)
+                rawScore *= scoreMultiplier;
 
             switch (mode)
             {
@@ -401,6 +413,7 @@ namespace osu.Game.Rulesets.Scoring
             currentMaximumScoringValues = default;
 
             TotalScore.Value = 0;
+            TotalScoreWithoutScoreMultiplier.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
             Rank.Disabled = false;
@@ -483,7 +496,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
         /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues)"/>.
+        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues,bool)"/>.
         /// </para>
         /// </remarks>
         /// <param name="scoreInfo">The score to extract scoring values from.</param>
