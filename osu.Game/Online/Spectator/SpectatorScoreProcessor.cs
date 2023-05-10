@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -61,6 +62,9 @@ namespace osu.Game.Online.Spectator
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
@@ -140,6 +144,7 @@ namespace osu.Game.Online.Spectator
                 return;
 
             Debug.Assert(spectatorState != null);
+            Debug.Assert(multiplayerClient != null);
             Debug.Assert(scoreProcessor != null);
 
             int frameIndex = replayFrames.BinarySearch(new TimedFrame(ReferenceClock.CurrentTime));
@@ -157,7 +162,8 @@ namespace osu.Game.Online.Spectator
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
 
-            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
+            bool shouldApplyMultiplier = multiplayerClient.Room?.Settings.NoScoreMultiplier != true;
+            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo, shouldApplyMultiplier);
         }
 
         protected override void Dispose(bool isDisposing)
