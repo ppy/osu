@@ -43,7 +43,8 @@ namespace osu.Game.Overlays.Mods
             Enabled.Value = selectedMods.Value.Any();
         }
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e) {
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
             if (e.Repeat || e.Action != GlobalAction.DeselectAllMods || searchTextBox.HasFocus)
                 return false;
 
