@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor)
+        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor, Player player)
         {
             scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
             scoreDisplayMode.BindValueChanged(scoreMode =>
@@ -42,7 +42,14 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }, true);
 
-            Current.BindTo(scoreProcessor.TotalScore);
+            if (player.Configuration.ShowScoreWithoutMultiplier)
+            {
+                Current.BindTo(scoreProcessor.TotalScoreWithoutScoreMultiplier);
+            }
+            else
+            {
+                Current.BindTo(scoreProcessor.TotalScore);
+            }
         }
     }
 }
