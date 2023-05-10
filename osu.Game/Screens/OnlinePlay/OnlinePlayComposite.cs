@@ -89,6 +89,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<bool> AutoSkip { get; private set; }
 
+        [Resolved(typeof(Room))]
+        protected Bindable<bool> NoScoreMultiplier { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
 

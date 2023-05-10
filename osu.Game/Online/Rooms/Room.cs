@@ -163,6 +163,10 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("auto_skip")]
         public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
 
+        [Cached]
+        [JsonProperty("no_score_multiplier")]
+        public readonly Bindable<bool> NoScoreMultiplier = new Bindable<bool>();
+
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
@@ -200,6 +204,7 @@ namespace osu.Game.Online.Rooms
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
             AutoSkip.Value = other.AutoSkip.Value;
+            NoScoreMultiplier.Value = other.NoScoreMultiplier.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
