@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             MinValue = 1,
             MaxValue = 10,
-            Precision = 0.1f
+            Precision = 0.5f
         };
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
