@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -40,6 +41,9 @@ namespace osu.Game.Screens.Spectate
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
@@ -169,6 +173,7 @@ namespace osu.Game.Screens.Spectate
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                     Ruleset = resolvedRuleset.RulesetInfo,
+                    IsScoreDisplayedWithoutScoreMultiplier = multiplayerClient?.Room?.Settings.NoScoreMultiplier == true
                 },
                 Replay = new Replay { HasReceivedAllFrames = false },
             };
