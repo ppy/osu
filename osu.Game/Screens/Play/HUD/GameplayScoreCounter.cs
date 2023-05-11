@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor, Player player)
+        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor)
         {
             scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
             scoreDisplayMode.BindValueChanged(scoreMode =>

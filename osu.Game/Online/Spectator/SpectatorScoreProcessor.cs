@@ -149,7 +149,6 @@ namespace osu.Game.Online.Spectator
                 return;
 
             Debug.Assert(spectatorState != null);
-            Debug.Assert(multiplayerClient != null);
             Debug.Assert(scoreProcessor != null);
 
             int frameIndex = replayFrames.BinarySearch(new TimedFrame(ReferenceClock.CurrentTime));

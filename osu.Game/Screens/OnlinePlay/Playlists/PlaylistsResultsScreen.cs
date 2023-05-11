@@ -18,7 +18,6 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Spectator;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
