@@ -118,9 +118,14 @@ namespace osu.Game.Online.Spectator
             Ruleset ruleset = rulesetInfo.CreateInstance();
 
             spectatorState = userState;
-            scoreInfo = new ScoreInfo { Ruleset = rulesetInfo };
             scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
+            scoreProcessor.IsScoreMultiplierApplied = multiplayerClient.Room?.Settings.NoScoreMultiplier == false;
+            scoreInfo = new ScoreInfo
+            {
+                Ruleset = rulesetInfo,
+                IsScoreDisplayedWithoutScoreMultiplier = !scoreProcessor.IsScoreMultiplierApplied
+            };
         }
 
         private void onNewFrames(int incomingUserId, FrameDataBundle bundle)
@@ -162,8 +167,7 @@ namespace osu.Game.Online.Spectator
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
 
-            bool shouldApplyMultiplier = multiplayerClient.Room?.Settings.NoScoreMultiplier != true;
-            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo, shouldApplyMultiplier);
+            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
         }
 
         protected override void Dispose(bool isDisposing)

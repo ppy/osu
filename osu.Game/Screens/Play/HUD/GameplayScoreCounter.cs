@@ -42,14 +42,7 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }, true);
 
-            if (player.Configuration.ShowScoreWithoutMultiplier)
-            {
-                Current.BindTo(scoreProcessor.TotalScoreWithoutScoreMultiplier);
-            }
-            else
-            {
-                Current.BindTo(scoreProcessor.TotalScore);
-            }
+            Current.BindTo(scoreProcessor.TotalScore);
         }
     }
 }

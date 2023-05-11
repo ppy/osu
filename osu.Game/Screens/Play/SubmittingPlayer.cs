@@ -37,6 +37,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; }
+
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)

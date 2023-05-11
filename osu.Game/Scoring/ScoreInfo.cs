@@ -78,8 +78,12 @@ namespace osu.Game.Scoring
         [MapTo("MaximumStatistics")]
         public string MaximumStatisticsJson { get; set; } = string.Empty;
 
+
+        private string _CreatedLocation = string.Empty;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
+            _CreatedLocation = Environment.StackTrace;
             Ruleset = ruleset ?? new RulesetInfo();
             BeatmapInfo = beatmap ?? new BeatmapInfo();
             RealmUser = realmUser ?? new RealmUser();
@@ -89,6 +93,7 @@ namespace osu.Game.Scoring
         [UsedImplicitly] // Realm
         private ScoreInfo()
         {
+            _CreatedLocation = Environment.StackTrace;
         }
 
         // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
@@ -147,6 +152,11 @@ namespace osu.Game.Scoring
         {
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
+            if (this.IsScoreDisplayedWithoutScoreMultiplier != clone.IsScoreDisplayedWithoutScoreMultiplier)
+            {
+                clone.IsScoreDisplayedWithoutScoreMultiplier = IsScoreDisplayedWithoutScoreMultiplier;
+            }
+
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
 
@@ -183,6 +193,9 @@ namespace osu.Game.Scoring
         /// </summary>
         [Ignored]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+
+        [Ignored]
+        public bool IsScoreDisplayedWithoutScoreMultiplier { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 

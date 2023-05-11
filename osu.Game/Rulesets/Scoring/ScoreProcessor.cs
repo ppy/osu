@@ -42,11 +42,6 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
-        /// The current total score without score multiplier applied.
-        /// </summary>
-        public readonly BindableLong TotalScoreWithoutScoreMultiplier = new BindableLong { MinValue = 0 };
-
-        /// <summary>
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -93,6 +88,11 @@ namespace osu.Game.Rulesets.Scoring
         /// Intended for use with various statistics displays.
         /// </summary>
         public IReadOnlyList<HitEvent> HitEvents => hitEvents;
+
+        /// <summary>
+        /// Whether the score multiplier should be applied to score calculations.
+        /// </summary>
+        public bool IsScoreMultiplierApplied { get; set; } = true;
 
         /// <summary>
         /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// The maximum <see cref="HitResult"/> of a basic (non-tick and non-bonus) hitobject.
-        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo,bool)"/> or <see cref="ResetFromReplayFrame"/>.
+        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo)"/> or <see cref="ResetFromReplayFrame"/>.
         /// </summary>
         private HitResult? maxBasicResult;
 
@@ -296,8 +296,10 @@ namespace osu.Game.Rulesets.Scoring
             MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
                 ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
                 : 1;
-            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, true);
-            TotalScoreWithoutScoreMultiplier.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, false);
+
+            if (IsScoreMultiplierApplied)
+                IsScoreMultiplierApplied = IsScoreMultiplierApplied;
+            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, IsScoreMultiplierApplied);
         }
 
         /// <summary>
@@ -325,17 +327,18 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         [Pure]
-        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo, bool applyScoreMultiplier = true)
+        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
-            return computeScore(mode, current, maximum, applyScoreMultiplier);
+            if (!scoreInfo.IsScoreDisplayedWithoutScoreMultiplier)
+                scoreInfo.IsScoreDisplayedWithoutScoreMultiplier = scoreInfo.IsScoreDisplayedWithoutScoreMultiplier;
+            return computeScore(mode, current, maximum, !scoreInfo.IsScoreDisplayedWithoutScoreMultiplier);
         }
 
         /// <summary>
@@ -413,7 +416,6 @@ namespace osu.Game.Rulesets.Scoring
             currentMaximumScoringValues = default;
 
             TotalScore.Value = 0;
-            TotalScoreWithoutScoreMultiplier.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
             Rank.Disabled = false;
