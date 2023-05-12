@@ -188,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).ToArray();
 
-            if (multiplayerClient.Room.Settings.NoScoreMultiplier)
+            if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
             {
                 // recalculate score without score multiplier
                 var ruleset = Ruleset.Value.CreateInstance();
