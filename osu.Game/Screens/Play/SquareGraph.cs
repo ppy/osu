@@ -139,18 +139,19 @@ namespace osu.Game.Screens.Play
             if (values == null)
             {
                 for (float i = 0; i < ColumnCount; i++)
+                {
                     newValues.Add(0);
-
-                return;
             }
-
+            }
+            else
+            {
             int max = values.Max();
-
             float step = values.Length / (float)ColumnCount;
 
             for (float i = 0; i < values.Length; i += step)
             {
                 newValues.Add((float)values[(int)i] / max);
+                }
             }
 
             calculatedValues = newValues.ToArray();
