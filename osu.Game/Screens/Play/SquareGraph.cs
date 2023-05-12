@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +14,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Threading;
 using osu.Framework.Layout;
 
 namespace osu.Game.Screens.Play
@@ -59,7 +57,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        bool haveValuesChanged;
+        private bool haveValuesChanged;
 
         private Color4 fillColour;
 
@@ -93,7 +91,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            
+
             if (!layout.IsValid)
             {
                 UpdateGraph();
