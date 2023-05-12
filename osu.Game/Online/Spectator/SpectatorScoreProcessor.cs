@@ -120,11 +120,12 @@ namespace osu.Game.Online.Spectator
             spectatorState = userState;
             scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
-            scoreProcessor.IsScoreMultiplierApplied = multiplayerClient.Room?.Settings.NoScoreMultiplier == false;
+            if (multiplayerClient.Room?.Settings.NoScoreMultiplier == true)
+                scoreProcessor.ScoreMultiplier = 1;
             scoreInfo = new ScoreInfo
             {
                 Ruleset = rulesetInfo,
-                IsScoreDisplayedWithoutScoreMultiplier = !scoreProcessor.IsScoreMultiplierApplied
+                IsScoreDisplayedWithoutScoreMultiplier = multiplayerClient.Room?.Settings.NoScoreMultiplier == true
             };
         }
 

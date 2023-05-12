@@ -90,11 +90,6 @@ namespace osu.Game.Rulesets.Scoring
         public IReadOnlyList<HitEvent> HitEvents => hitEvents;
 
         /// <summary>
-        /// Whether the score multiplier should be applied to score calculations.
-        /// </summary>
-        public bool IsScoreMultiplierApplied { get; set; } = true;
-
-        /// <summary>
         /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
         /// </summary>
         protected virtual double DefaultAccuracyPortion => 0.3;
@@ -157,7 +152,10 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
-        private double scoreMultiplier = 1;
+        /// <summary>
+        /// Should generally not be used to change multiplier. Use settter only to override default way of computing multiplier.
+        /// </summary>
+        public double ScoreMultiplier { get; set; } = 1;
 
         public ScoreProcessor(Ruleset ruleset)
         {
@@ -180,10 +178,10 @@ namespace osu.Game.Rulesets.Scoring
             Mode.ValueChanged += _ => updateScore();
             Mods.ValueChanged += mods =>
             {
-                scoreMultiplier = 1;
+                ScoreMultiplier = 1;
 
                 foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
+                    ScoreMultiplier *= m.ScoreMultiplier;
 
                 updateScore();
             };
@@ -297,9 +295,7 @@ namespace osu.Game.Rulesets.Scoring
                 ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
                 : 1;
 
-            if (IsScoreMultiplierApplied)
-                IsScoreMultiplierApplied = IsScoreMultiplierApplied;
-            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues, IsScoreMultiplierApplied);
+            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
@@ -336,9 +332,7 @@ namespace osu.Game.Rulesets.Scoring
 
             extractScoringValues(scoreInfo, out var current, out var maximum);
 
-            if (!scoreInfo.IsScoreDisplayedWithoutScoreMultiplier)
-                scoreInfo.IsScoreDisplayedWithoutScoreMultiplier = scoreInfo.IsScoreDisplayedWithoutScoreMultiplier;
-            return computeScore(mode, current, maximum, !scoreInfo.IsScoreDisplayedWithoutScoreMultiplier);
+            return computeScore(mode, current, maximum);
         }
 
         /// <summary>
@@ -347,14 +341,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="current">The current scoring values.</param>
         /// <param name="maximum">The maximum scoring values.</param>
-        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score computed from the given scoring values.</returns>
         [Pure]
-        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum, bool applyScoreMultiplier)
+        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
         {
             double accuracyRatio = maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects, applyScoreMultiplier);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
         }
 
         /// <summary>
@@ -365,17 +358,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="comboRatio">The portion of the max combo achieved by the player.</param>
         /// <param name="bonusScore">The total bonus score.</param>
         /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
-        /// <param name="applyScoreMultiplier">Whether score multiplier should be applied.</param>
         /// <returns>The total score computed from the given scoring component ratios.</returns>
         [Pure]
-        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects, bool applyScoreMultiplier)
+        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects)
         {
             double accuracyScore = accuracyPortion * accuracyRatio;
             double comboScore = comboPortion * comboRatio;
-            double rawScore = max_score * (accuracyScore + comboScore) + bonusScore;
-
-            if (applyScoreMultiplier)
-                rawScore *= scoreMultiplier;
+            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * ScoreMultiplier;
 
             switch (mode)
             {
@@ -498,7 +487,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
         /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues,bool)"/>.
+        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues)"/>.
         /// </para>
         /// </remarks>
         /// <param name="scoreInfo">The score to extract scoring values from.</param>
