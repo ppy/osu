@@ -22,15 +22,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Mod that randomises the positions of the <see cref="HitObject"/>s
     /// </summary>
-
-    public partial class AngleSharpnessSlider : SettingsSlider<float>
-    {
-        public AngleSharpnessSlider()
-        {
-            KeyboardStep = 0.5f;
-        }
-    }
-
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
         public override LocalisableString Description => "It never gets boring!";
@@ -169,6 +160,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                                               positionInfos[i - 1].HitObject.NewCombo;
 
             return previousObjectStartedCombo && random.NextDouble() < 0.6f;
+        }
+
+        public partial class AngleSharpnessSlider : SettingsSlider<float>
+        {
+        public AngleSharpnessSlider()
+            {
+            KeyboardStep = 0.5f;
+            }
         }
     }
 }
