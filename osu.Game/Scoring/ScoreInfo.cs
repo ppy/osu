@@ -147,11 +147,6 @@ namespace osu.Game.Scoring
         {
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
-            if (this.IsScoreDisplayedWithoutScoreMultiplier != clone.IsScoreDisplayedWithoutScoreMultiplier)
-            {
-                clone.IsScoreDisplayedWithoutScoreMultiplier = IsScoreDisplayedWithoutScoreMultiplier;
-            }
-
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
 
