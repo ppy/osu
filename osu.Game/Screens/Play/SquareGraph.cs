@@ -140,9 +140,10 @@ namespace osu.Game.Screens.Play
 
             // add missing columns
             float x = ColumnCount * Column.WIDTH;
+
             while (targetColumnCount > ColumnCount)
             {
-                var column = new Column()
+                var column = new Column
                 {
                     Height = DrawHeight,
                     LitColour = fillColour,
