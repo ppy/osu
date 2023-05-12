@@ -51,7 +51,8 @@ namespace osu.Game.Screens.Play
                 if (value == values) return;
 
                 values = value;
-                graphNeedsUpdate = true;
+                scheduledCreate?.Cancel();
+                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
             }
         }
 
@@ -70,27 +71,6 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate scheduledCreate;
-
-        private bool graphNeedsUpdate;
-
-        private Vector2 previousDrawSize;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize))
-            {
-                columns?.FadeOut(500, Easing.OutQuint).Expire();
-
-                scheduledCreate?.Cancel();
-                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
-
-                previousDrawSize = DrawSize;
-                graphNeedsUpdate = false;
-            }
-        }
-
         private CancellationTokenSource cts;
 
         /// <summary>
@@ -98,7 +78,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void RecreateGraph()
         {
-            var newColumns = new BufferedContainer<Column>(cachedFrameBuffer: true)
+            var newColumns = new BufferedContainer<Column>
             {
                 RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
