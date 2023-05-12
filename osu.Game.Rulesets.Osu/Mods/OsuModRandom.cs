@@ -164,9 +164,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public partial class AngleSharpnessSlider : SettingsSlider<float>
         {
-        public AngleSharpnessSlider()
+            public AngleSharpnessSlider()
             {
-            KeyboardStep = 0.5f;
+                KeyboardStep = 0.5f;
             }
         }
     }
