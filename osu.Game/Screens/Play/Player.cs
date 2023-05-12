@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.BeatmapHash = Beatmap.Value.BeatmapInfo.Hash;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
-            Score.ScoreInfo.IsScoreDisplayedWithoutScoreMultiplier = Configuration.DisableScoreMultiplier;
+            Score.ScoreInfo.IsScoreMultiplierDisabled = Configuration.DisableScoreMultiplier;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor));
 

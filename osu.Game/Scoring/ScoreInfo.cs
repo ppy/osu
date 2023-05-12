@@ -185,7 +185,7 @@ namespace osu.Game.Scoring
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
         [Ignored]
-        public bool IsScoreDisplayedWithoutScoreMultiplier { get; set; }
+        public bool IsScoreMultiplierDisabled { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 
