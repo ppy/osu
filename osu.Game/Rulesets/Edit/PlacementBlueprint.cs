@@ -47,6 +47,15 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
+        /// <summary>
+        /// Whether this blueprint is currently in a state that can be committed.
+        /// </summary>
+        /// <remarks>
+        /// Override this with any preconditions that should be double-checked on committing.
+        /// If <c>false</c> is returned and a commit is attempted, the blueprint will be destroyed instead.
+        /// </remarks>
+        protected virtual bool IsValidForPlacement => true;
+
         protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -88,7 +97,7 @@ namespace osu.Game.Rulesets.Edit
         /// Signals that the placement of <see cref="HitObject"/> has finished.
         /// This will destroy this <see cref="PlacementBlueprint"/>, and add the HitObject.StartTime to the <see cref="Beatmap"/>.
         /// </summary>
-        /// <param name="commit">Whether the object should be committed.</param>
+        /// <param name="commit">Whether the object should be committed. Note that a commit may fail if <see cref="IsValidForPlacement"/> is <c>false</c>.</param>
         public void EndPlacement(bool commit)
         {
             switch (PlacementActive)
@@ -102,7 +111,7 @@ namespace osu.Game.Rulesets.Edit
                     break;
             }
 
-            placementHandler.EndPlacement(HitObject, commit);
+            placementHandler.EndPlacement(HitObject, IsValidForPlacement && commit);
             PlacementActive = PlacementState.Finished;
         }
 
