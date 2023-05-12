@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.UpdateGraph();
 
-                if (base.ColumnCount > 0)
+                if (ColumnCount > 0)
                     CreationCount++;
             }
         }
