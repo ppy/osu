@@ -22,18 +22,27 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Mod that randomises the positions of the <see cref="HitObject"/>s
     /// </summary>
+
+    public partial class AngleSharpnessSlider : SettingsSlider<float>
+    {
+        public AngleSharpnessSlider()
+        {
+            KeyboardStep = 0.5f;
+        }
+    }
+
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
         public override LocalisableString Description => "It never gets boring!";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
 
-        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
+        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(AngleSharpnessSlider))]
         public BindableFloat AngleSharpness { get; } = new BindableFloat(7)
         {
             MinValue = 1,
             MaxValue = 10,
-            Precision = 0.5f
+            Precision = 0.1f
         };
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
