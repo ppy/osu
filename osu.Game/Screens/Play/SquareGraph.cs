@@ -90,9 +90,6 @@ namespace osu.Game.Screens.Play
             };
         }
 
-
-        // private Vector2 parentScale;
-
         protected override void Update()
         {
             base.Update();
