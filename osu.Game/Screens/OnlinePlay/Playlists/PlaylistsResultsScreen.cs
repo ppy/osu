@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
-        MultiplayerClient multiplayerClient { get; set; } = null!;
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
