@@ -20,6 +20,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -140,6 +142,18 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = SettingsToolboxGroup.CONTAINER_WIDTH + 25 * 2,
+                    Padding = new MarginPadding { Vertical = 25, Horizontal = 25 },
+                    Child = new VisualSettings
+                    {
+                        Expanded = { Value = true }
+                    }
+                }
             };
 
             State.ValueChanged += _ => InternalButtons.Deselect();
