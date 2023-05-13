@@ -100,6 +100,28 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
+                    case OsuSkinComponents.CursorRipple:
+                        if (GetTexture("cursor-ripple") != null)
+                        {
+                            var ripple = this.GetAnimation("cursor-ripple", false, false);
+
+                            // In stable this element was scaled down to 50% and opacity 20%, but this makes the elements WAY too big and inflexible.
+                            // If anyone complains about these not being applied, this can be uncommented.
+                            //
+                            // But if no one complains I'd rather fix this in lazer. Wiki documentation doesn't mention size,
+                            // so we might be okay.
+                            //
+                            // if (ripple != null)
+                            // {
+                            //     ripple.Scale = new Vector2(0.5f);
+                            //     ripple.Alpha = 0.2f;
+                            // }
+
+                            return ripple;
+                        }
+
+                        return null;
+
                     case OsuSkinComponents.CursorParticles:
                         if (GetTexture("star2") != null)
                             return new LegacyCursorParticles();

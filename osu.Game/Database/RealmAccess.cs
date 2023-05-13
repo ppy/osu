@@ -70,8 +70,9 @@ namespace osu.Game.Database
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
+        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// </summary>
-        private const int schema_version = 25;
+        private const int schema_version = 26;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -481,7 +482,7 @@ namespace osu.Game.Database
                 // server, which we don't use. May want to report upstream or revisit in the future.
                 using (var realm = getRealmInstance())
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
                 pendingAsyncWrites.Signal();
             });
@@ -558,7 +559,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));
@@ -865,6 +866,15 @@ namespace osu.Game.Database
                 case 25:
                     // Remove the default skins so they can be added back by SkinManager with updated naming.
                     migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
+                    break;
+
+                case 26:
+                    // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                        score.BeatmapHash = score.BeatmapInfo.Hash;
+
                     break;
             }
         }

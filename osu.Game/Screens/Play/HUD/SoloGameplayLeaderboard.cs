@@ -100,16 +100,16 @@ namespace osu.Game.Screens.Play.HUD
             local.DisplayOrder.Value = long.MaxValue;
         }
 
-        protected override bool CheckValidScorePosition(int i)
+        protected override bool CheckValidScorePosition(GameplayLeaderboardScore score, int position)
         {
             // change displayed position to '-' when there are 50 already submitted scores and tracked score is last
-            if (scoreSource.Value != PlayBeatmapDetailArea.TabType.Local)
+            if (score.Tracked && scoreSource.Value != PlayBeatmapDetailArea.TabType.Local)
             {
-                if (i == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
+                if (position == Flow.Count && Flow.Count > GetScoresRequest.MAX_SCORES_PER_REQUEST)
                     return false;
             }
 
-            return base.CheckValidScorePosition(i);
+            return base.CheckValidScorePosition(score, position);
         }
 
         private void updateVisibility() =>

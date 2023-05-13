@@ -1,24 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class ChatLine : CompositeDrawable
+    public partial class ChatLine : CompositeDrawable, IHasPopover
     {
         private Message message = null!;
 
@@ -54,7 +58,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly OsuSpriteText drawableTimestamp;
 
-        private readonly DrawableUsername drawableUsername;
+        private readonly DrawableChatUsername drawableUsername;
 
         private readonly LinkFlowContainer drawableContentFlow;
 
@@ -91,7 +95,7 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername = new DrawableUsername(message.Sender)
+                        drawableUsername = new DrawableChatUsername(message.Sender)
                         {
                             Width = UsernameWidth,
                             FontSize = FontSize,
@@ -99,6 +103,7 @@ namespace osu.Game.Overlays.Chat
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Margin = new MarginPadding { Horizontal = Spacing },
+                            ReportRequested = this.ShowPopover,
                         },
                         drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
@@ -126,6 +131,8 @@ namespace osu.Game.Overlays.Chat
             updateMessageContent();
             FinishTransforms(true);
         }
+
+        public Popover GetPopover() => new ReportChatPopover(message);
 
         /// <summary>
         /// Performs a highlight animation on this <see cref="ChatLine"/>.
@@ -175,9 +182,7 @@ namespace osu.Game.Overlays.Chat
 
         private void updateTimestamp()
         {
-            drawableTimestamp.Text = prefer24HourTime.Value
-                ? $@"{message.Timestamp.LocalDateTime:HH:mm:ss}"
-                : $@"{message.Timestamp.LocalDateTime:hh:mm:ss tt}";
+            drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
     }
 }

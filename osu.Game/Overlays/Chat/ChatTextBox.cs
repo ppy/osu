@@ -24,7 +24,6 @@ namespace osu.Game.Overlays.Chat
                 bool showSearch = change.NewValue;
 
                 PlaceholderText = showSearch ? HomeStrings.SearchPlaceholder : ChatStrings.InputPlaceholder;
-                Text = string.Empty;
             }, true);
         }
 

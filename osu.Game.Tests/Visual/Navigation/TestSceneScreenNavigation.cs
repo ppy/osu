@@ -19,6 +19,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
@@ -26,6 +27,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -79,7 +81,25 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
 
+                AddStep("go back to song select", () =>
+                {
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+
+                AddStep("press home button", () =>
+                {
+                    InputManager.MoveMouseTo(Game.Toolbar.ChildrenOfType<ToolbarHomeButton>().Single());
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddAssert("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is not null);
+
                 pushEscape();
+                pushEscape();
+
                 AddAssert("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is not null);
 
                 AddStep("confirm exit", () => InputManager.Key(Key.Enter));
@@ -175,10 +195,16 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for player", () =>
             {
                 DismissAnyNotifications();
-                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+                player = Game.ScreenStack.CurrentScreen as Player;
+                return player?.IsLoaded == true;
             });
 
             AddAssert("retry count is 0", () => player.RestartCount == 0);
+
+            // todo: see https://github.com/ppy/osu/issues/22220
+            // tests are supposed to be immune to this edge case by the logic in TestPlayer,
+            // but we're running a full game instance here, so we have to work around it manually.
+            AddStep("end spectator before retry", () => Game.SpectatorClient.EndPlaying(player.GameplayState));
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
             AddUntilStep("wait for old player gone", () => Game.ScreenStack.CurrentScreen != player);
@@ -516,6 +542,40 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestFeaturedArtistDisclaimerDialog()
+        {
+            BeatmapListingOverlay getBeatmapListingOverlay() => Game.ChildrenOfType<BeatmapListingOverlay>().FirstOrDefault();
+
+            AddStep("Wait for notifications to load", () => Game.SearchBeatmapSet(string.Empty));
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            AddUntilStep("Wait for beatmap overlay to load", () => getBeatmapListingOverlay()?.State.Value == Visibility.Visible);
+            AddAssert("featured artist filter is on", () => getBeatmapListingOverlay().ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+            AddStep("toggle featured artist filter",
+                () => getBeatmapListingOverlay().ChildrenOfType<FilterTabItem<SearchGeneral>>().First(i => i.Value == SearchGeneral.FeaturedArtists).TriggerClick());
+
+            AddAssert("disclaimer dialog is shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog != null);
+            AddAssert("featured artist filter is still on", () => getBeatmapListingOverlay().ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+
+            AddStep("confirm", () => InputManager.Key(Key.Enter));
+            AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+            AddUntilStep("featured artist filter is off", () => !getBeatmapListingOverlay().ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+        }
+
+        [Test]
+        public void TestBeatmapListingLinkSearchOnInitialOpen()
+        {
+            BeatmapListingOverlay getBeatmapListingOverlay() => Game.ChildrenOfType<BeatmapListingOverlay>().FirstOrDefault();
+
+            AddStep("open beatmap overlay with test query", () => Game.SearchBeatmapSet("test"));
+
+            AddUntilStep("wait for beatmap overlay to load", () => getBeatmapListingOverlay()?.State.Value == Visibility.Visible);
+
+            AddAssert("beatmap overlay sorted by relevance", () => getBeatmapListingOverlay().ChildrenOfType<BeatmapListingSortTabControl>().Single().Current.Value == SortCriteria.Relevance);
+        }
+
+        [Test]
         public void TestMainOverlaysClosesNotificationOverlay()
         {
             ChangelogOverlay getChangelogOverlay() => Game.ChildrenOfType<ChangelogOverlay>().FirstOrDefault();
@@ -640,7 +700,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("press escape twice rapidly", () =>
             {
                 InputManager.Key(Key.Escape);
-                InputManager.Key(Key.Escape);
+                Schedule(InputManager.Key, Key.Escape);
             });
 
             pushEscape();

@@ -13,6 +13,9 @@ namespace osu.Game.Overlays
 {
     public partial class OverlayRulesetSelector : RulesetSelector
     {
+        // Since this component is used in online overlays and currently web-side doesn't support non-legacy rulesets, let's disable them for now.
+        protected override bool LegacyOnly => true;
+
         public OverlayRulesetSelector()
         {
             AutoSizeAxes = Axes.Both;

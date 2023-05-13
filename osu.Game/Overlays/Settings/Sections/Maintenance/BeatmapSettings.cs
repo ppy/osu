@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
@@ -15,28 +14,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.Beatmaps;
 
-        private SettingsButton importBeatmapsButton = null!;
         private SettingsButton deleteBeatmapsButton = null!;
         private SettingsButton deleteBeatmapVideosButton = null!;
         private SettingsButton restoreButton = null!;
         private SettingsButton undeleteButton = null!;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
+        private void load(BeatmapManager beatmaps, IDialogOverlay? dialogOverlay)
         {
-            if (legacyImportManager?.SupportsImportFromStable == true)
-            {
-                Add(importBeatmapsButton = new SettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.ImportBeatmapsFromStable,
-                    Action = () =>
-                    {
-                        importBeatmapsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(_ => Schedule(() => importBeatmapsButton.Enabled.Value = true));
-                    }
-                });
-            }
-
             Add(deleteBeatmapsButton = new DangerousSettingsButton
             {
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,

@@ -30,7 +30,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
+    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>, IAnimationTimeReference
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -82,6 +82,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="JudgementResult"/> being reverted.
         /// </summary>
+        /// <remarks>
+        /// This is only invoked if this <see cref="DrawableHitObject"/> is alive when the result is reverted.
+        /// </remarks>
         public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
         /// <summary>
@@ -208,8 +211,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void Apply([NotNull] HitObject hitObject)
         {
-            if (hitObject == null)
-                throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
+            ArgumentNullException.ThrowIfNull(hitObject);
 
             Apply(new SyntheticHitObjectEntry(hitObject));
         }
@@ -223,6 +225,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             ensureEntryHasResult();
 
+            entry.RevertResult += onRevertResult;
+
             foreach (var h in HitObject.NestedHitObjects)
             {
                 var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h, this);
@@ -235,7 +239,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     OnNestedDrawableCreated?.Invoke(drawableNested);
 
                 drawableNested.OnNewResult += onNewResult;
-                drawableNested.OnRevertResult += onRevertResult;
+                drawableNested.OnRevertResult += onNestedRevertResult;
                 drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
                 // This is only necessary for non-pooled DHOs. For pooled DHOs, this is handled inside GetPooledDrawableRepresentation().
@@ -304,13 +308,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            if (Samples != null)
-                Samples.Samples = null;
+            Samples?.ClearSamples();
 
             foreach (var obj in nestedHitObjects)
             {
                 obj.OnNewResult -= onNewResult;
-                obj.OnRevertResult -= onRevertResult;
+                obj.OnRevertResult -= onNestedRevertResult;
                 obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
             }
 
@@ -318,6 +321,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             ClearNestedHitObjects();
 
             HitObject.DefaultsApplied -= onDefaultsApplied;
+
+            entry.RevertResult -= onRevertResult;
 
             OnFree();
 
@@ -352,13 +357,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (samples.Length <= 0)
                 return;
 
-            if (HitObject.SampleControlPoint == null)
-            {
-                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-            }
-
-            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            Samples.Samples = samples.Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
@@ -367,7 +366,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
-        private void onRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
+        private void onRevertResult()
+        {
+            updateState(ArmedState.Idle);
+            OnRevertResult?.Invoke(this, Result);
+        }
+
+        private void onNestedRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
 
         private void onApplyCustomUpdateState(DrawableHitObject drawableHitObject, ArmedState state) => ApplyCustomUpdateState?.Invoke(drawableHitObject, state);
 
@@ -420,11 +425,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             LifetimeEnd = double.MaxValue;
 
-            double transformTime = HitObject.StartTime - InitialLifetimeOffset;
-
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime))
+            double initialTransformsTime = HitObject.StartTime - InitialLifetimeOffset;
+
+            AnimationStartTime.Value = initialTransformsTime;
+
+            using (BeginAbsoluteSequence(initialTransformsTime))
                 UpdateInitialTransforms();
 
             using (BeginAbsoluteSequence(StateUpdateTime))
@@ -579,26 +586,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (Result != null && Result.HasResult)
-            {
-                double endTime = HitObject.GetEndTime();
-
-                if (Result.TimeOffset + endTime > Time.Current)
-                {
-                    OnRevertResult?.Invoke(this, Result);
-
-                    Result.TimeOffset = 0;
-                    Result.Type = HitResult.None;
-
-                    updateState(ArmedState.Idle);
-                }
-            }
-        }
-
         public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         protected override void UpdateAfterChildren()
@@ -653,18 +640,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> can be judged.
-        /// The time offset of <see cref="Result"/> will be clamped to this value during <see cref="ApplyResult"/>.
-        /// <para>
-        /// Defaults to the miss window of <see cref="HitObject"/>.
-        /// </para>
-        /// </summary>
-        /// <remarks>
-        /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
-        /// </remarks>
-        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
-
-        /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
@@ -685,7 +660,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
+            Result.RawTime = Time.Current;
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
@@ -748,6 +723,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (CurrentSkin != null)
                 CurrentSkin.SourceChanged -= skinSourceChanged;
         }
+
+        public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
     }
 
     public abstract partial class DrawableHitObject<TObject> : DrawableHitObject

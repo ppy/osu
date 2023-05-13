@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.Rankings.Tables
     public abstract partial class RankingsTable<TModel> : TableContainer
     {
         protected const int TEXT_SIZE = 12;
-        private const float horizontal_inset = 20;
         private const float row_height = 32;
         private const float row_spacing = 3;
         private const int items_per_page = 50;
@@ -39,7 +38,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
+            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height + row_spacing);
         }
 

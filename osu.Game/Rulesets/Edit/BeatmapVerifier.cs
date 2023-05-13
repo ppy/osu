@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Edit
             new CheckUnsnappedObjects(),
             new CheckConcurrentObjects(),
             new CheckZeroLengthObjects(),
+
+            // Timing
+            new CheckPreviewTime(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

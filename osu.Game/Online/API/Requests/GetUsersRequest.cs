@@ -9,7 +9,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUsersRequest : APIRequest<GetUsersResponse>
     {
-        private readonly int[] userIds;
+        public readonly int[] UserIds;
 
         private const int max_ids_per_request = 50;
 
@@ -18,9 +18,9 @@ namespace osu.Game.Online.API.Requests
             if (userIds.Length > max_ids_per_request)
                 throw new ArgumentException($"{nameof(GetUsersRequest)} calls only support up to {max_ids_per_request} IDs at once");
 
-            this.userIds = userIds;
+            UserIds = userIds;
         }
 
-        protected override string Target => "users/?ids[]=" + string.Join("&ids[]=", userIds);
+        protected override string Target => "users/?ids[]=" + string.Join("&ids[]=", UserIds);
     }
 }

@@ -8,10 +8,10 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -61,10 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
                             new PathControlPoint(new Vector2(100, 0))
                         }
                     },
-                    DifficultyControlPoint = new DifficultyControlPoint
-                    {
-                        SliderVelocity = 2
-                    }
+                    SliderVelocity = 2
                 });
             });
         }
@@ -100,8 +97,8 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("unify slider velocity", () =>
             {
-                foreach (var h in EditorBeatmap.HitObjects)
-                    h.DifficultyControlPoint.SliderVelocity = 1.5;
+                foreach (var h in EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>())
+                    h.SliderVelocity = 1.5;
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -185,7 +182,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void hitObjectHasVelocity(int objectIndex, double velocity) => AddAssert($"{objectIndex.ToOrdinalWords()} has velocity {velocity}", () =>
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
-            return h.DifficultyControlPoint.SliderVelocity == velocity;
+            return h is IHasSliderVelocity hasSliderVelocity && hasSliderVelocity.SliderVelocity == velocity;
         });
     }
 }

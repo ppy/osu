@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -117,10 +118,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(args.NewItems != null);
+
                     addRooms(args.NewItems.Cast<Room>());
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(args.OldItems != null);
+
                     removeRooms(args.OldItems.Cast<Room>());
                     break;
             }

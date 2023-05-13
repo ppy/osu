@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
-        public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
+        public bool AllPlayersLoaded => instances.All(p => p.PlayerLoaded);
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
@@ -171,9 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
             {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
-                                              .OrderBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime))
-                                              .FirstOrDefault();
+                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
 
                 // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
                 if (currentAudioSource != null)

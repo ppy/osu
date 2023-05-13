@@ -33,8 +33,7 @@ namespace osu.Game.Screens.Play.HUD
             get => current.Current;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                ArgumentNullException.ThrowIfNull(value);
 
                 current.Current = value;
             }

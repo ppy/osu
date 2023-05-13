@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.IncreaseFirstObjectVisibility,
                     Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
+                    Keywords = new[] { @"approach", @"circle", @"hidden" },
                 },
             };
         }

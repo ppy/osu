@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public virtual Vector2 PathOffset => path.PositionInBoundingBox(path.Vertices[0]);
 
         /// <summary>
+        /// Offset in absolute coordinates from the end of the curve.
+        /// </summary>
+        public virtual Vector2 PathEndOffset => path.PositionInBoundingBox(path.Vertices[^1]);
+
+        /// <summary>
         /// Used to colour the path.
         /// </summary>
         public Color4 AccentColour

@@ -16,8 +16,12 @@ namespace osu.Game.Overlays.Wiki.Markdown
 {
     public partial class WikiMarkdownContainer : OsuMarkdownContainer
     {
-        protected override bool Footnotes => true;
-        protected override bool CustomContainers => true;
+        protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+        {
+            Footnotes = true,
+            CustomContainers = true,
+            BlockAttributes = true
+        };
 
         public string CurrentPath
         {

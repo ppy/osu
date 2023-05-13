@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo);
+                    readCustomSampleBanks(split[10], bankInfo, true);
 
                 // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             return result;
         }
 
-        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false)
         {
             if (string.IsNullOrEmpty(str))
                 return;
@@ -201,6 +201,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             bankInfo.BankForNormal = stringBank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
+
+            if (banksOnly) return;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
@@ -439,19 +441,20 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
-            // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
-            if (!string.IsNullOrEmpty(bankInfo.Filename))
-            {
-                return new List<HitSampleInfo> { new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume) };
-            }
+            var soundTypes = new List<HitSampleInfo>();
 
-            var soundTypes = new List<HitSampleInfo>
+            if (string.IsNullOrEmpty(bankInfo.Filename))
             {
-                new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, bankInfo.CustomSampleBank,
-                    // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
-                    // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
-                    type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal))
-            };
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, bankInfo.CustomSampleBank,
+                                // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
+                                // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
+                                type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal)));
+            }
+            else
+            {
+                // Todo: This should set the normal SampleInfo if the specified sample file isn't found, but that's a pretty edge-case scenario
+                soundTypes.Add(new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume));
+            }
 
             if (type.HasFlagFast(LegacyHitSoundType.Finish))
                 soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));

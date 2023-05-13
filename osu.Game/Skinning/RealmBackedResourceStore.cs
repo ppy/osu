@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
 
         private string? getPathForFile(string filename)
         {
-            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string path))
+            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string? path))
                 return path;
 
             return null;

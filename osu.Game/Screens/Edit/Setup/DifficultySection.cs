@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,10 +15,12 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal partial class DifficultySection : SetupSection
     {
-        private LabelledSliderBar<float> circleSizeSlider;
-        private LabelledSliderBar<float> healthDrainSlider;
-        private LabelledSliderBar<float> approachRateSlider;
-        private LabelledSliderBar<float> overallDifficultySlider;
+        private LabelledSliderBar<float> circleSizeSlider = null!;
+        private LabelledSliderBar<float> healthDrainSlider = null!;
+        private LabelledSliderBar<float> approachRateSlider = null!;
+        private LabelledSliderBar<float> overallDifficultySlider = null!;
+        private LabelledSliderBar<double> baseVelocitySlider = null!;
+        private LabelledSliderBar<double> tickRateSlider = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
@@ -81,13 +81,42 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
+                baseVelocitySlider = new LabelledSliderBar<double>
+                {
+                    Label = EditorSetupStrings.BaseVelocity,
+                    FixedLabelWidth = LABEL_WIDTH,
+                    Description = EditorSetupStrings.BaseVelocityDescription,
+                    Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
+                    {
+                        Default = 1,
+                        MinValue = 0.4,
+                        MaxValue = 3.6,
+                        Precision = 0.01f,
+                    }
+                },
+                tickRateSlider = new LabelledSliderBar<double>
+                {
+                    Label = EditorSetupStrings.TickRate,
+                    FixedLabelWidth = LABEL_WIDTH,
+                    Description = EditorSetupStrings.TickRateDescription,
+                    Current = new BindableDouble(Beatmap.Difficulty.SliderTickRate)
+                    {
+                        Default = 1,
+                        MinValue = 1,
+                        MaxValue = 4,
+                        Precision = 1,
+                    }
+                },
             };
 
             foreach (var item in Children.OfType<LabelledSliderBar<float>>())
-                item.Current.ValueChanged += onValueChanged;
+                item.Current.ValueChanged += _ => updateValues();
+
+            foreach (var item in Children.OfType<LabelledSliderBar<double>>())
+                item.Current.ValueChanged += _ => updateValues();
         }
 
-        private void onValueChanged(ValueChangedEvent<float> args)
+        private void updateValues()
         {
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
@@ -95,6 +124,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.ApproachRate = approachRateSlider.Current.Value;
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
+            Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;
+            Beatmap.Difficulty.SliderTickRate = tickRateSlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
             Beatmap.SaveState();
