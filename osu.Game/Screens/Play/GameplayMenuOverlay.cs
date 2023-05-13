@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -62,6 +63,10 @@ namespace osu.Game.Screens.Play
 
         private FillFlowContainer retryCounterContainer;
 
+        private InputManager inputManager = null!;
+        public VisualSettings VisualSettings = null!;
+        protected Container MainContent = null!;
+
         protected GameplayMenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -72,74 +77,81 @@ namespace osu.Game.Screens.Play
         {
             Children = new Drawable[]
             {
-                new Box
+                MainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = background_alpha,
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 50),
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = background_alpha,
+                        },
                         new FillFlowContainer
                         {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 20),
+                            Spacing = new Vector2(0, 50),
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new FillFlowContainer
                                 {
-                                    Text = Header,
-                                    Font = OsuFont.GetFont(size: 30),
-                                    Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Colour = colours.Yellow,
-                                    Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 20),
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Text = Header,
+                                            Font = OsuFont.GetFont(size: 30),
+                                            Spacing = new Vector2(5, 0),
+                                            Origin = Anchor.TopCentre,
+                                            Anchor = Anchor.TopCentre,
+                                            Colour = colours.Yellow,
+                                            Shadow = true,
+                                            ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = Description,
+                                            Origin = Anchor.TopCentre,
+                                            Anchor = Anchor.TopCentre,
+                                            Shadow = true,
+                                            ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                        }
+                                    }
                                 },
-                                new OsuSpriteText
+                                InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
                                 {
-                                    Text = Description,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Masking = true,
+                                    EdgeEffect = new EdgeEffectParameters
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Color4.Black.Opacity(0.6f),
+                                        Radius = 50
+                                    },
+                                },
+                                retryCounterContainer = new FillFlowContainer
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    AutoSizeAxes = Axes.Both,
                                 }
                             }
                         },
-                        InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Masking = true,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.6f),
-                                Radius = 50
-                            },
-                        },
-                        retryCounterContainer = new FillFlowContainer
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                        }
                     }
                 },
                 new Container
@@ -149,7 +161,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + 25 * 2,
                     Padding = new MarginPadding { Vertical = 25, Horizontal = 25 },
-                    Child = new VisualSettings
+                    Child = VisualSettings = new VisualSettings
                     {
                         Expanded = { Value = true }
                     }
@@ -159,6 +171,27 @@ namespace osu.Game.Screens.Play
             State.ValueChanged += _ => InternalButtons.Deselect();
 
             updateRetryCount();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (inputManager.HoveredDrawables.Contains(VisualSettings))
+            {
+                MainContent.FadeOut(100);
+            }
+            else
+            {
+                MainContent.FadeIn(100);
+            }
         }
 
         private int retries;

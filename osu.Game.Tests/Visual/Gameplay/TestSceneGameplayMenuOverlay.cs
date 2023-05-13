@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
     {
         private FailOverlay failOverlay;
-        private PauseOverlay pauseOverlay;
+        private TestPauseOverlay pauseOverlay;
 
         private GlobalActionContainer globalActionContainer;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             globalActionContainer.Children = new Drawable[]
             {
-                pauseOverlay = new PauseOverlay
+                pauseOverlay = new TestPauseOverlay
                 {
                     OnResume = () => Logger.Log(@"Resume"),
                     OnRetry = () => Logger.Log(@"Retry"),
@@ -287,6 +287,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => pauseOverlay.Buttons.All(button => button.State == SelectionState.NotSelected));
         }
 
+        [Test]
+        public void TestContentFadeoutWhenVisualSettingsHoverd()
+        {
+            showOverlay();
+            AddStep("hover visual settings", () => InputManager.MoveMouseTo(pauseOverlay.VisualSettings));
+            AddUntilStep("content fadeout", () => pauseOverlay.MainContent.IsPresent == false);
+        }
+
         private void showOverlay() => AddStep("Show overlay", () => pauseOverlay.Show());
         private void hideOverlay() => AddStep("Hide overlay", () => pauseOverlay.Hide());
 
@@ -296,6 +304,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             globalActionContainer.TriggerPressed(action);
             globalActionContainer.TriggerReleased(action);
+        }
+
+        private partial class TestPauseOverlay : PauseOverlay
+        {
+            public new Container MainContent => base.MainContent;
         }
     }
 }
