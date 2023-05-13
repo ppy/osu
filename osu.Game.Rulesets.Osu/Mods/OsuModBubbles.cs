@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public partial class OsuModBubbles : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject, IApplicableToScoreProcessor
+    public partial class OsuModBubbles : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToDrawableHitObject, IApplicableToScoreProcessor, ICanBeToggledDuringReplay
     {
         public override string Name => "Bubbles";
 
@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         // Compatibility with these seems potentially feasible in the future, blocked for now because they don't work as one would expect
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel) };
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         private PlayfieldAdjustmentContainer bubbleContainer = null!;
 
@@ -67,7 +69,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
 
             // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
+            IsDisabled.BindValueChanged(s =>
+            {
+                drawableRuleset.Playfield.DisplayJudgements.Value = s.NewValue;
+            }, true);
 
             bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
@@ -78,6 +83,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             drawableObject.OnNewResult += (drawable, _) =>
             {
+                if (IsDisabled.Value) return;
+
                 if (drawable is not DrawableOsuHitObject drawableOsuHitObject) return;
 
                 switch (drawableOsuHitObject.HitObject)
