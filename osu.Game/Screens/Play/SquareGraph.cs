@@ -190,27 +190,24 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void recalculateValues()
         {
-            var newValues = new List<float>();
-
-            if (values == null)
+            int columnCount = ColumnCount;
+            if (values == null || values.Length == 0 || columnCount == 0)
             {
-                for (float i = 0; i < ColumnCount; i++)
-                {
-                    newValues.Add(0);
-                }
-            }
-            else
-            {
-                int max = values.Max();
-                float step = values.Length / (float)ColumnCount;
-
-                for (float i = 0; i < values.Length; i += step)
-                {
-                    newValues.Add((float)values[(int)i] / max);
-                }
+                calculatedValues = new float[0];
+                return;
             }
 
-            calculatedValues = newValues.ToArray();
+            float ratio = values.Length / (float)columnCount;
+
+            if (calculatedValues.Length != columnCount)
+                calculatedValues = new float[columnCount];
+
+            float max = (float)values.Max();
+
+            for (int i = 0; i < calculatedValues.Length; i++)
+            {
+                calculatedValues[i] = values[(int)(i * ratio)] / max;
+            }
         }
 
         public partial class Column : Container, IStateful<ColumnState>
