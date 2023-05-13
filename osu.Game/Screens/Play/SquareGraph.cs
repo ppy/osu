@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,14 +16,13 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Layout;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
     public partial class SquareGraph : Container
     {
         private BufferedContainer<Column> columns;
-
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize | Invalidation.DrawInfo);
 
         public int ColumnCount => columns?.Children.Count ?? 0;
 
@@ -52,12 +52,9 @@ namespace osu.Game.Screens.Play
                 if (value == values) return;
 
                 values = value;
-                haveValuesChanged = true;
                 layout.Invalidate();
             }
         }
-
-        private bool haveValuesChanged;
 
         private Color4 fillColour;
 
@@ -73,19 +70,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private ScheduledDelegate scheduledCreate;
+
+        private LayoutValue layout = new LayoutValue(Invalidation.DrawSize | Invalidation.DrawInfo);
+
         public SquareGraph()
         {
             AddLayout(layout);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = columns = new BufferedContainer<Column>(cachedFrameBuffer: true)
-            {
-                RedrawOnScale = false,
-                RelativeSizeAxes = Axes.Both
-            };
         }
 
         protected override void Update()
@@ -94,75 +85,51 @@ namespace osu.Game.Screens.Play
 
             if (!layout.IsValid)
             {
-                UpdateGraph();
+                columns?.FadeOut(500, Easing.OutQuint).Expire();
+
+                scheduledCreate?.Cancel();
+                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+
                 layout.Validate();
             }
         }
 
+        private CancellationTokenSource cts;
+
         /// <summary>
-        /// Updates the graph by either adding or removing columns based on DrawWidth.
-        /// Does nothing if correct number of columns already exists and/or if <see cref="SquareGraph.values"/> haven't changed.
+        /// Recreates the entire graph.
         /// </summary>
-        protected virtual void UpdateGraph()
+        protected virtual void RecreateGraph()
         {
-            int targetColumnCount = values == null ? 0 : (int)(DrawWidth / Column.WIDTH);
-
-            // early exit the most frequent case
-            if (!haveValuesChanged && targetColumnCount == ColumnCount)
+            var newColumns = new BufferedContainer<Column>(cachedFrameBuffer: true)
             {
-                updateColumnHeight();
-                columns.ForceRedraw();
-                return;
-            }
+                RedrawOnScale = false,
+                RelativeSizeAxes = Axes.Both,
+            };
 
-            ensureColumnCount(targetColumnCount);
-
-            // fill graph data
-            recalculateValues();
-            redrawFilled();
-            redrawProgress();
-
-            haveValuesChanged = false;
-        }
-
-        private void updateColumnHeight()
-        {
-            foreach (var column in columns)
+            for (float x = 0; x < DrawWidth; x += Column.WIDTH)
             {
-                column.Height = DrawHeight;
-            }
-        }
-
-        private void ensureColumnCount(int targetColumnCount)
-        {
-            // remove excess columns
-            while (targetColumnCount < ColumnCount)
-            {
-                columns.Remove(columns.Children[ColumnCount - 1], true);
-            }
-
-            updateColumnHeight();
-
-            // add missing columns
-            float x = ColumnCount * Column.WIDTH;
-
-            while (targetColumnCount > ColumnCount)
-            {
-                var column = new Column
+                newColumns.Add(new Column(DrawHeight)
                 {
-                    Height = DrawHeight,
                     LitColour = fillColour,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
-                };
-
-                LoadComponentAsync(column);
-                columns.Add(column);
-
-                x += Column.WIDTH;
+                });
             }
+
+            cts?.Cancel();
+
+            LoadComponentAsync(newColumns, c =>
+            {
+                Child = columns = c;
+                columns.FadeInFromZero(500, Easing.OutQuint);
+
+                recalculateValues();
+                redrawFilled();
+                redrawProgress();
+            }, (cts = new CancellationTokenSource()).Token);
         }
 
         /// <summary>
@@ -190,24 +157,26 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void recalculateValues()
         {
-            int columnCount = ColumnCount;
-            if (values == null || values.Length == 0 || columnCount == 0)
+            var newValues = new List<float>();
+
+            if (values == null)
             {
-                calculatedValues = new float[0];
+                for (float i = 0; i < ColumnCount; i++)
+                    newValues.Add(0);
+
                 return;
             }
 
-            float ratio = values.Length / (float)columnCount;
+            int max = values.Max();
 
-            if (calculatedValues.Length != columnCount)
-                calculatedValues = new float[columnCount];
+            float step = values.Length / (float)ColumnCount;
 
-            float max = (float)values.Max();
-
-            for (int i = 0; i < calculatedValues.Length; i++)
+            for (float i = 0; i < values.Length; i += step)
             {
-                calculatedValues[i] = values[(int)(i * ratio)] / max;
+                newValues.Add((float)values[(int)i] / max);
             }
+
+            calculatedValues = newValues.ToArray();
         }
 
         public partial class Column : Container, IStateful<ColumnState>
@@ -256,9 +225,10 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public Column()
+            public Column(float height)
             {
                 Width = WIDTH;
+                Height = height;
             }
 
             [BackgroundDependencyLoader]
