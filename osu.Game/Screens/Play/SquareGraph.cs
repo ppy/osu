@@ -110,6 +110,7 @@ namespace osu.Game.Screens.Play
             // early exit the most frequent case
             if (!haveValuesChanged && targetColumnCount == ColumnCount)
             {
+                updateColumnHeight();
                 columns.ForceRedraw();
                 return;
             }
@@ -124,6 +125,14 @@ namespace osu.Game.Screens.Play
             haveValuesChanged = false;
         }
 
+        private void updateColumnHeight()
+        {
+            foreach (var column in columns)
+            {
+                column.Height = DrawHeight;
+            }
+        }
+
         private void ensureColumnCount(int targetColumnCount)
         {
             // remove excess columns
@@ -132,11 +141,7 @@ namespace osu.Game.Screens.Play
                 columns.Remove(columns.Children[ColumnCount - 1], true);
             }
 
-            // update height of existing columns
-            foreach (var column in columns)
-            {
-                column.Height = DrawHeight;
-            }
+            updateColumnHeight();
 
             // add missing columns
             float x = ColumnCount * Column.WIDTH;
