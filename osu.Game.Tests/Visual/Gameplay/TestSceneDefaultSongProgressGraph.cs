@@ -63,12 +63,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public int CreationCount { get; private set; }
 
-            protected override void UpdateGraph()
+            protected override void RecreateGraph()
             {
-                base.UpdateGraph();
-
-                if (ColumnCount > 0)
-                    CreationCount++;
+                base.RecreateGraph();
+                CreationCount++;
             }
         }
     }
