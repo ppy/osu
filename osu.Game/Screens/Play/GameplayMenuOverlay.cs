@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding { Vertical = 25, Horizontal = 25 },
                     Child = VisualSettings = new VisualSettings
                     {
-                        Expanded = { Value = true }
+                        Expanded = { Value = false }
                     }
                 }
             };
