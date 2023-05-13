@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
@@ -19,17 +17,16 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModSnapColour : ModSnapColour, IApplicableToBeatmap, IApplicableToDrawableHitObject
     {
-        [Resolved]
-        private OsuColour colours { get; set; } = new OsuColour();
+        private readonly OsuColour colours = new OsuColour();
 
-        [Resolved(canBeNull: true)]
-        private IBeatmap currentBeatmap { get; set; }
+        [Resolved]
+        private IBeatmap? currentBeatmap { get; set; }
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             //Store a reference to the current beatmap to look up the beat divisor when notes are drawn
-            if (this.currentBeatmap != beatmap)
-                this.currentBeatmap = beatmap;
+            if (currentBeatmap != beatmap)
+                currentBeatmap = beatmap;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
