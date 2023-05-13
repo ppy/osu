@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Snap Colour";
         public override string Acronym => "SC";
-        public override LocalisableString Description => new LocalisableString("Colours hit objects based on the rhythm.");
+        public override LocalisableString Description => "Colours hit objects based on the rhythm.";
         public override double ScoreMultiplier => 1;
         public override ModType Type => ModType.Conversion;
     }
