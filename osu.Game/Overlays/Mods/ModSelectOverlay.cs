@@ -777,6 +777,9 @@ namespace osu.Game.Overlays.Mods
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
 
+                //Kill focus on SearchTextBox
+                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
+
                 return true;
             }
 
