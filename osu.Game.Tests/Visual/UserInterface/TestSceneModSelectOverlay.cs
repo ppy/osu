@@ -469,6 +469,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestSearchFocusChange()
+        {
+            createScreen();
+
+            AddStep("click on search", navigateAndClick<ShearedSearchTextBox>);
+            AddAssert("focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("click on mod column", navigateAndClick<ModColumn>);
+            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
+
+            void navigateAndClick<T>() where T : Drawable
+            {
+                InputManager.MoveMouseTo(modSelectOverlay.ChildrenOfType<T>().FirstOrDefault());
+                InputManager.Click(MouseButton.Left);
+            }
+        }
+
+        [Test]
         public void TestDeselectAllViaKey()
         {
             createScreen();
