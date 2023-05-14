@@ -72,7 +72,7 @@ namespace osu.Game.Online.Rooms
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;
-            // TODO: assign StarRating 
+            StarRating = item.Beatmap.StarRating; // generally not available, but lets at least try to use it
         }
     }
 }
