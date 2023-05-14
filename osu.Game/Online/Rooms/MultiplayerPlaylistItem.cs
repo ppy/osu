@@ -53,6 +53,9 @@ namespace osu.Game.Online.Rooms
         [Key(9)]
         public DateTimeOffset? PlayedAt { get; set; }
 
+        [Key(10)]
+        public double StarRating { get; set; }
+
         public MultiplayerPlaylistItem()
         {
         }
@@ -69,6 +72,7 @@ namespace osu.Game.Online.Rooms
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;
+            // TODO: assign StarRating 
         }
     }
 }
