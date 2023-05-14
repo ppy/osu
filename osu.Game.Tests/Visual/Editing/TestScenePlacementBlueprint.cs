@@ -79,5 +79,28 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("no active placement", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement.PlacementActive,
                 () => Is.EqualTo(PlacementBlueprint.PlacementState.Waiting));
         }
+
+        [Test]
+        public void TestCommitPlacementViaToolChange()
+        {
+            Playfield playfield = null!;
+
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("move mouse to top left of playfield", () =>
+            {
+                playfield = this.ChildrenOfType<Playfield>().Single();
+                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                InputManager.MoveMouseTo(location);
+            });
+            AddStep("begin placement", () => InputManager.Click(MouseButton.Left));
+            AddStep("move mouse to bottom right of playfield", () =>
+            {
+                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                InputManager.MoveMouseTo(location);
+            });
+
+            AddStep("change tool to circle", () => InputManager.Key(Key.Number2));
+            AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+        }
     }
 }
