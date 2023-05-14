@@ -9,10 +9,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract partial class PlacementBlueprint : CompositeDrawable
+    public abstract partial class PlacementBlueprint : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
@@ -113,6 +115,30 @@ namespace osu.Game.Rulesets.Edit
 
             placementHandler.EndPlacement(HitObject, IsValidForPlacement && commit);
             PlacementActive = PlacementState.Finished;
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (PlacementActive == PlacementState.Waiting)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.Select:
+                    EndPlacement(true);
+                    return true;
+
+                case GlobalAction.Back:
+                    EndPlacement(false);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         /// <summary>
