@@ -292,7 +292,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScoreFull()
         {
-            scoreMultiplier = ScoreMultiplierCalculator(new ScoreInfo() { Mods = Mods.Value.ToArray() });
+            scoreMultiplier = ScoreMultiplierCalculator(new ScoreInfo { Mods = Mods.Value.ToArray() });
             updateScore();
         }
 

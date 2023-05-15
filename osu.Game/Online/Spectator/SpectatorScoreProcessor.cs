@@ -123,7 +123,7 @@ namespace osu.Game.Online.Spectator
             scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
 
-            if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
+            if (multiplayerClient.Room?.Settings.NoScoreMultiplier == true)
             {
                 scoreInfo.ScoreMultiplierCalculator = _ => 1;
                 scoreProcessor.ScoreMultiplierCalculator = _ => 1;
