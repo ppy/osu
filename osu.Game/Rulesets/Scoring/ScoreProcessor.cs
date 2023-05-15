@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Scoring
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
-            scoreMultiplierCalculator = ScoreInfo.DefaultScoreMultiplierCalculator;
+            scoreMultiplierCalculator = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
 
             Mode.ValueChanged += _ => updateScore();
             Mods.ValueChanged += _ => updateScoreFull();

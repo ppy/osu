@@ -48,6 +48,6 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Determines how score multiplier for all displayed scores should be computed.
         /// </summary>
-        public Func<ScoreInfo, double> ScoreMultiplierCalculator { get; set; } = ScoreInfo.DefaultScoreMultiplierCalculator;
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator { get; set; } = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
     }
 }
