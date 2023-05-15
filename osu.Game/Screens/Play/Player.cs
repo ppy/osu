@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             if (Configuration.NoScoreMultiplier)
-                ScoreProcessor.ScoreMultiplier = 1;
+                ScoreProcessor.ScoreMultiplierCalculator = _ => 1;
 
             dependencies.CacheAs(ScoreProcessor);
 

@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 // recalculate score without score multiplier
                 var ruleset = Ruleset.Value.CreateInstance();
                 var scoreProcessor = ruleset.CreateScoreProcessor();
-                scoreProcessor.ScoreMultiplier = 1;
+                scoreProcessor.ScoreMultiplierCalculator = _ => 1;
 
                 foreach (var scoreInfo in scoreInfos)
                 {

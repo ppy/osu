@@ -115,7 +115,7 @@ namespace osu.Game.Scoring
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
             if (score.NoScoreMultiplier)
-                scoreProcessor.ScoreMultiplier = 1;
+                scoreProcessor.ScoreMultiplierCalculator = _ => 1;
 
             return scoreProcessor.ComputeScore(mode, score);
         }
