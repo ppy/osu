@@ -152,10 +152,19 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
-        /// <summary>
-        /// Should generally not be used to change multiplier. Use settter only to override default way of computing multiplier.
-        /// </summary>
-        public double ScoreMultiplier { get; set; } = 1;
+        private double scoreMultiplier = 1;
+
+        private Func<ScoreInfo, double> scoreMultiplierCalculator;
+
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator
+        {
+            get => scoreMultiplierCalculator;
+            set
+            {
+                scoreMultiplierCalculator = value;
+                updateScoreFull();
+            }
+        }
 
         public ScoreProcessor(Ruleset ruleset)
         {
@@ -175,16 +184,10 @@ namespace osu.Game.Rulesets.Scoring
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
+            scoreMultiplierCalculator = ScoreInfo.DefaultScoreMultiplierCalculator;
+
             Mode.ValueChanged += _ => updateScore();
-            Mods.ValueChanged += mods =>
-            {
-                ScoreMultiplier = 1;
-
-                foreach (var m in mods.NewValue)
-                    ScoreMultiplier *= m.ScoreMultiplier;
-
-                updateScore();
-            };
+            Mods.ValueChanged += _ => updateScoreFull();
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
@@ -287,6 +290,12 @@ namespace osu.Game.Rulesets.Scoring
                 scoringValues.CountBasicHitObjects--;
         }
 
+        private void updateScoreFull()
+        {
+            scoreMultiplier = ScoreMultiplierCalculator(new ScoreInfo() { Mods = Mods.Value.ToArray() });
+            updateScore();
+        }
+
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
@@ -364,7 +373,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             double accuracyScore = accuracyPortion * accuracyRatio;
             double comboScore = comboPortion * comboRatio;
-            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * ScoreMultiplier;
+            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
 
             switch (mode)
             {

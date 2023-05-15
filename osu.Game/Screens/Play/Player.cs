@@ -227,10 +227,9 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor.ScoreMultiplierCalculator = Configuration.ScoreMultiplierCalculator;
             ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
-            if (Configuration.DisableScoreMultiplier)
-                ScoreProcessor.ScoreMultiplier = 1;
 
             dependencies.CacheAs(ScoreProcessor);
 
@@ -253,7 +252,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.BeatmapHash = Beatmap.Value.BeatmapInfo.Hash;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
-            Score.ScoreInfo.IsScoreMultiplierDisabled = Configuration.DisableScoreMultiplier;
+            Score.ScoreInfo.ScoreMultiplierCalculator = Configuration.ScoreMultiplierCalculator;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor));
 
