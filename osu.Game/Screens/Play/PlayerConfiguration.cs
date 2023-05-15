@@ -3,6 +3,9 @@
 
 #nullable disable
 
+using System;
+using osu.Game.Scoring;
+
 namespace osu.Game.Screens.Play
 {
     public class PlayerConfiguration
@@ -43,8 +46,8 @@ namespace osu.Game.Screens.Play
         public bool AlwaysShowLeaderboard { get; set; }
 
         /// <summary>
-        /// Whether all displayed scores during gameplay should be shown without score multiplier applied.
+        /// Determines how score multiplier for all displayed scores should be computed.
         /// </summary>
-        public bool NoScoreMultiplier { get; set; }
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator { get; set; } = ScoreInfo.DefaultScoreMultiplierCalculator;
     }
 }

@@ -154,9 +154,9 @@ namespace osu.Game.Rulesets.Scoring
 
         private double scoreMultiplier = 1;
 
-        private Func<IReadOnlyList<Mod>, double> scoreMultiplierCalculator;
+        private Func<ScoreInfo, double> scoreMultiplierCalculator;
 
-        public Func<IReadOnlyList<Mod>, double> ScoreMultiplierCalculator
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator
         {
             get => scoreMultiplierCalculator;
             set
@@ -184,15 +184,7 @@ namespace osu.Game.Rulesets.Scoring
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
-            scoreMultiplierCalculator = mods =>
-            {
-                double scoreMultiplier = 1;
-
-                foreach (var m in mods)
-                    scoreMultiplier *= m.ScoreMultiplier;
-                
-                return scoreMultiplier;
-            };
+            scoreMultiplierCalculator = ScoreInfo.DefaultScoreMultiplierCalculator;
 
             Mode.ValueChanged += _ => updateScore();
             Mods.ValueChanged += _ => updateScoreFull();
@@ -300,7 +292,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScoreFull()
         {
-            scoreMultiplier = ScoreMultiplierCalculator(Mods.Value);
+            scoreMultiplier = ScoreMultiplierCalculator(new ScoreInfo() { Mods = Mods.Value.ToArray() });
             updateScore();
         }
 

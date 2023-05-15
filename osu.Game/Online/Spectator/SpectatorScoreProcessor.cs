@@ -117,16 +117,14 @@ namespace osu.Game.Online.Spectator
 
             Ruleset ruleset = rulesetInfo.CreateInstance();
 
+            scoreInfo = new ScoreInfo { Ruleset = rulesetInfo };
+
+            if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
+                scoreInfo.ScoreMultiplierCalculator = _ => 1;
+
             spectatorState = userState;
             scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
-            if (multiplayerClient.Room?.Settings.NoScoreMultiplier == true)
-                scoreProcessor.ScoreMultiplierCalculator = _ => 1;
-            scoreInfo = new ScoreInfo
-            {
-                Ruleset = rulesetInfo,
-                NoScoreMultiplier = multiplayerClient.Room?.Settings.NoScoreMultiplier == true
-            };
         }
 
         private void onNewFrames(int incomingUserId, FrameDataBundle bundle)

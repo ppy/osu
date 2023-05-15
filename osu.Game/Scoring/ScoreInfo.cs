@@ -185,7 +185,17 @@ namespace osu.Game.Scoring
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
         [Ignored]
-        public bool NoScoreMultiplier { get; set; }
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator { get; set; } = DefaultScoreMultiplierCalculator;
+
+        public static readonly Func<ScoreInfo, double> DefaultScoreMultiplierCalculator = s =>
+        {
+            double scoreMultiplier = 1;
+            foreach (var mod in s.Mods)
+            {
+                scoreMultiplier *= mod.ScoreMultiplier;
+            }
+            return scoreMultiplier;
+        };
 
         private Dictionary<HitResult, int>? statistics;
 

@@ -190,15 +190,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
             {
-                // recalculate score without score multiplier
-                var ruleset = Ruleset.Value.CreateInstance();
-                var scoreProcessor = ruleset.CreateScoreProcessor();
-                scoreProcessor.ScoreMultiplierCalculator = _ => 1;
-
                 foreach (var scoreInfo in scoreInfos)
                 {
-                    scoreInfo.NoScoreMultiplier = true;
-                    scoreInfo.TotalScore = scoreProcessor.ComputeScore(Rulesets.Scoring.ScoringMode.Standardised, scoreInfo);
+                    scoreInfo.ScoreMultiplierCalculator = _ => 1;
                 }
             }
 

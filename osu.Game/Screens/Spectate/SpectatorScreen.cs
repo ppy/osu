@@ -172,11 +172,15 @@ namespace osu.Game.Screens.Spectate
                     BeatmapInfo = resolvedBeatmap,
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
-                    Ruleset = resolvedRuleset.RulesetInfo,
-                    NoScoreMultiplier = multiplayerClient?.Room?.Settings.NoScoreMultiplier == true
+                    Ruleset = resolvedRuleset.RulesetInfo
                 },
                 Replay = new Replay { HasReceivedAllFrames = false },
             };
+
+            if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
+            {
+                score.ScoreInfo.ScoreMultiplierCalculator = _ => 1;
+            }
 
             var gameplayState = new SpectatorGameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 

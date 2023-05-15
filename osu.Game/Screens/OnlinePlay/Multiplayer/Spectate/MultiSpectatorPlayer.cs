@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             : base(score, new PlayerConfiguration
             {
                 AllowUserInteraction = false,
-                NoScoreMultiplier = score.ScoreInfo.NoScoreMultiplier,
+                ScoreMultiplierCalculator = score.ScoreInfo.ScoreMultiplierCalculator,
             })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
