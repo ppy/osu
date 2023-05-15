@@ -60,6 +60,9 @@ namespace osu.Game.Online.Rooms
         {
         }
 
+        /// <summary>
+        /// This constructor should only be used for test purposes.
+        /// </summary>
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
