@@ -125,7 +125,7 @@ namespace osu.Game.Online.Spectator
             scoreInfo = new ScoreInfo
             {
                 Ruleset = rulesetInfo,
-                IsScoreMultiplierDisabled = multiplayerClient.Room?.Settings.NoScoreMultiplier == true
+                NoScoreMultiplier = multiplayerClient.Room?.Settings.NoScoreMultiplier == true
             };
         }
 

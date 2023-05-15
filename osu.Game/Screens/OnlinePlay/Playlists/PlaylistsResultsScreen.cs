@@ -197,7 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 foreach (var scoreInfo in scoreInfos)
                 {
-                    scoreInfo.IsScoreMultiplierDisabled = true;
+                    scoreInfo.NoScoreMultiplier = true;
                     scoreInfo.TotalScore = scoreProcessor.ComputeScore(Rulesets.Scoring.ScoringMode.Standardised, scoreInfo);
                 }
             }

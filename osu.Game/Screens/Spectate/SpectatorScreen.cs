@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Spectate
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                     Ruleset = resolvedRuleset.RulesetInfo,
-                    IsScoreMultiplierDisabled = multiplayerClient?.Room?.Settings.NoScoreMultiplier == true
+                    NoScoreMultiplier = multiplayerClient?.Room?.Settings.NoScoreMultiplier == true
                 },
                 Replay = new Replay { HasReceivedAllFrames = false },
             };

@@ -45,6 +45,6 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether all displayed scores during gameplay should be shown without score multiplier applied.
         /// </summary>
-        public bool DisableScoreMultiplier { get; set; }
+        public bool NoScoreMultiplier { get; set; }
     }
 }
