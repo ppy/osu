@@ -190,7 +190,7 @@ namespace osu.Game.Scoring
         public static readonly Func<ScoreInfo, double> DEFAULT_SCORE_MULTIPLIER_CALCULATOR = s =>
         {
             double scoreMultiplier = 1;
-            
+
             foreach (var mod in s.Mods)
             {
                 scoreMultiplier *= mod.ScoreMultiplier;
