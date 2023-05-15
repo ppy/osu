@@ -317,12 +317,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private void commitIfPlacementActive()
+        {
+            CurrentPlacement?.EndPlacement(CurrentPlacement.PlacementActive == PlacementBlueprint.PlacementState.Active);
+            removePlacement();
+        }
+
         private void removePlacement()
         {
-            if (CurrentPlacement == null) return;
-
-            CurrentPlacement.EndPlacement(false);
-            CurrentPlacement.Expire();
+            CurrentPlacement?.EndPlacement(false);
+            CurrentPlacement?.Expire();
             CurrentPlacement = null;
         }
 
@@ -342,7 +346,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 currentTool = value;
 
-                refreshTool();
+                // As per stable editor, when changing tools, we should forcefully commit any pending placement.
+                commitIfPlacementActive();
             }
         }
     }
