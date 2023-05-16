@@ -29,8 +29,10 @@ using ChatStrings = osu.Game.Localisation.ChatStrings;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class DrawableUsername : OsuClickableContainer, IHasContextMenu
+    public partial class DrawableChatUsername : OsuClickableContainer, IHasContextMenu
     {
+        public Action? ReportRequested;
+
         public Color4 AccentColour { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableUsername(APIUser user)
+        public DrawableChatUsername(APIUser user)
         {
             this.user = user;
 
@@ -168,6 +170,9 @@ namespace osu.Game.Overlays.Chat
                         currentChannel.Value.TextBoxMessage.Value += $"@{user.Username} ";
                     }));
                 }
+
+                if (!user.Equals(api.LocalUser.Value))
+                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, ReportRequested));
 
                 return items.ToArray();
             }

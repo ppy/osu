@@ -77,5 +77,39 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("object has non-zero duration", () => EditorBeatmap.HitObjects.OfType<IHasDuration>().Single().Duration > 0);
         }
+
+        [Test]
+        public void TestDisallowRepeatsOnZeroDurationObjects()
+        {
+            DragArea dragArea;
+
+            AddStep("add zero length slider", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 2700
+                });
+            });
+
+            AddStep("hold down drag bar", () =>
+            {
+                // distinguishes between the actual drag bar and its "underlay shadow".
+                dragArea = this.ChildrenOfType<DragArea>().Single(bar => bar.HandlePositionalInput);
+                InputManager.MoveMouseTo(dragArea);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("try to extend drag bar", () =>
+            {
+                var blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().Single();
+                InputManager.MoveMouseTo(blueprint.SelectionQuad.TopLeft + new Vector2(100, 0));
+            });
+
+            AddStep("release button", () => InputManager.PressButton(MouseButton.Left));
+
+            AddAssert("object has zero repeats", () => EditorBeatmap.HitObjects.OfType<IHasRepeats>().Single().RepeatCount == 0);
+        }
     }
 }
