@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -28,6 +29,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Status.BindValueChanged(_ => updateDisplay(), true);
 
             FinishTransforms(true);
+
+            TextFlow.Colour = Colour4.Black;
         }
 
         private void updateDisplay()
