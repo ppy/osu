@@ -6,6 +6,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -20,6 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             Pill.Background.Colour = colours.Pink;
             Pill.Background.Alpha = 1;
+            TextFlow.Colour = Color4.Black;
 
             Category.BindValueChanged(c =>
             {
