@@ -193,16 +193,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
-                resolutions.RemoveRange(1, resolutions.Count - 1);
-
-                if (display.NewValue != null)
-                {
-                    resolutions.AddRange(display.NewValue.DisplayModes
-                                                .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                                .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
-                                                .Select(m => m.Size)
-                                                .Distinct());
-                }
+                resolutions.ReplaceRange(1, resolutions.Count - 1, display.NewValue.DisplayModes
+                                                                          .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                                          .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
+                                                                          .Select(m => m.Size)
+                                                                          .Distinct());
 
                 updateDisplaySettingsVisibility();
             }), true);
