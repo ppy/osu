@@ -34,11 +34,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             RoomStatus status = getDisplayStatus();
 
-            pill.Background.Alpha = 1;
-            pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
+            Pill.Background.Alpha = 1;
+            Pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
 
-            textFlow.Clear();
-            textFlow.AddText(status.Message);
+            TextFlow.Clear();
+            TextFlow.AddText(status.Message);
         }
 
         private RoomStatus getDisplayStatus()
