@@ -6,7 +6,6 @@
 using System.Linq;
 using Humanizer;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
