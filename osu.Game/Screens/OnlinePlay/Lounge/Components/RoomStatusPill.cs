@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
