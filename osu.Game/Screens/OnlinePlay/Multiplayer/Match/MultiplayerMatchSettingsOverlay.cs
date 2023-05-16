@@ -262,7 +262,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                             },
                                                                             NoScoreMultiplierCheckbox = new OsuCheckbox
                                                                             {
-                                                                                LabelText = "Disable mod score multiplier"
+                                                                                LabelText = "Display scores without mod multipliers"
                                                                             }
                                                                         }
                                                                     }
