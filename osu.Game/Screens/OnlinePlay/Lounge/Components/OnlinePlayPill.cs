@@ -12,8 +12,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public partial class OnlinePlayPill : OnlinePlayComposite
     {
-        protected PillContainer pill;
-        protected OsuTextFlowContainer textFlow;
+        protected PillContainer Pill;
+        protected OsuTextFlowContainer TextFlow;
 
         public OnlinePlayPill()
         {
@@ -23,9 +23,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = pill = new PillContainer
+            InternalChild = Pill = new PillContainer
             {
-                Child = textFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
+                Child = TextFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,

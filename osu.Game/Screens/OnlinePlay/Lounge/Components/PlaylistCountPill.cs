@@ -32,10 +32,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 ? Playlist.Count(i => !i.Expired)
                 : PlaylistItemStats.Value.CountActive;
 
-            textFlow.Clear();
-            textFlow.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
-            textFlow.AddText(" ");
-            textFlow.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
+            TextFlow.Clear();
+            TextFlow.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            TextFlow.AddText(" ");
+            TextFlow.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
         }
     }
 }

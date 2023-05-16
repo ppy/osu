@@ -18,17 +18,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            pill.Background.Colour = colours.Pink;
-            pill.Background.Alpha = 1;
+            Pill.Background.Colour = colours.Pink;
+            Pill.Background.Alpha = 1;
 
             Category.BindValueChanged(c =>
             {
-                textFlow.Clear();
-                textFlow.AddText(c.NewValue.GetLocalisableDescription());
+                TextFlow.Clear();
+                TextFlow.AddText(c.NewValue.GetLocalisableDescription());
 
                 var backgroundColour = colours.ForRoomCategory(Category.Value);
                 if (backgroundColour != null)
-                    pill.Background.Colour = backgroundColour.Value;
+                    Pill.Background.Colour = backgroundColour.Value;
             }, true);
         }
     }
