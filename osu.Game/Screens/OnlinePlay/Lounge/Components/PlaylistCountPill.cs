@@ -5,40 +5,17 @@
 
 using System.Linq;
 using Humanizer;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     /// <summary>
     /// A pill that displays the playlist item count.
     /// </summary>
-    public partial class PlaylistCountPill : OnlinePlayComposite
+    public partial class PlaylistCountPill : OnlinePlayPill
     {
-        private OsuTextFlowContainer count;
-
-        public PlaylistCountPill()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InternalChild = new PillContainer
-            {
-                Child = count = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
-            };
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -55,10 +32,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 ? Playlist.Count(i => !i.Expired)
                 : PlaylistItemStats.Value.CountActive;
 
-            count.Clear();
-            count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
-            count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
+            textFlow.Clear();
+            textFlow.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            textFlow.AddText(" ");
+            textFlow.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
         }
     }
 }
