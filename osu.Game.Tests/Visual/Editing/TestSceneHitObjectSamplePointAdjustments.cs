@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE - new Vector2(100, 0)) / 2,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 80)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: 80)
                     }
                 });
 
