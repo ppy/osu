@@ -535,13 +535,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 IsLayered = isLayered;
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
                 => With(newName, newBank, newVolume);
 
-            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<int> newCustomSampleBank = default,
                                                     Optional<bool> newIsLayered = default)
-                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank) ?? Bank, newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
+                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
                 // The additions to equality checks here are *required* to ensure that pooling works correctly.
@@ -573,7 +573,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Path.ChangeExtension(Filename, null)
             };
 
-            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                             Optional<int> newCustomSampleBank = default,
                                                             Optional<bool> newIsLayered = default)
                 => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));

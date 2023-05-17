@@ -76,8 +76,8 @@ namespace osu.Game.Audio
         /// <param name="newSuffix">An optional new lookup suffix.</param>
         /// <param name="newVolume">An optional new volume.</param>
         /// <returns>The new <see cref="HitSampleInfo"/>.</returns>
-        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
-            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank) ?? Bank, newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
+        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
         public bool Equals(HitSampleInfo? other)
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
