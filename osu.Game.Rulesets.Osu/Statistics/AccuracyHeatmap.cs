@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -64,34 +65,36 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 FillMode = FillMode.Fit,
                 Children = new Drawable[]
                 {
-                    new CircularContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(inner_portion),
-                        Masking = true,
-                        BorderThickness = line_thickness,
-                        BorderColour = Color4.White,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#202624")
-                        }
-                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
+                            new CircularContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(inner_portion),
+                                Masking = true,
+                                BorderThickness = line_thickness,
+                                BorderColour = Color4.White,
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#202624")
+                                }
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(1),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Rotation = rotation,
                                 Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
                                     Children = new Drawable[]
                                     {
                                         new Box
@@ -100,9 +103,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                             Origin = Anchor.Centre,
                                             EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness / 2,
-                                            Rotation = -rotation,
+                                            Width = line_thickness / 2, // adjust for edgesmoothness
+                                            Height = MathF.Sqrt(2),
+                                            Rotation = -rotation * 2,
                                             Alpha = 0.3f,
                                         },
                                         new Box
@@ -111,9 +114,44 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                             Origin = Anchor.Centre,
                                             EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
                                             Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Rotation = rotation
+                                            Height = MathF.Sqrt(2),
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Next",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.BottomRight,
+                                            Padding = new MarginPadding(3),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -inner_portion / 2,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "object",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.BottomLeft,
+                                            Padding = new MarginPadding(3),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -inner_portion / 2,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Last",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopRight,
+                                            Padding = new MarginPadding(3),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = inner_portion / 2,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "object",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopLeft,
+                                            Padding = new MarginPadding(3),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = inner_portion / 2,
                                         },
                                     }
                                 },
