@@ -119,14 +119,13 @@ namespace osu.Game.Screens.Select
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            base.OnMouseUp(e);
+
             if (e.Button == MouseButton.Right && IsHovered)
             {
                 rewindSearch = true;
                 TriggerClick();
-                return;
             }
-
-            base.OnMouseUp(e);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
