@@ -410,6 +410,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     });
                 }
 
+                // Add a fake 1/1 at the end to give context.
+                AddInternal(new Tick(1)
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.Centre,
+                    Depth = float.MaxValue,
+                    Alpha = 0.05f,
+                    Colour = BindableBeatDivisor.GetColourFor(1, colours),
+                });
+
                 AddInternal(marker = new Marker());
                 CurrentNumber.ValueChanged += moveMarker;
                 CurrentNumber.TriggerChange();
@@ -483,7 +493,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => 1 - 1 / divisor;
 
             private partial class Tick : Circle
             {
