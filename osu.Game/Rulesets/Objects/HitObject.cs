@@ -210,10 +210,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="sampleName">The name of the sample.</param>
         /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
-        protected HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
+        public HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
         {
             var hitnormalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
-            return hitnormalSample == null ? new HitSampleInfo(sampleName) : hitnormalSample.With(newName: sampleName);
+            return hitnormalSample == null ? new HitSampleInfo(sampleName, SampleControlPoint.DEFAULT_BANK, volume: 100) : hitnormalSample.With(newName: sampleName);
         }
     }
 

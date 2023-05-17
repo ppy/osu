@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private const float circle_size = 38;
 
         private Container? repeatsContainer;
+        private Container? nodeSamplesContainer;
 
         public Action<DragEvent?>? OnDragHandled = null!;
 
@@ -49,6 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Border border;
 
         private readonly Container colouredComponents;
+        private readonly Container sampleComponents;
         private readonly OsuSpriteText comboIndexText;
 
         [Resolved]
@@ -101,10 +103,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
+                sampleComponents = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre
+                    OriginPosition = Item is IHasRepeats ? new Vector2(10, 0) : new Vector2(2, 0),
+                    Y = 17
                 },
             });
 
@@ -231,6 +238,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 repeatsContainer.Add(new Tick
                 {
                     X = (float)(i + 1) / (repeats.RepeatCount + 1)
+                });
+            }
+
+            // Add node sample pieces
+            nodeSamplesContainer?.Expire();
+
+            sampleComponents.Add(nodeSamplesContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            for (int i = 0; i < repeats.RepeatCount + 2; i++)
+            {
+                nodeSamplesContainer.Add(new NodeSamplePointPiece(Item, i)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    RelativePositionAxes = Axes.X,
+                    OriginPosition = i == 0 ? new Vector2(-6, 0) : new Vector2(2, 0),
+                    X = (float)i / (repeats.RepeatCount + 1),
+                    Y = 17,
                 });
             }
         }
