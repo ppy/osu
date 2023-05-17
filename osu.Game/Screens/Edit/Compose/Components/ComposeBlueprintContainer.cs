@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 case TernaryState.True:
                     if (existingSample == null)
-                        samples.Add(CurrentPlacement.HitObject.GetSampleInfo(sampleName));
+                        samples.Add(CurrentPlacement.HitObject.CreateHitSampleInfo(sampleName));
                     break;
             }
         }
