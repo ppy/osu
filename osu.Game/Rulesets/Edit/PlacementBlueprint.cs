@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         public readonly HitObject HitObject;
 
         [Resolved]
-        protected EditorClock? EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; } = null!;
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Edit
         {
             if (PlacementActive == PlacementState.Waiting)
             {
-                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+                HitObject.StartTime = result.Time ?? EditorClock.CurrentTime;
 
                 if (HitObject is IHasComboInformation comboInformation)
                     comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
