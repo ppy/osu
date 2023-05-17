@@ -44,6 +44,8 @@ namespace osu.Game.Rulesets.Edit
 
         private Bindable<double> startTimeBindable = null!;
 
+        private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
+
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
 
@@ -84,7 +86,7 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement(bool commitStart = false)
         {
             // Take the hitnormal sample of the last hit object
-            var lastHitNormal = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
             if (lastHitNormal != null)
                 HitObject.Samples[0] = lastHitNormal;
 
