@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -12,8 +10,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public abstract partial class OnlinePlayPill : OnlinePlayComposite
     {
-        protected PillContainer Pill;
-        protected OsuTextFlowContainer TextFlow;
+        protected PillContainer Pill { get; private set; } = null!;
+        protected OsuTextFlowContainer TextFlow { get; private set; } = null!;
 
         protected OnlinePlayPill()
         {

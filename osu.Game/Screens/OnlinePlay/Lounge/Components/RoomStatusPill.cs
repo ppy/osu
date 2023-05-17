@@ -30,17 +30,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             FinishTransforms(true);
 
             TextFlow.Colour = Colour4.Black;
+            Pill.Background.Alpha = 1;
         }
 
         private void updateDisplay()
         {
             RoomStatus status = getDisplayStatus();
 
-            Pill.Background.Alpha = 1;
             Pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
-
-            TextFlow.Clear();
-            TextFlow.AddText(status.Message);
+            TextFlow.Text = status.Message;
         }
 
         private RoomStatus getDisplayStatus()

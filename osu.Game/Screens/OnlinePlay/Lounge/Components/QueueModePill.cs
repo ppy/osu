@@ -20,8 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void onQueueModeChanged(ValueChangedEvent<QueueMode> mode)
         {
-            TextFlow.Clear();
-            TextFlow.AddText(mode.NewValue.GetLocalisableDescription());
+            TextFlow.Text = mode.NewValue.GetLocalisableDescription();
         }
     }
 }

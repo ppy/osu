@@ -20,8 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void onMatchTypeChanged(ValueChangedEvent<MatchType> type)
         {
-            TextFlow.Clear();
-            TextFlow.AddText(type.NewValue.GetLocalisableDescription());
+            TextFlow.Text = type.NewValue.GetLocalisableDescription();
         }
     }
 }

@@ -19,18 +19,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            Pill.Background.Colour = colours.Pink;
             Pill.Background.Alpha = 1;
             TextFlow.Colour = Color4.Black;
 
             Category.BindValueChanged(c =>
             {
-                TextFlow.Clear();
-                TextFlow.AddText(c.NewValue.GetLocalisableDescription());
-
-                var backgroundColour = colours.ForRoomCategory(Category.Value);
-                if (backgroundColour != null)
-                    Pill.Background.Colour = backgroundColour.Value;
+                TextFlow.Text = c.NewValue.GetLocalisableDescription();
+                Pill.Background.Colour = colours.ForRoomCategory(c.NewValue) ?? colours.Pink;
             }, true);
         }
     }
