@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -148,7 +149,12 @@ namespace osu.Game.Rulesets.Edit
         public virtual void UpdateTimeAndPosition(SnapResult result)
         {
             if (PlacementActive == PlacementState.Waiting)
+            {
                 HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+
+                if (HitObject is IHasComboInformation comboInformation)
+                    comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
+            }
         }
 
         /// <summary>
