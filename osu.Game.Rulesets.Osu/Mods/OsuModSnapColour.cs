@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -19,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         private readonly OsuColour colours = new OsuColour();
 
-        [Resolved]
         private IBeatmap? currentBeatmap { get; set; }
 
         public void ApplyToBeatmap(IBeatmap beatmap)
