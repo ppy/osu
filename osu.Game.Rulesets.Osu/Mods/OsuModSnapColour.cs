@@ -33,10 +33,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (currentBeatmap.IsNull() || drawable.IsNull()) return;
 
-            drawable.OnUpdate += _ =>
-                drawable.AccentColour.Value = BindableBeatDivisor.GetColourFor(
-                    currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(drawable.HitObject.StartTime),
-                    colours);
+            drawable.ApplyCustomUpdateState += (drawableObject, state) =>
+            {
+                int snapDivisor = currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(drawableObject.HitObject.StartTime);
+
+                drawableObject.EnableComboColour = false;
+                drawableObject.AccentColour.Value = BindableBeatDivisor.GetColourFor(snapDivisor, colours);
+            };
         }
     }
 }
