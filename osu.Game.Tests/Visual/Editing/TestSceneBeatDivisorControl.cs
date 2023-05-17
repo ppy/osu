@@ -42,7 +42,8 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(90, 90)
+                    Size = new Vector2(90, 90),
+                    Scale = new Vector2(3),
                 }
             };
         });
