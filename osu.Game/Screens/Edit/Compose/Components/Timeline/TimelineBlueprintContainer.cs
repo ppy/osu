@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
-                placementBlueprint.Colour = Color4.MediumPurple;
+                placementBlueprint.Colour = OsuColour.Gray(0.9f);
 
                 SelectionBlueprints.Add(placementBlueprint);
             }
