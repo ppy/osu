@@ -75,6 +75,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
 
         /// <summary>
+        /// Whether this object should be coloured using its combo position
+        /// </summary>
+        public bool EnableComboColour { get; set; } = true;
+
+        /// <summary>
         /// Invoked by this or a nested <see cref="DrawableHitObject"/> after a <see cref="JudgementResult"/> has been applied.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnNewResult;
@@ -528,6 +533,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected void UpdateComboColour()
         {
             if (!(HitObject is IHasComboInformation combo)) return;
+            if (!EnableComboColour) return;
 
             Color4 colour = combo.GetComboColour(CurrentSkin);
 
