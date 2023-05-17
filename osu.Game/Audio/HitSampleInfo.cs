@@ -45,7 +45,7 @@ namespace osu.Game.Audio
         /// </summary>
         public int Volume { get; }
 
-        public HitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
+        public HitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 100)
         {
             Name = name;
             Bank = bank;
