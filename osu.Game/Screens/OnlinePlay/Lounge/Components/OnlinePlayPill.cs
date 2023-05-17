@@ -10,12 +10,12 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class OnlinePlayPill : OnlinePlayComposite
+    public abstract partial class OnlinePlayPill : OnlinePlayComposite
     {
         protected PillContainer Pill;
         protected OsuTextFlowContainer TextFlow;
 
-        public OnlinePlayPill()
+        protected OnlinePlayPill()
         {
             AutoSizeAxes = Axes.Both;
         }
