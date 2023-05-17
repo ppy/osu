@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -38,16 +36,16 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly HitObject HitObject;
 
-        [Resolved(canBeNull: true)]
-        protected EditorClock EditorClock { get; private set; }
+        [Resolved]
+        protected EditorClock? EditorClock { get; private set; }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
-        private Bindable<double> startTimeBindable;
+        private Bindable<double> startTimeBindable = null!;
 
         [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        private IPlacementHandler placementHandler { get; set; } = null!;
 
         /// <summary>
         /// Whether this blueprint is currently in a state that can be committed.
