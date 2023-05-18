@@ -107,15 +107,13 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
         {
+            // Shortcut to avoid potentially creating many ruleset objects in the default scoring mode.
             if (mode == ScoringMode.Standardised)
                 return score.TotalScore;
 
-            var ruleset = score.Ruleset.CreateInstance();
-            var scoreProcessor = ruleset.CreateScoreProcessor();
-            scoreProcessor.Mods.Value = score.Mods;
-
-            // Todo: This loses precision because we're dealing with pre-rounded total scores.
-            return scoreProcessor.ConvertToClassic(score.TotalScore);
+            return score.Ruleset.CreateInstance()
+                        .CreateScoreProcessor()
+                        .ComputeScore(mode, score);
         }
 
         /// <summary>
