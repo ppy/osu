@@ -98,6 +98,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Ruleset Ruleset;
 
         /// <summary>
+        /// The maximum achievable total score.
+        /// </summary>
+        public long MaxTotalScore { get; private set; }
+
+        /// <summary>
         /// The sum of all basic judgements at the current time.
         /// </summary>
         private double currentBasicScore;
@@ -334,6 +339,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 maximumResultCounts.Clear();
                 maximumResultCounts.AddRange(scoreResultCounts);
+
+                MaxTotalScore = TotalScore.Value;
             }
 
             scoreResultCounts.Clear();
