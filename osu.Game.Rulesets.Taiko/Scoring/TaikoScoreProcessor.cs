@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -12,10 +12,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
     {
         private const double combo_base = 4;
 
-        protected override double ClassicScoreMultiplier => 22;
-
-        public TaikoScoreProcessor(Ruleset ruleset)
-            : base(ruleset)
+        public TaikoScoreProcessor()
+            : base(new TaikoRuleset())
         {
         }
 

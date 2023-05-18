@@ -18,7 +18,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract partial class ScoreProcessor : JudgementProcessor
+    public partial class ScoreProcessor : JudgementProcessor
     {
         public const double MAX_SCORE = 1000000;
 
@@ -81,11 +81,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Intended for use with various statistics displays.
         /// </summary>
         public IReadOnlyList<HitEvent> HitEvents => hitEvents;
-
-        /// <summary>
-        /// An arbitrary multiplier to scale scores in the <see cref="ScoringMode.Classic"/> scoring mode.
-        /// </summary>
-        protected virtual double ClassicScoreMultiplier => 36;
 
         /// <summary>
         /// The ruleset this score processor is valid for.
@@ -162,7 +157,7 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
-        protected ScoreProcessor(Ruleset ruleset)
+        public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
 
@@ -289,7 +284,16 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(ComputeTotalScore());
         }
 
-        protected abstract double ComputeTotalScore();
+        protected virtual double ComputeTotalScore()
+        {
+            return
+                (int)Math.Round
+                ((
+                    700000 * ComboPortion / MaxComboPortion +
+                    300000 * Math.Pow(Accuracy.Value, 10) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                    BonusPortion
+                ) * ScoreMultiplier);
+        }
 
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
