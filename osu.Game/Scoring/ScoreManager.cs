@@ -20,6 +20,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
@@ -105,16 +106,7 @@ namespace osu.Game.Scoring
         /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
         /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
         /// <returns>The total score.</returns>
-        public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
-        {
-            // Shortcut to avoid potentially creating many ruleset objects in the default scoring mode.
-            if (mode == ScoringMode.Standardised)
-                return score.TotalScore;
-
-            return score.Ruleset.CreateInstance()
-                        .CreateScoreProcessor()
-                        .ComputeScore(mode, score);
-        }
+        public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised) => score.GetDisplayScore(mode);
 
         /// <summary>
         /// Retrieves the maximum achievable combo for the provided score.
