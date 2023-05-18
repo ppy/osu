@@ -42,9 +42,29 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.9,
         };
 
-        private ScoreProcessor scoreProcessor = null!;
+        private int baseScore;
+        private int maxBaseScore;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor) => this.scoreProcessor = scoreProcessor;
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            scoreProcessor.NewJudgement += j =>
+            {
+                if (!j.Type.AffectsAccuracy())
+                    return;
+
+                baseScore += Judgement.ToNumericResult(j.Type);
+                maxBaseScore += Judgement.ToNumericResult(j.Judgement.MaxResult);
+            };
+
+            scoreProcessor.JudgementReverted += j =>
+            {
+                if (!j.Type.AffectsAccuracy())
+                    return;
+
+                baseScore -= Judgement.ToNumericResult(j.Type);
+                maxBaseScore -= Judgement.ToNumericResult(j.Judgement.MaxResult);
+            };
+        }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
@@ -58,16 +78,11 @@ namespace osu.Game.Rulesets.Mods
 
         private double getAccuracyWithImminentResultAdded(JudgementResult result)
         {
-            var score = new ScoreInfo { Ruleset = scoreProcessor.Ruleset.RulesetInfo };
+            // baseScore and maxBaseScore are always exactly one judgement behind because the health processor is processed first (see: Player).
+            int imminentBaseScore = baseScore + Judgement.ToNumericResult(result.Type);
+            int imminentMaxBaseScore = maxBaseScore + Judgement.ToNumericResult(result.Judgement.MaxResult);
 
-            // This is super ugly, but if we don't do it this way we will not have the most recent result added to the accuracy value.
-            // Hopefully we can improve this in the future.
-            scoreProcessor.PopulateScore(score);
-            score.Statistics[result.Type]++;
-
-            // Todo:
-            return 0;
-            // return scoreProcessor.ComputeAccuracy(score);
+            return imminentMaxBaseScore > 0 ? imminentBaseScore / (double)imminentMaxBaseScore : 1;
         }
     }
 }
