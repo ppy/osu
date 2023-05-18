@@ -153,12 +153,10 @@ namespace osu.Game.Online.Spectator
             scoreInfo.MaxCombo = frame.Header.MaxCombo;
             scoreInfo.Statistics = frame.Header.Statistics;
             scoreInfo.MaximumStatistics = spectatorState.MaximumStatistics;
+            scoreInfo.TotalScore = frame.Header.TotalScore;
 
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
-
-            // Todo:
-            // TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, scoreInfo);
         }
 
         protected override void Dispose(bool isDisposing)
