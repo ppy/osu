@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -13,15 +13,13 @@ namespace osu.Game.Rulesets.Catch.Scoring
         private const int combo_cap = 200;
         private const double combo_base = 4;
 
-        protected override double ClassicScoreMultiplier => 28;
-
         private double tinyDropletScale;
 
         private int maximumTinyDroplets;
         private int hitTinyDroplets;
 
-        public CatchScoreProcessor(Ruleset ruleset)
-            : base(ruleset)
+        public CatchScoreProcessor()
+            : base(new CatchRuleset())
         {
         }
 
