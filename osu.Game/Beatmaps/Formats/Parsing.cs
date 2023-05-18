@@ -17,9 +17,9 @@ namespace osu.Game.Beatmaps.Formats
 
         public const double MAX_PARSE_VALUE = int.MaxValue;
 
-        public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE, bool allowNaN = false)
+        public static float ParseFloat(ReadOnlySpan<char> input, float parseLimit = (float)MAX_PARSE_VALUE, bool allowNaN = false)
         {
-            float output = float.Parse(input, CultureInfo.InvariantCulture);
+            float output = float.Parse(input, provider: CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
@@ -29,9 +29,9 @@ namespace osu.Game.Beatmaps.Formats
             return output;
         }
 
-        public static double ParseDouble(string input, double parseLimit = MAX_PARSE_VALUE, bool allowNaN = false)
+        public static double ParseDouble(ReadOnlySpan<char> input, double parseLimit = MAX_PARSE_VALUE, bool allowNaN = false)
         {
-            double output = double.Parse(input, CultureInfo.InvariantCulture);
+            double output = double.Parse(input, provider: CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
@@ -41,9 +41,9 @@ namespace osu.Game.Beatmaps.Formats
             return output;
         }
 
-        public static int ParseInt(string input, int parseLimit = (int)MAX_PARSE_VALUE)
+        public static int ParseInt(ReadOnlySpan<char> input, int parseLimit = (int)MAX_PARSE_VALUE)
         {
-            int output = int.Parse(input, CultureInfo.InvariantCulture);
+            int output = int.Parse(input, provider: CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");

@@ -3,10 +3,12 @@
 
 #nullable disable
 
+using System;
+
 namespace osu.Game.Rulesets.Objects
 {
     public abstract class HitObjectParser
     {
-        public abstract HitObject Parse(string text);
+        public abstract HitObject Parse(ReadOnlySpan<char> text);
     }
 }

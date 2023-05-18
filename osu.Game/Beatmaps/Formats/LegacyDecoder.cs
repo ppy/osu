@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
 using osuTK.Graphics;
@@ -33,21 +35,22 @@ namespace osu.Game.Beatmaps.Formats
 
             while ((line = stream.ReadLine()) != null)
             {
+                ReadOnlySpan<char> lineSpan = line;
                 if (ShouldSkipLine(line))
                     continue;
 
                 if (section != Section.Metadata)
                 {
                     // comments should not be stripped from metadata lines, as the song metadata may contain "//" as valid data.
-                    line = StripComments(line);
+                    lineSpan = StripComments(lineSpan);
                 }
 
-                line = line.TrimEnd();
+                lineSpan = lineSpan.TrimEnd();
 
-                if (line.StartsWith('[') && line.EndsWith(']'))
+                if (lineSpan[0] == '[' && lineSpan[^1] == ']')
                 {
-                    if (!Enum.TryParse(line[1..^1], out section))
-                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
+                    if (!Enum.TryParse(lineSpan[1..^1], out section))
+                        Logger.Log($"Unknown section \"{lineSpan}\" in \"{output}\"");
 
                     OnBeginNewSection(section);
                     continue;
@@ -55,11 +58,11 @@ namespace osu.Game.Beatmaps.Formats
 
                 try
                 {
-                    ParseLine(output, section, line);
+                    ParseLine(output, section, lineSpan);
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
+                    Logger.Log($"Failed to process line \"{lineSpan}\" into \"{output}\": {e.Message}");
                 }
             }
         }
@@ -74,7 +77,7 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        protected virtual void ParseLine(T output, Section section, string line)
+        protected virtual void ParseLine(T output, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -84,36 +87,40 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected string StripComments(string line)
+        protected ReadOnlySpan<char> StripComments(ReadOnlySpan<char> line)
         {
-            int index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.IndexOf("//");
             if (index > 0)
-                return line.Substring(0, index);
+                return line[..index];
 
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        protected void HandleColours<TModel>(TModel output, ReadOnlySpan<char> line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
-            string[] split = pair.Value.Split(',');
-
-            if (split.Length != 3 && split.Length != 4)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
-
             Color4 colour;
 
             try
             {
-                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
+                var split = pair.Value.Split(',');
+
+                split.MoveNext();
+                byte r = byte.Parse(split.Current);
+                split.MoveNext();
+                byte g = byte.Parse(split.Current);
+                split.MoveNext();
+                byte b = byte.Parse(split.Current);
+
+                byte alpha = allowAlpha && split.MoveNext() ? byte.Parse(split.Current) : (byte)255;
+                colour = new Color4(r, g, b, alpha);
             }
             catch
             {
-                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+                throw new InvalidOperationException($@"Color must be specified in R,G,B or R,G,B,A with 8-bit integer components. Got {pair.Value}.");
             }
 
             if (isCombo)
@@ -126,7 +133,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
 
-                tHasCustomColours.CustomColours[pair.Key] = colour;
+                tHasCustomColours.CustomColours[pair.Key.ToString()] = colour;
             }
         }
 
@@ -141,10 +148,54 @@ namespace osu.Game.Beatmaps.Formats
             );
         }
 
-        protected string CleanFilename(string path) => path
+        protected ref struct SpanKeyValuePair
+        {
+            // Use tuple when ref struct in generic parameter is a thing
+            public ReadOnlySpan<char> Key;
+            public ReadOnlySpan<char> Value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected SpanKeyValuePair SplitKeyVal(ReadOnlySpan<char> line, char separator = ':', bool shouldTrim = true)
+        {
+            // https://github.com/dotnet/runtime/issues/934
+            int index = line.IndexOf(separator);
+
+            if (shouldTrim)
+            {
+                return index == -1
+                    ? new SpanKeyValuePair
+                    {
+                        Key = line.Trim(),
+                        Value = default
+                    }
+                    : new SpanKeyValuePair
+                    {
+                        Key = line[0..index].Trim(),
+                        Value = line[(index + 1)..].Trim()
+                    };
+            }
+            else
+            {
+                return index == -1
+                    ? new SpanKeyValuePair
+                    {
+                        Key = line,
+                        Value = default
+                    }
+                    : new SpanKeyValuePair
+                    {
+                        Key = line[0..index],
+                        Value = line[(index + 1)..]
+                    };
+            }
+        }
+
+        protected string CleanFilename(ReadOnlySpan<char> path) => path
+                                                       .Trim('"')
+                                                       .ToString()
                                                        // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
                                                        .Replace(@"\\", @"\")
-                                                       .Trim('"')
                                                        .ToStandardisedPath();
 
         public enum Section

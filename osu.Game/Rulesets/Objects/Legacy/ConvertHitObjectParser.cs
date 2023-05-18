@@ -3,20 +3,20 @@
 
 #nullable disable
 
-using osuTK;
-using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.Audio;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Utils;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Extensions;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -44,15 +44,23 @@ namespace osu.Game.Rulesets.Objects.Legacy
         }
 
         [CanBeNull]
-        public override HitObject Parse(string text)
+        public override HitObject Parse(ReadOnlySpan<char> text)
         {
-            string[] split = text.Split(',');
+            var split = text.Split(',');
 
-            Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
+            split.MoveNext(); // split[0]
+            var posX = split.Current;
+            split.MoveNext(); // split[1]
+            var posY = split.Current;
+            Vector2 pos = new Vector2((int)Parsing.ParseFloat(posX, Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(posY, Parsing.MAX_COORDINATE_VALUE));
 
-            double startTime = Parsing.ParseDouble(split[2]) + Offset;
+            split.MoveNext(); // split[2]
+            var startTimeSpan = split.Current;
+            double startTime = Parsing.ParseDouble(startTimeSpan) + Offset;
 
-            LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(split[3]);
+            split.MoveNext(); // split[3]
+            var typeSpan = split.Current;
+            LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(typeSpan);
 
             int comboOffset = (int)(type & LegacyHitObjectType.ComboOffset) >> 4;
             type &= ~LegacyHitObjectType.ComboOffset;
@@ -60,7 +68,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bool combo = type.HasFlagFast(LegacyHitObjectType.NewCombo);
             type &= ~LegacyHitObjectType.NewCombo;
 
-            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
+            split.MoveNext(); // split[4]
+            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split.Current);
             var bankInfo = new SampleBankInfo();
 
             HitObject result = null;
@@ -69,14 +78,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 result = CreateHit(pos, combo, comboOffset);
 
-                if (split.Length > 5)
-                    readCustomSampleBanks(split[5], bankInfo);
+                if (split.MoveNext()) // split[5]
+                    readCustomSampleBanks(split.Current, bankInfo);
             }
             else if (type.HasFlagFast(LegacyHitObjectType.Slider))
             {
+                split.MoveNext(); // split[5]
+                var pointSpan = split.Current;
+
                 double? length = null;
 
-                int repeatCount = Parsing.ParseInt(split[6]);
+                split.MoveNext(); // split[6]
+                int repeatCount = Parsing.ParseInt(split.Current);
 
                 if (repeatCount > 9000)
                     throw new FormatException(@"Repeat count is way too high");
@@ -84,15 +97,24 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
 
-                if (split.Length > 7)
+                split.MoveNext(); // split[7]
+                var lengthSpan = split.Current;
+                split.MoveNext(); // split[8]
+                var perNodeSound = split.Current;
+                split.MoveNext(); // split[9]
+                var perNodeSample = split.Current;
+                split.MoveNext(); // split[10]
+                var sampleBanks = split.Current;
+
+                if (!lengthSpan.IsEmpty)
                 {
-                    length = Math.Max(0, Parsing.ParseDouble(split[7], Parsing.MAX_COORDINATE_VALUE));
+                    length = Math.Max(0, Parsing.ParseDouble(lengthSpan, Parsing.MAX_COORDINATE_VALUE));
                     if (length == 0)
                         length = null;
                 }
 
-                if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo, true);
+                if (!sampleBanks.IsEmpty)
+                    readCustomSampleBanks(sampleBanks, bankInfo, true);
 
                 // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
@@ -103,17 +125,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     nodeBankInfos.Add(bankInfo.Clone());
 
                 // Read any per-node sample banks
-                if (split.Length > 9 && split[9].Length > 0)
+                if (!perNodeSample.IsEmpty)
                 {
-                    string[] sets = split[9].Split('|');
-
-                    for (int i = 0; i < nodes; i++)
+                    int i = 0;
+                    foreach (var set in perNodeSample.Split('|'))
                     {
-                        if (i >= sets.Length)
+                        if (i >= nodes)
                             break;
 
                         SampleBankInfo info = nodeBankInfos[i];
-                        readCustomSampleBanks(sets[i], info);
+                        readCustomSampleBanks(set, info);
+                        i++;
                     }
                 }
 
@@ -123,17 +145,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     nodeSoundTypes.Add(soundType);
 
                 // Read any per-node sound types
-                if (split.Length > 8 && split[8].Length > 0)
+                if (!perNodeSound.IsEmpty)
                 {
-                    string[] adds = split[8].Split('|');
-
-                    for (int i = 0; i < nodes; i++)
+                    int i = 0;
+                    foreach (var add in perNodeSound.Split('|'))
                     {
-                        if (i >= adds.Length)
+                        if (i >= nodes)
                             break;
 
-                        int.TryParse(adds[i], out int sound);
+                        int.TryParse(add, out int sound);
                         nodeSoundTypes[i] = (LegacyHitSoundType)sound;
+                        i++;
                     }
                 }
 
@@ -142,35 +164,37 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
+                result = CreateSlider(pos, combo, comboOffset, convertPathString(pointSpan, pos), length, repeatCount, nodeSamples);
             }
             else if (type.HasFlagFast(LegacyHitObjectType.Spinner))
             {
-                double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + Offset - startTime);
+                split.MoveNext(); // split[5]
+                double duration = Math.Max(0, Parsing.ParseDouble(split.Current) + Offset - startTime);
 
                 result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
 
-                if (split.Length > 6)
-                    readCustomSampleBanks(split[6], bankInfo);
+                if (!split.MoveNext()) // split[6]
+                    readCustomSampleBanks(split.Current, bankInfo);
             }
             else if (type.HasFlagFast(LegacyHitObjectType.Hold))
             {
                 // Note: Hold is generated by BMS converts
 
-                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[2]));
+                double endTime = Math.Max(startTime, Parsing.ParseDouble(startTimeSpan));
 
-                if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
+                if (split.MoveNext()) // split[5]
                 {
-                    string[] ss = split[5].Split(':');
-                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
+                    var ss = split.Current.Split(':');
+                    ss.MoveNext();
+                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss.Current));
+                    readCustomSampleBanks(ss.RemainingSpan, bankInfo);
                 }
 
                 result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
             }
 
             if (result == null)
-                throw new InvalidDataException($"Unknown hit object type: {split[3]}");
+                throw new InvalidDataException($"Unknown hit object type: {typeSpan}");
 
             result.StartTime = startTime;
 
@@ -182,38 +206,57 @@ namespace osu.Game.Rulesets.Objects.Legacy
             return result;
         }
 
-        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false)
+        private void readCustomSampleBanks(ReadOnlySpan<char> str, SampleBankInfo bankInfo, bool banksOnly = false)
         {
-            if (string.IsNullOrEmpty(str))
+            if (str.IsEmpty)
                 return;
 
-            string[] split = str.Split(':');
+            var split = str.Split(':');
 
-            var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            split.MoveNext(); // split[0]
+            var bank = (LegacySampleBank)Parsing.ParseInt(split.Current);
+            split.MoveNext(); // split[1]
+            var addBank = (LegacySampleBank)Parsing.ParseInt(split.Current);
 
-            string stringBank = bank.ToString().ToLowerInvariant();
-            if (stringBank == @"none")
-                stringBank = null;
-            string stringAddBank = addBank.ToString().ToLowerInvariant();
-            if (stringAddBank == @"none")
-                stringAddBank = null;
+            static string toStringBank(LegacySampleBank value)
+            {
+                switch (value)
+                {
+                    default:
+                    case LegacySampleBank.None:
+                        return null;
+
+                    case LegacySampleBank.Normal:
+                        return @"normal";
+
+                    case LegacySampleBank.Soft:
+                        return @"soft";
+
+                    case LegacySampleBank.Drum:
+                        return @"drum";
+                }
+            }
+
+            string stringBank = toStringBank(bank);
+            string stringAddBank = toStringBank(addBank);
 
             bankInfo.BankForNormal = stringBank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (banksOnly) return;
 
-            if (split.Length > 2)
-                bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
+            if (split.MoveNext()) // split[2]
+                bankInfo.CustomSampleBank = Parsing.ParseInt(split.Current);
 
-            if (split.Length > 3)
-                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split[3]));
+            if (split.MoveNext()) // split[3]
+                bankInfo.Volume = Math.Max(0, Parsing.ParseInt(split.Current));
 
-            bankInfo.Filename = split.Length > 4 ? split[4] : null;
+            bankInfo.Filename = split.MoveNext() // split[4]
+                ? split.Current.ToString()
+                : null;
         }
 
-        private PathType convertPathType(string input)
+        private PathType convertPathType(ReadOnlySpan<char> input)
         {
             switch (input[0])
             {
@@ -253,10 +296,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="pointString">The point string.</param>
         /// <param name="offset">The positional offset to apply to the control points.</param>
         /// <returns>All control points in the resultant path.</returns>
-        private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
+        private PathControlPoint[] convertPathString(ReadOnlySpan<char> pointString, Vector2 offset)
         {
             // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
-            string[] pointSplit = pointString.Split('|');
+            var pointSplitList = new List<Range>();
+
+            // LINQ is unavailable to ref struct
+            var split = pointString.Split('|');
+            while (split.MoveNext())
+                pointSplitList.Add(split.CurrentRange);
+            Range[] pointSplit = pointSplitList.ToArray();
 
             var controlPoints = new List<Memory<PathControlPoint>>();
             int startIndex = 0;
@@ -266,20 +315,20 @@ namespace osu.Game.Rulesets.Objects.Legacy
             while (++endIndex < pointSplit.Length)
             {
                 // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
-                if (pointSplit[endIndex].Length > 1)
+                if (pointString[pointSplit[endIndex]].Length > 1)
                     continue;
 
                 // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
                 // The start of the next segment is the index after the type descriptor.
-                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
+                var endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : (Range?)null;
 
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
+                controlPoints.AddRange(convertPoints(pointString, pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
                 startIndex = endIndex;
                 first = false;
             }
 
             if (endIndex > startIndex)
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+                controlPoints.AddRange(convertPoints(pointString, pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
 
             return mergePointsLists(controlPoints);
         }
@@ -287,14 +336,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <summary>
         /// Converts a given point list into a set of path segments.
         /// </summary>
-        /// <param name="points">The point list.</param>
+        /// <param name="pointsString">The span containing all the points.</param>
+        /// <param name="points">The list of indices of points to convert.</param>
         /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
         /// <param name="first">Whether this is the first segment in the set. If <c>true</c> the first of the returned segments will contain a zero point.</param>
         /// <param name="offset">The positional offset to apply to the control points.</param>
         /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
-        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlyMemory<string> points, string endPoint, bool first, Vector2 offset)
+        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlySpan<char> pointsString, ReadOnlyMemory<Range> points, Range? endPoint, bool first, Vector2 offset)
         {
-            PathType type = convertPathType(points.Span[0]);
+            PathType type = convertPathType(pointsString[points.Span[0]]);
 
             int readOffset = first ? 1 : 0; // First control point is zero for the first segment.
             int readablePoints = points.Length - 1; // Total points readable from the base point span.
@@ -308,11 +358,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             // Parse into control points.
             for (int i = 1; i < points.Length; i++)
-                readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
+                readPoint(pointsString[points.Span[i]], offset, out vertices[readOffset + i - 1]);
 
             // If an endpoint is given, add it to the end.
             if (endPoint != null)
-                readPoint(endPoint, offset, out vertices[^1]);
+                readPoint(pointsString[endPoint.Value], offset, out vertices[^1]);
 
             // Edge-case rules (to match stable).
             if (type == PathType.PerfectCurve)
@@ -329,47 +379,54 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // The first control point must have a definite type.
             vertices[0].Type = type;
 
-            // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
-            // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
-            // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
-            // X: { (1,1), (2, 2) }
-            // X: { (3, 3) }
-            // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
-            int startIndex = 0;
-            int endIndex = 0;
+            return verticesToPoints(type, endPointLength, vertices);
 
-            while (++endIndex < vertices.Length - endPointLength)
+            // Span can't be used in yield generator methods, even if it does not live across yields
+            // Wrap the yield part into a separated method to workaround this
+            IEnumerable<Memory<PathControlPoint>> verticesToPoints(PathType type, int endPointLength, PathControlPoint[] vertices)
             {
-                // Keep incrementing while an implicit segment doesn't need to be started.
-                if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
-                    continue;
+                // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
+                // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+                // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
+                // X: { (1,1), (2, 2) }
+                // X: { (3, 3) }
+                // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
+                int startIndex = 0;
+                int endIndex = 0;
 
-                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
-                // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
-                // resulting in a duplicate (0,0) control point in the resultant list.
-                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
-                    continue;
+                while (++endIndex < vertices.Length - endPointLength)
+                {
+                    // Keep incrementing while an implicit segment doesn't need to be started.
+                    if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                        continue;
 
-                // The last control point of each segment is not allowed to start a new implicit segment.
-                if (endIndex == vertices.Length - endPointLength - 1)
-                    continue;
+                    // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                    // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
+                    // resulting in a duplicate (0,0) control point in the resultant list.
+                    if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                        continue;
 
-                // Force a type on the last point, and return the current control point set as a segment.
-                vertices[endIndex - 1].Type = type;
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+                    // The last control point of each segment is not allowed to start a new implicit segment.
+                    if (endIndex == vertices.Length - endPointLength - 1)
+                        continue;
 
-                // Skip the current control point - as it's the same as the one that's just been returned.
-                startIndex = endIndex + 1;
+                    // Force a type on the last point, and return the current control point set as a segment.
+                    vertices[endIndex - 1].Type = type;
+                    yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+
+                    // Skip the current control point - as it's the same as the one that's just been returned.
+                    startIndex = endIndex + 1;
+                }
+
+                if (endIndex > startIndex)
+                    yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
             }
 
-            if (endIndex > startIndex)
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
-
-            static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
+            static void readPoint(ReadOnlySpan<char> value, Vector2 startPos, out PathControlPoint point)
             {
-                string[] vertexSplit = value.Split(':');
+                int splitIndex = value.IndexOf(':');
 
-                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(value[..splitIndex], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(value[(splitIndex + 1)..], Parsing.MAX_COORDINATE_VALUE)) - startPos;
                 point = new PathControlPoint { Position = pos };
             }
 
