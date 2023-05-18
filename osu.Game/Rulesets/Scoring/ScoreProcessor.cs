@@ -274,20 +274,44 @@ namespace osu.Game.Rulesets.Scoring
         {
             Accuracy.Value = currentMaxBasicScore > 0 ? currentBasicScore / currentMaxBasicScore : 1;
 
-            double standardisedScore = ComputeTotalScore();
+            long standardisedScore = (long)Math.Round(ComputeTotalScore());
 
-            if (Mode.Value == ScoringMode.Standardised)
-                TotalScore.Value = (long)Math.Round(standardisedScore);
-            else
-                TotalScore.Value = ConvertToClassic(standardisedScore);
+            TotalScore.Value = Mode.Value == ScoringMode.Standardised
+                ? standardisedScore
+                : convertToClassic(standardisedScore, MaxBasicJudgements, ClassicScoreMultiplier);
         }
 
-        public long ConvertToClassic(double standardised)
+        /// <summary>
+        /// Retrieves the total score from a <see cref="ScoreInfo"/> in the given scoring mode.
+        /// </summary>
+        /// <param name="mode">The mode to return the total score in.</param>
+        /// <param name="scoreInfo">The score to get the total score of.</param>
+        /// <returns>The total score.</returns>
+        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
+        {
+            int maxBasicJudgements = scoreInfo.MaximumStatistics.Where(k => k.Key.IsBasic())
+                                              .Select(k => k.Value)
+                                              .DefaultIfEmpty(0)
+                                              .Sum();
+
+            return mode == ScoringMode.Standardised
+                ? scoreInfo.TotalScore
+                : convertToClassic(scoreInfo.TotalScore, maxBasicJudgements, ClassicScoreMultiplier);
+        }
+
+        /// <summary>
+        /// Converts a standardised total score to the classic score.
+        /// </summary>
+        /// <param name="score">The standardised score.</param>
+        /// <param name="maxBasicJudgements">The maximum possible number of basic judgements.</param>
+        /// <param name="classicMultiplier">The classic multiplier.</param>
+        /// <returns>The classic score.</returns>
+        private static long convertToClassic(long score, int maxBasicJudgements, double classicMultiplier)
         {
             // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
             // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-            double scaledRawScore = standardised / MAX_SCORE;
-            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, MaxBasicJudgements), 2) * ClassicScoreMultiplier);
+            double scaledRawScore = score / MAX_SCORE;
+            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, maxBasicJudgements), 2) * classicMultiplier);
         }
 
         protected abstract double ComputeTotalScore();
