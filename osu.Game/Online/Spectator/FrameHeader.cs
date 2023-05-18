@@ -45,6 +45,12 @@ namespace osu.Game.Online.Spectator
         public DateTimeOffset ReceivedTime { get; set; }
 
         /// <summary>
+        /// The total score.
+        /// </summary>
+        [Key(5)]
+        public long TotalScore { get; set; }
+
+        /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
         /// </summary>
         /// <param name="score">The score for reference.</param>
@@ -53,6 +59,7 @@ namespace osu.Game.Online.Spectator
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
             Accuracy = score.Accuracy;
+            TotalScore = score.TotalScore;
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
@@ -60,13 +67,14 @@ namespace osu.Game.Online.Spectator
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime, long totalScore)
         {
             Combo = combo;
             MaxCombo = maxCombo;
             Accuracy = accuracy;
             Statistics = statistics;
             ReceivedTime = receivedTime;
+            TotalScore = totalScore;
         }
     }
 }
