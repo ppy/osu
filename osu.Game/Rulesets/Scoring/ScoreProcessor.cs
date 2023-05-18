@@ -98,14 +98,20 @@ namespace osu.Game.Rulesets.Scoring
         public long MaxTotalScore { get; private set; }
 
         /// <summary>
-        /// The sum of all basic judgements at the current time.
+        /// The sum of all accuracy-affecting judgements at the current time.
         /// </summary>
-        private double currentBasicScore;
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentBaseScore;
 
         /// <summary>
-        /// The maximum sum of basic judgements at the current time.
+        /// The maximum sum of accuracy-affecting judgements at the current time.
         /// </summary>
-        private double currentMaxBasicScore;
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentMaxBaseScore;
 
         /// <summary>
         /// The total count of basic judgements in the beatmap.
@@ -206,8 +212,11 @@ namespace osu.Game.Rulesets.Scoring
             if (result.Type.IsBasic())
                 CurrentBasicJudgements++;
 
-            currentMaxBasicScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
-            currentBasicScore += Judgement.ToNumericResult(result.Type);
+            if (result.Type.AffectsAccuracy())
+            {
+                currentMaxBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentBaseScore += Judgement.ToNumericResult(result.Type);
+            }
 
             AddScoreChange(result);
 
@@ -241,8 +250,11 @@ namespace osu.Game.Rulesets.Scoring
             if (result.Type.IsBasic())
                 CurrentBasicJudgements--;
 
-            currentMaxBasicScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
-            currentBasicScore -= Judgement.ToNumericResult(result.Type);
+            if (result.Type.AffectsAccuracy())
+            {
+                currentMaxBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentBaseScore -= Judgement.ToNumericResult(result.Type);
+            }
 
             RemoveScoreChange(result);
 
@@ -257,7 +269,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             if (result.Type.IsBonus())
                 BonusPortion += Judgement.ToNumericResult(result.Type);
-            else
+
+            if (result.Type.AffectsCombo())
                 ComboPortion += Judgement.ToNumericResult(result.Type) * (1 + result.ComboAtJudgement / 10d);
         }
 
@@ -265,13 +278,14 @@ namespace osu.Game.Rulesets.Scoring
         {
             if (result.Type.IsBonus())
                 BonusPortion -= Judgement.ToNumericResult(result.Type);
-            else
+
+            if (result.Type.AffectsCombo())
                 ComboPortion -= Judgement.ToNumericResult(result.Type) * (1 + result.ComboAtJudgement / 10d);
         }
 
         private void updateScore()
         {
-            Accuracy.Value = currentMaxBasicScore > 0 ? currentBasicScore / currentMaxBasicScore : 1;
+            Accuracy.Value = currentMaxBaseScore > 0 ? currentBaseScore / currentMaxBaseScore : 1;
             TotalScore.Value = (long)Math.Round(ComputeTotalScore());
         }
 
@@ -301,8 +315,8 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts.Clear();
 
-            currentBasicScore = 0;
-            currentMaxBasicScore = 0;
+            currentBaseScore = 0;
+            currentMaxBaseScore = 0;
             CurrentBasicJudgements = 0;
             ComboPortion = 0;
             BonusPortion = 0;
@@ -314,8 +328,8 @@ namespace osu.Game.Rulesets.Scoring
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
-            currentBasicScore = 0;
-            currentMaxBasicScore = 0;
+            currentBaseScore = 0;
+            currentMaxBaseScore = 0;
         }
 
         /// <summary>
