@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -20,5 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Lower numbers will appear higher in cases of <see cref="TotalScore"/> ties.
         /// </summary>
         Bindable<long> DisplayOrder { get; }
+
+        Func<ScoringMode, long> GetDisplayScore { get; set; }
     }
 }

@@ -11,8 +11,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
@@ -55,6 +57,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
         public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
+        public Func<ScoringMode, long> GetDisplayScore { get; set; }
 
         public Color4? BackgroundColour { get; set; }
 
@@ -100,6 +103,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private Container scoreComponents;
 
+        private IBindable<ScoringMode> scoreDisplayMode;
+
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
         /// </summary>
@@ -112,10 +117,12 @@ namespace osu.Game.Screens.Play.HUD
 
             AutoSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
+
+            GetDisplayScore = _ => TotalScore.Value;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager osuConfigManager)
         {
             Container avatarContainer;
 
@@ -286,7 +293,9 @@ namespace osu.Game.Screens.Play.HUD
 
             LoadComponentAsync(new DrawableAvatar(User), avatarContainer.Add);
 
-            TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
+            scoreDisplayMode = osuConfigManager.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+            scoreDisplayMode.BindValueChanged(_ => updateScore());
+            TotalScore.BindValueChanged(_ => updateScore(), true);
 
             Accuracy.BindValueChanged(v =>
             {
@@ -301,6 +310,11 @@ namespace osu.Game.Screens.Play.HUD
             }, true);
 
             HasQuit.BindValueChanged(_ => updateState());
+        }
+
+        private void updateScore()
+        {
+            scoreText.Text = GetDisplayScore(scoreDisplayMode.Value).ToString("N0");
         }
 
         protected override void LoadComplete()

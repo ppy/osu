@@ -9,12 +9,14 @@ using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class GameplayScoreCounter : ScoreCounter
     {
         private Bindable<ScoringMode> scoreDisplayMode;
+        private Bindable<long> totalScoreBindable;
 
         protected GameplayScoreCounter()
             : base(6)
@@ -42,7 +44,8 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }, true);
 
-            Current.BindTo(scoreProcessor.TotalScore);
+            totalScoreBindable = scoreProcessor.TotalScore.GetBoundCopy();
+            totalScoreBindable.BindValueChanged(_ => Current.Value = scoreProcessor.GetDisplayScore(scoreDisplayMode.Value), true);
         }
     }
 }

@@ -3,13 +3,58 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
 {
     public static class ScoreInfoExtensions
     {
+        public static long GetDisplayScore(this ScoreProcessor scoreProcessor, ScoringMode mode)
+            => getDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
+
+        public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
+            => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
+
+        private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
+        {
+            if (mode == ScoringMode.Standardised)
+                return score;
+
+            double multiplier;
+
+            switch (rulesetId)
+            {
+                case 0:
+                    multiplier = 36;
+                    break;
+
+                case 1:
+                    multiplier = 22;
+                    break;
+
+                case 2:
+                    multiplier = 28;
+                    break;
+
+                case 3:
+                    multiplier = 16;
+                    break;
+
+                default:
+                    return score;
+            }
+
+            int maxBasicJudgements = maximumStatistics.Where(k => k.Key.IsBasic()).Select(k => k.Value).DefaultIfEmpty(0).Sum();
+
+            // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
+            // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
+            double scaledRawScore = score / ScoreProcessor.MAX_SCORE;
+            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, maxBasicJudgements), 2) * multiplier);
+        }
+
         public static int? GetCountGeki(this ScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
