@@ -288,11 +288,14 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double ComputeTotalScore()
         {
+            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
+            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
+
             return
                 (int)Math.Round
                 ((
-                    700000 * ComboPortion / MaxComboPortion +
-                    300000 * Math.Pow(Accuracy.Value, 10) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                    700000 * comboRatio +
+                    300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio +
                     BonusPortion
                 ) * ScoreMultiplier);
         }
