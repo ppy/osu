@@ -296,13 +296,13 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboRatio, accuracyRatio, currentBonusPortion) * scoreMultiplier);
         }
 
-        protected virtual double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
+        protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
             return
                 (int)Math.Round
                 ((
-                    700000 * comboRatio +
-                    300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio +
+                    700000 * comboProgress +
+                    300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress +
                     bonusPortion
                 ) * scoreMultiplier);
         }
