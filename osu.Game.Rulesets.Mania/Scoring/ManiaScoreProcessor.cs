@@ -16,38 +16,14 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        protected override double ComputeTotalScore()
+        protected override double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
         {
-            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
-            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
-
-            return (
-                200000 * comboRatio +
-                800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyRatio +
-                BonusPortion
-            ) * ScoreMultiplier;
+            return 200000 * comboRatio
+                   + 800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyRatio
+                   + bonusPortion;
         }
 
-        protected override void AddScoreChange(JudgementResult result)
-        {
-            var change = computeScoreChange(result);
-            ComboPortion += change.combo;
-            BonusPortion += change.bonus;
-        }
-
-        protected override void RemoveScoreChange(JudgementResult result)
-        {
-            var change = computeScoreChange(result);
-            ComboPortion -= change.combo;
-            BonusPortion -= change.bonus;
-        }
-
-        private (double combo, double bonus) computeScoreChange(JudgementResult result)
-        {
-            if (result.Type.IsBonus())
-                return (0, Judgement.ToNumericResult(result.Type));
-
-            return (Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base)), 0);
-        }
+        protected override double GetComboScoreChange(JudgementResult result)
+            => Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
     }
 }

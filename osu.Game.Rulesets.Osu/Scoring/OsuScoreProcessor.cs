@@ -13,16 +13,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override double ComputeTotalScore()
+        protected override double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
         {
-            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
-            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
-
-            return (
-                700000 * comboRatio +
-                300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio +
-                BonusPortion
-            ) * ScoreMultiplier;
+            return 700000 * comboRatio
+                   + 300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio
+                   + bonusPortion;
         }
     }
 }
