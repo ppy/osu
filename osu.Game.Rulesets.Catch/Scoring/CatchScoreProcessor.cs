@@ -26,13 +26,13 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
         }
 
-        protected override double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
+        protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
             double fruitHitsRatio = maximumTinyDroplets == 0 ? 0 : (double)hitTinyDroplets / maximumTinyDroplets;
 
             const int tiny_droplets_portion = 400000;
 
-            return ((1000000 - tiny_droplets_portion) + tiny_droplets_portion * (1 - tinyDropletScale)) * comboRatio
+            return ((1000000 - tiny_droplets_portion) + tiny_droplets_portion * (1 - tinyDropletScale)) * comboProgress
                    + tiny_droplets_portion * tinyDropletScale * fruitHitsRatio
                    + bonusPortion;
         }

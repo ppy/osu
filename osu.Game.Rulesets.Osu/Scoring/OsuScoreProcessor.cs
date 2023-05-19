@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
+        protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            return 700000 * comboRatio
-                   + 300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio
+            return 700000 * comboProgress
+                   + 300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress
                    + bonusPortion;
         }
     }
