@@ -394,19 +394,34 @@ namespace osu.Game.Rulesets.Scoring
 
             Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
+            TotalScore.Value = frame.Header.TotalScore;
 
             scoreResultCounts.Clear();
             scoreResultCounts.AddRange(frame.Header.Statistics);
+
+            ReadScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
 
             updateScore();
 
             OnResetFromReplayFrame?.Invoke();
         }
 
-        protected override void Dispose(bool isDisposing)
+        public virtual void WriteScoreProcessorStatistics(IDictionary<string, object> statistics)
         {
-            base.Dispose(isDisposing);
-            hitEvents.Clear();
+            statistics.Add(nameof(currentMaximumBaseScore), currentMaximumBaseScore);
+            statistics.Add(nameof(currentBaseScore), currentBaseScore);
+            statistics.Add(nameof(currentCountBasicJudgements), currentCountBasicJudgements);
+            statistics.Add(nameof(currentComboPortion), currentComboPortion);
+            statistics.Add(nameof(currentBonusPortion), currentBonusPortion);
+        }
+
+        public virtual void ReadScoreProcessorStatistics(IReadOnlyDictionary<string, object> statistics)
+        {
+            currentMaximumBaseScore = (double)statistics.GetValueOrDefault(nameof(currentMaximumBaseScore), 0);
+            currentBaseScore = (double)statistics.GetValueOrDefault(nameof(currentBaseScore), 0);
+            currentCountBasicJudgements = (int)statistics.GetValueOrDefault(nameof(currentCountBasicJudgements), 0);
+            currentComboPortion = (double)statistics.GetValueOrDefault(nameof(currentComboPortion), 0);
+            currentBonusPortion = (double)statistics.GetValueOrDefault(nameof(currentBonusPortion), 0);
         }
 
         #region Static helper methods
@@ -464,6 +479,12 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            hitEvents.Clear();
+        }
     }
 
     public enum ScoringMode

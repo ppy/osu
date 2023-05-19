@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -78,6 +79,22 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
             hitTinyDroplets = 0;
             currentBasicJudgements = 0;
+        }
+
+        public override void WriteScoreProcessorStatistics(IDictionary<string, object> statistics)
+        {
+            base.WriteScoreProcessorStatistics(statistics);
+
+            statistics.Add(nameof(hitTinyDroplets), hitTinyDroplets);
+            statistics.Add(nameof(currentBasicJudgements), currentBasicJudgements);
+        }
+
+        public override void ReadScoreProcessorStatistics(IReadOnlyDictionary<string, object> statistics)
+        {
+            base.ReadScoreProcessorStatistics(statistics);
+
+            hitTinyDroplets = (int)statistics.GetValueOrDefault(nameof(hitTinyDroplets), 0);
+            currentBasicJudgements = (int)statistics.GetValueOrDefault(nameof(currentBasicJudgements), 0);
         }
     }
 }
