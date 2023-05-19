@@ -18,9 +18,12 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override double ComputeTotalScore()
         {
+            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
+            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
+
             return (
-                200000 * ComboPortion / MaxComboPortion +
-                800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                200000 * comboRatio +
+                800000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyRatio +
                 BonusPortion
             ) * ScoreMultiplier;
         }

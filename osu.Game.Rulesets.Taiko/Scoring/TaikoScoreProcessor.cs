@@ -19,9 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override double ComputeTotalScore()
         {
+            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
+            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
+
             return (
-                250000 * ComboPortion / MaxComboPortion +
-                750000 * Math.Pow(Accuracy.Value, 3.6) * ((double)CurrentBasicJudgements / MaxBasicJudgements) +
+                250000 * comboRatio +
+                750000 * Math.Pow(Accuracy.Value, 3.6) * accuracyRatio +
                 BonusPortion
             ) * ScoreMultiplier;
         }
