@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             if (result.Type.IsBonus())
                 return (0, hitValue);
 
-            return (hitValue * Math.Min(Math.Max(0.5, Math.Log(result.ComboAtJudgement, combo_base)), Math.Log(400, combo_base)), 0);
+            return (hitValue * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base)), 0);
         }
     }
 }

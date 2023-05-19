@@ -204,6 +204,8 @@ namespace osu.Game.Rulesets.Scoring
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
 
+            result.ComboAfterJudgement = Combo.Value;
+
             if (result.Type.IsBasic())
                 CurrentBasicJudgements++;
 
@@ -266,7 +268,7 @@ namespace osu.Game.Rulesets.Scoring
                 BonusPortion += Judgement.ToNumericResult(result.Type);
 
             if (result.Type.AffectsCombo())
-                ComboPortion += Judgement.ToNumericResult(result.Type) * (1 + result.ComboAtJudgement / 10d);
+                ComboPortion += Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
         }
 
         protected virtual void RemoveScoreChange(JudgementResult result)
@@ -275,7 +277,7 @@ namespace osu.Game.Rulesets.Scoring
                 BonusPortion -= Judgement.ToNumericResult(result.Type);
 
             if (result.Type.AffectsCombo())
-                ComboPortion -= Judgement.ToNumericResult(result.Type) * (1 + result.ComboAtJudgement / 10d);
+                ComboPortion -= Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
         }
 
         private void updateScore()
