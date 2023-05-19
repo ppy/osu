@@ -15,66 +15,77 @@ namespace osu.Game.Online.Spectator
     public class FrameHeader
     {
         /// <summary>
-        /// The current accuracy of the score.
+        /// The total score.
         /// </summary>
         [Key(0)]
+        public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The current accuracy of the score.
+        /// </summary>
+        [Key(1)]
         public double Accuracy { get; set; }
 
         /// <summary>
         /// The current combo of the score.
         /// </summary>
-        [Key(1)]
+        [Key(2)]
         public int Combo { get; set; }
 
         /// <summary>
         /// The maximum combo achieved up to the current point in time.
         /// </summary>
-        [Key(2)]
+        [Key(3)]
         public int MaxCombo { get; set; }
 
         /// <summary>
         /// Cumulative hit statistics.
         /// </summary>
-        [Key(3)]
+        [Key(4)]
         public Dictionary<HitResult, int> Statistics { get; set; }
+
+        /// <summary>
+        /// Additional statistics that guides the score processor to calculate the correct score for this frame.
+        /// </summary>
+        [Key(5)]
+        public Dictionary<string, object> ScoreProcessorStatistics { get; set; }
 
         /// <summary>
         /// The time at which this frame was received by the server.
         /// </summary>
-        [Key(4)]
+        [Key(6)]
         public DateTimeOffset ReceivedTime { get; set; }
-
-        /// <summary>
-        /// The total score.
-        /// </summary>
-        [Key(5)]
-        public long TotalScore { get; set; }
 
         /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
         /// </summary>
         /// <param name="score">The score for reference.</param>
-        public FrameHeader(ScoreInfo score)
+        /// <param name="scoreProcessor">The score processor for reference.</param>
+        public FrameHeader(ScoreInfo score, ScoreProcessor scoreProcessor)
         {
+            TotalScore = score.TotalScore;
+            Accuracy = score.Accuracy;
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
-            Accuracy = score.Accuracy;
-            TotalScore = score.TotalScore;
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
+
+            ScoreProcessorStatistics = new Dictionary<string, object>();
+            scoreProcessor.WriteScoreProcessorStatistics(ScoreProcessorStatistics);
         }
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime, long totalScore)
+        public FrameHeader(long totalScore, double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, Dictionary<string, object> scoreProcessorStatistics, DateTimeOffset receivedTime)
         {
+            TotalScore = totalScore;
+            Accuracy = accuracy;
             Combo = combo;
             MaxCombo = maxCombo;
-            Accuracy = accuracy;
             Statistics = statistics;
+            ScoreProcessorStatistics = scoreProcessorStatistics;
             ReceivedTime = receivedTime;
-            TotalScore = totalScore;
         }
     }
 }
