@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             if (result.Type.IsBonus())
                 return (0, Judgement.ToNumericResult(result.Type), 0);
 
-            return (Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAtJudgement, combo_base)), Math.Log(combo_cap, combo_base)), 0, 0);
+            return (Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(combo_cap, combo_base)), 0, 0);
         }
 
         protected override void Reset(bool storeResults)
