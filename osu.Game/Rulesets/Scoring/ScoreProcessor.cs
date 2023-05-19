@@ -217,8 +217,7 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Type.IsBonus())
                 currentBonusPortion += GetBonusScoreChange(result);
-
-            if (result.Type.AffectsCombo())
+            else
                 currentComboPortion += GetComboScoreChange(result);
 
             ApplyScoreChange(result);
@@ -261,8 +260,7 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Type.IsBonus())
                 currentBonusPortion -= GetBonusScoreChange(result);
-
-            if (result.Type.AffectsCombo())
+            else
                 currentComboPortion -= GetComboScoreChange(result);
 
             RemoveScoreChange(result);
