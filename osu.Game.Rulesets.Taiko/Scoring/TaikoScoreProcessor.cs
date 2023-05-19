@@ -29,15 +29,15 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         protected override void AddScoreChange(JudgementResult result)
         {
             var change = computeScoreChange(result);
-            BonusPortion += change.bonus;
             ComboPortion += change.combo;
+            BonusPortion += change.bonus;
         }
 
         protected override void RemoveScoreChange(JudgementResult result)
         {
             var change = computeScoreChange(result);
-            BonusPortion -= change.bonus;
             ComboPortion -= change.combo;
+            BonusPortion -= change.bonus;
         }
 
         private (double combo, double bonus) computeScoreChange(JudgementResult result)
