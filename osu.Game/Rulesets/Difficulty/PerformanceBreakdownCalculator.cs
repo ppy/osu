@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Difficulty
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.Mods.Value = perfectPlay.Mods;
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
-                perfectPlay.TotalScore = scoreProcessor.MaxTotalScore;
+                perfectPlay.TotalScore = scoreProcessor.MaximumTotalScore;
 
                 // compute rank achieved
                 // default to SS, then adjust the rank with mods

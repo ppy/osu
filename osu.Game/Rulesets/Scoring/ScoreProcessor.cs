@@ -90,10 +90,18 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The maximum achievable total score.
         /// </summary>
-        public long MaxTotalScore { get; private set; }
+        public long MaximumTotalScore { get; private set; }
 
         /// <summary>
-        /// The sum of all accuracy-affecting judgements at the current time.
+        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentMaximumBaseScore;
+
+        /// <summary>
+        /// The sum of all accuracy-affecting judgements at the current point in time.
         /// </summary>
         /// <remarks>
         /// Used to compute accuracy.
@@ -101,42 +109,34 @@ namespace osu.Game.Rulesets.Scoring
         private double currentBaseScore;
 
         /// <summary>
-        /// The maximum sum of accuracy-affecting judgements at the current time.
+        /// The count of all basic judgements in the beatmap.
         /// </summary>
-        /// <remarks>
-        /// Used to compute accuracy.
-        /// </remarks>
-        private double currentMaxBaseScore;
+        private int maximumCountBasicJudgements;
 
         /// <summary>
-        /// The total count of basic judgements in the beatmap.
+        /// The count of basic judgements at the current point in time.
         /// </summary>
-        protected int MaxBasicJudgements { get; private set; }
+        private int currentCountBasicJudgements;
 
         /// <summary>
-        /// The current count of basic judgements by the player.
+        /// The maximum combo score in the beatmap.
         /// </summary>
-        protected int CurrentBasicJudgements { get; private set; }
+        private double maximumComboPortion;
 
         /// <summary>
-        /// The current combo score.
+        /// The combo score at the current point in time.
         /// </summary>
-        protected double ComboPortion { get; set; }
+        private double currentComboPortion;
 
         /// <summary>
-        /// The maximum achievable combo score.
+        /// The bonus score at the current point in time.
         /// </summary>
-        protected double MaxComboPortion { get; private set; }
-
-        /// <summary>
-        /// The current bonus score.
-        /// </summary>
-        protected double BonusPortion { get; set; }
+        private double currentBonusPortion;
 
         /// <summary>
         /// The total score multiplier.
         /// </summary>
-        protected double ScoreMultiplier { get; private set; } = 1;
+        private double scoreMultiplier = 1;
 
         public Dictionary<HitResult, int> MaximumStatistics
         {
@@ -171,10 +171,10 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                ScoreMultiplier = 1;
+                scoreMultiplier = 1;
 
                 foreach (var m in mods.NewValue)
-                    ScoreMultiplier *= m.ScoreMultiplier;
+                    scoreMultiplier *= m.ScoreMultiplier;
 
                 updateScore();
             };
@@ -207,15 +207,21 @@ namespace osu.Game.Rulesets.Scoring
             result.ComboAfterJudgement = Combo.Value;
 
             if (result.Type.IsBasic())
-                CurrentBasicJudgements++;
+                currentCountBasicJudgements++;
 
             if (result.Type.AffectsAccuracy())
             {
-                currentMaxBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore += Judgement.ToNumericResult(result.Type);
             }
 
-            AddScoreChange(result);
+            if (result.Type.IsBonus())
+                currentBonusPortion += GetBonusScoreChange(result);
+
+            if (result.Type.AffectsCombo())
+                currentComboPortion += GetComboScoreChange(result);
+
+            ApplyScoreChange(result);
 
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
@@ -245,13 +251,19 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             if (result.Type.IsBasic())
-                CurrentBasicJudgements--;
+                currentCountBasicJudgements--;
 
             if (result.Type.AffectsAccuracy())
             {
-                currentMaxBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore -= Judgement.ToNumericResult(result.Type);
             }
+
+            if (result.Type.IsBonus())
+                currentBonusPortion -= GetBonusScoreChange(result);
+
+            if (result.Type.AffectsCombo())
+                currentComboPortion -= GetComboScoreChange(result);
 
             RemoveScoreChange(result);
 
@@ -262,42 +274,37 @@ namespace osu.Game.Rulesets.Scoring
             updateScore();
         }
 
-        protected virtual void AddScoreChange(JudgementResult result)
-        {
-            if (result.Type.IsBonus())
-                BonusPortion += Judgement.ToNumericResult(result.Type);
+        protected virtual double GetBonusScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type);
 
-            if (result.Type.AffectsCombo())
-                ComboPortion += Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
+        protected virtual double GetComboScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
+
+        protected virtual void ApplyScoreChange(JudgementResult result)
+        {
         }
 
         protected virtual void RemoveScoreChange(JudgementResult result)
         {
-            if (result.Type.IsBonus())
-                BonusPortion -= Judgement.ToNumericResult(result.Type);
-
-            if (result.Type.AffectsCombo())
-                ComboPortion -= Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
         }
 
         private void updateScore()
         {
-            Accuracy.Value = currentMaxBaseScore > 0 ? currentBaseScore / currentMaxBaseScore : 1;
-            TotalScore.Value = (long)Math.Round(ComputeTotalScore());
+            Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
+
+            double comboRatio = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
+            double accuracyRatio = maximumCountBasicJudgements > 0 ? (double)currentCountBasicJudgements / maximumCountBasicJudgements : 1;
+
+            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboRatio, accuracyRatio, currentBonusPortion) * scoreMultiplier);
         }
 
-        protected virtual double ComputeTotalScore()
+        protected virtual double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
         {
-            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
-            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
-
             return
                 (int)Math.Round
                 ((
                     700000 * comboRatio +
                     300000 * Math.Pow(Accuracy.Value, 10) * accuracyRatio +
-                    BonusPortion
-                ) * ScoreMultiplier);
+                    bonusPortion
+                ) * scoreMultiplier);
         }
 
         /// <summary>
@@ -313,22 +320,22 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                MaxComboPortion = ComboPortion;
-                MaxBasicJudgements = CurrentBasicJudgements;
+                maximumComboPortion = currentComboPortion;
+                maximumCountBasicJudgements = currentCountBasicJudgements;
 
                 maximumResultCounts.Clear();
                 maximumResultCounts.AddRange(scoreResultCounts);
 
-                MaxTotalScore = TotalScore.Value;
+                MaximumTotalScore = TotalScore.Value;
             }
 
             scoreResultCounts.Clear();
 
             currentBaseScore = 0;
-            currentMaxBaseScore = 0;
-            CurrentBasicJudgements = 0;
-            ComboPortion = 0;
-            BonusPortion = 0;
+            currentMaximumBaseScore = 0;
+            currentCountBasicJudgements = 0;
+            currentComboPortion = 0;
+            currentBonusPortion = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -338,7 +345,7 @@ namespace osu.Game.Rulesets.Scoring
             HighestCombo.Value = 0;
 
             currentBaseScore = 0;
-            currentMaxBaseScore = 0;
+            currentMaximumBaseScore = 0;
         }
 
         /// <summary>

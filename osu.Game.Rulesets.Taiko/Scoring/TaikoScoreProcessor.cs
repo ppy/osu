@@ -17,46 +17,28 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        protected override double ComputeTotalScore()
+        protected override double ComputeTotalScore(double comboRatio, double accuracyRatio, double bonusPortion)
         {
-            double comboRatio = MaxComboPortion > 0 ? ComboPortion / MaxComboPortion : 1;
-            double accuracyRatio = MaxBasicJudgements > 0 ? (double)CurrentBasicJudgements / MaxBasicJudgements : 1;
-
-            return (
-                250000 * comboRatio +
-                750000 * Math.Pow(Accuracy.Value, 3.6) * accuracyRatio +
-                BonusPortion
-            ) * ScoreMultiplier;
+            return 250000 * comboRatio
+                   + 750000 * Math.Pow(Accuracy.Value, 3.6) * accuracyRatio
+                   + bonusPortion;
         }
 
-        protected override void AddScoreChange(JudgementResult result)
+        protected override double GetBonusScoreChange(JudgementResult result) => base.GetBonusScoreChange(result) * strongScaleValue(result);
+
+        protected override double GetComboScoreChange(JudgementResult result)
         {
-            var change = computeScoreChange(result);
-            ComboPortion += change.combo;
-            BonusPortion += change.bonus;
+            return Judgement.ToNumericResult(result.Type)
+                   * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base))
+                   * strongScaleValue(result);
         }
 
-        protected override void RemoveScoreChange(JudgementResult result)
+        private double strongScaleValue(JudgementResult result)
         {
-            var change = computeScoreChange(result);
-            ComboPortion -= change.combo;
-            BonusPortion -= change.bonus;
-        }
-
-        private (double combo, double bonus) computeScoreChange(JudgementResult result)
-        {
-            double hitValue = Judgement.ToNumericResult(result.Type);
-
             if (result.HitObject is StrongNestedHitObject strong)
-            {
-                double strongBonus = strong.Parent is DrumRollTick ? 3 : 7;
-                hitValue *= strongBonus;
-            }
+                return strong.Parent is DrumRollTick ? 3 : 7;
 
-            if (result.Type.IsBonus())
-                return (0, hitValue);
-
-            return (hitValue * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base)), 0);
+            return 1;
         }
     }
 }
