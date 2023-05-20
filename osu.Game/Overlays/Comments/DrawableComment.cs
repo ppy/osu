@@ -537,7 +537,7 @@ namespace osu.Game.Overlays.Comments
             {
                 return new MarginPadding
                 {
-                    Horizontal = 70,
+                    Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     Vertical = 15
                 };
             }

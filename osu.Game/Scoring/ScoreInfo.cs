@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -22,14 +21,27 @@ using Realms;
 
 namespace osu.Game.Scoring
 {
-    [ExcludeFromDynamicCompile]
+    /// <summary>
+    /// A realm model containing metadata for a single score.
+    /// </summary>
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
         [PrimaryKey]
         public Guid ID { get; set; }
 
+        /// <summary>
+        /// The <see cref="BeatmapInfo"/> this score was made against.
+        /// </summary>
+        /// <remarks>
+        /// When setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
+        /// </remarks>
         public BeatmapInfo BeatmapInfo { get; set; } = null!;
+
+        /// <summary>
+        /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
+        /// </summary>
+        public string BeatmapHash { get; set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
 

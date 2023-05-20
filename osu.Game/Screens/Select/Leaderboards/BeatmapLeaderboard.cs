@@ -191,6 +191,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                           + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
