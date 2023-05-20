@@ -5,8 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -16,47 +18,68 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     internal partial class ArgonHoldNoteTailPiece : CompositeDrawable
     {
+        [Resolved]
+        private DrawableHitObject? drawableObject { get; set; }
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
-        private readonly Box shadeBackground;
-        private readonly Box shadeForeground;
+        private readonly Box foreground;
+        private readonly ArgonHoldNoteHittingLayer hittingLayer;
+        private readonly Box foregroundAdditive;
 
         public ArgonHoldNoteTailPiece()
         {
             RelativeSizeAxes = Axes.X;
             Height = ArgonNotePiece.NOTE_HEIGHT;
 
-            CornerRadius = ArgonNotePiece.CORNER_RADIUS;
-            Masking = true;
-
             InternalChildren = new Drawable[]
             {
-                shadeBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = ArgonNotePiece.NOTE_HEIGHT,
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        shadeForeground = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black),
+                            // Avoid ugly single pixel overlap.
+                            Height = 0.9f,
                         },
-                    },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
+                            CornerRadius = ArgonNotePiece.CORNER_RADIUS,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                foreground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                hittingLayer = new ArgonHoldNoteHittingLayer(),
+                                foregroundAdditive = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Blending = BlendingParameters.Additive,
+                                    Height = 0.5f,
+                                },
+                            },
+                        },
+                    }
                 },
             };
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
+        private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
@@ -65,7 +88,22 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 accentColour.BindTo(drawableObject.AccentColour);
                 accentColour.BindValueChanged(onAccentChanged, true);
+
+                drawableObject.HitObjectApplied += hitObjectApplied;
             }
+        }
+
+        private void hitObjectApplied(DrawableHitObject drawableHitObject)
+        {
+            var holdNoteTail = (DrawableHoldNoteTail)drawableHitObject;
+
+            hittingLayer.Recycle();
+
+            hittingLayer.AccentColour.UnbindBindings();
+            hittingLayer.AccentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
+
+            hittingLayer.IsHitting.UnbindBindings();
+            ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHitting);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
@@ -75,8 +113,20 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent)
         {
-            shadeBackground.Colour = accent.NewValue.Darken(1.7f);
-            shadeForeground.Colour = accent.NewValue.Darken(1.1f);
+            foreground.Colour = accent.NewValue.Darken(0.6f); // matches body
+
+            foregroundAdditive.Colour = ColourInfo.GradientVertical(
+                accent.NewValue.Opacity(0.4f),
+                accent.NewValue.Opacity(0)
+            );
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.HitObjectApplied -= hitObjectApplied;
         }
     }
 }

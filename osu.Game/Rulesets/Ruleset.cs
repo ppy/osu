@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
@@ -34,7 +33,6 @@ using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
-    [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
         public RulesetInfo RulesetInfo { get; }

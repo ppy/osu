@@ -3,8 +3,11 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
+using osu.Framework.Bindables;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -15,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoStrongableHitObject, IHasPath
+    public class DrumRoll : TaikoStrongableHitObject, IHasPath, IHasSliderVelocity
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -35,6 +38,19 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double Velocity { get; private set; }
 
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
+
         /// <summary>
         /// Numer of ticks per beat length.
         /// </summary>
@@ -52,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
@@ -81,7 +97,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong
+                    IsStrong = IsStrong,
+                    Samples = Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToList()
                 });
 
                 first = false;

@@ -269,6 +269,13 @@ namespace osu.Game
             if (hideToolbar) Toolbar.Hide();
         }
 
+        protected override UserInputManager CreateUserInputManager()
+        {
+            var userInputManager = base.CreateUserInputManager();
+            (userInputManager as OsuUserInputManager)?.LocalUserPlaying.BindTo(LocalUserPlaying);
+            return userInputManager;
+        }
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>

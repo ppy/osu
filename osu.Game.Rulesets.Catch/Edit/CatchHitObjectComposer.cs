@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         private void load()
         {
             // todo: enable distance spacing once catch supports applying it to its existing distance snap grid implementation.
-            RightSideToolboxContainer.Alpha = 0;
             DistanceSpacingMultiplier.Disabled = true;
 
             LayerBelowRuleset.Add(new PlayfieldBorder

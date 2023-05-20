@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -281,6 +282,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
