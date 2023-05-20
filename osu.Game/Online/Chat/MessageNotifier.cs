@@ -93,7 +93,7 @@ namespace osu.Game.Online.Chat
             if (channel == null)
                 return;
 
-            // Only send notifications, if ChatOverlay and the target channel aren't visible, or if the window is unfocused
+            // Only send notifications if ChatOverlay or the target channel aren't visible, or if the window is unfocused
             if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel && host.IsActive.Value)
                 return;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Online.Chat
                 if (message.Id <= channel.LastReadId)
                     return;
 
-                // ignore notifications triggered by your own chat messages
+                // ignore notifications triggered by local user's own chat messages
                 if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
