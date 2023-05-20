@@ -77,6 +77,14 @@ namespace osu.Game.Overlays
             base.Content.Add(mainContent);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Ensure the scroll-to-top button is displayed above the fixed header.
+            AddInternal(ScrollFlow.Button.CreateProxy());
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
