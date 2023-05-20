@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             {
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
                 => new BananaHitSampleInfo(newVolume.GetOr(Volume));
 
             public bool Equals(BananaHitSampleInfo? other)
