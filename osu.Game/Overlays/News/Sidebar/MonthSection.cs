@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     new PostsContainer
                     {
                         Expanded = { BindTarget = Expanded },
-                        Children = posts.Select(p => new PostButton(p)).ToArray()
+                        Children = posts.Select(p => new PostLink(p)).ToArray()
                     }
                 }
             };
@@ -123,9 +123,9 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private partial class PostButton : LinkFlowContainer
+        private partial class PostLink : LinkFlowContainer
         {
-            public PostButton(APINewsPost post)
+            public PostLink(APINewsPost post)
                 : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
                 RelativeSizeAxes = Axes.X;
