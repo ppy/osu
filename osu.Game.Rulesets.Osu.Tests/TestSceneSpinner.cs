@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 EndTime = Time.Current + delay + length,
                 Samples = new List<HitSampleInfo>
                 {
-                    new HitSampleInfo("hitnormal")
+                    new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
                 }
             };
 
