@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneHitObjectSamplePointAdjustments : EditorTestScene
+    public partial class TestSceneHitObjectSampleAdjustments : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE - new Vector2(100, 0)) / 2,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 80)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: 80)
                     }
                 });
 
@@ -56,6 +56,26 @@ namespace osu.Game.Tests.Visual.Editing
                     }
                 });
             });
+        }
+
+        [Test]
+        public void TestAddSampleAddition()
+        {
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            AddStep("add clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+
+            AddStep("remove clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
         }
 
         [Test]
@@ -269,6 +289,12 @@ namespace osu.Game.Tests.Visual.Editing
             // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
             InputManager.ChangeFocus(textBox);
             InputManager.Key(Key.Enter);
+        });
+
+        private void hitObjectHasSamples(int objectIndex, params string[] samples) => AddAssert($"{objectIndex.ToOrdinalWords()} has samples {string.Join(',', samples)}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Select(s => s.Name).SequenceEqual(samples);
         });
 
         private void hitObjectHasSampleBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has bank {bank}", () =>

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -16,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -38,16 +37,18 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly HitObject HitObject;
 
-        [Resolved(canBeNull: true)]
-        protected EditorClock EditorClock { get; private set; }
+        [Resolved]
+        protected EditorClock EditorClock { get; private set; } = null!;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
-        private Bindable<double> startTimeBindable;
+        private Bindable<double> startTimeBindable = null!;
+
+        private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
 
         [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        private IPlacementHandler placementHandler { get; set; } = null!;
 
         /// <summary>
         /// Whether this blueprint is currently in a state that can be committed.
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             // adding the default hit sample should be the case regardless of the ruleset.
-            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, volume: 100));
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
 
             RelativeSizeAxes = Axes.Both;
 
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement(bool commitStart = false)
         {
             // Take the hitnormal sample of the last hit object
-            var lastHitNormal = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
             if (lastHitNormal != null)
                 HitObject.Samples[0] = lastHitNormal;
 
@@ -148,7 +149,12 @@ namespace osu.Game.Rulesets.Edit
         public virtual void UpdateTimeAndPosition(SnapResult result)
         {
             if (PlacementActive == PlacementState.Waiting)
-                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+            {
+                HitObject.StartTime = result.Time ?? EditorClock.CurrentTime;
+
+                if (HitObject is IHasComboInformation comboInformation)
+                    comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
+            }
         }
 
         /// <summary>
