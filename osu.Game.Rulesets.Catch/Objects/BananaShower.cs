@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 {
                     StartTime = time,
                     BananaIndex = i,
-                    Samples = new List<HitSampleInfo> { new Banana.BananaHitSampleInfo(GetSampleInfo().Volume) }
+                    Samples = new List<HitSampleInfo> { new Banana.BananaHitSampleInfo(CreateHitSampleInfo().Volume) }
                 });
 
                 time += spacing;
