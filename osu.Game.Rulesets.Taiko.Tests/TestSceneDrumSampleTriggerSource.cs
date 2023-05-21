@@ -110,6 +110,35 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [Test]
+        public void TestDrumStrongHit()
+        {
+            AddStep("add strong hit with drum samples", () =>
+            {
+                var hit = new Hit
+                {
+                    StartTime = 100,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "drum"),
+                        new HitSampleInfo(HitSampleInfo.HIT_FINISH, "drum") // implies strong
+                    }
+                };
+                hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+                var drawableHit = new DrawableHit(hit);
+                hitObjectContainer.Add(drawableHit);
+            });
+
+            AddAssert("most valid object is strong nested hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit.StrongNestedHit>);
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "drum");
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "drum");
+
+            AddStep("seek past hit", () => manualClock.CurrentTime = 200);
+            AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "drum");
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "drum");
+        }
+
+        [Test]
         public void TestNormalDrumRoll()
         {
             AddStep("add drum roll with normal samples", () =>
@@ -178,6 +207,41 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         [Test]
+        public void TestDrumStrongDrumRoll()
+        {
+            AddStep("add strong drum roll with drum samples", () =>
+            {
+                var drumRoll = new DrumRoll
+                {
+                    StartTime = 100,
+                    EndTime = 1100,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "drum"),
+                        new HitSampleInfo(HitSampleInfo.HIT_FINISH, "drum") // implies strong
+                    }
+                };
+                drumRoll.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+                var drawableDrumRoll = new DrawableDrumRoll(drumRoll);
+                hitObjectContainer.Add(drawableDrumRoll);
+            });
+
+            AddAssert("most valid object is drum roll tick's nested strong hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick.StrongNestedHit>);
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "drum");
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "drum");
+
+            AddStep("seek to middle of drum roll", () => manualClock.CurrentTime = 600);
+            AddAssert("most valid object is drum roll tick's nested strong hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick.StrongNestedHit>);
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "drum");
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "drum");
+
+            AddStep("seek past drum roll", () => manualClock.CurrentTime = 1200);
+            AddAssert("most valid object is drum roll", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRoll>);
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "drum");
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "drum");
+        }
+
+        [Test]
         public void TestNormalSwell()
         {
             AddStep("add swell with normal samples", () =>
@@ -216,7 +280,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("add swell with drum samples", () =>
             {
-                var swell = new Swell()
+                var swell = new Swell
                 {
                     StartTime = 100,
                     EndTime = 1100,
