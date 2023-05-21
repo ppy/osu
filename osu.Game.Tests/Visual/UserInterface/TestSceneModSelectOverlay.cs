@@ -469,6 +469,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestFirstModSelectDeselect()
+        {
+            createScreen();
+
+            AddStep("apply search", () => modSelectOverlay.SearchTerm = "HD");
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddAssert("hidden selected", () => getPanelForMod(typeof(OsuModHidden)).Active.Value);
+
+            AddStep("press enter again", () => InputManager.Key(Key.Enter));
+            AddAssert("hidden deselected", () => !getPanelForMod(typeof(OsuModHidden)).Active.Value);
+
+            AddStep("clear search", () => modSelectOverlay.SearchTerm = string.Empty);
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
         public void TestSearchFocusChange()
         {
             createScreen();
