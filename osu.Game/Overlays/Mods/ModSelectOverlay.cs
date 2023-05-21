@@ -612,10 +612,24 @@ namespace osu.Game.Overlays.Mods
                 // This is handled locally here because this overlay is being registered at the game level
                 // and therefore takes away keyboard focus from the screen stack.
                 case GlobalAction.ToggleModSelection:
+                    // Pressing toggle should completely hide the overlay in one shot.
+                    hideOverlay(true);
+                    return true;
+
                 case GlobalAction.Select:
                 {
-                    // Pressing toggle or select should completely hide the overlay in one shot.
-                    hideOverlay(true);
+                    // Pressing select should select first filtered mod or completely hide the overlay in one shot if search term is empty.
+                    if (string.IsNullOrEmpty(SearchTerm))
+                    {
+                        hideOverlay(true);
+                        return true;
+                    }
+
+                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.IsValid);
+
+                    if (firstMod is not null)
+                        firstMod.Active.Value = !firstMod.Active.Value;
+
                     return true;
                 }
             }
