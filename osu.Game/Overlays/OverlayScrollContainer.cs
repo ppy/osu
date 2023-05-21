@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         /// </summary>
         private const int button_scroll_position = 200;
 
-        protected ScrollBackButton Button;
+        public ScrollBackButton Button { get; private set; }
 
         private readonly Bindable<float?> lastScrollTarget = new Bindable<float?>();
 
