@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                AddLink(post.Title, LinkAction.External, "https://osu.ppy.sh/home/news/" + post.Slug, "view in browser");
+                AddLink(post.Title, LinkAction.External, @"/home/news/" + post.Slug, "view in browser");
             }
         }
 
