@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
-        private bool skipQueued;
+        public bool SkipQueued { get; private set; }
         private double nextAutoClickTime;
         private const double auto_click_timer = 200;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void SkipWhenReady()
         {
-            skipQueued = true;
+            SkipQueued = true;
             nextAutoClickTime = gameplayClock.CurrentTime + auto_click_timer;
         }
 
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
 
-            if (isClickable && skipQueued && gameplayClock.CurrentTime > nextAutoClickTime)
+            if (isClickable && SkipQueued && gameplayClock.CurrentTime > nextAutoClickTime)
             {
                 if (button.Enabled.Value)
                 {
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
                 }
                 else
                 {
-                    skipQueued = false;
+                    SkipQueued = false;
                 }
             }
         }

@@ -156,6 +156,47 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkRequestCount(0);
         }
 
+        [Test]
+        public void TestAutomatedSkipBeforeUpdate()
+        {
+            AddStep("create test", () =>
+            {
+                requestCount = 0;
+                increment = skip_time;
+
+                var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+
+                Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        skip = new TestSkipOverlay(skip_time)
+                        {
+                            RequestSkip = () =>
+                            {
+                                requestCount++;
+                                gameplayClockContainer.Seek(gameplayClock.CurrentTime + increment);
+                            }
+                        }
+                    },
+                };
+            });
+
+            AddStep("start automated skip", () => skip.SkipWhenReady());
+            AddWaitStep("wait without clock", 1);
+            AddAssert("ensure automated skip on", () => skip.SkipQueued);
+
+            AddStep("start clock", () =>
+            {
+                gameplayClockContainer.Start();
+                gameplayClock = gameplayClockContainer;
+            });
+            
+            AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
+            AddAssert("ensure automated skip off", () => skip.SkipQueued);
+        }
+
         private void checkRequestCount(int expected)
         {
             AddAssert($"skip count is {expected}", () => skip.SkipCount, () => Is.EqualTo(expected));
