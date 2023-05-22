@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Play
             isClickable = progress > 0;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
-            
+
             if (isClickable && skipQueued)
             {
                 skipQueued = false;
