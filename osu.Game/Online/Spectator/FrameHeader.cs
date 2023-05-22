@@ -48,7 +48,7 @@ namespace osu.Game.Online.Spectator
         /// Additional statistics that guides the score processor to calculate the correct score for this frame.
         /// </summary>
         [Key(5)]
-        public Dictionary<string, object> ScoreProcessorStatistics { get; set; }
+        public ScoreProcessorStatistics ScoreProcessorStatistics { get; set; }
 
         /// <summary>
         /// The time at which this frame was received by the server.
@@ -71,13 +71,12 @@ namespace osu.Game.Online.Spectator
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
 
-            ScoreProcessorStatistics = new Dictionary<string, object>();
-            scoreProcessor.WriteScoreProcessorStatistics(ScoreProcessorStatistics);
+            ScoreProcessorStatistics = scoreProcessor.GetScoreProcessorStatistics();
         }
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(long totalScore, double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, Dictionary<string, object> scoreProcessorStatistics, DateTimeOffset receivedTime)
+        public FrameHeader(long totalScore, double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, ScoreProcessorStatistics scoreProcessorStatistics, DateTimeOffset receivedTime)
         {
             TotalScore = totalScore;
             Accuracy = accuracy;
