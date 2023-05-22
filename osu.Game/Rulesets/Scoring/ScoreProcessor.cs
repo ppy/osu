@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using MessagePack;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -397,29 +398,29 @@ namespace osu.Game.Rulesets.Scoring
             scoreResultCounts.Clear();
             scoreResultCounts.AddRange(frame.Header.Statistics);
 
-            ReadScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
+            SetScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
 
             updateScore();
 
             OnResetFromReplayFrame?.Invoke();
         }
 
-        public virtual void WriteScoreProcessorStatistics(IDictionary<string, object> statistics)
+        public ScoreProcessorStatistics GetScoreProcessorStatistics() => new ScoreProcessorStatistics
         {
-            statistics.Add(nameof(currentMaximumBaseScore), currentMaximumBaseScore);
-            statistics.Add(nameof(currentBaseScore), currentBaseScore);
-            statistics.Add(nameof(currentCountBasicJudgements), currentCountBasicJudgements);
-            statistics.Add(nameof(currentComboPortion), currentComboPortion);
-            statistics.Add(nameof(currentBonusPortion), currentBonusPortion);
-        }
+            MaximumBaseScore = currentMaximumBaseScore,
+            BaseScore = currentBaseScore,
+            CountBasicJudgements = currentCountBasicJudgements,
+            ComboPortion = currentComboPortion,
+            BonusPortion = currentBonusPortion
+        };
 
-        public virtual void ReadScoreProcessorStatistics(IReadOnlyDictionary<string, object> statistics)
+        public void SetScoreProcessorStatistics(ScoreProcessorStatistics statistics)
         {
-            currentMaximumBaseScore = (double)statistics.GetValueOrDefault(nameof(currentMaximumBaseScore), 0);
-            currentBaseScore = (double)statistics.GetValueOrDefault(nameof(currentBaseScore), 0);
-            currentCountBasicJudgements = (int)statistics.GetValueOrDefault(nameof(currentCountBasicJudgements), 0);
-            currentComboPortion = (double)statistics.GetValueOrDefault(nameof(currentComboPortion), 0);
-            currentBonusPortion = (double)statistics.GetValueOrDefault(nameof(currentBonusPortion), 0);
+            currentMaximumBaseScore = statistics.MaximumBaseScore;
+            currentBaseScore = statistics.BaseScore;
+            currentCountBasicJudgements = statistics.CountBasicJudgements;
+            currentComboPortion = statistics.ComboPortion;
+            currentBonusPortion = statistics.BonusPortion;
         }
 
         #region Static helper methods
@@ -492,5 +493,25 @@ namespace osu.Game.Rulesets.Scoring
 
         [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ClassicScoreDisplay))]
         Classic
+    }
+
+    [Serializable]
+    [MessagePackObject]
+    public class ScoreProcessorStatistics
+    {
+        [Key(0)]
+        public double MaximumBaseScore { get; set; }
+
+        [Key(1)]
+        public double BaseScore { get; set; }
+
+        [Key(2)]
+        public int CountBasicJudgements { get; set; }
+
+        [Key(3)]
+        public double ComboPortion { get; set; }
+
+        [Key(4)]
+        public double BonusPortion { get; set; }
     }
 }
