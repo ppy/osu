@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -39,12 +38,12 @@ namespace osu.Game.Overlays.News
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, GameHost host)
+        private void load(OverlayColourProvider colourProvider, OsuGame? game)
         {
             if (post.Slug != null)
             {
                 TooltipText = "view in browser";
-                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
+                Action = () => game?.OpenUrlExternally(@"/home/news/" + post.Slug);
             }
 
             AddRange(new Drawable[]
