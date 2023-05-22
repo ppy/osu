@@ -108,6 +108,11 @@ namespace osu.Game.Screens.Edit
 
             foreach (var (oldObject, newObject) in oldObjects.Zip(newObjects))
             {
+                // if `oldObject` and `newObject` are the same, it means that `oldObject` was inserted into `editorBeatmap` by `processHitObjects()`.
+                // in that case, there is nothing to do (and some of the subsequent changes may even prove destructive).
+                if (ReferenceEquals(oldObject, newObject))
+                    continue;
+
                 if (oldObject is IHasSliderVelocity oldWithVelocity && newObject is IHasSliderVelocity newWithVelocity)
                     oldWithVelocity.SliderVelocity = newWithVelocity.SliderVelocity;
 
