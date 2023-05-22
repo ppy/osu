@@ -111,8 +111,15 @@ namespace osu.Game.Overlays.SkinEditor
                                         if (!ModUtils.CheckCompatibleSet(usableMods, out var invalid))
                                             mods.Value = mods.Value.Except(invalid).ToArray();
 
-                                        if (replayGeneratingMod != null)
-                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
+                                        if (replayGeneratingMod == null)
+                                            return;
+
+                                        if (screen is SongSelect songSelect)
+                                            songSelect.FinaliseSelection(customStartAction: loadPlayer);
+                                        else
+                                            loadPlayer();
+
+                                        void loadPlayer() => screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
                                     }, new[] { typeof(Player), typeof(SongSelect) })
                                 },
                             }

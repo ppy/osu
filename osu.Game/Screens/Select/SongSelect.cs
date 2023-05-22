@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Select
                 throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce);
-            this.Push(new EditorLoader());
+            FinaliseSelection(beatmapInfo ?? beatmapInfoNoDebounce, customStartAction: () => this.Push(new EditorLoader()));
         }
 
         /// <summary>
@@ -429,13 +429,16 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
+            Carousel.AllowSelection = false;
+
             if (customStartAction != null)
-            {
                 customStartAction();
-                Carousel.AllowSelection = false;
+            else
+            {
+                if (!OnStart())
+                    // start operation failed; allow selection again.
+                    Carousel.AllowSelection = true;
             }
-            else if (OnStart())
-                Carousel.AllowSelection = false;
         }
 
         /// <summary>
@@ -665,6 +668,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
+            Debug.Assert(Carousel.BeatmapSetsLoaded);
+            Debug.Assert(!Carousel.AllowSelection, $"Carousel selection is still allowed on suspension. Make sure to call {nameof(FinaliseSelection)} when pushing a new screen.");
+
             // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
             // Without this, it's possible for a transfer to happen while we are not the current screen.
             transferRulesetValue();

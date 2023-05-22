@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestPlayerLoaderSettingsHover()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
+            AddStep("Start player loader", () => songSelect.FinaliseSelection(customStartAction: () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true }))));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             setupUserSettings();
 
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer(allowPause))));
+            AddStep("Start player loader", () => songSelect.FinaliseSelection(customStartAction: () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer(allowPause)))));
 
             AddUntilStep("Wait for Player Loader to load", () => playerLoader.IsLoaded);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
