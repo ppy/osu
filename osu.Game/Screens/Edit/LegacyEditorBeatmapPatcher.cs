@@ -15,7 +15,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -42,6 +44,7 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.BeginChange();
             processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
             processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
+            processSliderVelocity(() => newBeatmap ??= readBeatmap(newState));
             editorBeatmap.EndChange();
         }
 
@@ -68,6 +71,17 @@ namespace osu.Game.Screens.Edit
                     foreach (var point in newGroup.ControlPoints)
                         editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
                 }
+            }
+        }
+
+        private void processSliderVelocity(Func<IBeatmap> getNewBeatmap)
+        {
+            var legacyControlPoints = (LegacyControlPointInfo)getNewBeatmap().ControlPointInfo;
+
+            foreach (var hitObject in editorBeatmap.HitObjects.Where(ho => ho is IHasSliderVelocity))
+            {
+                var difficultyPoint = legacyControlPoints.DifficultyPointAt(hitObject.StartTime);
+                ((IHasSliderVelocity)hitObject).SliderVelocity = difficultyPoint.SliderVelocity;
             }
         }
 
