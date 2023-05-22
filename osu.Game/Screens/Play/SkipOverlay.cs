@@ -143,22 +143,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void SkipWhenReady()
         {
-            if (skipQueued) return;
-
             skipQueued = true;
-            attemptNextSkip();
-
-            void attemptNextSkip() => Scheduler.AddDelayed(() =>
-            {
-                if (!button.Enabled.Value)
-                {
-                    skipQueued = false;
-                    return;
-                }
-
-                button.TriggerClick();
-                attemptNextSkip();
-            }, 200);
         }
 
         protected override void Update()
@@ -177,6 +162,12 @@ namespace osu.Game.Screens.Play
             isClickable = progress > 0;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
+            
+            if (isClickable && skipQueued)
+            {
+                skipQueued = false;
+                button.TriggerClick();
+            }
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
