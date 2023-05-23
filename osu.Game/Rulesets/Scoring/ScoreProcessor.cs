@@ -110,14 +110,14 @@ namespace osu.Game.Rulesets.Scoring
         private double currentBaseScore;
 
         /// <summary>
-        /// The count of all basic judgements in the beatmap.
+        /// The count of all accuracy-affecting judgements in the beatmap.
         /// </summary>
-        private int maximumCountBasicJudgements;
+        private int maximumCountAccuracyJudgements;
 
         /// <summary>
-        /// The count of basic judgements at the current point in time.
+        /// The count of accuracy-affecting judgements at the current point in time.
         /// </summary>
-        private int currentCountBasicJudgements;
+        private int currentCountAccuracyJudgements;
 
         /// <summary>
         /// The maximum combo score in the beatmap.
@@ -207,13 +207,11 @@ namespace osu.Game.Rulesets.Scoring
 
             result.ComboAfterJudgement = Combo.Value;
 
-            if (result.Type.IsBasic())
-                currentCountBasicJudgements++;
-
             if (result.Type.AffectsAccuracy())
             {
                 currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore += Judgement.ToNumericResult(result.Type);
+                currentCountAccuracyJudgements++;
             }
 
             if (result.Type.IsBonus())
@@ -250,13 +248,11 @@ namespace osu.Game.Rulesets.Scoring
             if (!result.Type.IsScorable())
                 return;
 
-            if (result.Type.IsBasic())
-                currentCountBasicJudgements--;
-
             if (result.Type.AffectsAccuracy())
             {
                 currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore -= Judgement.ToNumericResult(result.Type);
+                currentCountAccuracyJudgements--;
             }
 
             if (result.Type.IsBonus())
@@ -290,7 +286,7 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
 
             double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
-            double accuracyProcess = maximumCountBasicJudgements > 0 ? (double)currentCountBasicJudgements / maximumCountBasicJudgements : 1;
+            double accuracyProcess = maximumCountAccuracyJudgements > 0 ? (double)currentCountAccuracyJudgements / maximumCountAccuracyJudgements : 1;
 
             TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
         }
@@ -316,7 +312,7 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 maximumComboPortion = currentComboPortion;
-                maximumCountBasicJudgements = currentCountBasicJudgements;
+                maximumCountAccuracyJudgements = currentCountAccuracyJudgements;
 
                 maximumResultCounts.Clear();
                 maximumResultCounts.AddRange(scoreResultCounts);
@@ -328,7 +324,7 @@ namespace osu.Game.Rulesets.Scoring
 
             currentBaseScore = 0;
             currentMaximumBaseScore = 0;
-            currentCountBasicJudgements = 0;
+            currentCountAccuracyJudgements = 0;
             currentComboPortion = 0;
             currentBonusPortion = 0;
 
@@ -405,7 +401,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             MaximumBaseScore = currentMaximumBaseScore,
             BaseScore = currentBaseScore,
-            CountBasicJudgements = currentCountBasicJudgements,
+            CountAccuracyJudgements = currentCountAccuracyJudgements,
             ComboPortion = currentComboPortion,
             BonusPortion = currentBonusPortion
         };
@@ -414,7 +410,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             currentMaximumBaseScore = statistics.MaximumBaseScore;
             currentBaseScore = statistics.BaseScore;
-            currentCountBasicJudgements = statistics.CountBasicJudgements;
+            currentCountAccuracyJudgements = statistics.CountAccuracyJudgements;
             currentComboPortion = statistics.ComboPortion;
             currentBonusPortion = statistics.BonusPortion;
         }
@@ -502,7 +498,7 @@ namespace osu.Game.Rulesets.Scoring
         public double BaseScore { get; set; }
 
         [Key(2)]
-        public int CountBasicJudgements { get; set; }
+        public int CountAccuracyJudgements { get; set; }
 
         [Key(3)]
         public double ComboPortion { get; set; }
