@@ -76,22 +76,38 @@ namespace osu.Game.Tests.Gameplay
             // Reset with a miss instead.
             scoreProcessor.ResetFromReplayFrame(new OsuReplayFrame
             {
-                Header = new FrameHeader(0, 0, 0, new Dictionary<HitResult, int> { { HitResult.Miss, 1 } }, DateTimeOffset.Now)
+                Header = new FrameHeader(0, 0, 0, 0, new Dictionary<HitResult, int> { { HitResult.Miss, 1 } }, new ScoreProcessorStatistics
+                {
+                    MaximumBaseScore = 300,
+                    BaseScore = 0,
+                    CountAccuracyJudgements = 1,
+                    ComboPortion = 0,
+                    BonusPortion = 0
+                }, DateTimeOffset.Now)
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
             Assert.That(scoreProcessor.JudgedHits, Is.EqualTo(1));
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(0));
 
             // Reset with no judged hit.
             scoreProcessor.ResetFromReplayFrame(new OsuReplayFrame
             {
-                Header = new FrameHeader(0, 0, 0, new Dictionary<HitResult, int>(), DateTimeOffset.Now)
+                Header = new FrameHeader(0, 0, 0, 0, new Dictionary<HitResult, int>(), new ScoreProcessorStatistics
+                {
+                    MaximumBaseScore = 0,
+                    BaseScore = 0,
+                    CountAccuracyJudgements = 0,
+                    ComboPortion = 0,
+                    BonusPortion = 0
+                }, DateTimeOffset.Now)
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
             Assert.That(scoreProcessor.JudgedHits, Is.Zero);
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
         }
 
         [Test]
