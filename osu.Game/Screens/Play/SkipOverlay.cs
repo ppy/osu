@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play
 
             void attemptNextSkip() => Scheduler.AddDelayed(() =>
             {
-                if (!isClickable)
+                if (!button.Enabled.Value)
                 {
                     attemptNextSkip();
                     return;
