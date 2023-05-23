@@ -57,6 +57,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float line_extension = 0.2f;
+
             InternalChild = new Container
             {
                 Anchor = Anchor.Centre,
@@ -97,81 +99,67 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Height = MathF.Sqrt(2),
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
                                             Rotation = -rotation * 2,
-                                            Alpha = 0.3f,
+                                            Alpha = 0.6f,
                                         },
-                                        new Box
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Height = MathF.Sqrt(2),
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "Next",
+                                            Text = "Overshoot",
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.BottomRight,
+                                            Origin = Anchor.BottomCentre,
                                             Padding = new MarginPadding(3),
                                             RelativePositionAxes = Axes.Both,
-                                            Y = -inner_portion / 2,
+                                            Y = -(inner_portion + line_extension) / 2,
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "object",
+                                            Text = "Undershoot",
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.BottomLeft,
+                                            Origin = Anchor.TopCentre,
                                             Padding = new MarginPadding(3),
                                             RelativePositionAxes = Axes.Both,
-                                            Y = -inner_portion / 2,
+                                            Y = (inner_portion + line_extension) / 2,
                                         },
-                                        new OsuSpriteText
+                                        new Circle
                                         {
-                                            Text = "Last",
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.TopRight,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.TopCentre,
                                             RelativePositionAxes = Axes.Both,
-                                            Y = inner_portion / 2,
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = 45,
                                         },
-                                        new OsuSpriteText
+                                        new Circle
                                         {
-                                            Text = "object",
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.TopCentre,
                                             RelativePositionAxes = Axes.Both,
-                                            Y = inner_portion / 2,
-                                        },
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = -45,
+                                        }
                                     }
                                 },
                             },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Width = 10,
-                                EdgeSmoothness = new Vector2(1),
-                                Height = line_thickness / 2, // adjust for edgesmoothness
-                            },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                EdgeSmoothness = new Vector2(1),
-                                Width = line_thickness / 2, // adjust for edgesmoothness
-                                Height = 10,
-                            }
                         }
                     },
                     bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
