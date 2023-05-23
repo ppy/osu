@@ -90,12 +90,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         private Vector2 getPositionForDivisor(int divisor)
         {
-            float relativePosition = (float)Math.Clamp(divisor, 0, 16) / 16;
-            var sliderDrawQuad = tickSliderBar.ScreenSpaceDrawQuad;
-            return new Vector2(
-                sliderDrawQuad.TopLeft.X + sliderDrawQuad.Width * relativePosition,
-                sliderDrawQuad.Centre.Y
-            );
+            float localX = 1 - 1 / (float)divisor;
+            return tickSliderBar.ToScreenSpace(new Vector2(
+                localX,
+                0.5f
+            ));
         }
 
         [Test]
