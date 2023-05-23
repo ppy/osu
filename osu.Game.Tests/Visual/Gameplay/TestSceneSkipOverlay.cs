@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestAutomatedSkipBeforeClock()
+        public void TestAutomaticSkipTriggerBeforeClock()
         {
             AddStep("create test", () =>
             {
