@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -51,9 +52,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual Action SelectAction => () => InternalButtons.Selected?.TriggerClick();
 
-        public abstract string Header { get; }
+        public abstract LocalisableString Header { get; }
 
-        public abstract string Description { get; }
+        public abstract LocalisableString Description { get; }
 
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
@@ -170,7 +171,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected void AddButton(string text, Color4 colour, Action action)
+        protected void AddButton(LocalisableString text, Color4 colour, Action action)
         {
             var button = new Button
             {
