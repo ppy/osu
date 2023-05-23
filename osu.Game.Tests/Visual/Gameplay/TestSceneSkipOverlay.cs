@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestAutomatedSkipBeforeUpdate()
+        public void TestAutomatedSkipBeforeClock()
         {
             AddStep("create test", () =>
             {
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             
             AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
-            AddAssert("ensure automated skip off", () => skip.SkipQueued);
+            AddAssert("ensure automated skip off", () => !skip.SkipQueued);
         }
 
         private void checkRequestCount(int expected)

@@ -53,8 +53,6 @@ namespace osu.Game.Screens.Play
 
         internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
 
-        internal bool IsButtonEnabled => button.Enabled.Value;
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
