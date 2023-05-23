@@ -402,13 +402,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
                     int divisor = largestDivisor;
+                    // Find lowest divisor that the tick fits into
                     foreach (int validDivisor in beatDivisor.ValidDivisors.Value.Presets)
                     {
                         if (divisor > validDivisor && (tickIndex * validDivisor) % largestDivisor == 0)
                             divisor = validDivisor;
                     }
-                    bool solidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
-                    AddInternal(new Tick(solidTick, divisor)
+
+                    bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
+                    AddInternal(new Tick(isSolidTick, divisor)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
@@ -417,6 +419,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         X = tickIndex / (float)largestDivisor,
                     });
                 }
+
                 AddInternal(marker = new Marker());
                 CurrentNumber.ValueChanged += moveMarker;
                 CurrentNumber.TriggerChange();
