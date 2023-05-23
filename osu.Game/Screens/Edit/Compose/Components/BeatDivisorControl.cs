@@ -401,13 +401,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Max();
                 for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
-                    int divisor = largestDivisor;
-                    // Find lowest divisor that the tick fits into
-                    foreach (int validDivisor in beatDivisor.ValidDivisors.Value.Presets)
-                    {
-                        if (divisor > validDivisor && (tickIndex * validDivisor) % largestDivisor == 0)
-                            divisor = validDivisor;
-                    }
+                    int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
 
                     bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
                     AddInternal(new Tick(isSolidTick, divisor)
