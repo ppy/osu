@@ -1,19 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract partial class PlacementBlueprint : CompositeDrawable
+    public abstract partial class PlacementBlueprint : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
@@ -36,23 +37,34 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly HitObject HitObject;
 
-        [Resolved(canBeNull: true)]
-        protected EditorClock EditorClock { get; private set; }
+        [Resolved]
+        protected EditorClock EditorClock { get; private set; } = null!;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
-        private Bindable<double> startTimeBindable;
+        private Bindable<double> startTimeBindable = null!;
+
+        private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
 
         [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        private IPlacementHandler placementHandler { get; set; } = null!;
+
+        /// <summary>
+        /// Whether this blueprint is currently in a state that can be committed.
+        /// </summary>
+        /// <remarks>
+        /// Override this with any preconditions that should be double-checked on committing.
+        /// If <c>false</c> is returned and a commit is attempted, the blueprint will be destroyed instead.
+        /// </remarks>
+        protected virtual bool IsValidForPlacement => true;
 
         protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
 
             // adding the default hit sample should be the case regardless of the ruleset.
-            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, volume: 100));
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
 
             RelativeSizeAxes = Axes.Both;
 
@@ -75,7 +87,7 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement(bool commitStart = false)
         {
             // Take the hitnormal sample of the last hit object
-            var lastHitNormal = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
             if (lastHitNormal != null)
                 HitObject.Samples[0] = lastHitNormal;
 
@@ -88,7 +100,7 @@ namespace osu.Game.Rulesets.Edit
         /// Signals that the placement of <see cref="HitObject"/> has finished.
         /// This will destroy this <see cref="PlacementBlueprint"/>, and add the HitObject.StartTime to the <see cref="Beatmap"/>.
         /// </summary>
-        /// <param name="commit">Whether the object should be committed.</param>
+        /// <param name="commit">Whether the object should be committed. Note that a commit may fail if <see cref="IsValidForPlacement"/> is <c>false</c>.</param>
         public void EndPlacement(bool commit)
         {
             switch (PlacementActive)
@@ -102,8 +114,32 @@ namespace osu.Game.Rulesets.Edit
                     break;
             }
 
-            placementHandler.EndPlacement(HitObject, commit);
+            placementHandler.EndPlacement(HitObject, IsValidForPlacement && commit);
             PlacementActive = PlacementState.Finished;
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (PlacementActive == PlacementState.Waiting)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.Select:
+                    EndPlacement(true);
+                    return true;
+
+                case GlobalAction.Back:
+                    EndPlacement(false);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         /// <summary>
@@ -113,7 +149,12 @@ namespace osu.Game.Rulesets.Edit
         public virtual void UpdateTimeAndPosition(SnapResult result)
         {
             if (PlacementActive == PlacementState.Waiting)
-                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+            {
+                HitObject.StartTime = result.Time ?? EditorClock.CurrentTime;
+
+                if (HitObject is IHasComboInformation comboInformation)
+                    comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
+            }
         }
 
         /// <summary>
