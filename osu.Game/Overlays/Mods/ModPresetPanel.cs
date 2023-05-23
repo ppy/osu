@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
@@ -18,7 +19,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>, IHasContextMenu
+    public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>, IHasContextMenu, IHasPopover
     {
         public readonly Live<ModPreset> Preset;
 
@@ -111,7 +112,8 @@ namespace osu.Game.Overlays.Mods
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new DeleteModPresetDialog(Preset)))
+            new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Highlighted, this.ShowPopover),
+            new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new DeleteModPresetDialog(Preset))),
         };
 
         #endregion
@@ -122,5 +124,7 @@ namespace osu.Game.Overlays.Mods
 
             settingChangeTracker?.Dispose();
         }
+
+        public Popover GetPopover() => new EditPresetPopover(Preset);
     }
 }
