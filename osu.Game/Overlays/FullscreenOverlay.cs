@@ -56,6 +56,7 @@ namespace osu.Game.Overlays
             {
                 Colour = Color4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
+                Hollow = true,
                 Radius = 10
             };
 
