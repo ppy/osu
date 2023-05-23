@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 gameplayClockContainer.Start();
                 gameplayClock = gameplayClockContainer;
             });
-            
+
             AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
             AddAssert("ensure automated skip off", () => !skip.SkipQueued);
         }
