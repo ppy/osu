@@ -148,6 +148,11 @@ namespace osu.Game.Screens.Play
             SkipQueued = true;
         }
 
+        private double getProgress()
+        {
+            return Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -157,25 +162,25 @@ namespace osu.Game.Screens.Play
             if (fadeOutBeginTime <= displayTime)
                 return;
 
-            double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
-
+            double progress = getProgress();
+            isClickable = progress > 0;
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            isClickable = progress > 0;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
 
-            if (SkipQueued && gameplayClock.CurrentTime > nextAutoClickTime)
+            if (SkipQueued && isClickable && gameplayClock.CurrentTime > nextAutoClickTime && gameplayClock.IsRunning)
             {
+                button.TriggerClick();
+
+                // either set next click time or disable SkipQueued
+                progress = getProgress();
+                isClickable = progress > 0;
+
                 if (isClickable)
-                {
-                    button.TriggerClick();
                     nextAutoClickTime = gameplayClock.CurrentTime + auto_click_timer;
-                }
                 else
-                {
                     SkipQueued = false;
-                }
             }
         }
 
