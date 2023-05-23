@@ -398,7 +398,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ClearInternal();
                 CurrentNumber.ValueChanged -= moveMarker;
 
-                int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Max();
+                int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Last();
                 for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
                     int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
