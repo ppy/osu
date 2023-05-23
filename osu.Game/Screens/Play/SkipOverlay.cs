@@ -45,8 +45,6 @@ namespace osu.Game.Screens.Play
 
         private bool isClickable;
         internal bool SkipQueued { get; private set; }
-        private double nextAutoClickTime;
-        private const double auto_click_timer = 200;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
@@ -145,7 +143,29 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void SkipWhenReady()
         {
+            if (SkipQueued) return;
+
             SkipQueued = true;
+            attemptNextSkip();
+
+            void attemptNextSkip() => Scheduler.AddDelayed(() =>
+            {
+                if (!isClickable || !gameplayClock.IsRunning)
+                {
+                    attemptNextSkip();
+                    return;
+                }
+
+                button.TriggerClick();
+
+                double progress = getProgress();
+
+                if (progress > 0)
+                    attemptNextSkip();
+                else
+                    SkipQueued = false;
+
+            }, 200);
         }
 
         private double getProgress()
@@ -163,25 +183,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             double progress = getProgress();
-            isClickable = progress > 0;
+
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
+            isClickable = progress > 0;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
-
-            if (SkipQueued && isClickable && gameplayClock.CurrentTime > nextAutoClickTime && gameplayClock.IsRunning)
-            {
-                button.TriggerClick();
-
-                // either set next click time or disable SkipQueued
-                progress = getProgress();
-                isClickable = progress > 0;
-
-                if (isClickable)
-                    nextAutoClickTime = gameplayClock.CurrentTime + auto_click_timer;
-                else
-                    SkipQueued = false;
-            }
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
