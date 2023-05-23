@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play
 
             void attemptNextSkip() => Scheduler.AddDelayed(() =>
             {
-                if (!isClickable || !gameplayClock.IsRunning)
+                if (!isClickable)
                 {
                     attemptNextSkip();
                     return;
@@ -173,14 +173,19 @@ namespace osu.Game.Screens.Play
 
             // This case causes an immediate expire in `LoadComplete`, but `Update` may run once after that.
             // Avoid div-by-zero below.
-            if (fadeOutBeginTime <= displayTime)
-                return;
+            if (fadeOutBeginTime <= displayTime || !gameplayClock.IsRunning)
+            {
+                isClickable = false;
+            }
+            else
+            {
+                double p = progress;
 
-            double p = progress;
+                remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, p, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, p, Math.Clamp(Time.Elapsed / 40, 0, 1));
+                isClickable = p > 0;
+            }
 
-            isClickable = p > 0;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
