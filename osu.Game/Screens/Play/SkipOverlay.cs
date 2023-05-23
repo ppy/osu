@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
-        public bool SkipQueued { get; private set; }
+        internal bool SkipQueued { get; private set; }
         private double nextAutoClickTime;
         private const double auto_click_timer = 200;
 
@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Play
         private IGameplayClock gameplayClock { get; set; }
 
         internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
+
+        internal bool IsButtonEnabled => button.Enabled.Value;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -146,7 +148,6 @@ namespace osu.Game.Screens.Play
         public void SkipWhenReady()
         {
             SkipQueued = true;
-            nextAutoClickTime = gameplayClock.CurrentTime + auto_click_timer;
         }
 
         protected override void Update()
@@ -166,9 +167,9 @@ namespace osu.Game.Screens.Play
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
 
-            if (isClickable && SkipQueued && gameplayClock.CurrentTime > nextAutoClickTime)
+            if (SkipQueued && gameplayClock.CurrentTime > nextAutoClickTime)
             {
-                if (button.Enabled.Value)
+                if (isClickable)
                 {
                     button.TriggerClick();
                     nextAutoClickTime = gameplayClock.CurrentTime + auto_click_timer;
