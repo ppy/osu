@@ -289,10 +289,10 @@ namespace osu.Game.Rulesets.Scoring
         {
             Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
 
-            double comboRatio = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
-            double accuracyRatio = maximumCountBasicJudgements > 0 ? (double)currentCountBasicJudgements / maximumCountBasicJudgements : 1;
+            double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
+            double accuracyProcess = maximumCountBasicJudgements > 0 ? (double)currentCountBasicJudgements / maximumCountBasicJudgements : 1;
 
-            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboRatio, accuracyRatio, currentBonusPortion) * scoreMultiplier);
+            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
