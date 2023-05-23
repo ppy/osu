@@ -164,7 +164,6 @@ namespace osu.Game.Screens.Play
                     attemptNextSkip();
                 else
                     SkipQueued = false;
-
             }, 200);
         }
 
