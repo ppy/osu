@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 foreach (Tick child in InternalChildren.OfType<Tick>())
                 {
-                    float newAlpha = child.Solid ? 1f : divisor.NewValue % child.Divisor == 0 ? 0.2f : 0f;
+                    float newAlpha = child.IsSolid ? 1f : divisor.NewValue % child.Divisor == 0 ? 0.2f : 0f;
                     child.FadeTo(newAlpha);
                 }
             }
@@ -497,11 +497,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private partial class Tick : Circle
             {
-                public bool Solid;
+                public bool IsSolid;
                 public int Divisor;
-                public Tick(bool solid, int divisor)
+                public Tick(bool isSolid, int divisor)
                 {
-                    Solid = solid;
+                    IsSolid = isSolid;
                     Divisor = divisor;
                     Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
