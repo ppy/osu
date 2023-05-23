@@ -181,20 +181,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     },
                 };
+                gameplayClock = gameplayClockContainer;
             });
 
             AddStep("start automated skip", () => skip.SkipWhenReady());
-            AddWaitStep("wait without clock", 1);
-            AddAssert("ensure automated skip on", () => skip.SkipQueued);
+            checkRequestCount(0);
 
             AddStep("start clock", () =>
             {
                 gameplayClockContainer.Start();
-                gameplayClock = gameplayClockContainer;
             });
 
             AddUntilStep("wait for button disabled", () => !skip.IsButtonVisible);
             AddAssert("ensure automated skip off", () => !skip.SkipQueued);
+            checkRequestCount(1);
         }
 
         private void checkRequestCount(int expected)
