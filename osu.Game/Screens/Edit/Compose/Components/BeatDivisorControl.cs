@@ -402,8 +402,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
                     int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
-
                     bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
+
                     AddInternal(new Tick(isSolidTick, divisor)
                     {
                         Anchor = Anchor.CentreLeft,
