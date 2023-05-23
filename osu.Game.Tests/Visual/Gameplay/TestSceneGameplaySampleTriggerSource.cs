@@ -73,8 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new HitCircle
                 {
                     StartTime = t += spacing,
-                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
-                    SampleControlPoint = new SampleControlPoint { SampleBank = "soft" },
+                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft") },
                 },
                 new HitCircle
                 {
@@ -84,8 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
-                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) },
-                    SampleControlPoint = new SampleControlPoint { SampleBank = "soft" },
+                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, "soft") },
                 },
             });
 

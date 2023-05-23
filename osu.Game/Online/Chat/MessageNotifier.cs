@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
@@ -34,6 +35,9 @@ namespace osu.Game.Online.Chat
 
         [Resolved]
         private ChannelManager channelManager { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private Bindable<bool> notifyOnUsername;
         private Bindable<bool> notifyOnPrivateMessage;
@@ -89,8 +93,8 @@ namespace osu.Game.Online.Chat
             if (channel == null)
                 return;
 
-            // Only send notifications, if ChatOverlay and the target channel aren't visible.
-            if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel)
+            // Only send notifications if ChatOverlay or the target channel aren't visible, or if the window is unfocused
+            if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel && host.IsActive.Value)
                 return;
 
             foreach (var message in messages.OrderByDescending(m => m.Id))
@@ -99,6 +103,7 @@ namespace osu.Game.Online.Chat
                 if (message.Id <= channel.LastReadId)
                     return;
 
+                // ignore notifications triggered by local user's own chat messages
                 if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
