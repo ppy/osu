@@ -90,10 +90,10 @@ namespace osu.Game.Tests.Visual.Editing
 
         private Vector2 getPositionForDivisor(int divisor)
         {
-            float localX = 1 - 1 / (float)divisor;
+            float localX = (1 - 1 / (float)divisor) * tickSliderBar.UsableWidth + tickSliderBar.RangePadding;
             return tickSliderBar.ToScreenSpace(new Vector2(
                 localX,
-                0.5f
+                tickSliderBar.DrawHeight / 2
             ));
         }
 
