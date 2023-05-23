@@ -35,14 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString PausedHeader => new TranslatableString(getKey(@"paused_header"), @"paused");
 
         /// <summary>
-        /// "you're dead, try again?"
+        /// "You're dead, try again?"
         /// </summary>
-        public static LocalisableString FailedDescription => new TranslatableString(getKey(@"failed_description"), @"you're dead, try again?");
+        public static LocalisableString FailedDescription => new TranslatableString(getKey(@"failed_description"), @"You're dead, try again?");
 
         /// <summary>
-        /// "you're not going to do what i think you're going to do, are ya?"
+        /// "You're not going to do what i think you're going to do, are ya?"
         /// </summary>
-        public static LocalisableString PausedDescription => new TranslatableString(getKey(@"paused_description"), @"you're not going to do what i think you're going to do, are ya?");
+        public static LocalisableString PausedDescription => new TranslatableString(getKey(@"paused_description"), @"You're not going to do what i think you're going to do, are ya?");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
