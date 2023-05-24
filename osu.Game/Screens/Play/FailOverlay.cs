@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Play
         public Func<Task<ScoreInfo>> SaveReplay;
 
         public override string Header => "failed";
-        public override string Description => "you're dead, try again?";
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

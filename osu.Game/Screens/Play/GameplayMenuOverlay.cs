@@ -53,8 +53,6 @@ namespace osu.Game.Screens.Play
 
         public abstract string Header { get; }
 
-        public abstract string Description { get; }
-
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
@@ -107,14 +105,6 @@ namespace osu.Game.Screens.Play
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                new OsuSpriteText
-                                {
-                                    Text = Description,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
-                                }
                             }
                         },
                         InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
