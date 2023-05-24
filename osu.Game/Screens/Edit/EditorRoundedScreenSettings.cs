@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorRoundedScreenSettings : CompositeDrawable
+    public abstract partial class EditorRoundedScreenSettings : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)

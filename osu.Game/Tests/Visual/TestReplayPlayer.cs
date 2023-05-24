@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A player that exposes many components that would otherwise not be available, for testing purposes.
     /// </summary>
-    public class TestReplayPlayer : ReplayPlayer
+    public partial class TestReplayPlayer : ReplayPlayer
     {
         protected override bool PauseOnFocusLost { get; }
 

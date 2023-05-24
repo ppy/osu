@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectatorHost : PlayerTestScene
+    public partial class TestSceneSpectatorHost : PlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 

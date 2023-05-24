@@ -14,7 +14,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class ModPresetSettings : SettingsSubsection
+    public partial class ModPresetSettings : SettingsSubsection
     {
         protected override LocalisableString Header => CommonStrings.ModPresets;
 

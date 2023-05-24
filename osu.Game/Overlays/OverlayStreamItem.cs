@@ -18,7 +18,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamItem<T> : TabItem<T>
+    public abstract partial class OverlayStreamItem<T> : TabItem<T>
     {
         public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
@@ -39,12 +39,14 @@ namespace osu.Game.Overlays
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
+        public const float PADDING = 5;
+
         protected OverlayStreamItem(T value)
             : base(value)
         {
             Height = 50;
             Width = 90;
-            Margin = new MarginPadding(5);
+            Margin = new MarginPadding(PADDING);
         }
 
         [BackgroundDependencyLoader]

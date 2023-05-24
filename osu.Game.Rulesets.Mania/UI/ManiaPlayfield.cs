@@ -19,7 +19,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class ManiaPlayfield : ScrollingPlayfield
+    public partial class ManiaPlayfield : ScrollingPlayfield
     {
         public IReadOnlyList<Stage> Stages => stages;
 
@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
-            if (stageDefinitions == null)
-                throw new ArgumentNullException(nameof(stageDefinitions));
+            ArgumentNullException.ThrowIfNull(stageDefinitions);
 
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");

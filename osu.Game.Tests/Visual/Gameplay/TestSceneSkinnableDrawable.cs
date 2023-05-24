@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableDrawable : OsuTestScene
+    public partial class TestSceneSkinnableDrawable : OsuTestScene
     {
         [Test]
         public void TestConfineScaleDown()
@@ -160,11 +160,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
         }
 
-        private class SwitchableSkinProvidingContainer : SkinProvidingContainer
+        private partial class SwitchableSkinProvidingContainer : SkinProvidingContainer
         {
             private bool allow = true;
 
-            protected override bool AllowDrawableLookup(ISkinComponent component) => allow;
+            protected override bool AllowDrawableLookup(ISkinComponentLookup lookup) => allow;
 
             public void Disable()
             {
@@ -178,17 +178,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class ExposedSkinnableDrawable : SkinnableDrawable
+        private partial class ExposedSkinnableDrawable : SkinnableDrawable
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, ConfineMode confineMode = ConfineMode.ScaleToFit)
-                : base(new TestSkinComponent(name), defaultImplementation, confineMode)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponentLookup, Drawable> defaultImplementation, ConfineMode confineMode = ConfineMode.ScaleToFit)
+                : base(new TestSkinComponentLookup(name), defaultImplementation, confineMode)
             {
             }
         }
 
-        private class DefaultBox : DrawWidthBox
+        private partial class DefaultBox : DrawWidthBox
         {
             public DefaultBox()
             {
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawWidthBox : Container
+        private partial class DrawWidthBox : Container
         {
             private readonly OsuSpriteText text;
 
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class NamedBox : Container
+        private partial class NamedBox : Container
         {
             public NamedBox(string name)
             {
@@ -246,13 +246,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class SkinConsumer : SkinnableDrawable
+        private partial class SkinConsumer : SkinnableDrawable
         {
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
 
-            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation)
-                : base(new TestSkinComponent(name), defaultImplementation)
+            public SkinConsumer(string name, Func<ISkinComponentLookup, Drawable> defaultImplementation)
+                : base(new TestSkinComponentLookup(name), defaultImplementation)
             {
             }
 
@@ -263,7 +263,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class BaseSourceBox : NamedBox
+        private partial class BaseSourceBox : NamedBox
         {
             public BaseSourceBox()
                 : base("Base Source")
@@ -271,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class SecondarySourceBox : NamedBox
+        private partial class SecondarySourceBox : NamedBox
         {
             public SecondarySourceBox()
                 : base("Secondary Source")
@@ -288,8 +288,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.size = size;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent componentName) =>
-                componentName.LookupName == "available"
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) =>
+                (componentLookupName as TestSkinComponentLookup)?.LookupName == "available"
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,
@@ -306,7 +306,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class SecondarySource : ISkin
         {
-            public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
@@ -316,9 +316,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        private class SkinSourceContainer : Container, ISkinSource
+        private partial class SkinSourceContainer : Container, ISkinSource
         {
-            public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
+            public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
@@ -337,9 +337,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestSkinComponent : ISkinComponent
+        private class TestSkinComponentLookup : ISkinComponentLookup
         {
-            public TestSkinComponent(string name)
+            public TestSkinComponentLookup(string name)
             {
                 LookupName = name;
             }

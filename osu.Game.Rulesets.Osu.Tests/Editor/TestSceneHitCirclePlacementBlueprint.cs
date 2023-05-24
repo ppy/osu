@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneHitCirclePlacementBlueprint : PlacementBlueprintTestScene
+    public partial class TestSceneHitCirclePlacementBlueprint : PlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHitCircle((HitCircle)hitObject);
         protected override PlacementBlueprint CreateBlueprint() => new HitCirclePlacementBlueprint();

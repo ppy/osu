@@ -20,7 +20,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneCursors : OsuManualInputManagerTestScene
+    public partial class TestSceneCursors : OsuManualInputManagerTestScene
     {
         private readonly GlobalCursorDisplay globalCursorDisplay;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
@@ -178,6 +178,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestKeyboardLocalCursor([Values] bool clickToShow)
         {
+            AddStep("Enable cursor hiding", () => globalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = true);
             AddStep("Move to purple area", () => InputManager.MoveMouseTo(cursorBoxes[3].ScreenSpaceDrawQuad.Centre + new Vector2(10, 0)));
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check global cursor alpha is 1", () => globalCursorDisplay.MenuCursor.Alpha == 1);
@@ -201,6 +202,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestKeyboardUserCursor([Values] bool clickToShow)
         {
+            AddStep("Enable cursor hiding", () => globalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = true);
             AddStep("Move to green area", () => InputManager.MoveMouseTo(cursorBoxes[0]));
             AddAssert("Check green cursor visible", () => checkVisible(cursorBoxes[0].Cursor));
             AddAssert("Check global cursor alpha is 0", () => !checkVisible(globalCursorDisplay.MenuCursor) && globalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 0);
@@ -237,7 +239,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private bool checkAtMouse(CursorContainer cursorContainer)
             => Precision.AlmostEquals(InputManager.CurrentState.Mouse.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
-        private class CustomCursorBox : Container, IProvideCursor
+        private partial class CustomCursorBox : Container, IProvideCursor
         {
             public bool SmoothTransition;
 
@@ -288,11 +290,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestCursorContainer : CursorContainer
+        private partial class TestCursorContainer : CursorContainer
         {
             protected override Drawable CreateCursor() => new TestCursor();
 
-            private class TestCursor : CircularContainer
+            private partial class TestCursor : CircularContainer
             {
                 public TestCursor()
                 {

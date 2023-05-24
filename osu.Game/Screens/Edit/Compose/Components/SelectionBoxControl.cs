@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// Represents the base appearance for UI controls of the <see cref="SelectionBox"/>,
     /// such as scale handles, rotation handles, buttons, etc...
     /// </summary>
-    public abstract class SelectionBoxControl : CompositeDrawable
+    public abstract partial class SelectionBoxControl : CompositeDrawable
     {
         public const double TRANSFORM_DURATION = 100;
 

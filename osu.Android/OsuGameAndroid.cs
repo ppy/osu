@@ -5,7 +5,7 @@
 
 using System;
 using Android.App;
-using Android.OS;
+using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
 using osu.Framework.Android.Input;
 using osu.Framework.Input.Handlers;
@@ -14,11 +14,10 @@ using osu.Game;
 using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.Android
 {
-    public class OsuGameAndroid : OsuGame
+    public partial class OsuGameAndroid : OsuGame
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;
@@ -48,7 +47,7 @@ namespace osu.Android
                     // https://stackoverflow.com/questions/52977079/android-sdk-28-versioncode-in-packageinfo-has-been-deprecated
                     string versionName = string.Empty;
 
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    if (OperatingSystem.IsAndroidVersionAtLeast(28))
                     {
                         versionName = packageInfo.LongVersionCode.ToString();
                         // ensure we only read the trailing portion of long (the part we are interested in).

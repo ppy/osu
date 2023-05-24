@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardVideoLayer : StoryboardLayer
+    public partial class StoryboardVideoLayer : StoryboardLayer
     {
         public StoryboardVideoLayer(string name, int depth, bool masking)
             : base(name, depth, masking)
@@ -19,7 +19,7 @@ namespace osu.Game.Storyboards
         public override DrawableStoryboardLayer CreateDrawable()
             => new DrawableStoryboardVideoLayer(this) { Depth = Depth, Name = Name };
 
-        public class DrawableStoryboardVideoLayer : DrawableStoryboardLayer
+        public partial class DrawableStoryboardVideoLayer : DrawableStoryboardLayer
         {
             public DrawableStoryboardVideoLayer(StoryboardVideoLayer layer)
                 : base(layer)

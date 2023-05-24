@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class IconPill : CircularContainer, IHasTooltip
+    public abstract partial class IconPill : CircularContainer, IHasTooltip
     {
         public Vector2 IconSize
         {

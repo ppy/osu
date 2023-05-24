@@ -5,18 +5,21 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
     /// Handles debouncing hover sounds at a global level to ensure the effects are not overwhelming.
     /// </summary>
-    public abstract class HoverSampleDebounceComponent : CompositeDrawable
+    public abstract partial class HoverSampleDebounceComponent : Component
     {
         private Bindable<double?> lastPlaybackTime;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) == true;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)

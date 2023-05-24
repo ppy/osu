@@ -10,7 +10,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
-    public class LocalScoreDeleteDialog : DeleteConfirmationDialog
+    public partial class LocalScoreDeleteDialog : DangerousActionDialog
     {
         private readonly ScoreInfo score;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
 
             Icon = FontAwesome.Regular.TrashAlt;
-            DeleteAction = () => scoreManager.Delete(score);
+            DangerousAction = () => scoreManager.Delete(score);
         }
     }
 }

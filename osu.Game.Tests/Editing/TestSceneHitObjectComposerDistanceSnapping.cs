@@ -7,19 +7,21 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing
 {
     [HeadlessTest]
-    public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
+    public partial class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
         private TestHitObjectComposer composer = null!;
 
@@ -66,20 +68,27 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
-            assertSnapDistance(100 * multiplier);
+            assertSnapDistance(100 * multiplier, null, true);
         }
 
         [TestCase(1)]
         [TestCase(2)]
-        public void TestSpeedMultiplier(float multiplier)
+        public void TestSpeedMultiplierDoesNotChangeDistanceSnap(float multiplier)
         {
-            assertSnapDistance(100 * multiplier, new HitObject
+            assertSnapDistance(100, new Slider
             {
-                DifficultyControlPoint = new DifficultyControlPoint
-                {
-                    SliderVelocity = multiplier
-                }
-            });
+                SliderVelocity = multiplier
+            }, false);
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        public void TestSpeedMultiplierDoesChangeDistanceSnap(float multiplier)
+        {
+            assertSnapDistance(100 * multiplier, new Slider
+            {
+                SliderVelocity = multiplier
+            }, true);
         }
 
         [TestCase(1)]
@@ -88,7 +97,29 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set divisor = {divisor}", () => BeatDivisor.Value = divisor);
 
-            assertSnapDistance(100f / divisor);
+            assertSnapDistance(100f / divisor, null, true);
+        }
+
+        /// <summary>
+        /// The basic distance-duration functions should always include slider velocity of the reference object.
+        /// </summary>
+        [Test]
+        public void TestConversionsWithSliderVelocity()
+        {
+            const float base_distance = 100;
+            const float slider_velocity = 1.2f;
+
+            var referenceObject = new Slider
+            {
+                SliderVelocity = slider_velocity
+            };
+
+            assertSnapDistance(base_distance * slider_velocity, referenceObject, true);
+            assertSnappedDistance(base_distance * slider_velocity + 10, base_distance * slider_velocity, referenceObject);
+            assertSnappedDuration(base_distance * slider_velocity + 10, 1000, referenceObject);
+
+            assertDistanceToDuration(base_distance * slider_velocity, 1000, referenceObject);
+            assertDurationToDistance(1000, base_distance * slider_velocity, referenceObject);
         }
 
         [Test]
@@ -197,22 +228,22 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance, HitObject? hitObject = null)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()), () => Is.EqualTo(expectedDistance));
+        private void assertSnapDistance(float expectedDistance, HitObject? referenceObject, bool includeSliderVelocity)
+            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(referenceObject ?? new HitObject(), includeSliderVelocity), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
-        private void assertDurationToDistance(double duration, float expectedDistance)
-            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(new HitObject(), duration) == expectedDistance);
+        private void assertDurationToDistance(double duration, float expectedDistance, HitObject? referenceObject = null)
+            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(referenceObject ?? new HitObject(), duration), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
-        private void assertDistanceToDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(new HitObject(), distance) == expectedDuration);
+        private void assertDistanceToDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
-        private void assertSnappedDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(new HitObject(), distance) == expectedDuration);
+        private void assertSnappedDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
-        private void assertSnappedDistance(float distance, float expectedDistance)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(new HitObject(), distance) == expectedDistance);
+        private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
-        private class TestHitObjectComposer : OsuHitObjectComposer
+        private partial class TestHitObjectComposer : OsuHitObjectComposer
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
 

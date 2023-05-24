@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -26,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play.HUD
 {
     [LongRunningLoad]
-    public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
+    public partial class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
@@ -154,11 +154,13 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void playingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void playingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (int userId in e.OldItems.OfType<int>())
                     {
                         spectatorClient.StopWatchingUser(userId);
@@ -184,7 +186,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)Math.Round(u.ScoreProcessor.TotalScore.Value);
+                    team.Value += u.ScoreProcessor.TotalScore.Value;
             }
         }
 

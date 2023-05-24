@@ -21,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
+    public abstract partial class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
@@ -40,10 +40,9 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        /// <summary>
-        /// Whether all overlays should be hidden when this screen is entered or resumed.
-        /// </summary>
         public virtual bool HideOverlaysOnEnter => false;
+
+        public virtual bool HideMenuCursorOnNonMouseInput => false;
 
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
@@ -234,7 +233,13 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual void LogoArriving(OsuLogo logo, bool resuming)
         {
-            ApplyLogoArrivingDefaults(logo);
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+            logo.Anchor = Anchor.TopLeft;
+            logo.Origin = Anchor.Centre;
+            logo.RelativePositionAxes = Axes.Both;
+            logo.Triangles = true;
+            logo.Ripple = true;
         }
 
         private void applyArrivingDefaults(bool isResuming)
@@ -243,22 +248,6 @@ namespace osu.Game.Screens
             {
                 if (this.IsCurrentScreen()) LogoArriving(logo, isResuming);
             }, true);
-        }
-
-        /// <summary>
-        /// Applies default animations to an arriving logo.
-        /// Todo: This should not exist.
-        /// </summary>
-        /// <param name="logo">The logo to apply animations to.</param>
-        public static void ApplyLogoArrivingDefaults(OsuLogo logo)
-        {
-            logo.Action = null;
-            logo.FadeOut(300, Easing.OutQuint);
-            logo.Anchor = Anchor.TopLeft;
-            logo.Origin = Anchor.Centre;
-            logo.RelativePositionAxes = Axes.Both;
-            logo.Triangles = true;
-            logo.Ripple = true;
         }
 
         private void onExitingLogo()

@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class MetronomeBeat : BeatSyncedContainer, IAdjustableAudioComponent
+    public partial class MetronomeBeat : BeatSyncedContainer, IAdjustableAudioComponent
     {
         private readonly double firstHitTime;
 

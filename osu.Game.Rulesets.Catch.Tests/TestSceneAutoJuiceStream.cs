@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneAutoJuiceStream : TestSceneCatchPlayer
+    public partial class TestSceneAutoJuiceStream : TestSceneCatchPlayer
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     NewCombo = i % 8 == 0,
                     Samples = new List<HitSampleInfo>(new[]
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_NORMAL, volume: 100)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
                     })
                 });
             }

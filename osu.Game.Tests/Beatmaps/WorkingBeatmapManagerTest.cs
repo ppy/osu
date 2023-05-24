@@ -19,7 +19,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public class WorkingBeatmapManagerTest : OsuTestScene
+    public partial class WorkingBeatmapManagerTest : OsuTestScene
     {
         private BeatmapManager beatmaps = null!;
 

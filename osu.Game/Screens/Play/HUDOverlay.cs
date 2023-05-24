@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -22,13 +23,16 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
+using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public partial class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 300;
 
@@ -39,9 +43,16 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
 
-        // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
-        // Without blocking input, this would also allow them to be interacted with in such a state.
-        public override bool PropagatePositionalInputSubTree => ShowHud.Value;
+        protected override bool ShouldBeConsideredForInput(Drawable child)
+        {
+            // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
+            // Without blocking input, this would also allow them to be interacted with in such a state.
+            if (ShowHud.Value)
+                return base.ShouldBeConsideredForInput(child);
+
+            // hold to quit button should always be interactive.
+            return child == bottomRightElements;
+        }
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly ModDisplay ModDisplay;
@@ -50,6 +61,9 @@ namespace osu.Game.Screens.Play
 
         [Cached]
         private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+
+        [Cached]
+        private readonly JudgementTally tally;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -76,7 +90,7 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool holdingForHUD = new BindableBool();
 
-        private readonly SkinnableTargetContainer mainComponents;
+        private readonly SkinComponentsContainer mainComponents;
 
         /// <summary>
         /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
@@ -88,18 +102,22 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
+            Drawable rulesetComponents;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 CreateFailingLayer(),
-                mainComponents = new MainComponentsContainer
-                {
-                    AlwaysPresent = true,
-                },
+                //Needs to be initialized before skinnable drawables.
+                tally = new JudgementTally(),
+                mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
+                rulesetComponents = drawableRuleset != null
+                    ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
+                    : Empty(),
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -141,7 +159,7 @@ namespace osu.Game.Screens.Play
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
             };
 
-            hideTargets = new List<Drawable> { mainComponents, KeyCounter, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, KeyCounter, topRightElements };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -165,7 +183,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
+                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
                 });
             }
 
@@ -313,7 +331,7 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
+        protected KeyCounterDisplay CreateKeyCounter() => new DefaultKeyCounterDisplay
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
@@ -376,15 +394,15 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MainComponentsContainer : SkinnableTargetContainer
+        private partial class HUDComponentsContainer : SkinComponentsContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
             [Resolved]
             private OsuConfigManager config { get; set; }
 
-            public MainComponentsContainer()
-                : base(SkinnableTarget.MainHUDComponents)
+            public HUDComponentsContainer([CanBeNull] RulesetInfo ruleset = null)
+                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;
             }

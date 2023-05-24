@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// Shows the number of times the given beatmap set has been played.
     /// </summary>
-    public class PlayCountStatistic : BeatmapCardStatistic
+    public partial class PlayCountStatistic : BeatmapCardStatistic
     {
         public PlayCountStatistic(IBeatmapSetOnlineInfo onlineInfo)
         {

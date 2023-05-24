@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardDifficultyList : OsuTestScene
+    public partial class TestSceneBeatmapCardDifficultyList : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

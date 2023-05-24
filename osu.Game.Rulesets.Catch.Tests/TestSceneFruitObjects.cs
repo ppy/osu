@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneFruitObjects : CatchSkinnableTestScene
+    public partial class TestSceneFruitObjects : CatchSkinnableTestScene
     {
         protected override void LoadComplete()
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));
     }
 
-    public class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
+    public partial class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
     {
         public readonly ManualClock ManualClock;
 

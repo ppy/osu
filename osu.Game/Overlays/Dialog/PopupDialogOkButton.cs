@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogOkButton : PopupDialogButton
+    public partial class PopupDialogOkButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

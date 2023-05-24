@@ -9,7 +9,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class BeatmapBackground : Background
+    public partial class BeatmapBackground : Background
     {
         public readonly WorkingBeatmap Beatmap;
 

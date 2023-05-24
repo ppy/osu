@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
+            decodeVariables(ref line);
+
             int depth = 0;
 
             foreach (char c in line)
@@ -90,8 +92,6 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             line = line.Substring(depth);
-
-            decodeVariables(ref line);
 
             string[] split = line.Split(',');
 
@@ -108,6 +108,14 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         int offset = Parsing.ParseInt(split[1]);
                         string path = CleanFilename(split[2]);
+
+                        // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
+                        // the file extension is not a valid video.
+                        //
+                        // This avoids potential weird crashes when ffmpeg attempts to parse an image file as a video
+                        // (see https://github.com/ppy/osu/issues/22829#issuecomment-1465552451).
+                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
+                            break;
 
                         storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
                         break;
@@ -276,7 +284,8 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                            startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":
@@ -301,11 +310,11 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
 
         private Anchor parseOrigin(string value)
         {
-            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+            var origin = Enum.Parse<LegacyOrigins>(value);
 
             switch (origin)
             {
@@ -343,13 +352,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private AnimationLoopType parseAnimationLoopType(string value)
         {
-            var parsed = (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), value);
-            return Enum.IsDefined(typeof(AnimationLoopType), parsed) ? parsed : AnimationLoopType.LoopForever;
+            var parsed = Enum.Parse<AnimationLoopType>(value);
+            return Enum.IsDefined(parsed) ? parsed : AnimationLoopType.LoopForever;
         }
 
         private void handleVariables(string line)
         {
-            var pair = SplitKeyVal(line, '=');
+            var pair = SplitKeyVal(line, '=', false);
             variables[pair.Key] = pair.Value;
         }
 

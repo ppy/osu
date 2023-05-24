@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public class OsuScoreProcessor : ScoreProcessor
+    public partial class OsuScoreProcessor : ScoreProcessor
     {
         public OsuScoreProcessor()
             : base(new OsuRuleset())

@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Contracted
     /// <summary>
     /// The content that appears in the middle of a contracted <see cref="ScorePanel"/>.
     /// </summary>
-    public class ContractedPanelMiddleContent : CompositeDrawable
+    public partial class ContractedPanelMiddleContent : CompositeDrawable
     {
         private readonly ScoreInfo score;
 

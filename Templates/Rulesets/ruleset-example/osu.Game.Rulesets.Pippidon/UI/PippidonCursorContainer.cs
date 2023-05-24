@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Pippidon.UI
 {
-    public class PippidonCursorContainer : GameplayCursorContainer
+    public partial class PippidonCursorContainer : GameplayCursorContainer
     {
         private Sprite cursorSprite;
         private Texture cursorTexture;

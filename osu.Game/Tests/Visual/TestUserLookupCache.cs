@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestUserLookupCache : UserLookupCache
+    public partial class TestUserLookupCache : UserLookupCache
     {
         /// <summary>
         /// A special user ID which <see cref="ComputeValueAsync"/> would return a <see langword="null"/> <see cref="APIUser"/> for.

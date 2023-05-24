@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSpinnerApplication : OsuTestScene
+    public partial class TestSceneSpinnerApplication : OsuTestScene
     {
         [Test]
         public void TestApplyNewSpinner()

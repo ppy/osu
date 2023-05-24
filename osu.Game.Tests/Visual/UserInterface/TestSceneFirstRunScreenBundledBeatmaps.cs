@@ -10,7 +10,7 @@ using osu.Game.Overlays.FirstRunSetup;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFirstRunScreenBundledBeatmaps : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunScreenBundledBeatmaps : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);

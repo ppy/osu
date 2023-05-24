@@ -19,7 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelList : Container
+    public partial class ChannelList : Container
     {
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 announceChannelGroup.Show();
         }
 
-        private class ChannelGroup : FillFlowContainer
+        private partial class ChannelGroup : FillFlowContainer
         {
             public readonly FillFlowContainer<ChannelListItem> ItemFlow;
 

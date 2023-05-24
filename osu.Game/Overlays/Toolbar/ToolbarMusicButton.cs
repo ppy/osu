@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarMusicButton : ToolbarOverlayToggleButton
+    public partial class ToolbarMusicButton : ToolbarOverlayToggleButton
     {
         private Circle volumeBar;
 

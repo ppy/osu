@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -22,7 +23,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
 {
-    public class ScoreProcessorTest
+    public partial class ScoreProcessorTest
     {
         private ScoreProcessor scoreProcessor;
         private IBeatmap beatmap;
@@ -355,6 +356,28 @@ namespace osu.Game.Tests.Rulesets.Scoring
         }
 #pragma warning restore CS0618
 
+        [Test]
+        public void TestAccuracyWhenNearPerfect()
+        {
+            const int count_judgements = 1000;
+            const int count_misses = 1;
+
+            double actual = new TestScoreProcessor().ComputeAccuracy(new ScoreInfo
+            {
+                Statistics = new Dictionary<HitResult, int>
+                {
+                    { HitResult.Great, count_judgements - count_misses },
+                    { HitResult.Miss, count_misses }
+                }
+            });
+
+            const double expected = (count_judgements - count_misses) / (double)count_judgements;
+
+            Assert.That(actual, Is.Not.EqualTo(0.0));
+            Assert.That(actual, Is.Not.EqualTo(1.0));
+            Assert.That(actual, Is.EqualTo(expected).Within(Precision.FLOAT_EPSILON));
+        }
+
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
@@ -394,7 +417,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             }
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             protected override double DefaultAccuracyPortion => 0.5;
             protected override double DefaultComboPortion => 0.5;

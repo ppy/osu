@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace osu.Game.Tests.Visual.Online
 {
     [Description("uses online API")]
-    public class TestSceneOnlineBeatmapListingOverlay : OsuTestScene
+    public partial class TestSceneOnlineBeatmapListingOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

@@ -10,7 +10,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonOptions : FooterButton
+    public partial class FooterButtonOptions : FooterButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

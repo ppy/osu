@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class ModsSettings : SettingsSubsection
+    public partial class ModsSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.ModsHeader;
 
@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.IncreaseFirstObjectVisibility,
                     Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
+                    Keywords = new[] { @"approach", @"circle", @"hidden" },
                 },
             };
         }

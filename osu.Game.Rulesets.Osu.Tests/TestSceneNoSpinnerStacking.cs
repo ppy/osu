@@ -11,7 +11,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneNoSpinnerStacking : TestSceneOsuPlayer
+    public partial class TestSceneNoSpinnerStacking : TestSceneOsuPlayer
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {

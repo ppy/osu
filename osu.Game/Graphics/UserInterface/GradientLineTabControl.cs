@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class GradientLineTabControl<TModel> : PageTabControl<TModel>
+    public abstract partial class GradientLineTabControl<TModel> : PageTabControl<TModel>
     {
         protected Color4 LineColour
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
             Spacing = new Vector2(20, 0),
         };
 
-        private class GradientLine : GridContainer
+        private partial class GradientLine : GridContainer
         {
             public GradientLine()
             {

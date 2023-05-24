@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneSectionsContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneSectionsContainer : OsuManualInputManagerTestScene
     {
         private SectionsContainer<TestSection> container;
         private float custom;
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             InputManager.ScrollVerticalBy(direction);
         }
 
-        private class TestSection : TestBox
+        private partial class TestSection : TestBox
         {
             public bool Selected
             {
@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestBox : Container
+        private partial class TestBox : Container
         {
             private readonly Box background;
             private readonly OsuSpriteText text;

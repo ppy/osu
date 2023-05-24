@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public abstract class ThemeComparisonTestScene : OsuGridTestScene
+    public abstract partial class ThemeComparisonTestScene : OsuGridTestScene
     {
         protected ThemeComparisonTestScene()
             : base(1, 2)

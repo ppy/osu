@@ -16,7 +16,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneRankRangePill : OsuTestScene
+    public partial class TestSceneRankRangePill : OsuTestScene
     {
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
 

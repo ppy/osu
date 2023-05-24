@@ -15,7 +15,7 @@ using osu.Game.Overlays.Login;
 
 namespace osu.Game.Overlays
 {
-    public class LoginOverlay : OsuFocusedOverlayContainer
+    public partial class LoginOverlay : OsuFocusedOverlayContainer
     {
         private LoginPanel panel;
 

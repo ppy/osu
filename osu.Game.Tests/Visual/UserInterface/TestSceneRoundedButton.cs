@@ -9,14 +9,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneRoundedButton : ThemeComparisonTestScene
+    public partial class TestSceneRoundedButton : ThemeComparisonTestScene
     {
         private readonly BindableBool enabled = new BindableBool(true);
 
@@ -37,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     new SettingsButton
                     {
-                        Text = "Test button",
+                        Text = "Test settings button",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Enabled = { BindTarget = enabled },
@@ -56,8 +55,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestBackgroundColour()
         {
             AddStep("set red scheme", () => CreateThemedContent(OverlayColourScheme.Red));
-            AddAssert("rounded button has correct colour", () => Cell(0, 1).ChildrenOfType<RoundedButton>().First().BackgroundColour == new OsuColour().Blue3);
-            AddAssert("settings button has correct colour", () => Cell(0, 1).ChildrenOfType<SettingsButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Highlight1);
+            AddAssert("rounded button has correct colour", () => Cell(0, 1).ChildrenOfType<RoundedButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
+            AddAssert("settings button has correct colour", () => Cell(0, 1).ChildrenOfType<SettingsButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
         }
     }
 }

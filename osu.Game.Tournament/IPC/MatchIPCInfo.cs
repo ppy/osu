@@ -10,7 +10,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.IPC
 {
-    public class MatchIPCInfo : Component
+    public partial class MatchIPCInfo : Component
     {
         public Bindable<TournamentBeatmap> Beatmap { get; } = new Bindable<TournamentBeatmap>();
         public Bindable<LegacyMods> Mods { get; } = new Bindable<LegacyMods>();

@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
+    public partial class OsuCursorContainer : GameplayCursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
 
+        private readonly CursorRippleVisualiser rippleVisualiser;
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
@@ -47,8 +49,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
-                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
+                    cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    rippleVisualiser = new CursorRippleVisualiser(),
+                    new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
         }
@@ -82,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 var newScale = new Vector2(e.NewValue);
 
                 ActiveCursor.Scale = newScale;
+                rippleVisualiser.CursorScale = newScale;
                 cursorTrail.Scale = newScale;
             }, true);
 
@@ -165,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             ActiveCursor.ScaleTo(CursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
-        private class DefaultCursorTrail : CursorTrail
+        private partial class DefaultCursorTrail : CursorTrail
         {
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public abstract class DrawableBeatmapList : CompositeDrawable
+    public abstract partial class DrawableBeatmapList : CompositeDrawable
     {
         private readonly List<APIBeatmapSet> beatmapSets;
 

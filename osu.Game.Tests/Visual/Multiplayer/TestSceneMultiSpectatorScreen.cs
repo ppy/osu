@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
-                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
+                p.ChildrenOfType<ArgonSongProgressBar>().SingleOrDefault()?.Interactive == false));
 
             AddStep("restore config hud visibility", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }

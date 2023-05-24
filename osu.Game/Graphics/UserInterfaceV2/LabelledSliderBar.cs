@@ -9,7 +9,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledSliderBar<TNumber> : LabelledComponent<SettingsSlider<TNumber>, TNumber>
+    public partial class LabelledSliderBar<TNumber> : LabelledComponent<SettingsSlider<TNumber>, TNumber>
         where TNumber : struct, IEquatable<TNumber>, IComparable<TNumber>, IConvertible
     {
         public LabelledSliderBar()

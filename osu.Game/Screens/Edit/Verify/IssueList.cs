@@ -21,7 +21,7 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Verify
 {
     [Cached]
-    public class IssueList : CompositeDrawable
+    public partial class IssueList : CompositeDrawable
     {
         private IssueTable table;
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -16,12 +14,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
-        private CircularContainer largeFaint;
-        private CircularContainer smallFaint;
-        private CircularContainer directionalGlow1;
-        private CircularContainer directionalGlow2;
+        private CircularContainer largeFaint = null!;
+        private CircularContainer smallFaint = null!;
+        private CircularContainer directionalGlow1 = null!;
+        private CircularContainer directionalGlow2 = null!;
 
         [BackgroundDependencyLoader]
         private void load()

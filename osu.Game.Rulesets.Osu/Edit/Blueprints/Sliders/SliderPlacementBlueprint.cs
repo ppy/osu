@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -23,14 +22,14 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class SliderPlacementBlueprint : PlacementBlueprint
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
         private SliderBodyPiece bodyPiece;
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
-        private PathControlPointVisualiser controlPointVisualiser;
+        private PathControlPointVisualiser<Slider> controlPointVisualiser;
 
         private InputManager inputManager;
 
@@ -41,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
+
+        protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
         public SliderPlacementBlueprint()
             : base(new Slider())
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                controlPointVisualiser = new PathControlPointVisualiser(HitObject, false)
+                controlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, false)
             };
 
             setState(SliderPlacementState.Initial);
@@ -83,11 +84,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    var nearestDifficultyPoint = editorBeatmap.HitObjects
-                                                              .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime)?
-                                                              .DifficultyControlPoint?.DeepClone() as DifficultyControlPoint;
+                    double? nearestSliderVelocity = (editorBeatmap.HitObjects
+                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocity;
 
-                    HitObject.DifficultyControlPoint = nearestDifficultyPoint ?? new DifficultyControlPoint();
+                    HitObject.SliderVelocity = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(HitObject.Path.HasValidLength);
+            EndPlacement(true);
         }
 
         protected override void Update()

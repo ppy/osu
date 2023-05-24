@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Taiko.UI;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneFlyingHits : DrawableTaikoRulesetTestScene
+    public partial class TestSceneFlyingHits : DrawableTaikoRulesetTestScene
     {
         [TestCase(HitType.Centre)]
         [TestCase(HitType.Rim)]

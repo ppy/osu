@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using JetBrains.Annotations;
 using System;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
@@ -20,11 +17,10 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class ProfileLineChart : CompositeDrawable
+    public partial class ProfileLineChart : CompositeDrawable
     {
-        private APIUserHistoryCount[] values;
+        private APIUserHistoryCount[] values = Array.Empty<APIUserHistoryCount>();
 
-        [NotNull]
         public APIUserHistoryCount[] Values
         {
             get => values;
@@ -242,7 +238,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             return Math.Max((long)(tickMultiplier * tickBase), 1);
         }
 
-        private class TickText : OsuSpriteText
+        private partial class TickText : OsuSpriteText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -251,7 +247,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
-        private class TickLine : Box
+        private partial class TickLine : Box
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

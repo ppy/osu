@@ -12,7 +12,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
 {
-    public class StorageErrorDialog : PopupDialog
+    public partial class StorageErrorDialog : PopupDialog
     {
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; }

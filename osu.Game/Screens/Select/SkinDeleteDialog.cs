@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
 {
-    public class SkinDeleteDialog : DeleteConfirmationDialog
+    public partial class SkinDeleteDialog : DangerousActionDialog
     {
         private readonly Skin skin;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(SkinManager manager)
         {
-            DeleteAction = () =>
+            DangerousAction = () =>
             {
                 manager.Delete(skin.SkinInfo.Value);
                 manager.CurrentSkinInfo.SetDefault();

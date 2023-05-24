@@ -18,7 +18,7 @@ using osu.Game.Overlays.Chat;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatTextBox : OsuTestScene
+    public partial class TestSceneChatTextBox : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);

@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -14,12 +13,15 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
-using JetBrains.Annotations;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Users
 {
-    public abstract class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu
     {
         public readonly APIUser User;
 
@@ -27,29 +29,37 @@ namespace osu.Game.Users
         /// Perform an action in addition to showing the user's profile.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
         /// </summary>
-        public new Action Action;
+        public new Action? Action;
 
-        protected Action ViewProfile { get; private set; }
+        protected Action ViewProfile { get; private set; } = null!;
 
-        protected Drawable Background { get; private set; }
+        protected Drawable Background { get; private set; } = null!;
 
         protected UserPanel(APIUser user)
             : base(HoverSampleSet.Button)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             User = user;
         }
 
-        [Resolved(canBeNull: true)]
-        private UserProfileOverlay profileOverlay { get; set; }
-
-        [Resolved(canBeNull: true)]
-        protected OverlayColourProvider ColourProvider { get; private set; }
+        [Resolved]
+        private UserProfileOverlay? profileOverlay { get; set; }
 
         [Resolved]
-        protected OsuColour Colours { get; private set; }
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private ChannelManager? channelManager { get; set; }
+
+        [Resolved]
+        private ChatOverlay? chatOverlay { get; set; }
+
+        [Resolved]
+        protected OverlayColourProvider? ColourProvider { get; private set; }
+
+        [Resolved]
+        protected OsuColour Colours { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -80,7 +90,6 @@ namespace osu.Game.Users
             };
         }
 
-        [NotNull]
         protected abstract Drawable CreateLayout();
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
@@ -90,9 +99,26 @@ namespace osu.Game.Users
             Text = User.Username,
         };
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
-        };
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>
+                {
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
+                };
+
+                if (!User.Equals(api.LocalUser.Value))
+                {
+                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
+                    {
+                        channelManager?.OpenPrivateChannel(User);
+                        chatOverlay?.Show();
+                    }));
+                }
+
+                return items.ToArray();
+            }
+        }
     }
 }

@@ -20,7 +20,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsHeader : CompositeDrawable
+    public partial class CommentsHeader : CompositeDrawable
     {
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Comments
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         new OverlaySortTabControl<CommentsSortCriteria>
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Comments
             background.Colour = colourProvider.Background4;
         }
 
-        private class ShowDeletedButton : HeaderButton
+        private partial class ShowDeletedButton : HeaderButton
         {
             public readonly BindableBool Checked = new BindableBool();
 

@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -21,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSliderApplication : OsuTestScene
+    public partial class TestSceneSliderApplication : OsuTestScene
     {
         [Resolved]
         private SkinManager skinManager { get; set; }
@@ -68,10 +69,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("create slider", () =>
             {
-                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
-                tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
-
-                var provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(tintingSkin, Beatmap.Value.Beatmap);
+                var skin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
+                var provider = Ruleset.Value.CreateInstance().CreateSkinTransformer(skin, Beatmap.Value.Beatmap);
 
                 Child = new SkinProvidingContainer(provider)
                 {
@@ -92,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddStep("set accent white", () => dho.AccentColour.Value = Color4.White);
-            AddAssert("ball is white", () => dho.ChildrenOfType<DrawableSliderBall>().Single().AccentColour == Color4.White);
+            AddAssert("ball is white", () => dho.ChildrenOfType<LegacySliderBall>().Single().BallColour == Color4.White);
 
             AddStep("set accent red", () => dho.AccentColour.Value = Color4.Red);
-            AddAssert("ball is red", () => dho.ChildrenOfType<DrawableSliderBall>().Single().AccentColour == Color4.Red);
+            AddAssert("ball is red", () => dho.ChildrenOfType<LegacySliderBall>().Single().BallColour == Color4.Red);
         }
 
         private Slider prepareObject(Slider slider)

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A <see cref="Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
     /// </summary>
-    public class PlayfieldCoveringWrapper : CompositeDrawable
+    public partial class PlayfieldCoveringWrapper : CompositeDrawable
     {
         /// <summary>
         /// The complete cover, including gradient and fill.

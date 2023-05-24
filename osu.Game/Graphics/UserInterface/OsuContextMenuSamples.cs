@@ -11,7 +11,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenuSamples : Component
+    public partial class OsuContextMenuSamples : Component
     {
         private Sample sampleClick;
         private Sample sampleOpen;

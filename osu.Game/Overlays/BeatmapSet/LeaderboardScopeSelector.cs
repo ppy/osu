@@ -13,7 +13,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class LeaderboardScopeSelector : GradientLineTabControl<BeatmapLeaderboardScope>
+    public partial class LeaderboardScopeSelector : GradientLineTabControl<BeatmapLeaderboardScope>
     {
         protected override bool AddEnumEntriesAutomatically => false;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapSet
             LineColour = colourProvider.Background1;
         }
 
-        private class ScopeSelectorTabItem : PageTabItem
+        private partial class ScopeSelectorTabItem : PageTabItem
         {
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
