@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             {
                                 // Never remove a sample bank.
                                 // These are basically radio buttons, not toggles.
-                                if (SelectedItems.All(h => h.SampleControlPoint.SampleBank == bankName))
+                                if (SelectedItems.All(h => h.Samples.All(s => s.Bank == bankName)))
                                     bindable.Value = TernaryState.True;
                             }
 
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach ((string bankName, var bindable) in SelectionBankStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedItems, h => h.SampleControlPoint.SampleBank == bankName);
+                bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.All(s => s.Bank == bankName));
             }
         }
 
@@ -183,25 +183,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h.SampleControlPoint.SampleBank == bankName)
+                if (h.Samples.All(s => s.Bank == bankName))
                     return;
 
-                h.SampleControlPoint.SampleBank = bankName;
-                EditorBeatmap.Update(h);
-            });
-        }
-
-        /// <summary>
-        /// Removes a sample bank from all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="bankName">The name of the sample bank.</param>
-        public void RemoveSampleBank(string bankName)
-        {
-            EditorBeatmap.PerformOnSelection(h =>
-            {
-                if (h.SampleControlPoint.SampleBank == bankName)
-                    h.SampleControlPoint.SampleBankBindable.SetDefault();
-
+                h.Samples = h.Samples.Select(s => s.With(newBank: bankName)).ToList();
                 EditorBeatmap.Update(h);
             });
         }

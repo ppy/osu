@@ -199,12 +199,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void bankChanged(string bankName, TernaryState state)
         {
-            if (currentPlacement == null) return;
+            if (CurrentPlacement == null) return;
 
             switch (state)
             {
                 case TernaryState.True:
-                    currentPlacement.HitObject.SampleControlPoint.SampleBank = bankName;
+                    CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
                     break;
             }
         }
