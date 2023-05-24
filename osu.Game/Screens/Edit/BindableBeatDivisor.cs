@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="index">The 0-based beat index.</param>
         /// <param name="beatDivisor">The beat divisor.</param>
-        /// <param name="validDivisors">The list of valid divisors which can be chosen from. Assumes ordered from low to high.</param>
+        /// <param name="validDivisors">The list of valid divisors which can be chosen from. Assumes ordered from low to high. Defaults to <see cref="PREDEFINED_DIVISORS"/> if omitted.</param>
         /// <returns>The applicable divisor.</returns>
         public static int GetDivisorForBeatIndex(int index, int beatDivisor, int[] validDivisors = null)
         {
