@@ -77,10 +77,10 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateState()
         {
-            hoverClickSounds.Enabled.Value = !Item.Action.Disabled;
-            Alpha = Item.Action.Disabled ? 0.2f : 1;
+            hoverClickSounds.Enabled.Value = IsActionable;
+            Alpha = IsActionable ? 1 : 0.2f;
 
-            if (IsHovered && !Item.Action.Disabled)
+            if (IsHovered && IsActionable)
             {
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
                 text.NormalText.FadeOut(transition_length, Easing.OutQuint);

@@ -193,25 +193,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
-                // there is no easy way to perform an atomic swap on the `resolutions` list, which is bound to the dropdown via `ItemSource`.
-                // this means, if the old resolution isn't saved, the `RemoveRange()` call below will cause `resolutionDropdown.Current` to reset value,
-                // therefore making it impossible to select any dropdown value other than "Default".
-                // to circumvent this locally, store the old value here, so that we can attempt to restore it later.
-                var oldResolution = resolutionDropdown.Current.Value;
-
-                resolutions.RemoveRange(1, resolutions.Count - 1);
-
-                if (display.NewValue != null)
+                if (display.NewValue == null)
                 {
-                    resolutions.AddRange(display.NewValue.DisplayModes
-                                                .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                                .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
-                                                .Select(m => m.Size)
-                                                .Distinct());
+                    resolutions.Clear();
+                    return;
                 }
 
-                if (resolutions.Contains(oldResolution))
-                    resolutionDropdown.Current.Value = oldResolution;
+                resolutions.ReplaceRange(1, resolutions.Count - 1, display.NewValue.DisplayModes
+                                                                          .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                                          .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
+                                                                          .Select(m => m.Size)
+                                                                          .Distinct());
 
                 updateDisplaySettingsVisibility();
             }), true);
