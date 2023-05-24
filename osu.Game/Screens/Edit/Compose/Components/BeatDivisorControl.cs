@@ -383,7 +383,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
 
-                Padding = new MarginPadding { Horizontal = 5 };
+                RangePadding = 5;
+                Padding = new MarginPadding { Horizontal = RangePadding };
             }
 
             protected override void LoadComplete()
