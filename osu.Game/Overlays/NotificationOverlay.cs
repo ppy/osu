@@ -210,7 +210,7 @@ namespace osu.Game.Overlays
 
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeEdgeEffectTo(0.4f, WaveContainer.APPEAR_DURATION, Easing.Out);
+            mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             toastTray.FlushAllToasts();
         }
