@@ -201,12 +201,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (CurrentPlacement == null) return;
 
-            switch (state)
-            {
-                case TernaryState.True:
-                    CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
-                    break;
-            }
+            if (state == TernaryState.True)
+                CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
