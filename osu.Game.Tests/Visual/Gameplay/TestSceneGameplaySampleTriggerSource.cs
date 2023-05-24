@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
-                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, "soft") },
+                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT) },
                 },
             });
 

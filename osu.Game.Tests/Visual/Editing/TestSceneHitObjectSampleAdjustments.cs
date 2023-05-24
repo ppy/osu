@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE + new Vector2(100, 0)) / 2,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft", volume: 60)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT, volume: 60)
                     }
                 });
             });
@@ -67,14 +67,14 @@ namespace osu.Game.Tests.Visual.Editing
 
             hitObjectHasSampleBank(0, "normal");
             hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
-            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
 
             AddStep("remove clap addition", () => InputManager.Key(Key.R));
 
             hitObjectHasSampleBank(0, "normal");
             hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
-            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
         }
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestUndo()
         {
             clickSamplePiece(1);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
             samplePopoverHasSingleVolume(60);
 
             setVolumeViaPopover(90);
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     for (int i = 0; i < h.Samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newBank: "soft");
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
                     }
                 }
             });
