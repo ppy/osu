@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania;
@@ -16,6 +17,7 @@ using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -82,5 +84,63 @@ namespace osu.Game.Tests.Visual.Navigation
 
             BeatmapSetInfo[] allBeatmapSets() => Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
         }
+
+        [Test]
+        public void TestExitEditorWithoutSelection()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import test beatmap", () => Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely());
+            AddStep("retrieve beatmap", () => beatmapSet = Game.BeatmapManager.QueryBeatmapSet(set => !set.Protected).AsNonNull().Value.Detach());
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapSet));
+            AddUntilStep("wait for song select",
+                () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
+                      && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
+                      && songSelect.IsLoaded);
+
+            AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+
+            AddStep("escape once", () => InputManager.Key(Key.Escape));
+
+            AddUntilStep("wait for editor exit", () => Game.ScreenStack.CurrentScreen is not Editor);
+        }
+
+        [Test]
+        public void TestExitEditorWithSelection()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import test beatmap", () => Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely());
+            AddStep("retrieve beatmap", () => beatmapSet = Game.BeatmapManager.QueryBeatmapSet(set => !set.Protected).AsNonNull().Value.Detach());
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapSet));
+            AddUntilStep("wait for song select",
+                () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
+                      && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
+                      && songSelect.IsLoaded);
+
+            AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+
+            AddStep("make selection", () =>
+            {
+                var beatmap = getEditorBeatmap();
+                beatmap.SelectedHitObjects.AddRange(beatmap.HitObjects.Take(5));
+            });
+
+            AddAssert("selection exists", () => getEditorBeatmap().SelectedHitObjects, () => Has.Count.GreaterThan(0));
+
+            AddStep("escape once", () => InputManager.Key(Key.Escape));
+
+            AddAssert("selection exists", () => getEditorBeatmap().SelectedHitObjects, () => Has.Count.Zero);
+
+            AddStep("escape again", () => InputManager.Key(Key.Escape));
+
+            AddUntilStep("wait for editor exit", () => Game.ScreenStack.CurrentScreen is not Editor);
+        }
+
+        private EditorBeatmap getEditorBeatmap() => ((Editor)Game.ScreenStack.CurrentScreen).ChildrenOfType<EditorBeatmap>().Single();
     }
 }
