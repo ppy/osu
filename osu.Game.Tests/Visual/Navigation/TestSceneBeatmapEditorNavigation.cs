@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("escape once", () => InputManager.Key(Key.Escape));
 
-            AddAssert("selection exists", () => getEditorBeatmap().SelectedHitObjects, () => Has.Count.Zero);
+            AddAssert("selection empty", () => getEditorBeatmap().SelectedHitObjects, () => Has.Count.Zero);
 
             AddStep("escape again", () => InputManager.Key(Key.Escape));
 
