@@ -14,12 +14,15 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -27,7 +30,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
     {
         protected override bool UseFreshStoragePerRun => true;
 
@@ -63,6 +66,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                             new OsuModDifficultyAdjust
                             {
                                 ApproachRate = { Value = 0 }
+                            }
+                        }
+                    });
+                    r.Add(new ModPreset
+                    {
+                        Name = "Half Time 0.5x",
+                        Description = "Very slow",
+                        Ruleset = r.Find<RulesetInfo>(OsuRuleset.SHORT_NAME),
+                        Mods = new[]
+                        {
+                            new OsuModHalfTime
+                            {
+                                SpeedChange = { Value = 0.5 }
                             }
                         }
                     });
@@ -269,7 +285,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
 
-            AddStep("set setting", () => modSelectOverlay.ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = 8);
+            AddStep("set setting", () => modSelectOverlay.ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value = 8);
 
             AddAssert("ensure setting is propagated", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
 
@@ -338,26 +354,80 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestRulesetChanges()
+        public void TestCommonModsMaintainedOnRulesetChange()
         {
             createScreen();
             changeRuleset(0);
 
-            var noFailMod = new OsuRuleset().GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
-
-            AddStep("set mods externally", () => { SelectedMods.Value = new[] { noFailMod }; });
+            AddStep("select relax mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModRelax>() });
 
             changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModRelax);
 
-            AddAssert("ensure mods still selected", () => SelectedMods.Value.SingleOrDefault(m => m is OsuModNoFail) != null);
+            changeRuleset(2);
+            AddAssert("catch variant selected", () => SelectedMods.Value.SingleOrDefault() is CatchModRelax);
 
             changeRuleset(3);
+            AddAssert("no mod selected", () => SelectedMods.Value.Count == 0);
+        }
 
-            AddAssert("ensure mods not selected", () => SelectedMods.Value.Count == 0);
-
+        [Test]
+        public void TestUncommonModsDiscardedOnRulesetChange()
+        {
+            createScreen();
             changeRuleset(0);
 
-            AddAssert("ensure mods not selected", () => SelectedMods.Value.Count == 0);
+            AddStep("select single tap mod", () => SelectedMods.Value = new[] { new OsuModSingleTap() });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModSingleTap);
+
+            changeRuleset(3);
+            AddAssert("no mod selected", () => SelectedMods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestKeepSharedSettingsFromSimilarMods()
+        {
+            const float setting_change = 1.2f;
+
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModDifficultyAdjust>()! });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModDifficultyAdjust);
+
+            AddStep("change mod settings", () =>
+            {
+                var osuMod = getSelectedMod<OsuModDifficultyAdjust>();
+
+                osuMod.ExtendedLimits.Value = true;
+                osuMod.CircleSize.Value = setting_change;
+                osuMod.DrainRate.Value = setting_change;
+                osuMod.OverallDifficulty.Value = setting_change;
+                osuMod.ApproachRate.Value = setting_change;
+            });
+
+            changeRuleset(1);
+            AddAssert("taiko variant selected", () => SelectedMods.Value.SingleOrDefault() is TaikoModDifficultyAdjust);
+
+            AddAssert("shared settings preserved", () =>
+            {
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
+
+                return taikoMod.ExtendedLimits.Value &&
+                       taikoMod.DrainRate.Value == setting_change &&
+                       taikoMod.OverallDifficulty.Value == setting_change;
+            });
+
+            AddAssert("non-shared settings remain default", () =>
+            {
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
+
+                return taikoMod.ScrollSpeed.IsDefault;
+            });
         }
 
         [Test]
@@ -555,6 +625,28 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("5 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 5);
         }
 
+        [Test]
+        public void TestModMultiplierUpdates()
+        {
+            createScreen();
+
+            AddStep("select mod preset with half time", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().Single(preset => preset.Preset.Value.Name == "Half Time 0.5x"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.5));
+
+            // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
+            // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
+            AddStep("force collection", GC.Collect);
+
+            AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
+            AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
+                                                                              .ChildrenOfType<RestoreDefaultValueButton<double>>().Single().TriggerClick());
+            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
             () => modSelectOverlay.ChildrenOfType<ModColumn>().Any() && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 
@@ -570,10 +662,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Value == active);
         }
 
+        private T getSelectedMod<T>() where T : Mod => SelectedMods.Value.OfType<T>().Single();
+
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
 
-        private class TestModSelectOverlay : UserModSelectOverlay
+        private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
 

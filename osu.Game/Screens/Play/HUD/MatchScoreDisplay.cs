@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class MatchScoreDisplay : CompositeDrawable
+    public partial class MatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
         private const float font_size = 50;
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play.HUD
             Score2Text.X = Math.Max(5 + Score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        protected class MatchScoreCounter : CommaSeparatedScoreCounter
+        protected partial class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 

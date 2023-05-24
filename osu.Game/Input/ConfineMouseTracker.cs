@@ -18,7 +18,7 @@ namespace osu.Game.Input
     /// If <see cref="OsuGame.LocalUserPlaying"/> is true, we should also confine the mouse cursor if it has been
     /// requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
     /// </summary>
-    public class ConfineMouseTracker : Component
+    public partial class ConfineMouseTracker : Component
     {
         private Bindable<ConfineMouseMode> frameworkConfineMode;
         private Bindable<WindowMode> frameworkWindowMode;

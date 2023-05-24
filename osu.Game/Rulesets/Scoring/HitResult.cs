@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// An array of all scorable <see cref="HitResult"/>s.
         /// </summary>
-        public static readonly HitResult[] ALL_TYPES = ((HitResult[])Enum.GetValues(typeof(HitResult))).Except(new[] { HitResult.LegacyComboIncrease }).ToArray();
+        public static readonly HitResult[] ALL_TYPES = Enum.GetValues<HitResult>().Except(new[] { HitResult.LegacyComboIncrease }).ToArray();
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> is valid within a given <see cref="HitResult"/> range.

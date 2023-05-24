@@ -11,7 +11,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
-    public class EditorPlayerLoader : PlayerLoader
+    public partial class EditorPlayerLoader : PlayerLoader
     {
         [Resolved]
         private OsuLogo osuLogo { get; set; }

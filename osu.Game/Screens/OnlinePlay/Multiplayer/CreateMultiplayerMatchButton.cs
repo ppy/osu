@@ -10,7 +10,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class CreateMultiplayerMatchButton : CreateRoomButton
+    public partial class CreateMultiplayerMatchButton : CreateRoomButton
     {
         private IBindable<bool> isConnected;
         private IBindable<bool> operationInProgress;

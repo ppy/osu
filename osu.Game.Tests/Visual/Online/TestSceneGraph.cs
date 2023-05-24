@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,7 +13,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneGraph : OsuTestScene
+    public partial class TestSceneGraph : OsuTestScene
     {
         public TestSceneGraph()
         {
@@ -32,6 +33,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Select(i => (float)i));
             AddStep("values from 1-100", () => graph.Values = Enumerable.Range(1, 100).Select(i => (float)i));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().Select(i => (float)i));
+            AddStep("empty values", () => graph.Values = Array.Empty<float>());
             AddStep("Bottom to top", () => graph.Direction = BarDirection.BottomToTop);
             AddStep("Top to bottom", () => graph.Direction = BarDirection.TopToBottom);
             AddStep("Left to right", () => graph.Direction = BarDirection.LeftToRight);

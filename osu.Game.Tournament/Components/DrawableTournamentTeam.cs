@@ -12,7 +12,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public abstract class DrawableTournamentTeam : CompositeDrawable
+    public abstract partial class DrawableTournamentTeam : CompositeDrawable
     {
         public readonly TournamentTeam Team;
 

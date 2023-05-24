@@ -7,7 +7,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class OverlinedPlaylistHeader : OverlinedHeader
+    public partial class OverlinedPlaylistHeader : OverlinedHeader
     {
         public OverlinedPlaylistHeader()
             : base("Playlist")

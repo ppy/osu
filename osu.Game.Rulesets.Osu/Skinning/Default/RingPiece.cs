@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class RingPiece : CircularContainer
+    public partial class RingPiece : CircularContainer
     {
         public RingPiece(float thickness = 9)
         {

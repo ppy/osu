@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuEditorSelectInvalidPath : EditorTestScene
+    public partial class TestSceneOsuEditorSelectInvalidPath : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

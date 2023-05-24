@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class AccountCreationBackground : Sprite
+    public partial class AccountCreationBackground : Sprite
     {
         public AccountCreationBackground()
         {

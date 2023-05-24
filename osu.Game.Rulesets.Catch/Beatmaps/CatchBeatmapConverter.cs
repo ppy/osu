@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using System.Collections.Generic;
@@ -28,6 +26,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var xPositionData = obj as IHasXPosition;
             var yPositionData = obj as IHasYPosition;
             var comboData = obj as IHasCombo;
+            var sliderVelocityData = obj as IHasSliderVelocity;
 
             switch (obj)
             {
@@ -43,7 +42,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
                         LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0,
-                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y
+                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y,
+                        SliderVelocity = sliderVelocityData?.SliderVelocity ?? 1
                     }.Yield();
 
                 case IHasDuration endTime:

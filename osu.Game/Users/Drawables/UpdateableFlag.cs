@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public class UpdateableFlag : ModelBackedDrawable<CountryCode>
+    public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
         public CountryCode CountryCode
         {
@@ -30,14 +28,14 @@ namespace osu.Game.Users.Drawables
         /// Perform an action in addition to showing the country ranking.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
         /// </summary>
-        public Action Action;
+        public Action? Action;
 
         public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
             CountryCode = countryCode;
         }
 
-        protected override Drawable CreateDrawable(CountryCode countryCode)
+        protected override Drawable? CreateDrawable(CountryCode countryCode)
         {
             if (countryCode == CountryCode.Unknown && !ShowPlaceholderOnUnknown)
                 return null;
@@ -56,8 +54,8 @@ namespace osu.Game.Users.Drawables
             };
         }
 
-        [Resolved(canBeNull: true)]
-        private RankingsOverlay rankingsOverlay { get; set; }
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
 
         protected override bool OnClick(ClickEvent e)
         {

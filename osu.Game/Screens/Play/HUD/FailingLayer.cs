@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// An overlay layer on top of the playfield which fades to red when the current player health falls below a certain threshold defined by <see cref="low_health_threshold"/>.
     /// </summary>
-    public class FailingLayer : HealthDisplay
+    public partial class FailingLayer : HealthDisplay
     {
         /// <summary>
         /// Whether the current player health should be shown on screen.

@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -25,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileScore : CompositeDrawable
+    public partial class DrawableProfileScore : CompositeDrawable
     {
         private const int height = 40;
         private const int performance_width = 100;
@@ -35,10 +32,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         protected readonly SoloScoreInfo Score;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public DrawableProfileScore(SoloScoreInfo score)
         {
@@ -85,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
+                                            new ScoreBeatmapMetadataContainer(Score.Beatmap.AsNonNull()),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -95,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Score.Beatmap?.DifficultyName}",
+                                                        Text = $"{Score.Beatmap.AsNonNull().DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
@@ -163,7 +160,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
-                                Colour = colourProvider.Background4,
+                                Colour = colourProvider.Background3,
                                 Shear = new Vector2(-performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
@@ -175,7 +172,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 RelativePositionAxes = Axes.Y,
                                 Height = -0.5f,
                                 Position = new Vector2(0, 1),
-                                Colour = colourProvider.Background4,
+                                Colour = colourProvider.Background3,
                                 Shear = new Vector2(performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
@@ -200,7 +197,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
         }
 
-        [NotNull]
         protected virtual Drawable CreateRightContent() => CreateDrawableAccuracy();
 
         protected Drawable CreateDrawableAccuracy() => new Container
@@ -258,7 +254,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             };
         }
 
-        private class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
+        private partial class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
         {
             public ScoreBeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
                 : base(beatmapInfo)
@@ -268,8 +264,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             protected override Drawable[] CreateText(IBeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-
-                Debug.Assert(metadata != null);
 
                 return new Drawable[]
                 {

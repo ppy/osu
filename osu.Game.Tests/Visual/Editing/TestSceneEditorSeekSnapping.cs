@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneEditorSeekSnapping : EditorClockTestScene
+    public partial class TestSceneEditorSeekSnapping : EditorClockTestScene
     {
         public TestSceneEditorSeekSnapping()
         {
@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Reset", () => EditorClock.Seek(0));
         }
 
-        private class TimingPointVisualiser : CompositeDrawable
+        private partial class TimingPointVisualiser : CompositeDrawable
         {
             private readonly double length;
 
@@ -386,7 +386,7 @@ namespace osu.Game.Tests.Visual.Editing
                 tracker.X = (float)(Time.Current / length);
             }
 
-            private class TimingPointTimeline : CompositeDrawable
+            private partial class TimingPointTimeline : CompositeDrawable
             {
                 public TimingPointTimeline(TimingControlPoint timingPoint, double endTime, double fullDuration)
                 {

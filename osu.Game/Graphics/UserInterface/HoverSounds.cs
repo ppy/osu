@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     /// Adds hover sounds to a drawable.
     /// Does not draw anything.
     /// </summary>
-    public class HoverSounds : HoverSampleDebounceComponent
+    public partial class HoverSounds : HoverSampleDebounceComponent
     {
         private Sample sampleHover;
 

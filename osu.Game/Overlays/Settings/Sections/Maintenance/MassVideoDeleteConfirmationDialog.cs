@@ -5,7 +5,7 @@ using System;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MassVideoDeleteConfirmationDialog : MassDeleteConfirmationDialog
+    public partial class MassVideoDeleteConfirmationDialog : MassDeleteConfirmationDialog
     {
         public MassVideoDeleteConfirmationDialog(Action deleteAction)
             : base(deleteAction)

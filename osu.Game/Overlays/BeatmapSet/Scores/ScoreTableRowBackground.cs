@@ -14,7 +14,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTableRowBackground : CompositeDrawable
+    public partial class ScoreTableRowBackground : CompositeDrawable
     {
         private const int fade_duration = 100;
 

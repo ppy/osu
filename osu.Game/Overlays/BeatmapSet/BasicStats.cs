@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BasicStats : Container
+    public partial class BasicStats : Container
     {
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDisplay();
         }
 
-        private class Statistic : Container, IHasTooltip
+        private partial class Statistic : Container, IHasTooltip
         {
             private readonly OsuSpriteText value;
 

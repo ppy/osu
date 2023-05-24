@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSnapping : EditorTestScene
+    public partial class TestSceneSliderSnapping : EditorTestScene
     {
         private const double beat_length = 1000;
 
@@ -72,14 +72,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestMovingUnsnappedSliderNodesSnaps()
         {
-            PathControlPointPiece sliderEnd = null;
+            PathControlPointPiece<Slider> sliderEnd = null;
 
             assertSliderSnapped(false);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("select slider end", () =>
             {
-                sliderEnd = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
+                sliderEnd = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
                 InputManager.MoveMouseTo(sliderEnd.ScreenSpaceDrawQuad.Centre);
             });
             AddStep("move slider end", () =>
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to new point location", () =>
             {
-                var firstPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
+                var firstPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
                 var pos = slider.Path.PositionAt(0.25d) + slider.Position;
                 InputManager.MoveMouseTo(firstPiece.Parent.ToScreenSpace(pos));
             });
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to second control point", () =>
             {
-                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
+                var secondPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
                 InputManager.MoveMouseTo(secondPiece);
             });
             AddStep("quick delete", () =>

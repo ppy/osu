@@ -30,7 +30,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSliderSnaking : TestSceneOsuPlayer
+    public partial class TestSceneSliderSnaking : TestSceneOsuPlayer
     {
         [Resolved]
         private AudioManager audioManager { get; set; }

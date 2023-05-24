@@ -18,7 +18,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {
-    public abstract class TournamentTestScene : OsuTestScene
+    public abstract partial class TournamentTestScene : OsuTestScene
     {
         private TournamentMatch match;
 
@@ -165,7 +165,7 @@ namespace osu.Game.Tournament.Tests
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
 
-        public class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
+        public partial class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
         {
             private TestSceneTestRunner.TestRunner runner;
 

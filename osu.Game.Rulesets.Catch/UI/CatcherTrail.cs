@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects.Pooling;
@@ -14,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// A trail of the catcher.
     /// It also represents a hyper dash afterimage.
     /// </summary>
-    public class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
+    public partial class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
     {
         private readonly SkinnableCatcher body;
 

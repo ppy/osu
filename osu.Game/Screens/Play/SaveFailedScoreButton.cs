@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class SaveFailedScoreButton : CompositeDrawable
+    public partial class SaveFailedScoreButton : CompositeDrawable
     {
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 

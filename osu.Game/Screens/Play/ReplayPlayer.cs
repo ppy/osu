@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
@@ -13,18 +12,20 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
-    public class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
+    public partial class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
     {
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         private readonly bool replayIsFailedScore;
+
+        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
@@ -94,7 +95,7 @@ namespace osu.Game.Screens.Play
 
             void keyboardSeek(int direction)
             {
-                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.HitObjects.Last().GetEndTime());
+                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.GetLastObjectTime());
 
                 Seek(target);
             }

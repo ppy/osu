@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,12 +13,12 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class CirclePiece : CompositeDrawable
+    public partial class CirclePiece : CompositeDrawable
     {
         [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
-        private TrianglesPiece triangles;
+        private TrianglesPiece triangles = null!;
 
         public CirclePiece()
         {
@@ -72,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject != null)
+            if (drawableObject.IsNotNull())
                 drawableObject.HitObjectApplied -= onHitObjectApplied;
         }
     }

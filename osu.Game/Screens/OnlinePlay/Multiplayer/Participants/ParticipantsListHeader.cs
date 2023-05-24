@@ -10,7 +10,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public class ParticipantsListHeader : OverlinedHeader
+    public partial class ParticipantsListHeader : OverlinedHeader
     {
         [Resolved]
         private MultiplayerClient client { get; set; }

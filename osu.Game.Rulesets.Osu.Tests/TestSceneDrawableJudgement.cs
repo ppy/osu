@@ -22,7 +22,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneDrawableJudgement : OsuSkinnableTestScene
+    public partial class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private class TestDrawableOsuJudgement : DrawableOsuJudgement
+        private partial class TestDrawableOsuJudgement : DrawableOsuJudgement
         {
             public new SkinnableSprite Lighting => base.Lighting;
             public new SkinnableDrawable JudgementBody => base.JudgementBody;

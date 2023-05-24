@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
+    public partial class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
         private const int height = 70;
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Rankings
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
-                        Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                        Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Children = new Drawable[]
                         {
                             new OsuSpriteText

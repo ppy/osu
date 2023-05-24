@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDrawableDate : OsuTestScene
+    public partial class TestSceneDrawableDate : OsuTestScene
     {
         public TestSceneDrawableDate()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class PokeyDrawableDate : CompositeDrawable
+        private partial class PokeyDrawableDate : CompositeDrawable
         {
             public PokeyDrawableDate(DateTimeOffset date)
             {

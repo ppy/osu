@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class GameplayClockContainerTest
+    public partial class GameplayClockContainerTest
     {
         [TestCase(0)]
         [TestCase(1)]
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(gameplayClock.GetTrueGameplayRate(), Is.EqualTo(2));
         }
 
-        private class TestGameplayClockContainer : GameplayClockContainer
+        private partial class TestGameplayClockContainer : GameplayClockContainer
         {
             public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)

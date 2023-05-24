@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class UserTrackingScrollContainer : UserTrackingScrollContainer<Drawable>
+    public partial class UserTrackingScrollContainer : UserTrackingScrollContainer<Drawable>
     {
         public UserTrackingScrollContainer()
         {
@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class UserTrackingScrollContainer<T> : OsuScrollContainer<T>
+    public partial class UserTrackingScrollContainer<T> : OsuScrollContainer<T>
         where T : Drawable
     {
         /// <summary>

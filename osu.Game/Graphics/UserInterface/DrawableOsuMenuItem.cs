@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DrawableOsuMenuItem : Menu.DrawableMenuItem
+    public partial class DrawableOsuMenuItem : Menu.DrawableMenuItem
     {
         public const int MARGIN_HORIZONTAL = 17;
         public const int MARGIN_VERTICAL = 4;
@@ -24,6 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int transition_length = 80;
 
         private TextContainer text;
+        private HoverClickSounds hoverClickSounds;
 
         public DrawableOsuMenuItem(MenuItem item)
             : base(item)
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundColour = Color4.Transparent;
             BackgroundColourHover = Color4Extensions.FromHex(@"172023");
 
-            AddInternal(new HoverClickSounds());
+            AddInternal(hoverClickSounds = new HoverClickSounds());
 
             updateTextColour();
 
@@ -76,9 +77,10 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateState()
         {
-            Alpha = Item.Action.Disabled ? 0.2f : 1;
+            hoverClickSounds.Enabled.Value = IsActionable;
+            Alpha = IsActionable ? 1 : 0.2f;
 
-            if (IsHovered && !Item.Action.Disabled)
+            if (IsHovered && IsActionable)
             {
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
                 text.NormalText.FadeOut(transition_length, Easing.OutQuint);
@@ -93,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
         protected sealed override Drawable CreateContent() => text = CreateTextContainer();
         protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
-        protected class TextContainer : Container, IHasText
+        protected partial class TextContainer : Container, IHasText
         {
             public LocalisableString Text
             {

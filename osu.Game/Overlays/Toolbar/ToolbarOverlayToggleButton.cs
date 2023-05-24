@@ -12,7 +12,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarOverlayToggleButton : ToolbarButton
+    public partial class ToolbarOverlayToggleButton : ToolbarButton
     {
         private readonly Box stateBackground;
 

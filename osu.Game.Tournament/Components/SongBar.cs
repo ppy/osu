@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class SongBar : CompositeDrawable
+    public partial class SongBar : CompositeDrawable
     {
         private TournamentBeatmap beatmap;
 
@@ -242,7 +242,7 @@ namespace osu.Game.Tournament.Components
             };
         }
 
-        public class DiffPiece : TextFlowContainer
+        public partial class DiffPiece : TextFlowContainer
         {
             public DiffPiece(params (string heading, string content)[] tuples)
             {

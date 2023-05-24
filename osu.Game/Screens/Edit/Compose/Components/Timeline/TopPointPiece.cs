@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TopPointPiece : CompositeDrawable
+    public partial class TopPointPiece : CompositeDrawable
     {
         private readonly ControlPoint point;
 

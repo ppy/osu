@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class DashboardPopularBeatmapPanel : DashboardBeatmapPanel
+    public partial class DashboardPopularBeatmapPanel : DashboardBeatmapPanel
     {
         public DashboardPopularBeatmapPanel(APIBeatmapSet beatmapSet)
             : base(beatmapSet)

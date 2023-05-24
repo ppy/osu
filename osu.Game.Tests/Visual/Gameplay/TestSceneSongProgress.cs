@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -17,7 +17,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSongProgress : SkinnableHUDComponentTestScene
+    public partial class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
         private GameplayClockContainer gameplayClockContainer = null!;
 
@@ -28,49 +28,61 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
+            FrameStabilityContainer frameStabilityContainer;
+
+            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
+            {
+                Child = frameStabilityContainer = new FrameStabilityContainer
+                {
+                    MaxCatchUpFrames = 1
+                }
+            });
 
             Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
+            Dependencies.CacheAs<IFrameStableClock>(frameStabilityContainer);
         }
 
         [SetUpSteps]
         public void SetupSteps()
         {
             AddStep("reset clock", () => gameplayClockContainer.Reset());
-            AddStep("set hit objects", setHitObjects);
+            AddStep("set hit objects", () => this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = Beatmap.Value.Beatmap.HitObjects));
+            AddStep("hook seeking", () =>
+            {
+                applyToDefaultProgress(d => d.ChildrenOfType<DefaultSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
+                applyToArgonProgress(d => d.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
+            });
+            AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
+            AddStep("start", () => gameplayClockContainer.Start());
         }
 
         [Test]
-        public void TestDisplay()
+        public void TestBasic()
         {
-            AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
-            AddStep("start", gameplayClockContainer.Start);
+            AddToggleStep("toggle seeking", b =>
+            {
+                applyToDefaultProgress(s => s.Interactive.Value = b);
+                applyToArgonProgress(s => s.Interactive.Value = b);
+            });
+
+            AddToggleStep("toggle graph", b =>
+            {
+                applyToDefaultProgress(s => s.ShowGraph.Value = b);
+                applyToArgonProgress(s => s.ShowGraph.Value = b);
+            });
+
             AddStep("stop", gameplayClockContainer.Stop);
         }
 
-        [Test]
-        public void TestToggleSeeking()
-        {
-            void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
-                this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
+        private void applyToArgonProgress(Action<ArgonSongProgress> action) =>
+            this.ChildrenOfType<ArgonSongProgress>().ForEach(action);
 
-            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
-            AddStep("hide graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = false));
-            AddStep("disallow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = false));
-            AddStep("allow seeking", () => applyToDefaultProgress(s => s.AllowSeeking.Value = true));
-            AddStep("show graph", () => applyToDefaultProgress(s => s.ShowGraph.Value = true));
-        }
-
-        private void setHitObjects()
-        {
-            var objects = new List<HitObject>();
-            for (double i = 0; i < 5000; i++)
-                objects.Add(new HitObject { StartTime = i });
-
-            this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
-        }
+        private void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
+            this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
 
         protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
+
+        protected override Drawable CreateArgonImplementation() => new ArgonSongProgress();
 
         protected override Drawable CreateLegacyImplementation() => new LegacySongProgress();
     }

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public abstract class ClockDisplay : CompositeDrawable
+    public abstract partial class ClockDisplay : CompositeDrawable
     {
         private int? lastSecond;
 

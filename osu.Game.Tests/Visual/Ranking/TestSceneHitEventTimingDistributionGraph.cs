@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
+    public partial class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
         private HitEventTimingDistributionGraph graph = null!;
         private readonly BindableFloat width = new BindableFloat(600);

@@ -10,7 +10,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchChatDisplay : StandAloneChatDisplay
+    public partial class MatchChatDisplay : StandAloneChatDisplay
     {
         private readonly IBindable<int> channelId = new Bindable<int>();
 

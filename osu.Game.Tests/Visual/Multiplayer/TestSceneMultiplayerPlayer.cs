@@ -14,7 +14,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerPlayer : MultiplayerTestScene
+    public partial class TestSceneMultiplayerPlayer : MultiplayerTestScene
     {
         private MultiplayerPlayer player;
 

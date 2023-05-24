@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultStageBackground : CompositeDrawable
+    public partial class DefaultStageBackground : CompositeDrawable
     {
         public DefaultStageBackground()
         {

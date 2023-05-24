@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneObjectOrderedHitPolicy : RateAdjustedBeatmapTestScene
+    public partial class TestSceneObjectOrderedHitPolicy : RateAdjustedBeatmapTestScene
     {
         private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
         private const double late_miss_window = 500; // time after +500 is considered a miss
@@ -377,7 +377,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
-                () => judgementResults.Single(r => r.HitObject == hitObject).Type == result);
+                () => judgementResults.Single(r => r.HitObject == hitObject).Type, () => Is.EqualTo(result));
         }
 
         private void addJudgementAssert(string name, Func<OsuHitObject> hitObject, HitResult result)
@@ -439,7 +439,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
-                DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f };
+                SliderVelocity = 0.1f;
 
                 DefaultsApplied += _ =>
                 {
@@ -474,7 +474,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override DifficultyRange[] GetRanges() => ranges;
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

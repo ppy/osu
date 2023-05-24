@@ -120,6 +120,26 @@ namespace osu.Game.Localisation
         public static LocalisableString OverallDifficultyDescription => new TranslatableString(getKey(@"overall_difficulty_description"), @"The harshness of hit windows and difficulty of special objects (ie. spinners)");
 
         /// <summary>
+        /// "Tick Rate"
+        /// </summary>
+        public static LocalisableString TickRate => new TranslatableString(getKey(@"tick_rate"), @"Tick Rate");
+
+        /// <summary>
+        /// "Determines how many &quot;ticks&quot; are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc."
+        /// </summary>
+        public static LocalisableString TickRateDescription => new TranslatableString(getKey(@"tick_rate_description"), @"Determines how many ""ticks"" are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc.");
+
+        /// <summary>
+        /// "Base Velocity"
+        /// </summary>
+        public static LocalisableString BaseVelocity => new TranslatableString(getKey(@"base_velocity"), @"Base Velocity");
+
+        /// <summary>
+        /// "The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets."
+        /// </summary>
+        public static LocalisableString BaseVelocityDescription => new TranslatableString(getKey(@"base_velocity_description"), @"The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets.");
+
+        /// <summary>
         /// "Metadata"
         /// </summary>
         public static LocalisableString MetadataHeader => new TranslatableString(getKey(@"metadata_header"), @"Metadata");
@@ -198,6 +218,11 @@ namespace osu.Game.Localisation
         /// "Difficulty"
         /// </summary>
         public static LocalisableString DifficultyHeader => new TranslatableString(getKey(@"difficulty_header"), @"Difficulty");
+
+        /// <summary>
+        /// "Drag image here to set beatmap background!"
+        /// </summary>
+        public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

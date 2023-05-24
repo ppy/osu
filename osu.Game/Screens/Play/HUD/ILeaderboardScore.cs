@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public interface ILeaderboardScore
     {
-        BindableDouble TotalScore { get; }
+        BindableLong TotalScore { get; }
         BindableDouble Accuracy { get; }
         BindableInt Combo { get; }
 

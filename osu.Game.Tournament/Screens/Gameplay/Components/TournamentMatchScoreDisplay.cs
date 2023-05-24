@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     // TODO: Update to derive from osu-side class?
-    public class TournamentMatchScoreDisplay : CompositeDrawable
+    public partial class TournamentMatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        private class MatchScoreCounter : CommaSeparatedScoreCounter
+        private partial class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 

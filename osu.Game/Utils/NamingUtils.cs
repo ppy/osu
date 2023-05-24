@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Utils
@@ -28,8 +29,53 @@ namespace osu.Game.Utils
         /// </remarks>
         public static string GetNextBestName(IEnumerable<string> existingNames, string desiredName)
         {
-            string pattern = $@"^(?i){Regex.Escape(desiredName)}(?-i)( \((?<copyNumber>[1-9][0-9]*)\))?$";
+            string pattern = $@"^{getBaselineNameDetectingPattern(desiredName)}$";
             var regex = new Regex(pattern, RegexOptions.Compiled);
+
+            int bestNumber = findBestNumber(existingNames, regex);
+
+            return bestNumber == 0
+                ? desiredName
+                : $"{desiredName} ({bestNumber.ToString()})";
+        }
+
+        /// <summary>
+        /// Given a set of <paramref name="existingFilenames"/> and a desired target <paramref name="desiredFilename"/>
+        /// finds a filename closest to <paramref name="desiredFilename"/> that is not in <paramref name="existingFilenames"/>
+        /// </summary>
+        public static string GetNextBestFilename(IEnumerable<string> existingFilenames, string desiredFilename)
+        {
+            string name = Path.GetFileNameWithoutExtension(desiredFilename);
+            string extension = Path.GetExtension(desiredFilename);
+
+            string pattern = $@"^{getBaselineNameDetectingPattern(name)}(?i){Regex.Escape(extension)}(?-i)$";
+            var regex = new Regex(pattern, RegexOptions.Compiled);
+
+            int bestNumber = findBestNumber(existingFilenames, regex);
+
+            return bestNumber == 0
+                ? desiredFilename
+                : $"{name} ({bestNumber.ToString()}){extension}";
+        }
+
+        /// <summary>
+        /// Generates a basic regex pattern that will match all possible conflicting filenames when picking the best available name, given the <paramref name="desiredName"/>.
+        /// The generated pattern can be composed into more complicated regexes for particular uses, such as picking filenames, which need additional file extension handling.
+        /// </summary>
+        /// <remarks>
+        /// The regex shall detect:
+        /// <list type="bullet">
+        /// <item>all strings that are equal to <paramref name="desiredName"/>,</item>
+        /// <item>all strings of the format <c>desiredName (number)</c>, where <c>number</c> is a number written using Arabic numerals.</item>
+        /// </list>
+        /// All comparisons are made in a case-insensitive manner.
+        /// If a number is detected in the matches, it will be output to the <c>copyNumber</c> named group.
+        /// </remarks>
+        private static string getBaselineNameDetectingPattern(string desiredName)
+            => $@"(?i){Regex.Escape(desiredName)}(?-i)( \((?<copyNumber>[1-9][0-9]*)\))?";
+
+        private static int findBestNumber(IEnumerable<string> existingNames, Regex regex)
+        {
             var takenNumbers = new HashSet<int>();
 
             foreach (string name in existingNames)
@@ -53,9 +99,7 @@ namespace osu.Game.Utils
             while (takenNumbers.Contains(bestNumber))
                 bestNumber += 1;
 
-            return bestNumber == 0
-                ? desiredName
-                : $"{desiredName} ({bestNumber})";
+            return bestNumber;
         }
     }
 }

@@ -7,24 +7,27 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
+using Key = osuTK.Input.Key;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
+    public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
     {
         public Action<float> HandleRotate { get; set; }
 
         public LocalisableString TooltipText { get; private set; }
 
         private SpriteIcon icon;
+
+        private const float snap_step = 15;
 
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
 
@@ -50,17 +53,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            cumulativeRotation.BindValueChanged(_ => updateTooltipText(), true);
-        }
-
         protected override void UpdateHoverState()
         {
             base.UpdateHoverState();
             icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
         }
+
+        private float rawCumulativeRotation;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -74,21 +73,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnDrag(e);
 
-            float instantaneousAngle = convertDragEventToAngleOfRotation(e);
-            cumulativeRotation.Value += instantaneousAngle;
+            rawCumulativeRotation += convertDragEventToAngleOfRotation(e);
 
-            if (cumulativeRotation.Value < -180)
-                cumulativeRotation.Value += 360;
-            else if (cumulativeRotation.Value > 180)
-                cumulativeRotation.Value -= 360;
+            applyRotation(shouldSnap: e.ShiftPressed);
+        }
 
-            HandleRotate?.Invoke(instantaneousAngle);
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+            {
+                applyRotation(shouldSnap: true);
+                return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+                applyRotation(shouldSnap: false);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
             base.OnDragEnd(e);
             cumulativeRotation.Value = null;
+            rawCumulativeRotation = 0;
+            TooltipText = default;
         }
 
         private float convertDragEventToAngleOfRotation(DragEvent e)
@@ -100,9 +114,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return (endAngle - startAngle) * 180 / MathF.PI;
         }
 
-        private void updateTooltipText()
+        private void applyRotation(bool shouldSnap)
         {
-            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default;
+            float oldRotation = cumulativeRotation.Value ?? 0;
+
+            float newRotation = shouldSnap ? snap(rawCumulativeRotation, snap_step) : MathF.Round(rawCumulativeRotation);
+            newRotation = (newRotation - 180) % 360 + 180;
+
+            cumulativeRotation.Value = newRotation;
+
+            HandleRotate?.Invoke(newRotation - oldRotation);
+            TooltipText = shouldSnap ? EditorStrings.RotationSnapped(newRotation) : EditorStrings.RotationUnsnapped(newRotation);
         }
+
+        private float snap(float value, float step) => MathF.Round(value / step) * step;
     }
 }

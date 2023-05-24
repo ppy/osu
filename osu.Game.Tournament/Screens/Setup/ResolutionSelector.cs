@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ResolutionSelector : ActionableInfo
+    internal partial class ResolutionSelector : ActionableInfo
     {
         private const int minimum_window_height = 480;
         private const int maximum_window_height = 2160;

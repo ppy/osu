@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Scoring
     /// A <see cref="HealthProcessor"/> that accumulates health and causes a fail if the final health
     /// is less than a value required to pass the beatmap.
     /// </summary>
-    public class AccumulatingHealthProcessor : HealthProcessor
+    public partial class AccumulatingHealthProcessor : HealthProcessor
     {
         protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value < requiredHealth;
 

@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual.Multiplayer;
 namespace osu.Game.Tests.NonVisual.Multiplayer
 {
     [HeadlessTest]
-    public class StatefulMultiplayerClientTest : MultiplayerTestScene
+    public partial class StatefulMultiplayerClientTest : MultiplayerTestScene
     {
         [Test]
         public void TestUserAddedOnJoin()

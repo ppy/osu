@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A flow container with an origin based on one of its contained drawables.
     /// </summary>
-    public class FlowContainerWithOrigin : FillFlowContainer
+    public partial class FlowContainerWithOrigin : FillFlowContainer
     {
         /// <summary>
         /// A target drawable which this flowcontainer should be centered around.

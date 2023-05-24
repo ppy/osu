@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// Shows the number of favourites that a beatmap set has received.
     /// </summary>
-    public class FavouritesStatistic : BeatmapCardStatistic, IHasCurrentValue<BeatmapSetFavouriteState>
+    public partial class FavouritesStatistic : BeatmapCardStatistic, IHasCurrentValue<BeatmapSetFavouriteState>
     {
         private readonly BindableWithCurrent<BeatmapSetFavouriteState> current;
 

@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneParticleSpewer : OsuTestScene
+    public partial class TestSceneParticleSpewer : OsuTestScene
     {
         private TestParticleSpewer spewer;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Size = new Vector2(0.5f),
             };
 
-        private class TestParticleSpewer : ParticleSpewer
+        private partial class TestParticleSpewer : ParticleSpewer
         {
             public const int MAX_DURATION = 1500;
             private const int rate = 250;

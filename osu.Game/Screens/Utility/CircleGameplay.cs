@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Utility
 {
-    public class CircleGameplay : LatencySampleComponent
+    public partial class CircleGameplay : LatencySampleComponent
     {
         private int nextLocation;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Utility
             hitEvents.Add(h);
         }
 
-        public class SampleHitCircle : LatencySampleComponent
+        public partial class SampleHitCircle : LatencySampleComponent
         {
             public HitEvent? HitEvent;
 

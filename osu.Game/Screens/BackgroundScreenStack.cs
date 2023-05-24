@@ -9,7 +9,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens
 {
-    public class BackgroundScreenStack : ScreenStack
+    public partial class BackgroundScreenStack : ScreenStack
     {
         public BackgroundScreenStack()
             : base(false)

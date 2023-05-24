@@ -11,7 +11,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online
 {
-    public class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
+    public partial class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
     {
         [Resolved(CanBeNull = true)]
         protected ScoreModelDownloader? Downloader { get; private set; }

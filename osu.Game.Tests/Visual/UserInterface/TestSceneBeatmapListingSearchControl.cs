@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBeatmapListingSearchControl : OsuTestScene
+    public partial class TestSceneBeatmapListingSearchControl : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

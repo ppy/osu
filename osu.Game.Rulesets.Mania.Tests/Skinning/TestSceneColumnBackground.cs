@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneColumnBackground : ManiaSkinnableTestScene
+    public partial class TestSceneColumnBackground : ManiaSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+                        Child = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         }
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+                        Child = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         }

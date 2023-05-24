@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ProgressBar : SliderBar<double>
+    public partial class ProgressBar : SliderBar<double>
     {
         public Action<double> OnSeek;
 

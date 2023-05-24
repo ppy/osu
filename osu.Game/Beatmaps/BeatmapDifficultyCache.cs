@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps
     /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset/mod combinations.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class BeatmapDifficultyCache : MemoryCachingComponent<BeatmapDifficultyCache.DifficultyCacheLookup, StarDifficulty?>
+    public partial class BeatmapDifficultyCache : MemoryCachingComponent<BeatmapDifficultyCache.DifficultyCacheLookup, StarDifficulty?>
     {
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));

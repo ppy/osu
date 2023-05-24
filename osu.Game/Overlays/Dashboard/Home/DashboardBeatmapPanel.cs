@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public abstract class DashboardBeatmapPanel : OsuClickableContainer
+    public abstract partial class DashboardBeatmapPanel : OsuClickableContainer
     {
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; }

@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -17,11 +16,21 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerRotationTracker : CircularContainer
+    public partial class SpinnerRotationTracker : CircularContainer
     {
         public override bool IsPresent => true; // handle input when hidden
 
         private readonly DrawableSpinner drawableSpinner;
+
+        private Vector2 mousePosition;
+
+        private float lastAngle;
+        private float currentRotation;
+
+        private bool rotationTransferred;
+
+        [Resolved(canBeNull: true)]
+        private IGameplayClock? gameplayClock { get; set; }
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
@@ -50,16 +59,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
             return base.OnMouseMove(e);
         }
-
-        private Vector2 mousePosition;
-
-        private float lastAngle;
-        private float currentRotation;
-
-        private bool rotationTransferred;
-
-        [Resolved(canBeNull: true)]
-        private IGameplayClock gameplayClock { get; set; }
 
         protected override void Update()
         {
@@ -126,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.HitObjectApplied -= resetState;
         }
     }

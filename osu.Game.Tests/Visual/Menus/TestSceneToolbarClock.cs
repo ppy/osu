@@ -18,7 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneToolbarClock : OsuManualInputManagerTestScene
+    public partial class TestSceneToolbarClock : OsuManualInputManagerTestScene
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
 

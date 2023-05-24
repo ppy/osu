@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public abstract class SkinnableHUDComponentTestScene : SkinnableTestScene
+    public abstract partial class SkinnableHUDComponentTestScene : SkinnableTestScene
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
@@ -20,7 +20,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var implementation = skin is LegacySkin
                     ? CreateLegacyImplementation()
-                    : CreateDefaultImplementation();
+                    : skin is ArgonSkin
+                        ? CreateArgonImplementation()
+                        : CreateDefaultImplementation();
 
                 implementation.Anchor = Anchor.Centre;
                 implementation.Origin = Anchor.Centre;
@@ -29,6 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         });
 
         protected abstract Drawable CreateDefaultImplementation();
+        protected virtual Drawable CreateArgonImplementation() => CreateDefaultImplementation();
         protected abstract Drawable CreateLegacyImplementation();
     }
 }

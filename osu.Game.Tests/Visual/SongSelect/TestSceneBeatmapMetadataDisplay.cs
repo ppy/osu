@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneBeatmapMetadataDisplay : OsuTestScene
+    public partial class TestSceneBeatmapMetadataDisplay : OsuTestScene
     {
         private BeatmapMetadataDisplay display;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("finish loading", () => display.Loading = false);
         }
 
-        private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
+        private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
             private TaskCompletionSource<bool> calculationBlocker;
 

@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -16,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
 {
-    public class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
+    public partial class DrawablePippidonHitObject : DrawableHitObject<PippidonHitObject>
     {
         private const double time_preempt = 600;
         private const double time_fadein = 400;
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
 
         public override IEnumerable<HitSampleInfo> GetSamples() => new[]
         {
-            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK)
+            new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
         };
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

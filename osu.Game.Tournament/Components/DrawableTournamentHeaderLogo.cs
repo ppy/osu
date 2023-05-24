@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTournamentHeaderLogo : CompositeDrawable
+    public partial class DrawableTournamentHeaderLogo : CompositeDrawable
     {
         public DrawableTournamentHeaderLogo()
         {
@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Components
             RelativeSizeAxes = Axes.X;
         }
 
-        private class LogoSprite : Sprite
+        private partial class LogoSprite : Sprite
         {
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)

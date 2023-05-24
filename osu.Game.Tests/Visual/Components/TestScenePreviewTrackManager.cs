@@ -13,7 +13,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Components
 {
-    public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
+    public partial class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
         private readonly IAdjustableAudioComponent gameTrackAudio = new AudioAdjustments();
 
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Components
             return track;
         }
 
-        private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
+        private partial class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
             private readonly PreviewTrack track;
             private readonly bool registerAsOwner;
@@ -227,7 +227,7 @@ namespace osu.Game.Tests.Visual.Components
             }
         }
 
-        public class TestPreviewTrackManager : PreviewTrackManager
+        public partial class TestPreviewTrackManager : PreviewTrackManager
         {
             public bool AllowUpdate = true;
 
@@ -248,7 +248,7 @@ namespace osu.Game.Tests.Visual.Components
                 return base.UpdateSubTree();
             }
 
-            public class TestPreviewTrack : TrackManagerPreviewTrack
+            public partial class TestPreviewTrack : TrackManagerPreviewTrack
             {
                 private readonly ITrackStore trackManager;
 

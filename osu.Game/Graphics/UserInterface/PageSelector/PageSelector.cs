@@ -11,7 +11,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
-    public class PageSelector : CompositeDrawable
+    public partial class PageSelector : CompositeDrawable
     {
         public readonly BindableInt CurrentPage = new BindableInt { MinValue = 0, };
 

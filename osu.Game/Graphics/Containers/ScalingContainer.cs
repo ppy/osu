@@ -15,13 +15,14 @@ using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// Handles user-defined scaling, allowing application at multiple levels defined by <see cref="ScalingMode"/>.
     /// </summary>
-    public class ScalingContainer : Container
+    public partial class ScalingContainer : Container
     {
         internal const float TRANSITION_DURATION = 500;
 
@@ -29,6 +30,7 @@ namespace osu.Game.Graphics.Containers
         private Bindable<float> sizeY;
         private Bindable<float> posX;
         private Bindable<float> posY;
+        private Bindable<bool> applySafeAreaPadding;
 
         private Bindable<MarginPadding> safeAreaPadding;
 
@@ -44,6 +46,8 @@ namespace osu.Game.Graphics.Containers
         private readonly Container sizableContainer;
 
         private BackgroundScreenStack backgroundStack;
+
+        private Bindable<float> scalingMenuBackgroundDim;
 
         private RectangleF? customRect;
         private bool customRectIsRelativePosition;
@@ -81,7 +85,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public partial class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
@@ -132,8 +136,14 @@ namespace osu.Game.Graphics.Containers
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
+            applySafeAreaPadding = config.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
+            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+            scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
         }
 
         protected override void LoadComplete()
@@ -144,7 +154,9 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.FinishTransforms();
         }
 
-        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
+        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays)
+                                                  && (sizeX.Value != 1 || sizeY.Value != 1)
+                                                  && scalingMenuBackgroundDim.Value < 1;
 
         private void updateSize()
         {
@@ -157,8 +169,8 @@ namespace osu.Game.Graphics.Containers
                     {
                         AddInternal(backgroundStack = new BackgroundScreenStack
                         {
-                            Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
+                            Colour = Color4.Black,
                             Depth = float.MaxValue
                         });
 
@@ -166,6 +178,7 @@ namespace osu.Game.Graphics.Containers
                     }
 
                     backgroundStack.FadeIn(TRANSITION_DURATION);
+                    backgroundStack.FadeColour(OsuColour.Gray(1.0f - scalingMenuBackgroundDim.Value), TRANSITION_DURATION, Easing.OutQuint);
                 }
                 else
                     backgroundStack?.FadeOut(TRANSITION_DURATION);
@@ -192,7 +205,7 @@ namespace osu.Game.Graphics.Containers
             bool requiresMasking = targetRect.Size != Vector2.One
                                    // For the top level scaling container, for now we apply masking if safe areas are in use.
                                    // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
-                                   || (targetMode == ScalingMode.Everything && safeAreaPadding.Value.Total != Vector2.Zero);
+                                   || (targetMode == ScalingMode.Everything && (applySafeAreaPadding.Value && safeAreaPadding.Value.Total != Vector2.Zero));
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
@@ -207,7 +220,7 @@ namespace osu.Game.Graphics.Containers
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
-        private class ScalingBackgroundScreen : BackgroundScreenDefault
+        private partial class ScalingBackgroundScreen : BackgroundScreenDefault
         {
             protected override bool AllowStoryboardBackground => false;
 
@@ -217,13 +230,16 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private class SizeableAlwaysInputContainer : Container
+        private partial class SizeableAlwaysInputContainer : Container
         {
             [Resolved]
             private GameHost host { get; set; }
 
             [Resolved]
             private ISafeArea safeArea { get; set; }
+
+            [Resolved]
+            private OsuConfigManager config { get; set; }
 
             private readonly bool confineHostCursor;
             private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
@@ -259,7 +275,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (host.Window == null) return;
 
-                bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
+                bool coversWholeScreen = Size == Vector2.One && (!config.Get<bool>(OsuSetting.SafeAreaConsiderations) || safeArea.SafeAreaPadding.Value.Total == Vector2.Zero);
                 host.Window.CursorConfineRect = coversWholeScreen ? null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }

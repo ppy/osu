@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileItemContainer : Container
+    public partial class ProfileItemContainer : Container
     {
         private const int hover_duration = 200;
 
@@ -67,8 +65,8 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            IdleColour = colourProvider.Background3;
-            HoverColour = colourProvider.Background2;
+            IdleColour = colourProvider.Background2;
+            HoverColour = colourProvider.Background1;
         }
 
         protected override bool OnHover(HoverEvent e)

@@ -7,12 +7,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
-    public class SoloSpectatorPlayer : SpectatorPlayer
+    public partial class SoloSpectatorPlayer : SpectatorPlayer
     {
         private readonly Score score;
+
+        protected override UserActivity InitialActivity => new UserActivity.SpectatingUser(Score.ScoreInfo);
 
         public SoloSpectatorPlayer(Score score, PlayerConfiguration configuration = null)
             : base(score, configuration)

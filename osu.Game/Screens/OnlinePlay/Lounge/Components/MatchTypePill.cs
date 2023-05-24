@@ -13,7 +13,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class MatchTypePill : OnlinePlayComposite
+    public partial class MatchTypePill : OnlinePlayComposite
     {
         private OsuTextFlowContainer textFlow;
 

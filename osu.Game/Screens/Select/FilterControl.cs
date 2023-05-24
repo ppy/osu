@@ -10,12 +10,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
@@ -24,14 +26,21 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FilterControl : Container
+    public partial class FilterControl : Container
     {
-        public const float HEIGHT = 2 * side_margin + 85;
-        private const float side_margin = 20;
+        public const float HEIGHT = 2 * side_margin + 120;
+
+        private const float side_margin = 10;
 
         public Action<FilterCriteria> FilterChanged;
 
         public Bindable<string> CurrentTextSearch => searchTextBox.Current;
+
+        public LocalisableString InformationalText
+        {
+            get => searchTextBox.FilterText.Text;
+            set => searchTextBox.FilterText.Text = value;
+        }
 
         private OsuTabControl<SortMode> sortTabs;
 
@@ -39,7 +48,7 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        private SeekLimitedSearchTextBox searchTextBox;
+        private FilterControlTextBox searchTextBox;
 
         private CollectionDropdown collectionDropdown;
 
@@ -98,72 +107,63 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.Both,
                         Spacing = new Vector2(0, 5),
-                        Children = new[]
+                        Children = new Drawable[]
                         {
-                            new Container
+                            searchTextBox = new FilterControlTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 60,
-                                Children = new Drawable[]
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 1,
+                                Colour = OsuColour.Gray(80),
+                            },
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                ColumnDimensions = new[]
                                 {
-                                    searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                                    new Box
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                },
+                                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                Content = new[]
+                                {
+                                    new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = 1,
-                                        Colour = OsuColour.Gray(80),
-                                        Origin = Anchor.BottomLeft,
-                                        Anchor = Anchor.BottomLeft,
-                                    },
-                                    new GridContainer
-                                    {
-                                        Anchor = Anchor.BottomRight,
-                                        Origin = Anchor.BottomRight,
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        ColumnDimensions = new[]
+                                        new OsuSpriteText
                                         {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
-                                            new Dimension(),
-                                            new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
-                                            new Dimension(GridSizeMode.AutoSize),
+                                            Text = SortStrings.Default,
+                                            Font = OsuFont.GetFont(size: 14),
+                                            Margin = new MarginPadding(5),
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
                                         },
-                                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                                        Content = new[]
+                                        Empty(),
+                                        sortTabs = new OsuTabControl<SortMode>
                                         {
-                                            new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SortStrings.Default,
-                                                    Font = OsuFont.GetFont(size: 14),
-                                                    Margin = new MarginPadding(5),
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                },
-                                                Empty(),
-                                                sortTabs = new OsuTabControl<SortMode>
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Height = 24,
-                                                    AutoSort = true,
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                    AccentColour = colours.GreenLight,
-                                                    Current = { BindTarget = sortMode }
-                                                },
-                                                Empty(),
-                                                new OsuTabControlCheckbox
-                                                {
-                                                    Text = "Show converted",
-                                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                },
-                                            }
-                                        }
-                                    },
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 24,
+                                            AutoSort = true,
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                            AccentColour = colours.GreenLight,
+                                            Current = { BindTarget = sortMode }
+                                        },
+                                        Empty(),
+                                        new OsuTabControlCheckbox
+                                        {
+                                            Text = "Show converted",
+                                            Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                        },
+                                    }
                                 }
                             },
                             new Container
@@ -172,12 +172,19 @@ namespace osu.Game.Screens.Select
                                 Height = 40,
                                 Children = new Drawable[]
                                 {
-                                    new DifficultyRangeFilterControl
+                                    new RangeSlider
                                     {
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
+                                        Label = "Difficulty range",
+                                        LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
+                                        UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                                         RelativeSizeAxes = Axes.Both,
                                         Width = 0.48f,
+                                        DefaultStringLowerBound = "0",
+                                        DefaultStringUpperBound = "∞",
+                                        DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit,
+                                        TooltipSuffix = "stars"
                                     },
                                     collectionDropdown = new CollectionDropdown
                                     {
@@ -240,5 +247,33 @@ namespace osu.Game.Screens.Select
         protected override bool OnClick(ClickEvent e) => true;
 
         protected override bool OnHover(HoverEvent e) => true;
+
+        private partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        {
+            private const float filter_text_size = 12;
+
+            public OsuSpriteText FilterText { get; private set; }
+
+            public FilterControlTextBox()
+            {
+                Height += filter_text_size;
+                TextContainer.Height *= (Height - filter_text_size) / Height;
+                TextContainer.Margin = new MarginPadding { Bottom = filter_text_size };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                TextContainer.Add(FilterText = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                    Depth = float.MinValue,
+                    Font = OsuFont.Default.With(size: filter_text_size, weight: FontWeight.SemiBold),
+                    Margin = new MarginPadding { Top = 2, Left = 2 },
+                    Colour = colours.Yellow
+                });
+            }
+        }
     }
 }

@@ -5,13 +5,14 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class DigitalClockDisplay : ClockDisplay
+    public partial class DigitalClockDisplay : ClockDisplay
     {
         private OsuSpriteText realTime;
         private OsuSpriteText gameTime;
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = use24HourDisplay ? $"{now:HH:mm:ss}" : $"{now:h:mm:ss tt}";
+            realTime.Text = now.ToLocalisableString(use24HourDisplay ? @"HH:mm:ss" : @"h:mm:ss tt");
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 

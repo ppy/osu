@@ -14,7 +14,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Display an icon that is forced to scale to the size of this container.
     /// </summary>
-    public class ConstrainedIconContainer : CompositeDrawable
+    public partial class ConstrainedIconContainer : CompositeDrawable
     {
         public Drawable Icon
         {

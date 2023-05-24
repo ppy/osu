@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyHealthDisplay : HealthDisplay, ISkinnableDrawable
+    public partial class LegacyHealthDisplay : HealthDisplay, ISerialisableDrawable
     {
         private const double epic_cutoff = 0.5;
 
@@ -94,7 +94,7 @@ namespace osu.Game.Skinning
             return Color4.White;
         }
 
-        public class LegacyOldStyleMarker : LegacyMarker
+        public partial class LegacyOldStyleMarker : LegacyMarker
         {
             private readonly Texture normalTexture;
             private readonly Texture dangerTexture;
@@ -129,7 +129,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public class LegacyNewStyleMarker : LegacyMarker
+        public partial class LegacyNewStyleMarker : LegacyMarker
         {
             private readonly ISkin skin;
 
@@ -153,7 +153,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal abstract class LegacyFill : LegacyHealthPiece
+        internal abstract partial class LegacyFill : LegacyHealthPiece
         {
             protected LegacyFill(ISkin skin)
             {
@@ -175,7 +175,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal class LegacyOldStyleFill : LegacyFill
+        internal partial class LegacyOldStyleFill : LegacyFill
         {
             public LegacyOldStyleFill(ISkin skin)
                 : base(skin)
@@ -184,7 +184,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal class LegacyNewStyleFill : LegacyFill
+        internal partial class LegacyNewStyleFill : LegacyFill
         {
             public LegacyNewStyleFill(ISkin skin)
                 : base(skin)
@@ -199,7 +199,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public abstract class LegacyMarker : LegacyHealthPiece
+        public abstract partial class LegacyMarker : LegacyHealthPiece
         {
             protected Sprite Main;
 
@@ -252,7 +252,7 @@ namespace osu.Game.Skinning
                 Main.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
         }
 
-        public class LegacyHealthPiece : CompositeDrawable
+        public partial class LegacyHealthPiece : CompositeDrawable
         {
             public Bindable<double> Current { get; } = new Bindable<double>();
 

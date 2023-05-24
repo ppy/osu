@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class NoteSelectionBlueprint : ManiaSelectionBlueprint<Note>
+    public partial class NoteSelectionBlueprint : ManiaSelectionBlueprint<Note>
     {
         public NoteSelectionBlueprint(Note note)
             : base(note)

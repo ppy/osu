@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Input
 {
     [HeadlessTest]
-    public class ConfineMouseTrackerTest : OsuGameTestScene
+    public partial class ConfineMouseTrackerTest : OsuGameTestScene
     {
         [Resolved]
         private FrameworkConfigManager frameworkConfigManager { get; set; }

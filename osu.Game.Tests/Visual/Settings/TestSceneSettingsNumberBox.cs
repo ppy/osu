@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneSettingsNumberBox : OsuTestScene
+    public partial class TestSceneSettingsNumberBox : OsuTestScene
     {
         private SettingsNumberBox numberBox;
         private OsuTextBox textBox;

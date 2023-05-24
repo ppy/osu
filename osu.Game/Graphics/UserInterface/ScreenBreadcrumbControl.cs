@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A <see cref="BreadcrumbControl{IScreen}"/> which follows the active screen (and allows navigation) in a <see cref="Screen"/> stack.
     /// </summary>
-    public class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
+    public partial class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
     {
         public ScreenBreadcrumbControl(ScreenStack stack)
         {

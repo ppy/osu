@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class GameplayScoreCounter : ScoreCounter
+    public abstract partial class GameplayScoreCounter : ScoreCounter
     {
         private Bindable<ScoringMode> scoreDisplayMode;
 

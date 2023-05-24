@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class TeamDisplay : DrawableTournamentTeam
+    public partial class TeamDisplay : DrawableTournamentTeam
     {
         private readonly TeamScore score;
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// It holds a <see cref="Catcher"/> as a child and translates input to the catcher movement.
     /// It also holds a combo display that is above the catcher, and judgment results are translated to the catcher and the combo display.
     /// </summary>
-    public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
+    public partial class CatcherArea : Container, IKeyBindingHandler<CatchAction>
     {
         public Catcher Catcher
         {
@@ -35,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatcherTrailDisplay catcherTrails;
 
-        private Catcher catcher;
+        private Catcher catcher = null!;
 
         /// <summary>
         /// <c>-1</c> when only left button is pressed.
@@ -75,10 +73,10 @@ namespace osu.Game.Rulesets.Catch.UI
             comboDisplay.OnNewResult(hitObject, result);
         }
 
-        public void OnRevertResult(DrawableCatchHitObject hitObject, JudgementResult result)
+        public void OnRevertResult(JudgementResult result)
         {
-            comboDisplay.OnRevertResult(hitObject, result);
-            Catcher.OnRevertResult(hitObject, result);
+            comboDisplay.OnRevertResult(result);
+            Catcher.OnRevertResult(result);
         }
 
         protected override void Update()

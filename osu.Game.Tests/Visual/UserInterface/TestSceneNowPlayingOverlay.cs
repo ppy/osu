@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneNowPlayingOverlay : OsuTestScene
+    public partial class TestSceneNowPlayingOverlay : OsuTestScene
     {
         [Cached]
         private MusicController musicController = new MusicController();

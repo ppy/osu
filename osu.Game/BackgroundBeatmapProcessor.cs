@@ -20,7 +20,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
-    public class BackgroundBeatmapProcessor : Component
+    public partial class BackgroundBeatmapProcessor : Component
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;

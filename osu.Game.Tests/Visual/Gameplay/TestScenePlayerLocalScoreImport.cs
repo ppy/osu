@@ -27,7 +27,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLocalScoreImport : PlayerTestScene
+    public partial class TestScenePlayerLocalScoreImport : PlayerTestScene
     {
         private BeatmapManager beatmaps = null!;
         private RulesetStore rulesets = null!;

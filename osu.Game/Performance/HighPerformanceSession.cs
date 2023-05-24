@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Performance
 {
-    public class HighPerformanceSession : Component
+    public partial class HighPerformanceSession : Component
     {
         private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
 

@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarChangelogButton : ToolbarOverlayToggleButton
+    public partial class ToolbarChangelogButton : ToolbarOverlayToggleButton
     {
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 

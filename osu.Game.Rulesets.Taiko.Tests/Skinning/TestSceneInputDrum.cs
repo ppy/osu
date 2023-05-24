@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneInputDrum : TaikoSkinnableTestScene
+    public partial class TestSceneInputDrum : TaikoSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

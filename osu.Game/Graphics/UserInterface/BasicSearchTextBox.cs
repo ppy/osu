@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BasicSearchTextBox : SearchTextBox
+    public partial class BasicSearchTextBox : SearchTextBox
     {
         public BasicSearchTextBox()
         {

@@ -13,7 +13,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailJudgement : TestSceneAllRulesetPlayers
+    public partial class TestSceneFailJudgement : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private class FailPlayer : TestPlayer
+        private partial class FailPlayer : TestPlayer
         {
             public new HealthProcessor HealthProcessor => base.HealthProcessor;
 

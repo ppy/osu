@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneExpandedPanelTopContent : OsuTestScene
+    public partial class TestSceneExpandedPanelTopContent : OsuTestScene
     {
         public TestSceneExpandedPanelTopContent()
         {

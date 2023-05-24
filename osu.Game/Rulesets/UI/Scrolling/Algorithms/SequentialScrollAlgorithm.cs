@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             return (float)(objectLength * scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
         {
             double timelineLength = relativePositionAt(time, timeRange) - relativePositionAt(currentTime, timeRange);
             return (float)(timelineLength * scrollLength);
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             if (controlPoints.Count == 0)
                 return;
 
-            positionMappings.Add(new PositionMapping(controlPoints[0].StartTime, controlPoints[0]));
+            positionMappings.Add(new PositionMapping(controlPoints[0].Time, controlPoints[0]));
 
             for (int i = 0; i < controlPoints.Count - 1; i++)
             {
@@ -129,9 +129,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 var next = controlPoints[i + 1];
 
                 // Figure out how much of the time range the duration represents, and adjust it by the speed multiplier
-                float length = (float)((next.StartTime - current.StartTime) / timeRange * current.Multiplier);
+                float length = (float)((next.Time - current.Time) / timeRange * current.Multiplier);
 
-                positionMappings.Add(new PositionMapping(next.StartTime, next, positionMappings[^1].Position + length));
+                positionMappings.Add(new PositionMapping(next.Time, next, positionMappings[^1].Position + length));
             }
         }
 

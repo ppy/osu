@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System.Reflection;
 using Android.App;
+using Android.OS;
 using osu.Framework.Android;
 
 namespace osu.Game.Tests.Android
@@ -12,5 +14,16 @@ namespace osu.Game.Tests.Android
     public class MainActivity : AndroidGameActivity
     {
         protected override Framework.Game CreateGame() => new OsuTestBrowser();
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            // See the comment in OsuGameActivity
+            Assembly.Load("osu.Game.Rulesets.Osu");
+            Assembly.Load("osu.Game.Rulesets.Taiko");
+            Assembly.Load("osu.Game.Rulesets.Catch");
+            Assembly.Load("osu.Game.Rulesets.Mania");
+        }
     }
 }

@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneHitApplication : HitObjectApplicationTestScene
+    public partial class TestSceneHitApplication : HitObjectApplicationTestScene
     {
         [Test]
         public void TestApplyNewHit()

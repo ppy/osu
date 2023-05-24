@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class JudgementProcessor : Component
+    public abstract partial class JudgementProcessor : Component
     {
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.

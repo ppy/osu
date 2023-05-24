@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
+    public partial class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableFruit((Fruit)hitObject);
 

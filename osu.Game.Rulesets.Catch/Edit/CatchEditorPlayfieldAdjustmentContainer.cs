@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchEditorPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class CatchEditorPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             };
         }
 
-        private class ScalingContainer : Container
+        private partial class ScalingContainer : Container
         {
             public ScalingContainer()
             {

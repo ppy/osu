@@ -31,7 +31,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
+    public partial class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
@@ -98,6 +98,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
 
             AddAssert("freemods empty", () => songSelect.FreeMods.Value.Count == 0);
+
+            // A previous test's mod overlay could still be fading out.
+            AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
+
             assertHasFreeModButton(allowedMod, false);
             assertHasFreeModButton(requiredMod, false);
         }
@@ -112,7 +116,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                           .All(b => b.Mod.GetType() != type));
         }
 
-        private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
+        private partial class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
         {
             public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 

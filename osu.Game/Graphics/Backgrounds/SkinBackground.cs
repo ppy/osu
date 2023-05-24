@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    internal class SkinBackground : Background
+    internal partial class SkinBackground : Background
     {
         private readonly Skin skin;
 

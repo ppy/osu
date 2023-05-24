@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ScorePanelList : CompositeDrawable
+    public partial class ScorePanelList : CompositeDrawable
     {
         /// <summary>
         /// Normal spacing between all panels.
@@ -322,7 +322,7 @@ namespace osu.Game.Screens.Ranking
             loadCancellationSource?.Cancel();
         }
 
-        private class Flow : FillFlowContainer<ScorePanelTrackingContainer>
+        private partial class Flow : FillFlowContainer<ScorePanelTrackingContainer>
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
@@ -339,7 +339,7 @@ namespace osu.Game.Screens.Ranking
                                                                                                                        .ThenBy(s => s.Panel.Score.OnlineID);
         }
 
-        private class Scroll : OsuScrollContainer
+        private partial class Scroll : OsuScrollContainer
         {
             public new float Target => base.Target;
 

@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuContextMenuContainer : ContextMenuContainer
+    public partial class OsuContextMenuContainer : ContextMenuContainer
     {
         [Cached]
         private OsuContextMenuSamples samples = new OsuContextMenuSamples();

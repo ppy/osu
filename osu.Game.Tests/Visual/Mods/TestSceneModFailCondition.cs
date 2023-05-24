@@ -14,7 +14,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Mods
 {
-    public class TestSceneModFailCondition : ModTestScene
+    public partial class TestSceneModFailCondition : ModTestScene
     {
         private bool restartRequested;
 

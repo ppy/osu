@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -12,7 +10,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An integer <see cref="RollingCounter{T}"/> that uses number sprites from a legacy skin.
     /// </summary>
-    public class LegacyRollingCounter : RollingCounter<int>
+    public partial class LegacyRollingCounter : RollingCounter<int>
     {
         private readonly LegacyFont font;
 

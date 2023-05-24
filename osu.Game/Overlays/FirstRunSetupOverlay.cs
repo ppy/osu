@@ -31,7 +31,7 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Overlays
 {
     [Cached]
-    public class FirstRunSetupOverlay : ShearedOverlayContainer
+    public partial class FirstRunSetupOverlay : ShearedOverlayContainer
     {
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
@@ -301,7 +301,7 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Count)
             {
-                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value]);
+                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value])!;
 
                 loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
                 nextScreen.OnLoadComplete += _ =>

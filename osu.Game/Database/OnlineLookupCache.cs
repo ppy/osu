@@ -15,7 +15,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Database
 {
-    public abstract class OnlineLookupCache<TLookup, TValue, TRequest> : MemoryCachingComponent<TLookup, TValue>
+    public abstract partial class OnlineLookupCache<TLookup, TValue, TRequest> : MemoryCachingComponent<TLookup, TValue>
         where TLookup : IEquatable<TLookup>
         where TValue : class, IHasOnlineID<TLookup>
         where TRequest : APIRequest

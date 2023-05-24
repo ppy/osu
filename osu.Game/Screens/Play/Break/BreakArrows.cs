@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class BreakArrows : CompositeDrawable
+    public partial class BreakArrows : CompositeDrawable
     {
         private const int glow_icon_size = 60;
         private const int glow_icon_blur_sigma = 10;

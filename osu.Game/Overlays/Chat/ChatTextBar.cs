@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTextBar : Container
+    public partial class ChatTextBar : Container
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 
@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Chat
 
         private const float chatting_text_width = 220;
         private const float search_icon_width = 40;
+        private const float padding = 5;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -71,9 +72,10 @@ namespace osu.Game.Overlays.Chat
                                 RelativeSizeAxes = Axes.Y,
                                 Width = chatting_text_width,
                                 Masking = true,
-                                Padding = new MarginPadding { Right = 5 },
+                                Padding = new MarginPadding { Horizontal = padding },
                                 Child = chattingText = new OsuSpriteText
                                 {
+                                    MaxWidth = chatting_text_width - padding * 2,
                                     Font = OsuFont.Torus.With(size: 20),
                                     Colour = colourProvider.Background1,
                                     Anchor = Anchor.CentreRight,
@@ -97,7 +99,7 @@ namespace osu.Game.Overlays.Chat
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Right = 5 },
+                                Padding = new MarginPadding { Right = padding },
                                 Child = chatTextBox = new ChatTextBox
                                 {
                                     Anchor = Anchor.CentreLeft,
@@ -128,9 +130,8 @@ namespace osu.Game.Overlays.Chat
                 chattingTextContainer.FadeTo(showSearch ? 0 : 1);
                 searchIconContainer.FadeTo(showSearch ? 1 : 0);
 
-                // Clear search terms if any exist when switching back to chat mode
-                if (!showSearch)
-                    OnSearchTermsChanged?.Invoke(string.Empty);
+                if (showSearch)
+                    OnSearchTermsChanged?.Invoke(chatTextBox.Current.Value);
             }, true);
 
             currentChannel.BindValueChanged(change =>
@@ -151,6 +152,12 @@ namespace osu.Game.Overlays.Chat
                         chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
                         break;
                 }
+
+                if (change.OldValue != null)
+                    chatTextBox.Current.UnbindFrom(change.OldValue.TextBoxMessage);
+
+                if (newChannel != null)
+                    chatTextBox.Current.BindTo(newChannel.TextBoxMessage);
             }, true);
         }
 

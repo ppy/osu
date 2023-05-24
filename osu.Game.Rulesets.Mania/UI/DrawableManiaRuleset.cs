@@ -30,7 +30,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
+    public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
         /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.

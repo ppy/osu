@@ -20,7 +20,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsResultsScreen : ResultsScreen
+    public partial class PlaylistsResultsScreen : ResultsScreen
     {
         private readonly long roomId;
         private readonly PlaylistItem playlistItem;
@@ -235,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        private class PanelListLoadingSpinner : LoadingSpinner
+        private partial class PanelListLoadingSpinner : LoadingSpinner
         {
             private readonly ScorePanelList list;
 

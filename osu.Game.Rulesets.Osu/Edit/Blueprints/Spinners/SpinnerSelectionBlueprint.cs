@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
-    public class SpinnerSelectionBlueprint : OsuSelectionBlueprint<Spinner>
+    public partial class SpinnerSelectionBlueprint : OsuSelectionBlueprint<Spinner>
     {
         private readonly SpinnerPiece piece;
 

@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
+    public partial class TestSceneModDifficultyAdjustSettings : OsuManualInputManagerTestScene
     {
         private OsuModDifficultyAdjust modDifficultyAdjust;
 
@@ -124,6 +124,21 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkSliderAtValue("Circle Size", 9);
             checkBindableAtValue("Circle Size", 9);
+        }
+
+        [Test]
+        public void TestExtendedLimitsRetainedAfterBoundCopyCreation()
+        {
+            setExtendedLimits(true);
+            setSliderValue("Circle Size", 11);
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
+
+            AddStep("create bound copy", () => _ = modDifficultyAdjust.CircleSize.GetBoundCopy());
+
+            checkSliderAtValue("Circle Size", 11);
+            checkBindableAtValue("Circle Size", 11);
         }
 
         [Test]
@@ -246,7 +261,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep($"Set {name} slider to {value}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = value);
+                    .ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value = value);
         }
 
         private void checkBindableAtValue(string name, float? expectedValue)
@@ -260,7 +275,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddAssert($"Slider {name} at {expectedValue}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value == expectedValue);
+                    .ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value == expectedValue);
         }
 
         private void setBeatmapWithDifficultyParameters(float value)

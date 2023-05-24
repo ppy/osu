@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuResumeOverlay : ResumeOverlay
+    public partial class OsuResumeOverlay : ResumeOverlay
     {
         private Container cursorScaleContainer;
         private OsuClickToResumeCursor clickToResumeCursor;
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
             localCursorContainer?.Expire();
             localCursorContainer = null;
-            GameplayCursor?.ActiveCursor?.Show();
+            GameplayCursor?.ActiveCursor.Show();
         }
 
         protected override bool OnHover(HoverEvent e) => true;
 
-        public class OsuClickToResumeCursor : OsuCursor, IKeyBindingHandler<OsuAction>
+        public partial class OsuClickToResumeCursor : OsuCursor, IKeyBindingHandler<OsuAction>
         {
             public override bool HandlePositionalInput => true;
 

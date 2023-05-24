@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorSelectionHandler : SelectionHandler<HitObject>
+    public partial class EditorSelectionHandler : SelectionHandler<HitObject>
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (h.Samples.Any(s => s.Name == sampleName))
                     return;
 
-                h.Samples.Add(new HitSampleInfo(sampleName));
+                h.Samples.Add(h.CreateHitSampleInfo(sampleName));
                 EditorBeatmap.Update(h);
             });
         }

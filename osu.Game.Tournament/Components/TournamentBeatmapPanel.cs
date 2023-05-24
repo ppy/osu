@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentBeatmapPanel : CompositeDrawable
+    public partial class TournamentBeatmapPanel : CompositeDrawable
     {
         public readonly TournamentBeatmap Beatmap;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Components
 
         public TournamentBeatmapPanel(TournamentBeatmap beatmap, string mod = null)
         {
-            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+            ArgumentNullException.ThrowIfNull(beatmap);
 
             Beatmap = beatmap;
             this.mod = mod;

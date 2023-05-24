@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class MatchHeader : Container
+    public partial class MatchHeader : Container
     {
         private TeamScoreDisplay teamDisplay1;
         private TeamScoreDisplay teamDisplay2;

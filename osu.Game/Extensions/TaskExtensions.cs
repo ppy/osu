@@ -37,7 +37,7 @@ namespace osu.Game.Extensions
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    tcs.SetCanceled();
+                    tcs.SetCanceled(cancellationToken);
                 }
                 else
                 {

@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
+    public abstract partial class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
         public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;

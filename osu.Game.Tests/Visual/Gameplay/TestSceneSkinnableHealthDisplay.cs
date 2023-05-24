@@ -16,7 +16,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableHealthDisplay : SkinnableHUDComponentTestScene
+    public partial class TestSceneSkinnableHealthDisplay : SkinnableHUDComponentTestScene
     {
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);

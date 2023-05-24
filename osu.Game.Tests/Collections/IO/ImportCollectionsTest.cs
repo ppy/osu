@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Collections.IO
             }
 
             // Name matches the automatically chosen name from `CleanRunHeadlessGameHost` above, so we end up using the same storage location.
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName, null))
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName))
             {
                 try
                 {

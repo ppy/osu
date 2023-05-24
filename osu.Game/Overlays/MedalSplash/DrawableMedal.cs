@@ -19,7 +19,7 @@ using osu.Game.Users;
 namespace osu.Game.Overlays.MedalSplash
 {
     [LongRunningLoad]
-    public class DrawableMedal : Container, IStateful<DisplayState>
+    public partial class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;

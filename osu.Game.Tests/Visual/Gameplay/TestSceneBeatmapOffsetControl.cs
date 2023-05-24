@@ -14,7 +14,7 @@ using osu.Game.Tests.Visual.Ranking;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBeatmapOffsetControl : OsuTestScene
+    public partial class TestSceneBeatmapOffsetControl : OsuTestScene
     {
         private BeatmapOffsetControl offsetControl;
 

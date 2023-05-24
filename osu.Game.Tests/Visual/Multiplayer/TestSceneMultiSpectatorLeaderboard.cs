@@ -16,7 +16,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
         private Dictionary<int, ManualClock> clocks;
         private MultiSpectatorLeaderboard leaderboard;

@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsOnlineStatusItem : OverlayStreamItem<FriendStream>
+    public partial class FriendsOnlineStatusItem : OverlayStreamItem<FriendStream>
     {
         public FriendsOnlineStatusItem(FriendStream value)
             : base(value)

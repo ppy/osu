@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestPlayfieldBorder : OsuTestScene
+    public partial class TestPlayfieldBorder : OsuTestScene
     {
         public TestPlayfieldBorder()
         {

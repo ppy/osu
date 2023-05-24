@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {
-    public class ScreenEntry : AccountCreationScreen
+    public partial class ScreenEntry : AccountCreationScreen
     {
         private ErrorTextFlowContainer usernameDescription;
         private ErrorTextFlowContainer emailAddressDescription;
@@ -46,6 +46,9 @@ namespace osu.Game.Overlays.AccountCreation
 
         [Resolved]
         private GameHost host { get; set; }
+
+        [Resolved]
+        private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -194,9 +197,20 @@ namespace osu.Game.Overlays.AccountCreation
                     {
                         if (errors != null)
                         {
-                            usernameDescription.AddErrors(errors.User.Username);
-                            emailAddressDescription.AddErrors(errors.User.Email);
-                            passwordDescription.AddErrors(errors.User.Password);
+                            if (errors.User != null)
+                            {
+                                usernameDescription.AddErrors(errors.User.Username);
+                                emailAddressDescription.AddErrors(errors.User.Email);
+                                passwordDescription.AddErrors(errors.User.Password);
+                            }
+
+                            if (!string.IsNullOrEmpty(errors.Redirect))
+                            {
+                                if (!string.IsNullOrEmpty(errors.Message))
+                                    passwordDescription.AddErrors(new[] { errors.Message });
+
+                                game.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
+                            }
                         }
                         else
                         {

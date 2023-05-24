@@ -12,7 +12,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSample : PausableSkinnableSound
+    public partial class DrawableStoryboardSample : PausableSkinnableSound
     {
         /// <summary>
         /// The amount of time allowable beyond the start time of the sample, for the sample to start.

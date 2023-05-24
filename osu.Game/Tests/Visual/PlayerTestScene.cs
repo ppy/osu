@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -14,7 +15,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class PlayerTestScene : RateAdjustedBeatmapTestScene
+    public abstract partial class PlayerTestScene : RateAdjustedBeatmapTestScene
     {
         /// <summary>
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
@@ -24,6 +25,24 @@ namespace osu.Game.Tests.Visual
         protected TestPlayer Player;
 
         protected OsuConfigManager LocalConfig;
+
+        private double lastReportedTime;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Player?.GameplayClockContainer != null)
+            {
+                int roundedTime = (int)Player.GameplayClockContainer.CurrentTime / 1000;
+
+                if (roundedTime != lastReportedTime)
+                {
+                    lastReportedTime = roundedTime;
+                    Logger.Log($"⏱️ Gameplay clock reached {lastReportedTime * 1000:N0} ms");
+                }
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()

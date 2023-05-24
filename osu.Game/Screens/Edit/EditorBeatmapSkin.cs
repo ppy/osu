@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit
 
         #region Delegated ISkin implementation
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => Skin.GetDrawableComponent(component);
+        public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => Skin.GetDrawableComponent(lookup);
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
         public ISample GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);

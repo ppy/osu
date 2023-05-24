@@ -10,7 +10,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsSidebar : ExpandingButtonContainer
+    public partial class SettingsSidebar : ExpandingButtonContainer
     {
         public const float DEFAULT_WIDTH = 70;
         public const int EXPANDED_WIDTH = 200;

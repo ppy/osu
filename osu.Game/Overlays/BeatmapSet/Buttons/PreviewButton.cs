@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class PreviewButton : OsuClickableContainer
+    public partial class PreviewButton : OsuClickableContainer
     {
         private readonly Box background, progress;
         private readonly PlayButton playButton;

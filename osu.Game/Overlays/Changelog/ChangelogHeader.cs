@@ -18,7 +18,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : BreadcrumbControlOverlayHeader
+    public partial class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
         public readonly Bindable<APIChangelogBuild> Build = new Bindable<APIChangelogBuild>();
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Changelog
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding
                     {
-                        Horizontal = 65,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - ChangelogUpdateStreamItem.PADDING,
                         Vertical = 20
                     },
                     Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Changelog
             currentStream.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
-        private class ChangelogHeaderTitle : OverlayTitle
+        private partial class ChangelogHeaderTitle : OverlayTitle
         {
             public ChangelogHeaderTitle()
             {

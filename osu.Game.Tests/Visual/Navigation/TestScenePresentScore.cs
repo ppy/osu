@@ -24,7 +24,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePresentScore : OsuGameTestScene
+    public partial class TestScenePresentScore : OsuGameTestScene
     {
         private BeatmapSetInfo beatmap;
 

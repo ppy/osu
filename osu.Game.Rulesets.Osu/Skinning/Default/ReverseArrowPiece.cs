@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
@@ -16,10 +14,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class ReverseArrowPiece : BeatSyncedContainer
+    public partial class ReverseArrowPiece : BeatSyncedContainer
     {
         [Resolved]
-        private DrawableHitObject drawableRepeat { get; set; }
+        private DrawableHitObject drawableRepeat { get; set; } = null!;
 
         public ReverseArrowPiece()
         {
@@ -31,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+            Child = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingParameters.Additive,

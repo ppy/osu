@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardThumbnail : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCardThumbnail : OsuManualInputManagerTestScene
     {
         private PlayButton playButton => this.ChildrenOfType<PlayButton>().Single();
 

@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
+    public partial class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
         public const float EXTENDED_WIDTH = regular_width + top_player_left_width_extension;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
-        public BindableDouble TotalScore { get; } = new BindableDouble();
+        public BindableLong TotalScore { get; } = new BindableLong();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
@@ -62,20 +62,22 @@ namespace osu.Game.Screens.Play.HUD
 
         private int? scorePosition;
 
+        private bool scorePositionIsSet;
+
         public int? ScorePosition
         {
             get => scorePosition;
             set
             {
-                if (value == scorePosition)
+                // We always want to run once, as the incoming value may be null and require a visual update to "-".
+                if (value == scorePosition && scorePositionIsSet)
                     return;
 
                 scorePosition = value;
 
-                if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition.Value.FormatRank()}";
+                positionText.Text = scorePosition.HasValue ? $"#{scorePosition.Value.FormatRank()}" : "-";
+                scorePositionIsSet = true;
 
-                positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
                 updateState();
             }
         }

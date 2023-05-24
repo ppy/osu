@@ -9,7 +9,7 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneIntroTriangles : IntroTestScene
+    public partial class TestSceneIntroTriangles : IntroTestScene
     {
         protected override bool IntroReliesOnTrack => true;
         protected override IntroScreen CreateScreen() => new IntroTriangles();

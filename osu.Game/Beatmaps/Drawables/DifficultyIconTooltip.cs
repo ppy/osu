@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
+    internal partial class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
     {
         private OsuSpriteText difficultyName;
         private StarRatingDisplay starRating;

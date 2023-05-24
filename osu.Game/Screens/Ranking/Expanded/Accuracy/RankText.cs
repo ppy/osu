@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// The text that appears in the middle of the <see cref="AccuracyCircle"/> displaying the user's rank.
     /// </summary>
-    public class RankText : CompositeDrawable
+    public partial class RankText : CompositeDrawable
     {
         private readonly ScoreRank rank;
 

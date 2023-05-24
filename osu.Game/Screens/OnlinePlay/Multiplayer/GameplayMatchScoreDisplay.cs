@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class GameplayMatchScoreDisplay : MatchScoreDisplay
+    public partial class GameplayMatchScoreDisplay : MatchScoreDisplay
     {
         public Bindable<bool> Expanded = new Bindable<bool>();
 

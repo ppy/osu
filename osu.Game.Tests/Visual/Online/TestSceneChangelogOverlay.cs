@@ -18,7 +18,7 @@ using osu.Game.Overlays.Changelog;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChangelogOverlay : OsuTestScene
+    public partial class TestSceneChangelogOverlay : OsuTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show build", () => changelog.ShowBuild(requestedBuild));
         }
 
-        private class TestChangelogOverlay : ChangelogOverlay
+        private partial class TestChangelogOverlay : ChangelogOverlay
         {
             public new List<APIUpdateStream> Streams => base.Streams;
 

@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModColumn : OsuManualInputManagerTestScene
+    public partial class TestSceneModColumn : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
@@ -294,7 +294,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 modState.Filtered.Value = filter?.Invoke(modState.Mod) == false;
         }
 
-        private class TestModColumn : ModColumn
+        private partial class TestModColumn : ModColumn
         {
             public new bool SelectionAnimationRunning => base.SelectionAnimationRunning;
 

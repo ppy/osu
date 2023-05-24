@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament
 {
-    internal class WarningBox : Container
+    internal partial class WarningBox : Container
     {
         public WarningBox(string text)
         {

@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
     /// </summary>
-    public abstract class EditorScreen : VisibilityContainer
+    public abstract partial class EditorScreen : VisibilityContainer
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }

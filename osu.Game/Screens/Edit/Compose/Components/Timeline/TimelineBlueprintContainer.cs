@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineBlueprintContainer : EditorBlueprintContainer
+    internal partial class TimelineBlueprintContainer : EditorBlueprintContainer
     {
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
@@ -83,8 +83,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
-                placementBlueprint.Colour = Color4.MediumPurple;
+                placementBlueprint.Colour = OsuColour.Gray(0.9f);
 
+                // TODO: this is out of order, causing incorrect stacking height.
                 SelectionBlueprints.Add(placementBlueprint);
             }
         }
@@ -198,7 +199,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
         }
 
-        private class SelectableAreaBackground : CompositeDrawable
+        private partial class SelectableAreaBackground : CompositeDrawable
         {
             [Resolved]
             private OsuColour colours { get; set; }
@@ -246,7 +247,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
+        protected partial class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
         {
             protected override Container<SelectionBlueprint<HitObject>> Content { get; }
 

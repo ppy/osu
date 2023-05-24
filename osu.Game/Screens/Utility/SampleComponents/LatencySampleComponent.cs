@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Utility.SampleComponents
 {
-    public abstract class LatencySampleComponent : CompositeDrawable
+    public abstract partial class LatencySampleComponent : CompositeDrawable
     {
         protected readonly BindableDouble SampleBPM = new BindableDouble();
         protected readonly BindableDouble SampleApproachRate = new BindableDouble();

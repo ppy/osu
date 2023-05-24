@@ -14,7 +14,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class DrawableManiaEditorRuleset : DrawableManiaRuleset
+    public partial class DrawableManiaEditorRuleset : DrawableManiaRuleset
     {
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 

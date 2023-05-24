@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModSpunOut : OsuModTestScene
+    public partial class TestSceneOsuModSpunOut : OsuModTestScene
     {
         protected override bool AllowFail => true;
 

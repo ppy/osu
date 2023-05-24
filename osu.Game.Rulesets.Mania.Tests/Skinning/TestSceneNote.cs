@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneNote : ManiaHitObjectTestScene
+    public partial class TestSceneNote : ManiaHitObjectTestScene
     {
         protected override DrawableManiaHitObject CreateHitObject()
         {

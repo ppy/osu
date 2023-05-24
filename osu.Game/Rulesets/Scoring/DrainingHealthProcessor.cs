@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Scoring
     /// At HP=5, the minimum health reached for a perfect play is 70%.<br />
     /// At HP=10, the minimum health reached for a perfect play is 30%.
     /// </summary>
-    public class DrainingHealthProcessor : HealthProcessor
+    public partial class DrainingHealthProcessor : HealthProcessor
     {
         /// <summary>
         /// A reasonable allowable error for the minimum health offset from <see cref="targetMinimumHealth"/>. A 1% error is unnoticeable.
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Scoring
         public DrainingHealthProcessor(double drainStartTime, double drainLenience = 0)
         {
             this.drainStartTime = drainStartTime;
-            this.drainLenience = drainLenience;
+            this.drainLenience = Math.Clamp(drainLenience, 0, 1);
         }
 
         protected override void Update()
@@ -79,7 +79,8 @@ namespace osu.Game.Rulesets.Scoring
             double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
             double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
 
-            Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
+            if (drainLenience < 1)
+                Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)

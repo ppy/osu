@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Catch.Mods;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneDrawableHitObjectsHidden : TestSceneDrawableHitObjects
+    public partial class TestSceneDrawableHitObjectsHidden : TestSceneDrawableHitObjects
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

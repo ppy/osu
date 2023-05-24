@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroWelcome : IntroScreen
+    public partial class IntroWelcome : IntroScreen
     {
         protected override string BeatmapHash => "64e00d7022195959bfa3109d09c2e2276c8f12f486b91fcf6175583e973b48f2";
         protected override string BeatmapFile => "welcome.osz";
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private class WelcomeIntroSequence : Container
+        private partial class WelcomeIntroSequence : Container
         {
             private Drawable welcomeText;
             private Container scaleContainer;
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Menu
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Colour = Color4.DarkBlue,
-                                Size = new Vector2(0.96f)
+                                Size = OsuLogo.SCALE_ADJUST,
                             },
                             new Circle
                             {

@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneStoryboardSamplePlayback : PlayerTestScene
+    public partial class TestSceneStoryboardSamplePlayback : PlayerTestScene
     {
         private Storyboard storyboard;
 

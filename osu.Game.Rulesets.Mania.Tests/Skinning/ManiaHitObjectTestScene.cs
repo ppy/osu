@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// <summary>
     /// A test scene for a mania hitobject.
     /// </summary>
-    public abstract class ManiaHitObjectTestScene : ManiaSkinnableTestScene
+    public abstract partial class ManiaHitObjectTestScene : ManiaSkinnableTestScene
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

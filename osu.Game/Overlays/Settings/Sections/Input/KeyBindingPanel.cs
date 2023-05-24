@@ -11,7 +11,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class KeyBindingPanel : SettingsSubPanel
+    public partial class KeyBindingPanel : SettingsSubPanel
     {
         protected override Drawable CreateHeader() => new SettingsHeader(InputSettingsStrings.KeyBindingPanelHeader, InputSettingsStrings.KeyBindingPanelDescription);
 

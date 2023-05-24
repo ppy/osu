@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// A pill that displays the star rating of a beatmap.
     /// </summary>
-    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
+    public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
         private readonly bool animated;
         private readonly Box background;

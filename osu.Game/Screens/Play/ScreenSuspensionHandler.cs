@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Ensures screen is not suspended / dimmed while gameplay is active.
     /// </summary>
-    public class ScreenSuspensionHandler : Component
+    public partial class ScreenSuspensionHandler : Component
     {
         private readonly GameplayClockContainer gameplayClockContainer;
         private IBindable<bool> isPaused;

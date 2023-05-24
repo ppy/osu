@@ -9,7 +9,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class VideoIconPill : IconPill
+    public partial class VideoIconPill : IconPill
     {
         public VideoIconPill()
             : base(FontAwesome.Solid.Film)

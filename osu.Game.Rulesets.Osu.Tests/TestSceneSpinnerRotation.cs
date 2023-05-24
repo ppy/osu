@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneSpinnerRotation : TestSceneOsuPlayer
+    public partial class TestSceneSpinnerRotation : TestSceneOsuPlayer
     {
         private const double spinner_start_time = 100;
         private const double spinner_duration = 6000;
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("player score matching expected bonus score", () =>
             {
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
-                double totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                long totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
                 return totalScore == (int)(drawableSpinner.Result.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
             });
 
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         };
 
-        private class ScoreExposedPlayer : TestPlayer
+        private partial class ScoreExposedPlayer : TestPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

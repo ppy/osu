@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
+    public partial class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
         private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;
@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
+
+        protected override bool IsValidForPlacement => HitObject.Duration > 0;
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -75,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return;
 
             base.OnMouseUp(e);
-            EndPlacement(HitObject.Duration > 0);
+            EndPlacement(true);
         }
 
         private double originalStartTime;

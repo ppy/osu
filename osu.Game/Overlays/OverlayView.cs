@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
     /// Automatically performs a data fetch on load.
     /// </remarks>
     /// <typeparam name="T">The type of the API response.</typeparam>
-    public abstract class OverlayView<T> : CompositeDrawable
+    public abstract partial class OverlayView<T> : CompositeDrawable
         where T : class
     {
         [Resolved]

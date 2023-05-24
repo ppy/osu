@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
@@ -14,11 +13,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class TaikoLegacyPlayfieldBackgroundRight : BeatSyncedContainer
+    public partial class TaikoLegacyPlayfieldBackgroundRight : BeatSyncedContainer
     {
-        private Sprite kiai;
+        private Sprite kiai = null!;
 
-        private bool kiaiDisplayed;
+        private bool isKiaiActive;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -43,17 +42,19 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             };
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isKiaiActive)
+                kiai.Alpha = (float)Math.Min(1, kiai.Alpha + Math.Abs(Clock.ElapsedFrameTime) / 200f);
+            else
+                kiai.Alpha = (float)Math.Max(0, kiai.Alpha - Math.Abs(Clock.ElapsedFrameTime) / 200f);
+        }
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-            if (effectPoint.KiaiMode != kiaiDisplayed)
-            {
-                kiaiDisplayed = effectPoint.KiaiMode;
-
-                kiai.ClearTransforms();
-                kiai.FadeTo(kiaiDisplayed ? 1 : 0, 200);
-            }
+            isKiaiActive = effectPoint.KiaiMode;
         }
     }
 }

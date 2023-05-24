@@ -20,7 +20,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboard : Container<DrawableStoryboardLayer>
+    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
         [Cached]
         public Storyboard Storyboard { get; }
@@ -69,7 +69,7 @@ namespace osu.Game.Storyboards.Drawables
 
             Size = new Vector2(640, 480);
 
-            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).Any(e => !(e is StoryboardVideo));
+            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).All(e => e is StoryboardVideo);
 
             Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
 

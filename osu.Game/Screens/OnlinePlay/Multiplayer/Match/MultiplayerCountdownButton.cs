@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerCountdownButton : IconButton, IHasPopover
+    public partial class MultiplayerCountdownButton : IconButton, IHasPopover
     {
         private static readonly TimeSpan[] available_delays =
         {
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             foreach (var duration in available_delays)
             {
-                flow.Add(new OsuButton
+                flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = $"Start match in {duration.Humanize()}",
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
             {
-                flow.Add(new OsuButton
+                flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Stop countdown",

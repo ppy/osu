@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneMatchHeader : TournamentTestScene
+    public partial class TestSceneMatchHeader : TournamentTestScene
     {
         public TestSceneMatchHeader()
         {

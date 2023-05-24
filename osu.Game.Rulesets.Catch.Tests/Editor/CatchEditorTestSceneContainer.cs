@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class CatchEditorTestSceneContainer : Container
+    public partial class CatchEditorTestSceneContainer : Container
     {
         [Cached(typeof(Playfield))]
         public readonly ScrollingPlayfield Playfield;
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             };
         }
 
-        private class TestCatchPlayfield : CatchEditorPlayfield
+        private partial class TestCatchPlayfield : CatchEditorPlayfield
         {
             public TestCatchPlayfield()
                 : base(new BeatmapDifficulty { CircleSize = 0 })

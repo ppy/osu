@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Chat
     /// <summary>
     /// An <see cref="OsuScrollContainer"/> with functionality to automatically scroll whenever the maximum scrollable distance increases.
     /// </summary>
-    public class ChannelScrollContainer : OsuScrollContainer
+    public partial class ChannelScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The chat will be automatically scrolled to end if and only if

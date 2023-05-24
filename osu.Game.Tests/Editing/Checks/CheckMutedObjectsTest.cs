@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -21,8 +19,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckMutedObjectsTest
     {
-        private CheckMutedObjects check;
-        private ControlPointInfo cpi;
+        private CheckMutedObjects check = null!;
+        private ControlPointInfo cpi = null!;
 
         private const int volume_regular = 50;
         private const int volume_low = 15;
@@ -37,45 +35,6 @@ namespace osu.Game.Tests.Editing.Checks
             cpi.Add(0, new SampleControlPoint { SampleVolume = volume_regular });
             cpi.Add(1000, new SampleControlPoint { SampleVolume = volume_low });
             cpi.Add(2000, new SampleControlPoint { SampleVolume = volume_muted });
-        }
-
-        [Test]
-        public void TestNormalControlPointVolume()
-        {
-            var hitCircle = new HitCircle
-            {
-                StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
-            };
-            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            assertOk(new List<HitObject> { hitCircle });
-        }
-
-        [Test]
-        public void TestLowControlPointVolume()
-        {
-            var hitCircle = new HitCircle
-            {
-                StartTime = 1000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
-            };
-            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            assertLowVolume(new List<HitObject> { hitCircle });
-        }
-
-        [Test]
-        public void TestMutedControlPointVolume()
-        {
-            var hitCircle = new HitCircle
-            {
-                StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
-            };
-            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            assertMuted(new List<HitObject> { hitCircle });
         }
 
         [Test]
@@ -124,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -137,7 +96,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -157,13 +116,13 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick", volume: volume_regular) }
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) } // Applies to the tail.
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) } // Applies to the tail.
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -176,73 +135,20 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick", volume: volume_regular) }
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 2500)
             {
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) } // Applies to the tail.
-            };
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            assertMutedPassive(new List<HitObject> { slider });
-        }
-
-        [Test]
-        public void TestMutedControlPointVolumeSliderHead()
-        {
-            var sliderHead = new SliderHeadCircle
-            {
-                StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
-            };
-            sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            var sliderTick = new SliderTick
-            {
-                StartTime = 2250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
-            };
-            sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 2000, endTime: 2500)
-            {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
-            };
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            assertMuted(new List<HitObject> { slider });
-        }
-
-        [Test]
-        public void TestMutedControlPointVolumeSliderTail()
-        {
-            var sliderHead = new SliderHeadCircle
-            {
-                StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
-            };
-            sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            var sliderTick = new SliderTick
-            {
-                StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
-            };
-            sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            // Ends after the 5% control point.
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 2500)
-            {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 

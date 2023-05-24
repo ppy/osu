@@ -8,7 +8,7 @@ using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
-    public class WikiMarkdownImage : OsuMarkdownImage
+    public partial class WikiMarkdownImage : OsuMarkdownImage
     {
         public WikiMarkdownImage(LinkInline linkInline)
             : base(linkInline)

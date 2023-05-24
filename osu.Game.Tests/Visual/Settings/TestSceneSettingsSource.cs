@@ -15,7 +15,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsSource : OsuTestScene
+    public partial class TestSceneSettingsSource : OsuTestScene
     {
         public TestSceneSettingsSource()
         {

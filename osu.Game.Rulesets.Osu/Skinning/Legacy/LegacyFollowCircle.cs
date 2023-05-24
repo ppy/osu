@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyFollowCircle : FollowCircle
+    public partial class LegacyFollowCircle : FollowCircle
     {
         public LegacyFollowCircle(Drawable animationContent)
         {

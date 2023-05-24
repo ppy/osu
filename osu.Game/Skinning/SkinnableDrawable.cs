@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -14,12 +12,12 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
     /// </summary>
-    public class SkinnableDrawable : SkinReloadableDrawable
+    public partial class SkinnableDrawable : SkinReloadableDrawable
     {
         /// <summary>
         /// The displayed component.
         /// </summary>
-        public Drawable Drawable { get; private set; }
+        public Drawable Drawable { get; private set; } = null!;
 
         /// <summary>
         /// Whether the drawable component should be centered in available space.
@@ -33,25 +31,25 @@ namespace osu.Game.Skinning
             set => base.AutoSizeAxes = value;
         }
 
-        protected readonly ISkinComponent Component;
+        protected readonly ISkinComponentLookup ComponentLookup;
 
         private readonly ConfineMode confineMode;
 
         /// <summary>
         /// Create a new skinnable drawable.
         /// </summary>
-        /// <param name="component">The namespace-complete resource name for this skinnable element.</param>
+        /// <param name="lookup">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-            : this(component, confineMode)
+        public SkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : this(lookup, confineMode)
         {
             createDefault = defaultImplementation;
         }
 
-        protected SkinnableDrawable(ISkinComponent component, ConfineMode confineMode = ConfineMode.NoScaling)
+        protected SkinnableDrawable(ISkinComponentLookup lookup, ConfineMode confineMode = ConfineMode.NoScaling)
         {
-            Component = component;
+            ComponentLookup = lookup;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
@@ -62,13 +60,13 @@ namespace osu.Game.Skinning
         /// </summary>
         public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
 
-        private readonly Func<ISkinComponent, Drawable> createDefault;
+        private readonly Func<ISkinComponentLookup, Drawable>? createDefault;
 
         private readonly Cached scaling = new Cached();
 
         private bool isDefault;
 
-        protected virtual Drawable CreateDefault(ISkinComponent component) => createDefault?.Invoke(component) ?? Empty();
+        protected virtual Drawable CreateDefault(ISkinComponentLookup lookup) => createDefault?.Invoke(lookup) ?? Empty();
 
         /// <summary>
         /// Whether to apply size restrictions (specified via <see cref="confineMode"/>) to the default implementation.
@@ -77,30 +75,28 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin)
         {
-            Drawable = skin.GetDrawableComponent(Component);
+            var retrieved = skin.GetDrawableComponent(ComponentLookup);
 
-            isDefault = false;
-
-            if (Drawable == null)
+            if (retrieved == null)
             {
-                Drawable = CreateDefault(Component);
+                Drawable = CreateDefault(ComponentLookup);
                 isDefault = true;
             }
-
-            if (Drawable != null)
-            {
-                scaling.Invalidate();
-
-                if (CentreComponent)
-                {
-                    Drawable.Origin = Anchor.Centre;
-                    Drawable.Anchor = Anchor.Centre;
-                }
-
-                InternalChild = Drawable;
-            }
             else
-                ClearInternal();
+            {
+                Drawable = retrieved;
+                isDefault = false;
+            }
+
+            scaling.Invalidate();
+
+            if (CentreComponent)
+            {
+                Drawable.Origin = Anchor.Centre;
+                Drawable.Anchor = Anchor.Centre;
+            }
+
+            InternalChild = Drawable;
         }
 
         protected override void Update()
@@ -111,7 +107,7 @@ namespace osu.Game.Skinning
             {
                 try
                 {
-                    if (Drawable == null || (isDefault && !ApplySizeRestrictionsToDefault)) return;
+                    if (isDefault && !ApplySizeRestrictionsToDefault) return;
 
                     switch (confineMode)
                     {

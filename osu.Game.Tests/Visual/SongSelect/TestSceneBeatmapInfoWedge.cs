@@ -30,7 +30,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapInfoWedge : OsuTestScene
+    public partial class TestSceneBeatmapInfoWedge : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapInfoWedge infoWedge;
@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private class TestBeatmapInfoWedge : BeatmapInfoWedge
+        private partial class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new Container DisplayedContent => base.DisplayedContent;
 

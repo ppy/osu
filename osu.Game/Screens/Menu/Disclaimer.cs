@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : StartupScreen
+    public partial class Disclaimer : StartupScreen
     {
         private SpriteIcon icon;
         private Color4 iconColour;
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Menu
                 "New features are coming online every update. Make sure to stay up-to-date!",
                 "If you find the UI too large or small, try adjusting UI scale in settings!",
                 "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
-                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-D!",
+                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
                 "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
                 "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
                 "Try scrolling down in the mod select panel to find a bunch of new fun mods!",

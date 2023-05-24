@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
+    public partial class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Rankings
             countryName.Text = country.NewValue.GetDescription();
         }
 
-        private class CloseButton : OsuHoverContainer
+        private partial class CloseButton : OsuHoverContainer
         {
             private readonly SpriteIcon icon;
 

@@ -9,7 +9,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarSocialButton : ToolbarOverlayToggleButton
+    public partial class ToolbarSocialButton : ToolbarOverlayToggleButton
     {
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 

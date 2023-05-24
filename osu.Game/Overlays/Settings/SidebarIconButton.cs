@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarIconButton : SidebarButton
+    public partial class SidebarIconButton : SidebarButton
     {
         private const float selection_indicator_height_active = 18;
         private const float selection_indicator_height_inactive = 4;

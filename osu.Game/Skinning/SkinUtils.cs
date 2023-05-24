@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 
 namespace osu.Game.Skinning
@@ -18,6 +16,6 @@ namespace osu.Game.Skinning
         /// <param name="value">The value.</param>
         /// <typeparam name="TValue">The type of value <paramref name="value"/>, and the type of the resulting bindable.</typeparam>
         /// <returns>The resulting bindable.</returns>
-        public static Bindable<TValue> As<TValue>(object value) => (Bindable<TValue>)value;
+        public static Bindable<TValue>? As<TValue>(object? value) => (Bindable<TValue>?)value;
     }
 }

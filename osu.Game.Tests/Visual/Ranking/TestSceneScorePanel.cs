@@ -12,7 +12,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneScorePanel : OsuTestScene
+    public partial class TestSceneScorePanel : OsuTestScene
     {
         private ScorePanel panel;
 

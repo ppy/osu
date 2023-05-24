@@ -19,7 +19,7 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayPanelDisplayStyleControl : OsuTabControl<OverlayPanelDisplayStyle>
+    public partial class OverlayPanelDisplayStyleControl : OsuTabControl<OverlayPanelDisplayStyle>
     {
         protected override Dropdown<OverlayPanelDisplayStyle> CreateDropdown() => null;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
             Direction = FillDirection.Horizontal
         };
 
-        private class PanelDisplayTabItem : TabItem<OverlayPanelDisplayStyle>, IHasTooltip
+        private partial class PanelDisplayTabItem : TabItem<OverlayPanelDisplayStyle>, IHasTooltip
         {
             public IconUsage Icon
             {

@@ -15,7 +15,7 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneVotePill : OsuTestScene
+    public partial class TestSceneVotePill : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class TestPill : VotePill
+        private partial class TestPill : VotePill
         {
             public new Box Background => base.Background;
 

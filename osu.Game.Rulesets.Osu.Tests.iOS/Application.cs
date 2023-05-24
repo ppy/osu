@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.iOS;
-using UIKit;
+using osu.Game.Tests;
 
 namespace osu.Game.Rulesets.Osu.Tests.iOS
 {
@@ -12,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Tests.iOS
     {
         public static void Main(string[] args)
         {
-            UIApplication.Main(args, typeof(GameUIApplication), typeof(AppDelegate));
+            GameApplication.Main(new OsuTestBrowser());
         }
     }
 }

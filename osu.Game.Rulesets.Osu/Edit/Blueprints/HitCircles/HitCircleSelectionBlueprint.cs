@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
-    public class HitCircleSelectionBlueprint : OsuSelectionBlueprint<HitCircle>
+    public partial class HitCircleSelectionBlueprint : OsuSelectionBlueprint<HitCircle>
     {
         protected new DrawableHitCircle DrawableObject => (DrawableHitCircle)base.DrawableObject;
 

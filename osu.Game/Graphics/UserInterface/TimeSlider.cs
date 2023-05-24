@@ -10,8 +10,8 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A slider bar which displays a millisecond time value.
     /// </summary>
-    public class TimeSlider : OsuSliderBar<double>
+    public partial class TimeSlider : RoundedSliderBar<double>
     {
-        public override LocalisableString TooltipText => $"{Current.Value:N0} ms";
+        public override LocalisableString TooltipText => $"{base.TooltipText} ms";
     }
 }

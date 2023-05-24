@@ -17,7 +17,7 @@ using osu.Game.Overlays.FirstRunSetup;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFirstRunScreenImportFromStable : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunScreenImportFromStable : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);

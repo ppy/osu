@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneCatchDistanceSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneCatchDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private readonly ManualClock manualClock = new ManualClock();
 

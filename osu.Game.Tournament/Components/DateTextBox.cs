@@ -10,7 +10,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DateTextBox : SettingsTextBox
+    public partial class DateTextBox : SettingsTextBox
     {
         public new Bindable<DateTimeOffset> Current
         {

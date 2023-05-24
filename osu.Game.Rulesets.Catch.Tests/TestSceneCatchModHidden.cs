@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneCatchModHidden : ModTestScene
+    public partial class TestSceneCatchModHidden : ModTestScene
     {
         [Test]
         public void TestJuiceStream()

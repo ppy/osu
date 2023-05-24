@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 
@@ -11,22 +9,22 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A component that tracks a batch change, only applying after all active changes are completed.
     /// </summary>
-    public abstract class TransactionalCommitComponent : Component
+    public abstract partial class TransactionalCommitComponent : Component
     {
         /// <summary>
         /// Fires whenever a transaction begins. Will not fire on nested transactions.
         /// </summary>
-        public event Action TransactionBegan;
+        public event Action? TransactionBegan;
 
         /// <summary>
         /// Fires when the last transaction completes.
         /// </summary>
-        public event Action TransactionEnded;
+        public event Action? TransactionEnded;
 
         /// <summary>
         /// Fires when <see cref="SaveState"/> is called and results in a non-transactional state save.
         /// </summary>
-        public event Action SaveStateTriggered;
+        public event Action? SaveStateTriggered;
 
         public bool TransactionActive => bulkChangesStarted > 0;
 
@@ -35,7 +33,7 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Signal the beginning of a change.
         /// </summary>
-        public void BeginChange()
+        public virtual void BeginChange()
         {
             if (bulkChangesStarted++ == 0)
                 TransactionBegan?.Invoke();

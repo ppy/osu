@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -20,10 +21,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public abstract class SmokeSegment : Drawable, ITexturedShaderDrawable
+    public abstract partial class SmokeSegment : Drawable, ITexturedShaderDrawable
     {
-        private const int max_point_count = 18_000;
-
         // fade anim values
         private const double initial_fade_out_duration = 4000;
 
@@ -50,15 +49,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private const float max_rotation = 0.25f;
 
         public IShader? TextureShader { get; private set; }
-        public IShader? RoundedTextureShader { get; private set; }
 
         protected Texture? Texture { get; set; }
 
-        private float radius => Texture?.DisplayWidth * 0.165f ?? 3;
+        private float height => Texture?.DisplayHeight * 0.165f ?? 3;
+
+        private float width => Texture?.DisplayWidth * 0.165f ?? 3;
 
         protected readonly List<SmokePoint> SmokePoints = new List<SmokePoint>();
 
-        private float pointInterval => radius * 7f / 8;
+        private float pointInterval => width * 7f / 8;
 
         private double smokeStartTime { get; set; } = double.MinValue;
 
@@ -70,7 +70,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
@@ -83,12 +82,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
             LifetimeStart = smokeStartTime = Time.Current;
 
             totalDistance = pointInterval;
-        }
-
-        private Vector2 nextPointDirection()
-        {
-            float angle = RNG.NextSingle(0, 2 * MathF.PI);
-            return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
         }
 
         public void AddPosition(Vector2 position, double time)
@@ -107,33 +100,27 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 Vector2 pointPos = (pointInterval - (totalDistance - delta)) * increment + (Vector2)lastPosition;
                 increment *= pointInterval;
 
-                if (SmokePoints.Count > 0 && SmokePoints[^1].Time > time)
-                {
-                    int index = ~SmokePoints.BinarySearch(new SmokePoint { Time = time }, new SmokePoint.UpperBoundComparer());
-                    SmokePoints.RemoveRange(index, SmokePoints.Count - index);
-                }
-
                 totalDistance %= pointInterval;
 
-                for (int i = 0; i < count; i++)
+                if (SmokePoints.Count == 0 || SmokePoints[^1].Time <= time)
                 {
-                    SmokePoints.Add(new SmokePoint
+                    for (int i = 0; i < count; i++)
                     {
-                        Position = pointPos,
-                        Time = time,
-                        Direction = nextPointDirection(),
-                    });
+                        SmokePoints.Add(new SmokePoint
+                        {
+                            Position = pointPos,
+                            Time = time,
+                            Angle = RNG.NextSingle(0, 2 * MathF.PI),
+                        });
 
-                    pointPos += increment;
+                        pointPos += increment;
+                    }
                 }
 
                 Invalidate(Invalidation.DrawNode);
             }
 
             lastPosition = position;
-
-            if (SmokePoints.Count >= max_point_count)
-                FinishDrawing(time);
         }
 
         public void FinishDrawing(double time)
@@ -157,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             public Vector2 Position;
             public double Time;
-            public Vector2 Direction;
+            public float Angle;
 
             public struct UpperBoundComparer : IComparer<SmokePoint>
             {
@@ -169,6 +156,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     // value will be the index's complement.
 
                     return x.Time > target.Time ? 1 : -1;
+                }
+            }
+
+            public struct LowerBoundComparer : IComparer<SmokePoint>
+            {
+                public int Compare(SmokePoint x, SmokePoint target)
+                {
+                    // Similar logic as UpperBoundComparer, except returned index will always be
+                    // the first element larger or equal
+
+                    return x.Time < target.Time ? -1 : 1;
                 }
             }
         }
@@ -183,15 +181,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             private readonly List<SmokePoint> points = new List<SmokePoint>();
             private IVertexBatch<TexturedVertex2D>? quadBatch;
-            private float radius;
+            private float width;
+            private float height;
             private Vector2 drawSize;
             private Texture? texture;
             private int rotationSeed;
-            private int rotationIndex;
+            private int firstVisiblePointIndex;
 
             // anim calculation vars (color, scale, direction)
             private double initialFadeOutDurationTrunc;
-            private double firstVisiblePointTime;
+            private double firstVisiblePointTimeAfterSmokeEnded;
 
             private double initialFadeOutTime;
             private double reFadeInTime;
@@ -206,10 +205,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 base.ApplyState();
 
-                points.Clear();
-                points.AddRange(Source.SmokePoints);
-
-                radius = Source.radius;
+                width = Source.width;
+                height = Source.height;
                 drawSize = Source.DrawSize;
                 texture = Source.Texture;
 
@@ -220,11 +217,18 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 rotationSeed = Source.rotationSeed;
 
                 initialFadeOutDurationTrunc = Math.Min(initial_fade_out_duration, SmokeEndTime - SmokeStartTime);
-                firstVisiblePointTime = SmokeEndTime - initialFadeOutDurationTrunc;
+                firstVisiblePointTimeAfterSmokeEnded = SmokeEndTime - initialFadeOutDurationTrunc;
 
-                initialFadeOutTime = CurrentTime;
-                reFadeInTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / re_fade_in_speed);
-                finalFadeOutTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTime * (1 - 1 / final_fade_out_speed);
+                initialFadeOutTime = Math.Min(CurrentTime, SmokeEndTime);
+                reFadeInTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTimeAfterSmokeEnded * (1 - 1 / re_fade_in_speed);
+                finalFadeOutTime = CurrentTime - initialFadeOutDurationTrunc - firstVisiblePointTimeAfterSmokeEnded * (1 - 1 / final_fade_out_speed);
+
+                double firstVisiblePointTime = Math.Min(SmokeEndTime, CurrentTime) - initialFadeOutDurationTrunc;
+                firstVisiblePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = firstVisiblePointTime }, new SmokePoint.LowerBoundComparer());
+                int futurePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = CurrentTime }, new SmokePoint.UpperBoundComparer());
+
+                points.Clear();
+                points.AddRange(Source.SmokePoints.Skip(firstVisiblePointIndex).Take(futurePointIndex - firstVisiblePointIndex));
             }
 
             public sealed override void Draw(IRenderer renderer)
@@ -234,24 +238,28 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (points.Count == 0)
                     return;
 
-                rotationIndex = 0;
+                quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(200, 4);
 
-                quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(max_point_count / 10, 10);
+                if (points.Count > quadBatch.Size && quadBatch.Size != IRenderer.MAX_QUADS)
+                {
+                    int batchSize = Math.Min(quadBatch.Size * 2, IRenderer.MAX_QUADS);
+                    quadBatch = renderer.CreateQuadBatch<TexturedVertex2D>(batchSize, 4);
+                }
+
                 texture ??= renderer.WhitePixel;
                 RectangleF textureRect = texture.GetTextureRect();
-
-                var shader = GetAppropriateShader(renderer);
 
                 renderer.SetBlend(BlendingParameters.Additive);
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                shader.Bind();
+                BindTextureShader(renderer);
+
                 texture.Bind();
 
-                foreach (var point in points)
-                    drawPointQuad(point, textureRect);
+                for (int i = 0; i < points.Count; i++)
+                    drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
 
-                shader.Unbind();
+                UnbindTextureShader(renderer);
                 renderer.PopLocalMatrix();
             }
 
@@ -263,30 +271,34 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 var color = Color4.White;
 
-                double timeDoingInitialFadeOut = Math.Min(initialFadeOutTime, SmokeEndTime) - point.Time;
+                double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
 
-                if (timeDoingInitialFadeOut > 0)
+                if (timeDoingFinalFadeOut > 0 && point.Time >= firstVisiblePointTimeAfterSmokeEnded)
                 {
-                    float fraction = Math.Clamp((float)(timeDoingInitialFadeOut / initial_fade_out_duration), 0, 1);
-                    color.A = (1 - fraction) * initial_alpha;
+                    float fraction = Math.Clamp((float)(timeDoingFinalFadeOut / final_fade_out_duration), 0, 1);
+                    fraction = MathF.Pow(fraction, 5);
+                    color.A = (1 - fraction) * re_fade_in_alpha;
                 }
-
-                if (color.A > 0)
+                else
                 {
-                    double timeDoingReFadeIn = reFadeInTime - point.Time / re_fade_in_speed;
-                    double timeDoingFinalFadeOut = finalFadeOutTime - point.Time / final_fade_out_speed;
+                    double timeDoingInitialFadeOut = initialFadeOutTime - point.Time;
 
-                    if (timeDoingFinalFadeOut > 0)
+                    if (timeDoingInitialFadeOut > 0)
                     {
-                        float fraction = Math.Clamp((float)(timeDoingFinalFadeOut / final_fade_out_duration), 0, 1);
-                        fraction = MathF.Pow(fraction, 5);
-                        color.A = (1 - fraction) * re_fade_in_alpha;
+                        float fraction = Math.Clamp((float)(timeDoingInitialFadeOut / initial_fade_out_duration), 0, 1);
+                        color.A = (1 - fraction) * initial_alpha;
                     }
-                    else if (timeDoingReFadeIn > 0)
+
+                    if (point.Time > firstVisiblePointTimeAfterSmokeEnded)
                     {
-                        float fraction = Math.Clamp((float)(timeDoingReFadeIn / re_fade_in_duration), 0, 1);
-                        fraction = 1 - MathF.Pow(1 - fraction, 5);
-                        color.A = fraction * (re_fade_in_alpha - color.A) + color.A;
+                        double timeDoingReFadeIn = reFadeInTime - point.Time / re_fade_in_speed;
+
+                        if (timeDoingReFadeIn > 0)
+                        {
+                            float fraction = Math.Clamp((float)(timeDoingReFadeIn / re_fade_in_duration), 0, 1);
+                            fraction = 1 - MathF.Pow(1 - fraction, 5);
+                            color.A = fraction * (re_fade_in_alpha - color.A) + color.A;
+                        }
                     }
                 }
 
@@ -301,37 +313,39 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 return fraction * (final_scale - initial_scale) + initial_scale;
             }
 
-            protected virtual Vector2 PointDirection(SmokePoint point)
+            protected virtual Vector2 PointDirection(SmokePoint point, int index)
             {
-                float initialAngle = MathF.Atan2(point.Direction.Y, point.Direction.X);
-                float finalAngle = initialAngle + nextRotation();
-
                 double timeDoingRotation = CurrentTime - point.Time;
                 float fraction = Math.Clamp((float)(timeDoingRotation / rotation_duration), 0, 1);
                 fraction = 1 - MathF.Pow(1 - fraction, 5);
-                float angle = fraction * (finalAngle - initialAngle) + initialAngle;
+                float angle = fraction * getRotation(index) + point.Angle;
 
                 return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
             }
 
-            private float nextRotation() => max_rotation * (StatelessRNG.NextSingle(rotationSeed, rotationIndex++) * 2 - 1);
+            private float getRotation(int index) => max_rotation * (StatelessRNG.NextSingle(rotationSeed, index) * 2 - 1);
 
-            private void drawPointQuad(SmokePoint point, RectangleF textureRect)
+            private void drawPointQuad(SmokePoint point, RectangleF textureRect, int index)
             {
                 Debug.Assert(quadBatch != null);
 
                 var colour = PointColour(point);
-                float scale = PointScale(point);
-                var dir = PointDirection(point);
-                var ortho = dir.PerpendicularLeft;
-
-                if (colour.A == 0 || scale == 0)
+                if (colour.A == 0)
                     return;
 
-                var localTopLeft = point.Position + (radius * scale * (-ortho - dir));
-                var localTopRight = point.Position + (radius * scale * (-ortho + dir));
-                var localBotLeft = point.Position + (radius * scale * (ortho - dir));
-                var localBotRight = point.Position + (radius * scale * (ortho + dir));
+                float scale = PointScale(point);
+                if (scale == 0)
+                    return;
+
+                var dir = PointDirection(point, index);
+                var ortho = dir.PerpendicularLeft;
+                dir *= scale * width;
+                ortho *= scale * height;
+
+                var localTopLeft = point.Position - ortho - dir;
+                var localTopRight = point.Position - ortho + dir;
+                var localBotLeft = point.Position + ortho - dir;
+                var localBotRight = point.Position + ortho + dir;
 
                 quadBatch.Add(new TexturedVertex2D
                 {

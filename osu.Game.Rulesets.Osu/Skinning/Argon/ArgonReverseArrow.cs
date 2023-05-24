@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonReverseArrow : CompositeDrawable
+    public partial class ArgonReverseArrow : CompositeDrawable
     {
         private Bindable<Color4> accentColour = null!;
 

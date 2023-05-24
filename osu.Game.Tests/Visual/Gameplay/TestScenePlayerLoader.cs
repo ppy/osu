@@ -32,7 +32,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLoader : ScreenTestScene
+    public partial class TestScenePlayerLoader : ScreenTestScene
     {
         private TestPlayerLoader loader;
         private TestPlayer player;
@@ -44,6 +44,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private SessionStatics sessionStatics { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notificationOverlay;
@@ -317,6 +320,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -334,11 +338,29 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestEpilepsyWarningWithDisabledStoryboard()
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("disable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, false));
+            AddStep("change epilepsy warning", () => epilepsyWarning = true);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("epilepsy warning absent", () => getWarning() == null);
+
+            restoreVolumes();
+        }
+
+        [Test]
         public void TestEpilepsyWarningEarlyExit()
         {
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set epilepsy warning", () => epilepsyWarning = true);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -449,9 +471,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click notification", () => notification.TriggerClick());
         }
 
-        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
+        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault(w => w.IsAlive);
 
-        private class TestPlayerLoader : PlayerLoader
+        private partial class TestPlayerLoader : PlayerLoader
         {
             public new VisualSettings VisualSettings => base.VisualSettings;
 
@@ -482,7 +504,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        protected class SlowLoadPlayer : TestPlayer
+        protected partial class SlowLoadPlayer : TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 

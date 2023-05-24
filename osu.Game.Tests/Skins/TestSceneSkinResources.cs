@@ -26,22 +26,29 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Skins
 {
     [HeadlessTest]
-    public class TestSceneSkinResources : OsuTestScene
+    public partial class TestSceneSkinResources : OsuTestScene
     {
         [Resolved]
         private SkinManager skins { get; set; } = null!;
 
-        private ISkin skin = null!;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestRetrieveOggSample()
         {
-            var imported = skins.Import(new ImportTask(TestResources.OpenResource("Archives/ogg-skin.osk"), "ogg-skin.osk")).GetResultSafely();
-            skin = imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
+            ISkin skin = null!;
+
+            AddStep("import skin", () => skin = importSkinFromArchives(@"ogg-skin.osk"));
+            AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo(@"sample")) != null);
         }
 
         [Test]
-        public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo("sample")) != null);
+        public void TestRetrievalWithConflictingFilenames()
+        {
+            ISkin skin = null!;
+
+            AddStep("import skin", () => skin = importSkinFromArchives(@"conflicting-filenames-skin.osk"));
+            AddAssert("texture is non-null", () => skin.GetTexture(@"spinner-osu") != null);
+            AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo(@"spinner-osu")) != null);
+        }
 
         [Test]
         public void TestSampleRetrievalOrder()
@@ -76,6 +83,12 @@ namespace osu.Game.Tests.Skins
                        && Path.GetExtension(lookups[2]) == ".mp3"
                        && Path.GetExtension(lookups[3]) == ".ogg";
             });
+        }
+
+        private Skin importSkinFromArchives(string filename)
+        {
+            var imported = skins.Import(new ImportTask(TestResources.OpenResource($@"Archives/{filename}"), filename)).GetResultSafely();
+            return imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
         }
 
         private class TestSkin : Skin

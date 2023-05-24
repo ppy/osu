@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Rulesets.Pippidon
 {
-    public class PippidonRulesetIcon : Sprite
+    public partial class PippidonRulesetIcon : Sprite
     {
         private readonly Ruleset ruleset;
 

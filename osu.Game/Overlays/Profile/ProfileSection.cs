@@ -1,25 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile
 {
-    public abstract class ProfileSection : Container
+    public abstract partial class ProfileSection : Container
     {
         public abstract LocalisableString Title { get; }
 
@@ -31,7 +27,9 @@ namespace osu.Game.Overlays.Profile
 
         protected override Container<Drawable> Content => content;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
+
+        private const float outer_gutter_width = 10;
 
         protected ProfileSection()
         {
@@ -40,14 +38,22 @@ namespace osu.Game.Overlays.Profile
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                },
-                new SectionTriangles
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Masking = true,
+                    CornerRadius = 10,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Offset = new Vector2(0, 1),
+                        Radius = 3,
+                        Colour = Colour4.Black.Opacity(0.25f)
+                    },
+                    Child = background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -61,8 +67,8 @@ namespace osu.Game.Overlays.Profile
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                Top = 15,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
+                                Top = 20,
                                 Bottom = 20,
                             },
                             Children = new Drawable[]
@@ -70,7 +76,7 @@ namespace osu.Game.Overlays.Profile
                                 new OsuSpriteText
                                 {
                                     Text = Title,
-                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                                 },
                                 underscore = new Box
                                 {
@@ -91,7 +97,7 @@ namespace osu.Game.Overlays.Profile
                             RelativeSizeAxes = Axes.X,
                             Padding = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
                                 Bottom = 20
                             }
                         },
@@ -103,43 +109,8 @@ namespace osu.Game.Overlays.Profile
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colourProvider.Background5;
+            background.Colour = colourProvider.Background4;
             underscore.Colour = colourProvider.Highlight1;
-        }
-
-        private class SectionTriangles : Container
-        {
-            private readonly Triangles triangles;
-            private readonly Box foreground;
-
-            public SectionTriangles()
-            {
-                RelativeSizeAxes = Axes.X;
-                Height = 100;
-                Masking = true;
-                Children = new Drawable[]
-                {
-                    triangles = new Triangles
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        TriangleScale = 3,
-                    },
-                    foreground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                triangles.ColourLight = colourProvider.Background4;
-                triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
-                foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
-            }
         }
     }
 }

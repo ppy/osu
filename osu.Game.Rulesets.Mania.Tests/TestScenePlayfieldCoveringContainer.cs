@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestScenePlayfieldCoveringContainer : OsuTestScene
+    public partial class TestScenePlayfieldCoveringContainer : OsuTestScene
     {
         private readonly ScrollingTestContainer scrollingContainer;
         private readonly PlayfieldCoveringWrapper cover;

@@ -15,7 +15,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentMatchChatDisplay : OsuTestScene
+    public partial class TestSceneTournamentMatchChatDisplay : OsuTestScene
     {
         private readonly Channel testChannel = new Channel();
         private readonly Channel testChannel2 = new Channel();
