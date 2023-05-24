@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.Edit
         public PlacementState PlacementActive { get; private set; }
 
         /// <summary>
+        /// Whether the sample bank should be taken from the previous hit object.
+        /// </summary>
+        public bool AutomaticBankAssignment;
+
+        /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
         public readonly HitObject HitObject;
@@ -86,11 +91,6 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
         protected void BeginPlacement(bool commitStart = false)
         {
-            // Take the hitnormal sample of the last hit object
-            var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
-            if (lastHitNormal != null)
-                HitObject.Samples[0] = lastHitNormal;
-
             placementHandler.BeginPlacement(HitObject);
             if (commitStart)
                 PlacementActive = PlacementState.Active;
@@ -154,6 +154,14 @@ namespace osu.Game.Rulesets.Edit
 
                 if (HitObject is IHasComboInformation comboInformation)
                     comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
+            }
+
+            if (AutomaticBankAssignment)
+            {
+                // Take the hitnormal sample of the last hit object
+                var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+                if (lastHitNormal != null)
+                    HitObject.Samples[0] = lastHitNormal;
             }
         }
 
