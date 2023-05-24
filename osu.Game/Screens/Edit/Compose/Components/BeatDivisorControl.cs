@@ -399,27 +399,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ClearInternal();
                 CurrentNumber.ValueChanged -= moveMarker;
 
-                foreach (int divisor in beatDivisor.ValidDivisors.Value.Presets)
+                int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Last();
+                for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
-                    AddInternal(new Tick(divisor)
+                    int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
+                    bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
+
+                    AddInternal(new Tick(isSolidTick, divisor)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
                         Colour = BindableBeatDivisor.GetColourFor(divisor, colours),
-                        X = getMappedPosition(divisor),
+                        X = tickIndex / (float)largestDivisor,
                     });
                 }
-
-                // Add a fake 1/1 at the end to give context.
-                AddInternal(new Tick(1)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.Centre,
-                    Depth = float.MaxValue,
-                    Alpha = 0.05f,
-                    Colour = BindableBeatDivisor.GetColourFor(1, colours),
-                });
 
                 AddInternal(marker = new Marker());
                 CurrentNumber.ValueChanged += moveMarker;
@@ -429,6 +423,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private void moveMarker(ValueChangedEvent<int> divisor)
             {
                 marker.MoveToX(getMappedPosition(divisor.NewValue), 100, Easing.OutQuint);
+
+                foreach (Tick child in InternalChildren.OfType<Tick>())
+                {
+                    float newAlpha = child.IsSolid ? 1f : divisor.NewValue % child.Divisor == 0 ? 0.2f : 0f;
+                    child.FadeTo(newAlpha);
+                }
             }
 
             protected override void UpdateValue(float value)
@@ -498,8 +498,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private partial class Tick : Circle
             {
-                public Tick(int divisor)
+                public bool IsSolid;
+                public int Divisor;
+                public Tick(bool isSolid, int divisor)
                 {
+                    IsSolid = isSolid;
+                    Divisor = divisor;
                     Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
                 }
