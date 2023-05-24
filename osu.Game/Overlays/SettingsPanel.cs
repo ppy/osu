@@ -115,6 +115,7 @@ namespace osu.Game.Overlays
                     Hollow = true,
                     Radius = 10
                 },
+                MaskingSmoothness = 0,
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
                 SelectedSection = { BindTarget = CurrentSection },
@@ -166,7 +167,7 @@ namespace osu.Game.Overlays
 
             ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
 
-            SectionsContainer.FadeEdgeEffectTo(0.4f, WaveContainer.APPEAR_DURATION, Easing.Out);
+            SectionsContainer.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             // delay load enough to ensure it doesn't overlap with the initial animation.
             // this is done as there is still a brief stutter during load completion which is more visible if the transition is in progress.
