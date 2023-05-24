@@ -17,7 +17,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
