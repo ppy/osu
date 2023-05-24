@@ -17,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Play
 
             State.ValueChanged += _ => InternalButtons.Deselect();
 
-            updateRetryCount();
+            updateInfoText();
         }
 
         private int retries;
@@ -136,11 +137,16 @@ namespace osu.Game.Screens.Play
                 retries = value;
 
                 if (IsLoaded)
-                    updateRetryCount();
+                    updateInfoText();
             }
         }
 
-        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopIn()
+        {
+            this.FadeIn(TRANSITION_DURATION, Easing.In);
+            updateInfoText();
+        }
+
         protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
@@ -195,14 +201,30 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void updateRetryCount()
-        {
-            // "You've retried 1,065 times in this session"
-            // "You've retried 1 time in this session"
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
 
+        [Resolved]
+        private DrawableRuleset? drawableRuleset { get; set; }
+
+        private void updateInfoText()
+        {
             playInfoText.Clear();
             playInfoText.AddText("Retry count: ");
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+
+            if (gameplayClock != null && drawableRuleset != null)
+            {
+                double firstHitTime = drawableRuleset.Objects.FirstOrDefault()?.StartTime ?? 0;
+                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+                double lastHitTime = drawableRuleset.Objects.LastOrDefault()?.GetEndTime() ?? 0;
+
+                double progress = Math.Clamp((gameplayClock.CurrentTime - firstHitTime) / (lastHitTime - firstHitTime), 0, 1);
+
+                playInfoText.NewLine();
+                playInfoText.AddText("Song progress: ");
+                playInfoText.AddText(progress.ToString("0%"), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+            }
         }
 
         private partial class Button : DialogButton
