@@ -400,12 +400,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 CurrentNumber.ValueChanged -= moveMarker;
 
                 int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Last();
+
                 for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
                     int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
                     bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
 
-                    AddInternal(new Tick(isSolidTick, divisor)
+                    AddInternal(new Tick(divisor, isSolidTick)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
@@ -424,10 +425,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 marker.MoveToX(getMappedPosition(divisor.NewValue), 100, Easing.OutQuint);
 
-                foreach (Tick child in InternalChildren.OfType<Tick>())
+                foreach (Tick tick in InternalChildren.OfType<Tick>().Where(t => !t.AlwaysDisplayed))
                 {
-                    float newAlpha = child.IsSolid ? 1f : divisor.NewValue % child.Divisor == 0 ? 0.2f : 0f;
-                    child.FadeTo(newAlpha);
+                    tick.FadeTo(divisor.NewValue % tick.Divisor == 0 ? 0.2f : 0f, 100, Easing.OutQuint);
                 }
             }
 
@@ -498,13 +498,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private partial class Tick : Circle
             {
-                public bool IsSolid;
-                public int Divisor;
-                public Tick(bool isSolid, int divisor)
+                public readonly bool AlwaysDisplayed;
+
+                public readonly int Divisor;
+
+                public Tick(int divisor, bool alwaysDisplayed)
                 {
-                    IsSolid = isSolid;
+                    AlwaysDisplayed = alwaysDisplayed;
                     Divisor = divisor;
+
                     Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
+                    Alpha = alwaysDisplayed ? 1 : 0;
+
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
                 }
             }
