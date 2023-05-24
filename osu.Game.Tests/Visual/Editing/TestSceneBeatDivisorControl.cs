@@ -65,17 +65,24 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(tickMarkerHead.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });
-            AddStep("move to 8 and release", () =>
+            AddStep("move to 1", () => InputManager.MoveMouseTo(getPositionForDivisor(1)));
+            AddStep("move to 16 and release", () =>
             {
-                InputManager.MoveMouseTo(tickSliderBar.ScreenSpaceDrawQuad.Centre);
+                InputManager.MoveMouseTo(getPositionForDivisor(16));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
-            AddAssert("divisor is 8", () => bindableBeatDivisor.Value == 8);
+            AddAssert("divisor is 16", () => bindableBeatDivisor.Value == 16);
             AddStep("hold marker", () => InputManager.PressButton(MouseButton.Left));
-            AddStep("move to 16", () => InputManager.MoveMouseTo(getPositionForDivisor(16)));
-            AddStep("move to ~10 and release", () =>
+            AddStep("move to ~6 and release", () =>
+            {
+                InputManager.MoveMouseTo(getPositionForDivisor(6));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("divisor clamped to 8", () => bindableBeatDivisor.Value == 8);
+            AddStep("move to ~10 and click", () =>
             {
                 InputManager.MoveMouseTo(getPositionForDivisor(10));
+                InputManager.PressButton(MouseButton.Left);
                 InputManager.ReleaseButton(MouseButton.Left);
             });
             AddAssert("divisor clamped to 8", () => bindableBeatDivisor.Value == 8);
@@ -83,12 +90,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         private Vector2 getPositionForDivisor(int divisor)
         {
-            float relativePosition = (float)Math.Clamp(divisor, 0, 16) / 16;
-            var sliderDrawQuad = tickSliderBar.ScreenSpaceDrawQuad;
-            return new Vector2(
-                sliderDrawQuad.TopLeft.X + sliderDrawQuad.Width * relativePosition,
-                sliderDrawQuad.Centre.Y
-            );
+            float localX = (1 - 1 / (float)divisor) * tickSliderBar.UsableWidth + tickSliderBar.RangePadding;
+            return tickSliderBar.ToScreenSpace(new Vector2(
+                localX,
+                tickSliderBar.DrawHeight / 2
+            ));
         }
 
         [Test]
