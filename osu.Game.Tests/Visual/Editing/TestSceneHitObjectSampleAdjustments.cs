@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -170,7 +171,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestMultipleSelectionWithSameSampleBank()
+        public void TestPopoverMultipleSelectionWithSameSampleBank()
         {
             AddStep("unify sample bank", () =>
             {
@@ -204,7 +205,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestMultipleSelectionWithDifferentSampleBank()
+        public void TestPopoverMultipleSelectionWithDifferentSampleBank()
         {
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
             clickSamplePiece(0);
@@ -224,6 +225,101 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
             hitObjectHasSampleBank(1, HitSampleInfo.BANK_NORMAL);
             samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+        }
+
+        [Test]
+        public void TestHotkeysMultipleSelectionWithSameSampleBank()
+        {
+            AddStep("unify sample bank", () =>
+            {
+                foreach (var h in EditorBeatmap.HitObjects)
+                {
+                    for (int i = 0; i < h.Samples.Count; i++)
+                    {
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
+                    }
+                }
+            });
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+
+            AddStep("Press normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+
+            AddStep("Press auto bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            // Should be a noop.
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestHotkeysDuringPlacement()
+        {
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move between two objects", () => EditorClock.Seek(250));
+
+            AddStep("Press normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_DRUM);
+
+            AddStep("Press auto bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Move after second object", () => EditorClock.Seek(750));
+            checkPlacementSample(HitSampleInfo.BANK_SOFT);
+
+            AddStep("Move to first object", () => EditorClock.Seek(0));
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            void checkPlacementSample(string expected) => AddAssert($"Placement sample is {expected}", () => EditorBeatmap.PlacementObject.Value.Samples.First().Bank, () => Is.EqualTo(expected));
         }
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
