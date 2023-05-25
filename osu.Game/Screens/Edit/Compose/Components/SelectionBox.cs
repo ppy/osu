@@ -376,7 +376,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float leftExcess = thisQuad.TopLeft.X - parentQuad.TopLeft.X;
             float rightExcess = parentQuad.TopRight.X - thisQuad.TopRight.X;
 
-            if (topExcess > bottomExcess)
+            if (topExcess + bottomExcess < buttons.Height + button_padding)
+            {
+                buttons.Anchor = Anchor.BottomCentre;
+                buttons.Origin = Anchor.BottomCentre;
+            }
+            else if (topExcess > bottomExcess)
             {
                 buttons.Anchor = Anchor.TopCentre;
                 buttons.Origin = Anchor.BottomCentre;
@@ -387,8 +392,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 buttons.Origin = Anchor.TopCentre;
             }
 
-            if (leftExcess < 0) buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(leftExcess)).X;
-            if (rightExcess < 0) buttons.X += ToLocalSpace(thisQuad.TopLeft + new Vector2(rightExcess)).X;
+            buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
         }
     }
 }
