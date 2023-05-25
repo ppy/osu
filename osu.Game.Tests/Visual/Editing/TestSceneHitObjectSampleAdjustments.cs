@@ -110,6 +110,21 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestUndo()
+        {
+            clickSamplePiece(1);
+            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleVolume(60);
+
+            setVolumeViaPopover(90);
+            hitObjectHasSampleVolume(1, 90);
+            dismissPopover();
+
+            AddStep("undo", () => Editor.Undo());
+            hitObjectHasSampleVolume(1, 60);
+        }
+
+        [Test]
         public void TestMultipleSelectionWithSameSampleVolume()
         {
             AddStep("unify sample volume", () =>
