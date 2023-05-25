@@ -93,6 +93,20 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestUndo()
+        {
+            clickDifficultyPiece(1);
+            velocityPopoverHasSingleValue(2);
+
+            setVelocityViaPopover(5);
+            hitObjectHasVelocity(1, 5);
+            dismissPopover();
+
+            AddStep("undo", () => Editor.Undo());
+            hitObjectHasVelocity(1, 2);
+        }
+
+        [Test]
         public void TestMultipleSelectionWithSameSliderVelocity()
         {
             AddStep("unify slider velocity", () =>
