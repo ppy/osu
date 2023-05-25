@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps
         /// Find the total milliseconds between the first and last hittable objects.
         /// </summary>
         /// <remarks>
-        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferrable when available.
+        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferable when available.
         /// </remarks>
         public static double CalculatePlayableLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects);
 
@@ -134,7 +134,7 @@ namespace osu.Game.Beatmaps
         /// Find the total milliseconds between the first and last hittable objects.
         /// </summary>
         /// <remarks>
-        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferrable when available.
+        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferable when available.
         /// </remarks>
         public static double CalculatePlayableLength(IEnumerable<HitObject> objects)
         {
