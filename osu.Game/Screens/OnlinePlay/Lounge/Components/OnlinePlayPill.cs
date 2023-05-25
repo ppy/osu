@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
@@ -12,6 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     {
         protected PillContainer Pill { get; private set; } = null!;
         protected OsuTextFlowContainer TextFlow { get; private set; } = null!;
+        protected virtual FontUsage Font => OsuFont.GetFont(size: 12);
 
         protected OnlinePlayPill()
         {
@@ -23,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             InternalChild = Pill = new PillContainer
             {
-                Child = TextFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
+                Child = TextFlow = new OsuTextFlowContainer(s => s.Font = Font)
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,

@@ -5,6 +5,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
@@ -14,6 +15,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     {
         [Resolved]
         private OsuColour colours { get; set; }
+
+        protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 
         protected override void LoadComplete()
         {
