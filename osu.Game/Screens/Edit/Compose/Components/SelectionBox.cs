@@ -247,8 +247,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Height = 30,
                     Direction = FillDirection.Horizontal,
                     Margin = new MarginPadding(button_padding),
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre
                 }
             };
 
@@ -367,24 +365,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             buttons.Position = Vector2.Zero;
 
-            var buttonsQuad = buttons.ScreenSpaceDrawQuad;
             var thisQuad = ScreenSpaceDrawQuad;
 
             // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
             // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
             var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
 
-            float leftExcess = buttonsQuad.TopLeft.X - parentQuad.TopLeft.X;
-            float rightExcess = parentQuad.TopRight.X - buttonsQuad.TopRight.X;
-            float bottomExcess = thisQuad.BottomLeft.Y + buttonsQuad.Height - parentQuad.BottomLeft.Y;
+            float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
+            float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
+            float leftExcess = thisQuad.TopLeft.X - parentQuad.TopLeft.X;
+            float rightExcess = parentQuad.TopRight.X - thisQuad.TopRight.X;
 
-            if (leftExcess < 0)
-                buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(leftExcess)).X;
-            else if (rightExcess < 0)
-                buttons.X -= ToLocalSpace(thisQuad.TopLeft - new Vector2(rightExcess)).X;
+            if (topExcess > bottomExcess)
+            {
+                buttons.Anchor = Anchor.TopCentre;
+                buttons.Origin = Anchor.BottomCentre;
+            }
+            else
+            {
+                buttons.Anchor = Anchor.BottomCentre;
+                buttons.Origin = Anchor.TopCentre;
+            }
 
-            if (bottomExcess > 0)
-                buttons.Y += ToLocalSpace(thisQuad.TopLeft - new Vector2(bottomExcess)).X;
+            if (leftExcess < 0) buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(leftExcess)).X;
+            if (rightExcess < 0) buttons.X += ToLocalSpace(thisQuad.TopLeft + new Vector2(rightExcess)).X;
         }
     }
 }
