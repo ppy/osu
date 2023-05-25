@@ -12,13 +12,12 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -205,7 +204,7 @@ namespace osu.Game.Screens.Play
         private IGameplayClock? gameplayClock { get; set; }
 
         [Resolved]
-        private DrawableRuleset? drawableRuleset { get; set; }
+        private GameplayState? gameplayState { get; set; }
 
         private void updateInfoText()
         {
@@ -213,11 +212,9 @@ namespace osu.Game.Screens.Play
             playInfoText.AddText("Retry count: ");
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
 
-            if (gameplayClock != null && drawableRuleset != null)
+            if (gameplayState != null && gameplayClock != null)
             {
-                double firstHitTime = drawableRuleset.Objects.FirstOrDefault()?.StartTime ?? 0;
-                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-                double lastHitTime = drawableRuleset.Objects.LastOrDefault()?.GetEndTime() ?? 0;
+                (double firstHitTime, double lastHitTime) = gameplayState.Beatmap.CalculatePlayableBounds();
 
                 double progress = Math.Clamp((gameplayClock.CurrentTime - firstHitTime) / (lastHitTime - firstHitTime), 0, 1);
 
