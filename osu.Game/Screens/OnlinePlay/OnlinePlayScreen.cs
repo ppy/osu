@@ -132,7 +132,9 @@ namespace osu.Game.Screens.OnlinePlay
             this.ScaleTo(1, 250, Easing.OutSine);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnResuming(e);
+
+            if (screenStack.CurrentScreen.IsCurrentScreen())
+                screenStack.CurrentScreen.OnResuming(e);
 
             base.OnResuming(e);
         }
@@ -143,7 +145,9 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeOut(250);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnSuspending(e);
+
+            if (screenStack.CurrentScreen.IsCurrentScreen())
+                screenStack.CurrentScreen.OnSuspending(e);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
