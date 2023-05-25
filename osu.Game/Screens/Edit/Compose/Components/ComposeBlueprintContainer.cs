@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
                 CurrentPlacement.AutomaticBankAssignment = state == TernaryState.True;
-            if (state == TernaryState.True)
+            else if (state == TernaryState.True)
                 CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
         }
 
