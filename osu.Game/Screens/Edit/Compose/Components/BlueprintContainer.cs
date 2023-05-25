@@ -92,7 +92,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             SelectionHandler = CreateSelectionHandler();
-            SelectionHandler.DeselectAll = DeselectAll;
             SelectionHandler.SelectedItems.BindTo(SelectedItems);
 
             AddRangeInternal(new[]
