@@ -197,9 +197,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Selection Handling
 
         /// <summary>
-        /// Bind an action to deselect all selected blueprints.
+        /// Deselect all selected items.
         /// </summary>
-        internal Action DeselectAll { private get; set; }
+        protected void DeselectAll() => SelectedItems.Clear();
 
         /// <summary>
         /// Handle a blueprint becoming selected.
@@ -303,7 +303,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (blueprint.IsSelected)
                 return false;
 
-            DeselectAll?.Invoke();
+            DeselectAll();
             blueprint.Select();
             return true;
         }
