@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Whether the sample bank should be taken from the previous hit object.
         /// </summary>
-        public bool AutomaticBankAssignment;
+        public bool AutomaticBankAssignment { get; set; }
 
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
