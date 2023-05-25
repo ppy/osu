@@ -85,6 +85,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             }
                             else
                             {
+                                // Auto should never apply when there is a selection made.
+                                // This is also required to stop a bindable feedback loop when a HitObject has zero samples (and LINQ `All` below becomes true).
+                                if (bankName == HIT_BANK_AUTO)
+                                    break;
+
                                 // Never remove a sample bank.
                                 // These are basically radio buttons, not toggles.
                                 if (SelectedItems.All(h => h.Samples.All(s => s.Bank == bankName)))
