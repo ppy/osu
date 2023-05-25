@@ -57,6 +57,10 @@ namespace osu.Game.Screens.Play.HUD
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
         public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
+
+        /// <summary>
+        /// A function providing a display score. If a custom function is not provided, this defaults to using <see cref="TotalScore"/>.
+        /// </summary>
         public Func<ScoringMode, long> GetDisplayScore { get; set; }
 
         public Color4? BackgroundColour { get; set; }
