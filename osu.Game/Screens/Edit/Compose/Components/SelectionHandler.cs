@@ -311,6 +311,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected void DeleteSelected()
         {
             DeleteItems(SelectedItems.ToArray());
+            DeselectAll();
         }
 
         #endregion
