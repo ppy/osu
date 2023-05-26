@@ -212,16 +212,27 @@ namespace osu.Game.Screens.Play
             playInfoText.AddText("Retry count: ");
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
 
-            if (gameplayState != null && gameplayClock != null)
+            if (getSongProgress() is int progress)
             {
-                (double firstHitTime, double lastHitTime) = gameplayState.Beatmap.CalculatePlayableBounds();
-
-                double progress = Math.Clamp((gameplayClock.CurrentTime - firstHitTime) / (lastHitTime - firstHitTime), 0, 1);
-
                 playInfoText.NewLine();
                 playInfoText.AddText("Song progress: ");
-                playInfoText.AddText(progress.ToString("0%"), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+                playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
+        }
+
+        private int? getSongProgress()
+        {
+            if (gameplayClock == null || gameplayState == null)
+                return null;
+
+            (double firstHitTime, double lastHitTime) = gameplayState.Beatmap.CalculatePlayableBounds();
+
+            double playableLength = (lastHitTime - firstHitTime);
+
+            if (playableLength == 0)
+                return 0;
+
+            return (int)Math.Clamp(((gameplayClock.CurrentTime - firstHitTime) / playableLength) * 100, 0, 100);
         }
 
         private partial class Button : DialogButton
