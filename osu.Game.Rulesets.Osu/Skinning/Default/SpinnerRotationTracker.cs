@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -27,14 +29,33 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private bool rotationTransferred;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
+
+        private Stack<(double time, float rotation)>? rotationHistory;
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
             this.drawableSpinner = drawableSpinner;
 
             RelativeSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IFrameStableClock? frameStableClock)
+        {
+            if (frameStableClock == null)
+            {
+                // This class already guarantees correct rewind behaviour via the rate-adjusted calculations, but
+                // this only holds as long as spinners are within a frame-stable playback environment.
+                //
+                // This is not the case in the editor, for instance, which results in rotation tracking not working as expected.
+                // As a temporary measure, let's store the history of rotations and use it only in such cases.
+                //
+                // Reasoning for not always using this is because we are already quite confident with the existing methodology of this class,
+                // and I'd rather not potentially break that in the process.
+                rotationHistory = new Stack<(double time, float rotation)>();
+            }
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -60,6 +81,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void Update()
         {
             base.Update();
+
+            if (rotationHistory != null)
+            {
+                var clock = (gameplayClock ?? Clock);
+
+                if (clock.ElapsedFrameTime < 0)
+                {
+                    while (rotationHistory.TryPop(out (double time, float rotation) pair))
+                    {
+                        if (pair.time < clock.CurrentTime)
+                            break;
+
+                        drawableSpinner.Result.RateAdjustedRotation = pair.rotation;
+                    }
+                }
+            }
+
             float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
             float delta = thisAngle - lastAngle;
@@ -104,9 +142,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }
 
             currentRotation += angle;
+
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
             drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+
+            rotationHistory?.Push(((gameplayClock ?? Clock).CurrentTime, drawableSpinner.Result.RateAdjustedRotation));
         }
 
         public void Reset()
@@ -116,6 +157,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             mousePosition = default;
             lastAngle = currentRotation = Rotation = 0;
             rotationTransferred = false;
+            rotationHistory?.Clear();
         }
     }
 }
