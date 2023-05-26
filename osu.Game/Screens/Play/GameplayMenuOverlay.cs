@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -120,7 +121,7 @@ namespace osu.Game.Screens.Play
 
             State.ValueChanged += _ => InternalButtons.Deselect();
 
-            updateRetryCount();
+            updateInfoText();
         }
 
         private int retries;
@@ -135,11 +136,16 @@ namespace osu.Game.Screens.Play
                 retries = value;
 
                 if (IsLoaded)
-                    updateRetryCount();
+                    updateInfoText();
             }
         }
 
-        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopIn()
+        {
+            this.FadeIn(TRANSITION_DURATION, Easing.In);
+            updateInfoText();
+        }
+
         protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
@@ -194,14 +200,39 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void updateRetryCount()
-        {
-            // "You've retried 1,065 times in this session"
-            // "You've retried 1 time in this session"
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
 
+        [Resolved]
+        private GameplayState? gameplayState { get; set; }
+
+        private void updateInfoText()
+        {
             playInfoText.Clear();
             playInfoText.AddText("Retry count: ");
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+
+            if (getSongProgress() is int progress)
+            {
+                playInfoText.NewLine();
+                playInfoText.AddText("Song progress: ");
+                playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+            }
+        }
+
+        private int? getSongProgress()
+        {
+            if (gameplayClock == null || gameplayState == null)
+                return null;
+
+            (double firstHitTime, double lastHitTime) = gameplayState.Beatmap.CalculatePlayableBounds();
+
+            double playableLength = (lastHitTime - firstHitTime);
+
+            if (playableLength == 0)
+                return 0;
+
+            return (int)Math.Clamp(((gameplayClock.CurrentTime - firstHitTime) / playableLength) * 100, 0, 100);
         }
 
         private partial class Button : DialogButton
