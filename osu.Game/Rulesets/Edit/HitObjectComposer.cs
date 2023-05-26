@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Edit
 
         private FillFlowContainer togglesCollection;
 
+        private FillFlowContainer sampleBankTogglesCollection;
+
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
 
@@ -160,6 +162,16 @@ namespace osu.Game.Rulesets.Edit
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
                                     },
+                                },
+                                new EditorToolboxGroup("bank (Shift-Q~R)")
+                                {
+                                    Child = sampleBankTogglesCollection = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                    },
                                 }
                             }
                         },
@@ -196,6 +208,8 @@ namespace osu.Game.Rulesets.Edit
 
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
+
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
@@ -249,7 +263,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.TernaryStates;
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -274,7 +288,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
@@ -291,7 +305,9 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out int rightIndex))
             {
-                var item = togglesCollection.ElementAtOrDefault(rightIndex);
+                var item = e.ShiftPressed
+                    ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
+                    : togglesCollection.ElementAtOrDefault(rightIndex);
 
                 if (item is DrawableTernaryButton button)
                 {
