@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlagFast(SnapType.RelativeGrids))
             {
                 if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
                     Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
