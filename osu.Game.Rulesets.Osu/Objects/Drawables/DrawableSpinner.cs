@@ -115,6 +115,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning.BindValueChanged(updateSpinningSample);
         }
 
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            RotationTracker.Reset();
+        }
+
         protected override void OnFree()
         {
             base.OnFree();
