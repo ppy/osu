@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
@@ -40,29 +38,16 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
         {
-            // Find the control point relating to the position.
+            Debug.Assert(controlPoints.Count > 0);
+
+            // Iterate over control points and find the most relevant for the provided position.
             // Note: Due to velocity adjustments, overlapping control points will provide multiple valid time values for a single position
             // As such, this operation provides unexpected results by using the latter of the control points.
+            var relevantControlPoint = controlPoints.LastOrDefault(cp => PositionAt(cp.Time, currentTime, timeRange, scrollLength) <= position) ?? controlPoints.First();
 
-            int i = 0;
-            float pos = 0;
+            float positionAtControlPoint = PositionAt(relevantControlPoint.Time, currentTime, timeRange, scrollLength);
 
-            for (; i < controlPoints.Count; i++)
-            {
-                float lastPos = pos;
-                pos = PositionAt(controlPoints[i].Time, currentTime, timeRange, scrollLength);
-
-                if (pos > position)
-                {
-                    i--;
-                    pos = lastPos;
-                    break;
-                }
-            }
-
-            i = Math.Clamp(i, 0, controlPoints.Count - 1);
-
-            return controlPoints[i].Time + (position - pos) * timeRange / controlPoints[i].Multiplier / scrollLength;
+            return relevantControlPoint.Time + (position - positionAtControlPoint) * timeRange / relevantControlPoint.Multiplier / scrollLength;
         }
 
         public void Reset()
