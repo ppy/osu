@@ -76,11 +76,11 @@ namespace osu.Game.Rulesets.Mods
 
         public enum AccuracyMode
         {
-            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
-            Standard,
-
             [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeMax))]
             MaximumAchievable,
+
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
+            Standard,
         }
     }
 }
