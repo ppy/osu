@@ -15,8 +15,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
@@ -24,14 +22,13 @@ namespace osu.Game.Screens.Play
     {
         public Func<Task<ScoreInfo>> SaveReplay;
 
-        public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
-        public override LocalisableString Description => GameplayMenuOverlayStrings.FailedDescription;
+        public override string Header => "failed";
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             // from #10339 maybe this is a better visual effect
             Add(new Container
             {
