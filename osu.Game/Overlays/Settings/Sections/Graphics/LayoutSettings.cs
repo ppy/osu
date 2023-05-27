@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using osu.Framework;
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
         private SettingsSlider<float> dimSlider = null!;
 
-        private readonly Bindable<Display?> currentDisplay = new Bindable<Display?>();
+        private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
 
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<Size> sizeFullscreen = null!;
@@ -193,11 +194,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
-                if (display.NewValue == null)
-                {
-                    resolutions.Clear();
-                    return;
-                }
+                Debug.Assert(display.NewValue != null);
 
                 resolutions.ReplaceRange(1, resolutions.Count - 1, display.NewValue.DisplayModes
                                                                           .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
