@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -33,6 +33,16 @@ namespace osu.Game.Localisation
         /// "paused"
         /// </summary>
         public static LocalisableString PausedHeader => new TranslatableString(getKey(@"paused_header"), @"paused");
+
+        /// <summary>
+        /// "Retry count: "
+        /// </summary>
+        public static LocalisableString RetryCount => new TranslatableString(getKey(@"retry_count"), @"Retry count: ");
+
+        /// <summary>
+        /// "Song progress: "
+        /// </summary>
+        public static LocalisableString SongProgress => new TranslatableString(getKey(@"song_progress"), @"Song progress: ");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

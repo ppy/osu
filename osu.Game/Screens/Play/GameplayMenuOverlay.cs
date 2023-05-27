@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
@@ -210,13 +211,13 @@ namespace osu.Game.Screens.Play
         private void updateInfoText()
         {
             playInfoText.Clear();
-            playInfoText.AddText("Retry count: ");
+            playInfoText.AddText(GameplayMenuOverlayStrings.RetryCount);
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
 
             if (getSongProgress() is int progress)
             {
                 playInfoText.NewLine();
-                playInfoText.AddText("Song progress: ");
+                playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
                 playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
         }
