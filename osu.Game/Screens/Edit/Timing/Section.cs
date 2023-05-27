@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Timing
                     }
 
                     if (ControlPoint.Value == null)
-                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePoint());
+                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePointFrom(SelectedGroup.Value.Time));
                 }
                 else
                 {
@@ -130,6 +130,6 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected abstract void OnControlPointChanged(ValueChangedEvent<T?> point);
 
-        protected abstract T CreatePoint();
+        protected abstract T CreatePointFrom(double time);
     }
 }

@@ -60,9 +60,9 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override TimingControlPoint CreatePoint()
+        protected override TimingControlPoint CreatePointFrom(double time)
         {
-            var reference = Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.TimingPointAt(time);
 
             return new TimingControlPoint
             {
