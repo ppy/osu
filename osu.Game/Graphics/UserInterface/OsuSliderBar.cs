@@ -96,11 +96,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (DisplayAsPercentage)
             {
-                if (significantDigits <= 2)
-                    return floatValue.ToString("0%");
-
-                string format = "0." + new string('0', significantDigits - 2) + "%";
-                return floatValue.ToString(format);
+                return floatValue.ToString($@"P{Math.Max(0, significantDigits - 2)}");
             }
 
             string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
