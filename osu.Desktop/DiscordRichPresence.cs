@@ -35,7 +35,7 @@ namespace osu.Desktop
         private IAPIProvider api { get; set; } = null!;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
-        private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly IBindable<UserActivity?> activity = new Bindable<UserActivity?>();
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 

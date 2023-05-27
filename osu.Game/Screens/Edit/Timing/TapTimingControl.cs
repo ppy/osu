@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
         private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
+        private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         private readonly BindableBool isHandlingTapping = new BindableBool();
 

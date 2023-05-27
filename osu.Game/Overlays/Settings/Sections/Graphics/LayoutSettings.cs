@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
         private SettingsSlider<float> dimSlider = null!;
 
-        private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
+        private readonly Bindable<Display?> currentDisplay = new Bindable<Display?>();
 
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<Size> sizeFullscreen = null!;

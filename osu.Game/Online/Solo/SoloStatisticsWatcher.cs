@@ -104,7 +104,7 @@ namespace osu.Game.Online.Solo
 
         private void userScoreProcessed(int userId, long scoreId)
         {
-            if (userId != api.LocalUser.Value?.OnlineID)
+            if (userId != api.LocalUser.Value.OnlineID)
                 return;
 
             lastProcessedScoreId = scoreId;
