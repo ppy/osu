@@ -10,6 +10,9 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// A string that should match the <see cref="IFilterable"/> children
         /// </summary>
+        /// <remarks>
+        /// Same as <see cref="SearchContainer{T}.SearchTerm"/> except the filtering is guarantied to be performed even when <see cref="SearchContainer{T}.Update"/> can't be run.
+        /// </remarks>
         public string ForcedSearchTerm
         {
             get => SearchTerm;
