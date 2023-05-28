@@ -8,10 +8,11 @@ namespace osu.Game.Overlays.Mods
     public partial class ModSearchContainer : SearchContainer
     {
         /// <summary>
-        /// A string that should match the <see cref="IFilterable"/> children
+        /// Same as <see cref="SearchContainer{T}.SearchTerm"/> except the filtering is guarantied to be performed
         /// </summary>
         /// <remarks>
-        /// Same as <see cref="SearchContainer{T}.SearchTerm"/> except the filtering is guarantied to be performed even when <see cref="SearchContainer{T}.Update"/> can't be run.
+        /// This is required because <see cref="ModColumn"/> can be hidden when search term applied
+        /// therefore <see cref="SearchContainer{T}.Update"/> cannot be reached and filter cannot automatically re-validate itself.
         /// </remarks>
         public string ForcedSearchTerm
         {
