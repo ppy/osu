@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = (ShowTotalMultiplier ? ModsEffectDisplay.HEIGHT : 0) + PADDING,
+                            Top = ModsEffectDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
