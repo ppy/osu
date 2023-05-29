@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Scoring;
@@ -24,8 +22,10 @@ namespace osu.Game.Screens.Play.HUD
         Bindable<long> DisplayOrder { get; }
 
         /// <summary>
-        /// A function providing a display score. If a custom function is not provided, this defaults to using <see cref="TotalScore"/>.
+        /// A custom function which handles converting a score to a display score using a provide <see cref="ScoringMode"/>.
         /// </summary>
+        /// <remarks>
+        /// If no function is provided, <see cref="TotalScore"/> will be used verbatim.</remarks>
         Func<ScoringMode, long> GetDisplayScore { set; }
     }
 }
