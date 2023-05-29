@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
 
         public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
 
-        public override LocalisableString Header => "paused";
+        public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
         private SkinnableSound pauseLoop;
 
