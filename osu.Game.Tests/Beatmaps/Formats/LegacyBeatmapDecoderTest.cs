@@ -253,17 +253,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 var soundPoint = controlPoints.SamplePointAt(0);
                 Assert.AreEqual(956, soundPoint.Time);
-                Assert.AreEqual("soft", soundPoint.SampleBank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
                 Assert.AreEqual(60, soundPoint.SampleVolume);
 
                 soundPoint = controlPoints.SamplePointAt(53373);
                 Assert.AreEqual(53373, soundPoint.Time);
-                Assert.AreEqual("soft", soundPoint.SampleBank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
                 Assert.AreEqual(60, soundPoint.SampleVolume);
 
                 soundPoint = controlPoints.SamplePointAt(119637);
                 Assert.AreEqual(119637, soundPoint.Time);
-                Assert.AreEqual("soft", soundPoint.SampleBank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
                 Assert.AreEqual(80, soundPoint.SampleVolume);
 
                 var effectPoint = controlPoints.EffectPointAt(0);
@@ -305,10 +305,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.EffectPointAt(2500).KiaiMode, Is.False);
                 Assert.That(controlPoints.EffectPointAt(3500).KiaiMode, Is.True);
 
-                Assert.That(controlPoints.SamplePointAt(500).SampleBank, Is.EqualTo("drum"));
-                Assert.That(controlPoints.SamplePointAt(1500).SampleBank, Is.EqualTo("drum"));
-                Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo("normal"));
-                Assert.That(controlPoints.SamplePointAt(3500).SampleBank, Is.EqualTo("drum"));
+                Assert.That(controlPoints.SamplePointAt(500).SampleBank, Is.EqualTo(HitSampleInfo.BANK_DRUM));
+                Assert.That(controlPoints.SamplePointAt(1500).SampleBank, Is.EqualTo(HitSampleInfo.BANK_DRUM));
+                Assert.That(controlPoints.SamplePointAt(2500).SampleBank, Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+                Assert.That(controlPoints.SamplePointAt(3500).SampleBank, Is.EqualTo(HitSampleInfo.BANK_DRUM));
 
                 Assert.That(controlPoints.TimingPointAt(500).BeatLength, Is.EqualTo(500).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
@@ -510,7 +510,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]
@@ -528,7 +528,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]
@@ -548,7 +548,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
-            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
         }
 
         [Test]

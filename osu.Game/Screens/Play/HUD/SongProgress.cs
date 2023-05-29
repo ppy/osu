@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -52,9 +52,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 objects = value;
-                FirstHitTime = objects.FirstOrDefault()?.StartTime ?? 0;
-                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-                LastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
+
+                (FirstHitTime, LastHitTime) = BeatmapExtensions.CalculatePlayableBounds(objects);
+
                 UpdateObjects(objects);
             }
         }

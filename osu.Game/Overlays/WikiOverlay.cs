@@ -157,7 +157,9 @@ namespace osu.Game.Overlays
 
         private void onFail(string originalPath)
         {
+            wikiData.Value = null;
             path.Value = "error";
+
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
                 $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_Page)."));
         }

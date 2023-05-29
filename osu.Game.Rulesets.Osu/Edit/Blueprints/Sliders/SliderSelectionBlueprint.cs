@@ -14,7 +14,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -311,17 +310,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 var splitControlPoints = controlPoints.Take(index + 1).ToList();
                 controlPoints.RemoveRange(0, index);
 
-                // Turn the control points which were split off into a new slider.
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                var difficultyPoint = (DifficultyControlPoint)HitObject.DifficultyControlPoint.DeepClone();
-
                 var newSlider = new Slider
                 {
                     StartTime = HitObject.StartTime,
                     Position = HitObject.Position + splitControlPoints[0].Position,
                     NewCombo = HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
-                    DifficultyControlPoint = difficultyPoint,
                     LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList(),
                     RepeatCount = HitObject.RepeatCount,
@@ -378,15 +371,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);
 
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                samplePoint.Time = time;
-
                 editorBeatmap.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = position,
                     NewCombo = i == 0 && HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
                     Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
                 });
 

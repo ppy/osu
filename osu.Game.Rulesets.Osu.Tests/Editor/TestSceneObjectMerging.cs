@@ -138,8 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
                 return slider1 is not null && mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
                                            && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
-                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples)
-                                           && mergedSlider.SampleControlPoint.IsRedundant(slider1.SampleControlPoint);
+                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples);
             });
 
             AddAssert("slider end is at same completion for last slider", () =>
