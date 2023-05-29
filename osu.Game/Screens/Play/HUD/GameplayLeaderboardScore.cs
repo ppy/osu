@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -50,7 +47,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
-        private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
+        private OsuSpriteText positionText = null!, scoreText = null!, accuracyText = null!, comboText = null!, usernameText = null!;
 
         public BindableLong TotalScore { get; } = new BindableLong();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
@@ -58,7 +55,12 @@ namespace osu.Game.Screens.Play.HUD
         public BindableBool HasQuit { get; } = new BindableBool();
         public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
 
-        public Func<ScoringMode, long> GetDisplayScore { get; set; }
+        private Func<ScoringMode, long>? getDisplayScoreFunction;
+
+        public Func<ScoringMode, long> GetDisplayScore
+        {
+            set => getDisplayScoreFunction = value;
+        }
 
         public Color4? BackgroundColour { get; set; }
 
@@ -86,32 +88,31 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        [CanBeNull]
-        public IUser User { get; }
+        public IUser? User { get; }
 
         /// <summary>
         /// Whether this score is the local user or a replay player (and should be focused / always visible).
         /// </summary>
         public readonly bool Tracked;
 
-        private Container mainFillContainer;
+        private Container mainFillContainer = null!;
 
-        private Box centralFill;
+        private Box centralFill = null!;
 
-        private Container backgroundPaddingAdjustContainer;
+        private Container backgroundPaddingAdjustContainer = null!;
 
-        private GridContainer gridContainer;
+        private GridContainer gridContainer = null!;
 
-        private Container scoreComponents;
+        private Container scoreComponents = null!;
 
-        private IBindable<ScoringMode> scoreDisplayMode;
+        private IBindable<ScoringMode> scoreDisplayMode = null!;
 
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
         /// </summary>
         /// <param name="user">The score's player.</param>
         /// <param name="tracked">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore([CanBeNull] IUser user, bool tracked)
+        public GameplayLeaderboardScore(IUser? user, bool tracked)
         {
             User = user;
             Tracked = tracked;
@@ -242,7 +243,7 @@ namespace osu.Game.Screens.Play.HUD
                                                         Origin = Anchor.CentreLeft,
                                                         Colour = Color4.White,
                                                         Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                                        Text = User?.Username,
+                                                        Text = User?.Username ?? string.Empty,
                                                         Truncate = true,
                                                         Shadow = false,
                                                     }
@@ -313,11 +314,6 @@ namespace osu.Game.Screens.Play.HUD
             HasQuit.BindValueChanged(_ => updateState());
         }
 
-        private void updateScore()
-        {
-            scoreText.Text = GetDisplayScore(scoreDisplayMode.Value).ToString("N0");
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -327,6 +323,8 @@ namespace osu.Game.Screens.Play.HUD
 
             FinishTransforms(true);
         }
+
+        private void updateScore() => scoreText.Text = (getDisplayScoreFunction?.Invoke(scoreDisplayMode.Value) ?? TotalScore.Value).ToString("N0");
 
         private void changeExpandedState(ValueChangedEvent<bool> expanded)
         {
