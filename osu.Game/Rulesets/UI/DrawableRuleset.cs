@@ -549,6 +549,11 @@ namespace osu.Game.Rulesets.UI
         public virtual bool AllowGameplayOverlays => true;
 
         /// <summary>
+        /// Whether to display the <see cref="CountdownOverlay"/>.
+        /// </summary>
+        public virtual bool AllowCountdown => true;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
