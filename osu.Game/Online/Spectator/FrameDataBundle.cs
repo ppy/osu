@@ -24,7 +24,7 @@ namespace osu.Game.Online.Spectator
         public FrameDataBundle(ScoreInfo score, ScoreProcessor scoreProcessor, IList<LegacyReplayFrame> frames)
         {
             Frames = frames;
-            Header = new FrameHeader(score, scoreProcessor);
+            Header = new FrameHeader(score, scoreProcessor.GetScoreProcessorStatistics());
         }
 
         [JsonConstructor]
