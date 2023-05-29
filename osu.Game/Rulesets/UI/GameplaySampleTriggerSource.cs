@@ -52,14 +52,13 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             var samples = nextObject.Samples
-                                    .Select(s => nextObject.SampleControlPoint.ApplyTo(s))
                                     .Cast<ISampleInfo>()
                                     .ToArray();
 
             PlaySamples(samples);
         }
 
-        protected void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
+        protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
             var hitSound = getNextSample();
             hitSound.Samples = samples;

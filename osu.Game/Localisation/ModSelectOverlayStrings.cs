@@ -34,6 +34,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AddPreset => new TranslatableString(getKey(@"add_preset"), @"Add preset");
 
+        /// <summary>
+        /// "Use current mods"
+        /// </summary>
+        public static LocalisableString UseCurrentMods => new TranslatableString(getKey(@"use_current_mods"), @"Use current mods");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

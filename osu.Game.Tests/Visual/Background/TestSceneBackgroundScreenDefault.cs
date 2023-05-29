@@ -311,6 +311,7 @@ namespace osu.Game.Tests.Visual.Background
                 public bool IsDrawable => true;
                 public double StartTime => double.MinValue;
                 public double EndTime => double.MaxValue;
+                public double EndTimeForDisplay => double.MaxValue;
 
                 public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
             }

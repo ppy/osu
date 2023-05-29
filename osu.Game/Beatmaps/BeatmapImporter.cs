@@ -12,7 +12,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -28,7 +27,6 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };

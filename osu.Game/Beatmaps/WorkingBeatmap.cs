@@ -16,7 +16,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -25,7 +24,6 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
-    [ExcludeFromDynamicCompile]
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
