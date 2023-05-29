@@ -117,12 +117,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The count of all accuracy-affecting judgements in the beatmap.
         /// </summary>
-        private int maximumCountAccuracyJudgements;
+        private int maximumAccuracyJudgementCount;
 
         /// <summary>
         /// The count of accuracy-affecting judgements at the current point in time.
         /// </summary>
-        private int currentCountAccuracyJudgements;
+        private int currentAccuracyJudgementCount;
 
         /// <summary>
         /// The maximum combo score in the beatmap.
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore += Judgement.ToNumericResult(result.Type);
-                currentCountAccuracyJudgements++;
+                currentAccuracyJudgementCount++;
             }
 
             if (result.Type.IsBonus())
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
                 currentBaseScore -= Judgement.ToNumericResult(result.Type);
-                currentCountAccuracyJudgements--;
+                currentAccuracyJudgementCount--;
             }
 
             if (result.Type.IsBonus())
@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Scoring
             MaximumAccuracy.Value = maximumBaseScore > 0 ? (currentBaseScore + (maximumBaseScore - currentMaximumBaseScore)) / maximumBaseScore : 1;
 
             double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
-            double accuracyProcess = maximumCountAccuracyJudgements > 0 ? (double)currentCountAccuracyJudgements / maximumCountAccuracyJudgements : 1;
+            double accuracyProcess = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
 
             TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
         }
@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Scoring
                 maximumBaseScore = currentBaseScore;
 
                 maximumComboPortion = currentComboPortion;
-                maximumCountAccuracyJudgements = currentCountAccuracyJudgements;
+                maximumAccuracyJudgementCount = currentAccuracyJudgementCount;
 
                 maximumResultCounts.Clear();
                 maximumResultCounts.AddRange(scoreResultCounts);
@@ -333,7 +333,7 @@ namespace osu.Game.Rulesets.Scoring
 
             currentBaseScore = 0;
             currentMaximumBaseScore = 0;
-            currentCountAccuracyJudgements = 0;
+            currentAccuracyJudgementCount = 0;
             currentComboPortion = 0;
             currentBonusPortion = 0;
 
@@ -407,7 +407,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             MaximumBaseScore = currentMaximumBaseScore,
             BaseScore = currentBaseScore,
-            AccuracyJudgementCount = currentCountAccuracyJudgements,
+            AccuracyJudgementCount = currentAccuracyJudgementCount,
             ComboPortion = currentComboPortion,
             BonusPortion = currentBonusPortion
         };
@@ -416,7 +416,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             currentMaximumBaseScore = statistics.MaximumBaseScore;
             currentBaseScore = statistics.BaseScore;
-            currentCountAccuracyJudgements = statistics.AccuracyJudgementCount;
+            currentAccuracyJudgementCount = statistics.AccuracyJudgementCount;
             currentComboPortion = statistics.ComboPortion;
             currentBonusPortion = statistics.BonusPortion;
         }
