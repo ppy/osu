@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Gameplay
                 {
                     MaximumBaseScore = 300,
                     BaseScore = 0,
-                    CountAccuracyJudgements = 1,
+                    AccuracyJudgementCount = 1,
                     ComboPortion = 0,
                     BonusPortion = 0
                 }, DateTimeOffset.Now)
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Gameplay
                 {
                     MaximumBaseScore = 0,
                     BaseScore = 0,
-                    CountAccuracyJudgements = 0,
+                    AccuracyJudgementCount = 0,
                     ComboPortion = 0,
                     BonusPortion = 0
                 }, DateTimeOffset.Now)

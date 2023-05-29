@@ -407,7 +407,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             MaximumBaseScore = currentMaximumBaseScore,
             BaseScore = currentBaseScore,
-            CountAccuracyJudgements = currentCountAccuracyJudgements,
+            AccuracyJudgementCount = currentCountAccuracyJudgements,
             ComboPortion = currentComboPortion,
             BonusPortion = currentBonusPortion
         };
@@ -416,7 +416,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             currentMaximumBaseScore = statistics.MaximumBaseScore;
             currentBaseScore = statistics.BaseScore;
-            currentCountAccuracyJudgements = statistics.CountAccuracyJudgements;
+            currentCountAccuracyJudgements = statistics.AccuracyJudgementCount;
             currentComboPortion = statistics.ComboPortion;
             currentBonusPortion = statistics.BonusPortion;
         }
@@ -497,18 +497,40 @@ namespace osu.Game.Rulesets.Scoring
     [MessagePackObject]
     public class ScoreProcessorStatistics
     {
+        /// <summary>
+        /// The sum of all accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// See: <see cref="HitResultExtensions.IsBasic"/> and <see cref="Judgement.ToNumericResult"/>.
+        /// </remarks>
         [Key(0)]
-        public double MaximumBaseScore { get; set; }
-
-        [Key(1)]
         public double BaseScore { get; set; }
 
-        [Key(2)]
-        public int CountAccuracyJudgements { get; set; }
+        /// <summary>
+        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        [Key(1)]
+        public double MaximumBaseScore { get; set; }
 
+        /// <summary>
+        /// The count of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        [Key(2)]
+        public int AccuracyJudgementCount { get; set; }
+
+        /// <summary>
+        /// The combo score at the current point in time.
+        /// </summary>
         [Key(3)]
         public double ComboPortion { get; set; }
 
+        /// <summary>
+        /// The bonus score at the current point in time.
+        /// </summary>
         [Key(4)]
         public double BonusPortion { get; set; }
     }
