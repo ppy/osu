@@ -151,7 +151,10 @@ namespace osu.Game.Overlays.Mods
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
                 toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.IsValid) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.IsValid).All(panel => panel.Active.Value);
+
+                //Prevent checkbox from checking when column have on valid panels
+                if (availableMods.Any(panel => panel.IsValid))
+                    toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.IsValid).All(panel => panel.Active.Value);
             }
         }
 
