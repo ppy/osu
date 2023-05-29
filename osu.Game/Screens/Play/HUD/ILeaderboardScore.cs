@@ -23,6 +23,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         Bindable<long> DisplayOrder { get; }
 
-        Func<ScoringMode, long> GetDisplayScore { get; set; }
+        /// <summary>
+        /// A function providing a display score. If a custom function is not provided, this defaults to using <see cref="TotalScore"/>.
+        /// </summary>
+        Func<ScoringMode, long> GetDisplayScore { set; }
     }
 }
