@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public const float BORDER_RADIUS = 3;
 
+        private const float button_padding = 5;
+
         public Func<float, bool> OnRotation;
         public Func<Vector2, Anchor, bool> OnScale;
         public Func<Direction, bool, bool> OnFlip;
@@ -182,6 +184,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.OnKeyDown(e);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            ensureButtonsOnScreen();
+        }
+
         private void recreate()
         {
             if (LoadState < LoadState.Loading)
@@ -234,11 +243,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 },
                 buttons = new FillFlowContainer
                 {
-                    Y = 20,
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = 30,
                     Direction = FillDirection.Horizontal,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.Centre
+                    Margin = new MarginPadding(button_padding),
                 }
             };
 
@@ -351,6 +359,40 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (activeOperations++ == 0)
                 OperationStarted?.Invoke();
+        }
+
+        private void ensureButtonsOnScreen()
+        {
+            buttons.Position = Vector2.Zero;
+
+            var thisQuad = ScreenSpaceDrawQuad;
+
+            // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
+            // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
+            var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
+
+            float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
+            float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
+            float leftExcess = thisQuad.TopLeft.X - parentQuad.TopLeft.X;
+            float rightExcess = parentQuad.TopRight.X - thisQuad.TopRight.X;
+
+            if (topExcess + bottomExcess < buttons.Height + button_padding)
+            {
+                buttons.Anchor = Anchor.BottomCentre;
+                buttons.Origin = Anchor.BottomCentre;
+            }
+            else if (topExcess > bottomExcess)
+            {
+                buttons.Anchor = Anchor.TopCentre;
+                buttons.Origin = Anchor.BottomCentre;
+            }
+            else
+            {
+                buttons.Anchor = Anchor.BottomCentre;
+                buttons.Origin = Anchor.TopCentre;
+            }
+
+            buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
         }
     }
 }

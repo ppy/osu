@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (slider is null) return;
 
-                sample = new HitSampleInfo("hitwhistle", "soft", volume: 70);
+                sample = new HitSampleInfo("hitwhistle", HitSampleInfo.BANK_SOFT, volume: 70);
                 slider.Samples.Add(sample.With());
             });
 
