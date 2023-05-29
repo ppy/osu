@@ -60,18 +60,17 @@ namespace osu.Game.Online.Spectator
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
         /// </summary>
         /// <param name="score">The score for reference.</param>
-        /// <param name="scoreProcessor">The score processor for reference.</param>
-        public FrameHeader(ScoreInfo score, ScoreProcessor scoreProcessor)
+        /// <param name="statistics">The score processor statistics for the current point in time.</param>
+        public FrameHeader(ScoreInfo score, ScoreProcessorStatistics statistics)
         {
             TotalScore = score.TotalScore;
             Accuracy = score.Accuracy;
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
-
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
 
-            ScoreProcessorStatistics = scoreProcessor.GetScoreProcessorStatistics();
+            ScoreProcessorStatistics = statistics;
         }
 
         [JsonConstructor]
