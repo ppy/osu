@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
@@ -144,6 +145,24 @@ namespace osu.Game.Tests.Chat
             });
 
             AddAssert("channel has no more messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestRollCommand()
+        {
+            Channel channel = null;
+            Message rollMessage = null;
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                channelManager.CurrentChannel.Value = channel;
+            });
+            AddStep("post /roll command", () => channelManager.PostCommand("roll", channel));
+            AddStep("find roll message", () => rollMessage = channel.Messages.Find(message => message.Content.Contains("rolled")));
+
+            AddAssert("roll message is found", () => rollMessage, () => Is.Not.Null);
+            AddAssert("roll message has a result", () => Regex.IsMatch(rollMessage.Content, @"^rolled a \d+$"));
         }
 
         private void handlePostMessageRequest(PostMessageRequest request)

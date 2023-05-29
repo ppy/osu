@@ -81,6 +81,8 @@ namespace osu.Game.Online.Chat
         private long? lastSilenceMessageId;
         private uint? lastSilenceId;
 
+        private readonly Random random = new Random();
+
         public ChannelManager(IAPIProvider api)
         {
             this.api = api;
@@ -311,6 +313,10 @@ namespace osu.Game.Online.Chat
 
                 case "help":
                     target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
+                    break;
+
+                case "roll":
+                    PostMessage($"rolled a {random.Next(1, 101)}", isAction: true, target: target);
                     break;
 
                 default:
