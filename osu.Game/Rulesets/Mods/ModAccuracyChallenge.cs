@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.9,
         };
 
-        [SettingSource("Accuracy Mode", "The Accuracy mode that will be used to Judge.")]
+        [SettingSource("Accuracy mode", "The mode of accuracy that will trigger failure.")]
         public Bindable<AccuracyMode> AccuracyJudgeMode { get; } = new Bindable<AccuracyMode>();
 
         private readonly Bindable<double> currentAccuracy = new Bindable<double>();
