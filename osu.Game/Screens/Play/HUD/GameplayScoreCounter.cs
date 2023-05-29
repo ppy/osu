@@ -25,6 +25,9 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ScoreProcessor scoreProcessor)
         {
+            totalScoreBindable = scoreProcessor.TotalScore.GetBoundCopy();
+            totalScoreBindable.BindValueChanged(_ => updateDisplayScore());
+
             scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
             scoreDisplayMode.BindValueChanged(scoreMode =>
             {
@@ -41,10 +44,11 @@ namespace osu.Game.Screens.Play.HUD
                     default:
                         throw new ArgumentOutOfRangeException(nameof(scoreMode));
                 }
+
+                updateDisplayScore();
             }, true);
 
-            totalScoreBindable = scoreProcessor.TotalScore.GetBoundCopy();
-            totalScoreBindable.BindValueChanged(_ => Current.Value = scoreProcessor.GetDisplayScore(scoreDisplayMode.Value), true);
+            void updateDisplayScore() => Current.Value = scoreProcessor.GetDisplayScore(scoreDisplayMode.Value);
         }
     }
 }
