@@ -179,8 +179,8 @@ namespace osu.Game.Database
                 applyFilenameSchemaSuffix(ref Filename);
 #endif
 
+            // `prepareFirstRealmAccess()` triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
             using (var realm = prepareFirstRealmAccess())
-                // This method triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
                 cleanupPendingDeletions(realm);
         }
 
