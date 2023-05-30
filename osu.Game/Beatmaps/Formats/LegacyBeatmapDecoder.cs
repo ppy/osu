@@ -12,6 +12,7 @@ using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
@@ -384,11 +385,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = Parsing.ParseDouble(pair.Value);
+                    difficulty.SliderMultiplier = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.4, 3.6);
                     break;
 
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = Parsing.ParseDouble(pair.Value);
+                    difficulty.SliderTickRate = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.5, 8);
                     break;
             }
         }
@@ -480,7 +481,7 @@ namespace osu.Game.Beatmaps.Formats
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
             if (stringSampleSet == @"none")
-                stringSampleSet = @"normal";
+                stringSampleSet = HitSampleInfo.BANK_NORMAL;
 
             if (timingChange)
             {

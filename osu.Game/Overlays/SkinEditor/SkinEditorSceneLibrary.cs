@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                                         if (replayGeneratingMod != null)
                                             screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
-                                    }, new[] { typeof(Player), typeof(SongSelect) })
+                                    }, new[] { typeof(Player), typeof(PlaySongSelect) })
                                 },
                             }
                         },
