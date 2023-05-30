@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Play.HUD
                                        var trackedUser = UserScores[user.Id];
 
                                        var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
+                                       leaderboardScore.GetDisplayScore = trackedUser.ScoreProcessor.GetDisplayScore;
                                        leaderboardScore.Accuracy.BindTo(trackedUser.ScoreProcessor.Accuracy);
                                        leaderboardScore.TotalScore.BindTo(trackedUser.ScoreProcessor.TotalScore);
                                        leaderboardScore.Combo.BindTo(trackedUser.ScoreProcessor.Combo);
