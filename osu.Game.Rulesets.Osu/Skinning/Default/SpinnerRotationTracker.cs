@@ -89,15 +89,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 // and I'd rather not potentially break that in the process.
                 var clock = (gameplayClock ?? Clock);
 
-                if (clock.ElapsedFrameTime < 0)
+                while (rotationHistory.TryPeek(out (double time, float rotation) pair))
                 {
-                    while (rotationHistory.TryPop(out (double time, float rotation) pair))
-                    {
-                        if (pair.time < clock.CurrentTime)
-                            break;
+                    if (pair.time < clock.CurrentTime)
+                        break;
 
-                        drawableSpinner.Result.RateAdjustedRotation = pair.rotation;
-                    }
+                    drawableSpinner.Result.RateAdjustedRotation = pair.rotation;
+                    rotationHistory.Pop();
                 }
             }
 
