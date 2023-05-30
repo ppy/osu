@@ -16,9 +16,9 @@ The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Curre
 
 ## Status
 
-This project is under heavy development, but is in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
+This project is under constant development, but we aim to keep things in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
 
-**IMPORTANT:** Gameplay mechanics (and other features which you may have come to know and love) are in a constant state of flux. Game balance and final quality-of-life passes come at the end of development, preceded by experimentation and changes which may potentially **reduce playability or usability**. This is done in order to allow us to move forward as developers and designers more efficiently. If this offends you, please consider sticking to the stable releases of osu! (found on the website). We are not yet open to heated discussion over game mechanics and will not be using github as a forum for such discussions just yet.
+**IMPORTANT:** Gameplay mechanics (and other features which you may have come to know and love) are in a constant state of flux. Game balance and final quality-of-life passes come at the end of development, preceded by experimentation and changes which may potentially **reduce playability or usability**. This is done in order to allow us to move forward as developers and designers more efficiently. If this offends you, please consider sticking to a [stable release](https://osu.ppy.sh/home/download) of osu!. We are not yet open to heated discussion over game mechanics and will not be using github as a forum for such discussions just yet.
 
 We are accepting bug reports (please report with as much detail as possible and follow the existing issue templates). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features. A few resources are available as starting points to getting involved and understanding the project:
 
@@ -27,9 +27,9 @@ We are accepting bug reports (please report with as much detail as possible and 
 
 ## Running osu!
 
-If you are looking to install or test osu! without setting up a development environment, you can consume our [binary releases](https://github.com/ppy/osu/releases). Handy links below will download the latest version for your operating system of choice:
+If you are looking to install or test osu! without setting up a development environment, you can consume our [releases](https://github.com/ppy/osu/releases). You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download). Failing that, you may use the links below to download the latest version for your operating system of choice:
 
-**Latest build:**
+**Latest release:**
 
 | [Windows 8.1+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | macOS 10.15+ ([Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip), [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip)) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 13.4+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
