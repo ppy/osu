@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Mods
 
         public string SearchTerm
         {
-            set => ItemsFlow.ForcedSearchTerm = value;
+            set => ItemsFlow.SearchTerm = value;
         }
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
