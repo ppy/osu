@@ -23,10 +23,32 @@ namespace osu.Game.Scoring.Legacy
             if (mode == ScoringMode.Standardised)
                 return score;
 
+            int maxBasicJudgements = maximumStatistics
+                                     .Where(k => k.Key.IsBasic())
+                                     .Select(k => k.Value)
+                                     .DefaultIfEmpty(0)
+                                     .Sum();
+
+            // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
+            // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
+            double scaledRawScore = score / ScoreProcessor.MAX_SCORE;
+
+            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, maxBasicJudgements), 2) * getStandardisedToClassicMultiplier(rulesetId));
+        }
+
+        /// <summary>
+        /// Returns a ballpark multiplier which gives a similar "feel" for how large scores should get when displayed in "classic" mode.
+        /// This is different per ruleset to match the different algorithms used in the scoring implementation.
+        /// </summary>
+        private static double getStandardisedToClassicMultiplier(int rulesetId)
+        {
             double multiplier;
 
             switch (rulesetId)
             {
+                // For non-legacy rulesets, just go with the same as the osu! ruleset.
+                // This is arbitrary, but at least allows the setting to do something to the score.
+                default:
                 case 0:
                     multiplier = 36;
                     break;
@@ -42,17 +64,9 @@ namespace osu.Game.Scoring.Legacy
                 case 3:
                     multiplier = 16;
                     break;
-
-                default:
-                    return score;
             }
 
-            int maxBasicJudgements = maximumStatistics.Where(k => k.Key.IsBasic()).Select(k => k.Value).DefaultIfEmpty(0).Sum();
-
-            // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
-            // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-            double scaledRawScore = score / ScoreProcessor.MAX_SCORE;
-            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, maxBasicJudgements), 2) * multiplier);
+            return multiplier;
         }
 
         public static int? GetCountGeki(this ScoreInfo scoreInfo)
