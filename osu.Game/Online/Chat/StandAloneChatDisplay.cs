@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,18 +20,19 @@ using osuTK.Input;
 namespace osu.Game.Online.Chat
 {
     /// <summary>
-    /// Display a chat channel in an insolated region.
+    /// Display a chat channel in an isolated region.
     /// </summary>
     public partial class StandAloneChatDisplay : CompositeDrawable
     {
         [Cached]
-        public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+        public readonly Bindable<Channel?> Channel = new Bindable<Channel?>();
 
-        protected readonly ChatTextBox TextBox;
+        protected readonly ChatTextBox? TextBox;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager? channelManager { get; set; }
 
-        private StandAloneDrawableChannel drawableChannel;
+        private StandAloneDrawableChannel? drawableChannel;
 
         private readonly bool postingTextBox;
 
@@ -78,14 +78,13 @@ namespace osu.Game.Online.Chat
 
                 TextBox.OnCommit += postMessage;
             }
-
-            Channel.BindValueChanged(channelChanged);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(ChannelManager manager)
+        protected override void LoadComplete()
         {
-            channelManager ??= manager;
+            base.LoadComplete();
+
+            Channel.BindValueChanged(channelChanged, true);
         }
 
         protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
@@ -93,6 +92,8 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newText)
         {
+            Debug.Assert(TextBox != null);
+
             string text = TextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
@@ -108,7 +109,7 @@ namespace osu.Game.Online.Chat
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
 
-        private void channelChanged(ValueChangedEvent<Channel> e)
+        private void channelChanged(ValueChangedEvent<Channel?> e)
         {
             drawableChannel?.Expire();
 
@@ -128,6 +129,8 @@ namespace osu.Game.Online.Chat
 
         public partial class ChatTextBox : HistoryTextBox
         {
+            public Action? FocusLost;
+
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
@@ -158,20 +161,23 @@ namespace osu.Game.Online.Chat
                 base.OnFocusLost(e);
                 FocusLost?.Invoke();
             }
-
-            public Action FocusLost;
         }
 
         public partial class StandAloneDrawableChannel : DrawableChannel
         {
-            public Func<Message, ChatLine> CreateChatLineAction;
+            public Func<Message, ChatLine>? CreateChatLineAction;
 
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
             }
 
-            protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
+            protected override ChatLine CreateChatLine(Message m)
+            {
+                Debug.Assert(CreateChatLineAction != null);
+
+                return CreateChatLineAction.Invoke(m);
+            }
 
             protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
         }
