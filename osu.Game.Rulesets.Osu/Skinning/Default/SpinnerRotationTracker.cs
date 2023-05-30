@@ -32,7 +32,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
-        private Stack<(double time, float rotation)>? rotationHistory;
+        [Resolved]
+        private IFrameStableClock? frameStableClock { get; set; }
+
+        private Stack<(double time, float rotation)> rotationHistory = new Stack<(double time, float rotation)>();
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
@@ -42,18 +45,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         }
 
         [BackgroundDependencyLoader]
-        private void load(IFrameStableClock? frameStableClock)
+        private void load()
         {
             if (frameStableClock == null)
             {
-                // This class already guarantees correct rewind behaviour via the rate-adjusted calculations, but
-                // this only holds as long as spinners are within a frame-stable playback environment.
-                //
-                // This is not the case in the editor, for instance, which results in rotation tracking not working as expected.
-                // As a temporary measure, let's store the history of rotations and use it only in such cases.
-                //
-                // Reasoning for not always using this is because we are already quite confident with the existing methodology of this class,
-                // and I'd rather not potentially break that in the process.
                 rotationHistory = new Stack<(double time, float rotation)>();
             }
         }
@@ -82,8 +77,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Update();
 
-            if (rotationHistory != null)
+            if (frameStableClock?.FrameStablePlayback != true)
             {
+                // This class already guarantees correct rewind behaviour via the rate-adjusted calculations, but
+                // this only holds as long as spinners are within a frame-stable playback environment.
+                //
+                // This is not the case in the editor, for instance, which results in rotation tracking not working as expected.
+                // As a temporary measure, let's store the history of rotations and use it only in such cases.
+                //
+                // Reasoning for not always using this is because we are already quite confident with the existing methodology of this class,
+                // and I'd rather not potentially break that in the process.
                 var clock = (gameplayClock ?? Clock);
 
                 if (clock.ElapsedFrameTime < 0)
@@ -147,7 +150,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             // (see: ModTimeRamp)
             drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
 
-            rotationHistory?.Push(((gameplayClock ?? Clock).CurrentTime, drawableSpinner.Result.RateAdjustedRotation));
+            if (frameStableClock?.FrameStablePlayback != true)
+            {
+                rotationHistory.Push(((gameplayClock ?? Clock).CurrentTime, drawableSpinner.Result.RateAdjustedRotation));
+            }
         }
 
         public void Reset()

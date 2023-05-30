@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether to enable frame-stable playback.
         /// </summary>
-        internal bool FrameStablePlayback { get; set; } = true;
+        public bool FrameStablePlayback { get; internal set; } = true;
 
         protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
 

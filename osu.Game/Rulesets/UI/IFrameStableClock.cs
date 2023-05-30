@@ -14,5 +14,10 @@ namespace osu.Game.Rulesets.UI
         /// Whether the frame stable clock is waiting on new frames to arrive to be able to progress time.
         /// </summary>
         IBindable<bool> WaitingOnFrames { get; }
+
+        /// <summary>
+        /// Whether playback is currently frame stable in nature. This may change at any point in execution.
+        /// </summary>
+        bool FrameStablePlayback { get; }
     }
 }
