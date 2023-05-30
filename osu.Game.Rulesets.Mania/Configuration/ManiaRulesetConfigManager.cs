@@ -15,33 +15,27 @@ namespace osu.Game.Rulesets.Mania.Configuration
         public ManiaRulesetConfigManager(SettingsStore? settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
-            migrate();
         }
 
         protected override void InitialiseDefaults()
         {
             base.InitialiseDefaults();
 
-#pragma warning disable CS0618
-            // Although obsolete, this is still required to populate the bindable from the database in case migration is required.
-            SetDefault<double?>(ManiaRulesetSetting.ScrollTime, null);
-#pragma warning restore CS0618
-
             SetDefault(ManiaRulesetSetting.ScrollSpeed, 8, 1, 40);
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
-        }
 
 #pragma warning disable CS0618
-        private void migrate()
-        {
+            // Although obsolete, this is still required to populate the bindable from the database in case migration is required.
+            SetDefault<double?>(ManiaRulesetSetting.ScrollTime, null);
+
             if (Get<double?>(ManiaRulesetSetting.ScrollTime) is double scrollTime)
             {
                 SetValue(ManiaRulesetSetting.ScrollSpeed, (int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime));
                 SetValue<double?>(ManiaRulesetSetting.ScrollTime, null);
             }
-        }
 #pragma warning restore CS0618
+        }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
