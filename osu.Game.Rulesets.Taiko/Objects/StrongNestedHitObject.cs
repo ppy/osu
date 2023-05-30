@@ -15,6 +15,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
     /// </summary>
     public abstract class StrongNestedHitObject : TaikoHitObject
     {
+        public readonly TaikoHitObject Parent;
+
+        protected StrongNestedHitObject(TaikoHitObject parent)
+        {
+            Parent = parent;
+        }
+
         public override Judgement CreateJudgement() => new TaikoStrongJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
