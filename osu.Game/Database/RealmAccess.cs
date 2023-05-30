@@ -912,7 +912,7 @@ namespace osu.Game.Database
 
             int attempts = 10;
 
-            while (attempts-- > 0)
+            while (true)
             {
                 try
                 {
@@ -930,6 +930,9 @@ namespace osu.Game.Database
                 }
                 catch (IOException)
                 {
+                    if (attempts-- <= 0)
+                        throw;
+
                     // file may be locked during use.
                     Thread.Sleep(500);
                 }
