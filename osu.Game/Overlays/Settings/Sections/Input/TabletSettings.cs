@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,6 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public partial class TabletSettings : SettingsSubsection
     {
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "area" });
+
         public TabletAreaSelection AreaSelection { get; private set; }
 
         private readonly ITabletHandler tabletHandler;

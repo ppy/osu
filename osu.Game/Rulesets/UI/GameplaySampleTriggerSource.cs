@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.UI
             PlaySamples(samples);
         }
 
-        protected void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
+        protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
             var hitSound = getNextSample();
             hitSound.Samples = samples;
