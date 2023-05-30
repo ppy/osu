@@ -35,22 +35,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved]
         private IFrameStableClock? frameStableClock { get; set; }
 
-        private Stack<(double time, float rotation)> rotationHistory = new Stack<(double time, float rotation)>();
+        private readonly Stack<(double time, float rotation)> rotationHistory = new Stack<(double time, float rotation)>();
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
             this.drawableSpinner = drawableSpinner;
 
             RelativeSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (frameStableClock == null)
-            {
-                rotationHistory = new Stack<(double time, float rotation)>();
-            }
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -161,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             mousePosition = default;
             lastAngle = currentRotation = Rotation = 0;
             rotationTransferred = false;
-            rotationHistory?.Clear();
+            rotationHistory.Clear();
         }
     }
 }
