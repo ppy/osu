@@ -1,21 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Game.Online.Chat;
-using osuTK;
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
@@ -47,14 +46,14 @@ namespace osu.Game.Tests.Visual.Online
             Id = 5,
         };
 
-        private ChannelManager channelManager;
+        private ChannelManager channelManager = null!;
 
-        private TestStandAloneChatDisplay chatDisplay;
-        private TestStandAloneChatDisplay chatWithTextBox;
-        private TestStandAloneChatDisplay chatWithTextBox2;
+        private TestStandAloneChatDisplay chatDisplay = null!;
+        private TestStandAloneChatDisplay chatWithTextBox = null!;
+        private TestStandAloneChatDisplay chatWithTextBox2 = null!;
         private int messageIdSequence;
 
-        private Channel testChannel;
+        private Channel testChannel = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -171,6 +170,26 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestReportUserPopover()
+        {
+            sendRegularMessages();
+
+            AddStep("right click user to show menu", () =>
+            {
+                InputManager.MoveMouseTo(chatWithTextBox.ChildrenOfType<DrawableChatUsername>().Last());
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("click report button", () =>
+            {
+                InputManager.MoveMouseTo(chatWithTextBox.ChildrenOfType<DrawableOsuMenuItem>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for popover", () => this.ChildrenOfType<ReportChatPopover>().Any());
+        }
+
+        [Test]
         public void TestManyMessages()
         {
             sendRegularMessages();
@@ -209,7 +228,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestMessageHighlighting()
         {
-            Message highlighted = null;
+            Message? highlighted = null;
 
             sendRegularMessages();
 
