@@ -7,23 +7,20 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModSearchContainer : SearchContainer
     {
-        /// <summary>
-        /// Same as <see cref="SearchContainer{T}.SearchTerm"/> except the filtering is guarantied to be performed
-        /// </summary>
-        /// <remarks>
-        /// This is required because <see cref="ModColumn"/> can be hidden when search term applied
-        /// therefore <see cref="SearchContainer{T}.Update"/> cannot be reached and filter cannot automatically re-validate itself.
-        /// </remarks>
-        public string ForcedSearchTerm
+        public new string SearchTerm
         {
-            get => SearchTerm;
+            get => base.SearchTerm;
             set
             {
                 if (value == SearchTerm)
                     return;
 
                 SearchTerm = value;
-                Update();
+
+                // Manual filtering here is required because ModColumn can be hidden when search term applied,
+                // causing the whole SearchContainer to become non-present and never actually perform a subsequent
+                // filter.
+                Filter();
             }
         }
     }
