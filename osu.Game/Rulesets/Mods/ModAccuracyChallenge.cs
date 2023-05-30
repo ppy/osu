@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
@@ -42,47 +43,44 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.9,
         };
 
-        private int baseScore;
-        private int maxBaseScore;
+        [SettingSource("Accuracy mode", "The mode of accuracy that will trigger failure.")]
+        public Bindable<AccuracyMode> AccuracyJudgeMode { get; } = new Bindable<AccuracyMode>();
+
+        private readonly Bindable<double> currentAccuracy = new Bindable<double>();
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.NewJudgement += j =>
+            switch (AccuracyJudgeMode.Value)
             {
-                if (!j.Type.AffectsAccuracy())
-                    return;
+                case AccuracyMode.Standard:
+                    currentAccuracy.BindTo(scoreProcessor.Accuracy);
+                    break;
 
-                baseScore += Judgement.ToNumericResult(j.Type);
-                maxBaseScore += Judgement.ToNumericResult(j.Judgement.MaxResult);
-            };
+                case AccuracyMode.MaximumAchievable:
+                    currentAccuracy.BindTo(scoreProcessor.MaximumAccuracy);
+                    break;
+            }
 
-            scoreProcessor.JudgementReverted += j =>
+            currentAccuracy.BindValueChanged(s =>
             {
-                if (!j.Type.AffectsAccuracy())
-                    return;
-
-                baseScore -= Judgement.ToNumericResult(j.Type);
-                maxBaseScore -= Judgement.ToNumericResult(j.Judgement.MaxResult);
-            };
+                if (s.NewValue < MinimumAccuracy.Value)
+                {
+                    TriggerFailure();
+                }
+            });
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => false;
+
+        public enum AccuracyMode
         {
-            if (!result.Type.AffectsAccuracy())
-                return false;
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeMax))]
+            MaximumAchievable,
 
-            return getAccuracyWithImminentResultAdded(result) < MinimumAccuracy.Value;
-        }
-
-        private double getAccuracyWithImminentResultAdded(JudgementResult result)
-        {
-            // baseScore and maxBaseScore are always exactly one judgement behind because the health processor is processed first (see: Player).
-            int imminentBaseScore = baseScore + Judgement.ToNumericResult(result.Type);
-            int imminentMaxBaseScore = maxBaseScore + Judgement.ToNumericResult(result.Judgement.MaxResult);
-
-            return imminentMaxBaseScore > 0 ? imminentBaseScore / (double)imminentMaxBaseScore : 1;
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
+            Standard,
         }
     }
 }
