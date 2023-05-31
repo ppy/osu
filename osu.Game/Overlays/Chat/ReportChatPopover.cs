@@ -15,8 +15,10 @@ namespace osu.Game.Overlays.Chat
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        // Nullability only required here for test coverage (even though TestSceneChatOverlay caches a ChannelManager,
+        // it is not seen by the PopoverContainer which is at a higher level in some cases).
         [Resolved]
-        private ChannelManager channelManager { get; set; } = null!;
+        private ChannelManager? channelManager { get; set; }
 
         private readonly Message message;
 
@@ -33,7 +35,7 @@ namespace osu.Game.Overlays.Chat
         {
             var request = new ChatReportRequest(message.Id, reason, comments);
 
-            request.Success += () => channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(UsersStrings.ReportThanks.ToString()));
+            request.Success += () => channelManager?.CurrentChannel.Value.AddNewMessages(new InfoMessage(UsersStrings.ReportThanks.ToString()));
 
             api.Queue(request);
         }
