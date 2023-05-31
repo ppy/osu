@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Audio
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
-        public TaikoHitSampleInfo(string name, string? bank = null, string? suffix = null, int volume = 0)
+        public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
             : base(name, bank, suffix, volume)
         {
         }
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         }
 
         /// <inheritdoc />
-        public override TaikoHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+        public override TaikoHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
             => new TaikoHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
         public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix, LookupNames);
