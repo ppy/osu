@@ -171,6 +171,8 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
+        public double? LastEditTime { get; set; }
+
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
 
