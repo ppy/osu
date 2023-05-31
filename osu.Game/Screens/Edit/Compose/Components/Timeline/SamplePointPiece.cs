@@ -98,6 +98,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private FillFlowContainer togglesCollection = null!;
 
+            private HitObject[] relevantObjects = null!;
+            private IList<HitSampleInfo>[] relevantSamples = null!;
+
             protected virtual IList<HitSampleInfo> GetSamples(HitObject ho) => ho.Samples;
 
             [Resolved(canBeNull: true)]
@@ -153,44 +156,41 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
-                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                var relevantSamples = relevantObjects.Select(GetSamples).ToArray();
+                relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
+                relevantSamples = relevantObjects.Select(GetSamples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
-                string? commonBank = getCommonBank(relevantSamples);
+                string? commonBank = getCommonBank();
                 if (!string.IsNullOrEmpty(commonBank))
                     bank.Current.Value = commonBank;
 
-                string? commonAdditionBank = getCommonAdditionBank(relevantSamples);
-                if (!string.IsNullOrEmpty(commonAdditionBank))
-                    additionBank.Current.Value = commonAdditionBank;
-
-                int? commonVolume = getCommonVolume(relevantSamples);
+                int? commonVolume = getCommonVolume();
                 if (commonVolume != null)
                     volume.Current.Value = commonVolume.Value;
 
-                updateBankPlaceholderText(relevantObjects);
+                updateBankPlaceholderText();
                 bank.Current.BindValueChanged(val =>
                 {
-                    updateBankFor(relevantObjects, val.NewValue);
-                    updateBankPlaceholderText(relevantObjects);
+                    updateBank(val.NewValue);
+                    updateBankPlaceholderText();
                 });
                 // on commit, ensure that the value is correct by sourcing it from the objects' samples again.
                 // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank(relevantSamples);
+                bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank();
 
-                updateAdditionBankPlaceholderText(relevantObjects);
+                updateAdditionBankPlaceholderText();
+                updateAdditionBankText();
                 additionBank.Current.BindValueChanged(val =>
                 {
-                    updateAdditionBankFor(relevantObjects, val.NewValue);
-                    updateAdditionBankPlaceholderText(relevantObjects);
+                    updateAdditionBank(val.NewValue);
+                    updateAdditionBankPlaceholderText();
                 });
-                additionBank.OnCommit += (_, _) => additionBank.Current.Value = getCommonAdditionBank(relevantSamples);
+                additionBank.OnCommit += (_, _) => updateAdditionBankText();
 
-                volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
+                volume.Current.BindValueChanged(val => updateVolume(val.NewValue));
 
-                createStateBindables(relevantObjects);
-                updateTernaryStates(relevantObjects);
+                createStateBindables();
+                updateTernaryStates();
                 togglesCollection.AddRange(createTernaryButtons().Select(b => new DrawableTernaryButton(b) { RelativeSizeAxes = Axes.None, Size = new Vector2(40, 40) }));
             }
 
@@ -200,15 +200,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
             }
 
-            private static string? getCommonBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
-            private static string? getCommonAdditionBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(relevantSamples.First()) : null;
-            private static int? getCommonVolume(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(relevantSamples.First()) : null;
+            private string? getCommonBank() => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
+            private string? getCommonAdditionBank() => relevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(relevantSamples.First()) : null;
+            private int? getCommonVolume() => relevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(relevantSamples.First()) : null;
 
-            private void updateFor(IEnumerable<HitObject> objects, Action<HitObject, IList<HitSampleInfo>> updateAction)
+            private void update(Action<HitObject, IList<HitSampleInfo>> updateAction)
             {
                 beatmap.BeginChange();
 
-                foreach (var h in objects)
+                foreach (var h in relevantObjects)
                 {
                     var samples = GetSamples(h);
                     updateAction(h, samples);
@@ -218,12 +218,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 beatmap.EndChange();
             }
 
-            private void updateBankFor(IEnumerable<HitObject> objects, string? newBank)
+            private void updateBank(string? newBank)
             {
                 if (string.IsNullOrEmpty(newBank))
                     return;
 
-                updateFor(objects, (_, samples) =>
+                update((_, samples) =>
                 {
                     for (int i = 0; i < samples.Count; i++)
                     {
@@ -234,12 +234,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            private void updateAdditionBankFor(IEnumerable<HitObject> objects, string? newBank)
+            private void updateAdditionBank(string? newBank)
             {
                 if (string.IsNullOrEmpty(newBank))
                     return;
 
-                updateFor(objects, (_, samples) =>
+                update((_, samples) =>
                 {
                     for (int i = 0; i < samples.Count; i++)
                     {
@@ -250,24 +250,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
+            private void updateBankPlaceholderText()
             {
-                string? commonBank = getCommonBank(objects.Select(GetSamples).ToArray());
+                string? commonBank = getCommonBank();
                 bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
             }
 
-            private void updateAdditionBankPlaceholderText(IEnumerable<HitObject> objects)
+            private void updateAdditionBankPlaceholderText()
             {
-                string? commonAdditionBank = getCommonAdditionBank(objects.Select(GetSamples).ToArray());
+                string? commonAdditionBank = getCommonAdditionBank();
                 additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
             }
 
-            private void updateVolumeFor(IEnumerable<HitObject> objects, int? newVolume)
+            private void updateAdditionBankText()
+            {
+                if (additionBank.Current.Disabled) return;
+
+                string? commonAdditionBank = getCommonAdditionBank();
+                if (string.IsNullOrEmpty(commonAdditionBank)) return;
+
+                additionBank.Current.Value = commonAdditionBank;
+            }
+
+            private void updateVolume(int? newVolume)
             {
                 if (newVolume == null)
                     return;
 
-                updateFor(objects, (_, samples) =>
+                update((_, samples) =>
                 {
                     for (int i = 0; i < samples.Count; i++)
                     {
@@ -280,7 +290,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private readonly Dictionary<string, Bindable<TernaryState>> selectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
 
-            private void createStateBindables(IEnumerable<HitObject> objects)
+            private void createStateBindables()
             {
                 foreach (string sampleName in HitSampleInfo.AllAdditions)
                 {
@@ -294,11 +304,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         switch (state.NewValue)
                         {
                             case TernaryState.False:
-                                removeHitSampleFor(objects, sampleName);
+                                removeHitSample(sampleName);
                                 break;
 
                             case TernaryState.True:
-                                addHitSampleFor(objects, sampleName);
+                                addHitSample(sampleName);
                                 break;
                         }
                     };
@@ -307,11 +317,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            private void updateTernaryStates(IEnumerable<HitObject> objects)
+            private void updateTernaryStates()
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(objects, h => GetSamples(h).Any(s => s.Name == sampleName));
+                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(relevantObjects, h => GetSamples(h).Any(s => s.Name == sampleName));
                 }
             }
 
@@ -321,12 +331,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     yield return new TernaryButton(bindable, string.Empty, () => ComposeBlueprintContainer.GetIconForSample(sampleName));
             }
 
-            private void addHitSampleFor(IEnumerable<HitObject> objects, string sampleName)
+            private void addHitSample(string sampleName)
             {
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                updateFor(objects, (h, samples) =>
+                update((h, samples) =>
                 {
                     // Make sure there isn't already an existing sample
                     if (samples.Any(s => s.Name == sampleName))
@@ -336,14 +346,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     var relevantSample = samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? samples.FirstOrDefault();
                     samples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
+
+                updateAdditionBankText();
             }
 
-            private void removeHitSampleFor(IEnumerable<HitObject> objects, string sampleName)
+            private void removeHitSample(string sampleName)
             {
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                updateFor(objects, (_, samples) =>
+                update((_, samples) =>
                 {
                     for (int i = 0; i < samples.Count; i++)
                     {
@@ -351,6 +363,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             samples.RemoveAt(i--);
                     }
                 });
+
+                updateAdditionBankText();
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
