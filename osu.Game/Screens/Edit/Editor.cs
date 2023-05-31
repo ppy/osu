@@ -441,6 +441,8 @@ namespace osu.Game.Screens.Edit
 
             try
             {
+                editorBeatmap.BeatmapInfo.LastEditTime = clock.CurrentTime;
+
                 // save the loaded beatmap's data stream.
                 beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
             }
@@ -833,7 +835,11 @@ namespace osu.Game.Screens.Edit
             {
                 double targetTime = 0;
 
-                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                if (editorBeatmap.BeatmapInfo.LastEditTime != null)
+                {
+                    targetTime = editorBeatmap.BeatmapInfo.LastEditTime.Value;
+                }
+                else if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
                 {
                     // seek to one beat length before the first hitobject
                     targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
