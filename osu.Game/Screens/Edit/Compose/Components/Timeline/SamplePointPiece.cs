@@ -180,6 +180,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 updateAdditionBankPlaceholderText();
                 updateAdditionBankText();
+                updateAdditionBankActivated();
                 additionBank.Current.BindValueChanged(val =>
                 {
                     updateAdditionBank(val.NewValue);
@@ -260,6 +261,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 string? commonAdditionBank = getCommonAdditionBank();
                 additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
+            }
+
+            private void updateAdditionBankActivated()
+            {
+                bool anyAdditions = relevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
+                if (anyAdditions)
+                    additionBank.Show();
+                else
+                    additionBank.Hide();
             }
 
             private void updateAdditionBankText()
@@ -347,6 +357,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     samples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
 
+                updateAdditionBankActivated();
                 updateAdditionBankText();
             }
 
@@ -365,6 +376,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
 
                 updateAdditionBankText();
+                updateAdditionBankActivated();
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
