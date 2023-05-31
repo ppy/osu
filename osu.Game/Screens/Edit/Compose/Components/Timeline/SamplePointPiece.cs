@@ -332,7 +332,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (samples.Any(s => s.Name == sampleName))
                         return;
 
-                    samples.Add(h.CreateHitSampleInfo(sampleName));
+                    // First try inheriting the sample info from the node samples instead of the samples of the hitobject
+                    var relevantSample = samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? samples.FirstOrDefault();
+                    samples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
             }
 
