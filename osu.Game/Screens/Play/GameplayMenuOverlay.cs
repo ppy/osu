@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
@@ -48,7 +51,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual Action SelectAction => () => InternalButtons.Selected?.TriggerClick();
 
-        public abstract string Header { get; }
+        public abstract LocalisableString Header { get; }
 
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons = null!;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
@@ -120,7 +123,7 @@ namespace osu.Game.Screens.Play
 
             State.ValueChanged += _ => InternalButtons.Deselect();
 
-            updateRetryCount();
+            updateInfoText();
         }
 
         private int retries;
@@ -135,11 +138,16 @@ namespace osu.Game.Screens.Play
                 retries = value;
 
                 if (IsLoaded)
-                    updateRetryCount();
+                    updateInfoText();
             }
         }
 
-        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopIn()
+        {
+            this.FadeIn(TRANSITION_DURATION, Easing.In);
+            updateInfoText();
+        }
+
         protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
@@ -147,7 +155,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected void AddButton(string text, Color4 colour, Action? action)
+        protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
             var button = new Button
             {
@@ -194,14 +202,39 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void updateRetryCount()
-        {
-            // "You've retried 1,065 times in this session"
-            // "You've retried 1 time in this session"
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
 
+        [Resolved]
+        private GameplayState? gameplayState { get; set; }
+
+        private void updateInfoText()
+        {
             playInfoText.Clear();
-            playInfoText.AddText("Retry count: ");
+            playInfoText.AddText(GameplayMenuOverlayStrings.RetryCount);
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+
+            if (getSongProgress() is int progress)
+            {
+                playInfoText.NewLine();
+                playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
+                playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+            }
+        }
+
+        private int? getSongProgress()
+        {
+            if (gameplayClock == null || gameplayState == null)
+                return null;
+
+            (double firstHitTime, double lastHitTime) = gameplayState.Beatmap.CalculatePlayableBounds();
+
+            double playableLength = (lastHitTime - firstHitTime);
+
+            if (playableLength == 0)
+                return 0;
+
+            return (int)Math.Clamp(((gameplayClock.CurrentTime - firstHitTime) / playableLength) * 100, 0, 100);
         }
 
         private partial class Button : DialogButton

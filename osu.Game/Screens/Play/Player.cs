@@ -238,9 +238,6 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(HealthProcessor);
 
-            if (!ScoreProcessor.Mode.Disabled)
-                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
-
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));

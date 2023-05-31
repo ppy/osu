@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     StartTime = 100,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft")
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT)
                     }
                 };
                 hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -100,13 +100,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "soft");
-            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "soft");
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             AddStep("seek past hit", () => manualClock.CurrentTime = 200);
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "soft");
-            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "soft");
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
         }
 
         [Test]
@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     EndTime = 1100,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft")
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT)
                     }
                 };
                 drumRoll.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -192,18 +192,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "soft");
-            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "soft");
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             AddStep("seek to middle of drum roll", () => manualClock.CurrentTime = 600);
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "soft");
-            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "soft");
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             AddStep("seek past drum roll", () => manualClock.CurrentTime = 1200);
             AddAssert("most valid object is drum roll", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRoll>);
-            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, "soft");
-            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, "soft");
+            checkSound(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSound(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
         }
 
         [Test]

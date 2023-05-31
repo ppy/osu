@@ -20,10 +20,19 @@ namespace osu.Game.Audio
         public const string HIT_FINISH = @"hitfinish";
         public const string HIT_CLAP = @"hitclap";
 
+        public const string BANK_NORMAL = @"normal";
+        public const string BANK_SOFT = @"soft";
+        public const string BANK_DRUM = @"drum";
+
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
         public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_FINISH, HIT_CLAP };
+
+        /// <summary>
+        /// All valid bank constants.
+        /// </summary>
+        public static IEnumerable<string> AllBanks => new[] { BANK_NORMAL, BANK_SOFT, BANK_DRUM };
 
         /// <summary>
         /// The name of the sample to load.
