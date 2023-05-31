@@ -62,6 +62,8 @@ namespace osu.Game.Online.Chat
                 },
             };
 
+            // TODO: move this to MatchChatDisplay as it is the only usage.
+            // This will allow removing the weird nullability logic around TextBox.
             if (postingTextBox)
             {
                 AddInternal(TextBox = new ChatTextBox

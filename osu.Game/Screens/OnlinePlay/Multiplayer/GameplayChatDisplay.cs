@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,9 +16,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public partial class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private ILocalUserPlayInfo localUserInfo { get; set; }
+        [Resolved]
+        private ILocalUserPlayInfo? localUserInfo { get; set; }
 
         private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
 
@@ -41,6 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Background.Alpha = 0.2f;
 
+            Debug.Assert(TextBox != null);
+
             TextBox.FocusLost = () => expandedFromTextBoxFocus.Value = false;
         }
 
@@ -48,6 +47,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void LoadComplete()
         {
+            Debug.Assert(TextBox != null);
+
             base.LoadComplete();
 
             if (localUserInfo != null)
@@ -79,6 +80,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            Debug.Assert(TextBox != null);
+
             switch (e.Action)
             {
                 case GlobalAction.Back:
