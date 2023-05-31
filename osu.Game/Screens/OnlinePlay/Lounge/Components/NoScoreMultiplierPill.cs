@@ -3,7 +3,6 @@
 
 #nullable disable
 
-
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
