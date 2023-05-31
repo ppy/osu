@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -49,23 +50,39 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void Play(HitType hitType)
         {
-            var hitObject = GetMostValidObject();
-            if (hitObject == null) return;
+            var hitSample = GetMostValidObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-            string sampleName = hitType switch
+            if (hitSample == null)
+                return;
+
+            string sampleName;
+
+            switch (hitType)
             {
-                HitType.Centre => HitSampleInfo.HIT_NORMAL,
-                HitType.Rim => HitSampleInfo.HIT_CLAP,
-                HitType.StrongCentre => TaikoHitSampleInfo.TAIKO_STRONG_HIT,
-                HitType.StrongRim => TaikoHitSampleInfo.TAIKO_STRONG_CLAP,
-                _ => throw new InvalidOperationException(@"Attempted to trigger sample playback of an invalid HitType")
-            };
+                case HitType.Centre:
+                    sampleName = HitSampleInfo.HIT_NORMAL;
+                    break;
+
+                case HitType.Rim:
+                    sampleName = HitSampleInfo.HIT_CLAP;
+                    break;
+
+                case HitType.StrongCentre:
+                    sampleName = TaikoHitSampleInfo.TAIKO_STRONG_HIT;
+                    break;
+
+                case HitType.StrongRim:
+                    sampleName = TaikoHitSampleInfo.TAIKO_STRONG_CLAP;
+                    break;
+
+                default:
+                    throw new InvalidOperationException(@"Attempted to trigger sample playback of an invalid HitType");
+            }
 
             if (hitType is HitType.StrongRim or HitType.StrongCentre)
                 FlushPlayback();
 
-            var scp = hitObject.SampleControlPoint;
-            PlaySamples(new ISampleInfo[] { new TaikoHitSampleInfo(sampleName, scp.SampleBank, volume: scp.SampleVolume) });
+            PlaySamples(new ISampleInfo[] { new HitSampleInfo(sampleName, hitSample.Bank, volume: hitSample.Volume) });
         }
 
         public void FlushPlayback()

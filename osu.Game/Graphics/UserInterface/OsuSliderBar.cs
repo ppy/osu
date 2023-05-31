@@ -89,15 +89,19 @@ namespace osu.Game.Graphics.UserInterface
 
             double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
 
-            if (DisplayAsPercentage)
-                return floatValue.ToString("0%");
-
             decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
             // Find the number of significant digits (we could have less than 5 after normalize())
             int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
 
-            return floatValue.ToString($"N{significantDigits}");
+            if (DisplayAsPercentage)
+            {
+                return floatValue.ToString($@"P{Math.Max(0, significantDigits - 2)}");
+            }
+
+            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
+
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}";
         }
 
         /// <summary>

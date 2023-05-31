@@ -3,14 +3,12 @@
 
 using System;
 using JetBrains.Annotations;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using Realms;
 
 namespace osu.Game.Models
 {
-    [ExcludeFromDynamicCompile]
     public class RealmNamedFileUsage : EmbeddedObject, INamedFile, INamedFileUsage
     {
         public RealmFile File { get; set; } = null!;
