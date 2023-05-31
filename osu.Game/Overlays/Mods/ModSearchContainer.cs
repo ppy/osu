@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Mods
                 if (value == SearchTerm)
                     return;
 
-                SearchTerm = value;
+                base.SearchTerm = value;
 
                 // Manual filtering here is required because ModColumn can be hidden when search term applied,
                 // causing the whole SearchContainer to become non-present and never actually perform a subsequent
