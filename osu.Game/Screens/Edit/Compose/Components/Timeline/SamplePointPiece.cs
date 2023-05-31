@@ -36,7 +36,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             HitObject = hitObject;
         }
 
-        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
+        public bool AlternativeColor { get; init; }
+
+        protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.Purple : colours.Pink;
 
         [BackgroundDependencyLoader]
         private void load()
