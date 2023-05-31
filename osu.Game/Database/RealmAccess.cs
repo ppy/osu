@@ -318,46 +318,53 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions(Realm realm)
         {
-            using (var transaction = realm.BeginWrite())
+            try
             {
-                var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
-
-                foreach (var score in pendingDeleteScores)
-                    realm.Remove(score);
-
-                var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
-
-                foreach (var beatmapSet in pendingDeleteSets)
+                using (var transaction = realm.BeginWrite())
                 {
-                    foreach (var beatmap in beatmapSet.Beatmaps)
-                    {
-                        // Cascade delete related scores, else they will have a null beatmap against the model's spec.
-                        foreach (var score in beatmap.Scores)
-                            realm.Remove(score);
+                    var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
 
-                        realm.Remove(beatmap.Metadata);
-                        realm.Remove(beatmap);
+                    foreach (var score in pendingDeleteScores)
+                        realm.Remove(score);
+
+                    var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
+
+                    foreach (var beatmapSet in pendingDeleteSets)
+                    {
+                        foreach (var beatmap in beatmapSet.Beatmaps)
+                        {
+                            // Cascade delete related scores, else they will have a null beatmap against the model's spec.
+                            foreach (var score in beatmap.Scores)
+                                realm.Remove(score);
+
+                            realm.Remove(beatmap.Metadata);
+                            realm.Remove(beatmap);
+                        }
+
+                        realm.Remove(beatmapSet);
                     }
 
-                    realm.Remove(beatmapSet);
+                    var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeleteSkins)
+                        realm.Remove(s);
+
+                    var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeletePresets)
+                        realm.Remove(s);
+
+                    transaction.Commit();
                 }
 
-                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeleteSkins)
-                    realm.Remove(s);
-
-                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeletePresets)
-                    realm.Remove(s);
-
-                transaction.Commit();
+                // clean up files after dropping any pending deletions.
+                // in the future we may want to only do this when the game is idle, rather than on every startup.
+                new RealmFileStore(this, storage).Cleanup();
             }
-
-            // clean up files after dropping any pending deletions.
-            // in the future we may want to only do this when the game is idle, rather than on every startup.
-            new RealmFileStore(this, storage).Cleanup();
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to clean up unused files. This is not critical but please report if it happens regularly.");
+            }
         }
 
         /// <summary>
