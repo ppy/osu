@@ -111,7 +111,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
-                    X = Item is IHasRepeats ? -10 : 0
+                    X = Item is IHasRepeats ? -10 : 0,
+                    AlternativeColor = Item is IHasRepeats
                 },
             });
 
@@ -256,7 +257,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     X = (float)i / (repeats.RepeatCount + 1),
                     RelativePositionAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
                 });
             }
         }

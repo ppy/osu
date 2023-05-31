@@ -4,10 +4,8 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Audio;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -23,8 +21,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             NodeIndex = nodeIndex;
         }
-
-        protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
 
         protected override IList<HitSampleInfo> GetSamples()
         {
