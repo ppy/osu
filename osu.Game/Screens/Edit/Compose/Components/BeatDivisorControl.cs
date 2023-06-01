@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -372,10 +370,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private partial class TickSliderBar : SliderBar<int>
         {
-            private Marker marker;
+            private Marker marker = null!;
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             private readonly BindableBeatDivisor beatDivisor;
 
@@ -517,7 +515,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private partial class Marker : CompositeDrawable
             {
                 [Resolved]
-                private OverlayColourProvider colourProvider { get; set; }
+                private OverlayColourProvider colourProvider { get; set; } = null!;
 
                 [BackgroundDependencyLoader]
                 private void load()
