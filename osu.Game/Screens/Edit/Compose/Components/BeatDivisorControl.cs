@@ -196,11 +196,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch ((BeatDivisorType)nextDivisorType)
             {
                 case BeatDivisorType.Common:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                    beatDivisor.SetArbitraryDivisor(4);
                     break;
 
                 case BeatDivisorType.Triplets:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                    beatDivisor.SetArbitraryDivisor(6);
                     break;
 
                 case BeatDivisorType.Custom:
