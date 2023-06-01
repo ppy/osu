@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private FillFlowContainer togglesCollection = null!;
 
             private HitObject[] relevantObjects = null!;
-            private IList<HitSampleInfo>[] relevantSamples = null!;
+            private IList<HitSampleInfo>[] allRelevantSamples = null!;
 
             /// <summary>
             /// Gets the sub-set of samples relevant to this sample point piece.
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                relevantSamples = relevantObjects.Select(GetRelevantSamples).ToArray();
+                allRelevantSamples = relevantObjects.Select(GetRelevantSamples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
                 string? commonBank = getCommonBank();
@@ -206,19 +206,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
             }
 
-            private string? getCommonBank() => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
-            private string? getCommonAdditionBank() => relevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(relevantSamples.First()) : null;
-            private int? getCommonVolume() => relevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(relevantSamples.First()) : null;
+            private string? getCommonBank() => allRelevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(allRelevantSamples.First()) : null;
+            private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
+            private int? getCommonVolume() => allRelevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(allRelevantSamples.First()) : null;
 
-            private void update(Action<HitObject, IList<HitSampleInfo>> updateAction)
+            /// <summary>
+            /// Applies the given update action on all samples of <see cref="allRelevantSamples"/>
+            /// and invokes the necessary update notifiers for the beatmap and hit objects.
+            /// </summary>
+            /// <param name="updateAction">The action to perform on each element of <see cref="allRelevantSamples"/>.</param>
+            private void updateAllRelevantSamples(Action<HitObject, IList<HitSampleInfo>> updateAction)
             {
                 beatmap.BeginChange();
 
-                foreach (var h in relevantObjects)
+                foreach (var relevantHitObject in relevantObjects)
                 {
-                    var samples = GetRelevantSamples(h);
-                    updateAction(h, samples);
-                    beatmap.Update(h);
+                    var relevantSamples = GetRelevantSamples(relevantHitObject);
+                    updateAction(relevantHitObject, relevantSamples);
+                    beatmap.Update(relevantHitObject);
                 }
 
                 beatmap.EndChange();
@@ -229,13 +234,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(newBank))
                     return;
 
-                update((_, samples) =>
+                updateAllRelevantSamples((_, relevantSamples) =>
                 {
-                    for (int i = 0; i < samples.Count; i++)
+                    for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (samples[i].Name != HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL) continue;
 
-                        samples[i] = samples[i].With(newBank: newBank);
+                        relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
                     }
                 });
             }
@@ -245,13 +250,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(newBank))
                     return;
 
-                update((_, samples) =>
+                updateAllRelevantSamples((_, relevantSamples) =>
                 {
-                    for (int i = 0; i < samples.Count; i++)
+                    for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (samples[i].Name == HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name == HitSampleInfo.HIT_NORMAL) continue;
 
-                        samples[i] = samples[i].With(newBank: newBank);
+                        relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
                     }
                 });
             }
@@ -267,7 +272,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 string? commonAdditionBank = getCommonAdditionBank();
                 additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
 
-                bool anyAdditions = relevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
+                bool anyAdditions = allRelevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
                 if (anyAdditions)
                     additionBank.Show();
                 else
@@ -287,11 +292,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (newVolume == null)
                     return;
 
-                update((_, samples) =>
+                updateAllRelevantSamples((_, relevantSamples) =>
                 {
-                    for (int i = 0; i < samples.Count; i++)
+                    for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        samples[i] = samples[i].With(newVolume: newVolume.Value);
+                        relevantSamples[i] = relevantSamples[i].With(newVolume: newVolume.Value);
                     }
                 });
             }
@@ -346,15 +351,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                update((h, samples) =>
+                updateAllRelevantSamples((h, relevantSamples) =>
                 {
                     // Make sure there isn't already an existing sample
-                    if (samples.Any(s => s.Name == sampleName))
+                    if (relevantSamples.Any(s => s.Name == sampleName))
                         return;
 
                     // First try inheriting the sample info from the node samples instead of the samples of the hitobject
-                    var relevantSample = samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? samples.FirstOrDefault();
-                    samples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
+                    var relevantSample = relevantSamples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? relevantSamples.FirstOrDefault();
+                    relevantSamples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
 
                 updateAdditionBankVisual();
@@ -366,12 +371,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                update((_, samples) =>
+                updateAllRelevantSamples((_, relevantSamples) =>
                 {
-                    for (int i = 0; i < samples.Count; i++)
+                    for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (samples[i].Name == sampleName)
-                            samples.RemoveAt(i--);
+                        if (relevantSamples[i].Name == sampleName)
+                            relevantSamples.RemoveAt(i--);
                     }
                 });
 
