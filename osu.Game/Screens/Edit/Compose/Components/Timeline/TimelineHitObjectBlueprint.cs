@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
         private readonly SamplePointPiece samplePointPiece;
-        private readonly DifficultyPointPiece difficultyPointPiece = null!;
+        private readonly DifficultyPointPiece? difficultyPointPiece;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
