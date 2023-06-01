@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         public readonly bool RequiresHitEvents;
 
         /// <summary>
-        /// Creates a new <see cref="StatisticItem"/>, to be displayed inside a <see cref="StatisticRow"/> in the results screen.
+        /// Creates a new <see cref="StatisticItem"/>, to be displayed in the results screen.
         /// </summary>
         /// <param name="name">The name of the item. Can be <see langword="null"/> to hide the item header.</param>
         /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
