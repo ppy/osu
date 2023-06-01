@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class BeatDivisorControl : CompositeDrawable
     {
+        private int? lastCustomDivisor;
+
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
@@ -182,16 +184,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatDivisor.ValidDivisors.BindValueChanged(valid =>
+            {
+                if (valid.NewValue.Type == BeatDivisorType.Custom)
+                    lastCustomDivisor = valid.NewValue.Presets.Last();
+            }, true);
+        }
+
         private void cycleDivisorType(int direction)
         {
-            Debug.Assert(Math.Abs(direction) == 1);
-            int nextDivisorType = (int)beatDivisor.ValidDivisors.Value.Type + direction;
-            if (nextDivisorType > (int)BeatDivisorType.Triplets)
-                nextDivisorType = (int)BeatDivisorType.Common;
-            else if (nextDivisorType < (int)BeatDivisorType.Common)
-                nextDivisorType = (int)BeatDivisorType.Triplets;
+            int totalTypes = Enum.GetValues<BeatDivisorType>().Length;
+            BeatDivisorType currentType = beatDivisor.ValidDivisors.Value.Type;
 
-            switch ((BeatDivisorType)nextDivisorType)
+            Debug.Assert(Math.Abs(direction) == 1);
+
+            cycleOnce();
+
+            if (lastCustomDivisor == null && currentType == BeatDivisorType.Custom)
+                cycleOnce();
+
+            switch (currentType)
             {
                 case BeatDivisorType.Common:
                     beatDivisor.SetArbitraryDivisor(4);
@@ -202,9 +218,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     break;
 
                 case BeatDivisorType.Custom:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(beatDivisor.ValidDivisors.Value.Presets.Max());
+                    Debug.Assert(lastCustomDivisor != null);
+                    beatDivisor.SetArbitraryDivisor(lastCustomDivisor.Value);
                     break;
             }
+
+            void cycleOnce() => currentType = (BeatDivisorType)(((int)currentType + totalTypes + direction) % totalTypes);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -302,12 +321,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
-                divisorTextBox.OnCommit += (_, _) => setPresets();
+                divisorTextBox.OnCommit += (_, _) => setPresetsFromTextBoxEntry();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
             }
 
-            private void setPresets()
+            private void setPresetsFromTextBoxEntry()
             {
                 if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
                 {
