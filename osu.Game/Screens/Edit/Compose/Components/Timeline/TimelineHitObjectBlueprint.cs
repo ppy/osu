@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
-                    X = Item is IHasRepeats ? -10 : 0,
+                    X = Item is IHasRepeats ? 30 : 0,
                     AlternativeColor = Item is IHasRepeats
                 },
             });
