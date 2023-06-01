@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -23,8 +21,8 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public partial class TestSceneBeatDivisorControl : OsuManualInputManagerTestScene
     {
-        private BeatDivisorControl beatDivisorControl;
-        private BindableBeatDivisor bindableBeatDivisor;
+        private BeatDivisorControl beatDivisorControl = null!;
+        private BindableBeatDivisor bindableBeatDivisor = null!;
 
         private SliderBar<int> tickSliderBar => beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
         private Triangle tickMarkerHead => tickSliderBar.ChildrenOfType<Triangle>().Single();
@@ -237,7 +235,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
 
-            BeatDivisorControl.CustomDivisorPopover popover = null;
+            BeatDivisorControl.CustomDivisorPopover? popover = null;
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<BeatDivisorControl.CustomDivisorPopover>().SingleOrDefault()) != null && popover.IsLoaded);
             AddStep($"set divisor to {divisor}", () =>
             {
