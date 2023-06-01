@@ -8,10 +8,14 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Input;
 using static osu.Game.Screens.Edit.Compose.Components.Timeline.TimelineHitObjectBlueprint;
@@ -110,6 +114,74 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("release button", () => InputManager.PressButton(MouseButton.Left));
 
             AddAssert("object has zero repeats", () => EditorBeatmap.HitObjects.OfType<IHasRepeats>().Single().RepeatCount == 0);
+        }
+
+        [Test]
+        public void TestSamplePointPiece()
+        {
+            SamplePointPiece samplePointPiece;
+            SamplePointPiece.SampleEditPopover popover = null!;
+
+            AddStep("add circle", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new HitCircle
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 2700,
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    }
+                });
+            });
+
+            AddStep("open hitsound popover", () =>
+            {
+                samplePointPiece = this.ChildrenOfType<SamplePointPiece>().Single();
+                InputManager.MoveMouseTo(samplePointPiece);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddStep("add whistle addition", () =>
+            {
+                popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().First();
+                var whistleTernaryButton = popover.ChildrenOfType<DrawableTernaryButton>().First();
+                InputManager.MoveMouseTo(whistleTernaryButton);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("has whistle sample", () => EditorBeatmap.HitObjects.First().Samples.Any(o => o.Name == HitSampleInfo.HIT_WHISTLE));
+
+            AddStep("change bank name", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<LabelledTextBox>().First();
+                bankTextBox.Current.Value = "soft";
+            });
+
+            AddAssert("bank name changed", () =>
+                EditorBeatmap.HitObjects.First().Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "soft")
+                && EditorBeatmap.HitObjects.First().Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "normal"));
+
+            AddStep("change addition bank name", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<LabelledTextBox>().ToArray()[1];
+                bankTextBox.Current.Value = "drum";
+            });
+
+            AddAssert("addition bank name changed", () =>
+                EditorBeatmap.HitObjects.First().Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "soft")
+                && EditorBeatmap.HitObjects.First().Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "drum"));
+
+            AddStep("change volume", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+                bankTextBox.Current.Value = 30;
+            });
+
+            AddAssert("volume changed", () => EditorBeatmap.HitObjects.First().Samples.All(o => o.Volume == 30));
         }
     }
 }
