@@ -1145,8 +1145,11 @@ namespace osu.Game
                             IconColour = Colours.RedDark,
                         });
 
-                        var tabletHandler = Host.AvailableInputHandlers.OfType<ITabletHandler>().FirstOrDefault();
-                        if (tabletHandler != null)
+                        // We only have one tablet handler currently.
+                        // The loop here is weakly guarding against a future where more than one is added.
+                        // If this is ever the case, this logic needs adjustment as it should probably only
+                        // disable the relevant tablet handler rather than all.
+                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
                             tabletHandler.Enabled.Value = false;
                     });
                 }
