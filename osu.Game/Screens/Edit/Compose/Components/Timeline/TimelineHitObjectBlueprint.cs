@@ -250,11 +250,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             // Since children are exceeding the component size, we need to use a custom quad to compute whether it should be masked away.
 
-            // When component isn't masked away there's no need to apply custom logic.
+            // If the component isn't considered masked away by itself, there's no need to apply custom logic.
             if (!base.ComputeIsMaskedAway(maskingBounds))
                 return false;
 
-            // If component is considered masked away we'll use children to create an extended quad.
+            // If the component is considered masked away, we'll use children to create an extended quad that encapsulates all parts of this blueprint
+            // to ensure it doesn't pop in and out of existence abruptly when scrolling the timeline.
             var rect = RectangleF.Union(ScreenSpaceDrawQuad.AABBFloat, circle.ScreenSpaceDrawQuad.AABBFloat);
             rect = RectangleF.Union(rect, samplePointPiece.ScreenSpaceDrawQuad.AABBFloat);
 
