@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -11,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
@@ -182,6 +184,81 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("volume changed", () => EditorBeatmap.HitObjects.First().Samples.All(o => o.Volume == 30));
+        }
+
+        [Test]
+        public void TestNodeSamplePointPiece()
+        {
+            Slider slider = null!;
+            SamplePointPiece samplePointPiece;
+            SamplePointPiece.SampleEditPopover popover = null!;
+
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(slider = new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 2700,
+                    Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    },
+                    NodeSamples =
+                    {
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                    }
+                });
+            });
+
+            AddStep("open slider end hitsound popover", () =>
+            {
+                samplePointPiece = this.ChildrenOfType<NodeSamplePointPiece>().Last();
+                InputManager.MoveMouseTo(samplePointPiece);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddStep("add whistle addition", () =>
+            {
+                popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().First();
+                var whistleTernaryButton = popover.ChildrenOfType<DrawableTernaryButton>().First();
+                InputManager.MoveMouseTo(whistleTernaryButton);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("has whistle sample", () => slider.NodeSamples[1].Any(o => o.Name == HitSampleInfo.HIT_WHISTLE));
+
+            AddStep("change bank name", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<LabelledTextBox>().First();
+                bankTextBox.Current.Value = "soft";
+            });
+
+            AddAssert("bank name changed", () =>
+                slider.NodeSamples[1].Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "soft")
+                && slider.NodeSamples[1].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "normal"));
+
+            AddStep("change addition bank name", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<LabelledTextBox>().ToArray()[1];
+                bankTextBox.Current.Value = "drum";
+            });
+
+            AddAssert("addition bank name changed", () =>
+                slider.NodeSamples[1].Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "soft")
+                && slider.NodeSamples[1].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == "drum"));
+
+            AddStep("change volume", () =>
+            {
+                var bankTextBox = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+                bankTextBox.Current.Value = 30;
+            });
+
+            AddAssert("volume changed", () => slider.NodeSamples[1].All(o => o.Volume == 30));
         }
     }
 }
