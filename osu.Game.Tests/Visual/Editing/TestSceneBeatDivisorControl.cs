@@ -161,9 +161,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Triplets);
+            assertBeatSnap(6);
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Common);
+            assertBeatSnap(4);
 
             switchPresets(-1);
             assertPreset(BeatDivisorType.Triplets);
@@ -179,6 +181,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             setDivisorViaInput(15);
             assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(15);
 
             switchBeatSnap(-1);
             assertBeatSnap(5);
@@ -188,12 +191,14 @@ namespace osu.Game.Tests.Visual.Editing
 
             setDivisorViaInput(5);
             assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(5);
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Common);
 
             switchPresets(-1);
-            assertPreset(BeatDivisorType.Triplets);
+            assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(15);
         }
 
         private void switchBeatSnap(int direction) => AddRepeatStep($"move snap {(direction > 0 ? "forward" : "backward")}", () =>
@@ -217,7 +222,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void assertPreset(BeatDivisorType type, int? maxDivisor = null)
         {
-            AddAssert($"preset is {type}", () => bindableBeatDivisor.ValidDivisors.Value.Type == type);
+            AddAssert($"preset is {type}", () => bindableBeatDivisor.ValidDivisors.Value.Type, () => Is.EqualTo(type));
 
             if (type == BeatDivisorType.Custom)
             {
