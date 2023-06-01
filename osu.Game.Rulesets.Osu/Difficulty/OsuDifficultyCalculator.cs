@@ -11,6 +11,8 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
@@ -26,9 +28,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public override int Version => 20220902;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -71,7 +76,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
-            double starRating = basePerformance > 0.00001 ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
+            double starRating = basePerformance > 0.00001
+                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                : 0;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
@@ -90,6 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
+                TotalScoreV1 = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods).TotalScore,
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
@@ -141,5 +149,144 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModFlashlight(),
             new MultiMod(new OsuModFlashlight(), new OsuModHidden())
         };
+    }
+
+    public abstract class ScoreV1Processor
+    {
+        protected readonly int DifficultyPeppyStars;
+        protected readonly double ScoreMultiplier;
+
+        protected readonly IBeatmap PlayableBeatmap;
+
+        protected ScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        {
+            PlayableBeatmap = playableBeatmap;
+
+            int countNormal = 0;
+            int countSlider = 0;
+            int countSpinner = 0;
+
+            foreach (HitObject obj in baseBeatmap.HitObjects)
+            {
+                switch (obj)
+                {
+                    case IHasPath:
+                        countSlider++;
+                        break;
+
+                    case IHasDuration:
+                        countSpinner++;
+                        break;
+
+                    default:
+                        countNormal++;
+                        break;
+                }
+            }
+
+            int objectCount = countNormal + countSlider + countSpinner;
+
+            DifficultyPeppyStars = (int)Math.Round(
+                (playableBeatmap.Difficulty.DrainRate
+                 + playableBeatmap.Difficulty.OverallDifficulty
+                 + playableBeatmap.Difficulty.CircleSize
+                 + Math.Clamp(objectCount / playableBeatmap.Difficulty.DrainRate * 8, 0, 16)) / 38 * 5);
+
+            ScoreMultiplier = 1 * DifficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+        }
+    }
+
+    public class OsuScoreV1Processor : ScoreV1Processor
+    {
+        public int TotalScore { get; private set; }
+        private int combo;
+
+        public OsuScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+            : base(baseBeatmap, playableBeatmap, mods)
+        {
+            foreach (var obj in playableBeatmap.HitObjects)
+                increaseScore(obj);
+        }
+
+        private void increaseScore(HitObject hitObject)
+        {
+            bool increaseCombo = true;
+            bool addScoreComboMultiplier = false;
+            int scoreIncrease = 0;
+
+            switch (hitObject)
+            {
+                case SliderHeadCircle:
+                case SliderTailCircle:
+                case SliderRepeat:
+                    scoreIncrease = 30;
+                    break;
+
+                case SliderTick:
+                    scoreIncrease = 10;
+                    break;
+
+                case SpinnerBonusTick:
+                    scoreIncrease = 1100;
+                    increaseCombo = false;
+                    break;
+
+                case SpinnerTick:
+                    scoreIncrease = 100;
+                    increaseCombo = false;
+                    break;
+
+                case HitCircle:
+                    scoreIncrease = 300;
+                    addScoreComboMultiplier = true;
+                    break;
+
+                case Slider:
+                    foreach (var nested in hitObject.NestedHitObjects)
+                        increaseScore(nested);
+
+                    scoreIncrease = 300;
+                    increaseCombo = false;
+                    addScoreComboMultiplier = true;
+                    break;
+
+                case Spinner spinner:
+                    // The spinner object applies a lenience because gameplay mechanics differ from osu-stable.
+                    // We'll redo the calculations to match osu-stable here...
+                    const double maximum_rotations_per_second = 477.0 / 60;
+                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(PlayableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
+                    double secondsDuration = spinner.Duration / 1000;
+
+                    // The total amount of half spins possible for the entire spinner.
+                    int totalHalfSpinsPossible = (int)(secondsDuration * maximum_rotations_per_second * 2);
+                    // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
+                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
+                    // To be able to receive bonus points, the spinner must be rotated another 1.5 times.
+                    int halfSpinsRequiredBeforeBonus = halfSpinsRequiredForCompletion + 3;
+
+                    for (int i = 0; i <= totalHalfSpinsPossible; i++)
+                    {
+                        if (i > halfSpinsRequiredBeforeBonus && (i - halfSpinsRequiredBeforeBonus) % 2 == 0)
+                            increaseScore(new SpinnerBonusTick());
+                        else if (i > 1 && i % 2 == 0)
+                            increaseScore(new SpinnerTick());
+                    }
+
+                    scoreIncrease = 300;
+                    addScoreComboMultiplier = true;
+                    break;
+            }
+
+            if (addScoreComboMultiplier)
+            {
+                // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
+                scoreIncrease += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * ScoreMultiplier));
+            }
+
+            if (increaseCombo)
+                combo++;
+
+            TotalScore += scoreIncrease;
+        }
     }
 }

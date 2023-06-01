@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -27,6 +26,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
+        protected const int ATTRIB_ID_TOTAL_SCORE_V1 = 23;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
@@ -36,14 +36,20 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The combined star rating of all skills.
         /// </summary>
-        [JsonProperty("star_rating", Order = -3)]
+        [JsonProperty("star_rating", Order = -4)]
         public double StarRating { get; set; }
 
         /// <summary>
         /// The maximum achievable combo.
         /// </summary>
-        [JsonProperty("max_combo", Order = -2)]
+        [JsonProperty("max_combo", Order = -3)]
         public int MaxCombo { get; set; }
+
+        /// <summary>
+        /// The total score achievable in ScoreV1.
+        /// </summary>
+        [JsonProperty("total_score_v1", Order = -2)]
+        public int TotalScoreV1 { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
@@ -69,7 +75,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// <remarks>
         /// See: osu_difficulty_attribs table.
         /// </remarks>
-        public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes() => Enumerable.Empty<(int, object)>();
+        public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
+        {
+            yield return (ATTRIB_ID_TOTAL_SCORE_V1, TotalScoreV1);
+        }
 
         /// <summary>
         /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
@@ -78,6 +87,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
+            TotalScoreV1 = (int)values[ATTRIB_ID_TOTAL_SCORE_V1];
         }
     }
 }
