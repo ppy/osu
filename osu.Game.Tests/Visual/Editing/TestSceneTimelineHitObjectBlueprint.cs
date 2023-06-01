@@ -121,7 +121,6 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestSamplePointPiece()
         {
-            SamplePointPiece samplePointPiece;
             SamplePointPiece.SampleEditPopover popover = null!;
 
             AddStep("add circle", () =>
@@ -140,7 +139,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("open hitsound popover", () =>
             {
-                samplePointPiece = this.ChildrenOfType<SamplePointPiece>().Single();
+                var samplePointPiece = this.ChildrenOfType<SamplePointPiece>().Single();
                 InputManager.MoveMouseTo(samplePointPiece);
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.ReleaseButton(MouseButton.Left);
@@ -184,13 +183,20 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("volume changed", () => EditorBeatmap.HitObjects.First().Samples.All(o => o.Volume == 30));
+
+            AddStep("close popover", () =>
+            {
+                InputManager.MoveMouseTo(popover, new Vector2(200, 0));
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+                popover = null;
+            });
         }
 
         [Test]
         public void TestNodeSamplePointPiece()
         {
             Slider slider = null!;
-            SamplePointPiece samplePointPiece;
             SamplePointPiece.SampleEditPopover popover = null!;
 
             AddStep("add slider", () =>
@@ -215,7 +221,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("open slider end hitsound popover", () =>
             {
-                samplePointPiece = this.ChildrenOfType<NodeSamplePointPiece>().Last();
+                var samplePointPiece = this.ChildrenOfType<NodeSamplePointPiece>().Last();
                 InputManager.MoveMouseTo(samplePointPiece);
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.ReleaseButton(MouseButton.Left);
@@ -259,6 +265,14 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("volume changed", () => slider.NodeSamples[1].All(o => o.Volume == 30));
+
+            AddStep("close popover", () =>
+            {
+                InputManager.MoveMouseTo(popover, new Vector2(200, 0));
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+                popover = null;
+            });
         }
     }
 }
