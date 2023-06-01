@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new SamplePointPiece(Item)
+                samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
