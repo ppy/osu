@@ -101,7 +101,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private HitObject[] relevantObjects = null!;
             private IList<HitSampleInfo>[] relevantSamples = null!;
 
-            protected virtual IList<HitSampleInfo> GetSamples(HitObject ho) => ho.Samples;
+            /// <summary>
+            /// Gets the sub-set of samples relevant to this sample point piece.
+            /// For example, to edit node samples this should return the samples at the index of the node.
+            /// </summary>
+            /// <param name="ho">The hit object to get the relevant samples from.</param>
+            /// <returns>The relevant list of samples.</returns>
+            protected virtual IList<HitSampleInfo> GetRelevantSamples(HitObject ho) => ho.Samples;
 
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; } = null!;
@@ -157,7 +163,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                relevantSamples = relevantObjects.Select(GetSamples).ToArray();
+                relevantSamples = relevantObjects.Select(GetRelevantSamples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
                 string? commonBank = getCommonBank();
@@ -210,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 foreach (var h in relevantObjects)
                 {
-                    var samples = GetSamples(h);
+                    var samples = GetRelevantSamples(h);
                     updateAction(h, samples);
                     beatmap.Update(h);
                 }
@@ -325,7 +331,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(relevantObjects, h => GetSamples(h).Any(s => s.Name == sampleName));
+                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(relevantObjects, h => GetRelevantSamples(h).Any(s => s.Name == sampleName));
                 }
             }
 
