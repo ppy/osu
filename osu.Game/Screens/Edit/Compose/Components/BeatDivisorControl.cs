@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
                 divisorTextBox.OnCommit += (_, _) => setPresets();
 
-                Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
+                divisorTextBox.SelectAll();
             }
 
             private void setPresets()
