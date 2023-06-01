@@ -507,7 +507,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopIn();
 
-            multiplierDisplay?
+            aboveColumnsContent?
                 .FadeIn(fade_in_duration, Easing.OutQuint)
                 .MoveToY(0, fade_in_duration, Easing.OutQuint);
 
@@ -565,7 +565,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopOut();
 
-            multiplierDisplay?
+            aboveColumnsContent?
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .MoveToY(-distance, fade_out_duration / 2, Easing.OutQuint);
 
