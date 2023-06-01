@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly int nodeIndex;
 
-            protected override IList<HitSampleInfo> GetSamples(HitObject ho)
+            protected override IList<HitSampleInfo> GetRelevantSamples(HitObject ho)
             {
                 if (ho is not IHasRepeats hasRepeats)
                     return ho.Samples;
