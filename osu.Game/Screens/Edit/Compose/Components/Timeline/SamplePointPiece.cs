@@ -178,13 +178,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // this ensures that committing empty text causes a revert to the previous value.
                 bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank();
 
-                updateAdditionBankPlaceholderText();
                 updateAdditionBankText();
-                updateAdditionBankActivated();
+                updateAdditionBankVisual();
                 additionBank.Current.BindValueChanged(val =>
                 {
                     updateAdditionBank(val.NewValue);
-                    updateAdditionBankPlaceholderText();
+                    updateAdditionBankVisual();
                 });
                 additionBank.OnCommit += (_, _) => updateAdditionBankText();
 
@@ -257,14 +256,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
             }
 
-            private void updateAdditionBankPlaceholderText()
+            private void updateAdditionBankVisual()
             {
                 string? commonAdditionBank = getCommonAdditionBank();
                 additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
-            }
 
-            private void updateAdditionBankActivated()
-            {
                 bool anyAdditions = relevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
                 if (anyAdditions)
                     additionBank.Show();
@@ -274,8 +270,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateAdditionBankText()
             {
-                if (additionBank.Current.Disabled) return;
-
                 string? commonAdditionBank = getCommonAdditionBank();
                 if (string.IsNullOrEmpty(commonAdditionBank)) return;
 
@@ -357,7 +351,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     samples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
 
-                updateAdditionBankActivated();
+                updateAdditionBankVisual();
                 updateAdditionBankText();
             }
 
@@ -376,7 +370,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
 
                 updateAdditionBankText();
-                updateAdditionBankActivated();
+                updateAdditionBankVisual();
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
