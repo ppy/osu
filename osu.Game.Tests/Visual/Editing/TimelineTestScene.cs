@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -52,35 +51,28 @@ namespace osu.Game.Tests.Visual.Editing
 
             Composer.Alpha = 0;
 
-            Add(new PopoverContainer
+            Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new OsuContextMenuContainer
+                    EditorBeatmap,
+                    Composer,
+                    new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 5),
                         Children = new Drawable[]
                         {
-                            EditorBeatmap,
-                            Composer,
-                            new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 5),
-                                Children = new Drawable[]
-                                {
-                                    new StartStopButton(),
-                                    new AudioVisualiser(),
-                                }
-                            },
-                            TimelineArea = new TimelineArea(CreateTestComponent())
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            }
+                            new StartStopButton(),
+                            new AudioVisualiser(),
                         }
+                    },
+                    TimelineArea = new TimelineArea(CreateTestComponent())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     }
                 }
             });
