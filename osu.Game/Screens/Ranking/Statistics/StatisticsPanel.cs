@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 Origin = Anchor.Centre,
                             });
 
-                            dimensions.Add(col.Dimension ?? new Dimension());
+                            dimensions.Add(new Dimension());
                         }
 
                         rows.Add(new GridContainer
