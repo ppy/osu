@@ -1136,12 +1136,19 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Schedule(() =>
                     {
-                        Text = $"Encountered tablet error: \"{message}\"",
-                        Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.RedDark,
-                    }));
+                        Notifications.Post(new SimpleNotification
+                        {
+                            Text = $"Disabling tablet support due to error: \"{message}\"",
+                            Icon = FontAwesome.Solid.PenSquare,
+                            IconColour = Colours.RedDark,
+                        });
+
+                        var tabletHandler = Host.AvailableInputHandlers.OfType<ITabletHandler>().FirstOrDefault();
+                        if (tabletHandler != null)
+                            tabletHandler.Enabled.Value = false;
+                    });
                 }
                 else if (notifyOnWarning)
                 {
