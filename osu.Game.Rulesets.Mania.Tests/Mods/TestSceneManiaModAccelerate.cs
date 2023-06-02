@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -14,8 +15,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [Test]
         public void TestModAccelerate() => CreateModTest(new ModTestData
         {
-            Mod = new ManiaModAccelerate(),
-            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
+            Mod = new ManiaModAccelerate
+            {
+                MaxComboCount = { Value = 2 }
+            },
+            PassCondition = () =>
+            {
+                var drawableRuleset = (DrawableManiaRuleset)Player.DrawableRuleset;
+                return drawableRuleset.ScrollSpeed.Value < DrawableManiaRuleset.MIN_TIME_RANGE;
+            }
         });
     }
 }
