@@ -18,9 +18,36 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
+        /// <summary>
+        /// A taiko-specific velocity suffix, currently applied automatically based on volume.
+        /// </summary>
+        public readonly string VelocitySuffix;
+
         public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
             : base(name, bank, suffix, volume)
         {
+            VelocitySuffix = getVelocitySuffix(name, volume);
+        }
+
+        private static string getVelocitySuffix(string name, int volume)
+        {
+            switch (name)
+            {
+                case HIT_NORMAL:
+                case HIT_CLAP:
+                {
+                    if (volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
+                        return "-hard";
+
+                    if (volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
+                        return "-medium";
+
+                    return "-soft";
+                }
+
+                default:
+                    return string.Empty;
+            }
         }
 
         public override IEnumerable<string> LookupNames
@@ -28,15 +55,6 @@ namespace osu.Game.Rulesets.Taiko.Audio
             get
             {
                 List<string> lookupNames = new List<string>();
-
-                string velocity;
-
-                if (Volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
-                    velocity = "hard";
-                else if (Volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
-                    velocity = "medium";
-                else
-                    velocity = "soft";
 
                 // Custom sample sets should still take priority
                 if (!string.IsNullOrEmpty(Suffix))
@@ -71,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
                     case HIT_NORMAL:
                     case HIT_CLAP:
-                        lookupNames.Add($"Gameplay/taiko-{Name}");
+                        lookupNames.Add($"Gameplay/taiko-{Name}{VelocitySuffix}");
                         break;
                 }
 
@@ -85,6 +103,6 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public override TaikoHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
             => new TaikoHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
-        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix);
+        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix, VelocitySuffix);
     }
 }
