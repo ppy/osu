@@ -22,6 +22,9 @@ namespace osu.Game.Localisation
         [Description(@"Български")]
         bg,
 
+        [Description(@"Català")]
+        ca,
+
         [Description(@"Česky")]
         cs,
 
@@ -37,11 +40,23 @@ namespace osu.Game.Localisation
         [Description(@"español")]
         es,
 
+        [Description(@"فارسی")]
+        fa_ir,
+
         [Description(@"Suomi")]
         fi,
 
+        [Description(@"Filipino")]
+        fil,
+
         [Description(@"français")]
         fr,
+
+        [Description(@"עברית")]
+        he,
+
+        [Description(@"Hrvatski")]
+        hr_hr,
 
         [Description(@"Magyar")]
         hu,
@@ -57,6 +72,15 @@ namespace osu.Game.Localisation
 
         [Description(@"한국어")]
         ko,
+
+        [Description(@"Lietuvių")]
+        lt,
+
+        [Description(@"Latviešu")]
+        lv_lv,
+
+        [Description(@"Melayu")]
+        ms_my,
 
         [Description(@"Nederlands")]
         nl,
@@ -79,11 +103,23 @@ namespace osu.Game.Localisation
         [Description(@"Русский")]
         ru,
 
+        [Description(@"සිංහල")]
+        si_lk,
+
         [Description(@"Slovenčina")]
         sk,
 
+        [Description(@"Slovenščina")]
+        sl,
+
+        [Description(@"Српски")]
+        sr,
+
         [Description(@"Svenska")]
         sv,
+
+        [Description(@"Тоҷикӣ")]
+        tg_tj,
 
         [Description(@"ไทย")]
         th,
@@ -104,6 +140,9 @@ namespace osu.Game.Localisation
 
         [Description(@"简体中文")]
         zh,
+
+        [Description(@"繁體中文")]
+        zh_tw,
 
         // Traditional Chinese (Hong Kong) is listed in web sources but has no associated localisations,
         // and was wrongly falling back to Simplified Chinese.
