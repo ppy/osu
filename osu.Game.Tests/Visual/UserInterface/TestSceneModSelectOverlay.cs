@@ -490,15 +490,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             changeRuleset(0);
 
-            AddAssert("double time visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).Any(panel => panel.IsValid));
+            AddAssert("double time visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).Any(panel => panel.Visible));
 
             AddStep("make double time invalid", () => modSelectOverlay.IsValidMod = m => !(m is OsuModDoubleTime));
-            AddUntilStep("double time not visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).All(panel => !panel.IsValid));
-            AddAssert("nightcore still visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModNightcore).Any(panel => panel.IsValid));
+            AddUntilStep("double time not visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).All(panel => !panel.Visible));
+            AddAssert("nightcore still visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModNightcore).Any(panel => panel.Visible));
 
             AddStep("make double time valid again", () => modSelectOverlay.IsValidMod = _ => true);
-            AddUntilStep("double time visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).Any(panel => panel.IsValid));
-            AddAssert("nightcore still visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(b => b.Mod is OsuModNightcore).Any(panel => panel.IsValid));
+            AddUntilStep("double time visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(panel => panel.Mod is OsuModDoubleTime).Any(panel => panel.Visible));
+            AddAssert("nightcore still visible", () => modSelectOverlay.ChildrenOfType<ModPanel>().Where(b => b.Mod is OsuModNightcore).Any(panel => panel.Visible));
         }
 
         [Test]
@@ -524,7 +524,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set ruleset", () => Ruleset.Value = testRuleset.RulesetInfo);
             waitForColumnLoad();
 
-            AddAssert("unimplemented mod panel is filtered", () => !getPanelForMod(typeof(TestUnimplementedMod)).IsValid);
+            AddAssert("unimplemented mod panel is filtered", () => !getPanelForMod(typeof(TestUnimplementedMod)).Visible);
         }
 
         [Test]
@@ -585,7 +585,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
             AddStep("focus on search", () => modSelectOverlay.SearchTextBox.TakeFocus());
             AddStep("apply search", () => modSelectOverlay.SearchTerm = "Easy");
-            AddAssert("DT + HD selected and hidden", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.IsValid && panel.Active.Value) == 2);
+            AddAssert("DT + HD selected and hidden", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.Visible && panel.Active.Value) == 2);
 
             AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
             AddAssert("DT + HD still selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
@@ -630,7 +630,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("deselect all button enabled", () => this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
 
             AddStep("apply search", () => modSelectOverlay.SearchTerm = "Easy");
-            AddAssert("DT + HD + RD are hidden and selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.IsValid && panel.Active.Value) == 3);
+            AddAssert("DT + HD + RD are hidden and selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => !panel.Visible && panel.Active.Value) == 3);
             AddAssert("deselect all button enabled", () => this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
 
             AddStep("click deselect all button", () =>

@@ -73,9 +73,9 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Determine if <see cref="ModPanel"/> is valid and can be shown
+        /// Whether the <see cref="ModPanel"/> is passing all filters and visible for user
         /// </summary>
-        public bool IsValid => modState.IsValid;
+        public bool Visible => modState.Visible;
 
         public bool ValidForSelection
         {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateFilterState()
         {
-            this.FadeTo(IsValid ? 1 : 0);
+            this.FadeTo(Visible ? 1 : 0);
         }
 
         #endregion
