@@ -79,27 +79,24 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            drawableRuleset.ScoreSpeed.Disabled = false;
-            scrollTime.BindTo(drawableRuleset.ScoreSpeed);
-            scrollTime.Value = MinScoreSpeed.Value;
-            targetScrollTime.Value = MinScoreSpeed.Value;
+            drawableRuleset.ScrollSpeed.Disabled = false;
+            scrollTime.BindTo(drawableRuleset.ScrollSpeed);
+            scrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScoreSpeed.Value);
+            targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScoreSpeed.Value);
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Combo.BindValueChanged(s =>
             {
-                if (s.NewValue >= MaxComboCount.Value)
-                {
-                    targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MaxScoreSpeed.Value);
-                }
-                else
-                {
-                    targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(
-                        MinScoreSpeed.Value + (MaxScoreSpeed.Value - MinScoreSpeed.Value) * (s.NewValue / MaxComboCount.Value));
-                }
+                targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(s.NewValue >= MaxComboCount.Value
+                    ? MaxScoreSpeed.Value
+                    : targetScrollSpeed(s.NewValue));
             });
         }
+
+        private int targetScrollSpeed(int combo) =>
+            (int)(MinScoreSpeed.Value + (MaxScoreSpeed.Value - MinScoreSpeed.Value) * (combo / (double)MaxComboCount.Value));
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
