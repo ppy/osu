@@ -87,6 +87,6 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public override TaikoHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
             => new TaikoHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
-        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix, LookupNames);
+        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix);
     }
 }
