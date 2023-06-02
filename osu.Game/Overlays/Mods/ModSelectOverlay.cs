@@ -511,7 +511,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.IsValid);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.Visible);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -573,7 +573,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (column is ModColumn modColumn)
                 {
-                    allFiltered = modColumn.AvailableMods.All(modState => !modState.IsValid);
+                    allFiltered = modColumn.AvailableMods.All(modState => !modState.Visible);
                     modColumn.FlushPendingSelections();
                 }
 
@@ -623,7 +623,7 @@ namespace osu.Game.Overlays.Mods
                         return true;
                     }
 
-                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.IsValid);
+                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
 
                     if (firstMod is not null)
                         firstMod.Active.Value = !firstMod.Active.Value;

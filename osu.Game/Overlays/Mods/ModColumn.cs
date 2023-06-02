@@ -146,15 +146,15 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => !mod.IsValid) ? 0 : 1;
+            Alpha = availableMods.All(mod => !mod.Visible) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.IsValid) ? 1 : 0;
+                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.Visible) ? 1 : 0;
 
                 //Prevent checkbox from checking when column have on valid panels
-                if (availableMods.Any(panel => panel.IsValid))
-                    toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.IsValid).All(panel => panel.Active.Value);
+                if (availableMods.Any(panel => panel.Visible))
+                    toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.Visible).All(panel => panel.Active.Value);
             }
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => !b.Active.Value && b.IsValid))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && b.Visible))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 

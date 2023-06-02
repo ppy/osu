@@ -39,9 +39,9 @@ namespace osu.Game.Overlays.Mods
         public BindableBool ValidForSelection { get; } = new BindableBool(true);
 
         /// <summary>
-        /// Determine if <see cref="Mod"/> is valid and can be shown
+        /// Whether the <see cref="Mod"/> is passing all filters and visible for user
         /// </summary>
-        public bool IsValid => MatchingFilter.Value && ValidForSelection.Value;
+        public bool Visible => MatchingFilter.Value && ValidForSelection.Value;
 
         /// <summary>
         /// Whether the mod is matching the current filter, i.e. it is available for user selection.
