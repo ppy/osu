@@ -102,18 +102,22 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             // sound more musically coherent by biasing towards to end of groups/combos of strong rim hits instead of the start.
             double? lastFlourish = null;
 
-            converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(x =>
+            converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(h =>
             {
-                if (x is not Hit hitObj || !hitObj.IsStrong || hitObj.Type != HitType.Rim)
-                    return x;
+                // Switch to using TaikoHitSampleInfo for all samples.
+                // This adds additional fallback lookup paths.
+                h.Samples = h.Samples.ToArray().Select(s => (HitSampleInfo)new TaikoHitSampleInfo(s.Name, s.Bank, s.Suffix, s.Volume)).ToList();
 
-                if (lastFlourish == null || Math.Abs(hitObj.StartTime - (double)lastFlourish) >= time_between_flourishes)
+                if (h is not Hit hit || !hit.IsStrong || hit.Type != HitType.Rim)
+                    return h;
+
+                if (lastFlourish == null || Math.Abs(hit.StartTime - (double)lastFlourish) >= time_between_flourishes)
                 {
-                    hitObj.Samples.Add(hitObj.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
-                    lastFlourish = hitObj.StartTime;
+                    hit.Samples.Add(hit.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
+                    lastFlourish = hit.StartTime;
                 }
 
-                return x;
+                return h;
             }).Reverse().ToList();
 
             return converted;
