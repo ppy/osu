@@ -64,9 +64,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        /// <summary>
-        /// Search term applied on mod overlay
-        /// </summary>
         public string SearchTerm
         {
             get => SearchTextBox.Current.Value;
@@ -79,9 +76,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        /// <summary>
-        /// Search box applied on mod overlay
-        /// </summary>
         public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
 
         /// <summary>
