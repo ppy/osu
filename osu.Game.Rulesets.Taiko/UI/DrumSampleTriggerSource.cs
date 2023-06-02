@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             AudioContainer.Balance.BindTo(balanceBindable);
         }
 
-        public void Play(HitType hitType)
+        public void Play(HitType hitType, bool strong)
         {
             var hitSample = GetMostValidObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
@@ -60,26 +60,18 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (hitType)
             {
                 case HitType.Centre:
-                    sampleName = HitSampleInfo.HIT_NORMAL;
+                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_HIT : HitSampleInfo.HIT_NORMAL;
                     break;
 
                 case HitType.Rim:
-                    sampleName = HitSampleInfo.HIT_CLAP;
-                    break;
-
-                case HitType.StrongCentre:
-                    sampleName = TaikoHitSampleInfo.TAIKO_STRONG_HIT;
-                    break;
-
-                case HitType.StrongRim:
-                    sampleName = TaikoHitSampleInfo.TAIKO_STRONG_CLAP;
+                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_CLAP : HitSampleInfo.HIT_CLAP;
                     break;
 
                 default:
                     throw new InvalidOperationException(@"Attempted to trigger sample playback of an invalid HitType");
             }
 
-            if (hitType is HitType.StrongRim or HitType.StrongCentre)
+            if (strong)
                 FlushPlayback();
 
             PlaySamples(new ISampleInfo[] { new HitSampleInfo(sampleName, hitSample.Bank, volume: hitSample.Volume) });
