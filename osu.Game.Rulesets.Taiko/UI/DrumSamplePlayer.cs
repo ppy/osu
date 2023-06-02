@@ -12,12 +12,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
     {
-        private readonly DrumSampleTriggerSource leftHitSampleTriggerSource;
-        private readonly DrumSampleTriggerSource rightHitSampleTriggerSource;
-        private readonly DrumSampleTriggerSource leftRimSampleTriggerSource;
-        private readonly DrumSampleTriggerSource rightRimSampleTriggerSource;
-        private readonly DrumSampleTriggerSource strongHitSampleTriggerSource;
-        private readonly DrumSampleTriggerSource strongRimSampleTriggerSource;
+        private readonly DrumSampleTriggerSource leftCentreTrigger;
+        private readonly DrumSampleTriggerSource rightCentreTrigger;
+        private readonly DrumSampleTriggerSource leftRimTrigger;
+        private readonly DrumSampleTriggerSource rightRimTrigger;
+        private readonly DrumSampleTriggerSource strongCentreTrigger;
+        private readonly DrumSampleTriggerSource strongRimTrigger;
 
         private double lastHitTime;
         private TaikoAction? lastAction;
@@ -26,12 +26,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new Drawable[]
             {
-                leftHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
-                rightHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
-                leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
-                rightRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
-                strongHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
-                strongRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer)
+                leftCentreTrigger = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightCentreTrigger = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
+                leftRimTrigger = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightRimTrigger = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
+                strongCentreTrigger = new DrumSampleTriggerSource(hitObjectContainer),
+                strongRimTrigger = new DrumSampleTriggerSource(hitObjectContainer)
             };
         }
 
@@ -47,22 +47,22 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoAction.LeftCentre:
                     hitType = HitType.Centre;
-                    triggerSource = strong ? strongHitSampleTriggerSource : leftHitSampleTriggerSource;
+                    triggerSource = strong ? strongCentreTrigger : leftCentreTrigger;
                     break;
 
                 case TaikoAction.RightCentre:
                     hitType = HitType.Centre;
-                    triggerSource = strong ? strongHitSampleTriggerSource : rightHitSampleTriggerSource;
+                    triggerSource = strong ? strongCentreTrigger : rightCentreTrigger;
                     break;
 
                 case TaikoAction.LeftRim:
                     hitType = HitType.Rim;
-                    triggerSource = strong ? strongRimSampleTriggerSource : leftRimSampleTriggerSource;
+                    triggerSource = strong ? strongRimTrigger : leftRimTrigger;
                     break;
 
                 case TaikoAction.RightRim:
                     hitType = HitType.Rim;
-                    triggerSource = strong ? strongRimSampleTriggerSource : rightRimSampleTriggerSource;
+                    triggerSource = strong ? strongRimTrigger : rightRimTrigger;
                     break;
 
                 default:
@@ -114,16 +114,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void flushCenterTriggerSources()
         {
-            leftHitSampleTriggerSource.FlushPlayback();
-            rightHitSampleTriggerSource.FlushPlayback();
-            strongHitSampleTriggerSource.FlushPlayback();
+            leftCentreTrigger.FlushPlayback();
+            rightCentreTrigger.FlushPlayback();
+            strongCentreTrigger.FlushPlayback();
         }
 
         private void flushRimTriggerSources()
         {
-            leftRimSampleTriggerSource.FlushPlayback();
-            rightRimSampleTriggerSource.FlushPlayback();
-            strongRimSampleTriggerSource.FlushPlayback();
+            leftRimTrigger.FlushPlayback();
+            rightRimTrigger.FlushPlayback();
+            strongRimTrigger.FlushPlayback();
         }
 
         public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
