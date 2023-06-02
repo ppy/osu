@@ -188,10 +188,6 @@ namespace osu.Game.Overlays
 
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value);
 
-            protected override bool OnClick(ClickEvent e) => true;
-
-            protected override bool OnHover(HoverEvent e) => true;
-
             private partial class ProfileSectionTabItem : TabItem<ProfileSection>
             {
                 private OsuSpriteText text = null!;
