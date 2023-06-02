@@ -41,34 +41,34 @@ namespace osu.Game.Rulesets.Mania.Mods
             MaxValue = 2000,
         };
 
-        [SettingSource("Min Speed", "The speed when combo is 0", SettingControlType = typeof(SettingsSlider<double, ManiaScrollSlider>))]
-        public BindableDouble MinScoreSpeed { get; } = new BindableDouble(DrawableManiaRuleset.MAX_TIME_RANGE)
+        [SettingSource("Min Speed", "The speed when combo is 0", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
+        public BindableInt MinScoreSpeed { get; } = new BindableInt(8)
         {
-            MinValue = DrawableManiaRuleset.MIN_TIME_RANGE + 5,
-            MaxValue = DrawableManiaRuleset.MAX_TIME_RANGE,
-            Precision = 5,
+            MinValue = 1,
+            MaxValue = 39,
+            Value = 8,
         };
 
-        [SettingSource("Max Speed", "The Max speed will reach", SettingControlType = typeof(SettingsSlider<double, ManiaScrollSlider>))]
-        public BindableDouble MaxScoreSpeed { get; } = new BindableDouble(DrawableManiaRuleset.MIN_TIME_RANGE)
+        [SettingSource("Max Speed", "The Max speed will reach", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
+        public BindableInt MaxScoreSpeed { get; } = new BindableInt(40)
         {
-            MinValue = DrawableManiaRuleset.MIN_TIME_RANGE,
-            MaxValue = DrawableManiaRuleset.MAX_TIME_RANGE - 5,
-            Precision = 5,
+            MinValue = 2,
+            MaxValue = 40,
+            Value = 40,
         };
 
         public ManiaModAccelerate()
         {
             MinScoreSpeed.BindValueChanged(val =>
             {
-                if (val.NewValue <= MaxScoreSpeed.Value)
-                    MaxScoreSpeed.Value = val.NewValue - MaxScoreSpeed.Precision;
+                if (val.NewValue >= MaxScoreSpeed.Value)
+                    MaxScoreSpeed.Value = val.NewValue + MaxScoreSpeed.Precision;
             });
 
             MaxScoreSpeed.BindValueChanged(val =>
             {
-                if (val.NewValue >= MinScoreSpeed.Value)
-                    MinScoreSpeed.Value = val.NewValue + MinScoreSpeed.Precision;
+                if (val.NewValue <= MinScoreSpeed.Value)
+                    MinScoreSpeed.Value = val.NewValue - MinScoreSpeed.Precision;
             });
         }
 
@@ -91,11 +91,12 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 if (s.NewValue >= MaxComboCount.Value)
                 {
-                    targetScrollTime.Value = MaxScoreSpeed.Value;
+                    targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MaxScoreSpeed.Value);
                 }
                 else
                 {
-                    targetScrollTime.Value = MinScoreSpeed.Value - (MinScoreSpeed.Value - MaxScoreSpeed.Value) * Math.Log(s.NewValue + 1, MaxComboCount.Value + 1);
+                    targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(
+                        MinScoreSpeed.Value + (MaxScoreSpeed.Value - MinScoreSpeed.Value) * (s.NewValue / MaxComboCount.Value));
                 }
             });
         }
