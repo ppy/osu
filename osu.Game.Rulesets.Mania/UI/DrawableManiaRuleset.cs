@@ -64,26 +64,21 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public BindableDouble ScoreSpeed = new BindableDouble();
-
-        private double scoreSpeed
-        {
-            get
-            {
-                if (ScoreSpeed.Disabled)
-                    return configTimeRange.Value;
-
-                return ScoreSpeed.Value;
-            }
-        }
-
         private ScrollVisualisationMethod scrollMethod = ScrollVisualisationMethod.Sequential;
 
         protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();
-        private double smoothTimeRange;
+        private double configSmoothTimeRange;
+
+        // Enable it only when need, it overrides configSmoothTimeRange
+        public BindableDouble ScrollSpeed = new BindableDouble
+        {
+            Disabled = true
+        };
+
+        private double smoothTimeRange => ScrollSpeed.Disabled ? configSmoothTimeRange : ScrollSpeed.Value;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -122,9 +117,9 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(configSmoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
 
-            TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+            TimeRange.Value = configSmoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
