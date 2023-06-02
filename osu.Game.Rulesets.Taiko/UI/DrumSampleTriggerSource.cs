@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             };
 
-            AudioMixer.Balance.BindTo(balanceBindable);
+            AudioContainer.Balance.BindTo(balanceBindable);
         }
 
         public void Play(HitType hitType)

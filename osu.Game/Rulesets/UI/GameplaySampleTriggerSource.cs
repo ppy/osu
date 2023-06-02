@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Linq;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
@@ -28,13 +27,14 @@ namespace osu.Game.Rulesets.UI
         private int nextHitSoundIndex;
 
         protected readonly Container<SkinnableSound> HitSounds;
-        protected readonly DrawableAudioMixer AudioMixer;
+
+        protected readonly AudioContainer AudioContainer;
 
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
 
-            InternalChild = AudioMixer = new DrawableAudioMixer
+            InternalChild = AudioContainer = new AudioContainer
             {
                 Child = HitSounds = new Container<SkinnableSound>
                 {
