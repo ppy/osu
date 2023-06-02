@@ -29,12 +29,14 @@ namespace osu.Game.Rulesets.Taiko.Audio
             {
                 List<string> lookupNames = new List<string>();
 
-                string velocity = Volume switch
-                {
-                    >= SAMPLE_VOLUME_THRESHOLD_HARD => "hard",
-                    >= SAMPLE_VOLUME_THRESHOLD_MEDIUM => "medium",
-                    _ => "soft"
-                };
+                string velocity;
+
+                if (Volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
+                    velocity = "hard";
+                else if (Volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
+                    velocity = "medium";
+                else
+                    velocity = "soft";
 
                 // Custom sample sets should still take priority
                 if (!string.IsNullOrEmpty(Suffix))
