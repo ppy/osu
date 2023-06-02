@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Accelerate";
         public override string Acronym => "AC";
         public override LocalisableString Description => @"Key will become faster..., until you miss";
+
+        public override Type[] IncompatibleMods => new[] { typeof(ManiaModConstantSpeed) };
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => null;
         public override ModType Type => ModType.Fun;
