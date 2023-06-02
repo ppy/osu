@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModPanel : ModSelectPanel, IConditionalFilterable
+    public partial class ModPanel : ModSelectPanel, IFilterable
     {
         public Mod Mod => modState.Mod;
         public override BindableBool Active => modState.Active;
@@ -109,13 +109,6 @@ namespace osu.Game.Overlays.Mods
                 modState.MatchingFilter.Value = value;
             }
         }
-
-        /// <summary>
-        /// This property is always <see langword="true"/> because it affects search result
-        /// </summary>
-        private readonly BindableBool canBeShown = new BindableBool(true);
-
-        IBindable<bool> IConditionalFilterable.CanBeShown => canBeShown;
 
         private void updateFilterState()
         {
