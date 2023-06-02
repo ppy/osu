@@ -98,29 +98,34 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 }).ToList();
             }
 
-            // Add an additional 'flourish' sample to strong rim hits (that are at least `time_between_flourishes` apart). This is applied to hitobjects in reverse order, as to
-            // sound more musically coherent by biasing towards to end of groups/combos of strong rim hits instead of the start.
-            double? lastFlourish = null;
-
-            converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(h =>
-            {
-                // Switch to using TaikoHitSampleInfo for all samples.
-                // This adds additional fallback lookup paths.
-                h.Samples = h.Samples.ToArray().Select(s => (HitSampleInfo)new TaikoHitSampleInfo(s.Name, s.Bank, s.Suffix, s.Volume)).ToList();
-
-                if (h is not Hit hit || !hit.IsStrong || hit.Type != HitType.Rim)
-                    return h;
-
-                if (lastFlourish == null || Math.Abs(hit.StartTime - (double)lastFlourish) >= time_between_flourishes)
-                {
-                    hit.Samples.Add(hit.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
-                    lastFlourish = hit.StartTime;
-                }
-
-                return h;
-            }).Reverse().ToList();
+            augmentSamples(converted.HitObjects);
 
             return converted;
+        }
+
+        private static void augmentSamples(List<TaikoHitObject> hitObjects)
+        {
+            // Add an additional 'flourish' sample to strong rim hits (that are at least `time_between_flourishes` apart).
+            // This is applied to hitobjects in reverse order, as to sound more musically coherent by biasing towards to
+            // end of groups/combos of strong rim hits instead of the start.
+            double? lastFlourish = null;
+
+            for (int i = hitObjects.Count - 1; i >= 0; i--)
+            {
+                var h = hitObjects[i];
+
+                // Switch to using `TaikoHitSampleInfo` for all samples. This adds additional fallback lookup paths and velocity support.
+                h.Samples = h.Samples.Select(s => (HitSampleInfo)new TaikoHitSampleInfo(s.Name, s.Bank, s.Suffix, s.Volume)).ToArray();
+
+                if (h is Hit hit && hit.IsStrong && hit.Type == HitType.Rim)
+                {
+                    if (lastFlourish == null || lastFlourish - hit.StartTime >= time_between_flourishes)
+                    {
+                        h.Samples.Add(h.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
+                        lastFlourish = h.StartTime;
+                    }
+                }
+            }
         }
 
         protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap, CancellationToken cancellationToken)
