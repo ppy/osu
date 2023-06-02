@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void Update(Playfield playfield)
         {
-            scrollTime.Value = Interpolation.DampContinuously(scrollTime.Value, targetScrollTime.Value, 250, playfield.Clock.ElapsedFrameTime);
+            scrollTime.Value = Interpolation.DampContinuously(scrollTime.Value, targetScrollTime.Value, 250, Math.Abs(playfield.Clock.ElapsedFrameTime));
         }
     }
 }
