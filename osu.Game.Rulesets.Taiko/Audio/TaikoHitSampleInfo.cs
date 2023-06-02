@@ -56,24 +56,22 @@ namespace osu.Game.Rulesets.Taiko.Audio
                     case TAIKO_STRONG_CLAP:
                         lookupNames.Add(@$"Gameplay/{Name}");
 
-                        string? fallback = Name switch
+                        if (Name == TAIKO_STRONG_HIT)
                         {
-                            TAIKO_STRONG_HIT => HIT_NORMAL,
-                            TAIKO_STRONG_CLAP => HIT_CLAP,
-                            _ => null
-                        };
-
-                        if (fallback != null)
+                            lookupNames.Add($"Gameplay/taiko-{Bank}-{HIT_NORMAL}");
+                            lookupNames.Add($"Gameplay/{Bank}-{HIT_NORMAL}");
+                        }
+                        else if (Name == TAIKO_STRONG_CLAP)
                         {
-                            lookupNames.Add($"Gameplay/taiko-{Bank}-{fallback}");
-                            lookupNames.Add($"Gameplay/{Bank}-{fallback}");
+                            lookupNames.Add($"Gameplay/taiko-{Bank}-{HIT_CLAP}");
+                            lookupNames.Add($"Gameplay/{Bank}-{HIT_CLAP}");
                         }
 
                         return lookupNames;
 
                     case HIT_NORMAL:
                     case HIT_CLAP:
-                        lookupNames.Add($"Gameplay/taiko-{Name}-{velocity}");
+                        lookupNames.Add($"Gameplay/taiko-{Name}");
                         break;
                 }
 
