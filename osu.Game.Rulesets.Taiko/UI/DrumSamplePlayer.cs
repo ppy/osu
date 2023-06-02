@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new Drawable[]
             {
-                leftHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer) { Balance = { Value = DrumSampleTriggerSource.SampleBalance.L } },
-                rightHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer) { Balance = { Value = DrumSampleTriggerSource.SampleBalance.R } },
-                leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer) { Balance = { Value = DrumSampleTriggerSource.SampleBalance.L } },
-                rightRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer) { Balance = { Value = DrumSampleTriggerSource.SampleBalance.R } },
+                leftHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
+                leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer, SampleBalance.Right),
                 strongHitSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
                 strongRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer)
             };

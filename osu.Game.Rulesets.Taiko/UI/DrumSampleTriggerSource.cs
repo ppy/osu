@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
-using osu.Framework.Utils;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -14,38 +13,25 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public partial class DrumSampleTriggerSource : GameplaySampleTriggerSource
     {
-        public enum SampleBalance
-        {
-            L, C, R
-        }
-
-        public Bindable<SampleBalance> Balance = new Bindable<SampleBalance>(SampleBalance.C);
-
-        private readonly Bindable<double> balanceBindable = new Bindable<double>();
         private const double stereo_separation = 0.2;
 
-        public DrumSampleTriggerSource(HitObjectContainer hitObjectContainer)
+        public DrumSampleTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance = SampleBalance.Centre)
             : base(hitObjectContainer)
         {
-            Balance.ValueChanged += change =>
+            switch (balance)
             {
-                switch (change.NewValue)
-                {
-                    case SampleBalance.L:
-                        balanceBindable.Value = -stereo_separation;
-                        break;
+                case SampleBalance.Left:
+                    AudioContainer.Balance.Value = -stereo_separation;
+                    break;
 
-                    case SampleBalance.C:
-                        balanceBindable.Value = 0;
-                        break;
+                case SampleBalance.Centre:
+                    AudioContainer.Balance.Value = 0;
+                    break;
 
-                    case SampleBalance.R:
-                        balanceBindable.Value = stereo_separation;
-                        break;
-                }
-            };
-
-            AudioContainer.Balance.BindTo(balanceBindable);
+                case SampleBalance.Right:
+                    AudioContainer.Balance.Value = stereo_separation;
+                    break;
+            }
         }
 
         public void Play(HitType hitType, bool strong)
@@ -95,5 +81,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         });
 
         public override void Play() => throw new InvalidOperationException(@"Use override with HitType parameter instead");
+    }
+
+    public enum SampleBalance
+    {
+        Left,
+        Centre,
+        Right
     }
 }
