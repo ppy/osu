@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Audio;
@@ -36,9 +35,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void Play(HitType hitType, bool strong)
         {
-            var hitSample = GetMostValidObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            var hitObject = GetMostValidObject();
 
-            if (hitSample == null)
+            if (hitObject == null)
                 return;
 
             string sampleName;
@@ -60,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (strong)
                 FlushPlayback();
 
-            PlaySamples(new ISampleInfo[] { new HitSampleInfo(sampleName, hitSample.Bank, volume: hitSample.Volume) });
+            PlaySamples(new ISampleInfo[] { hitObject.CreateHitSampleInfo(sampleName) });
         }
 
         public void FlushPlayback()
