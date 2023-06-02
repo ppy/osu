@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly DrumSampleTriggerSource strongRimSampleTriggerSource;
 
         private double lastHitTime;
-        private const double big_hit_window = 30;
         private TaikoAction? lastAction;
 
         public DrumSamplePlayer(HitObjectContainer hitObjectContainer)
@@ -38,54 +37,79 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            bool makeStrong;
-            bool isDoubleHit = Time.Current < lastHitTime + big_hit_window;
             HitType hitType;
 
             DrumSampleTriggerSource triggerSource;
 
+            bool strong = checkStrongValidity(e.Action, lastAction, Time.Current - lastHitTime);
+
             switch (e.Action)
             {
                 case TaikoAction.LeftCentre:
-                    makeStrong = isDoubleHit && lastAction == TaikoAction.RightCentre;
-                    hitType = makeStrong ? HitType.StrongCentre : HitType.Centre;
-                    triggerSource = makeStrong ? strongHitSampleTriggerSource : leftHitSampleTriggerSource;
+                    hitType = HitType.Centre;
+                    triggerSource = strong ? strongHitSampleTriggerSource : leftHitSampleTriggerSource;
                     break;
 
                 case TaikoAction.RightCentre:
-                    makeStrong = isDoubleHit && lastAction == TaikoAction.LeftCentre;
-                    hitType = makeStrong ? HitType.StrongCentre : HitType.Centre;
-                    triggerSource = makeStrong ? strongHitSampleTriggerSource : rightHitSampleTriggerSource;
+                    hitType = HitType.Centre;
+                    triggerSource = strong ? strongHitSampleTriggerSource : rightHitSampleTriggerSource;
                     break;
 
                 case TaikoAction.LeftRim:
-                    makeStrong = isDoubleHit && lastAction == TaikoAction.RightRim;
-                    hitType = makeStrong ? HitType.StrongRim : HitType.Rim;
-                    triggerSource = makeStrong ? strongRimSampleTriggerSource : leftRimSampleTriggerSource;
+                    hitType = HitType.Rim;
+                    triggerSource = strong ? strongRimSampleTriggerSource : leftRimSampleTriggerSource;
                     break;
 
                 case TaikoAction.RightRim:
-                    makeStrong = isDoubleHit && lastAction == TaikoAction.LeftRim;
-                    hitType = makeStrong ? HitType.StrongRim : HitType.Rim;
-                    triggerSource = makeStrong ? strongRimSampleTriggerSource : rightRimSampleTriggerSource;
+                    hitType = HitType.Rim;
+                    triggerSource = strong ? strongRimSampleTriggerSource : rightRimSampleTriggerSource;
                     break;
 
                 default:
                     return false;
             }
 
-            if (hitType == HitType.StrongCentre)
+            if (strong && hitType == HitType.Centre)
                 flushCenterTriggerSources();
 
-            if (hitType == HitType.StrongRim)
+            if (strong && hitType == HitType.Rim)
                 flushRimTriggerSources();
 
-            triggerSource.Play(hitType);
+            triggerSource.Play(hitType, strong);
 
             lastHitTime = Time.Current;
             lastAction = e.Action;
 
             return false;
+        }
+
+        private bool checkStrongValidity(TaikoAction newAction, TaikoAction? lastAction, double timeBetweenActions)
+        {
+            const double big_hit_window = 30;
+
+            if (lastAction == null)
+                return false;
+
+            if (timeBetweenActions > big_hit_window)
+                return false;
+
+            switch (newAction)
+            {
+                case TaikoAction.LeftCentre:
+                    return lastAction == TaikoAction.RightCentre;
+
+                case TaikoAction.RightCentre:
+                    return lastAction == TaikoAction.LeftCentre;
+
+                case TaikoAction.LeftRim:
+                    return lastAction == TaikoAction.RightRim;
+
+                case TaikoAction.RightRim:
+                    return lastAction == TaikoAction.LeftRim;
+
+                default:
+                    return false;
+            }
         }
 
         private void flushCenterTriggerSources()
