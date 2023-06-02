@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.UI;
@@ -21,7 +20,6 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
         [JsonIgnore]
