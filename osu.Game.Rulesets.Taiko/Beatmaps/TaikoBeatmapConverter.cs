@@ -101,6 +101,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             // Add an additional 'flourish' sample to strong rim hits (that are at least `time_between_flourishes` apart). This is applied to hitobjects in reverse order, as to
             // sound more musically coherent by biasing towards to end of groups/combos of strong rim hits instead of the start.
             double? lastFlourish = null;
+
             converted.HitObjects = converted.HitObjects.OrderByDescending(t => t.StartTime).Select(x =>
             {
                 if (x is not Hit hitObj || !hitObj.IsStrong || hitObj.Type != HitType.Rim)
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 if (lastFlourish == null || Math.Abs(hitObj.StartTime - (double)lastFlourish) >= time_between_flourishes)
                 {
-                    hitObj.Samples.Add(new TaikoHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH, volume: x.Samples.First().Volume));
+                    hitObj.Samples.Add(hitObj.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
                     lastFlourish = hitObj.StartTime;
                 }
 

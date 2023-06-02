@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Objects
         /// </remarks>
         /// <param name="sampleName">The name of the sample.</param>
         /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
-        public HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
+        public virtual HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
         {
             if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingSample)
                 return existingSample.With(newName: sampleName);
