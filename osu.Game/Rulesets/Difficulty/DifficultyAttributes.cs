@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </remarks>
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
+            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
             yield return (ATTRIB_ID_TOTAL_SCORE_V1, TotalScoreV1);
         }
 
@@ -87,6 +88,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
+            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             TotalScoreV1 = (int)values[ATTRIB_ID_TOTAL_SCORE_V1];
         }
     }
