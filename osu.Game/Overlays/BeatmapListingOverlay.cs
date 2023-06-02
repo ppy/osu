@@ -43,7 +43,8 @@ namespace osu.Game.Overlays
 
         private Container panelTarget;
         private FillFlowContainer<BeatmapCard> foundContent;
-        private BeatmapListingFilterControl filterControl;
+
+        private BeatmapListingFilterControl filterControl => Header.FilterControl;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -60,12 +61,6 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    filterControl = new BeatmapListingFilterControl
-                    {
-                        TypingStarted = onTypingStarted,
-                        SearchStarted = onSearchStarted,
-                        SearchFinished = onSearchFinished,
-                    },
                     new Container
                     {
                         AutoSizeAxes = Axes.Y,
@@ -88,6 +83,10 @@ namespace osu.Game.Overlays
                     },
                 }
             };
+
+            filterControl.TypingStarted = onTypingStarted;
+            filterControl.SearchStarted = onSearchStarted;
+            filterControl.SearchFinished = onSearchFinished;
         }
 
         protected override void LoadComplete()
@@ -108,6 +107,18 @@ namespace osu.Game.Overlays
             filterControl.Search(query);
             Show();
             ScrollFlow.ScrollToStart();
+        }
+
+        public void ShowWithGenreFilter(SearchGenre genre)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterGenre(genre);
+        }
+
+        public void ShowWithLanguageFilter(SearchLanguage language)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterLanguage(language);
         }
 
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();

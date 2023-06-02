@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,9 +17,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public readonly Func<Drawable> CreateIcon;
+        public readonly Func<Drawable>? CreateIcon;
 
-        public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable> createIcon = null)
+        public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable>? createIcon = null)
         {
             Bindable = bindable;
             Description = description;

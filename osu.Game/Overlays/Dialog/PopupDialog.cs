@@ -198,6 +198,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding(5),
                                 },
                             },
                         },

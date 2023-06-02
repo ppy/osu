@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -97,6 +98,7 @@ namespace osu.Game.Screens.Play.HUD
                                        var trackedUser = UserScores[user.Id];
 
                                        var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
+                                       leaderboardScore.GetDisplayScore = trackedUser.ScoreProcessor.GetDisplayScore;
                                        leaderboardScore.Accuracy.BindTo(trackedUser.ScoreProcessor.Accuracy);
                                        leaderboardScore.TotalScore.BindTo(trackedUser.ScoreProcessor.TotalScore);
                                        leaderboardScore.Combo.BindTo(trackedUser.ScoreProcessor.Combo);
@@ -153,11 +155,13 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void playingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void playingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
                     foreach (int userId in e.OldItems.OfType<int>())
                     {
                         spectatorClient.StopWatchingUser(userId);

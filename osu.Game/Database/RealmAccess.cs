@@ -70,8 +70,9 @@ namespace osu.Game.Database
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
+        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// </summary>
-        private const int schema_version = 25;
+        private const int schema_version = 26;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -178,43 +179,9 @@ namespace osu.Game.Database
                 applyFilenameSchemaSuffix(ref Filename);
 #endif
 
-            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
-
-            // Attempt to recover a newer database version if available.
-            if (storage.Exists(newerVersionFilename))
-            {
-                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
-                attemptRecoverFromFile(newerVersionFilename);
-            }
-
-            try
-            {
-                // This method triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
-                cleanupPendingDeletions();
-            }
-            catch (Exception e)
-            {
-                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
-                // This is the best way we can detect a schema version downgrade.
-                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
-                {
-                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
-
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
-                    if (!storage.Exists(newerVersionFilename))
-                        createBackup(newerVersionFilename);
-
-                    storage.Delete(Filename);
-                }
-                else
-                {
-                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
-                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
-                    storage.Delete(Filename);
-                }
-
-                cleanupPendingDeletions();
-            }
+            // `prepareFirstRealmAccess()` triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
+            using (var realm = prepareFirstRealmAccess())
+                cleanupPendingDeletions(realm);
         }
 
         /// <summary>
@@ -311,49 +278,93 @@ namespace osu.Game.Database
             Logger.Log(@"Recovery complete!", LoggingTarget.Database);
         }
 
-        private void cleanupPendingDeletions()
+        private Realm prepareFirstRealmAccess()
         {
-            using (var realm = getRealmInstance())
-            using (var transaction = realm.BeginWrite())
+            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
+
+            // Attempt to recover a newer database version if available.
+            if (storage.Exists(newerVersionFilename))
             {
-                var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
-
-                foreach (var score in pendingDeleteScores)
-                    realm.Remove(score);
-
-                var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
-
-                foreach (var beatmapSet in pendingDeleteSets)
-                {
-                    foreach (var beatmap in beatmapSet.Beatmaps)
-                    {
-                        // Cascade delete related scores, else they will have a null beatmap against the model's spec.
-                        foreach (var score in beatmap.Scores)
-                            realm.Remove(score);
-
-                        realm.Remove(beatmap.Metadata);
-                        realm.Remove(beatmap);
-                    }
-
-                    realm.Remove(beatmapSet);
-                }
-
-                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeleteSkins)
-                    realm.Remove(s);
-
-                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeletePresets)
-                    realm.Remove(s);
-
-                transaction.Commit();
+                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
+                attemptRecoverFromFile(newerVersionFilename);
             }
 
-            // clean up files after dropping any pending deletions.
-            // in the future we may want to only do this when the game is idle, rather than on every startup.
-            new RealmFileStore(this, storage).Cleanup();
+            try
+            {
+                return getRealmInstance();
+            }
+            catch (Exception e)
+            {
+                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
+                // This is the best way we can detect a schema version downgrade.
+                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
+                {
+                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
+
+                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    if (!storage.Exists(newerVersionFilename))
+                        createBackup(newerVersionFilename);
+                }
+                else
+                {
+                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                }
+
+                storage.Delete(Filename);
+                return getRealmInstance();
+            }
+        }
+
+        private void cleanupPendingDeletions(Realm realm)
+        {
+            try
+            {
+                using (var transaction = realm.BeginWrite())
+                {
+                    var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
+
+                    foreach (var score in pendingDeleteScores)
+                        realm.Remove(score);
+
+                    var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
+
+                    foreach (var beatmapSet in pendingDeleteSets)
+                    {
+                        foreach (var beatmap in beatmapSet.Beatmaps)
+                        {
+                            // Cascade delete related scores, else they will have a null beatmap against the model's spec.
+                            foreach (var score in beatmap.Scores)
+                                realm.Remove(score);
+
+                            realm.Remove(beatmap.Metadata);
+                            realm.Remove(beatmap);
+                        }
+
+                        realm.Remove(beatmapSet);
+                    }
+
+                    var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeleteSkins)
+                        realm.Remove(s);
+
+                    var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeletePresets)
+                        realm.Remove(s);
+
+                    transaction.Commit();
+                }
+
+                // clean up files after dropping any pending deletions.
+                // in the future we may want to only do this when the game is idle, rather than on every startup.
+                new RealmFileStore(this, storage).Cleanup();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to clean up unused files. This is not critical but please report if it happens regularly.");
+            }
         }
 
         /// <summary>
@@ -481,7 +492,7 @@ namespace osu.Game.Database
                 // server, which we don't use. May want to report upstream or revisit in the future.
                 using (var realm = getRealmInstance())
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
                 pendingAsyncWrites.Signal();
             });
@@ -558,7 +569,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));
@@ -866,6 +877,15 @@ namespace osu.Game.Database
                     // Remove the default skins so they can be added back by SkinManager with updated naming.
                     migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
+
+                case 26:
+                    // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                        score.BeatmapHash = score.BeatmapInfo.Hash;
+
+                    break;
             }
         }
 
@@ -899,7 +919,7 @@ namespace osu.Game.Database
 
             int attempts = 10;
 
-            while (attempts-- > 0)
+            while (true)
             {
                 try
                 {
@@ -917,6 +937,9 @@ namespace osu.Game.Database
                 }
                 catch (IOException)
                 {
+                    if (attempts-- <= 0)
+                        throw;
+
                     // file may be locked during use.
                     Thread.Sleep(500);
                 }

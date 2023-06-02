@@ -41,6 +41,7 @@ namespace osu.Game.Online.Spectator
                     connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
                     connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
                     connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+                    connection.On<int, long>(nameof(ISpectatorClient.UserScoreProcessed), ((ISpectatorClient)this).UserScoreProcessed);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
@@ -56,7 +57,7 @@ namespace osu.Game.Online.Spectator
 
             try
             {
-                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), scoreToken, state);
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), scoreToken, state).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -64,8 +65,8 @@ namespace osu.Game.Online.Spectator
                 {
                     Debug.Assert(connector != null);
 
-                    await connector.Reconnect();
-                    await BeginPlayingInternal(scoreToken, state);
+                    await connector.Reconnect().ConfigureAwait(false);
+                    await BeginPlayingInternal(scoreToken, state).ConfigureAwait(false);
                 }
 
                 // Exceptions can occur if, for instance, the locally played beatmap doesn't have a server-side counterpart.

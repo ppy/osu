@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Whether the local user is playing.
         /// </summary>
-        protected bool IsPlaying { get; private set; }
+        protected internal bool IsPlaying { get; private set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
@@ -65,6 +66,11 @@ namespace osu.Game.Online.Spectator
         public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
+        /// Called whenever a user-submitted score has been fully processed.
+        /// </summary>
+        public virtual event Action<int, long>? OnUserScoreProcessed;
+
+        /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
         private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
@@ -77,6 +83,7 @@ namespace osu.Game.Online.Spectator
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
         private long? currentScoreToken;
+        private ScoreProcessor? currentScoreProcessor;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
@@ -160,6 +167,13 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
+        Task ISpectatorClient.UserScoreProcessed(int userId, long scoreId)
+        {
+            Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
+
+            return Task.CompletedTask;
+        }
+
         public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
@@ -180,6 +194,7 @@ namespace osu.Game.Online.Spectator
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
                 currentScoreToken = scoreToken;
+                currentScoreProcessor = state.ScoreProcessor;
 
                 BeginPlayingInternal(currentScoreToken, currentState);
             });
@@ -290,9 +305,10 @@ namespace osu.Game.Online.Spectator
                 return;
 
             Debug.Assert(currentScore != null);
+            Debug.Assert(currentScoreProcessor != null);
 
             var frames = pendingFrames.ToArray();
-            var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
+            var bundle = new FrameDataBundle(currentScore.ScoreInfo, currentScoreProcessor, frames);
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;

@@ -132,13 +132,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
-            string[] split = line.Split(separator, 2);
-
-            if (shouldTrim)
-            {
-                for (int i = 0; i < split.Length; i++)
-                    split[i] = split[i].Trim();
-            }
+            string[] split = line.Split(separator, 2, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
 
             return new KeyValuePair<string, string>
             (
@@ -232,12 +226,16 @@ namespace osu.Game.Beatmaps.Formats
 
             public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(hitSampleInfo);
+                if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
+                {
+                    return legacy.With(
+                        newCustomSampleBank: legacy.CustomSampleBank > 0 ? legacy.CustomSampleBank : CustomSampleBank,
+                        newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume,
+                        newBank: legacy.BankSpecified ? legacy.Bank : SampleBank
+                    );
+                }
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
-                    return legacy.With(newCustomSampleBank: CustomSampleBank);
-
-                return baseInfo;
+                return base.ApplyTo(hitSampleInfo);
             }
 
             public override bool IsRedundant(ControlPoint? existing)

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Changelog
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 20 },
-                        Text = build.CreatedAt.Date.ToString("dd MMMM yyyy"),
+                        Text = build.CreatedAt.Date.ToLocalisableString("dd MMMM yyyy"),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 24),
                     });
 
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Padding = new MarginPadding { Horizontal = ChangelogBuild.HORIZONTAL_PADDING },
+                        Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Margin = new MarginPadding { Top = 30 },
                         Child = new Box
                         {

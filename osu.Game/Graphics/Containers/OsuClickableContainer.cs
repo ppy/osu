@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,8 +44,14 @@ namespace osu.Game.Graphics.Containers
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 
-            AddInternal(content);
-            Add(CreateHoverSounds(sampleSet));
+            AddRangeInternal(new Drawable[]
+            {
+                CreateHoverSounds(sampleSet),
+                content,
+            });
         }
+
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            throw new InvalidOperationException($"Clearing {nameof(InternalChildren)} will cause critical failure. Use {nameof(Clear)} instead.");
     }
 }

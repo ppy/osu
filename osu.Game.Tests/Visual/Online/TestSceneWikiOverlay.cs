@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Linq;
 using System.Net;
 using NUnit.Framework;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        private WikiOverlay wiki;
+        private WikiOverlay wiki = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() => Child = wiki = new WikiOverlay());
@@ -26,7 +27,16 @@ namespace osu.Game.Tests.Visual.Online
         public void TestMainPage()
         {
             setUpWikiResponse(responseMainPage);
-            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show main page", () => wiki.ShowPage());
+        }
+
+        [Test]
+        public void TestCancellationDoesntShowError()
+        {
+            AddStep("Show main page", () => wiki.ShowPage());
+            AddStep("Show another page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+
+            AddUntilStep("Current path is not error", () => wiki.CurrentPath != "error");
         }
 
         [Test]
@@ -56,10 +66,28 @@ namespace osu.Game.Tests.Visual.Online
         public void TestErrorPage()
         {
             setUpWikiResponse(responseArticlePage);
-            AddStep("Show Error Page", () => wiki.ShowPage("Error"));
+            AddStep("Show nonexistent page", () => wiki.ShowPage("This_page_will_error_out"));
+            AddUntilStep("Wait for error page", () => wiki.CurrentPath == "error");
+            AddUntilStep("Error message correct", () => wiki.ChildrenOfType<SpriteText>().Any(text => text.Text == "\"This_page_will_error_out\"."));
         }
 
-        private void setUpWikiResponse(APIWikiPage r, string redirectionPath = null)
+        [Test]
+        public void TestReturnAfterErrorPage()
+        {
+            setUpWikiResponse(responseArticlePage);
+
+            AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+            AddUntilStep("Wait for non-error page", () => wiki.CurrentPath == "Article_styling_criteria/Formatting");
+
+            AddStep("Show nonexistent page", () => wiki.ShowPage("This_page_will_error_out"));
+            AddUntilStep("Wait for error page", () => wiki.CurrentPath == "error");
+
+            AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+            AddUntilStep("Wait for non-error page", () => wiki.CurrentPath == "Article_styling_criteria/Formatting");
+            AddUntilStep("Error message not displayed", () => wiki.ChildrenOfType<SpriteText>().All(text => text.Text != "\"This_page_will_error_out\"."));
+        }
+
+        private void setUpWikiResponse(APIWikiPage r, string? redirectionPath = null)
             => AddStep("set up response", () =>
             {
                 dummyAPI.HandleRequest = request =>

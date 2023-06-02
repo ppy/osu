@@ -11,27 +11,25 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class BeatmapAttributeText : Container, ISkinnableDrawable
+    public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        public bool UsesFixedAnchor { get; set; }
-
-        [SettingSource("Attribute", "The attribute to be displayed.")]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
-        [SettingSource("Template", "Supports {Label} and {Value}, but also including arbitrary attributes like {StarRating} (see attribute list for supported values).")]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
         public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
 
         [Resolved]
@@ -67,7 +65,6 @@ namespace osu.Game.Skinning.Components
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Font = OsuFont.Default.With(size: 40)
                 }
             };
         }
@@ -87,8 +84,8 @@ namespace osu.Game.Skinning.Components
 
         private void updateBeatmapContent(WorkingBeatmap workingBeatmap)
         {
-            valueDictionary[BeatmapAttribute.Title] = workingBeatmap.BeatmapInfo.Metadata.Title;
-            valueDictionary[BeatmapAttribute.Artist] = workingBeatmap.BeatmapInfo.Metadata.Artist;
+            valueDictionary[BeatmapAttribute.Title] = new RomanisableString(workingBeatmap.BeatmapInfo.Metadata.TitleUnicode, workingBeatmap.BeatmapInfo.Metadata.Title);
+            valueDictionary[BeatmapAttribute.Artist] = new RomanisableString(workingBeatmap.BeatmapInfo.Metadata.ArtistUnicode, workingBeatmap.BeatmapInfo.Metadata.Artist);
             valueDictionary[BeatmapAttribute.DifficultyName] = workingBeatmap.BeatmapInfo.DifficultyName;
             valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
@@ -115,13 +112,15 @@ namespace osu.Game.Skinning.Components
                                             .Cast<object?>()
                                             .ToArray();
 
-            foreach (var type in Enum.GetValues(typeof(BeatmapAttribute)).Cast<BeatmapAttribute>())
+            foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
                 numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{1 + (int)type}}}");
             }
 
             text.Text = LocalisableString.Format(numberedTemplate, args);
         }
+
+        protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 
     public enum BeatmapAttribute

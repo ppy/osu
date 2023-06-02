@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Rankings
 
         protected override OverlayTitle CreateTitle() => new RankingsTitle();
 
-        protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
+        protected override Drawable CreateTabControlContent() => rulesetSelector = new OverlayRulesetSelector();
 
         protected override Drawable CreateContent() => countryFilter = new CountryFilter();
 

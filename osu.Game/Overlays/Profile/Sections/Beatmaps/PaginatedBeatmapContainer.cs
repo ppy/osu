@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override int InitialItemsCount => type == BeatmapSetType.Graveyard ? 2 : 6;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<APIUser> user, LocalisableString headerText)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<UserProfileData?> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
@@ -66,10 +64,10 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             }
         }
 
-        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(PaginationParameters pagination) =>
-            new GetUserBeatmapsRequest(User.Value.Id, type, pagination);
+        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(UserProfileData user, PaginationParameters pagination) =>
+            new GetUserBeatmapsRequest(user.User.Id, type, pagination);
 
-        protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
+        protected override Drawable? CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
             ? new BeatmapCardNormal(model)
             {
                 Anchor = Anchor.TopCentre,

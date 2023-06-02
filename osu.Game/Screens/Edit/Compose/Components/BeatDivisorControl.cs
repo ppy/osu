@@ -383,7 +383,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
 
-                Padding = new MarginPadding { Horizontal = 5 };
+                RangePadding = 5;
+                Padding = new MarginPadding { Horizontal = RangePadding };
             }
 
             protected override void LoadComplete()
@@ -398,15 +399,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ClearInternal();
                 CurrentNumber.ValueChanged -= moveMarker;
 
-                foreach (int divisor in beatDivisor.ValidDivisors.Value.Presets)
+                int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Last();
+
+                for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
-                    AddInternal(new Tick(divisor)
+                    int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
+                    bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
+
+                    AddInternal(new Tick(divisor, isSolidTick)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
                         Colour = BindableBeatDivisor.GetColourFor(divisor, colours),
-                        X = getMappedPosition(divisor),
+                        X = tickIndex / (float)largestDivisor,
                     });
                 }
 
@@ -418,6 +424,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private void moveMarker(ValueChangedEvent<int> divisor)
             {
                 marker.MoveToX(getMappedPosition(divisor.NewValue), 100, Easing.OutQuint);
+
+                foreach (Tick tick in InternalChildren.OfType<Tick>().Where(t => !t.AlwaysDisplayed))
+                {
+                    tick.FadeTo(divisor.NewValue % tick.Divisor == 0 ? 0.2f : 0f, 100, Easing.OutQuint);
+                }
             }
 
             protected override void UpdateValue(float value)
@@ -479,17 +490,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // copied from SliderBar so we can do custom spacing logic.
                 float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
-                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
+                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.MinBy(d => Math.Abs(getMappedPosition(d) - xPosition));
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => 1 - 1 / divisor;
 
             private partial class Tick : Circle
             {
-                public Tick(int divisor)
+                public readonly bool AlwaysDisplayed;
+
+                public readonly int Divisor;
+
+                public Tick(int divisor, bool alwaysDisplayed)
                 {
+                    AlwaysDisplayed = alwaysDisplayed;
+                    Divisor = divisor;
+
                     Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
+                    Alpha = alwaysDisplayed ? 1 : 0;
+
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
                 }
             }

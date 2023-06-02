@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,16 +10,17 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     public partial class SetupScreenHeaderBackground : CompositeDrawable
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> working { get; set; }
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         private readonly Container content;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                         new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))
                         {
-                            Text = "Drag image here to set beatmap background!",
+                            Text = EditorSetupStrings.DragToSetBackground,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both

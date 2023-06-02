@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
@@ -130,6 +131,7 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
+            spectatorClient.EndPlaying(GameplayState);
         }
 
         [Resolved]
@@ -157,8 +159,11 @@ namespace osu.Game.Screens.Play
 
             if (LoadedBeatmapSuccessfully)
             {
-                submitScore(Score.DeepClone());
-                spectatorClient.EndPlaying(GameplayState);
+                Task.Run(async () =>
+                {
+                    await submitScore(Score.DeepClone()).ConfigureAwait(false);
+                    spectatorClient.EndPlaying(GameplayState);
+                }).FireAndForget();
             }
 
             return exiting;

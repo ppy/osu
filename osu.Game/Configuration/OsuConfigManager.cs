@@ -12,7 +12,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -26,7 +25,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
-    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
         public OsuConfigManager(Storage storage)
@@ -58,7 +56,11 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
 
+            SetDefault(OsuSetting.ProfileCoverExpanded, true);
+
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
+
+            SetDefault(OsuSetting.SongSelectBackgroundBlur, true);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
@@ -153,6 +155,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
+            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -174,6 +177,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
+            SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -339,6 +343,7 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
+        SongSelectBackgroundBlur,
         Version,
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,
@@ -358,6 +363,7 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
+        ScalingBackgroundDim,
         UIScale,
         IntroSequence,
         NotifyOnUsernameMentioned,
@@ -369,11 +375,13 @@ namespace osu.Game.Configuration
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
         EditorShowHitMarkers,
+        EditorAutoSeekOnPlacement,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        ProfileCoverExpanded,
     }
 }

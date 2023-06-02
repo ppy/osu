@@ -156,6 +156,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
+            LayoutDuration = 200,
+            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 

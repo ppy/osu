@@ -9,7 +9,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
 
-        [SettingSource("Angle sharpness", "How sharp angles should be", SettingControlType = typeof(SettingsSlider<float>))]
+        [SettingSource("Angle sharpness", "How sharp angles should be")]
         public BindableFloat AngleSharpness { get; } = new BindableFloat(7)
         {
             MinValue = 1,
