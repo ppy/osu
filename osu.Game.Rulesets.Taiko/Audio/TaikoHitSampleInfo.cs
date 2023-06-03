@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
             : base(name, bank, suffix, volume)
         {
-            VolumeSuffix = getVelocitySuffix(name, volume);
+            VolumeSuffix = getVolumeSuffix(name, volume);
         }
 
-        private static string getVelocitySuffix(string name, int volume)
+        private static string getVolumeSuffix(string name, int volume)
         {
             switch (name)
             {
