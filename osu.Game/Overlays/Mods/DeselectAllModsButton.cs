@@ -18,15 +18,12 @@ namespace osu.Game.Overlays.Mods
     public partial class DeselectAllModsButton : ShearedButton, IKeyBindingHandler<GlobalAction>
     {
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
-        private readonly ShearedSearchTextBox searchTextBox;
 
         public DeselectAllModsButton(ModSelectOverlay modSelectOverlay)
             : base(ModSelectOverlay.BUTTON_WIDTH)
         {
             Text = CommonStrings.DeselectAll;
             Action = modSelectOverlay.DeselectAll;
-
-            searchTextBox = modSelectOverlay.SearchTextBox;
 
             selectedMods.BindTo(modSelectOverlay.SelectedMods);
         }
@@ -45,7 +42,7 @@ namespace osu.Game.Overlays.Mods
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat || e.Action != GlobalAction.DeselectAllMods || searchTextBox.HasFocus)
+            if (e.Repeat || e.Action != GlobalAction.DeselectAllMods)
                 return false;
 
             TriggerClick();
