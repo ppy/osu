@@ -141,9 +141,6 @@ namespace osu.Game.Localisation
         [Description(@"简体中文")]
         zh,
 
-        [Description(@"繁體中文")]
-        zh_tw,
-
         // Traditional Chinese (Hong Kong) is listed in web sources but has no associated localisations,
         // and was wrongly falling back to Simplified Chinese.
         // Can be revisited if localisations ever arrive.
