@@ -57,15 +57,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
 
             if (strong)
-                FlushPlayback();
+                StopAllPlayback();
 
             PlaySamples(new ISampleInfo[] { hitObject.CreateHitSampleInfo(sampleName) });
-        }
-
-        public void FlushPlayback()
-        {
-            foreach (var sound in HitSounds)
-                sound.Stop();
         }
 
         protected override void PlaySamples(ISampleInfo[] samples) => Schedule(() =>

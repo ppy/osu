@@ -113,16 +113,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void flushCenterTriggerSources()
         {
-            leftCentreTrigger.FlushPlayback();
-            rightCentreTrigger.FlushPlayback();
-            strongCentreTrigger.FlushPlayback();
+            leftCentreTrigger.StopAllPlayback();
+            rightCentreTrigger.StopAllPlayback();
+            strongCentreTrigger.StopAllPlayback();
         }
 
         private void flushRimTriggerSources()
         {
-            leftRimTrigger.FlushPlayback();
-            rightRimTrigger.FlushPlayback();
-            strongRimTrigger.FlushPlayback();
+            leftRimTrigger.StopAllPlayback();
+            rightRimTrigger.StopAllPlayback();
+            strongRimTrigger.StopAllPlayback();
         }
 
         public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)

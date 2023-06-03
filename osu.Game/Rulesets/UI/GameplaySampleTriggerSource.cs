@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.UI
 
         private int nextHitSoundIndex;
 
-        protected readonly Container<SkinnableSound> HitSounds;
+        private readonly Container<SkinnableSound> hitSounds;
 
         protected readonly AudioContainer AudioContainer;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.UI
 
             InternalChild = AudioContainer = new AudioContainer
             {
-                Child = HitSounds = new Container<SkinnableSound>
+                Child = hitSounds = new Container<SkinnableSound>
                 {
                     Name = "concurrent sample pool",
                     ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
@@ -69,6 +69,12 @@ namespace osu.Game.Rulesets.UI
             hitSound.Samples = samples;
             hitSound.Play();
         });
+
+        public void StopAllPlayback()
+        {
+            foreach (var sound in hitSounds)
+                sound.Stop();
+        }
 
         protected HitObject GetMostValidObject()
         {
@@ -132,7 +138,7 @@ namespace osu.Game.Rulesets.UI
 
         protected SkinnableSound GetNextSample()
         {
-            SkinnableSound hitSound = HitSounds[nextHitSoundIndex];
+            SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
 
             // round robin over available samples to allow for concurrent playback.
             nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
