@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     QueueMode = ServerAPIRoom.QueueMode.Value,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(item => TestMultiplayerClient.CreateMultiplayerPlaylistItem(item)).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
