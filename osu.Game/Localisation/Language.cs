@@ -122,8 +122,10 @@ namespace osu.Game.Localisation
         [Description(@"Svenska")]
         sv,
 
-        [Description(@"Тоҷикӣ")]
-        tg_tj,
+        // Tajik has no associated localisations yet, and is not supported on Windows versions <10.
+        // TODO: update language mapping in osu-resources to redirect tg-TJ to tg-Cyrl-TJ (which is supported on earlier Windows versions)
+        // [Description(@"Тоҷикӣ")]
+        // tg_tj,
 
         [Description(@"ไทย")]
         th,
