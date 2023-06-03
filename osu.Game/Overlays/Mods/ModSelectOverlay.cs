@@ -66,17 +66,17 @@ namespace osu.Game.Overlays.Mods
 
         public string SearchTerm
         {
-            get => SearchTextBox.Current.Value;
+            get => searchTextBox.Current.Value;
             set
             {
-                if (SearchTextBox.Current.Value == value)
+                if (searchTextBox.Current.Value == value)
                     return;
 
-                SearchTextBox.Current.Value = value;
+                searchTextBox.Current.Value = value;
             }
         }
 
-        public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
+        private ShearedSearchTextBox searchTextBox = null!;
 
         /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Mods
                     RelativeSizeAxes = Axes.X,
                     Height = ModsEffectDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
-                    Child = SearchTextBox = new ShearedSearchTextBox
+                    Child = searchTextBox = new ShearedSearchTextBox
                     {
                         HoldFocus = false,
                         Width = 300
@@ -249,7 +249,7 @@ namespace osu.Game.Overlays.Mods
             base.Hide();
 
             //We want to clear search for next user interaction with mod overlay
-            SearchTextBox.Current.Value = string.Empty;
+            searchTextBox.Current.Value = string.Empty;
         }
 
         private ModSettingChangeTracker? modSettingChangeTracker;
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays.Mods
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
-            SearchTextBox.Current.BindValueChanged(query =>
+            searchTextBox.Current.BindValueChanged(query =>
             {
                 foreach (var column in columnFlow.Columns)
                     column.SearchTerm = query.NewValue;
@@ -789,7 +789,7 @@ namespace osu.Game.Overlays.Mods
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
 
-                //Kill focus on SearchTextBox
+                //Kill focus on searchTextBox
                 Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
 
                 return true;
