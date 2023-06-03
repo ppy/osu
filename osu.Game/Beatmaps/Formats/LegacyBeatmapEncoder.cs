@@ -589,13 +589,13 @@ namespace osu.Game.Beatmaps.Formats
         {
             switch (sampleBank?.ToLowerInvariant())
             {
-                case "normal":
+                case HitSampleInfo.BANK_NORMAL:
                     return LegacySampleBank.Normal;
 
-                case "soft":
+                case HitSampleInfo.BANK_SOFT:
                     return LegacySampleBank.Soft;
 
-                case "drum":
+                case HitSampleInfo.BANK_DRUM:
                     return LegacySampleBank.Drum;
 
                 default:

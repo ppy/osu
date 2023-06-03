@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// </remarks>
     public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
-        public const string DEFAULT_BANK = "normal";
+        public const string DEFAULT_BANK = HitSampleInfo.BANK_NORMAL;
 
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {

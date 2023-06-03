@@ -1136,12 +1136,22 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Schedule(() =>
                     {
-                        Text = $"Encountered tablet error: \"{message}\"",
-                        Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.RedDark,
-                    }));
+                        Notifications.Post(new SimpleNotification
+                        {
+                            Text = $"Disabling tablet support due to error: \"{message}\"",
+                            Icon = FontAwesome.Solid.PenSquare,
+                            IconColour = Colours.RedDark,
+                        });
+
+                        // We only have one tablet handler currently.
+                        // The loop here is weakly guarding against a future where more than one is added.
+                        // If this is ever the case, this logic needs adjustment as it should probably only
+                        // disable the relevant tablet handler rather than all.
+                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
+                            tabletHandler.Enabled.Value = false;
+                    });
                 }
                 else if (notifyOnWarning)
                 {
