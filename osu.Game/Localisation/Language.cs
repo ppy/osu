@@ -47,8 +47,9 @@ namespace osu.Game.Localisation
         [Description(@"Suomi")]
         fi,
 
-        [Description(@"Filipino")]
-        fil,
+        // TODO: Doesn't work as appropriate satellite assemblies aren't copied from resources (see: https://github.com/ppy/osu/discussions/18851#discussioncomment-3042170)
+        // [Description(@"Filipino")]
+        // fil,
 
         [Description(@"français")]
         fr,
