@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -85,12 +86,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private bool checkStrongValidity(TaikoAction newAction, TaikoAction? lastAction, double timeBetweenActions)
         {
-            const double big_hit_window = 30;
-
             if (lastAction == null)
                 return false;
 
-            if (timeBetweenActions > big_hit_window)
+            if (timeBetweenActions > DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW)
                 return false;
 
             switch (newAction)
