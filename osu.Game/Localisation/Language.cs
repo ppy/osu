@@ -40,8 +40,9 @@ namespace osu.Game.Localisation
         [Description(@"español")]
         es,
 
-        [Description(@"فارسی")]
-        fa_ir,
+        // TODO: Requires Arabic glyphs to be added to resources (and possibly also RTL support).
+        // [Description(@"فارسی")]
+        // fa_ir,
 
         [Description(@"Suomi")]
         fi,
@@ -52,8 +53,9 @@ namespace osu.Game.Localisation
         [Description(@"français")]
         fr,
 
-        [Description(@"עברית")]
-        he,
+        // TODO: Requires Hebrew glyphs to be added to resources (and possibly also RTL support).
+        // [Description(@"עברית")]
+        // he,
 
         [Description(@"Hrvatski")]
         hr_hr,
@@ -103,8 +105,10 @@ namespace osu.Game.Localisation
         [Description(@"Русский")]
         ru,
 
-        [Description(@"සිංහල")]
-        si_lk,
+        // TODO: Requires Sinhala glyphs to be added to resources.
+        // Additionally, no translations available yet.
+        // [Description(@"සිංහල")]
+        // si_lk,
 
         [Description(@"Slovenčina")]
         sk,
