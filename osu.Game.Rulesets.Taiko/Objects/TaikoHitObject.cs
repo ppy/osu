@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public override HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
         {
             if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingSample)
-                return existingSample.With(newName: sampleName);
+                return new TaikoHitSampleInfo(sampleName, existingSample.Bank, existingSample.Suffix, existingSample.Volume);
 
             return new TaikoHitSampleInfo(sampleName);
         }
