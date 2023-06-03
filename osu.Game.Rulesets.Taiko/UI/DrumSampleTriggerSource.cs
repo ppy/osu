@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             hitSound.Play();
         });
 
-        public override void Play() => throw new InvalidOperationException(@"Use override with HitType parameter instead");
+        public override void Play() => throw new InvalidOperationException(@"Use Play(HitType, bool) override instead");
     }
 
     public enum SampleBalance
