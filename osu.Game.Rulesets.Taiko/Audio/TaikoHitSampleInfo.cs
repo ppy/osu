@@ -19,14 +19,14 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
         /// <summary>
-        /// A taiko-specific velocity suffix, currently applied automatically based on volume.
+        /// A taiko-specific volume suffix, currently applied automatically based on <see cref="HitSampleInfo.Volume"/>.
         /// </summary>
-        public readonly string VelocitySuffix;
+        public readonly string VolumeSuffix;
 
         public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
             : base(name, bank, suffix, volume)
         {
-            VelocitySuffix = getVelocitySuffix(name, volume);
+            VolumeSuffix = getVelocitySuffix(name, volume);
         }
 
         private static string getVelocitySuffix(string name, int volume)
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
                     case HIT_NORMAL:
                     case HIT_CLAP:
-                        lookupNames.Add($"Gameplay/taiko-{Name}{VelocitySuffix}");
+                        lookupNames.Add($"Gameplay/taiko-{Name}{VolumeSuffix}");
                         break;
                 }
 
@@ -103,6 +103,6 @@ namespace osu.Game.Rulesets.Taiko.Audio
         public override TaikoHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
             => new TaikoHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
-        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix, VelocitySuffix);
+        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix, VolumeSuffix);
     }
 }
