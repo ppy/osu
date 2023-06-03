@@ -147,7 +147,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                     foreach (var item in statisticItems)
                     {
                         var columnContent = new List<Drawable>();
-                        var dimensions = new List<Dimension>();
 
                         if (!hitEventsAvailable && item.RequiresHitEvents)
                         {
@@ -161,8 +160,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.Centre,
                         });
 
-                        dimensions.Add(new Dimension());
-
                         rows.Add(new GridContainer
                         {
                             Anchor = Anchor.TopCentre,
@@ -170,7 +167,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Content = new[] { columnContent.ToArray() },
-                            ColumnDimensions = dimensions.ToArray(),
+                            ColumnDimensions = new[] { new Dimension() },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
