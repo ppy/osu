@@ -62,6 +62,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createFreeModSelect();
 
+            AddStep("kill search bar focus", () => freeModSelectOverlay.SearchTextBox.KillFocus());
+
             AddStep("press ctrl+a", () => InputManager.Keys(PlatformAction.SelectAll));
             AddUntilStep("all mods selected", assertAllAvailableModsSelected);
 
