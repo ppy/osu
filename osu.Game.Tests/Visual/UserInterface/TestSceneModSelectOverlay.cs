@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -568,6 +569,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             createScreen();
             changeRuleset(0);
+
+            AddStep("kill search bar focus", () => modSelectOverlay.SearchTextBox.KillFocus());
 
             AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
             AddAssert("DT + HD selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
