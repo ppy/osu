@@ -295,8 +295,6 @@ namespace osu.Game.Overlays.Mods
                     column.SearchTerm = query.NewValue;
             }, true);
 
-            SearchTextBox.TakeFocus();
-
             // Start scrolled slightly to the right to give the user a sense that
             // there is more horizontal content available.
             ScheduleAfterChildren(() =>
@@ -502,6 +500,8 @@ namespace osu.Game.Overlays.Mods
             const double fade_in_duration = 400;
 
             base.PopIn();
+
+            SearchTextBox.TakeFocus();
 
             aboveColumnsContent
                 .FadeIn(fade_in_duration, Easing.OutQuint)
