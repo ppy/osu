@@ -9,12 +9,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public partial class TimelineArea : CompositeDrawable
     {
         public Timeline Timeline;
 
@@ -75,19 +77,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         {
                                             waveformCheckbox = new OsuCheckbox
                                             {
-                                                LabelText = "Waveform",
-                                                Current = { Value = true },
-                                            },
-                                            controlPointsCheckbox = new OsuCheckbox
-                                            {
-                                                LabelText = "Control Points",
+                                                LabelText = EditorStrings.TimelineWaveform,
                                                 Current = { Value = true },
                                             },
                                             ticksCheckbox = new OsuCheckbox
                                             {
-                                                LabelText = "Ticks",
+                                                LabelText = EditorStrings.TimelineTicks,
                                                 Current = { Value = true },
-                                            }
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = BeatmapsetsStrings.ShowStatsBpm,
+                                                Current = { Value = true },
+                                            },
                                         }
                                     }
                                 }

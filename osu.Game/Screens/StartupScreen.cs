@@ -10,7 +10,7 @@ namespace osu.Game.Screens
     /// <summary>
     /// A screen which is shown once as part of the startup procedure.
     /// </summary>
-    public abstract class StartupScreen : OsuScreen
+    public abstract partial class StartupScreen : OsuScreen
     {
         public override bool AllowBackButton => false;
 

@@ -21,7 +21,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -42,17 +46,18 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -62,9 +67,10 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
+    [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
         public const string OSU_PROTOCOL = "osu://";
 
@@ -76,6 +82,8 @@ namespace osu.Game
         public const string CLIENT_DATABASE_FILENAME = @"client.realm";
 
         public const int SAMPLE_CONCURRENCY = 6;
+
+        public const double SFX_STEREO_STRENGTH = 0.75;
 
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
@@ -89,8 +97,8 @@ namespace osu.Game
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
-        internal EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+        public virtual EndpointConfiguration CreateEndpoints() =>
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ExperimentalEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -151,9 +159,12 @@ namespace osu.Game
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
+        /// <summary>
+        /// The current ruleset selection for the local user.
+        /// </summary>
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         /// <summary>
         /// The current mod selection for the local user.
@@ -180,13 +191,16 @@ namespace osu.Game
 
         private RulesetConfigCache rulesetConfigCache;
 
-        private SpectatorClient spectatorClient;
+        protected SpectatorClient SpectatorClient { get; private set; }
 
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
+        private SoloStatisticsWatcher soloStatisticsWatcher;
 
         private RealmAccess realm;
+
+        protected SafeAreaContainer SafeAreaContainer { get; private set; }
 
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
@@ -253,8 +267,8 @@ namespace osu.Game
             largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
-            dependencies.CacheAs(this);
             dependencies.CacheAs(LocalConfig);
+            dependencies.CacheAs<IGameplaySettings>(LocalConfig);
 
             InitialiseFonts();
 
@@ -284,27 +298,28 @@ namespace osu.Game
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // Add after all the above cache operations as it depends on them.
-            AddInternal(difficultyCache);
+            base.Content.Add(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
-            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
+            dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
+            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
-            AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
-            BeatmapManager.ProcessBeatmap = args => beatmapUpdater.Process(args.beatmapSet, !args.isBatch);
+            BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
 
             dependencies.Cache(userCache = new UserLookupCache());
-            AddInternal(userCache);
+            base.Content.Add(userCache);
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
-            AddInternal(beatmapCache);
+            base.Content.Add(beatmapCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
-            AddInternal(scorePerformanceManager);
+            base.Content.Add(scorePerformanceManager);
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
@@ -331,17 +346,28 @@ namespace osu.Game
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
-                AddInternal(apiAccess);
+                base.Content.Add(apiAccess);
 
-            AddInternal(spectatorClient);
-            AddInternal(MultiplayerClient);
-            AddInternal(metadataClient);
+            base.Content.Add(SpectatorClient);
+            base.Content.Add(MultiplayerClient);
+            base.Content.Add(metadataClient);
+            base.Content.Add(soloStatisticsWatcher);
 
-            AddInternal(rulesetConfigCache);
+            base.Content.Add(rulesetConfigCache);
+
+            PreviewTrackManager previewTrackManager;
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
+            base.Content.Add(previewTrackManager);
+
+            base.Content.Add(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
+
+            MusicController.TrackChanged += onTrackChanged;
+            base.Content.Add(beatmapClock);
 
             GlobalActionContainer globalBindings;
 
-            base.Content.Add(new SafeAreaContainer
+            base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
@@ -363,16 +389,6 @@ namespace osu.Game
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
-
-            PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
-            Add(previewTrackManager);
-
-            AddInternal(MusicController = new MusicController());
-            dependencies.CacheAs(MusicController);
-
-            MusicController.TrackChanged += onTrackChanged;
-            AddInternal(beatmapClock);
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
@@ -521,6 +537,29 @@ namespace osu.Game
         /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
         public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
+            // One would think that this could be moved to the `OsuGameDesktop` class, but doing so means that
+            // OsuGameTestScenes will not show any input options (as they are based on OsuGame not OsuGameDesktop).
+            //
+            // This in turn makes it hard for ruleset creators to adjust input settings while testing their ruleset
+            // within the test browser interface.
+            if (RuntimeInfo.IsDesktop)
+            {
+                switch (handler)
+                {
+                    case ITabletHandler th:
+                        return new TabletSettings(th);
+
+                    case MouseHandler mh:
+                        return new MouseSettings(mh);
+
+                    case JoystickHandler jh:
+                        return new JoystickSettings(jh);
+
+                    case TouchHandler th:
+                        return new TouchSettings(th);
+                }
+            }
+
             switch (handler)
             {
                 case MidiHandler:
@@ -570,7 +609,7 @@ namespace osu.Game
 
             try
             {
-                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                foreach (ModType type in Enum.GetValues<ModType>())
                 {
                     dict[type] = instance.GetModsFor(type)
                                          // Rulesets should never return null mods, but let's be defensive just in case.
@@ -586,10 +625,22 @@ namespace osu.Game
                 return;
             }
 
-            if (!SelectedMods.Disabled)
-                SelectedMods.Value = Array.Empty<Mod>();
-
             AvailableMods.Value = dict;
+
+            if (SelectedMods.Disabled)
+                return;
+
+            var convertedMods = SelectedMods.Value.Select(mod =>
+            {
+                var newMod = instance.CreateModFromAcronym(mod.Acronym);
+                newMod?.CopyCommonSettingsFrom(mod);
+                return newMod;
+            }).Where(newMod => newMod != null).ToList();
+
+            if (!ModUtils.CheckValidForGameplay(convertedMods, out var invalid))
+                invalid.ForEach(newMod => convertedMods.Remove(newMod));
+
+            SelectedMods.Value = convertedMods;
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }

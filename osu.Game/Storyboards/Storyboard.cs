@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -31,7 +32,7 @@ namespace osu.Game.Storyboards
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
         /// </remarks>
-        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.StartTime).FirstOrDefault()?.StartTime;
+        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).MinBy(e => e.StartTime)?.StartTime;
 
         /// <summary>
         /// Across all layers, find the latest point in time that a storyboard element ends at.
@@ -41,7 +42,7 @@ namespace osu.Game.Storyboards
         /// This iterates all elements and as such should be used sparingly or stored locally.
         /// Videos and samples return StartTime as their EndTIme.
         /// </remarks>
-        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.GetEndTime()).LastOrDefault()?.GetEndTime();
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).MaxBy(e => e.GetEndTime())?.GetEndTime();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
@@ -89,12 +90,31 @@ namespace osu.Game.Storyboards
         public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
+        private static readonly string[] image_extensions = { @".png", @".jpg" };
+
         public Texture? GetTextureFromPath(string path, TextureStore textureStore)
         {
-            string? storyboardPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            string? resolvedPath = null;
 
-            if (!string.IsNullOrEmpty(storyboardPath))
-                return textureStore.Get(storyboardPath);
+            if (Path.HasExtension(path))
+            {
+                resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            }
+            else
+            {
+                // Just doing this extension logic locally here for simplicity.
+                //
+                // A more "sane" path may be to use the ISkinSource.GetTexture path (which will use the extensions of the underlying TextureStore),
+                // but comes with potential complexity (what happens if the user has beatmap skins disabled?).
+                foreach (string ext in image_extensions)
+                {
+                    if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(resolvedPath))
+                return textureStore.Get(resolvedPath);
 
             return null;
         }

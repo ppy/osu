@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class HitObjectArea : SkinReloadableDrawable
+    public partial class HitObjectArea : SkinReloadableDrawable
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
         public readonly HitObjectContainer HitObjectContainer;

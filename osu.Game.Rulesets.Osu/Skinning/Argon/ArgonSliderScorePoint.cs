@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSliderScorePoint : CircularContainer
+    public partial class ArgonSliderScorePoint : CircularContainer
     {
         private Bindable<Color4> accentColour = null!;
 

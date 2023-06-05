@@ -15,7 +15,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class DifficultyAdjustSettingsControl : SettingsItem<float?>
+    public partial class DifficultyAdjustSettingsControl : SettingsItem<float?>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             isInternalChange = false;
         }
 
-        private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
+        private partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    new OsuSliderBar<float>
+                    new RoundedSliderBar<float>
                     {
                         RelativeSizeAxes = Axes.X,
                         Current = currentNumber,
@@ -126,8 +126,7 @@ namespace osu.Game.Rulesets.Mods
                 get => this;
                 set
                 {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
+                    ArgumentNullException.ThrowIfNull(value);
 
                     if (currentBound != null) UnbindFrom(currentBound);
                     BindTo(currentBound = value);

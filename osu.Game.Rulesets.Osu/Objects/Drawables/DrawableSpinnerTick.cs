@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSpinnerTick : DrawableOsuHitObject
+    public partial class DrawableSpinnerTick : DrawableOsuHitObject
     {
         public override bool DisplayResult => false;
 
@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
-
-        public override double MaximumJudgementOffset => DrawableSpinner.HitObject.Duration;
 
         /// <summary>
         /// Apply a judgement result.

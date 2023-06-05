@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen
+    public partial class GameplayScreen : BeatmapInfoScreen
     {
         private readonly BindableBool warmup = new BindableBool();
 
@@ -232,7 +232,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private class ChromaArea : CompositeDrawable
+        private partial class ChromaArea : CompositeDrawable
         {
             [Resolved]
             private LadderInfo ladder { get; set; }

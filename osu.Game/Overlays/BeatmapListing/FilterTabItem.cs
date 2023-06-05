@@ -17,10 +17,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class FilterTabItem<T> : TabItem<T>
+    public partial class FilterTabItem<T> : TabItem<T>
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        protected OverlayColourProvider ColourProvider { get; private set; }
 
         private OsuSpriteText text;
 
@@ -52,38 +52,42 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             base.LoadComplete();
 
-            updateState();
+            UpdateState();
             FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated() => UpdateState();
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated() => UpdateState();
 
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
         /// </summary>
         protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
-        private void updateState()
+        protected virtual bool HighlightOnHoverWhenActive => false;
+
+        protected virtual void UpdateState()
         {
-            text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
-            text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
+            bool highlightHover = IsHovered && (!Active.Value || HighlightOnHoverWhenActive);
+
+            text.FadeColour(highlightHover ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
+            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
         }
 
-        protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+        protected virtual Color4 GetStateColour() => Active.Value ? ColourProvider.Content1 : ColourProvider.Light2;
     }
 }

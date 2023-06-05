@@ -62,11 +62,13 @@ namespace osu.Game.Rulesets.Difficulty
                                                 .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
                                                 .ToDictionary(pair => pair.hitResult, pair => pair.count);
                 perfectPlay.Statistics = statistics;
+                perfectPlay.MaximumStatistics = statistics;
 
                 // calculate total score
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.Mods.Value = perfectPlay.Mods;
-                perfectPlay.TotalScore = (long)scoreProcessor.ComputeScore(ScoringMode.Standardised, perfectPlay);
+                scoreProcessor.ApplyBeatmap(playableBeatmap);
+                perfectPlay.TotalScore = scoreProcessor.MaximumTotalScore;
 
                 // compute rank achieved
                 // default to SS, then adjust the rank with mods

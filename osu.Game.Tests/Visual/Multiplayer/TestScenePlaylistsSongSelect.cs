@@ -24,7 +24,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsSongSelect : OnlinePlayTestScene
+    public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
         private BeatmapManager manager;
 
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private class TestPlaylistsSongSelect : PlaylistsSongSelect
+        private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
 

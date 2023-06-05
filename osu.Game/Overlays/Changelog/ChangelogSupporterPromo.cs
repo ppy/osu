@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogSupporterPromo : CompositeDrawable
+    public partial class ChangelogSupporterPromo : CompositeDrawable
     {
         private const float image_container_width = 164;
         private const float heart_size = 75;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding
             {
                 Vertical = 20,
-                Horizontal = 50,
+                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
             };
         }
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Changelog
                                     Direction = FillDirection.Vertical,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Padding = new MarginPadding { Right = 50 + image_container_width },
+                                    Padding = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING + image_container_width },
                                     Children = new Drawable[]
                                     {
                                         new OsuSpriteText
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Changelog
             supportLinkText.AddText(" today!");
         }
 
-        private class SupporterPromoLinkFlowContainer : LinkFlowContainer
+        private partial class SupporterPromoLinkFlowContainer : LinkFlowContainer
         {
             public SupporterPromoLinkFlowContainer(Action<SpriteText> defaultCreationParameters)
                 : base(defaultCreationParameters)
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Changelog
 
             protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new SupporterPromoLinkCompiler(textPart);
 
-            private class SupporterPromoLinkCompiler : DrawableLinkCompiler
+            private partial class SupporterPromoLinkCompiler : DrawableLinkCompiler
             {
                 public SupporterPromoLinkCompiler(ITextPart part)
                     : base(part)

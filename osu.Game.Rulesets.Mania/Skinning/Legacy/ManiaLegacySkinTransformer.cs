@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class ManiaLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasKeyTexture.Value;
+
         /// <summary>
         /// Mapping of <see cref="HitResult"/> to their corresponding
         /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
@@ -72,14 +74,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             });
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
-                case ManiaSkinComponent maniaComponent:
+                case ManiaSkinComponentLookup maniaComponent:
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 
@@ -118,11 +120,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new LegacyStageForeground();
 
                         default:
-                            throw new UnsupportedSkinComponentException(component);
+                            throw new UnsupportedSkinComponentException(lookup);
                     }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         private Drawable getResult(HitResult result)

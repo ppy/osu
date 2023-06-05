@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -23,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     {
         private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE * 0.5f;
 
-        private CheckOffscreenObjects check;
+        private CheckOffscreenObjects check = null!;
 
         [SetUp]
         public void Setup()

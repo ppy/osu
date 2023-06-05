@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectator : ScreenTestScene
+    public partial class TestSceneSpectator : ScreenTestScene
     {
         private readonly APIUser streamingUser = new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFramesPurgedBeforeEndingPlay()
         {
-            AddStep("begin playing", () => spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), new Score()));
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), new Score()));
 
             AddStep("send frames and finish play", () =>
             {
@@ -388,7 +388,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <summary>
         /// Used for the sole purpose of adding <see cref="TestSpectatorClient"/> as a resolvable dependency.
         /// </summary>
-        private class DependenciesScreen : OsuScreen
+        private partial class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(SpectatorClient))]
             public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();

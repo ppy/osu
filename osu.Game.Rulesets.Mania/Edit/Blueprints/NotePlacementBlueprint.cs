@@ -12,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class NotePlacementBlueprint : ManiaPlacementBlueprint<Note>
+    public partial class NotePlacementBlueprint : ManiaPlacementBlueprint<Note>
     {
         private readonly EditNotePiece piece;
 

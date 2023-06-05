@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownQuoteBlock : MarkdownQuoteBlock
+    public partial class OsuMarkdownQuoteBlock : MarkdownQuoteBlock
     {
         public OsuMarkdownQuoteBlock(QuoteBlock quoteBlock)
             : base(quoteBlock)
@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             });
         }
 
-        private class QuoteBackground : Box
+        private partial class QuoteBackground : Box
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

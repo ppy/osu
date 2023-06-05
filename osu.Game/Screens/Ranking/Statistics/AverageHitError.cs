@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Displays the unstable rate statistic for a given play.
     /// </summary>
-    public class AverageHitError : SimpleStatisticItem<double?>
+    public partial class AverageHitError : SimpleStatisticItem<double?>
     {
         /// <summary>
         /// Creates and computes an <see cref="AverageHitError"/> statistic.

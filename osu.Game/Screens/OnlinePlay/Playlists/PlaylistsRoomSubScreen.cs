@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsRoomSubScreen : RoomSubScreen
+    public partial class PlaylistsRoomSubScreen : RoomSubScreen
     {
         public override string Title { get; }
 

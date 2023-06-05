@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class CentreMarker : CompositeDrawable
+    public partial class CentreMarker : CompositeDrawable
     {
         private const float triangle_width = 15;
         private const float triangle_height = 10;

@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledDropdown : OsuTestScene
+    public partial class TestSceneLabelledDropdown : OsuTestScene
     {
         [Test]
         public void TestLabelledDropdown()

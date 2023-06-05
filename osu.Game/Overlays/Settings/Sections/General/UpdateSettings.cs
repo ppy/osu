@@ -19,7 +19,7 @@ using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class UpdateSettings : SettingsSubsection
+    public partial class UpdateSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
@@ -70,6 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.OpenOsuFolder,
+                    Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
 

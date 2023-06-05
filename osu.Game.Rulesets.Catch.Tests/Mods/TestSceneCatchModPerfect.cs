@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public class TestSceneCatchModPerfect : ModPerfectTestScene
+    public partial class TestSceneCatchModPerfect : ModPerfectTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 

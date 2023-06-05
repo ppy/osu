@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneCatchReplay : TestSceneCatchPlayer
+    public partial class TestSceneCatchReplay : TestSceneCatchPlayer
     {
         protected override bool Autoplay => true;
 

@@ -15,8 +15,20 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAutoplay : OsuModTestScene
+    public partial class TestSceneOsuModAutoplay : OsuModTestScene
     {
+        [Test]
+        public void TestCursorPositionStoredToJudgement()
+        {
+            CreateModTest(new ModTestData
+            {
+                Autoplay = true,
+                PassCondition = () =>
+                    Player.ScoreProcessor.JudgedHits >= 1
+                    && Player.ScoreProcessor.HitEvents.Any(e => e.Position != null)
+            });
+        }
+
         [Test]
         public void TestSpmUnaffectedByRateAdjust()
             => runSpmTest(new OsuModDaycore

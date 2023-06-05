@@ -9,7 +9,7 @@ namespace osu.Game.Graphics
     /// <summary>
     /// A simple container which blocks input events from travelling through it.
     /// </summary>
-    public class InputBlockingContainer : Container
+    public partial class InputBlockingContainer : Container
     {
         protected override bool OnHover(HoverEvent e) => true;
 

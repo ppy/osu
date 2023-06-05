@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers
     ///
     /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
-    public class BeatSyncedContainer : Container
+    public partial class BeatSyncedContainer : Container
     {
         private int lastBeat;
 
@@ -114,7 +114,7 @@ namespace osu.Game.Graphics.Containers
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)

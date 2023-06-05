@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : HitObjectArea
+    public partial class ColumnHitObjectArea : HitObjectArea
     {
         public readonly Container Explosions;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
                 },
-                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
                     Depth = 1

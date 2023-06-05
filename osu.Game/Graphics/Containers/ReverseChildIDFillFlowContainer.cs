@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class ReverseChildIDFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
+    public partial class ReverseChildIDFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
         protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
     }

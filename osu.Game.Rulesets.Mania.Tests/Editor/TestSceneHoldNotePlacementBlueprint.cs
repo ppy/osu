@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneHoldNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
+    public partial class TestSceneHoldNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHoldNote((HoldNote)hitObject);
         protected override PlacementBlueprint CreateBlueprint() => new HoldNotePlacementBlueprint();

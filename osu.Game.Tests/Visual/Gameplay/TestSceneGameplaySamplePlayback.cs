@@ -14,7 +14,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplaySamplePlayback : PlayerTestScene
+    public partial class TestSceneGameplaySamplePlayback : PlayerTestScene
     {
         [Test]
         public void TestAllSamplesStopDuringSeek()

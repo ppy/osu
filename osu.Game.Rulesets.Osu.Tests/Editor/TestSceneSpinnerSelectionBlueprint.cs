@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSpinnerSelectionBlueprint : SelectionBlueprintTestScene
+    public partial class TestSceneSpinnerSelectionBlueprint : SelectionBlueprintTestScene
     {
         public TestSceneSpinnerSelectionBlueprint()
         {

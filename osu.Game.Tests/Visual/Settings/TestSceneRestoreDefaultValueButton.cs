@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneRestoreDefaultValueButton : OsuTestScene
+    public partial class TestSceneRestoreDefaultValueButton : OsuTestScene
     {
         [Resolved]
         private OsuColour colours { get; set; }

@@ -12,7 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class PerformanceTable : UserBasedTable
+    public partial class PerformanceTable : UserBasedTable
     {
         public PerformanceTable(int page, IReadOnlyList<UserStatistics> rankings)
             : base(page, rankings)

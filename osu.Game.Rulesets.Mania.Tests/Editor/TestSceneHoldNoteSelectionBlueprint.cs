@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneHoldNoteSelectionBlueprint : ManiaSelectionBlueprintTestScene
+    public partial class TestSceneHoldNoteSelectionBlueprint : ManiaSelectionBlueprintTestScene
     {
         public TestSceneHoldNoteSelectionBlueprint()
             : base(4)

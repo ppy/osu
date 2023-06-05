@@ -3,14 +3,17 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
@@ -19,34 +22,40 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneTimingScreen : EditorClockTestScene
+    public partial class TestSceneTimingScreen : EditorClockTestScene
     {
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private TimingScreen timingScreen;
+        private EditorBeatmap editorBeatmap;
 
         protected override bool ScrollUsingMouseWheel => false;
-
-        public TestSceneTimingScreen()
-        {
-            editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
-        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
             Beatmap.Disabled = true;
+        }
 
-            Child = timingScreen = new TimingScreen
+        private void reloadEditorBeatmap()
+        {
+            editorBeatmap = new EditorBeatmap(Beatmap.Value.GetPlayableBeatmap(Ruleset.Value));
+
+            Child = new DependencyProvidingContainer
             {
-                State = { Value = Visibility.Visible },
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(EditorBeatmap), editorBeatmap),
+                    (typeof(IBeatSnapProvider), editorBeatmap)
+                },
+                Child = timingScreen = new TimingScreen
+                {
+                    State = { Value = Visibility.Visible },
+                },
             };
         }
 
@@ -55,7 +64,9 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("Stop clock", () => EditorClock.Stop());
 
-            AddUntilStep("wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
+            AddStep("Reload Editor Beatmap", reloadEditorBeatmap);
+
+            AddUntilStep("Wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
         }
 
         [Test]
@@ -90,6 +101,37 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Seek to later", () => EditorClock.Seek(80000));
             AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 69670);
+        }
+
+        [Test]
+        public void TestScrollControlGroupIntoView()
+        {
+            AddStep("Add many control points", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+
+                editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint());
+
+                for (int i = 0; i < 100; i++)
+                {
+                    editorBeatmap.ControlPointInfo.Add((i + 1) * 1000, new EffectControlPoint
+                    {
+                        KiaiMode = Convert.ToBoolean(i % 2),
+                    });
+                }
+            });
+
+            AddStep("Select first effect point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<EffectRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("Seek to beginning", () => EditorClock.Seek(0));
+
+            AddStep("Seek to last point", () => EditorClock.Seek(101 * 1000));
+
+            AddUntilStep("Scrolled to end", () => timingScreen.ChildrenOfType<OsuScrollContainer>().First().IsScrolledToEnd());
         }
 
         protected override void Dispose(bool isDisposing)

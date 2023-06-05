@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,9 +10,9 @@ using osu.Game.Overlays.Profile.Header.Components;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfilePreviousUsernames : OsuTestScene
+    public partial class TestSceneUserProfilePreviousUsernames : OsuTestScene
     {
-        private PreviousUsernames container;
+        private PreviousUsernames container = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Is hidden", () => container.Alpha == 0);
         }
 
-        private static readonly APIUser[] users =
+        private static readonly APIUser?[] users =
         {
             new APIUser { Id = 1, PreviousUsernames = new[] { "username1" } },
             new APIUser { Id = 2, PreviousUsernames = new[] { "longusername", "longerusername" } },

@@ -11,7 +11,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapRulesetSelector : OverlayRulesetSelector
+    public partial class BeatmapRulesetSelector : OverlayRulesetSelector
     {
         private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
 

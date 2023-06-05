@@ -16,7 +16,7 @@ using osu.Game.Overlays.BeatmapListing;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBeatmapListingCardSizeTabControl : OsuTestScene
+    public partial class TestSceneBeatmapListingCardSizeTabControl : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

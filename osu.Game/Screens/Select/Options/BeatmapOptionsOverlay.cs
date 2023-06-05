@@ -19,7 +19,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
+    public partial class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_duration = 500;
         private const float x_position = 0.2f;

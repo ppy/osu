@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressCompletionNotification : SimpleNotification
+    public partial class ProgressCompletionNotification : SimpleNotification
     {
         public ProgressCompletionNotification()
         {

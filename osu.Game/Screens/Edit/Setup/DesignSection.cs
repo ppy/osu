@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Globalization;
 using System.Linq;
@@ -17,18 +15,18 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class DesignSection : SetupSection
+    internal partial class DesignSection : SetupSection
     {
-        protected LabelledSwitchButton EnableCountdown;
+        protected LabelledSwitchButton EnableCountdown = null!;
 
-        protected FillFlowContainer CountdownSettings;
-        protected LabelledEnumDropdown<CountdownType> CountdownSpeed;
-        protected LabelledNumberBox CountdownOffset;
+        protected FillFlowContainer CountdownSettings = null!;
+        protected LabelledEnumDropdown<CountdownType> CountdownSpeed = null!;
+        protected LabelledNumberBox CountdownOffset = null!;
 
-        private LabelledSwitchButton widescreenSupport;
-        private LabelledSwitchButton epilepsyWarning;
-        private LabelledSwitchButton letterboxDuringBreaks;
-        private LabelledSwitchButton samplesMatchPlaybackRate;
+        private LabelledSwitchButton widescreenSupport = null!;
+        private LabelledSwitchButton epilepsyWarning = null!;
+        private LabelledSwitchButton letterboxDuringBreaks = null!;
+        private LabelledSwitchButton samplesMatchPlaybackRate = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
@@ -55,7 +53,7 @@ namespace osu.Game.Screens.Edit.Setup
                         {
                             Label = EditorSetupStrings.CountdownSpeed,
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
-                            Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
+                            Items = Enum.GetValues<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {

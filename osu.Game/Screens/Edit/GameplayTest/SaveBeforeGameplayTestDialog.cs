@@ -9,7 +9,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
-    public class SaveBeforeGameplayTestDialog : PopupDialog
+    public partial class SaveBeforeGameplayTestDialog : PopupDialog
     {
         public SaveBeforeGameplayTestDialog(Action saveAndPreview)
         {

@@ -10,7 +10,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneOsuHitObjectSamples : HitObjectSampleTest
+    public partial class TestSceneOsuHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

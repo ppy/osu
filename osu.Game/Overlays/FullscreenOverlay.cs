@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
+    public abstract partial class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
         public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
@@ -56,6 +56,7 @@ namespace osu.Game.Overlays
             {
                 Colour = Color4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
+                Hollow = true,
                 Radius = 10
             };
 
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.4f, WaveContainer.APPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
         }
 
         protected override void PopOut()

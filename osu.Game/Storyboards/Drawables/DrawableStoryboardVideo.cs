@@ -11,7 +11,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardVideo : CompositeDrawable
+    public partial class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
 
@@ -58,7 +58,11 @@ namespace osu.Game.Storyboards.Drawables
             using (drawableVideo.BeginAbsoluteSequence(Video.StartTime))
             {
                 Schedule(() => drawableVideo.PlaybackPosition = Time.Current - Video.StartTime);
+
                 drawableVideo.FadeIn(500);
+
+                using (drawableVideo.BeginDelayedSequence(drawableVideo.Duration - 500))
+                    drawableVideo.FadeOut(500);
             }
         }
     }

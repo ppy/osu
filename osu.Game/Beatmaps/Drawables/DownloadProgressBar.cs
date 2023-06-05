@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DownloadProgressBar : CompositeDrawable
+    public partial class DownloadProgressBar : CompositeDrawable
     {
         private readonly ProgressBar progressBar;
         private readonly BeatmapDownloadTracker downloadTracker;

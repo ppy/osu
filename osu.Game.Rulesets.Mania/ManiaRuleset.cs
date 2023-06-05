@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
-        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new ManiaHealthProcessor(drainStartTime, 0.5);
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new ManiaHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
@@ -245,6 +245,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
+                        new ModAccuracyChallenge(),
                     };
 
                 case ModType.Conversion:
@@ -388,41 +389,23 @@ namespace osu.Game.Rulesets.Mania
             return base.GetDisplayNameForHitResult(result);
         }
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticRow
+            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
             {
-                Columns = new[]
-                {
-                    new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    }),
-                }
-            },
-            new StatisticRow
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y
+            }),
+            new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
             {
-                Columns = new[]
-                {
-                    new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 250
-                    }, true),
-                }
-            },
-            new StatisticRow
+                RelativeSizeAxes = Axes.X,
+                Height = 250
+            }, true),
+            new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
             {
-                Columns = new[]
-                {
-                    new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                    {
-                        new AverageHitError(score.HitEvents),
-                        new UnstableRate(score.HitEvents)
-                    }), true)
-                }
-            }
+                new AverageHitError(score.HitEvents),
+                new UnstableRate(score.HitEvents)
+            }), true)
         };
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()

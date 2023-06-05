@@ -20,7 +20,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : OsuClickableContainer
+    public partial class BeatmapOptionsButton : OsuClickableContainer
     {
         private const float width = 130;
 

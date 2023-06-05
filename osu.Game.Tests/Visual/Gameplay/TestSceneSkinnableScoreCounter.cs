@@ -10,13 +10,14 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
+    public partial class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
     {
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor = TestGameplayState.Create(new OsuRuleset()).ScoreProcessor;
 
         protected override Drawable CreateDefaultImplementation() => new DefaultScoreCounter();
         protected override Drawable CreateLegacyImplementation() => new LegacyScoreCounter();

@@ -12,7 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenu : OsuMenu
+    public partial class OsuContextMenu : OsuMenu
     {
         private const int fade_duration = 250;
 

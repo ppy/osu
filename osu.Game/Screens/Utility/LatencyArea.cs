@@ -17,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Utility
 {
     [Cached]
-    public class LatencyArea : CompositeDrawable, IProvideCursor
+    public partial class LatencyArea : CompositeDrawable, IProvideCursor
     {
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Utility
 
         public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
-        public CursorContainer? MenuCursor { get; private set; }
+        public CursorContainer? Cursor { get; private set; }
 
         public bool ProvidingUserCursor => IsActiveArea.Value;
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            MenuCursor = new LatencyCursorContainer
+                            Cursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            MenuCursor = new LatencyCursorContainer
+                            Cursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            MenuCursor = new LatencyCursorContainer
+                            Cursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },

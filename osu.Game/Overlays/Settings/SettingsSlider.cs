@@ -10,14 +10,14 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsSlider<T> : SettingsSlider<T, OsuSliderBar<T>>
+    public partial class SettingsSlider<T> : SettingsSlider<T, RoundedSliderBar<T>>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
     }
 
-    public class SettingsSlider<TValue, TSlider> : SettingsItem<TValue>
+    public partial class SettingsSlider<TValue, TSlider> : SettingsItem<TValue>
         where TValue : struct, IEquatable<TValue>, IComparable<TValue>, IConvertible
-        where TSlider : OsuSliderBar<TValue>, new()
+        where TSlider : RoundedSliderBar<TValue>, new()
     {
         protected override Drawable CreateControl() => new TSlider
         {

@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneExpandingContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneExpandingContainer : OsuManualInputManagerTestScene
     {
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("container still expanded", () => container.Expanded.Value);
         }
 
-        private class TestExpandingContainer : ExpandingContainer
+        private partial class TestExpandingContainer : ExpandingContainer
         {
             public TestExpandingContainer()
                 : base(120, 250)

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,14 +18,14 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class PreviousUsernames : CompositeDrawable
+    public partial class PreviousUsernames : CompositeDrawable
     {
         private const int duration = 200;
         private const int margin = 10;
         private const int width = 310;
         private const int move_offset = 15;
 
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
         private readonly TextFlowContainer text;
         private readonly Box background;
@@ -109,11 +107,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<APIUser> user)
+        private void onUserChanged(ValueChangedEvent<APIUser?> user)
         {
             text.Text = string.Empty;
 
-            string[] usernames = user.NewValue?.PreviousUsernames;
+            string[]? usernames = user.NewValue?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {
@@ -147,9 +145,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             this.MoveToY(0, duration, Easing.OutQuint);
         }
 
-        private class HoverIconContainer : Container
+        private partial class HoverIconContainer : Container
         {
-            public Action ActivateHover;
+            public Action? ActivateHover;
 
             public HoverIconContainer()
             {

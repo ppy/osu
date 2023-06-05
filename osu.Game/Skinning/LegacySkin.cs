@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -104,7 +105,7 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
                 case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
+                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
@@ -136,6 +137,10 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
 
                 case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
@@ -183,6 +188,16 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
+
+                    if (existing.NoteBodyStyle != null)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(existing.NoteBodyStyle.Value));
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.Stretch));
+
+                    return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.RepeatBottom));
 
                 case LegacyManiaSkinConfigurationLookups.NoteImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
@@ -276,7 +291,7 @@ namespace osu.Game.Skinning
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         private IBindable<string>? getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
-            => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
+            => source.ImageLookups.TryGetValue(lookup, out string? image) ? new Bindable<string>(image) : null;
 
         private IBindable<TValue>? legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
             where TValue : notnull
@@ -297,7 +312,7 @@ namespace osu.Game.Skinning
         {
             try
             {
-                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString() ?? string.Empty, out string? val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
                     // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).
@@ -321,18 +336,22 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(component) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    switch (target.Target)
+                case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
+
+                    switch (containerLookup.Target)
                     {
-                        case SkinnableTarget.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
@@ -372,35 +391,30 @@ namespace osu.Game.Skinning
                                     new BarHitErrorMeter(),
                                 }
                             };
-
-                            return skinnableTargetWrapper;
                     }
 
                     return null;
 
-                case GameplaySkinComponent<HitResult> resultComponent:
-                    // TODO: this should be inside the judgement pieces.
-                    Func<Drawable?> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
-                    if (createDrawable() != null)
+                    if (getJudgementAnimation(resultComponent.Component) != null)
                     {
+                        // TODO: this should be inside the judgement pieces.
+                        Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
+
                         var particle = getParticleTexture(resultComponent.Component);
 
                         if (particle != null)
                             return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, particle);
-                        else
-                            return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
+
+                        return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
                     return null;
-
-                case SkinnableSprite.SpriteComponent sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
-
-                default:
-                    throw new UnsupportedSkinComponentException(component);
             }
+
+            return null;
         }
 
         private Texture? getParticleTexture(HitResult result)

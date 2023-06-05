@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownHeading : MarkdownHeading
+    public partial class OsuMarkdownHeading : MarkdownHeading
     {
         private readonly int level;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
-        private class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
+        private partial class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
         {
             public float FontSize;
             public FontWeight FontWeight;

@@ -15,7 +15,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentMatchChatDisplay : StandAloneChatDisplay
+    public partial class TournamentMatchChatDisplay : StandAloneChatDisplay
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager(api) { HighPollRate = { Value = true } });
+                        AddInternal(manager = new ChannelManager(api));
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Components
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
 
-        public class MatchChannel : StandAloneDrawableChannel
+        public partial class MatchChannel : StandAloneDrawableChannel
         {
             public MatchChannel(Channel channel)
                 : base(channel)
@@ -84,7 +84,7 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        protected class MatchMessage : StandAloneMessage
+        protected partial class MatchMessage : StandAloneMessage
         {
             public MatchMessage(Message message)
                 : base(message)

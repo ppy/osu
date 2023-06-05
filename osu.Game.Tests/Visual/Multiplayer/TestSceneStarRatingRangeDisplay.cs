@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
+    public partial class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {

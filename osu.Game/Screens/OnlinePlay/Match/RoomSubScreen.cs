@@ -35,7 +35,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 namespace osu.Game.Screens.OnlinePlay.Match
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
+    public abstract partial class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         [Cached(typeof(IBindable<PlaylistItem>))]
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -517,7 +517,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
 
-        public class UserModSelectButton : PurpleTriangleButton, IKeyBindingHandler<GlobalAction>
+        public partial class UserModSelectButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
         {
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {

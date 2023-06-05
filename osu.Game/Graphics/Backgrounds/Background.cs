@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// <summary>
     /// A background which offers blurring via a <see cref="BufferedContainer"/> on demand.
     /// </summary>
-    public class Background : CompositeDrawable, IEquatable<Background>
+    public partial class Background : CompositeDrawable, IEquatable<Background>
     {
         public readonly Sprite Sprite;
 

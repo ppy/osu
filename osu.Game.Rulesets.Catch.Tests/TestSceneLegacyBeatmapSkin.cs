@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
+    public partial class TestSceneLegacyBeatmapSkin : LegacyBeatmapSkinColourTest
     {
         [Resolved]
         private AudioManager audio { get; set; }
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new CatchExposedPlayer(userHasCustomColours);
 
-        private class CatchExposedPlayer : ExposedPlayer
+        private partial class CatchExposedPlayer : ExposedPlayer
         {
             public CatchExposedPlayer(bool userHasCustomColours)
                 : base(userHasCustomColours)

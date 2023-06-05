@@ -11,7 +11,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class HUDSettings : SettingsSubsection
+    public partial class HUDSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.HUDHeader;
 

@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneStartupBeatmapSetDisplay : OsuGameTestScene
+    public partial class TestSceneStartupBeatmapSetDisplay : OsuGameTestScene
     {
         private const int requested_beatmap_set_id = 1;
 

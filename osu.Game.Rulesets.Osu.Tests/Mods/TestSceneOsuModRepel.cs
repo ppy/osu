@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModRepel : OsuModTestScene
+    public partial class TestSceneOsuModRepel : OsuModTestScene
     {
         [TestCase(0.1f)]
         [TestCase(0.5f)]

@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamWithPlayers : CompositeDrawable
+    public partial class DrawableTeamWithPlayers : CompositeDrawable
     {
         public DrawableTeamWithPlayers(TournamentTeam team, TeamColour colour)
         {

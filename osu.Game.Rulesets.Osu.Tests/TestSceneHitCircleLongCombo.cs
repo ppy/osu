@@ -11,7 +11,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircleLongCombo : TestSceneOsuPlayer
+    public partial class TestSceneHitCircleLongCombo : TestSceneOsuPlayer
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {

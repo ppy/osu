@@ -20,7 +20,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class LeaderboardModSelector : CompositeDrawable
+    public partial class LeaderboardModSelector : CompositeDrawable
     {
         public readonly BindableList<IMod> SelectedMods = new BindableList<IMod>();
         public readonly Bindable<IRulesetInfo> Ruleset = new Bindable<IRulesetInfo>();
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
-        private class ModButton : ModIcon
+        private partial class ModButton : ModIcon
         {
             private const int duration = 200;
 
