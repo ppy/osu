@@ -700,7 +700,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("press escape twice rapidly", () =>
             {
                 InputManager.Key(Key.Escape);
-                InputManager.Key(Key.Escape);
+                Schedule(InputManager.Key, Key.Escape);
             });
 
             pushEscape();

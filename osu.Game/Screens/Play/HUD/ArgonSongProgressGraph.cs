@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Graphics.UserInterface;
 
@@ -26,8 +27,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (!objects.Any())
                     return;
 
-                double firstHit = objects.First().StartTime;
-                double lastHit = objects.Max(o => o.GetEndTime());
+                (double firstHit, double lastHit) = BeatmapExtensions.CalculatePlayableBounds(objects);
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;

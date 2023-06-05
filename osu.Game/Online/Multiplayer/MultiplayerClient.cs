@@ -783,7 +783,7 @@ namespace osu.Game.Online.Multiplayer
             RoomUpdated?.Invoke();
         }
 
-        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID })
+        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
         {
             ID = item.ID,
             OwnerID = item.OwnerID,

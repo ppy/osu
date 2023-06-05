@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -219,6 +218,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < releaseTime)
                 releaseTime = null;
 
+            if (Time.Current < HoldStartTime)
+                endHold();
+
             // Pad the full size container so its contents (i.e. the masking container) reach under the tail.
             // This is required for the tail to not be masked away, since it lies outside the bounds of the hold note.
             sizingContainer.Padding = new MarginPadding
@@ -243,11 +245,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // As the note is being held, adjust the size of the sizing container. This has two effects:
             // 1. The contained masking container will mask the body and ticks.
             // 2. The head note will move along with the new "head position" in the container.
-            if (Head.IsHit && releaseTime == null && DrawHeight > 0)
+            //
+            // As per stable, this should not apply for early hits, waiting until the object starts to touch the
+            // judgement area first.
+            if (Head.IsHit && releaseTime == null && DrawHeight > 0 && Time.Current >= HitObject.StartTime)
             {
-                // How far past the hit target this hold note is. Always a positive value.
-                float yOffset = Math.Max(0, Direction.Value == ScrollingDirection.Up ? -Y : Y);
-                sizingContainer.Height = Math.Clamp(1 - yOffset / DrawHeight, 0, 1);
+                // How far past the hit target this hold note is.
+                float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
+                sizingContainer.Height = 1 - yOffset / DrawHeight;
             }
         }
 
@@ -322,12 +327,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (e.Action != Action.Value)
                 return;
 
-            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if (Time.Elapsed < 0)
-                return;
-
             // Make sure a hold was started
             if (HoldStartTime == null)
+                return;
+
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
                 return;
 
             Tail.UpdateResult();

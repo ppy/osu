@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 AddNested(i < SpinsRequired
                     ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
-                    : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { GetSampleInfo("spinnerbonus") } });
+                    : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { CreateHitSampleInfo("spinnerbonus") } });
             }
         }
 
