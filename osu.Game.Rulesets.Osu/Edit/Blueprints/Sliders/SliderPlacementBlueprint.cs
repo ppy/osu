@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
 
+        protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
+
         public SliderPlacementBlueprint()
             : base(new Slider())
         {
@@ -150,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(HitObject.Path.HasValidLength);
+            EndPlacement(true);
         }
 
         protected override void Update()
@@ -196,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
                 cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)

@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// </remarks>
     public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
-        public const string DEFAULT_BANK = "normal";
+        public const string DEFAULT_BANK = HitSampleInfo.BANK_NORMAL;
 
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="hitSampleInfo">The <see cref="HitSampleInfo"/>. This will not be modified.</param>
         /// <returns>The modified <see cref="HitSampleInfo"/>. This does not share a reference with <paramref name="hitSampleInfo"/>.</returns>
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
-            => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
+            => hitSampleInfo.With(newBank: hitSampleInfo.Bank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
         public override bool IsRedundant(ControlPoint? existing)
             => existing is SampleControlPoint existingSample

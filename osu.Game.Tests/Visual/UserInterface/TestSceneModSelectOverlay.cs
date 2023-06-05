@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -386,6 +387,50 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestKeepSharedSettingsFromSimilarMods()
+        {
+            const float setting_change = 1.2f;
+
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModDifficultyAdjust>()! });
+
+            changeRuleset(0);
+            AddAssert("ensure mod still selected", () => SelectedMods.Value.SingleOrDefault() is OsuModDifficultyAdjust);
+
+            AddStep("change mod settings", () =>
+            {
+                var osuMod = getSelectedMod<OsuModDifficultyAdjust>();
+
+                osuMod.ExtendedLimits.Value = true;
+                osuMod.CircleSize.Value = setting_change;
+                osuMod.DrainRate.Value = setting_change;
+                osuMod.OverallDifficulty.Value = setting_change;
+                osuMod.ApproachRate.Value = setting_change;
+            });
+
+            changeRuleset(1);
+            AddAssert("taiko variant selected", () => SelectedMods.Value.SingleOrDefault() is TaikoModDifficultyAdjust);
+
+            AddAssert("shared settings preserved", () =>
+            {
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
+
+                return taikoMod.ExtendedLimits.Value &&
+                       taikoMod.DrainRate.Value == setting_change &&
+                       taikoMod.OverallDifficulty.Value == setting_change;
+            });
+
+            AddAssert("non-shared settings remain default", () =>
+            {
+                var taikoMod = getSelectedMod<TaikoModDifficultyAdjust>();
+
+                return taikoMod.ScrollSpeed.IsDefault;
+            });
+        }
+
+        [Test]
         public void TestExternallySetCustomizedMod()
         {
             createScreen();
@@ -616,6 +661,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"customisation toggle is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Disabled == disabled);
             AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Value == active);
         }
+
+        private T getSelectedMod<T>() where T : Mod => SelectedMods.Value.OfType<T>().Single();
 
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);

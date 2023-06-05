@@ -15,7 +15,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -33,7 +32,6 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles general operations related to global beatmap management.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
@@ -41,6 +39,8 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
+
+        private readonly LegacyBeatmapExporter beatmapExporter;
 
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
@@ -76,6 +76,11 @@ namespace osu.Game.Beatmaps
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
+
+            beatmapExporter = new LegacyBeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -392,6 +397,8 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
