@@ -30,8 +30,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -329,11 +327,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+        public void Attach(IAttachableSkinComponent skinComponent) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(skinComponent);
 
-        public void Attach(ClicksPerSecondCalculator calculator) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
+        public void Detach(IAttachableSkinComponent skinComponent) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Detach(skinComponent);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
