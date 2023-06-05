@@ -34,11 +34,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, true);
 
-        protected override IEnumerable<ShearedButton> CreateFooterButtons() => base.CreateFooterButtons().Prepend(
-            new SelectAllModsButton(this)
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-            });
+        protected override IEnumerable<ShearedButton> CreateFooterButtons()
+            => base.CreateFooterButtons()
+                   .Prepend(
+                       SelectAllModsButton = new SelectAllModsButton(this)
+                       {
+                           Anchor = Anchor.BottomLeft,
+                           Origin = Anchor.BottomLeft,
+                       });
     }
 }

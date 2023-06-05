@@ -12,6 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -28,7 +30,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
+    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
     {
         public const int BUTTON_WIDTH = 200;
 
@@ -108,7 +110,7 @@ namespace osu.Game.Overlays.Mods
                 };
             }
 
-            yield return new DeselectAllModsButton(this);
+            yield return deselectAllModsButton = new DeselectAllModsButton(this);
         }
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> globalAvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -121,12 +123,14 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
+        protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
         private Sample? columnAppearSample;
 
@@ -616,6 +620,18 @@ namespace osu.Game.Overlays.Mods
                     hideOverlay(true);
                     return true;
 
+                //This is handled locally here to prevent search box from coupling in DeselectAllModsButton
+                case GlobalAction.DeselectAllMods:
+                {
+                    if (!SearchTextBox.HasFocus)
+                    {
+                        deselectAllModsButton.TriggerClick();
+                        return true;
+                    }
+
+                    break;
+                }
+
                 case GlobalAction.Select:
                 {
                     // Pressing select should select first filtered mod or completely hide the overlay in one shot if search term is empty.
@@ -649,6 +665,23 @@ namespace osu.Game.Overlays.Mods
 
                 BackButton.TriggerClick();
             }
+        }
+
+        /// <inheritdoc cref="IKeyBindingHandler{PlatformAction}"/>
+        /// <remarks>
+        /// This is handled locally here to allow <see cref="SearchTextBox"/> handle <see cref="PlatformAction"/> first
+        /// </remarks>>
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton is null)
+                return false;
+
+            SelectAllModsButton.TriggerClick();
+            return true;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
         }
 
         #endregion

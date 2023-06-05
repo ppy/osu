@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
