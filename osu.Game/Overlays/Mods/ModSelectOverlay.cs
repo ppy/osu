@@ -27,6 +27,7 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -682,6 +683,19 @@ namespace osu.Game.Overlays.Mods
 
         public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || e.Key != Key.Tab)
+                return false;
+
+            if (SearchTextBox.HasFocus)
+                SearchTextBox.KillFocus();
+            else
+                SearchTextBox.TakeFocus();
+
+            return true;
         }
 
         #endregion
