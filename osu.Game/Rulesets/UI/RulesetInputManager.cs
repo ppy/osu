@@ -158,9 +158,41 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
+        #region Component attachement
+
+        public void Attach(IAttachableSkinComponent skinComponent)
+        {
+            switch (skinComponent)
+            {
+                case KeyCounterDisplay keyCounterDisplay:
+                    attachKeyCounter(keyCounterDisplay);
+                    break;
+
+                case ClicksPerSecondCalculator clicksPerSecondCalculator:
+                    attachClicksPerSecond(clicksPerSecondCalculator);
+                    break;
+            }
+        }
+
+        public void Detach(IAttachableSkinComponent skinComponent)
+        {
+            switch (skinComponent)
+            {
+                case KeyCounterDisplay keyCounterDisplay:
+                    detachKeyCounter(keyCounterDisplay);
+                    break;
+
+                case ClicksPerSecondCalculator clicksPerSecondCalculator:
+                    detachClicksPerSecond(clicksPerSecondCalculator);
+                    break;
+            }
+        }
+
+        #endregion
+
         #region Key Counter Attachment
 
-        public void Attach(KeyCounterDisplay keyCounter)
+        private void attachKeyCounter(KeyCounterDisplay keyCounter)
         {
             var receptor = new ActionReceptor(keyCounter);
 
@@ -172,6 +204,10 @@ namespace osu.Game.Rulesets.UI
                                                    .Distinct()
                                                    .OrderBy(action => action)
                                                    .Select(action => new KeyCounterActionTrigger<T>(action)));
+        }
+
+        private void detachKeyCounter(KeyCounterDisplay keyCounter)
+        {
         }
 
         private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
@@ -197,11 +233,15 @@ namespace osu.Game.Rulesets.UI
 
         #region Keys per second Counter Attachment
 
-        public void Attach(ClicksPerSecondCalculator calculator)
+        private void attachClicksPerSecond(ClicksPerSecondCalculator calculator)
         {
             var listener = new ActionListener(calculator);
 
             KeyBindingContainer.Add(listener);
+        }
+
+        private void detachClicksPerSecond(ClicksPerSecondCalculator calculator)
+        {
         }
 
         private partial class ActionListener : Component, IKeyBindingHandler<T>
@@ -266,8 +306,12 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public interface ICanAttachHUDPieces
     {
-        void Attach(KeyCounterDisplay keyCounter);
-        void Attach(ClicksPerSecondCalculator calculator);
+        void Attach(IAttachableSkinComponent component);
+        void Detach(IAttachableSkinComponent component);
+    }
+
+    public interface IAttachableSkinComponent
+    {
     }
 
     public class RulesetInputManagerInputState<T> : InputState

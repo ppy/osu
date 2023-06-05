@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -18,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : CompositeDrawable
+    public abstract partial class KeyCounterDisplay : CompositeDrawable, IAttachableSkinComponent
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
@@ -44,12 +45,25 @@ namespace osu.Game.Screens.Play.HUD
 
         private Receptor? receptor;
 
+        /// <summary>
+        /// Sets a <see cref="Receptor"/> that will populate keybinding events to this <see cref="KeyCounterDisplay"/>.
+        /// </summary>
+        /// <param name="receptor">The receptor to set</param>
+        /// <exception cref="InvalidOperationException">When a <see cref="Receptor"/> is already active on this <see cref="KeyCounterDisplay"/></exception>
         public void SetReceptor(Receptor receptor)
         {
             if (this.receptor != null)
                 throw new InvalidOperationException("Cannot set a new receptor when one is already active");
 
             this.receptor = receptor;
+        }
+
+        /// <summary>
+        /// Clears any <see cref="Receptor"/> active
+        /// </summary>
+        public void ClearReceptor()
+        {
+            receptor = null;
         }
 
         /// <summary>
