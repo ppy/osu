@@ -71,7 +71,7 @@ namespace osu.Game.Database
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
         /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
-        /// 27   2023-06-06    Added EditorTimestamp to ScoreInfo.
+        /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
         /// </summary>
         private const int schema_version = 27;
 
