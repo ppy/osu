@@ -76,17 +76,24 @@ namespace osu.Game.Graphics.Sprites
             private IUniformBuffer<AnimationData> animationDataBuffer;
             private IVertexBatch<LogoAnimationVertex> animationVertexBatch;
 
-            protected override void Blit(IRenderer renderer)
+            protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
-                if (DrawRectangle.Width == 0 || DrawRectangle.Height == 0)
-                    return;
+                base.BindUniformResources(shader, renderer);
 
                 animationDataBuffer ??= renderer.CreateUniformBuffer<AnimationData>();
                 animationVertexBatch ??= renderer.CreateQuadBatch<LogoAnimationVertex>(1, 2);
 
                 animationDataBuffer.Data = animationDataBuffer.Data with { Progress = progress };
 
-                TextureShader.BindUniformBlock("m_AnimationData", animationDataBuffer);
+                shader.BindUniformBlock(@"m_AnimationData", animationDataBuffer);
+            }
+
+            protected override void Blit(IRenderer renderer)
+            {
+                if (DrawRectangle.Width == 0 || DrawRectangle.Height == 0)
+                    return;
+
+                base.Blit(renderer);
 
                 renderer.DrawQuad(
                     Texture,

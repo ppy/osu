@@ -108,7 +108,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
+                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                 {
                     RelativeSizeAxes = Axes.Both,
                 }, 300)

@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.Containers
     {
         public const float APPEAR_DURATION = 800;
         public const float DISAPPEAR_DURATION = 500;
+        public const float SHADOW_OPACITY = 0.2f;
 
         private const Easing easing_show = Easing.OutSine;
         private const Easing easing_hide = Easing.InSine;
