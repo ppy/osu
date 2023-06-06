@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHalfTime : ModHalfTime
     {
-        public override double ScoreMultiplier => 0.3;
     }
 }

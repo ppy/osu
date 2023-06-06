@@ -21,7 +21,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private TestActionKeyCounter leftKeyCounter = null!;
+        private DefaultKeyCounter leftKeyCounter = null!;
 
-        private TestActionKeyCounter rightKeyCounter = null!;
+        private DefaultKeyCounter rightKeyCounter = null!;
 
         private OsuInputManager osuInputManager = null!;
 
@@ -59,14 +59,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                leftKeyCounter = new TestActionKeyCounter(OsuAction.LeftButton)
+                                leftKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.LeftButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreRight,
                                     Depth = float.MinValue,
                                     X = -100,
                                 },
-                                rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton)
+                                rightKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.RightButton))
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreLeft,
@@ -598,8 +598,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertKeyCounter(int left, int right)
         {
-            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses, () => Is.EqualTo(left));
-            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses, () => Is.EqualTo(right));
+            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses.Value, () => Is.EqualTo(left));
+            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses.Value, () => Is.EqualTo(right));
         }
 
         private void releaseAllTouches()
@@ -615,11 +615,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
         private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
-        public partial class TestActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
+        public partial class TestActionKeyCounterTrigger : InputTrigger, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 
-            public TestActionKeyCounter(OsuAction action)
+            public TestActionKeyCounterTrigger(OsuAction action)
                 : base(action.ToString())
             {
                 Action = action;
@@ -629,8 +629,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (e.Action == Action)
                 {
-                    IsLit = true;
-                    Increment();
+                    Activate();
                 }
 
                 return false;
@@ -638,7 +637,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
-                if (e.Action == Action) IsLit = false;
+                if (e.Action == Action)
+                    Deactivate();
             }
         }
 

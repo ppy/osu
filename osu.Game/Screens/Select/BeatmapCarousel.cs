@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
         public float BleedBottom { get; set; }
 
         /// <summary>
-        /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
+        /// Triggered when <see cref="BeatmapSets"/> finish loading, or are subsequently changed.
         /// </summary>
         public Action? BeatmapSetsChanged;
 
@@ -353,6 +353,8 @@ namespace osu.Game.Screens.Select
 
             if (!Scroll.UserScrolling)
                 ScrollToSelected(true);
+
+            BeatmapSetsChanged?.Invoke();
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>

@@ -17,7 +17,6 @@ using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -121,7 +120,6 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
-        [ExcludeFromDynamicCompile]
         private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             [NotNull]

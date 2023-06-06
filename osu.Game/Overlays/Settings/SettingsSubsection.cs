@@ -10,12 +10,10 @@ using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    [ExcludeFromDynamicCompile]
     public abstract partial class SettingsSubsection : FillFlowContainer, IFilterable
     {
         protected override Container<Drawable> Content => FlowContent;

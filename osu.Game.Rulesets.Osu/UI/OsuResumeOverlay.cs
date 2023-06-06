@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             localCursorContainer?.Expire();
             localCursorContainer = null;
-            GameplayCursor?.ActiveCursor?.Show();
+            GameplayCursor?.ActiveCursor.Show();
         }
 
         protected override bool OnHover(HoverEvent e) => true;

@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// </remarks>
     public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
-        public const string DEFAULT_BANK = "normal";
+        public const string DEFAULT_BANK = HitSampleInfo.BANK_NORMAL;
 
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The default sample bank at this control point.
         /// </summary>
         public string SampleBank
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         /// <summary>
-        /// The default sample bank at this control point.
+        /// The default sample volume at this control point.
         /// </summary>
         public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="hitSampleInfo">The <see cref="HitSampleInfo"/>. This will not be modified.</param>
         /// <returns>The modified <see cref="HitSampleInfo"/>. This does not share a reference with <paramref name="hitSampleInfo"/>.</returns>
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
-            => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
+            => hitSampleInfo.With(newBank: hitSampleInfo.Bank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
         public override bool IsRedundant(ControlPoint? existing)
             => existing is SampleControlPoint existingSample

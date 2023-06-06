@@ -174,78 +174,33 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class TestRulesetAllStatsRequireHitEvents : TestRuleset
         {
-            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
             {
-                return new[]
-                {
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Requiring Hit Events 1",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
-                        }
-                    },
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Requiring Hit Events 2",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
-                        }
-                    }
-                };
-            }
+                new StatisticItem("Statistic Requiring Hit Events 1", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true),
+                new StatisticItem("Statistic Requiring Hit Events 2", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
+            };
         }
 
         private class TestRulesetNoStatsRequireHitEvents : TestRuleset
         {
-            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
             {
                 return new[]
                 {
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Not Requiring Hit Events 1",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
-                        }
-                    },
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Not Requiring Hit Events 2",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
-                        }
-                    }
+                    new StatisticItem("Statistic Not Requiring Hit Events 1", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events")),
+                    new StatisticItem("Statistic Not Requiring Hit Events 2", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
                 };
             }
         }
 
         private class TestRulesetMixed : TestRuleset
         {
-            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
             {
                 return new[]
                 {
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Requiring Hit Events",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
-                        }
-                    },
-                    new StatisticRow
-                    {
-                        Columns = new[]
-                        {
-                            new StatisticItem("Statistic Not Requiring Hit Events",
-                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
-                        }
-                    }
+                    new StatisticItem("Statistic Requiring Hit Events", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true),
+                    new StatisticItem("Statistic Not Requiring Hit Events", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
                 };
             }
         }
