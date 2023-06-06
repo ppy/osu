@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -55,6 +56,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
             AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
+        }
+
+        [Test]
+        public void TestSelectAllButtonUpdatesStateWhenSearchTermChanged()
+        {
+            createFreeModSelect();
+
+            AddStep("apply search term", () => freeModSelectOverlay.SearchTerm = "ea");
+
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("click select all button", navigateAndClick<SelectAllModsButton>);
+            AddAssert("select all button disabled", () => !this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("change search term", () => freeModSelectOverlay.SearchTerm = "e");
+
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            void navigateAndClick<T>() where T : Drawable
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<T>().Single());
+                InputManager.Click(MouseButton.Left);
+            }
         }
 
         [Test]
