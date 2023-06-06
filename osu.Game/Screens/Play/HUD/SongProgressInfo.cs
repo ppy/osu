@@ -145,12 +145,12 @@ namespace osu.Game.Screens.Play.HUD
             double time = gameplayClock?.CurrentTime ?? Time.Current;
 
             double songCurrentTime = time - startTime;
-            int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
+            int currentPercent = songLength == 0 ? 0 : Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
             int currentSecond = (int)Math.Floor(songCurrentTime / 1000.0);
 
             if (currentPercent != previousPercent)
             {
-                progress.Text = currentPercent + @"%";
+                progress.Text = $@"{currentPercent}%";
                 previousPercent = currentPercent;
             }
 

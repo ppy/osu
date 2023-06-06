@@ -309,7 +309,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition));
+                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
 
                 Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 

@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
@@ -11,11 +10,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SpinnerBonusTick : SpinnerTick
     {
-        public SpinnerBonusTick()
-        {
-            Samples.Add(new HitSampleInfo("spinnerbonus"));
-        }
-
         public override Judgement CreateJudgement() => new OsuSpinnerBonusTickJudgement();
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement

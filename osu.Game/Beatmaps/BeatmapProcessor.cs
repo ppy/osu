@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -22,34 +20,17 @@ namespace osu.Game.Beatmaps
 
         public virtual void PreProcess()
         {
-            IHasComboInformation lastObj = null;
-
-            bool isFirst = true;
+            IHasComboInformation? lastObj = null;
 
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
-                if (isFirst)
+                if (lastObj == null)
                 {
-                    obj.NewCombo = true;
-
                     // first hitobject should always be marked as a new combo for sanity.
-                    isFirst = false;
+                    obj.NewCombo = true;
                 }
 
-                obj.ComboIndex = lastObj?.ComboIndex ?? 0;
-                obj.ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
-                obj.IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
-
-                if (obj.NewCombo)
-                {
-                    obj.IndexInCurrentCombo = 0;
-                    obj.ComboIndex++;
-                    obj.ComboIndexWithOffsets += obj.ComboOffset + 1;
-
-                    if (lastObj != null)
-                        lastObj.LastInCombo = true;
-                }
-
+                obj.UpdateComboInformation(lastObj);
                 lastObj = obj;
             }
         }

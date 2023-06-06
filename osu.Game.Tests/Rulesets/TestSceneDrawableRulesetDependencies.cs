@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Rulesets
                 this.parentManager = parentManager;
             }
 
-            public override byte[] LoadRaw(string name) => parentManager.LoadRaw(name);
+            public override byte[] GetRawData(string fileName) => parentManager.GetRawData(fileName);
 
             public bool IsDisposed { get; private set; }
 
