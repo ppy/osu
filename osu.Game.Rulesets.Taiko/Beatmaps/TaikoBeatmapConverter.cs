@@ -92,6 +92,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 }).ToList();
             }
 
+            // TODO: stable makes the last tick of a drumroll non-required when the next object is too close.
+            // This probably needs to be reimplemented:
+            //
+            // List<HitObject> hitobjects = hitObjectManager.hitObjects;
+            // int ind = hitobjects.IndexOf(this);
+            // if (i < hitobjects.Count - 1 && hitobjects[i + 1].HittableStartTime - (EndTime + (int)TickSpacing) <= (int)TickSpacing)
+            //     lastTickHittable = false;
+
             return converted;
         }
 
