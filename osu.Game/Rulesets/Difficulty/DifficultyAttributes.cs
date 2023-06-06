@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
-        protected const int ATTRIB_ID_TOTAL_SCORE_V1 = 23;
+        protected const int ATTRIB_ID_LEGACY_TOTAL_SCORE = 23;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
@@ -46,10 +46,10 @@ namespace osu.Game.Rulesets.Difficulty
         public int MaxCombo { get; set; }
 
         /// <summary>
-        /// The total score achievable in ScoreV1.
+        /// The maximum achievable legacy total score.
         /// </summary>
-        [JsonProperty("total_score_v1", Order = -2)]
-        public int TotalScoreV1 { get; set; }
+        [JsonProperty("legacy_total_score", Order = -2)]
+        public int LegacyTotalScore { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_TOTAL_SCORE_V1, TotalScoreV1);
+            yield return (ATTRIB_ID_LEGACY_TOTAL_SCORE, LegacyTotalScore);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            TotalScoreV1 = (int)values[ATTRIB_ID_TOTAL_SCORE_V1];
+            LegacyTotalScore = (int)values[ATTRIB_ID_LEGACY_TOTAL_SCORE];
         }
     }
 }
