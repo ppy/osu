@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -97,8 +98,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 new ColumnTouchInputArea(this)
             };
 
-            applyGameWideClock(background);
-            applyGameWideClock(keyArea);
+            background.ApplyGameWideClock(host);
+            keyArea.ApplyGameWideClock(host);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
@@ -107,18 +108,6 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
-
-            // Some elements don't handle rewind correctly and fixing them is non-trivial.
-            // In the future we need a better solution to this, but as a temporary work-around, give these components the game-wide
-            // clock so they don't need to worry about rewind.
-            // This only works because they handle OnPressed/OnReleased which results in a correct state while rewinding.
-            //
-            // This is kinda dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
-            void applyGameWideClock(Drawable drawable)
-            {
-                drawable.Clock = host.UpdateThread.Clock;
-                drawable.ProcessCustomClock = false;
-            }
         }
 
         private void onSourceChanged()
