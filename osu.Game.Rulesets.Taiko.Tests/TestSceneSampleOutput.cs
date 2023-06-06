@@ -5,9 +5,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitSampleInfo.HIT_FINISH,
                 HitSampleInfo.HIT_WHISTLE,
                 HitSampleInfo.HIT_WHISTLE,
-                HitSampleInfo.HIT_WHISTLE,
+                $"{HitSampleInfo.HIT_WHISTLE},{TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH}",
             };
 
             var actualSampleNames = new List<string>();
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             AddUntilStep("all samples collected", () => actualSampleNames.Count == expectedSampleNames.Length);
 
-            AddAssert("samples are correct", () => actualSampleNames.SequenceEqual(expectedSampleNames));
+            AddAssert("samples are correct", () => actualSampleNames, () => Is.EqualTo(expectedSampleNames));
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TaikoBeatmapConversionTest().GetBeatmap("sample-to-type-conversions");
