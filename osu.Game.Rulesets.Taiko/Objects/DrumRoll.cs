@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
 using osu.Framework.Bindables;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -86,7 +85,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             bool first = true;
 
-            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
+            // TODO: this implementation of drum roll tick does not match stable.
+            // Stable uses next-object intrinsics to decide whether the end of a drum roll gets a tick.
+            // It also changes the rate of ticks based on BPM. This is quite important.
+            for (double t = StartTime; Precision.AlmostBigger(EndTime, t, 1); t += tickSpacing)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
