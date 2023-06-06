@@ -25,13 +25,16 @@ namespace osu.Game.Screens.Play
         // Make things look bigger without using Scale
         private const float scale_factor = 1.5f;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public ArgonKeyCounter(InputTrigger trigger)
             : base(trigger)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -76,14 +79,27 @@ namespace osu.Game.Screens.Play
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
-            keyNameText.FlashColour(Colour4.White, 200);
-            inputIndicator.FadeIn().MoveToY(0).Then().MoveToY(3, 100, Easing.OutQuart);
+
+            keyNameText
+                .FadeColour(Colour4.White, 10, Easing.OutQuint);
+
+            inputIndicator
+                .FadeIn(10, Easing.OutQuint)
+                .MoveToY(0)
+                .Then()
+                .MoveToY(4, 60, Easing.OutQuint);
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
         {
             base.Deactivate(forwardPlayback);
-            inputIndicator.MoveToY(0, 200, Easing.OutQuart).FadeTo(0.5f, 200, Easing.OutQuart);
+
+            keyNameText
+                .FadeColour(colours.Blue0, 200, Easing.OutQuart);
+
+            inputIndicator
+                .MoveToY(0, 250, Easing.OutQuart)
+                .FadeTo(0.5f, 250, Easing.OutQuart);
         }
     }
 }
