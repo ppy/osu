@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Padding = new MarginPadding { Horizontal = ChangelogBuild.HORIZONTAL_PADDING },
+                        Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Margin = new MarginPadding { Top = 30 },
                         Child = new Box
                         {

@@ -293,10 +293,10 @@ namespace osu.Game.Rulesets.UI
         {
             // prepare sample pools ahead of time so we're not initialising at runtime.
             foreach (var sample in hitObject.Samples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var sample in hitObject.AuxiliarySamples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var nestedObject in hitObject.NestedHitObjects)
                 preloadSamples(nestedObject);

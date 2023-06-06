@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -27,8 +28,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private HUDOverlay hudOverlay;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor => gameplayState.ScoreProcessor;
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -88,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                     action?.Invoke(hudOverlay);
 

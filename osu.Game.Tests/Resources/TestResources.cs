@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Resources
             BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
-            TotalScore = 2845370,
+            TotalScore = 284537,
             Accuracy = 0.95,
             MaxCombo = 999,
             Position = 1,

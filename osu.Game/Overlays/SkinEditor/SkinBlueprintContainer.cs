@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
+        protected override bool AllowCyclicSelection => true;
+
         public SkinBlueprintContainer(ISerialisableDrawableContainer targetContainer)
         {
             this.targetContainer = targetContainer;

@@ -10,18 +10,18 @@ using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasPathWithRepeats
+    public class Slider : OsuHitObject, IHasPathWithRepeats, IHasSliderVelocity, IHasGenerateTicks
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
@@ -134,6 +134,21 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool OnlyJudgeNestedObjects = true;
 
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
+
+        public bool GenerateTicks { get; set; } = true;
+
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
 
@@ -151,15 +166,11 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-#pragma warning disable 618
-            var legacyDifficultyPoint = DifficultyControlPoint as LegacyBeatmapDecoder.LegacyDifficultyControlPoint;
-#pragma warning restore 618
 
-            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
-            bool generateTicks = legacyDifficultyPoint?.GenerateTicks ?? true;
+            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
+            TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
