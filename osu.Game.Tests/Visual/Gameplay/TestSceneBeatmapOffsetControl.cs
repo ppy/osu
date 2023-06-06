@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
                     HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(10),
-                    Mods = new[] { new OsuModRelax() }
+                    Mods = new Mod[] { new OsuModRelax() }
                 };
             });
 
