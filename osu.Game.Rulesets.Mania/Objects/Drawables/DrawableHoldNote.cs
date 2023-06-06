@@ -245,7 +245,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // As the note is being held, adjust the size of the sizing container. This has two effects:
             // 1. The contained masking container will mask the body and ticks.
             // 2. The head note will move along with the new "head position" in the container.
-            if (Head.IsHit && releaseTime == null && DrawHeight > 0)
+            //
+            // As per stable, this should not apply for early hits, waiting until the object starts to touch the
+            // judgement area first.
+            if (Head.IsHit && releaseTime == null && DrawHeight > 0 && Time.Current >= HitObject.StartTime)
             {
                 // How far past the hit target this hold note is.
                 float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;

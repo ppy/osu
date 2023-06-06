@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Playlist =
                     {
-                        new MultiplayerPlaylistItem(playlistItem),
+                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(playlistItem),
                     },
                     Users = { localUser },
                     Host = localUser,
