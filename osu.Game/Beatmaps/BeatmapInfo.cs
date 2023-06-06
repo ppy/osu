@@ -171,7 +171,10 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
-        public double? LastEditTime { get; set; }
+        /// <summary>
+        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
+        /// </summary>
+        public double? EditorTimestamp { get; set; }
 
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
