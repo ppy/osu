@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                TotalScoreV1 = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods).TotalScore,
+                LegacyTotalScore = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods).TotalScore,
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
