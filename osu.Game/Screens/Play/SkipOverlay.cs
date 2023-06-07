@@ -162,14 +162,12 @@ namespace osu.Game.Screens.Play
 
                 button.TriggerClick();
 
-                if (progress > 0)
+                if (isClickable)
                     attemptNextSkip();
                 else
                     SkipQueued = false;
             }, 200);
         }
-
-        private double progress => Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
         protected override void Update()
         {
@@ -183,11 +181,11 @@ namespace osu.Game.Screens.Play
             }
             else
             {
-                double p = progress;
+                double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
-                remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, p, Math.Clamp(Time.Elapsed / 40, 0, 1));
+                remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-                isClickable = p > 0;
+                isClickable = progress > 0;
             }
 
             button.Enabled.Value = isClickable;
