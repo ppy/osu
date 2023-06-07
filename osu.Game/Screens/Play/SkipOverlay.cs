@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
-        private bool stillClickable;
+        private bool stillClickable = true;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
@@ -155,6 +155,12 @@ namespace osu.Game.Screens.Play
 
             void attemptNextSkip() => Scheduler.AddDelayed(() =>
             {
+                if (!stillClickable)
+                {
+                    SkipQueued = false;
+                    return;
+                }
+
                 if (!button.Enabled.Value)
                 {
                     attemptNextSkip();
@@ -165,10 +171,7 @@ namespace osu.Game.Screens.Play
 
                 // A skip button may be clickable more than once.
                 // Automated seeks should seek until it's no longer possible, so let's keep trying.
-                if (stillClickable)
-                    attemptNextSkip();
-                else
-                    SkipQueued = false;
+                attemptNextSkip();
             }, 200);
         }
 
