@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     {
                         case 0: return colour_green;
 
-                        case 1: return colour_purple;
+                        case 1: return colour_special_column;
 
                         case 2: return colour_cyan;
 
