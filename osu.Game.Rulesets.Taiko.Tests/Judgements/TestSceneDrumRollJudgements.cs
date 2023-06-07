@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitAllDrumRoll()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
@@ -24,11 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 new TaikoReplayFrame(1001),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000
-            }));
+            }, CreateBeatmap(createDrumRoll(false)));
 
             AssertJudgementCount(3);
             AssertResult<DrumRollTick>(0, HitResult.SmallBonus);
@@ -39,18 +33,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitSomeDrumRoll()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000
-            }));
+            }, CreateBeatmap(createDrumRoll(false)));
 
             AssertJudgementCount(3);
             AssertResult<DrumRollTick>(0, HitResult.IgnoreMiss);
@@ -61,16 +49,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitNoneDrumRoll()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000
-            }));
+            }, CreateBeatmap(createDrumRoll(false)));
 
             AssertJudgementCount(3);
             AssertResult<DrumRollTick>(0, HitResult.IgnoreMiss);
@@ -81,8 +63,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitAllStrongDrumRollWithOneKey()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
@@ -90,12 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 new TaikoReplayFrame(1001),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000,
-                IsStrong = true
-            }));
+            }, CreateBeatmap(createDrumRoll(true)));
 
             AssertJudgementCount(6);
 
@@ -112,19 +87,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitSomeStrongDrumRollWithOneKey()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000,
-                IsStrong = true
-            }));
+            }, CreateBeatmap(createDrumRoll(true)));
 
             AssertJudgementCount(6);
 
@@ -141,8 +109,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitAllStrongDrumRollWithBothKeys()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
@@ -150,12 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 new TaikoReplayFrame(1001),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre, TaikoAction.RightCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000,
-                IsStrong = true
-            }));
+            }, CreateBeatmap(createDrumRoll(true)));
 
             AssertJudgementCount(6);
 
@@ -172,19 +133,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         [Test]
         public void TestHitSomeStrongDrumRollWithBothKeys()
         {
-            const double hit_time = 1000;
-
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre, TaikoAction.RightCentre),
                 new TaikoReplayFrame(2001),
-            }, CreateBeatmap(new DrumRoll
-            {
-                StartTime = hit_time,
-                Duration = 1000,
-                IsStrong = true
-            }));
+            }, CreateBeatmap(createDrumRoll(true)));
 
             AssertJudgementCount(6);
 
@@ -197,5 +151,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AssertResult<DrumRoll>(0, HitResult.IgnoreHit);
             AssertResult<StrongNestedHitObject>(2, HitResult.IgnoreHit);
         }
+
+        private DrumRoll createDrumRoll(bool strong) => new DrumRoll
+        {
+            StartTime = 1000,
+            Duration = 1000,
+            IsStrong = strong
+        };
     }
 }
