@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public int SkipCount { get; private set; }
 
+        /// <summary>
+        /// Whether a skip is currently queued via <see cref="SkipWhenReady"/>. A skip operation will be performed as soon as the skip button becomes available.
+        /// </summary>
+        internal bool SkipQueued { get; private set; }
+
         private readonly double startTime;
 
         public Action RequestSkip;
@@ -44,7 +49,6 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
-        internal bool SkipQueued { get; private set; }
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
