@@ -109,7 +109,10 @@ namespace osu.Game.Tests.Visual.Editing
             switchBeatSnap(3);
             assertBeatSnap(8);
 
-            switchBeatSnap(-1);
+            switchBeatSnap(3);
+            assertBeatSnap(16);
+
+            switchBeatSnap(-2);
             assertBeatSnap(4);
 
             switchBeatSnap(-3);
