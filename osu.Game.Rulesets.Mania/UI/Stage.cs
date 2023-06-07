@@ -82,9 +82,6 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             Name = "Column backgrounds",
                             RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                            }
                         },
                         new Container
                         {
