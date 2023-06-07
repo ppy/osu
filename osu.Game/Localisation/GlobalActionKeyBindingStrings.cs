@@ -280,6 +280,16 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
 
         /// <summary>
+        /// "Cycle previous beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCyclePreviousBeatSnapDivisor => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Cycle previous beat snap divisor");
+
+        /// <summary>
+        /// "Cycle next beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCycleNextBeatSnapDivisor => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Cycle next beat snap divisor");
+
+        /// <summary>
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");

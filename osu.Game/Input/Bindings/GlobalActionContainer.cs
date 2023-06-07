@@ -101,6 +101,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelDown }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelUp }, GlobalAction.EditorCycleNextBeatSnapDivisor),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -355,6 +357,12 @@ namespace osu.Game.Input.Bindings
         ToggleProfile,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCloneSelection))]
-        EditorCloneSelection
+        EditorCloneSelection,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCyclePreviousBeatSnapDivisor))]
+        EditorCyclePreviousBeatSnapDivisor,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleNextBeatSnapDivisor))]
+        EditorCycleNextBeatSnapDivisor,
     }
 }

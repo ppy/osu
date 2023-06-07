@@ -16,12 +16,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -29,7 +31,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -218,6 +220,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleNextBeatSnapDivisor:
+                    cycle(1);
+                    return true;
+
+                case GlobalAction.EditorCyclePreviousBeatSnapDivisor:
+                    cycle(-1);
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void cycle(int direction)
+        {
+            var presets = beatDivisor.ValidDivisors.Value.Presets;
+
+            int selectedIndex = presets.Count(e => e < beatDivisor.Value);
+            int newIndex = Math.Clamp(selectedIndex + direction, 0, presets.Count - 1);
+
+            beatDivisor.Value = presets[newIndex];
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
