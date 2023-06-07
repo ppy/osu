@@ -90,7 +90,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally.
+                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
+                // (see `Stage.columnBackgrounds`).
                 BackgroundContainer,
                 TopLevelContainer,
                 new ColumnTouchInputArea(this)
