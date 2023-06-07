@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddRepeatStep("move previous", () => bindableBeatDivisor.Previous(), 2);
+            AddRepeatStep("move previous", () => bindableBeatDivisor.SelectPrevious(), 2);
             AddAssert("divisor is 4", () => bindableBeatDivisor.Value == 4);
-            AddRepeatStep("move next", () => bindableBeatDivisor.Next(), 1);
+            AddRepeatStep("move next", () => bindableBeatDivisor.SelectNext(), 1);
             AddAssert("divisor is 12", () => bindableBeatDivisor.Value == 8);
         }
 
@@ -101,6 +101,9 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestBeatChevronNavigation()
         {
             switchBeatSnap(1);
+            assertBeatSnap(16);
+
+            switchBeatSnap(-4);
             assertBeatSnap(1);
 
             switchBeatSnap(3);
@@ -110,7 +113,7 @@ namespace osu.Game.Tests.Visual.Editing
             assertBeatSnap(4);
 
             switchBeatSnap(-3);
-            assertBeatSnap(16);
+            assertBeatSnap(1);
         }
 
         [Test]
@@ -207,7 +210,7 @@ namespace osu.Game.Tests.Visual.Editing
         }, Math.Abs(direction));
 
         private void assertBeatSnap(int expected) => AddAssert($"beat snap is {expected}",
-            () => bindableBeatDivisor.Value == expected);
+            () => bindableBeatDivisor.Value, () => Is.EqualTo(expected));
 
         private void switchPresets(int direction) => AddRepeatStep($"move presets {(direction > 0 ? "forward" : "backward")}", () =>
         {

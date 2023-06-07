@@ -103,13 +103,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.SelectPrevious
                                                     },
                                                     new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Action = beatDivisor.SelectNext
                                                     }
                                                 },
                                             },
@@ -227,11 +227,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorCycleNextBeatSnapDivisor:
-                    cycle(1);
+                    beatDivisor.SelectNext();
                     return true;
 
                 case GlobalAction.EditorCyclePreviousBeatSnapDivisor:
-                    cycle(-1);
+                    beatDivisor.SelectPrevious();
                     return true;
             }
 
@@ -474,12 +474,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Right:
-                        beatDivisor.Next();
+                        beatDivisor.SelectNext();
                         OnUserChange(Current.Value);
                         return true;
 
                     case Key.Left:
-                        beatDivisor.Previous();
+                        beatDivisor.SelectPrevious();
                         OnUserChange(Current.Value);
                         return true;
 
