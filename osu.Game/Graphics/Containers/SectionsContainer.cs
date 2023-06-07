@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,11 +20,35 @@ namespace osu.Game.Graphics.Containers
     public partial class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
-        public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        public Bindable<T?> SelectedSection { get; } = new Bindable<T?>();
 
-        private T lastClickedSection;
+        private T? lastClickedSection;
 
-        public Drawable ExpandableHeader
+        protected override Container<T> Content => scrollContentContainer;
+
+        private readonly UserTrackingScrollContainer scrollContainer;
+        private readonly Container headerBackgroundContainer;
+        private readonly MarginPadding originalSectionsMargin;
+
+        private Drawable? fixedHeader;
+
+        private Drawable? footer;
+        private Drawable? headerBackground;
+
+        private FlowContainer<T> scrollContentContainer = null!;
+
+        private float? headerHeight, footerHeight;
+
+        private float? lastKnownScroll;
+
+        /// <summary>
+        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
+        /// </summary>
+        private const float scroll_y_centre = 0.1f;
+
+        private Drawable? expandableHeader;
+
+        public Drawable? ExpandableHeader
         {
             get => expandableHeader;
             set
@@ -42,11 +63,12 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(expandableHeader);
+
                 lastKnownScroll = null;
             }
         }
 
-        public Drawable FixedHeader
+        public Drawable? FixedHeader
         {
             get => fixedHeader;
             set
@@ -63,7 +85,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        public Drawable Footer
+        public Drawable? Footer
         {
             get => footer;
             set
@@ -75,16 +97,17 @@ namespace osu.Game.Graphics.Containers
 
                 footer = value;
 
-                if (value == null) return;
+                if (footer == null) return;
 
                 footer.Anchor |= Anchor.y2;
                 footer.Origin |= Anchor.y2;
+
                 scrollContainer.Add(footer);
                 lastKnownScroll = null;
             }
         }
 
-        public Drawable HeaderBackground
+        public Drawable? HeaderBackground
         {
             get => headerBackground;
             set
@@ -101,23 +124,6 @@ namespace osu.Game.Graphics.Containers
                 lastKnownScroll = null;
             }
         }
-
-        protected override Container<T> Content => scrollContentContainer;
-
-        private readonly UserTrackingScrollContainer scrollContainer;
-        private readonly Container headerBackgroundContainer;
-        private readonly MarginPadding originalSectionsMargin;
-        private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private FlowContainer<T> scrollContentContainer;
-
-        private float? headerHeight, footerHeight;
-
-        private float? lastKnownScroll;
-
-        /// <summary>
-        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
-        /// </summary>
-        private const float scroll_y_centre = 0.1f;
 
         public SectionsContainer()
         {
@@ -171,10 +177,8 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
-        [NotNull]
         protected virtual UserTrackingScrollContainer CreateScrollContainer() => new UserTrackingScrollContainer();
 
-        [NotNull]
         protected virtual FlowContainer<T> CreateScrollContentContainer() =>
             new FillFlowContainer<T>
             {
