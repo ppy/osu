@@ -9,6 +9,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
@@ -156,23 +158,57 @@ namespace osu.Game.Graphics.Containers
             footerHeight = null;
         }
 
+        private ScheduledDelegate? scrollToTargetDelegate;
+
         public void ScrollTo(Drawable target)
         {
+            Logger.Log($"Scrolling to {target}..");
+
             lastKnownScroll = null;
 
-            // implementation similar to ScrollIntoView but a bit more nuanced.
-            float top = scrollContainer.GetChildPosInContent(target);
+            float scrollTarget = getScrollTargetForDrawable(target);
 
-            float bottomScrollExtent = scrollContainer.ScrollableExtent;
-            float scrollTarget = top - scrollContainer.DisplayableContent * scroll_y_centre;
-
-            if (scrollTarget > bottomScrollExtent)
+            if (scrollTarget > scrollContainer.ScrollableExtent)
                 scrollContainer.ScrollToEnd();
             else
                 scrollContainer.ScrollTo(scrollTarget);
 
             if (target is T section)
                 lastClickedSection = section;
+
+            // Content may load in as a scroll occurs, changing the scroll target we need to aim for.
+            // This scheduled operation ensures that we keep trying until actually arriving at the target.
+            scrollToTargetDelegate?.Cancel();
+            scrollToTargetDelegate = Scheduler.AddDelayed(() =>
+            {
+                if (scrollContainer.UserScrolling)
+                {
+                    Logger.Log("Scroll operation interrupted by user scroll");
+                    scrollToTargetDelegate?.Cancel();
+                    scrollToTargetDelegate = null;
+                    return;
+                }
+
+                if (Precision.AlmostEquals(scrollContainer.Current, scrollTarget, 1))
+                {
+                    Logger.Log($"Finished scrolling to {target}!");
+                    scrollToTargetDelegate?.Cancel();
+                    scrollToTargetDelegate = null;
+                    return;
+                }
+
+                if (!Precision.AlmostEquals(getScrollTargetForDrawable(target), scrollTarget, 1))
+                {
+                    Logger.Log($"Reattempting scroll to {target} due to change in position");
+                    ScrollTo(target);
+                }
+            }, 50, true);
+        }
+
+        private float getScrollTargetForDrawable(Drawable target)
+        {
+            // implementation similar to ScrollIntoView but a bit more nuanced.
+            return scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre;
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
