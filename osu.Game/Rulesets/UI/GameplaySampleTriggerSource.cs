@@ -66,9 +66,14 @@ namespace osu.Game.Rulesets.UI
         protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
             var hitSound = GetNextSample();
-            hitSound.Samples = samples;
+            ApplySampleInfo(hitSound, samples);
             hitSound.Play();
         });
+
+        protected virtual void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        {
+            hitSound.Samples = samples;
+        }
 
         public void StopAllPlayback()
         {

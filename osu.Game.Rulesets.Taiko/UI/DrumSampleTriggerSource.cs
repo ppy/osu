@@ -7,6 +7,7 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -62,16 +63,13 @@ namespace osu.Game.Rulesets.Taiko.UI
             PlaySamples(new ISampleInfo[] { hitObject.CreateHitSampleInfo(sampleName) });
         }
 
-        protected override void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
+        protected override void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
         {
-            var hitSound = GetNextSample();
-            hitSound.Samples = samples;
+            base.ApplySampleInfo(hitSound, samples);
 
             hitSound.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
             hitSound.Balance.Value = -0.05 + RNG.NextDouble(0.1);
-
-            hitSound.Play();
-        });
+        }
 
         public override void Play() => throw new InvalidOperationException(@"Use Play(HitType, bool) override instead");
     }
