@@ -56,11 +56,11 @@ namespace osu.Game.Overlays.Chat
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
 
-        private readonly OsuSpriteText drawableTimestamp;
+        private OsuSpriteText drawableTimestamp = null!;
 
-        private readonly DrawableChatUsername drawableUsername;
+        private DrawableChatUsername drawableUsername = null!;
 
-        private readonly LinkFlowContainer drawableContentFlow;
+        private LinkFlowContainer drawableContentFlow = null!;
 
         private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
@@ -69,8 +69,16 @@ namespace osu.Game.Overlays.Chat
         public ChatLine(Message message)
         {
             Message = message;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager configManager)
+        {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
             InternalChild = new GridContainer
             {
@@ -103,7 +111,6 @@ namespace osu.Game.Overlays.Chat
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Margin = new MarginPadding { Horizontal = Spacing },
-                            ReportRequested = this.ShowPopover,
                         },
                         drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
@@ -115,13 +122,6 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager configManager)
-        {
-            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
-            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -130,6 +130,17 @@ namespace osu.Game.Overlays.Chat
 
             updateMessageContent();
             FinishTransforms(true);
+
+            if (this.FindClosestParent<PopoverContainer>() != null)
+            {
+                // This guards against cases like in-game chat where there's no available popover container.
+                // There may be a future where a global one becomes available, at which point this code may be unnecessary.
+                //
+                // See:
+                // https://github.com/ppy/osu/pull/23698
+                // https://github.com/ppy/osu/pull/14554
+                drawableUsername.ReportRequested = this.ShowPopover;
+            }
         }
 
         public Popover GetPopover() => new ReportChatPopover(message);
