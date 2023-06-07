@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.OnKeyDown(e);
         }
 
-        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
