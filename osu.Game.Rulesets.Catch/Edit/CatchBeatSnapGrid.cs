@@ -1,31 +1,33 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Edit
+namespace osu.Game.Rulesets.Catch.Edit
 {
     /// <summary>
     /// A grid which displays coloured beat divisor lines in proximity to the selection or placement cursor.
     /// </summary>
-    public partial class ManiaBeatSnapGrid : Component
+    /// <remarks>
+    /// This class heavily borrows from osu!mania's implementation (ManiaBeatSnapGrid).
+    /// If further changes are to be made, they should also be applied there.
+    /// If the scale of the changes are large enough, abstracting may be a good path.
+    /// </remarks>
+    public partial class CatchBeatSnapGrid : Component
     {
         private const double visible_range = 750;
 
@@ -45,33 +47,26 @@ namespace osu.Game.Rulesets.Mania.Edit
         }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private BindableBeatDivisor beatDivisor { get; set; }
-
-        private readonly List<ScrollingHitObjectContainer> grids = new List<ScrollingHitObjectContainer>();
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
         private readonly Cached lineCache = new Cached();
 
         private (double start, double end)? selectionTimeRange;
 
+        private ScrollingHitObjectContainer lineContainer = null!;
+
         [BackgroundDependencyLoader]
         private void load(HitObjectComposer composer)
         {
-            foreach (var stage in ((ManiaPlayfield)composer.Playfield).Stages)
-            {
-                foreach (var column in stage.Columns)
-                {
-                    var lineContainer = new ScrollingHitObjectContainer();
+            lineContainer = new ScrollingHitObjectContainer();
 
-                    grids.Add(lineContainer);
-                    column.UnderlayElements.Add(lineContainer);
-                }
-            }
+            ((CatchPlayfield)composer.Playfield).UnderlayElements.Add(lineContainer);
 
             beatDivisor.BindValueChanged(_ => createLines(), true);
         }
@@ -91,13 +86,10 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private void createLines()
         {
-            foreach (var grid in grids)
-            {
-                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
-                    availableLines.Push(line);
+            foreach (var line in lineContainer.Objects.OfType<DrawableGridLine>())
+                availableLines.Push(line);
 
-                grid.Clear();
-            }
+            lineContainer.Clear();
 
             if (selectionTimeRange == null)
                 return;
@@ -131,48 +123,37 @@ namespace osu.Game.Rulesets.Mania.Edit
                 Color4 colour = BindableBeatDivisor.GetColourFor(
                     BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value), colours);
 
-                foreach (var grid in grids)
-                {
-                    if (!availableLines.TryPop(out var line))
-                        line = new DrawableGridLine();
+                if (!availableLines.TryPop(out var line))
+                    line = new DrawableGridLine();
 
-                    line.HitObject.StartTime = time;
-                    line.Colour = colour;
+                line.HitObject.StartTime = time;
+                line.Colour = colour;
 
-                    grid.Add(line);
-                }
+                lineContainer.Add(line);
 
                 beat++;
                 time += timingPoint.BeatLength / beatDivisor.Value;
             }
 
-            foreach (var grid in grids)
+            // required to update ScrollingHitObjectContainer's cache.
+            lineContainer.UpdateSubTree();
+
+            foreach (var line in lineContainer.Objects.OfType<DrawableGridLine>())
             {
-                // required to update ScrollingHitObjectContainer's cache.
-                grid.UpdateSubTree();
+                time = line.HitObject.StartTime;
 
-                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
+                if (time >= range.start && time <= range.end)
+                    line.Alpha = 1;
+                else
                 {
-                    time = line.HitObject.StartTime;
-
-                    if (time >= range.start && time <= range.end)
-                        line.Alpha = 1;
-                    else
-                    {
-                        double timeSeparation = time < range.start ? range.start - time : time - range.end;
-                        line.Alpha = (float)Math.Max(0, 1 - timeSeparation / visible_range);
-                    }
+                    double timeSeparation = time < range.start ? range.start - time : time - range.end;
+                    line.Alpha = (float)Math.Max(0, 1 - timeSeparation / visible_range);
                 }
             }
         }
 
         private partial class DrawableGridLine : DrawableHitObject
         {
-            [Resolved]
-            private IScrollingInfo scrollingInfo { get; set; }
-
-            private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-
             public DrawableGridLine()
                 : base(new HitObject())
             {
@@ -185,15 +166,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             [BackgroundDependencyLoader]
             private void load()
             {
-                direction.BindTo(scrollingInfo.Direction);
-                direction.BindValueChanged(onDirectionChanged, true);
-            }
-
-            private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
-            {
-                Origin = Anchor = direction.NewValue == ScrollingDirection.Up
-                    ? Anchor.TopLeft
-                    : Anchor.BottomLeft;
+                Origin = Anchor.BottomLeft;
+                Anchor = Anchor.BottomLeft;
             }
 
             protected override void UpdateInitialTransforms()
