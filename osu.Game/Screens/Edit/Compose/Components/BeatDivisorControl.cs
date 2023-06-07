@@ -238,16 +238,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        private void cycle(int direction)
-        {
-            var presets = beatDivisor.ValidDivisors.Value.Presets;
-
-            int selectedIndex = presets.Count(e => e < beatDivisor.Value);
-            int newIndex = Math.Clamp(selectedIndex + direction, 0, presets.Count - 1);
-
-            beatDivisor.Value = presets[newIndex];
-        }
-
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
