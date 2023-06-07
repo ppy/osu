@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 }
 
                 Color4 colour = BindableBeatDivisor.GetColourFor(
-                    BindableBeatDivisor.GetDivisorForBeatIndex(Math.Max(1, beat), beatDivisor.Value), colours);
+                    BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value), colours);
 
                 if (!availableLines.TryPop(out var line))
                     line = new DrawableGridLine();
