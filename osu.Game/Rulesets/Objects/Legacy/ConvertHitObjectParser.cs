@@ -586,7 +586,5 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
-
-#nullable disable
     }
 }
