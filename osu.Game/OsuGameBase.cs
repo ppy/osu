@@ -296,7 +296,6 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
 
@@ -305,6 +304,7 @@ namespace osu.Game
 
             CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
+            dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
