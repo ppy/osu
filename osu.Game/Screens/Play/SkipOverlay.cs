@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
-        private bool isClickable;
+        private bool stillClickable;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
@@ -89,6 +89,7 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Enabled = { Value = false }
                         },
                         remainingTimeBox = new Box
                         {
@@ -162,7 +163,9 @@ namespace osu.Game.Screens.Play
 
                 button.TriggerClick();
 
-                if (isClickable)
+                // A skip button may be clickable more than once.
+                // Automated seeks should seek until it's no longer possible, so let's keep trying.
+                if (stillClickable)
                     attemptNextSkip();
                 else
                     SkipQueued = false;
@@ -175,26 +178,22 @@ namespace osu.Game.Screens.Play
 
             // This case causes an immediate expire in `LoadComplete`, but `Update` may run once after that.
             // Avoid div-by-zero below.
-            if (fadeOutBeginTime <= displayTime || !gameplayClock.IsRunning)
-            {
-                isClickable = false;
-            }
-            else
-            {
-                double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+            if (fadeOutBeginTime <= displayTime)
+                return;
 
-                remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
-                isClickable = progress > 0;
-            }
+            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            button.Enabled.Value = isClickable;
-            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
+            stillClickable = progress > 0;
+
+            button.Enabled.Value = stillClickable;
+            buttonContainer.State.Value = stillClickable ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (isClickable && !e.HasAnyButtonPressed)
+            if (stillClickable && !e.HasAnyButtonPressed)
                 fadeContainer.TriggerShow();
 
             return base.OnMouseMove(e);
