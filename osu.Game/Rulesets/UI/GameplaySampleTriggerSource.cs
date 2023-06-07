@@ -75,11 +75,11 @@ namespace osu.Game.Rulesets.UI
             hitSound.Samples = samples;
         }
 
-        public void StopAllPlayback()
+        public void StopAllPlayback() => Schedule(() =>
         {
             foreach (var sound in hitSounds)
                 sound.Stop();
-        }
+        });
 
         protected HitObject GetMostValidObject()
         {
