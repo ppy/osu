@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override LocalisableString Header => GeneralSettingsStrings.LanguageHeader;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, OsuConfigManager config, FrameworkConfigManager frameworkConfig)
+        private void load(OsuGameBase game, OsuConfigManager config, FrameworkConfigManager frameworkConfig)
         {
             Children = new Drawable[]
             {
