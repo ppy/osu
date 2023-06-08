@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
 
             float snapRadius =
-                playfield.GamefieldToScreenSpace(new Vector2(OsuHitObject.OBJECT_RADIUS / 5)).X -
+                playfield.GamefieldToScreenSpace(new Vector2(OsuHitObject.OBJECT_RADIUS * 0.10f)).X -
                 playfield.GamefieldToScreenSpace(Vector2.Zero).X;
 
             foreach (var b in blueprints)

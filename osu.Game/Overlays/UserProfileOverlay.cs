@@ -120,7 +120,7 @@ namespace osu.Game.Overlays
                 if (lastSection != section.NewValue)
                 {
                     lastSection = section.NewValue;
-                    tabs.Current.Value = lastSection;
+                    tabs.Current.Value = lastSection!;
                 }
             };
 

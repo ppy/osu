@@ -14,12 +14,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -27,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private int? lastCustomDivisor;
 
@@ -101,13 +103,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.SelectPrevious
                                                     },
                                                     new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Action = beatDivisor.SelectNext
                                                     }
                                                 },
                                             },
@@ -235,6 +237,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleNextBeatSnapDivisor:
+                    beatDivisor.SelectNext();
+                    return true;
+
+                case GlobalAction.EditorCyclePreviousBeatSnapDivisor:
+                    beatDivisor.SelectPrevious();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
@@ -459,12 +481,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Right:
-                        beatDivisor.Next();
+                        beatDivisor.SelectNext();
                         OnUserChange(Current.Value);
                         return true;
 
                     case Key.Left:
-                        beatDivisor.Previous();
+                        beatDivisor.SelectPrevious();
                         OnUserChange(Current.Value);
                         return true;
 

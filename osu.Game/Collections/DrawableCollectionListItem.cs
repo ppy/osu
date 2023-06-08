@@ -86,6 +86,7 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
+                                CommitOnFocusLost = true,
                                 PlaceholderText = collection.IsManaged ? string.Empty : "Create a new collection"
                             },
                         }

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Notifications;
 using osu.Game.Tests;
@@ -28,6 +29,8 @@ namespace osu.Game.Online.API
         public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        public Language Language => Language.en;
 
         public string AccessToken => "token";
 
