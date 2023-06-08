@@ -248,7 +248,6 @@ namespace osu.Game.Overlays.Volume
                 displayVolume = value;
 
                 int intValue = (int)Math.Round(displayVolume * 100);
-                bool intVolumeChanged = intValue != displayVolumeInt;
 
                 displayVolumeInt = intValue;
 
@@ -266,8 +265,6 @@ namespace osu.Game.Overlays.Volume
                 volumeCircle.Current.Value = displayVolume * 0.75f;
                 volumeCircleGlow.Current.Value = displayVolume * 0.75f;
 
-                if (intVolumeChanged && IsLoaded)
-                    Scheduler.AddOnce(playTickSound);
             }
         }
 
@@ -283,7 +280,7 @@ namespace osu.Game.Overlays.Volume
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
 
             // intentionally pitched down, even when hitting max.
-            if (displayVolumeInt == 0 || displayVolumeInt == 100)
+            if (Bindable.Value >= 0.995f)
                 channel.Frequency.Value -= 0.5f;
 
             channel.Play();
@@ -293,7 +290,12 @@ namespace osu.Game.Overlays.Volume
         public double Volume
         {
             get => Bindable.Value;
-            private set => Bindable.Value = value;
+            private set
+            {
+                Bindable.Value = value;
+
+                Scheduler.AddOnce(playTickSound);
+            }
         }
 
         private const double adjust_step = 0.05;
