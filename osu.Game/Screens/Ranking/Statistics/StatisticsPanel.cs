@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;
 
-                var statisticRows = CreateStatisticRows(newScore, task.GetResultSafely());
+                var statisticItems = CreateStatisticItems(newScore, task.GetResultSafely());
 
-                if (!hitEventsAvailable && statisticRows.SelectMany(r => r.Columns).All(c => c.RequiresHitEvents))
+                if (!hitEventsAvailable && statisticItems.All(c => c.RequiresHitEvents))
                 {
                     container = new FillFlowContainer
                     {
@@ -144,32 +144,21 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     bool anyRequiredHitEvents = false;
 
-                    foreach (var row in statisticRows)
+                    foreach (var item in statisticItems)
                     {
-                        var columns = row.Columns;
-
-                        if (columns.Length == 0)
-                            continue;
-
                         var columnContent = new List<Drawable>();
-                        var dimensions = new List<Dimension>();
 
-                        foreach (var col in columns)
+                        if (!hitEventsAvailable && item.RequiresHitEvents)
                         {
-                            if (!hitEventsAvailable && col.RequiresHitEvents)
-                            {
-                                anyRequiredHitEvents = true;
-                                continue;
-                            }
-
-                            columnContent.Add(new StatisticContainer(col)
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            });
-
-                            dimensions.Add(col.Dimension ?? new Dimension());
+                            anyRequiredHitEvents = true;
+                            continue;
                         }
+
+                        columnContent.Add(new StatisticContainer(item)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        });
 
                         rows.Add(new GridContainer
                         {
@@ -178,7 +167,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Content = new[] { columnContent.ToArray() },
-                            ColumnDimensions = dimensions.ToArray(),
+                            ColumnDimensions = new[] { new Dimension() },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
@@ -219,11 +208,11 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         /// <summary>
-        /// Creates the <see cref="StatisticRow"/>s to be displayed in this panel for a given <paramref name="newScore"/>.
+        /// Creates the <see cref="StatisticItem"/>s to be displayed in this panel for a given <paramref name="newScore"/>.
         /// </summary>
         /// <param name="newScore">The score to create the rows for.</param>
         /// <param name="playableBeatmap">The beatmap on which the score was set.</param>
-        protected virtual ICollection<StatisticRow> CreateStatisticRows(ScoreInfo newScore, IBeatmap playableBeatmap)
+        protected virtual ICollection<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
             => newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap);
 
         protected override bool OnClick(ClickEvent e)

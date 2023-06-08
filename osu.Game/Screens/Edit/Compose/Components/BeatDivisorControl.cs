@@ -16,12 +16,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -29,7 +31,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -101,13 +103,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.SelectPrevious
                                                     },
                                                     new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Action = beatDivisor.SelectNext
                                                     }
                                                 },
                                             },
@@ -218,6 +220,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleNextBeatSnapDivisor:
+                    beatDivisor.SelectNext();
+                    return true;
+
+                case GlobalAction.EditorCyclePreviousBeatSnapDivisor:
+                    beatDivisor.SelectPrevious();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
@@ -383,7 +405,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
 
-                Padding = new MarginPadding { Horizontal = 5 };
+                RangePadding = 5;
+                Padding = new MarginPadding { Horizontal = RangePadding };
             }
 
             protected override void LoadComplete()
@@ -398,15 +421,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ClearInternal();
                 CurrentNumber.ValueChanged -= moveMarker;
 
-                foreach (int divisor in beatDivisor.ValidDivisors.Value.Presets)
+                int largestDivisor = beatDivisor.ValidDivisors.Value.Presets.Last();
+
+                for (int tickIndex = 0; tickIndex <= largestDivisor; tickIndex++)
                 {
-                    AddInternal(new Tick(divisor)
+                    int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(tickIndex, largestDivisor, (int[])beatDivisor.ValidDivisors.Value.Presets);
+                    bool isSolidTick = divisor * (largestDivisor - tickIndex) == largestDivisor;
+
+                    AddInternal(new Tick(divisor, isSolidTick)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
                         Colour = BindableBeatDivisor.GetColourFor(divisor, colours),
-                        X = getMappedPosition(divisor),
+                        X = tickIndex / (float)largestDivisor,
                     });
                 }
 
@@ -418,6 +446,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private void moveMarker(ValueChangedEvent<int> divisor)
             {
                 marker.MoveToX(getMappedPosition(divisor.NewValue), 100, Easing.OutQuint);
+
+                foreach (Tick tick in InternalChildren.OfType<Tick>().Where(t => !t.AlwaysDisplayed))
+                {
+                    tick.FadeTo(divisor.NewValue % tick.Divisor == 0 ? 0.2f : 0f, 100, Easing.OutQuint);
+                }
             }
 
             protected override void UpdateValue(float value)
@@ -431,12 +464,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Right:
-                        beatDivisor.Next();
+                        beatDivisor.SelectNext();
                         OnUserChange(Current.Value);
                         return true;
 
                     case Key.Left:
-                        beatDivisor.Previous();
+                        beatDivisor.SelectPrevious();
                         OnUserChange(Current.Value);
                         return true;
 
@@ -483,13 +516,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => 1 - 1 / divisor;
 
             private partial class Tick : Circle
             {
-                public Tick(int divisor)
+                public readonly bool AlwaysDisplayed;
+
+                public readonly int Divisor;
+
+                public Tick(int divisor, bool alwaysDisplayed)
                 {
+                    AlwaysDisplayed = alwaysDisplayed;
+                    Divisor = divisor;
+
                     Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
+                    Alpha = alwaysDisplayed ? 1 : 0;
+
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
                 }
             }

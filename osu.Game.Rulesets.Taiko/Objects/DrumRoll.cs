@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
 using osu.Framework.Bindables;
@@ -69,6 +67,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
             double scoringDistance = base_distance * difficulty.SliderMultiplier * SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
+            TickRate = difficulty.SliderTickRate == 3 ? 3 : 4;
+
             tickSpacing = timingPoint.BeatLength / TickRate;
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this)
         {
             StartTime = startTime,
             Samples = Samples
@@ -117,6 +117,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             // The strong hit of the drum roll doesn't actually provide any score.
             public override Judgement CreateJudgement() => new IgnoreJudgement();
+
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
 
         #region LegacyBeatmapEncoder
