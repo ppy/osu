@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModFlashlight()
         {
+            // Required because some rulesets have different default values for the final flashlight size.
             FinalFlashlightSize.DefaultChanged += _ => FinalFlashlightSize.SetDefault();
 
             ChangeSizeComboDivisor.BindValueChanged(e =>
