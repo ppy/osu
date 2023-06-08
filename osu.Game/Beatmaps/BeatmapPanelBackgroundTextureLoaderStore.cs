@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapPanelBackgroundTextureLoaderStore : IResourceStore<TextureUpload>
     {
         // These numbers are taken from the draw visualiser size requirements for song select panel textures at extreme aspect ratios.
-        private const int height = 130;
+        private const int max_height = 130;
         private const int max_width = 1280;
 
         private readonly IResourceStore<TextureUpload>? textureStore;
@@ -67,13 +67,14 @@ namespace osu.Game.Beatmaps
 
             Size size = image.Size();
             int usableWidth = Math.Min(max_width, size.Width);
+            int usableHeight = Math.Min(max_height, size.Height);
 
             // Crop the centre region of the background for now.
             Rectangle cropRectangle = new Rectangle(
                 (size.Width - usableWidth) / 2,
-                size.Height / 2 - height / 2,
+                (size.Height - usableHeight) / 3,
                 usableWidth,
-                height
+                usableHeight
             );
 
             image.Mutate(i => i.Crop(cropRectangle));
