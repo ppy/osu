@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             bool first = true;
 
-            for (double t = StartTime; t < EndTime + tickSpacing; t += tickSpacing)
+            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
