@@ -57,7 +57,13 @@ namespace osu.Game.Rulesets.Osu
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both });
+            var osuTouchDeviceDetector = new OsuTouchDeviceDetector { RelativeSizeAxes = Axes.Both };
+
+            AddRange(new Drawable[]
+            {
+                osuTouchDeviceDetector,
+                new OsuTouchInputMapper(this, osuTouchDeviceDetector) { RelativeSizeAxes = Axes.Both }
+            });
         }
 
         protected override bool Handle(UIEvent e)

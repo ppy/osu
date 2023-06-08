@@ -33,11 +33,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly OsuInputManager osuInputManager;
 
+        private readonly OsuTouchDeviceDetector osuTouchTouchDeviceDetector;
+
         private Bindable<bool> mouseDisabled = null!;
 
-        public OsuTouchInputMapper(OsuInputManager inputManager)
+        public OsuTouchInputMapper(OsuInputManager inputManager, OsuTouchDeviceDetector touchDeviceDetector)
         {
             osuInputManager = inputManager;
+            osuTouchTouchDeviceDetector = touchDeviceDetector;
         }
 
         [BackgroundDependencyLoader]
@@ -80,7 +83,14 @@ namespace osu.Game.Rulesets.Osu.UI
             handleTouchMovement(e);
 
             if (shouldResultInAction)
+            {
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
+
+                if (newTouch.DirectTouch)
+                {
+                    osuTouchTouchDeviceDetector.OnDirectTouch(e);
+                }
+            }
 
             return true;
         }
@@ -155,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.OnTouchUp(e);
         }
 
-        private class TrackedTouch
+        public class TrackedTouch
         {
             public readonly TouchSource Source;
 
