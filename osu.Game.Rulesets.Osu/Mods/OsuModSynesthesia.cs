@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -14,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Mod that colours <see cref="HitObject"/>s based on the musical division they are on
     /// </summary>
-    public class OsuModSnapColour : ModSnapColour, IApplicableToBeatmap, IApplicableToDrawableHitObject
+    public class OsuModSynesthesia : ModSynesthesia, IApplicableToBeatmap, IApplicableToDrawableHitObject
     {
         private readonly OsuColour colours = new OsuColour();
 
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            if (currentBeatmap.IsNull() || drawable.IsNull()) return;
+            if (currentBeatmap == null) return;
 
             drawable.OnUpdate += _ =>
                 drawable.AccentColour.Value = BindableBeatDivisor.GetColourFor(

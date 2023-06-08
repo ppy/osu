@@ -176,7 +176,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
-                        new OsuModSnapColour(),
                         new MultiMod(new OsuModAlternate(), new OsuModSingleTap())
                     };
 
@@ -205,7 +204,8 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
-                        new OsuModBubbles()
+                        new OsuModBubbles(),
+                        new OsuModSynesthesia()
                     };
 
                 case ModType.System:
