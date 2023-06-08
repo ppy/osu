@@ -28,6 +28,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -91,6 +92,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -700,6 +704,13 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
+            realm.Write(r =>
+            {
+                var beatmap = r.Find<BeatmapInfo>(editorBeatmap.BeatmapInfo.ID);
+                if (beatmap != null)
+                    beatmap.EditorTimestamp = clock.CurrentTime;
+            });
+
             ApplyToBackground(b =>
             {
                 b.DimWhenUserSettingsIgnored.Value = 0;
@@ -833,7 +844,11 @@ namespace osu.Game.Screens.Edit
             {
                 double targetTime = 0;
 
-                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                if (editorBeatmap.BeatmapInfo.EditorTimestamp != null)
+                {
+                    targetTime = editorBeatmap.BeatmapInfo.EditorTimestamp.Value;
+                }
+                else if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
                 {
                     // seek to one beat length before the first hitobject
                     targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
