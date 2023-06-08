@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
             // Crop the centre region of the background for now.
             Rectangle cropRectangle = new Rectangle(
                 (size.Width - usableWidth) / 2,
-                (size.Height - usableHeight) / 3,
+                (size.Height - usableHeight) / 2,
                 usableWidth,
                 usableHeight
             );
