@@ -299,6 +299,8 @@ namespace osu.Game.Overlays.Volume
         }
 
         private const double adjust_step = 0.05;
+        private const double adjust_step_fine = 0.01;
+        private bool isFineAdjustment = false;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -325,7 +327,8 @@ namespace osu.Game.Overlays.Volume
             }
             else
             {
-                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
+                double step = isFineAdjustment ? adjust_step_fine : adjust_step;
+                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * step));
             }
         }
 
@@ -349,6 +352,19 @@ namespace osu.Game.Overlays.Volume
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            text.ScaleTo(1.16f, transition_length, Easing.OutExpo);
+            isFineAdjustment = true;
+            return true;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            text.ScaleTo(1f, transition_length, Easing.OutExpo);
+            isFineAdjustment = false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
