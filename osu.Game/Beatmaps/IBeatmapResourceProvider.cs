@@ -17,6 +17,11 @@ namespace osu.Game.Beatmaps
         TextureStore LargeTextureStore { get; }
 
         /// <summary>
+        /// Retrieve a global large texture store, used specifically for retrieving cropped beatmap panel backgrounds.
+        /// </summary>
+        TextureStore BeatmapPanelTextureStore { get; }
+
+        /// <summary>
         /// Access a global track store for retrieving beatmap tracks from.
         /// </summary>
         ITrackStore Tracks { get; }
