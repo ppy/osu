@@ -17,9 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [TestCase(0.5f)]
         [TestCase(1.5f)]
         [TestCase(2f)]
-        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new OsuModFlashlight { SizeMultiplier = { Value = sizeMultiplier } }, PassCondition = () => true });
-
-        [Test]
-        public void TestComboBasedSize([Values] bool comboBasedSize) => CreateModTest(new ModTestData { Mod = new OsuModFlashlight { ComboBasedSize = { Value = comboBasedSize } }, PassCondition = () => true });
+        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new OsuModFlashlight { StartingFlashlightSize = { Value = sizeMultiplier } }, PassCondition = () => true });
     }
 }
