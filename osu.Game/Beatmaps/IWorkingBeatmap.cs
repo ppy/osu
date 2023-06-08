@@ -50,6 +50,11 @@ namespace osu.Game.Beatmaps
         Texture GetBackground();
 
         /// <summary>
+        /// Retrieves a cropped background for this <see cref="IWorkingBeatmap"/> used for display on panels.
+        /// </summary>
+        Texture GetPanelBackground();
+
+        /// <summary>
         /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="IWorkingBeatmap"/>.
         /// </summary>
         Waveform Waveform { get; }
