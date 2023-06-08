@@ -187,12 +187,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int objectCount = countNormal + countSlider + countSpinner;
 
             DifficultyPeppyStars = (int)Math.Round(
-                (playableBeatmap.Difficulty.DrainRate
-                 + playableBeatmap.Difficulty.OverallDifficulty
-                 + playableBeatmap.Difficulty.CircleSize
-                 + Math.Clamp(objectCount / playableBeatmap.Difficulty.DrainRate * 8, 0, 16)) / 38 * 5);
+                (baseBeatmap.Difficulty.DrainRate
+                 + baseBeatmap.Difficulty.OverallDifficulty
+                 + baseBeatmap.Difficulty.CircleSize
+                 + Math.Clamp(objectCount / baseBeatmap.Difficulty.DrainRate * 8, 0, 16)) / 38 * 5);
 
-            ScoreMultiplier = 1 * DifficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            ScoreMultiplier = DifficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
         }
     }
 
