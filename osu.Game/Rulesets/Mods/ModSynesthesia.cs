@@ -8,12 +8,12 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// Mod that colours hitobjects based on the musical division they are on
     /// </summary>
-    public class ModSnapColour : Mod
+    public class ModSynesthesia : Mod
     {
-        public override string Name => "Snap Colour";
-        public override string Acronym => "SC";
+        public override string Name => "Synesthesia";
+        public override string Acronym => "SY";
         public override LocalisableString Description => "Colours hit objects based on the rhythm.";
         public override double ScoreMultiplier => 1;
-        public override ModType Type => ModType.Conversion;
+        public override ModType Type => ModType.Fun;
     }
 }
