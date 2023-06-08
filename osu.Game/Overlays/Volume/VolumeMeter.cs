@@ -296,7 +296,7 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        private const double adjust_step = 0.01;
+        private const double adjust_step = 0.05;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -304,27 +304,10 @@ namespace osu.Game.Overlays.Volume
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
         private double scrollAccumulation;
 
-        private double accelerationModifier = 1;
-
-        private const double max_acceleration = 5;
-        private const double acceleration_multiplier = 1.8;
-
-        private ScheduledDelegate accelerationDebounce;
-
-        private void resetAcceleration() => accelerationModifier = 1;
-
         private void adjust(double delta, bool isPrecise)
         {
             if (delta == 0)
                 return;
-
-            // every adjust increment increases the rate at which adjustments happen up to a cutoff.
-            // this debounce will reset on inactivity.
-            accelerationDebounce?.Cancel();
-            accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
-
-            delta *= accelerationModifier;
-            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
             double precision = Bindable.Precision;
 
