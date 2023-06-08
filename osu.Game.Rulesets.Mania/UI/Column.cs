@@ -40,7 +40,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
+
+        internal readonly Container BackgroundContainer = new Container { RelativeSizeAxes = Axes.Both };
+
         internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
+
         private DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
@@ -77,30 +81,31 @@ namespace osu.Game.Rulesets.Mania.UI
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
-
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
-                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
-                background.CreateProxy(),
                 HitObjectArea,
                 keyArea = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                background,
+                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
+                // (see `Stage.columnBackgrounds`).
+                BackgroundContainer,
                 TopLevelContainer,
                 new ColumnTouchInputArea(this)
+            };
+
+            var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both,
             };
 
             background.ApplyGameWideClock(host);
             keyArea.ApplyGameWideClock(host);
 
+            BackgroundContainer.Add(background);
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
             RegisterPool<Note, DrawableNote>(10, 50);
