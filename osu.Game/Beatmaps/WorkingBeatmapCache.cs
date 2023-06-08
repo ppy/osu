@@ -160,7 +160,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override Texture GetBackground()
+            public override Texture GetBackground()
             {
                 if (string.IsNullOrEmpty(Metadata?.BackgroundFile))
                     return null;
