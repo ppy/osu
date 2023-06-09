@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
 
         // public for tests
         [CanBeNull]
-        public MainMenuButton playButton { get; private set; }
+        public MainMenuButton PlayButton { get; private set; }
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(
-                playButton = new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
+                PlayButton = new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
                     Key.P, hoverAction: ClearKeyboardSelection)
             );
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E, hoverAction: ClearKeyboardSelection));
@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Menu
         public void SelectUp()
         {
             // if we come from play, focus play button again
-            int parentSelection = State == ButtonSystemState.Play ? buttonsTopLevel.FindIndex(b => b == playButton) : -1;
+            int parentSelection = State == ButtonSystemState.Play ? buttonsTopLevel.FindIndex(b => b == PlayButton) : -1;
             goBack();
             SelectionIndex = parentSelection;
         }
@@ -401,7 +401,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    playButton!.TriggerClick();
+                    PlayButton!.TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:
