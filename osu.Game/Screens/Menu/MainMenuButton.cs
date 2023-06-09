@@ -48,15 +48,18 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
+        private readonly Action<HoverEvent> hoverAction;
         private Sample sampleClick;
         private Sample sampleHover;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown,
+            Action<HoverEvent> hoverAction = null)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
+            this.hoverAction = hoverAction;
             TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
@@ -158,7 +161,14 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (State != ButtonState.Expanded) return true;
+            SimulateHover();
+            hoverAction?.Invoke(e);
+            return true;
+        }
+
+        public void SimulateHover()
+        {
+            if (State != ButtonState.Expanded) return;
 
             sampleHover?.Play();
 
@@ -169,10 +179,14 @@ namespace osu.Game.Screens.Menu
             icon.ClearTransforms();
             icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
-            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
+        {
+            SimulateHoverLost();
+        }
+
+        public void SimulateHoverLost()
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
