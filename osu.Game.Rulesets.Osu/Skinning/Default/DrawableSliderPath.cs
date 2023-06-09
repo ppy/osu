@@ -68,5 +68,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         }
 
         protected float CalculatedBorderPortion => BorderSize * BORDER_PORTION;
+
+        protected DrawableSliderPath()
+        {
+            BackgroundColour = Color4.Transparent;
+        }
     }
 }
