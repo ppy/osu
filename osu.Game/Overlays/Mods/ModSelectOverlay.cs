@@ -219,8 +219,8 @@ namespace osu.Game.Overlays.Mods
             {
                 aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
                 });
             }
 
