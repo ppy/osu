@@ -22,12 +22,15 @@ using osu.Framework.Statistics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
+using osu.Game.IO.Legacy;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
 using Realms;
 using Realms.Exceptions;
@@ -72,8 +75,9 @@ namespace osu.Game.Database
         /// 25   2022-09-18    Remove skins to add with new naming.
         /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
+        /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
         /// </summary>
-        private const int schema_version = 27;
+        private const int schema_version = 28;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -880,6 +884,7 @@ namespace osu.Game.Database
                     break;
 
                 case 26:
+                {
                     // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
@@ -887,6 +892,44 @@ namespace osu.Game.Database
                         score.BeatmapHash = score.BeatmapInfo.Hash;
 
                     break;
+                }
+
+                case 28:
+                {
+                    var files = new RealmFileStore(this, storage);
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                    {
+                        string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
+                        if (replayFilename == null)
+                            continue;
+
+                        try
+                        {
+                            using (var stream = files.Store.GetStream(replayFilename))
+                            {
+                                if (stream == null)
+                                    continue;
+
+                                // Trimmed down logic from LegacyScoreDecoder to extract the version from replays.
+                                using (SerializationReader sr = new SerializationReader(stream))
+                                {
+                                    sr.ReadByte(); // Ruleset.
+                                    int version = sr.ReadInt32();
+                                    if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                        score.IsLegacyScore = true;
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
+                        }
+                    }
+
+                    break;
+                }
             }
         }
 
