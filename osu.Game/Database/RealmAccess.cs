@@ -902,25 +902,24 @@ namespace osu.Game.Database
                     foreach (var score in scores)
                     {
                         string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
-
                         if (replayFilename == null)
                             continue;
 
-                        using (var stream = files.Store.GetStream(replayFilename))
+                        try
                         {
-                            if (stream == null)
-                                continue;
-
-                            try
+                            using (var stream = files.Store.GetStream(replayFilename))
                             {
+                                if (stream == null)
+                                    continue;
+
                                 int version = new ReplayVersionParser().Parse(stream);
                                 if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
                                     score.IsLegacyScore = true;
                             }
-                            catch (Exception e)
-                            {
-                                Logger.Error(e, $"Failed to read replay {replayFilename}", LoggingTarget.Database);
-                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, $"Failed to read replay {replayFilename}", LoggingTarget.Database);
                         }
                     }
 
