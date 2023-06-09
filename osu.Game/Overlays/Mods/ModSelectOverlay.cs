@@ -838,7 +838,8 @@ namespace osu.Game.Overlays.Mods
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
 
-                //Kill focus on SearchTextBox
+                //By doing this we kill the focus on SearchTextBox.
+                //Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
                 Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
 
                 return true;
