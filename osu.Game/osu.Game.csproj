@@ -50,4 +50,7 @@
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Rulesets\Mods\ModAutoApplied.cs" />
+  </ItemGroup>
 </Project>
