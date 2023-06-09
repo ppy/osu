@@ -192,7 +192,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 foreach (var scoreInfo in scoreInfos)
                 {
-                    scoreInfo.ScoreMultiplierCalculator = _ => 1;
+                    var scoreMultiplier = scoreInfo.ScoreMultiplierCalculator(scoreInfo);
+                    scoreInfo.TotalScore = (long)Math.Round(scoreInfo.TotalScore / scoreMultiplier);
                 }
             }
 
