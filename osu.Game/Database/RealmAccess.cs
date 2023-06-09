@@ -911,9 +911,16 @@ namespace osu.Game.Database
                             if (stream == null)
                                 continue;
 
-                            int version = new ReplayVersionParser().Parse(stream);
-                            if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                                score.IsLegacyScore = true;
+                            try
+                            {
+                                int version = new ReplayVersionParser().Parse(stream);
+                                if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                    score.IsLegacyScore = true;
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Error(e, $"Failed to read replay {replayFilename}", LoggingTarget.Database);
+                            }
                         }
                     }
 
