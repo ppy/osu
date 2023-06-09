@@ -86,10 +86,8 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 osuInputManager.KeyBindingContainer.TriggerPressed(action);
 
-                if (newTouch.DirectTouch)
-                {
-                    osuTouchTouchDeviceDetector.OnDirectTouch(e);
-                }
+                if (newTouch == positionTrackingTouch)
+                    osuTouchTouchDeviceDetector.OnPositionTrackerDown(e);
             }
 
             return true;

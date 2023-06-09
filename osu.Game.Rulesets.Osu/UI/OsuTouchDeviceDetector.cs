@@ -19,60 +19,63 @@ namespace osu.Game.Rulesets.Osu.UI
         private const int mouse_input_touchscreen_distance = 100;
 
         /// <summary>
-        /// The max amount of <see cref="flaggedTouchesCount"/> that is required for <see cref="OsuModTouchDevice"/> to be applied.
+        /// The max amount of <see cref="FlaggedTouchesCount"/> that is required for <see cref="OsuModTouchDevice"/> to be applied.
         /// </summary>
         private const int max_flagged_touches = 10;
 
         /// <summary>
         /// Tracks the amount of inputs that got flagged as a touch device input.
         /// </summary>
-        private int flaggedTouchesCount;
+        public int FlaggedTouchesCount;
 
         /// <summary>
         /// Whether touch device input is already detected.
         /// </summary>
-        private bool detectedTouchDevice;
+        public bool DetectedTouchDevice => FlaggedTouchesCount >= max_flagged_touches;
 
         [Resolved(CanBeNull = true)]
         private Player? player { get; set; }
 
-        private Vector2? previousTouchPos;
+        private Vector2? previousInputPos;
 
         /// <summary>
         /// Checks whether a given input position is likely to be from a touch device.
-        /// This is done by comparing said position with the previous touch position.
+        /// This is done by comparing said position with the previous touch position
         /// </summary>
         /// <param name="inputPosition">The input position to be compared.</param>
         private bool isTouchInput(Vector2 inputPosition) =>
-            previousTouchPos != null && Vector2.Distance(previousTouchPos.Value, inputPosition) > mouse_input_touchscreen_distance;
+            previousInputPos != null && Vector2.Distance(previousInputPos.Value, inputPosition) > mouse_input_touchscreen_distance;
 
         /// <summary>
         /// Detects and applies the <see cref="OsuModTouchDevice"/> to the player mods.
         /// </summary>
+        /// <remarks>
+        /// This check should also be done even when the input is guaranteed to be from a touch device.
+        /// Because the behavior for whether a given score will be flagged as TD should remain the same across all types of devices.
+        /// </remarks>
         /// <param name="newTouchPosition">The new touch position to be checked against <see cref="isTouchInput"/></param>
         private void detectTouchInput(Vector2 newTouchPosition)
         {
-            if (player != null && !detectedTouchDevice && isTouchInput(newTouchPosition))
-            {
-                detectedTouchDevice = ++flaggedTouchesCount > max_flagged_touches;
+            if (isTouchInput(newTouchPosition))
+                FlaggedTouchesCount++;
 
-                if (detectedTouchDevice)
-                    player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
-            }
+            // A simple flag to check if the mod was already applied does not work. This parts get executed twice with that, not sure why.
+            if (player != null && !player.Score.ScoreInfo.Mods.Any(m => m is OsuModTouchDevice))
+                player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
 
-            previousTouchPos = newTouchPosition;
+            previousInputPos = newTouchPosition;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            // We should also check for touch input on mouse devices.
+            // This is due to some windows touchscreen devices sending touchscreen events as if they were
+            // being made with a mouse input.
             detectTouchInput(e.MousePosition);
 
             return base.OnMouseDown(e);
         }
 
-        public void OnDirectTouch(TouchDownEvent e)
-        {
-            detectTouchInput(e.TouchDownPosition);
-        }
+        public void OnPositionTrackerDown(TouchDownEvent e) => detectTouchInput(e.TouchDownPosition);
     }
 }
