@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Menu
 
         public readonly Key TriggerKey;
 
+        private readonly ButtonSystem buttonSystem;
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
@@ -52,14 +53,18 @@ namespace osu.Game.Screens.Menu
         private Sample sampleClick;
         private Sample sampleHover;
 
+        // for tests
+        public bool LooksHovered { get; private set; }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown,
-                              Action<HoverEvent> hoverAction = null)
+        public MainMenuButton(ButtonSystem buttonSystem, LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0,
+                              Key triggerKey = Key.Unknown, Action<HoverEvent> hoverAction = null)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
             this.hoverAction = hoverAction;
+            this.buttonSystem = buttonSystem;
             TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
@@ -161,8 +166,11 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            SimulateHover();
+            if (!buttonSystem.ConfirmHover(e.ScreenSpaceMousePosition))
+                return false;
+
             hoverAction?.Invoke(e);
+            SimulateHover();
             return true;
         }
 
@@ -173,6 +181,7 @@ namespace osu.Game.Screens.Menu
             sampleHover?.Play();
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, Easing.OutElastic);
+            LooksHovered = true;
 
             double duration = TimeUntilNextBeat;
 
@@ -188,6 +197,8 @@ namespace osu.Game.Screens.Menu
 
         public void SimulateHoverLost()
         {
+            LooksHovered = false;
+
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
             icon.MoveTo(Vector2.Zero, 500, Easing.Out);
