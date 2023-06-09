@@ -17,9 +17,8 @@ namespace osu.Game.Beatmaps
     // If issues are found it's worth checking to make sure similar issues exist there.
     public class BeatmapPanelBackgroundTextureLoaderStore : IResourceStore<TextureUpload>
     {
-        // These numbers are taken from the draw visualiser size requirements for song select panel textures at extreme aspect ratios.
-        private const int max_height = 130;
-        private const int max_width = 1280;
+        // The aspect ratio of SetPanelBackground at its maximum size (very tall window).
+        private const float minimum_display_ratio = 512 / 80f;
 
         private readonly IResourceStore<TextureUpload>? textureStore;
 
@@ -67,16 +66,18 @@ namespace osu.Game.Beatmaps
 
             Size size = image.Size();
 
-            float aspectRatio = (float)size.Width / size.Height;
-
-            int usableWidth = Math.Min((int)(max_width * aspectRatio), size.Width);
-            int usableHeight = Math.Min(max_height, size.Height);
+            // Assume that panel backgrounds are always displayed using `FillMode.Fill`.
+            // Also assume that all backgrounds are wider than they are tall, so the
+            // fill is always going to be based on width.
+            //
+            // We need to include enough height to make this work for all ratio panels are displayed at.
+            int usableHeight = (int)Math.Ceiling(size.Width * 1 / minimum_display_ratio);
 
             // Crop the centre region of the background for now.
             Rectangle cropRectangle = new Rectangle(
-                (size.Width - usableWidth) / 2,
+                0,
                 (size.Height - usableHeight) / 2,
-                usableWidth,
+                size.Width,
                 usableHeight
             );
 
