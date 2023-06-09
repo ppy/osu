@@ -126,8 +126,8 @@ namespace osu.Game.Screens.Menu
 
         [CanBeNull]
         public Container CurrentSelection =>
-            (SelectionIndex >= 0 && SelectionIndex < currentButtonsList?.Count)
-                ? currentButtonsList[SelectionIndex]
+            (SelectionIndex >= 0 && SelectionIndex < CurrentButtonsList?.Count)
+                ? CurrentButtonsList[SelectionIndex]
                 : logo;
 
         private Sample sampleBack;
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Menu
                 State = ButtonSystemState.TopLevel;
                 SelectionIndex = 1;
             }
-            else if (currentButtonsList == null)
+            else if (CurrentButtonsList == null)
             {
                 SelectionIndex = -1;
             }
@@ -338,8 +338,8 @@ namespace osu.Game.Screens.Menu
             {
                 int nextSelection = SelectionIndex + d;
 
-                if (nextSelection >= currentButtonsList.Count)
-                    nextSelection = currentButtonsList.Count - 1;
+                if (nextSelection >= CurrentButtonsList.Count)
+                    nextSelection = CurrentButtonsList.Count - 1;
                 else if (nextSelection < 0)
                     nextSelection = 0;
 
@@ -357,9 +357,9 @@ namespace osu.Game.Screens.Menu
 
         public void ClearKeyboardSelection(HoverEvent e)
         {
-            if (currentButtonsList != null)
+            if (CurrentButtonsList != null)
             {
-                foreach (var btn in currentButtonsList)
+                foreach (var btn in CurrentButtonsList)
                 {
                     if (btn != e.Target)
                     {
