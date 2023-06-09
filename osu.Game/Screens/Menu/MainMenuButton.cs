@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Menu
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown,
-                      Action<HoverEvent> hoverAction = null)
+                              Action<HoverEvent> hoverAction = null)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
