@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
+        private readonly SamplePointPiece samplePointPiece;
+        private readonly DifficultyPointPiece? difficultyPointPiece;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -101,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
-                new SamplePointPiece(Item)
+                samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre
@@ -118,7 +120,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (item is IHasSliderVelocity)
             {
-                AddInternal(new DifficultyPointPiece(Item)
+                AddInternal(difficultyPointPiece = new DifficultyPointPiece(Item)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.BottomCentre
@@ -243,6 +245,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds)
+        {
+            // Since children are exceeding the component size, we need to use a custom quad to compute whether it should be masked away.
+
+            // If the component isn't considered masked away by itself, there's no need to apply custom logic.
+            if (!base.ComputeIsMaskedAway(maskingBounds))
+                return false;
+
+            // If the component is considered masked away, we'll use children to create an extended quad that encapsulates all parts of this blueprint
+            // to ensure it doesn't pop in and out of existence abruptly when scrolling the timeline.
+            var rect = RectangleF.Union(ScreenSpaceDrawQuad.AABBFloat, circle.ScreenSpaceDrawQuad.AABBFloat);
+            rect = RectangleF.Union(rect, samplePointPiece.ScreenSpaceDrawQuad.AABBFloat);
+
+            if (difficultyPointPiece != null)
+                rect = RectangleF.Union(rect, difficultyPointPiece.ScreenSpaceDrawQuad.AABBFloat);
+
+            return !Precision.AlmostIntersects(maskingBounds, rect);
+        }
 
         private partial class Tick : Circle
         {
