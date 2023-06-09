@@ -62,7 +62,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             {
                 outerFill = new Circle // renders white outer border and dark fill
                 {
-                    Size = Size,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    // Slightly inset to prevent bleeding outside the ring
+                    Size = Size - new Vector2(0.5f),
                     Alpha = withOuterFill ? 1 : 0,
                 },
                 outerGradient = new Circle // renders the outer bright gradient
