@@ -193,6 +193,9 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
+            if (!IsPresent)
+                return;
+
             if (Active.Value)
                 sampleOn?.Play();
             else

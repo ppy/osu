@@ -212,8 +212,8 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var button in availableMods.Where(b => b.Active.Value))
             {
-                if (Alpha == 0f)
-                    button.Active.Value = false; //If column is hidden change state manually without any animation
+                if (!button.Visible)
+                    button.Active.Value = false; //If mod panel is hidden change state manually without any animation
                 else
                     pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
             }
