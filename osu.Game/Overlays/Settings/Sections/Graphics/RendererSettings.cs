@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -96,6 +97,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
                     automaticRendererInUse = renderer.Value == RendererType.Automatic;
                     hostResolvedRenderer = host.ResolvedRenderer;
+
+                    // We must re-run population in order to generate things correctly.
+                    // This is because OsuEnumDropdown runs GenerateItemText below in its ctor, before we know the automatic renderer usage state.
+                    Items = Enum.GetValues<RendererType>();
                 }
 
                 protected override LocalisableString GenerateItemText(RendererType item)
