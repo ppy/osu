@@ -819,9 +819,19 @@ namespace osu.Game.Screens.Play
             if (!canShowResults && !forceImport)
                 return Task.FromResult<ScoreInfo>(null);
 
+            // If non-default score multiplier calculator was used we want to recalculate actual score
+            // with default score multiplier which should always be used when importing or submitting scores.
+            var gameplayScoreMultiplierCalculator = ScoreProcessor.ScoreMultiplierCalculator;
+            ScoreProcessor.ScoreMultiplierCalculator = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
+            var actualTotalScore = ScoreProcessor.TotalScore.Value;
+            ScoreProcessor.ScoreMultiplierCalculator = gameplayScoreMultiplierCalculator;
+
             return prepareScoreForDisplayTask = Task.Run(async () =>
             {
                 var scoreCopy = Score.DeepClone();
+
+                var gameplayScore = scoreCopy.ScoreInfo.TotalScore;
+                scoreCopy.ScoreInfo.TotalScore = actualTotalScore;
 
                 try
                 {
@@ -840,6 +850,8 @@ namespace osu.Game.Screens.Play
                 {
                     Logger.Error(ex, @"Score import failed!");
                 }
+
+                scoreCopy.ScoreInfo.TotalScore = gameplayScore;
 
                 return scoreCopy.ScoreInfo;
             });
