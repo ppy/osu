@@ -95,11 +95,11 @@ namespace osu.Game.Screens.Menu
 
         [CanBeNull]
         private List<MainMenuButton> currentButtonsList => State switch
-            {
-                ButtonSystemState.TopLevel => buttonsTopLevel,
-                ButtonSystemState.Play => buttonsPlay,
-                _ => null
-            };
+        {
+            ButtonSystemState.TopLevel => buttonsTopLevel,
+            ButtonSystemState.Play => buttonsPlay,
+            _ => null
+        };
 
         private int selectionIndex = -1;
         public int SelectionIndex

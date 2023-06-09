@@ -29,7 +29,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("assume first button is 1 for following tests", () => buttons.SelectionIndex == 1);
             AddStep("press right (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup));
             AddAssert("button 2 is selected", () => buttons.SelectionIndex == 2);
-            AddStep("press right (keybind) many times", () => {
+            AddStep("press right (keybind) many times", () =>
+            {
                 globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup);
                 globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup);
                 globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup);
@@ -39,7 +40,8 @@ namespace osu.Game.Tests.Visual.Navigation
                 globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup);
             });
             AddAssert("last button is selected (exit button)", () => buttons.SelectionIndex == 4);
-            AddStep("press left (keybind) 3 times", () => {
+            AddStep("press left (keybind) 3 times", () =>
+            {
                 globalActionContainer.TriggerPressed(GlobalAction.SelectPreviousGroup);
                 globalActionContainer.TriggerPressed(GlobalAction.SelectPreviousGroup);
                 globalActionContainer.TriggerPressed(GlobalAction.SelectPreviousGroup);
