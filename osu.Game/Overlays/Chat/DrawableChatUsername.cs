@@ -87,7 +87,6 @@ namespace osu.Game.Overlays.Chat
             {
                 Shadow = false,
                 Truncate = true,
-                EllipsisString = "…",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
