@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Play
     public partial class ArgonKeyCounter : KeyCounter
     {
         private Circle inputIndicator = null!;
+        private OsuSpriteText keyNameText = null!;
         private OsuSpriteText countText = null!;
 
         // These values were taken from Figma
@@ -24,13 +25,16 @@ namespace osu.Game.Screens.Play
         // Make things look bigger without using Scale
         private const float scale_factor = 1.5f;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public ArgonKeyCounter(InputTrigger trigger)
             : base(trigger)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -42,7 +46,7 @@ namespace osu.Game.Screens.Play
                     Height = line_height * scale_factor,
                     Alpha = 0.5f
                 },
-                new OsuSpriteText
+                keyNameText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -69,8 +73,33 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            IsActive.BindValueChanged(e => inputIndicator.Alpha = e.NewValue ? 1 : 0.5f, true);
             CountPresses.BindValueChanged(e => countText.Text = e.NewValue.ToString(@"#,0"), true);
+        }
+
+        protected override void Activate(bool forwardPlayback = true)
+        {
+            base.Activate(forwardPlayback);
+
+            keyNameText
+                .FadeColour(Colour4.White, 10, Easing.OutQuint);
+
+            inputIndicator
+                .FadeIn(10, Easing.OutQuint)
+                .MoveToY(0)
+                .Then()
+                .MoveToY(4, 60, Easing.OutQuint);
+        }
+
+        protected override void Deactivate(bool forwardPlayback = true)
+        {
+            base.Deactivate(forwardPlayback);
+
+            keyNameText
+                .FadeColour(colours.Blue0, 200, Easing.OutQuart);
+
+            inputIndicator
+                .MoveToY(0, 250, Easing.OutQuart)
+                .FadeTo(0.5f, 250, Easing.OutQuart);
         }
     }
 }

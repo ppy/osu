@@ -291,56 +291,32 @@ namespace osu.Game.Rulesets.Osu
             return base.GetDisplayNameForHitResult(result);
         }
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
 
             return new[]
             {
-                new StatisticRow
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                }),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    Height = 250
+                }, true),
+                new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    Height = 250
+                }, true),
+                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                        {
-                            new AverageHitError(timedHitEvents),
-                            new UnstableRate(timedHitEvents)
-                        }), true)
-                    }
-                }
+                    new AverageHitError(timedHitEvents),
+                    new UnstableRate(timedHitEvents)
+                }), true)
             };
         }
 

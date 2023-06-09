@@ -264,8 +264,9 @@ namespace osu.Game.Tests.Visual.Collections
             assertCollectionName(1, "First");
         }
 
-        [Test]
-        public void TestCollectionRenamedOnTextChange()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestCollectionRenamedOnTextChange(bool commitWithEnter)
         {
             BeatmapCollection first = null!;
             DrawableCollectionListItem firstItem = null!;
@@ -293,8 +294,18 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("change first collection name", () =>
             {
                 firstItem.ChildrenOfType<TextBox>().First().Text = "First";
-                InputManager.Key(Key.Enter);
             });
+
+            if (commitWithEnter)
+                AddStep("commit via enter", () => InputManager.Key(Key.Enter));
+            else
+            {
+                AddStep("commit via click away", () =>
+                {
+                    InputManager.MoveMouseTo(firstItem.ScreenSpaceDrawQuad.TopLeft - new Vector2(10));
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
 
             AddUntilStep("collection has new name", () => first.Name == "First");
         }
