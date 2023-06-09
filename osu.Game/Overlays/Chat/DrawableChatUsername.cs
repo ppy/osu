@@ -83,10 +83,9 @@ namespace osu.Game.Overlays.Chat
 
             Action = openUserProfile;
 
-            drawableText = new OsuSpriteText
+            drawableText = new TruncatingSpriteText
             {
                 Shadow = false,
-                Truncate = true,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
