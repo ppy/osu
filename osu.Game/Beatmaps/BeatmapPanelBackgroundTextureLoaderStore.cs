@@ -66,7 +66,10 @@ namespace osu.Game.Beatmaps
             textureUpload.Dispose();
 
             Size size = image.Size();
-            int usableWidth = Math.Min(max_width, size.Width);
+
+            float aspectRatio = (float)size.Width / size.Height;
+
+            int usableWidth = Math.Min((int)(max_width * aspectRatio), size.Width);
             int usableHeight = Math.Min(max_height, size.Height);
 
             // Crop the centre region of the background for now.
