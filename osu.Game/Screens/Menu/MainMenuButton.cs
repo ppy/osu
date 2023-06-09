@@ -192,6 +192,9 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            if (!buttonSystem.ConfirmHover(e.ScreenSpaceMousePosition))
+                return;
+
             SimulateHoverLost();
         }
 

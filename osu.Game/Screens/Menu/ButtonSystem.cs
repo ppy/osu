@@ -394,6 +394,17 @@ namespace osu.Game.Screens.Menu
         public void PreferKeyboardNavigation()
         {
             blockedMousePosition = GetContainingInputManager().CurrentState.Mouse.Position;
+
+            if (CurrentButtonsList != null)
+            {
+                foreach (var btn in CurrentButtonsList)
+                {
+                    if (btn != CurrentSelection)
+                    {
+                        btn.SimulateHoverLost();
+                    }
+                }
+            }
         }
 
         public bool ConfirmHover(Vector2 currentMousePosition)
