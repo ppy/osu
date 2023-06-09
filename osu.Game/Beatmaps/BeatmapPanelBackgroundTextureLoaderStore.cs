@@ -73,6 +73,8 @@ namespace osu.Game.Beatmaps
             // We need to include enough height to make this work for all ratio panels are displayed at.
             int usableHeight = (int)Math.Ceiling(size.Width * 1 / minimum_display_ratio);
 
+            usableHeight = Math.Min(size.Height, usableHeight);
+
             // Crop the centre region of the background for now.
             Rectangle cropRectangle = new Rectangle(
                 0,
