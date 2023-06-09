@@ -924,7 +924,7 @@ namespace osu.Game.Database
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, $"Failed to read replay {replayFilename}", LoggingTarget.Database);
+                            Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
                         }
                     }
 
