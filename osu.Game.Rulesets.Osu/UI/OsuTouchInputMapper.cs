@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.OnTouchUp(e);
         }
 
-        public class TrackedTouch
+        private class TrackedTouch
         {
             public readonly TouchSource Source;
 
