@@ -83,18 +83,15 @@ namespace osu.Game.Screens.Menu
         private readonly MainMenuButton backButton;
         private readonly MainMenuButton settingsButton;
 
-        [CanBeNull]
-        private MainMenuButton playButton;
-
         // public for tests
         [CanBeNull]
-        public MainMenuButton PlayButton => playButton;
+        public MainMenuButton playButton { get; private set; }
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
 
         [CanBeNull]
-        private List<MainMenuButton> currentButtonsList => State switch
+        public List<MainMenuButton> CurrentButtonsList => State switch
         {
             ButtonSystemState.TopLevel => buttonsTopLevel,
             ButtonSystemState.Play => buttonsPlay,
@@ -102,6 +99,7 @@ namespace osu.Game.Screens.Menu
         };
 
         private int selectionIndex = -1;
+
         public int SelectionIndex
         {
             get => selectionIndex;
@@ -110,7 +108,9 @@ namespace osu.Game.Screens.Menu
                 MainMenuButton previousButton = null;
                 if (CurrentSelection is MainMenuButton button)
                     previousButton = button;
+
                 selectionIndex = value;
+
                 if (CurrentSelection is MainMenuButton newButton)
                 {
                     if (previousButton != newButton)
@@ -358,9 +358,16 @@ namespace osu.Game.Screens.Menu
         public void ClearKeyboardSelection(HoverEvent e)
         {
             if (currentButtonsList != null)
+            {
                 foreach (var btn in currentButtonsList)
+                {
                     if (btn != e.Target)
+                    {
                         btn.SimulateHoverLost();
+                    }
+                }
+            }
+
             selectionIndex = -1;
         }
 
@@ -394,7 +401,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    playButton.TriggerClick();
+                    playButton!.TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:
