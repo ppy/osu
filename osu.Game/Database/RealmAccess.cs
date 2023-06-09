@@ -912,9 +912,14 @@ namespace osu.Game.Database
                                 if (stream == null)
                                     continue;
 
-                                int version = new ReplayVersionParser().Parse(stream);
-                                if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                                    score.IsLegacyScore = true;
+                                // Trimmed down logic from LegacyScoreDecoder to extract the version from replays.
+                                using (SerializationReader sr = new SerializationReader(stream))
+                                {
+                                    sr.ReadByte(); // Ruleset.
+                                    int version = sr.ReadInt32();
+                                    if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                        score.IsLegacyScore = true;
+                                }
                             }
                         }
                         catch (Exception e)
@@ -1143,21 +1148,6 @@ namespace osu.Game.Database
                 realmRetrievalLock.Dispose();
 
                 isDisposed = true;
-            }
-        }
-
-        /// <summary>
-        /// A trimmed down <see cref="LegacyScoreDecoder"/> specialised to extract the version from replays.
-        /// </summary>
-        private class ReplayVersionParser
-        {
-            public int Parse(Stream stream)
-            {
-                using (SerializationReader sr = new SerializationReader(stream))
-                {
-                    sr.ReadByte(); // Ruleset.
-                    return sr.ReadInt32();
-                }
             }
         }
     }
