@@ -103,6 +103,8 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
+        protected readonly ModSelectOverlayStatics statics = new ModSelectOverlayStatics();
+
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
