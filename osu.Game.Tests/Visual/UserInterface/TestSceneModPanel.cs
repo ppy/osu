@@ -23,6 +23,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
+        [Cached]
+        private ModSelectOverlayStatics modOverlayStatics = new ModSelectOverlayStatics();
+
         [Test]
         public void TestVariousPanels()
         {
