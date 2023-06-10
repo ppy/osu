@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         private const double pre_beat_transition_time = 80;
 
-        private const float flash_opacity = 0.3f;
+        private const float flash_opacity = 0.15f;
 
         private ColourInfo accentColour;
 
