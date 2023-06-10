@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private const double pre_beat_transition_time = 80;
 
-        private const float flash_opacity = 0.3f;
+        private const float flash_opacity = 0.15f;
 
         [Resolved]
         private DrawableHitObject drawableHitObject { get; set; } = null!;
