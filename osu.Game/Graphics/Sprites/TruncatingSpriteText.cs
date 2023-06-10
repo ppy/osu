@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.Sprites
@@ -14,7 +15,7 @@ namespace osu.Game.Graphics.Sprites
 
         public TruncatingSpriteText()
         {
-            Truncate = true;
+            ((SpriteText)this).Truncate = true;
         }
     }
 }
