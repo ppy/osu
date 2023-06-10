@@ -118,22 +118,20 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Vertical,
                                 Children = new[]
                                 {
-                                    titleText = new OsuSpriteText
+                                    titleText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
                                             Left = -18 * ShearedOverlayContainer.SHEAR
                                         }
                                     },
-                                    descriptionText = new OsuSpriteText
+                                    descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
                                     }
                                 }
