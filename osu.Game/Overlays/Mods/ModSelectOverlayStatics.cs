@@ -9,12 +9,12 @@ namespace osu.Game.Overlays.Mods
     {
         protected override void InitialiseDefaults()
         {
-            SetDefault(Static.LastModSelectPanelSoundPlaybackTime, (double?)null);
+            SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
         }
     }
 
     public enum Static
     {
-        LastModSelectPanelSoundPlaybackTime
+        LastModSelectPanelSamplePlaybackTime
     }
 }

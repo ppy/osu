@@ -44,6 +44,7 @@ namespace osu.Game.Overlays.Mods
 
         public const float CORNER_RADIUS = 7;
         public const float HEIGHT = 42;
+        public double SAMPLE_PLAYBACK_DELAY = 30;
 
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;
@@ -61,6 +62,9 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; } = null!;
+
+        [Resolved]
+        protected ModSelectOverlayStatics ModOverlayStatics { get; private set; } = null!;
 
         private readonly OsuSpriteText titleText;
         private readonly OsuSpriteText descriptionText;
@@ -192,10 +196,17 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
+            double? lastPlaybackTime = ModOverlayStatics.Get<double?>(Static.LastModSelectPanelSamplePlaybackTime);
+
+            if (lastPlaybackTime is not null && Time.Current - lastPlaybackTime < SAMPLE_PLAYBACK_DELAY)
+                return;
+
             if (Active.Value)
                 sampleOn?.Play();
             else
                 sampleOff?.Play();
+
+            ModOverlayStatics.SetValue<double?>(Static.LastModSelectPanelSamplePlaybackTime, Time.Current);
         }
 
         protected override bool OnHover(HoverEvent e)
