@@ -126,13 +126,15 @@ namespace osu.Game.Overlays.Mods
                                         Margin = new MarginPadding
                                         {
                                             Left = -18 * ShearedOverlayContainer.SHEAR
-                                        }
+                                        },
+                                        ShowTooltip = false,
                                     },
                                     descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                        ShowTooltip = false,
                                     }
                                 }
                             }

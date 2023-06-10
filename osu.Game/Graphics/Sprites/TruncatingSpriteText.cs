@@ -9,9 +9,11 @@ namespace osu.Game.Graphics.Sprites
 {
     public sealed partial class TruncatingSpriteText : OsuSpriteText, IHasTooltip
     {
+        public bool ShowTooltip { get; init; } = true;
+
         public LocalisableString TooltipText => Text;
 
-        public override bool HandlePositionalInput => IsTruncated;
+        public override bool HandlePositionalInput => IsTruncated && ShowTooltip;
 
         public TruncatingSpriteText()
         {
