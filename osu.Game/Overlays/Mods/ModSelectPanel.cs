@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Mods
 
         public const float CORNER_RADIUS = 7;
         public const float HEIGHT = 42;
-        public double SAMPLE_PLAYBACK_DELAY = 30;
+        public const double SAMPLE_PLAYBACK_DELAY = 30;
 
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;
