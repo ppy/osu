@@ -98,8 +98,10 @@ namespace osu.Game.Screens.Menu
                 {
                     case ButtonSystemState.TopLevel:
                         return buttonsTopLevel;
+
                     case ButtonSystemState.Play:
                         return buttonsPlay;
+
                     default:
                         return null;
                 }
