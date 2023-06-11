@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Menu
         private readonly MainMenuButton settingsButton;
 
         [CanBeNull]
-        internal MainMenuButton playButton;
+        internal MainMenuButton PlayButton;
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
@@ -154,9 +154,10 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
-                settingsButton = new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O, hoverAction: ProcessHover),
+                settingsButton = new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(),
+                    -WEDGE_WIDTH, Key.O, hoverAction: processMenuButtonHover),
                 backButton = new MainMenuButton(ButtonSystemStrings.Back, @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
-                    -WEDGE_WIDTH, hoverAction: ProcessHover)
+                    -WEDGE_WIDTH, hoverAction: processMenuButtonHover)
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
@@ -178,21 +179,28 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P, hoverAction: ProcessHover));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M, hoverAction: ProcessHover));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L, hoverAction: ProcessHover));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(),
+                WEDGE_WIDTH, Key.P, hoverAction: processMenuButtonHover));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer,
+                0, Key.M, hoverAction: processMenuButtonHover));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists,
+                0, Key.L, hoverAction: processMenuButtonHover));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(
-                playButton = new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
-                    Key.P, hoverAction: ProcessHover)
+                PlayButton = new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play,
+                    WEDGE_WIDTH, Key.P, hoverAction: processMenuButtonHover)
             );
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E, hoverAction: ProcessHover));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0,
-                Key.D, hoverAction: ProcessHover));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(),
+                0, Key.E, hoverAction: processMenuButtonHover));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(),
+                0, Key.D, hoverAction: processMenuButtonHover));
 
             if (host.CanExit)
-                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q, hoverAction: ProcessHover));
+            {
+                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(),
+                    0, Key.Q, hoverAction: processMenuButtonHover));
+            }
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
@@ -363,14 +371,14 @@ namespace osu.Game.Screens.Menu
         public void SelectUp()
         {
             // if we come from play, focus play button again
-            int? parentSelection = State == ButtonSystemState.Play ? buttonsTopLevel.FindIndex(b => b == playButton) : null;
+            int? parentSelection = State == ButtonSystemState.Play ? buttonsTopLevel.FindIndex(b => b == PlayButton) : null;
             if (parentSelection == -1)
                 parentSelection = null;
             goBack();
             SelectionIndex = parentSelection;
         }
 
-        private bool ProcessHover(Vector2 screenSpacePosition, [CanBeNull] Drawable hoverElement)
+        private bool processMenuButtonHover(Vector2 screenSpacePosition, [CanBeNull] Drawable hoverElement)
         {
             if (!ConfirmHover(screenSpacePosition))
                 return false;
@@ -452,7 +460,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    playButton!.TriggerClick();
+                    PlayButton!.TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:

@@ -26,14 +26,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("state is initial", () => buttons.State, () => Is.EqualTo(ButtonSystemState.Initial));
             AddStep("press right (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup));
             AddAssert("state is top level", () => buttons.State, () => Is.EqualTo(ButtonSystemState.TopLevel));
-            AddAssert("auto focused play button", () => buttons.CurrentSelection, () => Is.EqualTo(buttons.playButton));
+            AddAssert("auto focused play button", () => buttons.CurrentSelection, () => Is.EqualTo(buttons.PlayButton));
             AddAssert("assume play button is 1 for following tests", () => buttons.SelectionIndex, () => Is.EqualTo(1));
             AddStep("press right (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup));
             AddAssert("button 2 is selected", () => buttons.SelectionIndex, () => Is.EqualTo(2));
             AddRepeatStep("press right (keybind) many times", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNextGroup), 7);
             AddAssert("last button is selected (exit button)", () => buttons.SelectionIndex, () => Is.EqualTo(4));
             AddRepeatStep("press left (keybind) 3 times", () => globalActionContainer.TriggerPressed(GlobalAction.SelectPreviousGroup), 3);
-            AddAssert("auto focused play button", () => buttons.CurrentSelection, () => Is.EqualTo(buttons.playButton));
+            AddAssert("auto focused play button", () => buttons.CurrentSelection, () => Is.EqualTo(buttons.PlayButton));
             AddStep("press down (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNext));
             AddAssert("state is play buttons", () => buttons.State, () => Is.EqualTo(ButtonSystemState.Play));
             AddStep("press down (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNext));
