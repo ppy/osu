@@ -36,7 +36,6 @@ namespace osu.Game.Screens.Menu
 
         public readonly Key TriggerKey;
 
-        private readonly ButtonSystem buttonSystem;
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
@@ -49,22 +48,21 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
-        private readonly Action<HoverEvent> hoverAction;
+        private readonly Func<Vector2, Drawable, bool> hoverAction;
         private Sample sampleClick;
         private Sample sampleHover;
 
         // for tests
-        public bool LooksHovered { get; private set; }
+        internal bool LooksHovered { get; private set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(ButtonSystem buttonSystem, LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0,
-                              Key triggerKey = Key.Unknown, Action<HoverEvent> hoverAction = null)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0,
+                              Key triggerKey = Key.Unknown, Func<Vector2, Drawable, bool> hoverAction = null)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
             this.hoverAction = hoverAction;
-            this.buttonSystem = buttonSystem;
             TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
@@ -166,10 +164,9 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!buttonSystem.ConfirmHover(e.ScreenSpaceMousePosition))
+            if (hoverAction?.Invoke(e.ScreenSpaceMousePosition, e.Target) == false)
                 return false;
 
-            hoverAction?.Invoke(e);
             SimulateHover();
             return true;
         }
@@ -192,7 +189,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!buttonSystem.ConfirmHover(e.ScreenSpaceMousePosition))
+            if (hoverAction?.Invoke(e.ScreenSpaceMousePosition, null) == false)
                 return;
 
             SimulateHoverLost();
