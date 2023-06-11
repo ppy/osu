@@ -45,6 +45,13 @@ namespace osu.Game.Screens.Select
         public RulesetInfo Ruleset;
         public bool AllowConvertedBeatmaps;
 
+        /// <summary>
+        /// The online ruleset ID that the current filter criteria will show
+        /// for map conversions, when enabled. (always standard osu! in standard
+        /// rulesets)
+        /// </summary>
+        public int ConversionSourceRulesetID = 0;
+
         private string searchText;
 
         /// <summary>

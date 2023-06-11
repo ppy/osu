@@ -380,5 +380,22 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
+
+        /// <summary>
+        /// <para>
+        /// The Ruleset Online ID that maps need to have to be able to get
+        /// converted from. Defaults to 0 (osu! maps), but can be changed to
+        /// other IDs to not use osu! maps, but instead only use taiko (1),
+        /// catch (2) or mania (3) maps as source maps.
+        /// </para>
+        /// <para>
+        /// Furthermore the player needs to allow converted maps in the settings
+        /// in order for converted maps to show, as well as the ruleset map
+        /// convertor returned by
+        /// <see cref="Ruleset.CreateBeatmapConverter(IBeatmap)"/>
+        /// needing to be able to convert them.
+        /// </para>
+        /// </summary>
+        public virtual int ConversionSourceRulesetID => 0;
     }
 }
