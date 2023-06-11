@@ -96,14 +96,17 @@ namespace osu.Game.Screens.Menu
             {
                 switch (State)
                 {
-                    case ButtonSystemState.TopLevel: return buttonsTopLevel;
-                    case ButtonSystemState.Play: return buttonsPlay;
-                    default: return null;
+                    case ButtonSystemState.TopLevel:
+                        return buttonsTopLevel;
+                    case ButtonSystemState.Play:
+                        return buttonsPlay;
+                    default:
+                        return null;
                 }
             }
         }
 
-        private int? selectionIndex = null;
+        private int? selectionIndex;
 
         public int? SelectionIndex
         {
@@ -134,7 +137,7 @@ namespace osu.Game.Screens.Menu
         /// input. Reset to Vector2.Zero when hovering over buttons. When a
         /// hover is registered very close to this position, we ignore the hover.
         /// </summary>
-        private Vector2? blockedMousePosition = null;
+        private Vector2? blockedMousePosition;
 
         private Sample sampleBack;
 
