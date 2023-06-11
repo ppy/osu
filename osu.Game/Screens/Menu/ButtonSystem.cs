@@ -312,20 +312,15 @@ namespace osu.Game.Screens.Menu
             {
                 case GlobalAction.Back:
                     PreferKeyboardNavigation();
-                    return goBack();
+                    SelectUp();
+                    return true;
 
                 case GlobalAction.Select:
-                case GlobalAction.SelectNext:
                     PreferKeyboardNavigation();
                     CurrentSelection?.TriggerClick();
                     // keyboard navgiation into submenu
                     if (State != ButtonSystemState.EnteringMode)
                         SelectionIndex = 1; // 1 to skip the back/settings btn
-                    return true;
-
-                case GlobalAction.SelectPrevious:
-                    PreferKeyboardNavigation();
-                    SelectUp();
                     return true;
 
                 case GlobalAction.SelectNextGroup:

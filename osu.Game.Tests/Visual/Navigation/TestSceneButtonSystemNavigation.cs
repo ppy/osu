@@ -34,9 +34,15 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("last button is selected (exit button)", () => buttons.SelectionIndex, () => Is.EqualTo(4));
             AddRepeatStep("press left (keybind) 3 times", () => globalActionContainer.TriggerPressed(GlobalAction.SelectPreviousGroup), 3);
             AddAssert("auto focused play button", () => buttons.CurrentSelection, () => Is.EqualTo(buttons.PlayButton));
-            AddStep("press down (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNext));
+            AddStep("confirm selection", () => globalActionContainer.TriggerPressed(GlobalAction.Select));
             AddAssert("state is play buttons", () => buttons.State, () => Is.EqualTo(ButtonSystemState.Play));
-            AddStep("press down (keybind)", () => globalActionContainer.TriggerPressed(GlobalAction.SelectNext));
+            AddAssert("solo button is selected", () => buttons.SelectionIndex, () => Is.EqualTo(1));
+            AddStep("escape", () => globalActionContainer.TriggerPressed(GlobalAction.Back));
+            AddAssert("play button is selected", () => buttons.SelectionIndex, () => Is.EqualTo(1));
+            AddAssert("state is top level", () => buttons.State, () => Is.EqualTo(ButtonSystemState.TopLevel));
+            AddStep("confirm selection", () => globalActionContainer.TriggerPressed(GlobalAction.Select));
+            AddAssert("state is play buttons", () => buttons.State, () => Is.EqualTo(ButtonSystemState.Play));
+            AddStep("confirm selection", () => globalActionContainer.TriggerPressed(GlobalAction.Select));
             AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
         }
 
