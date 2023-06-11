@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.Mods
         protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
         [Resolved]
-        protected ModSelectOverlayStatics ModOverlayStatics { get; private set; } = null!;
+        protected SessionStatics Statics { get; private set; } = null!;
 
         private readonly OsuSpriteText titleText;
         private readonly OsuSpriteText descriptionText;
@@ -196,7 +197,7 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
-            double? lastPlaybackTime = ModOverlayStatics.Get<double?>(Static.LastModSelectPanelSamplePlaybackTime);
+            double? lastPlaybackTime = Statics.Get<double?>(Static.LastModSelectPanelSamplePlaybackTime);
 
             if (lastPlaybackTime is not null && Time.Current - lastPlaybackTime < SAMPLE_PLAYBACK_DELAY)
                 return;
@@ -206,7 +207,7 @@ namespace osu.Game.Overlays.Mods
             else
                 sampleOff?.Play();
 
-            ModOverlayStatics.SetValue<double?>(Static.LastModSelectPanelSamplePlaybackTime, Time.Current);
+            Statics.SetValue<double?>(Static.LastModSelectPanelSamplePlaybackTime, Time.Current);
         }
 
         protected override bool OnHover(HoverEvent e)
