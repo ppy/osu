@@ -37,9 +37,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
-        [Cached]
-        private ModSelectOverlayStatics modOverlayStatics = new ModSelectOverlayStatics();
-
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
