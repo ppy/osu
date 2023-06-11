@@ -1,4 +1,7 @@
-# 如何构建本项目:
+## 已归档
+有关下载加速和LLin播放器，请移步[LLin]([MATRIX-feather/LLin](https://github.com/MATRIX-feather/LLin))
+
+## 如何构建本项目:
 
 ```bash
 #!/bin/bash
