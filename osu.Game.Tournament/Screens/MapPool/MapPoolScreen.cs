@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -25,6 +26,7 @@ namespace osu.Game.Tournament.Screens.MapPool
     public partial class MapPoolScreen : TournamentMatchScreen
     {
         private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
+        private TournamentMatch currentMatch;
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -36,6 +38,8 @@ namespace osu.Game.Tournament.Screens.MapPool
         private readonly OsuButton buttonBlueBan;
         private readonly OsuButton buttonRedPick;
         private readonly OsuButton buttonBluePick;
+
+        private readonly SettingsCheckbox chkBoxLineBreak;
 
         public MapPoolScreen()
         {
@@ -98,6 +102,15 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Action = reset
                         },
                         new ControlPanel.Spacer(),
+                        new TournamentSpriteText
+                        {
+                            Text = "Each modpool takes"
+                        },
+                        new TournamentSpriteText
+                        {
+                            Text = "different row"
+                        },
+                        chkBoxLineBreak = new SettingsCheckbox()
                     },
                 }
             };
@@ -107,6 +120,8 @@ namespace osu.Game.Tournament.Screens.MapPool
         private void load(MatchIPCInfo ipc)
         {
             ipc.Beatmap.BindValueChanged(beatmapChanged);
+            chkBoxLineBreak.Current.Value = true;
+            chkBoxLineBreak.Current.BindValueChanged(_ => rearrangeMappool());
         }
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
@@ -213,37 +228,42 @@ namespace osu.Game.Tournament.Screens.MapPool
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             base.CurrentMatchChanged(match);
+            currentMatch = match.NewValue;
+            rearrangeMappool();
+        }
 
+        private void rearrangeMappool()
+        {
             mapFlows.Clear();
 
-            if (match.NewValue == null)
+            if (currentMatch == null)
                 return;
-
             int totalRows = 0;
 
-            if (match.NewValue.Round.Value != null)
+            if (currentMatch.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
-
                 int flowCount = 0;
 
-                foreach (var b in match.NewValue.Round.Value.Beatmaps)
+                foreach (var b in currentMatch.Round.Value.Beatmaps)
                 {
                     if (currentFlow == null || currentMod != b.Mods)
                     {
-                        mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
+                        if (chkBoxLineBreak.Current.Value || currentFlow == null)
                         {
-                            Spacing = new Vector2(10, 5),
-                            Direction = FillDirection.Full,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        });
+                            mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
+                            {
+                                Spacing = new Vector2(10, 5),
+                                Direction = FillDirection.Full,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            });
 
+                            totalRows++;
+                            flowCount = 0;
+                        }
                         currentMod = b.Mods;
-
-                        totalRows++;
-                        flowCount = 0;
                     }
 
                     if (++flowCount > 2)
