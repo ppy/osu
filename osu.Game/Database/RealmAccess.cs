@@ -1192,26 +1192,4 @@ namespace osu.Game.Database
             }
         }
     }
-
-    internal class FakeHit : HitObject
-    {
-        private readonly Judgement judgement;
-
-        public override Judgement CreateJudgement() => judgement;
-
-        public FakeHit(Judgement judgement)
-        {
-            this.judgement = judgement;
-        }
-    }
-
-    internal class FakeJudgement : Judgement
-    {
-        public override HitResult MaxResult { get; }
-
-        public FakeJudgement(HitResult result)
-        {
-            MaxResult = result;
-        }
-    }
 }

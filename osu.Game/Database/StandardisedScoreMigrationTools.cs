@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -148,6 +149,28 @@ namespace osu.Game.Database
             }
 
             return (long)(1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore);
+        }
+
+        private class FakeHit : HitObject
+        {
+            private readonly Judgement judgement;
+
+            public override Judgement CreateJudgement() => judgement;
+
+            public FakeHit(Judgement judgement)
+            {
+                this.judgement = judgement;
+            }
+        }
+
+        private class FakeJudgement : Judgement
+        {
+            public override HitResult MaxResult { get; }
+
+            public FakeJudgement(HitResult result)
+            {
+                MaxResult = result;
+            }
         }
     }
 }
