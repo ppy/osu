@@ -45,6 +45,7 @@ namespace osu.Game.Overlays.Mods
 
         public const float CORNER_RADIUS = 7;
         public const float HEIGHT = 42;
+
         public const double SAMPLE_PLAYBACK_DELAY = 30;
 
         protected virtual float IdleSwitchWidth => 14;
@@ -64,15 +65,14 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
-        [Resolved]
-        protected SessionStatics Statics { get; private set; } = null!;
-
         private readonly OsuSpriteText titleText;
         private readonly OsuSpriteText descriptionText;
 
         private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool();
         private Sample? sampleOff;
         private Sample? sampleOn;
+
+        private Bindable<double?> lastPlaybackTime = null!;
 
         protected ModSelectPanel()
         {
@@ -168,13 +168,15 @@ namespace osu.Game.Overlays.Mods
         protected abstract void Deselect();
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)
+        private void load(AudioManager audio, SessionStatics statics, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             if (samplePlaybackDisabler != null)
                 ((IBindable<bool>)samplePlaybackDisabled).BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
         }
 
         protected sealed override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -197,17 +199,17 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
-            double? lastPlaybackTime = Statics.Get<double?>(Static.LastModSelectPanelSamplePlaybackTime);
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= SAMPLE_PLAYBACK_DELAY;
 
-            if (lastPlaybackTime is not null && Time.Current - lastPlaybackTime < SAMPLE_PLAYBACK_DELAY)
-                return;
+            if (enoughTimePassedSinceLastPlayback)
+            {
+                if (Active.Value)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
 
-            if (Active.Value)
-                sampleOn?.Play();
-            else
-                sampleOff?.Play();
-
-            Statics.SetValue<double?>(Static.LastModSelectPanelSamplePlaybackTime, Time.Current);
+                lastPlaybackTime.Value = Time.Current;
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
