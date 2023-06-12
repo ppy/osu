@@ -28,7 +28,10 @@ using osu.Game.IO.Legacy;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
@@ -76,8 +79,9 @@ namespace osu.Game.Database
         /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
+        /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
         /// </summary>
-        private const int schema_version = 28;
+        private const int schema_version = 29;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -930,6 +934,28 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 29:
+                {
+                    var scores = migration.NewRealm
+                                          .All<ScoreInfo>()
+                                          .Where(s => !s.IsLegacyScore);
+
+                    foreach (var score in scores)
+                    {
+                        // Recalculate the old-style standardised score to see if this was an old lazer score.
+                        long oldStandardised = StandardisedScoreMigrationTools.GetOldStandardised(score);
+
+                        if (oldStandardised == score.TotalScore)
+                        {
+                            long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                            Logger.Log($"Converting score {score.Rank} {score.Accuracy:P1} {score.TotalScore} -> {calculatedNew}");
+                            score.TotalScore = calculatedNew;
+                        }
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -1149,6 +1175,28 @@ namespace osu.Game.Database
 
                 isDisposed = true;
             }
+        }
+    }
+
+    internal class FakeHit : HitObject
+    {
+        private readonly Judgement judgement;
+
+        public override Judgement CreateJudgement() => judgement;
+
+        public FakeHit(Judgement judgement)
+        {
+            this.judgement = judgement;
+        }
+    }
+
+    internal class FakeJudgement : Judgement
+    {
+        public override HitResult MaxResult { get; }
+
+        public FakeJudgement(HitResult result)
+        {
+            MaxResult = result;
         }
     }
 }
