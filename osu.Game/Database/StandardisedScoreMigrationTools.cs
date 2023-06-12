@@ -21,6 +21,8 @@ namespace osu.Game.Database
             var ruleset = score.Ruleset.CreateInstance();
             var processor = ruleset.CreateScoreProcessor();
 
+            processor.TrackHitEvents = false;
+
             var beatmap = new Beatmap();
 
             HitResult maxRulesetJudgement = ruleset.GetHitResults().First().result;

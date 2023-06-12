@@ -31,6 +31,11 @@ namespace osu.Game.Rulesets.Scoring
         private const double accuracy_cutoff_d = 0;
 
         /// <summary>
+        /// Whether <see cref="HitEvents"/> should be populated during application of results.
+        /// </summary>
+        internal bool TrackHitEvents = true;
+
+        /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
         /// </summary>
         public event Action? OnResetFromReplayFrame;
@@ -226,7 +231,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ApplyScoreChange(result);
 
-            if (!IsSimulating)
+            if (!IsSimulating && TrackHitEvents)
             {
                 hitEvents.Add(CreateHitEvent(result));
                 lastHitObject = result.HitObject;
