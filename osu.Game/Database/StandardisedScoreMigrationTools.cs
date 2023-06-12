@@ -14,6 +14,9 @@ namespace osu.Game.Database
     {
         public static long GetNewStandardised(ScoreInfo score)
         {
+            // Avoid retrieving from realm inside loops.
+            int maxCombo = score.MaxCombo;
+
             var ruleset = score.Ruleset.CreateInstance();
             var processor = ruleset.CreateScoreProcessor();
 
@@ -61,7 +64,7 @@ namespace osu.Game.Database
                 if (result == HitResult.Miss || result == HitResult.LargeTickMiss)
                     continue;
 
-                if (processor.Combo.Value == score.MaxCombo)
+                if (processor.Combo.Value == maxCombo)
                 {
                     if (misses.Count > 0)
                     {
