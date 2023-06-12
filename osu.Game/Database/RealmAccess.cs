@@ -944,13 +944,20 @@ namespace osu.Game.Database
                     foreach (var score in scores)
                     {
                         // Recalculate the old-style standardised score to see if this was an old lazer score.
-                        long oldStandardised = StandardisedScoreMigrationTools.GetOldStandardised(score);
+                        bool oldScoreMatchesExpectations = StandardisedScoreMigrationTools.GetOldStandardised(score) == score.TotalScore;
+                        // Some older score don't have correct statistics populated, so let's give them benefit of doubt.
+                        bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
 
-                        if (oldStandardised == score.TotalScore)
+                        if (oldScoreMatchesExpectations || scoreIsVeryOld)
                         {
-                            long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
-                            Logger.Log($"Converting score {score.Rank} {score.Accuracy:P1} {score.TotalScore} -> {calculatedNew}");
-                            score.TotalScore = calculatedNew;
+                            try
+                            {
+                                long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                score.TotalScore = calculatedNew;
+                            }
+                            catch
+                            {
+                            }
                         }
                     }
 
