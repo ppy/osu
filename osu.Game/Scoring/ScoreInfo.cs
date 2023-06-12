@@ -181,8 +181,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [Ignored]
-        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+        public bool IsLegacyScore { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 
