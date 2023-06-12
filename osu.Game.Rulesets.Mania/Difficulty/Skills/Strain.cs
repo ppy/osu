@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainDecayBase => 1;
 
         private readonly double[] startTimes;
-        private readonly double[] endTimes;
+        private readonly double[] previousEndTimes;
         private readonly double[] individualStrains;
 
         private double individualStrain;
@@ -32,33 +32,41 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             : base(mods)
         {
             startTimes = new double[totalColumns];
-            endTimes = new double[totalColumns];
+            previousEndTimes = new double[totalColumns];
             individualStrains = new double[totalColumns];
             overallStrain = 1;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            var maniaCurrent = (ManiaDifficultyHitObject)current;
-            double startTime = maniaCurrent.StartTime;
-            double endTime = maniaCurrent.EndTime;
-            int column = maniaCurrent.BaseObject.Column;
-            bool isOverlapping = false;
+            var hitObject = (ManiaDifficultyHitObject)current;
 
-            double closestEndTime = Math.Abs(endTime - startTime); // Lowest value we can assume with the current information
-            double holdFactor = 1.0; // Factor to all additional strains in case something else is held
+            // Given a note, startTime == endTime.
+            double startTime = hitObject.StartTime;
+            double endTime = hitObject.EndTime;
+            int column = hitObject.BaseObject.Column;
+
+            double holdLength = Math.Abs(endTime - startTime);
+            double holdWeight = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
 
-            for (int i = 0; i < endTimes.Length; ++i)
+            // The closest end time, currently, is the current note's end time, which is its length
+            double closestEndTime = holdLength;
+
+            bool isOverlapping = false;
+
+            for (int i = 0; i < previousEndTimes.Length; ++i)
             {
                 // The current note is overlapped if a previous note or end is overlapping the current note body
                 isOverlapping |= Precision.DefinitelyBigger(endTimes[i], startTime, 1) && Precision.DefinitelyBigger(endTime, endTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
-                if (Precision.DefinitelyBigger(endTimes[i], endTime, 1))
-                    holdFactor = 1.25;
+                // This considers the scenarios A5:D5
+                if (Precision.DefinitelyBigger(previousEndTimes[i], endTime, 1))
+                    holdWeight = 1.25;
 
-                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - endTimes[i]));
+                // Update closest end time by looking through previous LNs
+                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - previousEndTimes[i]));
             }
 
             // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
@@ -76,18 +84,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             // Decay and increase individualStrains in own column
             individualStrains[column] = applyDecay(individualStrains[column], startTime - startTimes[column], individual_decay_base);
-            individualStrains[column] += 2.0 * holdFactor;
+            individualStrains[column] += 2.0 * holdWeight;
 
             // For notes at the same time (in a chord), the individualStrain should be the hardest individualStrain out of those columns
-            individualStrain = maniaCurrent.DeltaTime <= 1 ? Math.Max(individualStrain, individualStrains[column]) : individualStrains[column];
+            individualStrain = hitObject.DeltaTime <= 1 ? Math.Max(individualStrain, individualStrains[column]) : individualStrains[column];
 
             // Decay and increase overallStrain
             overallStrain = applyDecay(overallStrain, current.DeltaTime, overall_decay_base);
-            overallStrain += (1 + holdAddition) * holdFactor;
+            overallStrain += (1 + holdAddition) * holdWeight;
 
             // Update startTimes and endTimes arrays
             startTimes[column] = startTime;
-            endTimes[column] = endTime;
+            previousEndTimes[column] = endTime;
 
             // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
             return individualStrain + overallStrain - CurrentStrain;
