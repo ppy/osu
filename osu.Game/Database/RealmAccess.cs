@@ -28,16 +28,12 @@ using osu.Game.IO.Legacy;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
 using Realms;
 using Realms.Exceptions;
-using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace osu.Game.Database
 {
