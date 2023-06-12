@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private readonly Container kiaiContainer;
 
         private Bindable<bool> configHitLighting = null!;
+        private Bindable<bool> configHitFlash = null!;
 
         private static readonly Vector2 circle_size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -121,6 +122,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
 
             configHitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+            configHitFlash = config.GetBindable<bool>(OsuSetting.HitFlash);
         }
 
         protected override void LoadComplete()
@@ -205,10 +207,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         {
                             outerGradient.ResizeTo(OUTER_GRADIENT_SIZE * shrink_size, resize_duration, Easing.OutElasticHalf);
 
-                            outerGradient
-                                .FadeColour(Color4.White, 80)
-                                .Then()
-                                .FadeOut(flash_in_duration);
+                            if (configHitFlash.Value) {
+                                outerGradient
+                                    .FadeColour(Color4.White, 80)
+                                    .Then()
+                                    .FadeOut(flash_in_duration);
+                            } else {
+                                outerGradient
+                                    .FadeColour(Color4.White, flash_in_duration)
+                                    .FadeOut(flash_in_duration);
+                            }
                         }
 
                         if (configHitLighting.Value)
@@ -217,6 +225,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             flash.FadeTo(1, flash_in_duration, Easing.OutQuint);
 
                             this.FadeOut(fade_out_time, Easing.OutQuad);
+                        }
+                        else if (!configHitFlash.Value) {
+                            flash.HitLighting = false;
+                            this.FadeOut(fade_out_time / 2, Easing.OutQuad);
                         }
                         else
                         {

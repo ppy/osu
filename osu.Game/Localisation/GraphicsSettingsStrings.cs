@@ -115,6 +115,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
 
         /// <summary>
+        /// "Hit flash"
+        /// </summary>
+        public static LocalisableString HitFlash => new TranslatableString(getKey(@"hit_flash"), @"Hit flash");
+
+        /// <summary>
         /// "Screenshots"
         /// </summary>
         public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");
