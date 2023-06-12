@@ -127,14 +127,14 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             Left = -18 * ShearedOverlayContainer.SHEAR
                                         },
-                                        ShowTooltip = false,
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     },
                                     descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                        ShowTooltip = false,
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     }
                                 }
                             }
