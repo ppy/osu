@@ -15,6 +15,8 @@ namespace osu.Game.Database
     {
         public static long GetNewStandardised(ScoreInfo score)
         {
+            int maxJudgementIndex = 0;
+
             // Avoid retrieving from realm inside loops.
             int maxCombo = score.MaxCombo;
 
@@ -62,39 +64,25 @@ namespace osu.Game.Database
                                                                 .Where(kvp => kvp.Key == HitResult.Miss || kvp.Key == HitResult.LargeTickMiss)
                                                                 .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value)));
 
-            int maxJudgementIndex = 0;
-
             foreach (var result in sortedHits)
             {
                 // For the main part of this loop, ignore all misses, as they will be inserted from the queue.
                 if (result == HitResult.Miss || result == HitResult.LargeTickMiss)
                     continue;
 
+                // Reset combo if required.
                 if (processor.Combo.Value == maxCombo)
-                {
-                    if (misses.Count > 0)
-                    {
-                        processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
-                        {
-                            Type = misses.Dequeue(),
-                        });
-                    }
-                    else
-                    {
-                        // We ran out of misses. But we can't let max combo increase beyond the known value,
-                        // so let's forge a miss.
-                        processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
-                        {
-                            Type = HitResult.Miss,
-                        });
-                    }
-                }
+                    insertMiss();
 
                 processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
                 {
                     Type = result
                 });
             }
+
+            // Ensure we haven't forgotten any misses.
+            while (misses.Count > 0)
+                insertMiss();
 
             var bonusHits = score.Statistics
                                  .Where(kvp => kvp.Key.IsBonus())
@@ -107,6 +95,26 @@ namespace osu.Game.Database
             // Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
 
             return processor.TotalScore.Value;
+
+            void insertMiss()
+            {
+                if (misses.Count > 0)
+                {
+                    processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
+                    {
+                        Type = misses.Dequeue(),
+                    });
+                }
+                else
+                {
+                    // We ran out of misses. But we can't let max combo increase beyond the known value,
+                    // so let's forge a miss.
+                    processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
+                    {
+                        Type = HitResult.Miss,
+                    });
+                }
+            }
         }
 
         private static HitResult getMaxJudgementFor(HitResult hitResult, HitResult max)
