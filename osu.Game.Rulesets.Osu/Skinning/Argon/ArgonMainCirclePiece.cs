@@ -48,12 +48,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         private Bindable<bool> configHitLighting = null!;
 
+        private static readonly Vector2 circle_size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
         public ArgonMainCirclePiece(bool withOuterFill)
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = circle_size;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -65,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     // Slightly inset to prevent bleeding outside the ring
-                    Size = Size - new Vector2(0.5f),
+                    Size = circle_size - new Vector2(1),
                     Alpha = withOuterFill ? 1 : 0,
                 },
                 outerGradient = new Circle // renders the outer bright gradient
@@ -91,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Masking = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = Size,
+                    Size = circle_size,
                     Child = new KiaiFlash
                     {
                         RelativeSizeAxes = Axes.Both,
