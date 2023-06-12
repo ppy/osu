@@ -3,11 +3,14 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -86,6 +89,12 @@ namespace osu.Game.Tournament.Tests.Components
                 Content = "I am team red."
             }));
 
+            AddUntilStep("message from team red is red color", () =>
+            {
+                var chatLine = this.ChildrenOfType<ChatLine>().FirstOrDefault(m => m.Message.Sender.OnlineID == redUser.OnlineID);
+                return chatLine!.UsernameColour == TournamentGame.COLOUR_RED;
+            });
+
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = redUser.ToAPIUser(),
@@ -97,6 +106,12 @@ namespace osu.Game.Tournament.Tests.Components
                 Sender = blueUser.ToAPIUser(),
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
+
+            AddUntilStep("message from team blue is blue color", () =>
+            {
+                var chatLine = this.ChildrenOfType<ChatLine>().FirstOrDefault(m => m.Message.Sender.OnlineID == blueUser.OnlineID);
+                return chatLine!.UsernameColour == TournamentGame.COLOUR_BLUE;
+            });
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
