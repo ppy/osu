@@ -90,10 +90,7 @@ namespace osu.Game.Tournament.Tests.Components
             }));
 
             AddUntilStep("message from team red is red color", () =>
-            {
-                var chatLine = this.ChildrenOfType<ChatLine>().FirstOrDefault(m => m.Message.Sender.OnlineID == redUser.OnlineID);
-                return chatLine!.UsernameColour == TournamentGame.COLOUR_RED;
-            });
+                this.ChildrenOfType<DrawableChatUsername>().Any(s => s.AccentColour == TournamentGame.COLOUR_RED));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
@@ -108,10 +105,7 @@ namespace osu.Game.Tournament.Tests.Components
             }));
 
             AddUntilStep("message from team blue is blue color", () =>
-            {
-                var chatLine = this.ChildrenOfType<ChatLine>().FirstOrDefault(m => m.Message.Sender.OnlineID == blueUser.OnlineID);
-                return chatLine!.UsernameColour == TournamentGame.COLOUR_BLUE;
-            });
+                this.ChildrenOfType<DrawableChatUsername>().Any(s => s.AccentColour == TournamentGame.COLOUR_BLUE));
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
