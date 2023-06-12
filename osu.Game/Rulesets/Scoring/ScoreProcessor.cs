@@ -226,10 +226,13 @@ namespace osu.Game.Rulesets.Scoring
 
             ApplyScoreChange(result);
 
-            hitEvents.Add(CreateHitEvent(result));
-            lastHitObject = result.HitObject;
+            if (!IsSimulating)
+            {
+                hitEvents.Add(CreateHitEvent(result));
+                lastHitObject = result.HitObject;
 
-            updateScore();
+                updateScore();
+            }
         }
 
         /// <summary>
