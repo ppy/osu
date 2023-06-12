@@ -91,6 +91,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("stop", gameplayClockContainer.Stop);
         }
 
+        [Test]
+        public void TestSeekToKnownTime()
+        {
+            AddStep("seek to known time", () => gameplayClockContainer.Seek(60000));
+            AddWaitStep("wait some for seek", 15);
+            AddStep("stop", () => gameplayClockContainer.Stop());
+        }
+
         private void applyToArgonProgress(Action<ArgonSongProgress> action) =>
             this.ChildrenOfType<ArgonSongProgress>().ForEach(action);
 
