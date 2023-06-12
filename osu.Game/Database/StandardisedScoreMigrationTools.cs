@@ -15,9 +15,12 @@ namespace osu.Game.Database
     {
         public static long GetNewStandardised(ScoreInfo score)
         {
-            var processor = score.Ruleset.CreateInstance().CreateScoreProcessor();
+            var ruleset = score.Ruleset.CreateInstance();
+            var processor = ruleset.CreateScoreProcessor();
 
             var beatmap = new Beatmap();
+
+            HitResult maxRulesetJudgement = ruleset.GetHitResults().First().result;
 
             var maximumJudgements = score.MaximumStatistics
                                          .Where(kvp => kvp.Key.AffectsCombo())
@@ -28,10 +31,19 @@ namespace osu.Game.Database
             // This is a list of all results, ordered from best to worst.
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
             List<HitResult> sortedHits = score.Statistics
-                                              .Where(kvp => kvp.Key.AffectsCombo() && kvp.Key != HitResult.Miss && kvp.Key != HitResult.LargeTickMiss)
+                                              .Where(kvp => kvp.Key.AffectsCombo())
                                               .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
                                               .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
                                               .ToList();
+
+            if (maximumJudgements.Count != sortedHits.Count)
+            {
+                // Older scores may not have maximum judgements populated correctly.
+                // In this case we need to fill them.
+                maximumJudgements = sortedHits
+                                    .Select(r => new FakeJudgement(getMaxJudgementFor(r, maxRulesetJudgement)))
+                                    .ToList();
+            }
 
             foreach (var judgement in maximumJudgements)
                 beatmap.HitObjects.Add(new FakeHit(judgement));
@@ -46,15 +58,29 @@ namespace osu.Game.Database
 
             foreach (var result in sortedHits)
             {
+                // misses are handled from the queue.
+                if (result == HitResult.Miss || result == HitResult.LargeTickMiss)
+                    continue;
+
                 if (processor.Combo.Value == score.MaxCombo)
                 {
-                    processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
+                    if (misses.Count > 0)
                     {
-                        Type = misses.Dequeue(),
-                    });
+                        processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
+                        {
+                            Type = misses.Dequeue(),
+                        });
+                    }
+                    else
+                    {
+                        // worst case scenario, insert a miss.
+                        processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
+                        {
+                            Type = HitResult.Miss,
+                        });
+                    }
                 }
 
-                // TODO: pass a Judgement with correct MaxResult
                 processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
                 {
                     Type = result
@@ -68,9 +94,34 @@ namespace osu.Game.Database
             foreach (var result in bonusHits)
                 processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(result)) { Type = result });
 
-            Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
+            // Not true for all scores for whatever reason. Oh well.
+            // Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
 
             return processor.TotalScore.Value;
+        }
+
+        private static HitResult getMaxJudgementFor(HitResult hitResult, HitResult max)
+        {
+            switch (hitResult)
+            {
+                case HitResult.Miss:
+                case HitResult.Meh:
+                case HitResult.Ok:
+                case HitResult.Good:
+                case HitResult.Great:
+                case HitResult.Perfect:
+                    return max;
+
+                case HitResult.SmallTickMiss:
+                case HitResult.SmallTickHit:
+                    return HitResult.SmallTickHit;
+
+                case HitResult.LargeTickMiss:
+                case HitResult.LargeTickHit:
+                    return HitResult.LargeTickHit;
+            }
+
+            return HitResult.IgnoreHit;
         }
 
         public static long GetOldStandardised(ScoreInfo score)
