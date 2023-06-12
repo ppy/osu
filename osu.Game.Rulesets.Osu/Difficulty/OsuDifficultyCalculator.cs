@@ -93,11 +93,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
+            OsuScoreV1Processor sv1Processor = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+
             return new OsuDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
-                LegacyTotalScore = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods).TotalScore,
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
@@ -110,6 +111,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
+                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyComboScore = sv1Processor.ComboScore,
+                LegacyBonusScore = sv1Processor.BonusScore
             };
         }
 
@@ -198,20 +202,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
     public class OsuScoreV1Processor : ScoreV1Processor
     {
-        public int TotalScore { get; private set; }
+        public int TotalScore => BaseScore + ComboScore + BonusScore;
+
+        /// <summary>
+        /// Amount of score that is combo-and-difficulty-multiplied, excluding mod multipliers.
+        /// </summary>
+        public int ComboScore { get; private set; }
+
+        /// <summary>
+        /// Amount of score that is NOT combo-and-difficulty-multiplied.
+        /// </summary>
+        public int BaseScore { get; private set; }
+
+        /// <summary>
+        /// Amount of score whose judgements would be treated as "bonus" in ScoreV2.
+        /// </summary>
+        public int BonusScore { get; private set; }
+
         private int combo;
 
         public OsuScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
             : base(baseBeatmap, playableBeatmap, mods)
         {
             foreach (var obj in playableBeatmap.HitObjects)
-                increaseScore(obj);
+                simulateHit(obj);
         }
 
-        private void increaseScore(HitObject hitObject)
+        private void simulateHit(HitObject hitObject)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
+            bool isBonus = false;
+
             int scoreIncrease = 0;
 
             switch (hitObject)
@@ -229,11 +251,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 case SpinnerBonusTick:
                     scoreIncrease = 1100;
                     increaseCombo = false;
+                    isBonus = true;
                     break;
 
                 case SpinnerTick:
                     scoreIncrease = 100;
                     increaseCombo = false;
+                    isBonus = true;
                     break;
 
                 case HitCircle:
@@ -243,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 case Slider:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        increaseScore(nested);
+                        simulateHit(nested);
 
                     scoreIncrease = 300;
                     increaseCombo = false;
@@ -267,9 +291,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     for (int i = 0; i <= totalHalfSpinsPossible; i++)
                     {
                         if (i > halfSpinsRequiredBeforeBonus && (i - halfSpinsRequiredBeforeBonus) % 2 == 0)
-                            increaseScore(new SpinnerBonusTick());
+                            simulateHit(new SpinnerBonusTick());
                         else if (i > 1 && i % 2 == 0)
-                            increaseScore(new SpinnerTick());
+                            simulateHit(new SpinnerTick());
                     }
 
                     scoreIncrease = 300;
@@ -280,13 +304,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (addScoreComboMultiplier)
             {
                 // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
-                scoreIncrease += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * ScoreMultiplier));
+                ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * ScoreMultiplier));
             }
+
+            if (isBonus)
+                BonusScore += scoreIncrease;
+            else
+                BaseScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
-
-            TotalScore += scoreIncrease;
         }
     }
 }

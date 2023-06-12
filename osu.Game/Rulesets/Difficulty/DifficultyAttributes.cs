@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
         protected const int ATTRIB_ID_LEGACY_TOTAL_SCORE = 23;
+        protected const int ATTRIB_ID_LEGACY_COMBO_SCORE = 25;
+        protected const int ATTRIB_ID_LEGACY_BONUS_SCORE = 27;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
@@ -36,20 +39,32 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The combined star rating of all skills.
         /// </summary>
-        [JsonProperty("star_rating", Order = -4)]
+        [JsonProperty("star_rating", Order = -7)]
         public double StarRating { get; set; }
 
         /// <summary>
         /// The maximum achievable combo.
         /// </summary>
-        [JsonProperty("max_combo", Order = -3)]
+        [JsonProperty("max_combo", Order = -6)]
         public int MaxCombo { get; set; }
 
         /// <summary>
         /// The maximum achievable legacy total score.
         /// </summary>
-        [JsonProperty("legacy_total_score", Order = -2)]
+        [JsonProperty("legacy_total_score", Order = -5)]
         public int LegacyTotalScore { get; set; }
+
+        /// <summary>
+        /// The combo-multiplied portion of <see cref="LegacyTotalScore"/>.
+        /// </summary>
+        [JsonProperty("legacy_combo_score", Order = -4)]
+        public int LegacyComboScore { get; set; }
+
+        /// <summary>
+        /// The "bonus" portion of <see cref="LegacyTotalScore"/> consisting of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
+        /// </summary>
+        [JsonProperty("legacy_bonus_score", Order = -3)]
+        public int LegacyBonusScore { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
@@ -79,6 +94,8 @@ namespace osu.Game.Rulesets.Difficulty
         {
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
             yield return (ATTRIB_ID_LEGACY_TOTAL_SCORE, LegacyTotalScore);
+            yield return (ATTRIB_ID_LEGACY_COMBO_SCORE, LegacyComboScore);
+            yield return (ATTRIB_ID_LEGACY_BONUS_SCORE, LegacyBonusScore);
         }
 
         /// <summary>
@@ -90,6 +107,8 @@ namespace osu.Game.Rulesets.Difficulty
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             LegacyTotalScore = (int)values[ATTRIB_ID_LEGACY_TOTAL_SCORE];
+            LegacyComboScore = (int)values[ATTRIB_ID_LEGACY_COMBO_SCORE];
+            LegacyBonusScore = (int)values[ATTRIB_ID_LEGACY_BONUS_SCORE];
         }
     }
 }
