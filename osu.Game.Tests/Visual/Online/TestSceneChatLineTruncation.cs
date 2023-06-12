@@ -38,10 +38,13 @@ namespace osu.Game.Tests.Visual.Online
 
         private void clear() => AddStep("clear messages", textContainer.Clear);
 
-        private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, string username = null)
+        private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, string username = null, Colour4? color = null)
         {
             int index = textContainer.Count + 1;
-            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index, username));
+            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index, username))
+            {
+                UsernameColour = color
+            };
             textContainer.Add(newLine);
         }
 
@@ -51,6 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                 addMessageWithChecks($"Wide {a} character username.", username: new string('w', a));
             addMessageWithChecks("Short name with spaces.", username: "sho rt name");
             addMessageWithChecks("Long name with spaces.", username: "long name with s p a c e s");
+            addMessageWithChecks("message with custom color", username: "I have custom color", color: Colour4.Green);
         }
 
         private class DummyMessage : Message
