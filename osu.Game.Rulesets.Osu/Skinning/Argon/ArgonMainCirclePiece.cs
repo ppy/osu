@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                outerFill = new Circle // renders white outer border and dark fill
+                outerFill = new Circle // renders dark fill
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
