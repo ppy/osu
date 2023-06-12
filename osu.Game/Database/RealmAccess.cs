@@ -37,6 +37,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
 using Realms;
 using Realms.Exceptions;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace osu.Game.Database
 {
@@ -728,6 +729,11 @@ namespace osu.Game.Database
 
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
+            Logger.Log($"Running realm migration to version {targetVersion}...");
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
             switch (targetVersion)
             {
                 case 7:
@@ -964,6 +970,8 @@ namespace osu.Game.Database
                     break;
                 }
             }
+
+            Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId)
