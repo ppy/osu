@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableChatUsername(APIUser user)
+        public DrawableChatUsername(APIUser user, Color4? customColor = null)
         {
             this.user = user;
 
@@ -91,6 +91,14 @@ namespace osu.Game.Overlays.Chat
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
+
+            if (customColor != null)
+            {
+                AccentColour = customColor.Value;
+
+                Add(colouredDrawable = drawableText);
+                return;
+            }
 
             if (string.IsNullOrWhiteSpace(user.Colour))
             {
