@@ -27,9 +27,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public override int Version => 20220902;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
@@ -86,6 +89,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
+            TaikoScoreV1Processor sv1Processor = new TaikoScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+
             return new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
@@ -96,6 +101,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyComboScore = sv1Processor.ComboScore,
+                LegacyBonusScore = sv1Processor.BonusScore
             };
         }
 
