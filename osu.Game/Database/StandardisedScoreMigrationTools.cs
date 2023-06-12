@@ -27,12 +27,6 @@ namespace osu.Game.Database
 
             HitResult maxRulesetJudgement = ruleset.GetHitResults().First().result;
 
-            var maximumJudgements = score.MaximumStatistics
-                                         .Where(kvp => kvp.Key.AffectsCombo())
-                                         .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
-                                         .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
-                                         .ToList();
-
             // This is a list of all results, ordered from best to worst.
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
             List<HitResult> sortedHits = score.Statistics
@@ -41,20 +35,29 @@ namespace osu.Game.Database
                                               .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
                                               .ToList();
 
+            // Attempt to use maximum statistics from the database.
+            var maximumJudgements = score.MaximumStatistics
+                                         .Where(kvp => kvp.Key.AffectsCombo())
+                                         .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
+                                         .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
+                                         .ToList();
+
+            // Some older scores may not have maximum statistics populated correctly.
+            // In this case we need to fill them with best-known-defaults.
             if (maximumJudgements.Count != sortedHits.Count)
             {
-                // Older scores may not have maximum judgements populated correctly.
-                // In this case we need to fill them.
                 maximumJudgements = sortedHits
                                     .Select(r => new FakeJudgement(getMaxJudgementFor(r, maxRulesetJudgement)))
                                     .ToList();
             }
 
+            // This is required to get the correct maximum combo portion.
             foreach (var judgement in maximumJudgements)
                 beatmap.HitObjects.Add(new FakeHit(judgement));
-
             processor.ApplyBeatmap(beatmap);
 
+            // Insert all misses into a queue.
+            // These will be nibbled at whenever we need to reset the combo.
             Queue<HitResult> misses = new Queue<HitResult>(score.Statistics
                                                                 .Where(kvp => kvp.Key == HitResult.Miss || kvp.Key == HitResult.LargeTickMiss)
                                                                 .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value)));
@@ -63,7 +66,7 @@ namespace osu.Game.Database
 
             foreach (var result in sortedHits)
             {
-                // misses are handled from the queue.
+                // For the main part of this loop, ignore all misses, as they will be inserted from the queue.
                 if (result == HitResult.Miss || result == HitResult.LargeTickMiss)
                     continue;
 
@@ -78,7 +81,8 @@ namespace osu.Game.Database
                     }
                     else
                     {
-                        // worst case scenario, insert a miss.
+                        // We ran out of misses. But we can't let max combo increase beyond the known value,
+                        // so let's forge a miss.
                         processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
                         {
                             Type = HitResult.Miss,
@@ -169,9 +173,9 @@ namespace osu.Game.Database
         {
             public override HitResult MaxResult { get; }
 
-            public FakeJudgement(HitResult result)
+            public FakeJudgement(HitResult maxResult)
             {
-                MaxResult = result;
+                MaxResult = maxResult;
             }
         }
     }
