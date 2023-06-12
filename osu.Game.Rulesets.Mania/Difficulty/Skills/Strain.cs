@@ -37,6 +37,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = 1;
         }
 
+        /// <summary>
+        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        /// </summary>
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var hitObject = (ManiaDifficultyHitObject)current;
@@ -57,8 +60,40 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             for (int i = 0; i < previousEndTimes.Length; ++i)
             {
-                // The current note is overlapped if a previous note or end is overlapping the current note body
-                isOverlapping |= Precision.DefinitelyBigger(endTimes[i], startTime, 1) && Precision.DefinitelyBigger(endTime, endTimes[i], 1);
+                /* Possible scenarios if the previous note is an LN:
+                 *
+                 *                 +--------------+--------------+-------------+---------------+--------------+
+                 *                 | Before Head  | On Head      | On Body     |  On Tail      | After Tail   |
+                 *                 | (1)          | (2)          | (3)         |  (4)          | (5)          |
+                 * +---------------+--------------+--------------+-------------+---------------+--------------+
+                 * | Note      (A) | (A1)         | (A2)         |             |               | (A5 Inval.)  |
+                 * | Before        | O            |      O       |      X      |       X       |           O  |
+                 * | Note          |      O       |      O       |             |               |      O       |
+                 * +---------------+--------------+--------------+-------------+---------------+--------------+
+                 * | Long Note (B) | (B1)         | (B2)         |             |               | (B5)         |
+                 * | Before        | [==]         | [====]       |      X      |       X       | [==========] |
+                 * | Note          |      O       |      O       |             |               |      O       |
+                 * +---------------+--------------+--------------+-------------+---------------+--------------+
+                 * | Note      (C) | (C1)         | (C2)         | (C3)        |  (C4)         | (C5 Inval.)  |
+                 * | Before        | O            |      O       |        O    |           O   |            O |
+                 * | Long Note     |      [===]   |      [===]   |      [===]  |       [===]   |      [===]   |
+                 * +---------------+--------------+--------------+-------------+---------------+--------------+
+                 * | Long Note (D) | (D1)         | (D2)         | (D3)        |  (D4)         | (D5)         |
+                 * | Before        | [==]         | [====]       | [======]    |  [========]   | [==========] |
+                 * | Long Note     |      [===]   |      [===]   |      [===]  |       [===]   |      [===]   |
+                 * +---------------+--------------+--------------+-------------+---------------+--------------+
+                 *
+                 * Invalid states:
+                 * A5 and C5 are NOT possible as we sequentially, in time, process notes.
+                 * Thus, no HitObject can be in previousEndTimes, if their head is AFTER the current note
+                 */
+
+                // IsOverlapping considers scenarios C3:D3:
+                //      Criterion 1 accepts A3:D5
+                //      Criteiron 2 accepts A1:D1, C2:D3,
+                //      Thus, AND accepts C3:D3 only
+                isOverlapping |= Precision.DefinitelyBigger(previousEndTimes[i], startTime, 1) &&
+                                 Precision.DefinitelyBigger(endTime, previousEndTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
                 // This considers the scenarios A5:D5
