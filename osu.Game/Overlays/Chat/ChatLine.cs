@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -21,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -68,23 +68,10 @@ namespace osu.Game.Overlays.Chat
 
         private Container? highlight;
 
-        private Colour4? usernameColour;
-
         /// <summary>
         /// if set, it will override <see cref="APIUser.Colour"/> or <see cref="DrawableChatUsername.default_colours"/>.
-        /// Must be set when constructor, otherwise throw <see cref="InvalidOperationException"/>.
         /// </summary>
-        public Colour4? UsernameColour
-        {
-            get => usernameColour;
-            set
-            {
-                if (drawableUsername != null)
-                    throw new InvalidOperationException("Can't change Username color after DrawableChatUsername created");
-
-                usernameColour = value;
-            }
-        }
+        public Color4? UsernameColour { get; init; }
 
         public ChatLine(Message message)
         {
@@ -99,6 +86,28 @@ namespace osu.Game.Overlays.Chat
         {
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
+
+            if (UsernameColour != null)
+            {
+                drawableUsername = new DrawableChatUsername(message.Sender)
+                {
+                    AccentColour = UsernameColour.Value
+                };
+            }
+            else
+            {
+                drawableUsername = new DrawableChatUsername(message.Sender);
+            }
+
+            drawableUsername.With(u =>
+            {
+                u.Width = UsernameWidth;
+                u.FontSize = FontSize;
+                u.AutoSizeAxes = Axes.Y;
+                u.Origin = Anchor.TopRight;
+                u.Anchor = Anchor.TopRight;
+                u.Margin = new MarginPadding { Horizontal = Spacing };
+            });
 
             InternalChild = new GridContainer
             {
@@ -123,15 +132,7 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername = new DrawableChatUsername(message.Sender, usernameColour)
-                        {
-                            Width = UsernameWidth,
-                            FontSize = FontSize,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Margin = new MarginPadding { Horizontal = Spacing },
-                        },
+                        drawableUsername,
                         drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
                             AutoSizeAxes = Axes.Y,

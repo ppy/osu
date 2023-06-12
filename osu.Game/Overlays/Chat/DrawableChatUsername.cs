@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Chat
     {
         public Action? ReportRequested;
 
-        public Color4 AccentColour { get; }
+        public Color4 AccentColour { get; init; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             colouredDrawable.ReceivePositionalInputAt(screenSpacePos);
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly Drawable colouredDrawable;
 
-        public DrawableChatUsername(APIUser user, Color4? customColor = null)
+        public DrawableChatUsername(APIUser user)
         {
             this.user = user;
 
@@ -91,14 +91,6 @@ namespace osu.Game.Overlays.Chat
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
-
-            if (customColor != null)
-            {
-                AccentColour = customColor.Value;
-
-                Add(colouredDrawable = drawableText);
-                return;
-            }
 
             if (string.IsNullOrWhiteSpace(user.Colour))
             {
