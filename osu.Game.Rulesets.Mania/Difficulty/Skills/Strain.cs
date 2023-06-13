@@ -69,18 +69,49 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
     {
+        /// <summary>
+        /// Individual Strain Decay Exponent Base. Used in <see cref="applyDecay"/>
+        /// </summary>
         private const double decay_base = 0.125;
+
+        /// <summary>
+        /// Global Strain Decay Exponent Base. Used in <see cref="applyDecay"/>
+        /// </summary>
         private const double global_decay_base = 0.30;
+
+        /// <summary>
+        /// Center of our On Body Bias sigmoid function.
+        /// </summary>
         private const double release_threshold = 24;
 
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
 
+        /// <summary>
+        /// Previous notes' start times. Indices correspond to columns
+        /// </summary>
         private readonly double[] prevStartTimes;
-        private readonly double[] prevEndTimes;
-        private readonly double[] prevStrains;
 
-        private double prevStrain;
+        /// <summary>
+        /// Previous notes' end times. Indices correspond to columns
+        /// </summary>
+        private readonly double[] prevEndTimes;
+
+        /// <summary>
+        /// Column note strains. Indices correspond to columns.
+        /// The semantic meaning is the "strain" of each column.
+        /// </summary>
+        private readonly double[] columnStrains;
+
+        /// <summary>
+        /// Previous Strain processed.
+        /// </summary>
+        private double prevColumnStrain;
+
+        /// <summary>
+        /// Current Global Strain.
+        /// The semantic meaning is the "strain" of all fingers.
+        /// </summary>
         private double globalStrain;
 
         public Strain(Mod[] mods, int totalColumns)
