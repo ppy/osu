@@ -328,6 +328,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
         protected override void Reset(bool storeResults)
         {
+            // Run one last time to store max values.
+            updateScore();
+
             base.Reset(storeResults);
 
             hitEvents.Clear();
