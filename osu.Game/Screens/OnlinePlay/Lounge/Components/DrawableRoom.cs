@@ -136,6 +136,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 Padding = new MarginPadding
                                                 {
                                                     Left = 20,
+                                                    Right = DrawableRoomParticipantsList.SHEAR_WIDTH,
                                                     Vertical = 5
                                                 },
                                                 Children = new Drawable[]
