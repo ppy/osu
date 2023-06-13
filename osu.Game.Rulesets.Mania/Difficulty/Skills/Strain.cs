@@ -230,9 +230,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
              * We can also see that the last entry in a chord is always the peak strain.
              */
             double columnStrain = hitObject.DeltaTime <= 1 ? Math.Max(prevColumnStrain, columnStrains[column]) : columnStrains[column];
+
+            // The final strain is the sum
+            double strain = columnStrain + globalStrain;
+
+            // Update prev arrays
             prevStartTimes[column] = startTime;
             prevEndTimes[column] = endTime;
-            prevStrain = strain;
+            prevColumnStrain = columnStrain;
 
             // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
             return strain - CurrentStrain;
