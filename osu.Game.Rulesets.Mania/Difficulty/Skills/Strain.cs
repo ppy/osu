@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
     {
-        private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
+        private const double decay_base = 0.125;
         private const double release_threshold = 24;
 
         protected override double SkillMultiplier => 1;
@@ -80,8 +80,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private readonly double[] previousEndTimes;
         private readonly double[] individualStrains;
 
-        private double individualStrain;
         private double overallStrain;
+        private double prevStrain;
 
         public Strain(Mod[] mods, int totalColumns)
             : base(mods)
