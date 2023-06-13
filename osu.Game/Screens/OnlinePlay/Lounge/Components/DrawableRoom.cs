@@ -103,25 +103,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             CornerRadius = CORNER_RADIUS,
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colours.Background5,
-                                            Width = 0.2f,
-                                        },
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
-                                            Width = 0.8f,
-                                        },
-                                    },
+                                    Colour = colours.Background5,
+                                    Width = 0.2f,
+                                },
+                                new Box
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
+                                    Width = 0.8f,
                                 },
                                 new Container
                                 {
