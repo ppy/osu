@@ -33,7 +33,9 @@ namespace osu.Game.Overlays.Chat
     {
         public Action? ReportRequested;
 
-        public Color4 AccentColour { get; init; }
+        public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
+
+        public bool Inverted { get; init; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             colouredDrawable.ReceivePositionalInputAt(screenSpacePos);
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays.Chat
         private readonly APIUser user;
         private readonly OsuSpriteText drawableText;
 
-        private readonly Drawable colouredDrawable;
+        private Drawable colouredDrawable = null!;
 
         public DrawableChatUsername(APIUser user)
         {
@@ -91,17 +93,17 @@ namespace osu.Game.Overlays.Chat
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
+        }
 
-            if (string.IsNullOrWhiteSpace(user.Colour))
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (!Inverted)
             {
-                AccentColour = default_colours[user.Id % default_colours.Length];
-
                 Add(colouredDrawable = drawableText);
             }
             else
             {
-                AccentColour = Color4Extensions.FromHex(user.Colour);
-
                 Add(new Container
                 {
                     Anchor = Anchor.TopRight,
@@ -143,9 +145,12 @@ namespace osu.Game.Overlays.Chat
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             drawableText.Colour = colours.ChatBlue;
-            colouredDrawable.Colour = AccentColour;
+
+            AccentColour.BindValueChanged(c =>
+            {
+                colouredDrawable.Colour = c.NewValue;
+            }, true);
         }
 
         public MenuItem[] ContextMenuItems
@@ -191,7 +196,7 @@ namespace osu.Game.Overlays.Chat
 
         protected override bool OnHover(HoverEvent e)
         {
-            colouredDrawable.FadeColour(AccentColour.Lighten(0.6f), 30, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour.Value.Lighten(0.6f), 30, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -200,46 +205,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.OnHoverLost(e);
 
-            colouredDrawable.FadeColour(AccentColour, 800, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour.Value, 800, Easing.OutQuint);
         }
-
-        private static readonly Color4[] default_colours =
-        {
-            Color4Extensions.FromHex("588c7e"),
-            Color4Extensions.FromHex("b2a367"),
-            Color4Extensions.FromHex("c98f65"),
-            Color4Extensions.FromHex("bc5151"),
-            Color4Extensions.FromHex("5c8bd6"),
-            Color4Extensions.FromHex("7f6ab7"),
-            Color4Extensions.FromHex("a368ad"),
-            Color4Extensions.FromHex("aa6880"),
-
-            Color4Extensions.FromHex("6fad9b"),
-            Color4Extensions.FromHex("f2e394"),
-            Color4Extensions.FromHex("f2ae72"),
-            Color4Extensions.FromHex("f98f8a"),
-            Color4Extensions.FromHex("7daef4"),
-            Color4Extensions.FromHex("a691f2"),
-            Color4Extensions.FromHex("c894d3"),
-            Color4Extensions.FromHex("d895b0"),
-
-            Color4Extensions.FromHex("53c4a1"),
-            Color4Extensions.FromHex("eace5c"),
-            Color4Extensions.FromHex("ea8c47"),
-            Color4Extensions.FromHex("fc4f4f"),
-            Color4Extensions.FromHex("3d94ea"),
-            Color4Extensions.FromHex("7760ea"),
-            Color4Extensions.FromHex("af52c6"),
-            Color4Extensions.FromHex("e25696"),
-
-            Color4Extensions.FromHex("677c66"),
-            Color4Extensions.FromHex("9b8732"),
-            Color4Extensions.FromHex("8c5129"),
-            Color4Extensions.FromHex("8c3030"),
-            Color4Extensions.FromHex("1f5d91"),
-            Color4Extensions.FromHex("4335a5"),
-            Color4Extensions.FromHex("812a96"),
-            Color4Extensions.FromHex("992861"),
-        };
     }
 }

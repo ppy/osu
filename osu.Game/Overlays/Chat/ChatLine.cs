@@ -21,6 +21,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
+using Message = osu.Game.Online.Chat.Message;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -69,9 +70,9 @@ namespace osu.Game.Overlays.Chat
         private Container? highlight;
 
         /// <summary>
-        /// if set, it will override <see cref="APIUser.Colour"/> or <see cref="DrawableChatUsername.default_colours"/>.
+        /// if set, it will override <see cref="APIUser.Colour"/> or <see cref="default_colours"/>.
         /// </summary>
-        public Color4? UsernameColour { get; init; }
+        public Color4 UsernameColour { get; init; }
 
         public ChatLine(Message message)
         {
@@ -79,6 +80,11 @@ namespace osu.Game.Overlays.Chat
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            // If we have custom value, this value will be override.
+            UsernameColour = !string.IsNullOrEmpty(message.Sender.Colour)
+                ? Color4Extensions.FromHex(message.Sender.Colour)
+                : default_colours[message.SenderId % default_colours.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -87,27 +93,18 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
-            if (UsernameColour != null)
+            drawableUsername = new DrawableChatUsername(message.Sender)
             {
-                drawableUsername = new DrawableChatUsername(message.Sender)
-                {
-                    AccentColour = UsernameColour.Value
-                };
-            }
-            else
-            {
-                drawableUsername = new DrawableChatUsername(message.Sender);
-            }
+                Width = UsernameWidth,
+                FontSize = FontSize,
+                AutoSizeAxes = Axes.Y,
+                Origin = Anchor.TopRight,
+                Anchor = Anchor.TopRight,
+                Margin = new MarginPadding { Horizontal = Spacing },
+                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+            };
 
-            drawableUsername.With(u =>
-            {
-                u.Width = UsernameWidth;
-                u.FontSize = FontSize;
-                u.AutoSizeAxes = Axes.Y;
-                u.Origin = Anchor.TopRight;
-                u.Anchor = Anchor.TopRight;
-                u.Margin = new MarginPadding { Horizontal = Spacing };
-            });
+            drawableUsername.AccentColour.Value = UsernameColour;
 
             InternalChild = new GridContainer
             {
@@ -178,7 +175,7 @@ namespace osu.Game.Overlays.Chat
                     CornerRadius = 2f,
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = drawableUsername.AccentColour.Darken(1f),
+                    Colour = drawableUsername.AccentColour.Value.Darken(1f),
                     Depth = float.MaxValue,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
@@ -216,5 +213,44 @@ namespace osu.Game.Overlays.Chat
         {
             drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
+
+        private static readonly Color4[] default_colours =
+        {
+            Color4Extensions.FromHex("588c7e"),
+            Color4Extensions.FromHex("b2a367"),
+            Color4Extensions.FromHex("c98f65"),
+            Color4Extensions.FromHex("bc5151"),
+            Color4Extensions.FromHex("5c8bd6"),
+            Color4Extensions.FromHex("7f6ab7"),
+            Color4Extensions.FromHex("a368ad"),
+            Color4Extensions.FromHex("aa6880"),
+
+            Color4Extensions.FromHex("6fad9b"),
+            Color4Extensions.FromHex("f2e394"),
+            Color4Extensions.FromHex("f2ae72"),
+            Color4Extensions.FromHex("f98f8a"),
+            Color4Extensions.FromHex("7daef4"),
+            Color4Extensions.FromHex("a691f2"),
+            Color4Extensions.FromHex("c894d3"),
+            Color4Extensions.FromHex("d895b0"),
+
+            Color4Extensions.FromHex("53c4a1"),
+            Color4Extensions.FromHex("eace5c"),
+            Color4Extensions.FromHex("ea8c47"),
+            Color4Extensions.FromHex("fc4f4f"),
+            Color4Extensions.FromHex("3d94ea"),
+            Color4Extensions.FromHex("7760ea"),
+            Color4Extensions.FromHex("af52c6"),
+            Color4Extensions.FromHex("e25696"),
+
+            Color4Extensions.FromHex("677c66"),
+            Color4Extensions.FromHex("9b8732"),
+            Color4Extensions.FromHex("8c5129"),
+            Color4Extensions.FromHex("8c3030"),
+            Color4Extensions.FromHex("1f5d91"),
+            Color4Extensions.FromHex("4335a5"),
+            Color4Extensions.FromHex("812a96"),
+            Color4Extensions.FromHex("992861"),
+        };
     }
 }
