@@ -179,7 +179,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    new RoomNameText(),
+                                                                    new TruncatingSpriteText
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Font = OsuFont.GetFont(size: 28),
+                                                                        Current = { BindTarget = Room.Name }
+                                                                    },
                                                                     new RoomStatusText()
                                                                 }
                                                             }
@@ -314,23 +319,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             });
 
             return pills;
-        }
-
-        private partial class RoomNameText : OsuSpriteText
-        {
-            [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
-            private Bindable<string> name { get; set; }
-
-            public RoomNameText()
-            {
-                Font = OsuFont.GetFont(size: 28);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Current = name;
-            }
         }
 
         private partial class RoomStatusText : OnlinePlayComposite
