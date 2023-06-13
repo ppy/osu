@@ -199,13 +199,43 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             globalStrain = applyDecay(globalStrain, current.DeltaTime, global_decay_base);
             globalStrain += (1 + endOnBodyBias) * endAfterTailWeight;
 
-            // Update startTimes and endTimes arrays
+            /* For notes at the same time (in a chord), the strain should be the highest column strain + global strain out of those columns
+             *
+             * --- Problem
+             *
+             * Given a scenario with a 4 note chord with:
+             * - Global Strains (GS) [A, B, C, D]  <- Strains are different in a chord as we add to global strain every note. A < B < C < D
+             * - Column Strains (CS) [1, 2, 3, 4]
+             *
+             * The maximum strain evaluated should be D + 4 = max(GS) + max(CS)
+             * However, remember that strains are not necessarily increasing
+             *
+             * - Column Strains [4, 3, 2, 1] may yield A + 4 as the maxima.
+             *
+             * Shows that: max(GS + CS) != max(GS) + max(CS)
+             * This caused the issue where strain was column-variant.
+             *
+             * --- Solution
+             *
+             * This mechanism counters this effect by taking the running maximum of both arrays.
+             * (!) Global Strain is strictly increasing so it's not necessary to track it.
+             *
+             * With this mechanism:
+             * - Global Strains                    [A, B, C, D]
+             * - Column Strains                    [3, 4, 3, 2]
+             * - Column Strains w/ running Maximum [3, 4, 4, 4]
+             *
+             * Shows that: run_max(GS + CS) = max(GS) + max(CS)
+             *
+             * We can also see that the last entry in a chord is always the peak strain.
+             */
+            double columnStrain = hitObject.DeltaTime <= 1 ? Math.Max(prevColumnStrain, columnStrains[column]) : columnStrains[column];
             prevStartTimes[column] = startTime;
             prevEndTimes[column] = endTime;
             prevStrain = strain;
 
             // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
-            return strain + globalStrain - CurrentStrain;
+            return strain - CurrentStrain;
         }
 
         protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
