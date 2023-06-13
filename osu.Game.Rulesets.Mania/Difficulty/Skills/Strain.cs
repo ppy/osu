@@ -126,9 +126,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
         ///
-        /// Also note that the first hitObject is not considered in the calculation:
+        /// <param name="current">Current Hit Object to evaluate strain</param>
+        /// <remarks>
+        /// 1) The first hitObject is not considered in the calculation.
         /// <see cref="ManiaDifficultyCalculator.CreateDifficultyHitObjects"/>
-        ///
+        /// 2) Strain is binned/bucketed by sections by Section Length, with a Max aggregation
+        /// <see cref="StrainSkill.SectionLength"/>
+        /// <see cref="StrainSkill.Process"/>
+        /// </remarks>
         /// </summary>
         protected override double StrainValueOf(DifficultyHitObject current)
         {
