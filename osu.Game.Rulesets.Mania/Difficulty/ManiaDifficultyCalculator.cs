@@ -33,9 +33,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override int Version => 20220902;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
+
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
             originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
@@ -48,6 +52,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
+            ManiaScoreV1Processor sv1Processor = new ManiaScoreV1Processor(mods);
+
             return new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
@@ -55,7 +61,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
-                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject)
+                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
+                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyComboScore = sv1Processor.TotalScore
             };
         }
 
