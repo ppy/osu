@@ -187,15 +187,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (isEndAfterTail)
                 endAfterTailWeight = 1.25;
 
-            // Decay previous column strain by the column timeDelta
-            prevStrains[column] = applyDecay(prevStrains[column], startTime - prevStartTimes[column], decay_base);
-            prevStrains[column] += 2.0 * endAfterTailWeight;
-
-            // For notes at the same time (in a chord), the strain should be the hardest strain out of those columns
-            // This works by checking if
-            double strain = hitObject.DeltaTime <= 1 ? Math.Max(prevStrain, prevStrains[column]) : prevStrains[column];
-
-            // Decay and increase overallStrain
+            /* Update Column & Global Strain given context of note
+             * 1) We decay the strain given deltaTime
+             * 2) Increase strain given information of note and surroundings
+             *
+             * Only in Global Strain, we include endOnBodyBias as a design choice.
+             */
+            columnStrains[column] = applyDecay(columnStrains[column], startTime - prevStartTimes[column], decay_base);
+            columnStrains[column] += 2 * endAfterTailWeight;
             globalStrain = applyDecay(globalStrain, current.DeltaTime, global_decay_base);
             globalStrain += (1 + endOnBodyBias) * endAfterTailWeight;
 
