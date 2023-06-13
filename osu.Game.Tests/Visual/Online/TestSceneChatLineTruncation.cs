@@ -41,10 +41,14 @@ namespace osu.Game.Tests.Visual.Online
         private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, string username = null, Colour4? color = null)
         {
             int index = textContainer.Count + 1;
-            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index, username))
-            {
-                UsernameColour = color
-            };
+
+            var newLine = color != null
+                ? new ChatLine(new DummyMessage(text, isAction, isImportant, index, username))
+                {
+                    UsernameColour = color.Value
+                }
+                : new ChatLine(new DummyMessage(text, isAction, isImportant, index, username));
+
             textContainer.Add(newLine);
         }
 
