@@ -10,6 +10,15 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
+/* The calculation of strain is sequential, following rules:
+ * 1) The current strain value can only depend on past notes
+ * 2) Notes on the same offset may see different strain values, as column order sorting is not guaranteed.
+ * 3) The first hit object is omitted as it acts as a reference for the following note.
+ *
+ * E.g. A:(100ms @ Col 1), B:(200ms @ Col 1), C:(200ms @ Col 2)
+ * The following sequences are possible: B C, C B.
+ * A is omitted because of rule 3.
+ */
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
