@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether <see cref="HitEvents"/> should be populated during application of results.
         /// </summary>
+        /// <remarks>
+        /// Should only be disabled for special cases.
+        /// When disabled, <see cref="JudgementProcessor.RevertResult"/> cannot be used.</remarks>
         internal bool TrackHitEvents = true;
 
         /// <summary>
@@ -231,10 +234,13 @@ namespace osu.Game.Rulesets.Scoring
 
             ApplyScoreChange(result);
 
-            if (!IsSimulating && TrackHitEvents)
+            if (!IsSimulating)
             {
-                hitEvents.Add(CreateHitEvent(result));
-                lastHitObject = result.HitObject;
+                if (TrackHitEvents)
+                {
+                    hitEvents.Add(CreateHitEvent(result));
+                    lastHitObject = result.HitObject;
+                }
 
                 updateScore();
             }
@@ -250,6 +256,9 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {
+            if (!TrackHitEvents)
+                throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
+
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
 
