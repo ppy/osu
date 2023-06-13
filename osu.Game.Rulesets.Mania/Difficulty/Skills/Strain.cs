@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
 
-        private readonly double[] startTimes;
-        private readonly double[] previousEndTimes;
-        private readonly double[] individualStrains;
+        private readonly double[] prevStartTimes;
+        private readonly double[] prevEndTimes;
+        private readonly double[] prevStrains;
 
         private double prevStrain;
         private double globalStrain;
