@@ -57,6 +57,7 @@ namespace osu.Game.Database
             foreach (var judgement in maximumJudgements)
                 beatmap.HitObjects.Add(new FakeHit(judgement));
             processor.ApplyBeatmap(beatmap);
+            processor.Mods.Value = score.Mods;
 
             // Insert all misses into a queue.
             // These will be nibbled at whenever we need to reset the combo.
@@ -162,7 +163,12 @@ namespace osu.Game.Database
                     break;
             }
 
-            return (long)(1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore);
+            double modMultiplier = 1;
+
+            foreach (var mod in score.Mods)
+                modMultiplier *= mod.ScoreMultiplier;
+
+            return (long)((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
         }
 
         private class FakeHit : HitObject
