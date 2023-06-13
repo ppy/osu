@@ -25,9 +25,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public override int Version => 20220701;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public CatchDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -38,12 +41,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
+            CatchScoreV1Processor sv1Processor = new CatchScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+
             return new CatchDifficultyAttributes
             {
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyComboScore = sv1Processor.ComboScore,
+                LegacyBonusScore = sv1Processor.BonusScore
             };
         }
 
