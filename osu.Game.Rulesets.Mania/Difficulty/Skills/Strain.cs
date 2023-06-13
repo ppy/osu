@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         {
             prevStartTimes = new double[totalColumns];
             prevEndTimes = new double[totalColumns];
-            prevStrains = new double[totalColumns];
+            columnStrains = new double[totalColumns];
             globalStrain = 1;
         }
 
@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         }
 
         protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
-            => applyDecay(prevStrain, offset - current.Previous(0).StartTime, decay_base)
+            => applyDecay(prevColumnStrain, offset - current.Previous(0).StartTime, decay_base)
                + applyDecay(globalStrain, offset - current.Previous(0).StartTime, global_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
