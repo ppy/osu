@@ -86,14 +86,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         public Strain(Mod[] mods, int totalColumns)
             : base(mods)
         {
-            startTimes = new double[totalColumns];
-            previousEndTimes = new double[totalColumns];
-            individualStrains = new double[totalColumns];
-            overallStrain = 1;
+            prevStartTimes = new double[totalColumns];
+            prevEndTimes = new double[totalColumns];
+            prevStrains = new double[totalColumns];
+            globalStrain = 1;
         }
 
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        ///
+        /// Also note that the first hitObject is not considered in the calculation:
+        /// <see cref="ManiaDifficultyCalculator.CreateDifficultyHitObjects"/>
+        ///
         /// </summary>
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -105,69 +109,77 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             int column = hitObject.BaseObject.Column;
 
             double holdLength = Math.Abs(endTime - startTime);
-            double holdWeight = 1.0; // Factor to all additional strains in case something else is held
-            double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
+            double endOnBodyBias = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
+            double endAfterTailWeight = 1.0; // Factor to all additional strains in case something else is held
 
             // The closest end time, currently, is the current note's end time, which is its length
             double closestEndTime = holdLength;
 
-            bool isOverlapping = false;
+            bool isEndOnBody = false;
+            bool isEndAfterTail = false;
 
-            for (int i = 0; i < previousEndTimes.Length; ++i)
+            for (int i = 0; i < prevEndTimes.Length; ++i)
             {
+                /* True for Column 3 Scenarios:
+                 *      Criterion 1 accepts Col 3-5
+                 *      Criterion 2 accepts Col 1, D2:F3,
+                 *      Thus, AND accepts Col 3 Only.
                  */
+                isEndOnBody |= Precision.DefinitelyBigger(prevEndTimes[i], startTime, 1) &&
+                               Precision.DefinitelyBigger(endTime, prevEndTimes[i], 1);
 
-                // IsOverlapping considers scenarios C3:D3:
-                //      Criterion 1 accepts A3:D5
-                //      Criteiron 2 accepts A1:D1, C2:D3,
-                //      Thus, AND accepts C3:D3 only
-                isOverlapping |= Precision.DefinitelyBigger(previousEndTimes[i], startTime, 1) &&
-                                 Precision.DefinitelyBigger(endTime, previousEndTimes[i], 1);
-
-                // We give a slight bonus to everything if something is held meanwhile
-                // This considers the scenarios A5:D5
-                if (Precision.DefinitelyBigger(previousEndTimes[i], endTime, 1))
-                    holdWeight = 1.25;
+                // True for Column 5 Scenarios
+                isEndAfterTail |= Precision.DefinitelyBigger(prevEndTimes[i], endTime, 1);
 
                 // Update closest end time by looking through previous LNs
-                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - previousEndTimes[i]));
+                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
             }
 
-            // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
-            // Releasing multiple notes is just as easy as releasing 1. Nerfs the hold addition by half if the closest release is release_threshold away.
-            // holdAddition
-            //     ^
-            // 1.0 + - - - - - -+-----------
-            //     |           /
-            // 0.5 + - - - - -/   Sigmoid Curve
-            //     |         /|
-            // 0.0 +--------+-+---------------> Release Difference / ms
-            //         release_threshold
-            if (isOverlapping)
-                holdAddition = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
+            /* Give Hold Addition for Scenario Column 3.
+             * Releasing multiple notes is as easy as releasing one.
+             * Halves hold addition if closest release is release_threshold away.
+             *
+             * End on Body Bias
+             *     ^
+             * 1.0 + - - - - - -+-----------
+             *     |           /
+             * 0.5 + - - - - -/   Sigmoid Curve
+             *     |         /|
+             * 0.0 +--------+-+---------------> Release Difference / ms
+             *         release_threshold
+             */
+            if (isEndOnBody)
+                endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
 
-            // Decay and increase individualStrains in own column
-            individualStrains[column] = applyDecay(individualStrains[column], startTime - startTimes[column], individual_decay_base);
-            individualStrains[column] += 2.0 * holdWeight;
+            // Bonus for Holds that end after our tail.
+            // We give a slight bonus to everything if something is held meanwhile
+            if (isEndAfterTail)
+                endAfterTailWeight = 1.25;
 
-            // For notes at the same time (in a chord), the individualStrain should be the hardest individualStrain out of those columns
-            individualStrain = hitObject.DeltaTime <= 1 ? Math.Max(individualStrain, individualStrains[column]) : individualStrains[column];
+            // Decay previous column strain by the column timeDelta
+            prevStrains[column] = applyDecay(prevStrains[column], startTime - prevStartTimes[column], decay_base);
+            prevStrains[column] += 2.0 * endAfterTailWeight;
+
+            // For notes at the same time (in a chord), the strain should be the hardest strain out of those columns
+            // This works by checking if
+            double strain = hitObject.DeltaTime <= 1 ? Math.Max(prevStrain, prevStrains[column]) : prevStrains[column];
 
             // Decay and increase overallStrain
-            overallStrain = applyDecay(overallStrain, current.DeltaTime, overall_decay_base);
-            overallStrain += (1 + holdAddition) * holdWeight;
+            globalStrain = applyDecay(globalStrain, current.DeltaTime, global_decay_base);
+            globalStrain += (1 + endOnBodyBias) * endAfterTailWeight;
 
             // Update startTimes and endTimes arrays
-            startTimes[column] = startTime;
-            previousEndTimes[column] = endTime;
+            prevStartTimes[column] = startTime;
+            prevEndTimes[column] = endTime;
+            prevStrain = strain;
 
             // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
-            return individualStrain + overallStrain - CurrentStrain;
+            return strain + globalStrain - CurrentStrain;
         }
 
         protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
-            => applyDecay(individualStrain, offset - current.Previous(0).StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - current.Previous(0).StartTime, overall_decay_base);
+            => applyDecay(prevStrain, offset - current.Previous(0).StartTime, decay_base)
+               + applyDecay(globalStrain, offset - current.Previous(0).StartTime, global_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);
