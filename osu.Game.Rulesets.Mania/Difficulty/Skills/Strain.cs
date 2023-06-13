@@ -19,6 +19,52 @@ using osu.Game.Rulesets.Mods;
  * The following sequences are possible: B C, C B.
  * A is omitted because of rule 3.
  */
+
+/* Previous Note States
+ * When calculating strain by its history, there's these possible states.
+ *
+ * The last row of each cell shows the current note
+ * the 2nd last              shows the previous note
+ *
+ * The column describes where the previous note's end time is.
+ * E.g. E3 states that the previous note's end time is on the body (of the current note)
+ *
+ * Invalid/Impossible states are marked with X
+ * These states are not possible as their head is AFTER our current offset.
+ *
+ * E.g. D2 implies that our current note is a Hold. The previous note is a note, on the same offset.
+ *
+ *                 +-------------+-------------+-------------+-------------+--------------+
+ *                 | Before Head | On Head     | On Body     |  On Tail    | After Tail   |
+ *                 | (1)         | (2)         | (3)         |  (4)        | (5)          |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Note      (A) | (A1)        | (A2)        |             |             |              |
+ * | Before        | O           |      O      |      X      |      X      |      X       |
+ * | Note          |      O      |      O      |             |             |              |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Long Note (B) | (B1)        | (B2)        |             |             | (B5)         |
+ * | Before        | [==]        | [====]      |      X      |      X      | [==========] |
+ * | Note          |      O      |      O      |             |             |      O       |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Long Note (C) |             |             |             |             | (C5)         |
+ * | Before        |      X      |      x      |      X      |      X      |      [===]   |
+ * | Note          |             |             |             |             |      O       |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Note      (D) | (D1)        | (D2)        |             |             |              |
+ * | Before        | O           |      O      |      X      |      X      |      X       |
+ * | Long Note     |      [===]  |      [===]  |             |             |              |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Long Note (E) | (E1)        | (E2)        | (E3)        | (E4)        | (E5)         |
+ * | Before        | [==]        | [====]      | [======]    | [=========] | [==========] |
+ * | Long Note     |      [===]  |      [===]  |      [===]  |       [===] |      [===]   |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ * | Long Note (F) |             |             | (F3)        | (F4)        | (F5)         |
+ * | Before        |      X      |      X      |      [=]    |       [===] |      [=====] |
+ * | Long Note     |             |             |      [===]  |       [===] |      [===]   |
+ * +---------------+-------------+-------------+-------------+-------------+--------------+
+ *
+ */
+
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
@@ -69,32 +115,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             for (int i = 0; i < previousEndTimes.Length; ++i)
             {
-                /* Possible scenarios if the previous note is an LN:
-                 *
-                 *                 +--------------+--------------+-------------+---------------+--------------+
-                 *                 | Before Head  | On Head      | On Body     |  On Tail      | After Tail   |
-                 *                 | (1)          | (2)          | (3)         |  (4)          | (5)          |
-                 * +---------------+--------------+--------------+-------------+---------------+--------------+
-                 * | Note      (A) | (A1)         | (A2)         |             |               | (A5 Inval.)  |
-                 * | Before        | O            |      O       |      X      |       X       |           O  |
-                 * | Note          |      O       |      O       |             |               |      O       |
-                 * +---------------+--------------+--------------+-------------+---------------+--------------+
-                 * | Long Note (B) | (B1)         | (B2)         |             |               | (B5)         |
-                 * | Before        | [==]         | [====]       |      X      |       X       | [==========] |
-                 * | Note          |      O       |      O       |             |               |      O       |
-                 * +---------------+--------------+--------------+-------------+---------------+--------------+
-                 * | Note      (C) | (C1)         | (C2)         | (C3)        |  (C4)         | (C5 Inval.)  |
-                 * | Before        | O            |      O       |        O    |           O   |            O |
-                 * | Long Note     |      [===]   |      [===]   |      [===]  |       [===]   |      [===]   |
-                 * +---------------+--------------+--------------+-------------+---------------+--------------+
-                 * | Long Note (D) | (D1)         | (D2)         | (D3)        |  (D4)         | (D5)         |
-                 * | Before        | [==]         | [====]       | [======]    |  [========]   | [==========] |
-                 * | Long Note     |      [===]   |      [===]   |      [===]  |       [===]   |      [===]   |
-                 * +---------------+--------------+--------------+-------------+---------------+--------------+
-                 *
-                 * Invalid states:
-                 * A5 and C5 are NOT possible as we sequentially, in time, process notes.
-                 * Thus, no HitObject can be in previousEndTimes, if their head is AFTER the current note
                  */
 
                 // IsOverlapping considers scenarios C3:D3:
