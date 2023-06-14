@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
@@ -105,47 +104,31 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
     {
-        /// <summary>
-        /// Individual Strain Decay Exponent Base. Used in <see cref="applyDecay"/>
-        /// </summary>
+        /// <summary> Individual Strain Decay Exponent Base. Used in <see cref="applyDecay"/> </summary>
         private const double decay_base = 0.125;
 
-        /// <summary>
-        /// Global Strain Decay Exponent Base. Used in <see cref="applyDecay"/>
-        /// </summary>
+        /// <summary> Global Strain Decay Exponent Base. Used in <see cref="applyDecay"/> </summary>
         private const double global_decay_base = 0.30;
 
-        /// <summary>
-        /// Center of our On Body Bias sigmoid function.
-        /// </summary>
+        /// <summary> Center of our endOnBodyBias sigmoid function. </summary>
         private const double release_threshold = 24;
 
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
 
-        /// <summary>
-        /// Previous notes' start times. Indices correspond to columns
-        /// </summary>
+        /// <summary> Previous notes' start times. Indices correspond to columns </summary>
         private readonly double[] prevStartTimes;
 
-        /// <summary>
-        /// Previous notes' end times. Indices correspond to columns
-        /// </summary>
+        /// <summary> Previous notes' end times. Indices correspond to columns </summary>
         private readonly double[] prevEndTimes;
 
-        /// <summary>
-        /// Per-Column Strains. Indices correspond to columns
-        /// </summary>
+        /// <summary> Per-Column Strains. Indices correspond to columns </summary>
         private readonly double[] columnStrains;
 
-        /// <summary>
-        /// Previous Strain processed.
-        /// </summary>
+        /// <summary> Previous Strain processed. </summary>
         private double prevColumnStrain;
 
-        /// <summary>
-        /// Global Strain: The "strain" of all fingers.
-        /// </summary>
+        /// <summary> Global Strain: The "strain" of all fingers. </summary>
         private double globalStrain;
 
         public Strain(Mod[] mods, int totalColumns)
@@ -208,9 +191,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
             }
 
-            /* Strain Bias for Column 3 States
+            /* Strain Bias for End On Body States
              * Releasing multiple notes is as easy as releasing one.
-             * Halves hold addition if closest release is release_threshold away.
              *
              *             End on Body Bias
              *                 ▲
@@ -231,18 +213,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (isEndOnBody)
                 endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
 
-            /* Strain Weight for Column 5 States
-             * Bonus for Holds that end after our tail.
-             * We give a slight bonus to everything if something is held meanwhile
-             */
+            // Strain Weight for End After Tail States
             if (isEndAfterTail)
                 endAfterTailWeight = 1.25;
 
-            /* Update Column & Global Strain given context of note
+            /* Update Column & Global Strain
              * 1) We decay the strain given deltaTime
-             * 2) Increase strain given information of note and surroundings
+             * 2) Increase strain given note and surroundings
              *
-             * (!) Only in Global Strain, we include endOnBodyBias as a design choice.
+             * (!) endOnBodyBias only in Global Strain is a design choice.
              *
              *                  Column  Global
              *                  Strain  Strain
@@ -256,35 +235,33 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             globalStrain = applyDecay(globalStrain, current.DeltaTime, global_decay_base);
             globalStrain += (1 + endOnBodyBias) * endAfterTailWeight;
 
-            /* For notes at the same time (in a chord), the strain should be the highest column strain + global strain out of those columns
+            /* For notes at the same time (in a chord), strain is the maximum column strain + global strain out of those columns
              *
-             * --- Problem
+             * i.e. We want max(GS) + max(CS): Global Strain (GS), Column Strain (CS)
              *
              * Given a state with a 4 note chord with:
-             * - Global Strains (GS) [A, B, C, D]  <- Strains are different in chords, global strains are added every note. A < B < C < D
-             * - Column Strains (CS) [1, 2, 3, 4]
+             * - GS: [A, B, C, D]  <- Strains are different in chords, GS are added every note. A < B < C < D
+             * - CS: [1, 2, 3, 4]
              *
-             * The maximum strain evaluated should be D + 4 = max(GS) + max(CS)
-             * However, remember that strains are not necessarily increasing
+             * Here, max(GS + CS) = max(GS) + max(CS)
              *
-             * - Column Strains [4, 3, 2, 1] may yield A + 4 as the maxima.
+             * However, CS is not necessarily increasing
              *
-             * Shows that: max(GS + CS) != max(GS) + max(CS)
-             * This caused the issue where strain was column-variant.
+             * - GS: [A, B, C, D]
+             * - CS: [4, 3, 2, 1]
              *
-             * --- Solution
+             * Here: max(GS + CS) = A + 4 != max(GS) + max(CS) = D + 4
+             * Causing the issue where strain was column-variant.
              *
-             * This mechanism counters this effect by taking the running maximum of both arrays.
-             * (!) Global Strain is strictly increasing so it's not necessary to track it.
+             * We can find max(GS) + max(CS) by ensuring the final note in the chord has the highest GS and CS.
+             * (!) GS is strictly increasing so it's not necessary to do running maximum on it.
              *
              * With this mechanism:
              * - Global Strains                    [A, B, C, D]
              * - Column Strains                    [3, 4, 3, 2]
              * - Column Strains w/ running Maximum [3, 4, 4, 4]
              *
-             * Shows that: run_max(GS + CS) = max(GS) + max(CS)
-             *
-             * We can also see that the last entry in a chord is always the peak strain.
+             * Shows that: run_max(GS + CS)[-1] = max(GS) + max(CS)
              */
             double columnStrain = hitObject.DeltaTime <= 1 ? Math.Max(prevColumnStrain, columnStrains[column]) : columnStrains[column];
 
