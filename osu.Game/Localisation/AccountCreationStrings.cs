@@ -10,14 +10,14 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.AccountCreation";
 
         /// <summary>
-        /// "New Player Registration"
+        /// "New player registration"
         /// </summary>
-        public static LocalisableString NewPlayerRegistration => new TranslatableString(getKey(@"new_player_registration"), @"New Player Registration");
+        public static LocalisableString NewPlayerRegistration => new TranslatableString(getKey(@"new_player_registration"), @"New player registration");
 
         /// <summary>
-        /// "let&#39;s get you started"
+        /// "Let&#39;s get you started"
         /// </summary>
-        public static LocalisableString LetsGetYouStarted => new TranslatableString(getKey(@"lets_get_you_started"), @"let's get you started");
+        public static LocalisableString LetsGetYouStarted => new TranslatableString(getKey(@"lets_get_you_started"), @"Let's get you started");
 
         /// <summary>
         /// "Let&#39;s create an account!"

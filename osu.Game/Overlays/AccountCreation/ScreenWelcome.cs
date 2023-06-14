@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -45,14 +46,14 @@ namespace osu.Game.Overlays.AccountCreation
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
-                        Text = AccountCreationStrings.NewPlayerRegistration,
+                        Text = AccountCreationStrings.NewPlayerRegistration.ToTitle(),
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.GetFont(size: 12),
-                        Text = AccountCreationStrings.LetsGetYouStarted,
+                        Text = AccountCreationStrings.LetsGetYouStarted.ToLower(),
                     },
                     new SettingsButton
                     {
