@@ -176,16 +176,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             for (int i = 0; i < prevEndTimes.Length; ++i)
             {
-                /* True for Column 3 States:
-                 *      Criterion 1 accepts Col 3-5
-                 *      Criterion 2 accepts Col 1, D2:F3,
-                 *      Thus, AND accepts Col 3 Only.
-                 */
-                isEndOnBody |= Precision.DefinitelyBigger(prevEndTimes[i], startTime, 1) &&
-                               Precision.DefinitelyBigger(endTime, prevEndTimes[i], 1);
+                isEndOnBody |= // Accepts Col 3 States
+                    prevEndTimes[i] + 1 >= startTime && // Accepts Col 3-5
+                    prevEndTimes[i] <= endTime + 1; // Accepts Col 1 & D2:F3
 
-                // True for Column 5 States
-                isEndAfterTail |= Precision.DefinitelyBigger(prevEndTimes[i], endTime, 1);
+                // Accepts Column 5 States
+                isEndAfterTail |= prevEndTimes[i] + 1 >= endTime;
 
                 // Update closest end time by looking through previous LNs
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
