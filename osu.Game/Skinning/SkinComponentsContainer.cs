@@ -6,10 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Skinning
 {
@@ -41,8 +39,6 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        private ICanAttachHUDPieces? attachTarget;
-
         public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
         {
             Lookup = lookup;
@@ -66,10 +62,6 @@ namespace osu.Game.Skinning
 
         public void Reload(Container? componentsContainer)
         {
-            components
-                .OfType<IAttachableSkinComponent>()
-                .ForEach(c => attachTarget?.Detach(c));
-
             ClearInternal();
             components.Clear();
             ComponentsLoaded = false;
@@ -85,7 +77,6 @@ namespace osu.Game.Skinning
             LoadComponentAsync(content, wrapper =>
             {
                 AddInternal(wrapper);
-                wrapper.Children.OfType<IAttachableSkinComponent>().ForEach(c => attachTarget?.Attach(c));
                 components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
             }, (cancellationSource = new CancellationTokenSource()).Token);
@@ -102,9 +93,6 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            if (component is IAttachableSkinComponent attachableSkinComponent)
-                attachTarget?.Attach(attachableSkinComponent);
-
             content.Add(drawable);
             components.Add(component);
         }
@@ -120,22 +108,8 @@ namespace osu.Game.Skinning
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-            if (component is IAttachableSkinComponent attachableSkinComponent)
-                attachTarget?.Detach(attachableSkinComponent);
-
             content.Remove(drawable, disposeImmediately);
             components.Remove(component);
-        }
-
-        public void SetAttachTarget(ICanAttachHUDPieces target)
-        {
-            attachTarget = target;
-
-            foreach (var child in InternalChildren)
-            {
-                if (child is IAttachableSkinComponent attachable)
-                    attachTarget.Attach(attachable);
-            }
         }
 
         protected override void SkinChanged(ISkinSource skin)
