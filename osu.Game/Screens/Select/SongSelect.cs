@@ -1,42 +1,46 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Audio.Track;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Game.Collections;
-using osu.Game.Graphics.UserInterface;
-using System.Diagnostics;
-using osu.Framework.Extensions.ObjectExtensions;
-using osu.Game.Screens.Play;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -82,6 +86,17 @@ namespace osu.Game.Screens.Select
 
         public bool BeatmapSetsLoaded => IsLoaded && Carousel.BeatmapSetsLoaded;
 
+        /// <summary>
+        /// Creates any "action" menu items for the provided beatmap (ie. "Select", "Play", "Edit").
+        /// These will always be placed at the top of the context menu, with common items added below them.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create items for.</param>
+        /// <returns>The menu items.</returns>
+        public virtual MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
+        {
+            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(beatmap))
+        };
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
@@ -124,9 +139,20 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
+        private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
+
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender)
+        private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
+            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
+            configBackgroundBlur.BindValueChanged(e =>
+            {
+                if (!this.IsCurrentScreen())
+                    return;
+
+                ApplyToBackground(applyBlurToBackground);
+            });
+
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {
                 AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
@@ -137,6 +163,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = updateVisibleBeatmapCount,
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
@@ -170,6 +197,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Child = new WedgeBackground
@@ -249,7 +277,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinnableTargetContainer(GlobalSkinComponentLookup.LookupType.SongSelect)
+                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -739,12 +767,18 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            ApplyToBackground(backgroundModeBeatmap =>
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
             {
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            });
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
+
+                    applyBlurToBackground(backgroundModeBeatmap);
+                });
+            }
 
             beatmapInfoWedge.Beatmap = beatmap;
 
@@ -759,6 +793,14 @@ namespace osu.Game.Screens.Select
                 beatmapOptionsButton.Enabled.Value = false;
                 BeatmapOptions.Hide();
             }
+        }
+
+        private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
+        {
+            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
+
+            wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);
@@ -788,6 +830,7 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             bindBindables();
+            updateVisibleBeatmapCount();
 
             Carousel.AllowSelection = true;
 
@@ -815,6 +858,13 @@ namespace osu.Game.Screens.Select
                 // to show the dummy beatmap (we have nothing else to display).
                 performUpdateSelected();
             }
+        }
+
+        private void updateVisibleBeatmapCount()
+        {
+            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+            // but also in this case we want support for formatting a number within a string).
+            FilterControl.InformationalText = $"{"match".ToQuantity(Carousel.CountDisplayed, "#,0")}";
         }
 
         private bool boundLocalBindables;

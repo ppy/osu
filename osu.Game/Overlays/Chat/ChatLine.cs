@@ -1,25 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class ChatLine : CompositeDrawable
+    public partial class ChatLine : CompositeDrawable, IHasPopover
     {
         private Message message = null!;
 
@@ -53,11 +56,11 @@ namespace osu.Game.Overlays.Chat
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
 
-        private readonly OsuSpriteText drawableTimestamp;
+        private OsuSpriteText drawableTimestamp = null!;
 
-        private readonly DrawableUsername drawableUsername;
+        private DrawableChatUsername drawableUsername = null!;
 
-        private readonly LinkFlowContainer drawableContentFlow;
+        private LinkFlowContainer drawableContentFlow = null!;
 
         private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
@@ -66,8 +69,16 @@ namespace osu.Game.Overlays.Chat
         public ChatLine(Message message)
         {
             Message = message;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager configManager)
+        {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
             InternalChild = new GridContainer
             {
@@ -92,7 +103,7 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername = new DrawableUsername(message.Sender)
+                        drawableUsername = new DrawableChatUsername(message.Sender)
                         {
                             Width = UsernameWidth,
                             FontSize = FontSize,
@@ -111,13 +122,6 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager configManager)
-        {
-            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
-            prefer24HourTime.BindValueChanged(_ => updateTimestamp());
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -126,7 +130,20 @@ namespace osu.Game.Overlays.Chat
 
             updateMessageContent();
             FinishTransforms(true);
+
+            if (this.FindClosestParent<PopoverContainer>() != null)
+            {
+                // This guards against cases like in-game chat where there's no available popover container.
+                // There may be a future where a global one becomes available, at which point this code may be unnecessary.
+                //
+                // See:
+                // https://github.com/ppy/osu/pull/23698
+                // https://github.com/ppy/osu/pull/14554
+                drawableUsername.ReportRequested = this.ShowPopover;
+            }
         }
+
+        public Popover GetPopover() => new ReportChatPopover(message);
 
         /// <summary>
         /// Performs a highlight animation on this <see cref="ChatLine"/>.

@@ -22,6 +22,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -74,6 +75,8 @@ namespace osu.Game.Overlays.Comments
         private OsuSpriteText deletedLabel = null!;
         private GridContainer content = null!;
         private VotePill votePill = null!;
+        private Container<CommentEditor> replyEditorContainer = null!;
+        private Container repliesButtonContainer = null!;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -232,9 +235,17 @@ namespace osu.Game.Overlays.Comments
                                                         }
                                                     }
                                                 },
-                                                new Container
+                                                replyEditorContainer = new Container<CommentEditor>
+                                                {
+                                                    AutoSizeAxes = Axes.Y,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Top = 10 },
+                                                    Alpha = 0,
+                                                },
+                                                repliesButtonContainer = new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
+                                                    Alpha = 0,
                                                     Children = new Drawable[]
                                                     {
                                                         showRepliesButton = new ShowRepliesButton(Comment.RepliesCount)
@@ -254,6 +265,7 @@ namespace osu.Game.Overlays.Comments
                             },
                             childCommentsVisibilityContainer = new FillFlowContainer
                             {
+                                Name = @"Children comments",
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
@@ -344,6 +356,8 @@ namespace osu.Game.Overlays.Comments
 
             actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+            actionsContainer.AddLink(CommonStrings.ButtonsReply.ToLower(), toggleReply);
+            actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
                 actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
@@ -419,8 +433,9 @@ namespace osu.Game.Overlays.Comments
                 if (!ShowDeleted.Value)
                     Hide();
             });
-            request.Failure += _ => Schedule(() =>
+            request.Failure += e => Schedule(() =>
             {
+                Logger.Error(e, "Failed to delete comment");
                 actionsLoading.Hide();
                 actionsContainer.Show();
             });
@@ -431,6 +446,29 @@ namespace osu.Game.Overlays.Comments
         {
             host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
             onScreenDisplay?.Display(new CopyUrlToast());
+        }
+
+        private void toggleReply()
+        {
+            if (replyEditorContainer.Count == 0)
+            {
+                replyEditorContainer.Show();
+                replyEditorContainer.Add(new ReplyCommentEditor(Comment)
+                {
+                    OnPost = comments =>
+                    {
+                        Comment.RepliesCount += comments.Length;
+                        showRepliesButton.Count = Comment.RepliesCount;
+                        Replies.AddRange(comments);
+                    },
+                    OnCancel = toggleReply
+                });
+            }
+            else
+            {
+                replyEditorContainer.ForEach(e => e.Expire());
+                replyEditorContainer.Hide();
+            }
         }
 
         protected override void LoadComplete()
@@ -444,8 +482,6 @@ namespace osu.Game.Overlays.Comments
             updateButtonsState();
             base.LoadComplete();
         }
-
-        public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
 
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
         {
@@ -483,9 +519,11 @@ namespace osu.Game.Overlays.Comments
             int loadedRepliesCount = loadedReplies.Count;
             bool hasUnloadedReplies = loadedRepliesCount != Comment.RepliesCount;
 
-            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
-            showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
             showRepliesButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
+            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
+            repliesButtonContainer.FadeTo(repliesButtonContainer.Any(child => child.Alpha > 0) ? 1 : 0);
+
+            showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
 
             if (Comment.IsTopLevel)
                 chevronButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
@@ -499,7 +537,7 @@ namespace osu.Game.Overlays.Comments
             {
                 return new MarginPadding
                 {
-                    Horizontal = 70,
+                    Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     Vertical = 15
                 };
             }

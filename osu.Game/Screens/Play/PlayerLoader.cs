@@ -67,6 +67,8 @@ namespace osu.Game.Screens.Play
 
         private OsuScrollContainer settingsScroll = null!;
 
+        private Bindable<bool> showStoryboards = null!;
+
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
@@ -149,10 +151,11 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, AudioManager audio)
+        private void load(SessionStatics sessionStatics, AudioManager audio, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
+            showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             const float padding = 25;
 
@@ -417,7 +420,7 @@ namespace osu.Game.Screens.Play
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
-            ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
+            ApplyToBackground(b => b.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
         protected virtual void ContentOut()
@@ -463,7 +466,10 @@ namespace osu.Game.Screens.Play
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
-                if (epilepsyWarning?.IsAlive == true)
+                //
+                // note the late check of storyboard enable as the user may have just changed it
+                // from the settings on the loader screen.
+                if (epilepsyWarning?.IsAlive == true && showStoryboards.Value)
                 {
                     const double epilepsy_display_length = 3000;
 
@@ -483,6 +489,7 @@ namespace osu.Game.Screens.Play
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
                     this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    epilepsyWarning?.Expire();
                 }
 
                 pushSequence.Schedule(() =>

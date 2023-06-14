@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -539,6 +540,11 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
+
+            AddStep("exit lounge", () => Game.ScreenStack.Exit());
+            // `TestMultiplayerComponents` registers a request handler in its BDL, but never unregisters it.
+            // to prevent the handler living for longer than it should be, clean up manually.
+            AddStep("clean up multiplayer request handler", () => ((DummyAPIAccess)API).HandleRequest = null);
         }
 
         [Test]
@@ -561,6 +567,18 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
 
             AddUntilStep("featured artist filter is off", () => !getBeatmapListingOverlay().ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+        }
+
+        [Test]
+        public void TestBeatmapListingLinkSearchOnInitialOpen()
+        {
+            BeatmapListingOverlay getBeatmapListingOverlay() => Game.ChildrenOfType<BeatmapListingOverlay>().FirstOrDefault();
+
+            AddStep("open beatmap overlay with test query", () => Game.SearchBeatmapSet("test"));
+
+            AddUntilStep("wait for beatmap overlay to load", () => getBeatmapListingOverlay()?.State.Value == Visibility.Visible);
+
+            AddAssert("beatmap overlay sorted by relevance", () => getBeatmapListingOverlay().ChildrenOfType<BeatmapListingSortTabControl>().Single().Current.Value == SortCriteria.Relevance);
         }
 
         [Test]
@@ -688,7 +706,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("press escape twice rapidly", () =>
             {
                 InputManager.Key(Key.Escape);
-                InputManager.Key(Key.Escape);
+                Schedule(InputManager.Key, Key.Escape);
             });
 
             pushEscape();

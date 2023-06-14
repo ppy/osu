@@ -104,6 +104,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
+            scoreRetrievalRequest?.Cancel();
+            scoreRetrievalRequest = null;
+
             var fetchBeatmapInfo = BeatmapInfo;
 
             if (fetchBeatmapInfo == null)
@@ -152,8 +155,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            scoreRetrievalRequest?.Cancel();
-
             var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
             newRequest.Success += response => Schedule(() =>
             {
@@ -190,6 +191,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                           + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);

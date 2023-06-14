@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -41,6 +42,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal CatcherArea CatcherArea { get; private set; } = null!;
 
+        public Container UnderlayElements { get; private set; } = null!;
+
         private readonly IBeatmapDifficultyInfo difficulty;
 
         public CatchPlayfield(IBeatmapDifficultyInfo difficulty)
@@ -62,6 +65,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
             AddRangeInternal(new[]
             {
+                UnderlayElements = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 droppedObjectContainer,
                 Catcher.CreateProxiedContent(),
                 HitObjectContainer.CreateProxy(),
@@ -103,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
 
-        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
+        private void onRevertResult(JudgementResult result)
+            => CatcherArea.OnRevertResult(result);
     }
 }
