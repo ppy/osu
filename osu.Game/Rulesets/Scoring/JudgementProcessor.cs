@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -146,14 +147,11 @@ namespace osu.Game.Rulesets.Scoring
         {
             IsSimulating = true;
 
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in EnumerateHitObjects(beatmap))
                 simulate(obj);
 
             void simulate(HitObject obj)
             {
-                foreach (var nested in obj.NestedHitObjects)
-                    simulate(nested);
-
                 var judgement = obj.CreateJudgement();
 
                 var result = CreateResult(obj, judgement);
@@ -165,6 +163,29 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             IsSimulating = false;
+        }
+
+        /// <summary>
+        /// Enumerates all <see cref="HitObject"/>s in the given <paramref name="beatmap"/> in the order in which they are to be judged.
+        /// Used in <see cref="SimulateAutoplay"/>.
+        /// </summary>
+        /// <remarks>
+        /// In Score V2, the score awarded for each object includes a component based on the combo value after the judgement of that object.
+        /// This means that the score is dependent on the order of evaluation of judgements.
+        /// This method is provided so that rulesets can specify custom ordering that is correct for them and matches processing order during actual gameplay.
+        /// </remarks>
+        protected virtual IEnumerable<HitObject> EnumerateHitObjects(IBeatmap beatmap)
+            => enumerateRecursively(beatmap.HitObjects);
+
+        private IEnumerable<HitObject> enumerateRecursively(IEnumerable<HitObject> hitObjects)
+        {
+            foreach (var hitObject in hitObjects)
+            {
+                foreach (var nested in enumerateRecursively(hitObject.NestedHitObjects))
+                    yield return nested;
+
+                yield return hitObject;
+            }
         }
 
         /// <summary>
