@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -25,8 +24,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 {
     public partial class MapPoolScreen : TournamentMatchScreen
     {
-        private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
-        private TournamentMatch currentMatch;
+        private FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -34,14 +32,13 @@ namespace osu.Game.Tournament.Screens.MapPool
         private TeamColour pickColour;
         private ChoiceType pickType;
 
-        private readonly OsuButton buttonRedBan;
-        private readonly OsuButton buttonBlueBan;
-        private readonly OsuButton buttonRedPick;
-        private readonly OsuButton buttonBluePick;
+        private OsuButton buttonRedBan;
+        private OsuButton buttonBlueBan;
+        private OsuButton buttonRedPick;
+        private OsuButton buttonBluePick;
 
-        private readonly SettingsCheckbox chkBoxLineBreak;
-
-        public MapPoolScreen()
+        [BackgroundDependencyLoader]
+        private void load(MatchIPCInfo ipc)
         {
             InternalChildren = new Drawable[]
             {
@@ -102,26 +99,26 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Action = reset
                         },
                         new ControlPanel.Spacer(),
-                        new TournamentSpriteText
+                        new OsuCheckbox
                         {
-                            Text = "Each modpool takes"
+                            LabelText = "Split display by mods",
+                            Current = LadderInfo.SplitMapPoolByMods,
                         },
-                        new TournamentSpriteText
-                        {
-                            Text = "different row"
-                        },
-                        chkBoxLineBreak = new SettingsCheckbox()
                     },
                 }
             };
+
+            ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(MatchIPCInfo ipc)
+        private Bindable<bool> splitMapPoolByMods;
+
+        protected override void LoadComplete()
         {
-            ipc.Beatmap.BindValueChanged(beatmapChanged);
-            chkBoxLineBreak.Current.Value = true;
-            chkBoxLineBreak.Current.BindValueChanged(_ => rearrangeMappool());
+            base.LoadComplete();
+
+            splitMapPoolByMods = LadderInfo.SplitMapPoolByMods.GetBoundCopy();
+            splitMapPoolByMods.BindValueChanged(_ => updateDisplay());
         }
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
@@ -228,42 +225,40 @@ namespace osu.Game.Tournament.Screens.MapPool
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             base.CurrentMatchChanged(match);
-            currentMatch = match.NewValue;
-            rearrangeMappool();
+            updateDisplay();
         }
 
-        private void rearrangeMappool()
+        private void updateDisplay()
         {
             mapFlows.Clear();
 
-            if (currentMatch == null)
+            if (CurrentMatch.Value == null)
                 return;
+
             int totalRows = 0;
 
-            if (currentMatch.Round.Value != null)
+            if (CurrentMatch.Value.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
-                string currentMod = null;
+                string currentMods = null;
                 int flowCount = 0;
 
-                foreach (var b in currentMatch.Round.Value.Beatmaps)
+                foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
-                    if (currentFlow == null || currentMod != b.Mods)
+                    if (currentFlow == null || (LadderInfo.SplitMapPoolByMods.Value && currentMods != b.Mods))
                     {
-                        if (chkBoxLineBreak.Current.Value || currentFlow == null)
+                        mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
                         {
-                            mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
-                            {
-                                Spacing = new Vector2(10, 5),
-                                Direction = FillDirection.Full,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            });
+                            Spacing = new Vector2(10, 5),
+                            Direction = FillDirection.Full,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        });
 
-                            totalRows++;
-                            flowCount = 0;
-                        }
-                        currentMod = b.Mods;
+                        currentMods = b.Mods;
+
+                        totalRows++;
+                        flowCount = 0;
                     }
 
                     if (++flowCount > 2)
