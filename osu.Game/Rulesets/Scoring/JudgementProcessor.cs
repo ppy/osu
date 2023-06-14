@@ -148,9 +148,6 @@ namespace osu.Game.Rulesets.Scoring
             IsSimulating = true;
 
             foreach (var obj in EnumerateHitObjects(beatmap))
-                simulate(obj);
-
-            void simulate(HitObject obj)
             {
                 var judgement = obj.CreateJudgement();
 
