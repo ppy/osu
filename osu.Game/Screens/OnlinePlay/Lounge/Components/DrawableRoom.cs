@@ -337,7 +337,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Width = 0.5f;
             }
 
             [BackgroundDependencyLoader]
