@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -57,7 +58,14 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+
+        protected ExpandingToolboxContainer LeftToolbox { get; private set; }
+
+        protected ExpandingToolboxContainer RightToolbox { get; private set; }
 
         private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
@@ -69,7 +77,10 @@ namespace osu.Game.Rulesets.Edit
 
         private FillFlowContainer togglesCollection;
 
+        private FillFlowContainer sampleBankTogglesCollection;
+
         private IBindable<bool> hasTiming;
+        private Bindable<bool> autoSeekOnPlacement;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -80,8 +91,10 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OsuConfigManager config)
         {
+            autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
@@ -105,6 +118,11 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer = new Container
                 {
                     Name = "Content",
+                    Padding = new MarginPadding
+                    {
+                        Left = TOOLBOX_CONTRACTED_SIZE_LEFT,
+                        Right = TOOLBOX_CONTRACTED_SIZE_RIGHT,
+                    },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -127,7 +145,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new ExpandingToolboxContainer(60, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
                         {
                             Children = new Drawable[]
                             {
@@ -144,11 +162,43 @@ namespace osu.Game.Rulesets.Edit
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
                                     },
+                                },
+                                new EditorToolboxGroup("bank (Shift-Q~R)")
+                                {
+                                    Child = sampleBankTogglesCollection = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                    },
                                 }
                             }
                         },
                     }
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        {
+                            Child = new EditorToolboxGroup("inspector")
+                            {
+                                Child = new HitObjectInspector()
+                            },
+                        }
+                    }
+                }
             };
 
             toolboxCollection.Items = CompositionTools
@@ -158,6 +208,8 @@ namespace osu.Game.Rulesets.Edit
 
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
+
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
@@ -211,7 +263,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.TernaryStates;
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -236,7 +288,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
@@ -253,7 +305,9 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out int rightIndex))
             {
-                var item = togglesCollection.ElementAtOrDefault(rightIndex);
+                var item = e.ShiftPressed
+                    ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
+                    : togglesCollection.ElementAtOrDefault(rightIndex);
 
                 if (item is DrawableTernaryButton button)
                 {
@@ -365,7 +419,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                if (EditorClock.CurrentTime < hitObject.StartTime)
+                if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                     EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
@@ -390,7 +444,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.Grids))
+            if (snapType.HasFlagFast(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {
@@ -417,6 +471,9 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 130;
+
         public readonly Ruleset Ruleset;
 
         protected HitObjectComposer(Ruleset ruleset)

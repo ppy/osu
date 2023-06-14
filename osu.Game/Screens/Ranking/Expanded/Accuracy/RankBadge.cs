@@ -27,6 +27,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         public readonly double Accuracy;
 
+        /// <summary>
+        /// The position around the <see cref="AccuracyCircle"/> to display this badge.
+        /// </summary>
+        private readonly double displayPosition;
+
         private readonly ScoreRank rank;
 
         private Drawable rankContainer;
@@ -36,10 +41,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// Creates a new <see cref="RankBadge"/>.
         /// </summary>
         /// <param name="accuracy">The accuracy value corresponding to <paramref name="rank"/>.</param>
+        /// <param name="position">The position around the <see cref="AccuracyCircle"/> to display this badge.</param>
         /// <param name="rank">The <see cref="ScoreRank"/> to be displayed in this <see cref="RankBadge"/>.</param>
-        public RankBadge(double accuracy, ScoreRank rank)
+        public RankBadge(double accuracy, double position, ScoreRank rank)
         {
             Accuracy = accuracy;
+            displayPosition = position;
             this.rank = rank;
 
             RelativeSizeAxes = Axes.Both;
@@ -92,7 +99,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             base.Update();
 
             // Starts at -90deg (top) and moves counter-clockwise by the accuracy
-            rankContainer.Position = circlePosition(-MathF.PI / 2 - (1 - (float)Accuracy) * MathF.PI * 2);
+            rankContainer.Position = circlePosition(-MathF.PI / 2 - (1 - (float)displayPosition) * MathF.PI * 2);
         }
 
         private Vector2 circlePosition(float t)

@@ -70,7 +70,7 @@ namespace osu.Game.Tournament
 
         private async Task checkForChanges()
         {
-            string serialisedLadder = await Task.Run(() => tournamentGame.GetSerialisedLadder()).ConfigureAwait(false);
+            string serialisedLadder = await Task.Run(() => tournamentGame.GetSerialisedLadder()).ConfigureAwait(true);
 
             // If a save hasn't been triggered by the user yet, populate the initial value
             lastSerialisedLadder ??= serialisedLadder;

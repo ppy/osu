@@ -16,7 +16,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -25,7 +24,6 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
-    [ExcludeFromDynamicCompile]
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
@@ -35,8 +33,6 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public Storyboard Storyboard => storyboard.Value;
-
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
 
         public ISkin Skin => skin.Value;
 
@@ -69,7 +65,8 @@ namespace osu.Game.Beatmaps
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
         protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
+        public abstract Texture GetBackground();
+        public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
 
         /// <summary>

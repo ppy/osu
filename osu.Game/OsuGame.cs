@@ -49,6 +49,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
@@ -59,7 +60,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Skinning.Editor;
+using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -266,6 +267,13 @@ namespace osu.Game
                 overlay.Hide();
 
             if (hideToolbar) Toolbar.Hide();
+        }
+
+        protected override UserInputManager CreateUserInputManager()
+        {
+            var userInputManager = base.CreateUserInputManager();
+            (userInputManager as OsuUserInputManager)?.LocalUserPlaying.BindTo(LocalUserPlaying);
+            return userInputManager;
         }
 
         private DependencyContainer dependencies;
@@ -500,6 +508,23 @@ namespace osu.Game
         /// <param name="updateStream">The update stream name</param>
         /// <param name="version">The build version of the update stream</param>
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+
+        /// <summary>
+        /// Present a skin select immediately.
+        /// </summary>
+        /// <param name="skin">The skin to select.</param>
+        public void PresentSkin(SkinInfo skin)
+        {
+            var databasedSkin = SkinManager.Query(s => s.ID == skin.ID);
+
+            if (databasedSkin == null)
+            {
+                Logger.Log("The requested skin could not be loaded.", LoggingTarget.Information);
+                return;
+            }
+
+            SkinManager.CurrentSkinInfo.Value = databasedSkin;
+        }
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -777,6 +802,7 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
+            SkinManager.PresentImport = items => PresentSkin(items.First().Value);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
@@ -1110,12 +1136,22 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Schedule(() =>
                     {
-                        Text = $"Encountered tablet error: \"{message}\"",
-                        Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.RedDark,
-                    }));
+                        Notifications.Post(new SimpleNotification
+                        {
+                            Text = $"Disabling tablet support due to error: \"{message}\"",
+                            Icon = FontAwesome.Solid.PenSquare,
+                            IconColour = Colours.RedDark,
+                        });
+
+                        // We only have one tablet handler currently.
+                        // The loop here is weakly guarding against a future where more than one is added.
+                        // If this is ever the case, this logic needs adjustment as it should probably only
+                        // disable the relevant tablet handler rather than all.
+                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
+                            tabletHandler.Enabled.Value = false;
+                    });
                 }
                 else if (notifyOnWarning)
                 {

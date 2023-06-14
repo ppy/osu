@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
 
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { @"keybindings", @"controls", @"keyboard", @"keys" });
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {

@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Objects.Pooling;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -35,9 +36,9 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> NewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// Invoked when a judgement result is reverted.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> RevertResult;
+        public event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
@@ -98,6 +99,8 @@ namespace osu.Game.Rulesets.UI
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
+        private readonly Stack<HitObjectLifetimeEntry> judgedEntries;
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -107,14 +110,15 @@ namespace osu.Game.Rulesets.UI
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
             {
-                h.NewResult += (d, r) => NewResult?.Invoke(d, r);
-                h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.NewResult += onNewResult;
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
 
             entryManager.OnEntryAdded += onEntryAdded;
             entryManager.OnEntryRemoved += onEntryRemoved;
+
+            judgedEntries = new Stack<HitObjectLifetimeEntry>();
         }
 
         [BackgroundDependencyLoader]
@@ -224,7 +228,7 @@ namespace osu.Game.Rulesets.UI
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
-            otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.RevertResult += r => RevertResult?.Invoke(r);
             otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
             otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
@@ -252,6 +256,18 @@ namespace osu.Game.Rulesets.UI
                         updatable.Update(this);
                 }
             }
+
+            // When rewinding, revert future judgements in the reverse order.
+            while (judgedEntries.Count > 0)
+            {
+                var result = judgedEntries.Peek().Result;
+                Debug.Assert(result?.RawTime != null);
+
+                if (Time.Current >= result.RawTime.Value)
+                    break;
+
+                revertResult(judgedEntries.Pop());
+            }
         }
 
         /// <summary>
@@ -277,10 +293,10 @@ namespace osu.Game.Rulesets.UI
         {
             // prepare sample pools ahead of time so we're not initialising at runtime.
             foreach (var sample in hitObject.Samples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var sample in hitObject.AuxiliarySamples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var nestedObject in hitObject.NestedHitObjects)
                 preloadSamples(nestedObject);
@@ -442,6 +458,25 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        private void onNewResult(DrawableHitObject drawable, JudgementResult result)
+        {
+            Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null);
+            judgedEntries.Push(drawable.Entry.AsNonNull());
+
+            NewResult?.Invoke(drawable, result);
+        }
+
+        private void revertResult(HitObjectLifetimeEntry entry)
+        {
+            var result = entry.Result;
+            Debug.Assert(result != null);
+
+            RevertResult?.Invoke(result);
+            entry.OnRevertResult();
+
+            result.Reset();
+        }
 
         #region Editor logic
 

@@ -36,21 +36,24 @@ namespace osu.Game.Overlays.Profile
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
-            Masking = true;
-            CornerRadius = 10;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0, 1),
-                Radius = 3,
-                Colour = Colour4.Black.Opacity(0.25f)
-            };
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 10,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Offset = new Vector2(0, 1),
+                        Radius = 3,
+                        Colour = Colour4.Black.Opacity(0.25f)
+                    },
+                    Child = background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -64,7 +67,7 @@ namespace osu.Game.Overlays.Profile
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN - outer_gutter_width,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
                                 Top = 20,
                                 Bottom = 20,
                             },
@@ -94,7 +97,7 @@ namespace osu.Game.Overlays.Profile
                             RelativeSizeAxes = Axes.X,
                             Padding = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN - outer_gutter_width,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
                                 Bottom = 20
                             }
                         },

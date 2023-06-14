@@ -1064,8 +1064,23 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => manager.Delete());
-            AddWaitStep("wait for debounce", 1);
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
             AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
+        [Test]
+        public void TestTextBoxBeatmapDifficultyCount()
+        {
+            createSongSelect();
+
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+
+            addRulesetImportStep(0);
+
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
         }
 
         private void waitForInitialSelection()

@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
@@ -41,6 +42,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         private Guid currentBeatmapSetID => EditorBeatmap.BeatmapInfo.BeatmapSet?.ID ?? Guid.Empty;
 
@@ -224,7 +228,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return beatmap != null
                        && beatmap.DifficultyName == secondDifficultyName
                        && set != null
-                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+                       && set.PerformRead(s =>
+                           s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
             });
         }
 
@@ -325,6 +330,56 @@ namespace osu.Game.Tests.Visual.Editing
                            && s.Beatmaps.Any(b => b.DifficultyName == copyDifficultyName));
             });
             AddAssert("old beatmap file not deleted", () => refetchedBeatmapSet.AsNonNull().PerformRead(s => s.Files.Count == 2));
+        }
+
+        [Test]
+        public void TestCopyDifficultyDoesNotChangeCollections()
+        {
+            string originalDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = originalDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+
+            string originalMd5 = string.Empty;
+            BeatmapCollection collection = null!;
+
+            AddStep("setup a collection with original beatmap", () =>
+            {
+                collection = new BeatmapCollection("test copy");
+                collection.BeatmapMD5Hashes.Add(originalMd5 = EditorBeatmap.BeatmapInfo.MD5Hash);
+
+                realm.Write(r =>
+                {
+                    r.Add(collection);
+                });
+            });
+
+            AddAssert("collection contains original beatmap", () =>
+                !string.IsNullOrEmpty(originalMd5) && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != originalDifficultyName;
+            });
+
+            AddStep("save without changes", () => Editor.Save());
+
+            AddAssert("collection still points to old beatmap", () => !collection.BeatmapMD5Hashes.Contains(EditorBeatmap.BeatmapInfo.MD5Hash)
+                                                                      && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("clean up collection", () =>
+            {
+                realm.Write(r =>
+                {
+                    r.Remove(collection);
+                });
+            });
         }
 
         [Test]

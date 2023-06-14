@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddUntilStep("Leaderboard shows two aggregate scores", () => match.ChildrenOfType<MatchLeaderboardScore>().Count(s => s.ScoreText.Text != "0") == 2);
 
-            AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().TriggerClick());
+            ClickButtonWhenEnabled<PlaylistsReadyButton>();
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
         }
 

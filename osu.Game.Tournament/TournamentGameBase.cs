@@ -58,7 +58,7 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage baseStorage)
         {
-            AddInternal(initialisationText = new TournamentSpriteText
+            Add(initialisationText = new TournamentSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -332,13 +332,6 @@ namespace osu.Game.Tournament
 
         private void saveChanges()
         {
-            foreach (var r in ladder.Rounds)
-                r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
-
-            ladder.Progressions = ladder.Matches.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
-                                            ladder.Matches.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
-                                        .ToList();
-
             // Serialise before opening stream for writing, so if there's a failure it will leave the file in the previous state.
             string serialisedLadder = GetSerialisedLadder();
 
@@ -349,6 +342,13 @@ namespace osu.Game.Tournament
 
         public string GetSerialisedLadder()
         {
+            foreach (var r in ladder.Rounds)
+                r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
+
+            ladder.Progressions = ladder.Matches.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
+                                            ladder.Matches.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
+                                        .ToList();
+
             return JsonConvert.SerializeObject(ladder,
                 new JsonSerializerSettings
                 {

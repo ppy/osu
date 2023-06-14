@@ -159,11 +159,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void assertSelectionCount(int count) =>
-            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
+            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == count);
 
         private void assertSelected(int index) =>
             AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
-                () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
+                () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
 
         private void moveMouseToRelativePosition(Vector2 relativePosition) =>
             AddStep($"move mouse to {relativePosition}", () =>
@@ -202,12 +202,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(2);
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             addMovementStep(new Vector2(450, 50));
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             assertControlPointPosition(2, new Vector2(450, 50));
             assertControlPointType(2, PathType.PerfectCurve);
@@ -236,12 +236,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(3);
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             addMovementStep(new Vector2(550, 50));
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             // note: if the head is part of the selection being moved, the entire slider is moved.
             // the unselected nodes will therefore change position relative to the slider head.
@@ -354,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
             public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
-            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
+            public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
                 : base(slider)
