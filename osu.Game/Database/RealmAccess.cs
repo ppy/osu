@@ -945,22 +945,26 @@ namespace osu.Game.Database
 
                     foreach (var score in scores)
                     {
-                        // Recalculate the old-style standardised score to see if this was an old lazer score.
-                        bool oldScoreMatchesExpectations = StandardisedScoreMigrationTools.GetOldStandardised(score) == score.TotalScore;
-                        // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
-                        bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
-
-                        if (oldScoreMatchesExpectations || scoreIsVeryOld)
+                        try
                         {
-                            try
+                            // Recalculate the old-style standardised score to see if this was an old lazer score.
+                            bool oldScoreMatchesExpectations = StandardisedScoreMigrationTools.GetOldStandardised(score) == score.TotalScore;
+                            // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
+                            bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
+
+                            if (oldScoreMatchesExpectations || scoreIsVeryOld)
                             {
-                                long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
-                                score.TotalScore = calculatedNew;
-                            }
-                            catch
-                            {
+                                try
+                                {
+                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                    score.TotalScore = calculatedNew;
+                                }
+                                catch
+                                {
+                                }
                             }
                         }
+                        catch { }
                     }
 
                     break;
