@@ -211,14 +211,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
              * Releasing multiple notes is as easy as releasing one.
              * Halves hold addition if closest release is release_threshold away.
              *
-             * End on Body Bias
-             *     ^
-             * 1.0 + - - - - - -+-----------
-             *     |           /
-             * 0.5 + - - - - -/   Sigmoid Curve
-             *     |         /|
-             * 0.0 +--------+-+---------------> Release Difference / ms
-             *         release_threshold
+             *             End on Body Bias
+             *                 ▲
+             *             1.0 ┼ - - - - -  ────────────
+             *                 │           /
+             *             0.5 ┼ - - - -  ▲   Sigmoid Curve
+             *                 │         /│
+             *             0.0─┼──────────┴───────────────► Closest End Time / ms
+             *                 │   release_threshold
+             *                 │
+             * State E3  [=============]
+             * State F3        [=======]
+             * This            [============================]
+             * closestEndTime  <------->
+             *
+             * The closestEndTime is the closest end time to the current LN's head in ms.
              */
             if (isEndOnBody)
                 endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
