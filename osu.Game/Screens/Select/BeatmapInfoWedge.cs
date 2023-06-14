@@ -233,12 +233,11 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
-                            VersionLabel = new OsuSpriteText
+                            VersionLabel = new TruncatingSpriteText
                             {
                                 Text = beatmapInfo.DifficultyName,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                         }
                     },
@@ -286,19 +285,17 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
-                            TitleLabel = new OsuSpriteText
+                            TitleLabel = new TruncatingSpriteText
                             {
                                 Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
-                            ArtistLabel = new OsuSpriteText
+                            ArtistLabel = new TruncatingSpriteText
                             {
                                 Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                             MapperContainer = new FillFlowContainer
                             {
