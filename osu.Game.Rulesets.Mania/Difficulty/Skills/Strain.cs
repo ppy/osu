@@ -160,6 +160,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
         ///
+        /// The function documentation heavily references diagrams the top of the file.
+        ///
         /// <param name="current">Current Hit Object to evaluate strain</param>
         /// <remarks>
         /// 1) The first hitObject is not considered in the calculation.
