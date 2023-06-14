@@ -24,6 +24,9 @@ namespace osu.Game.Tournament.Tests.Screens
             Add(screen = new MapPoolScreen { Width = 0.7f });
         }
 
+        [SetUp]
+        public void SetUp() => Schedule(() => Ladder.SplitMapPoolByMods.Value = true);
+
         [Test]
         public void TestFewMaps()
         {
@@ -128,6 +131,26 @@ namespace osu.Game.Tournament.Tests.Screens
             });
 
             assertThreeWide();
+        }
+
+        [Test]
+        public void TestDisableMapsPerMod()
+        {
+            AddStep("load many maps", () =>
+            {
+                Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
+
+                for (int i = 0; i < 12; i++)
+                    addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
+            });
+
+            AddStep("disable maps per mod", () => Ladder.SplitMapPoolByMods.Value = false);
+
+            AddStep("reset match", () =>
+            {
+                Ladder.CurrentMatch.Value = new TournamentMatch();
+                Ladder.CurrentMatch.Value = Ladder.Matches.First();
+            });
         }
 
         private void addBeatmap(string mods = "NM")
