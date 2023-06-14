@@ -134,10 +134,10 @@ namespace osu.Game.Overlays.AccountCreation
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
-            usernameDescription.AddText(AccountCreationStrings.ThisWillBeYourPublic);
+            usernameDescription.AddText(AccountCreationStrings.UsernameDescription);
 
-            emailAddressDescription.AddText(AccountCreationStrings.EmailUsage);
-            emailAddressDescription.AddText(AccountCreationStrings.MakeSureToGetIt, cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
+            emailAddressDescription.AddText(AccountCreationStrings.EmailDescription1);
+            emailAddressDescription.AddText(AccountCreationStrings.EmailDescription2, cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
             passwordDescription.AddText("At least ");
             characterCheckText = passwordDescription.AddText("8 characters long");
