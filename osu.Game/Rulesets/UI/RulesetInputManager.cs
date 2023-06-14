@@ -164,9 +164,8 @@ namespace osu.Game.Rulesets.UI
         {
             switch (skinComponent)
             {
-                case KeyCounterDisplay keyCounterDisplay:
-                    attachKeyCounter(keyCounterDisplay);
-                    break;
+                case KeyCounterController keyCounterDisplay:
+                    attachKeyCounter(keyCounterDisplay); break;
 
                 case ClicksPerSecondCalculator clicksPerSecondCalculator:
                     attachClicksPerSecond(clicksPerSecondCalculator);
@@ -178,7 +177,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (skinComponent)
             {
-                case KeyCounterDisplay keyCounterDisplay:
+                case KeyCounterController keyCounterDisplay:
                     detachKeyCounter(keyCounterDisplay);
                     break;
 
@@ -192,7 +191,7 @@ namespace osu.Game.Rulesets.UI
 
         #region Key Counter Attachment
 
-        private void attachKeyCounter(KeyCounterDisplay keyCounter)
+        private void attachKeyCounter(KeyCounterController keyCounter)
         {
             var receptor = new ActionReceptor(keyCounter);
 
@@ -206,25 +205,25 @@ namespace osu.Game.Rulesets.UI
                                                    .Select(action => new KeyCounterActionTrigger<T>(action)));
         }
 
-        private void detachKeyCounter(KeyCounterDisplay keyCounter)
+        private void detachKeyCounter(KeyCounterController keyCounter)
         {
+            keyCounter.ClearReceptor();
         }
 
-        private partial class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
+        private partial class ActionReceptor : KeyCounterController.Receptor, IKeyBindingHandler<T>
         {
-            public ActionReceptor(KeyCounterDisplay target)
+            public ActionReceptor(KeyCounterController target)
                 : base(target)
             {
             }
 
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>)
-                                                                      .Select(c => (KeyCounterActionTrigger<T>)c.Trigger)
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Triggers
+                                                                      .OfType<KeyCounterActionTrigger<T>>()
                                                                       .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
-                foreach (var c
-                         in Target.Counters.Where(c => c.Trigger is KeyCounterActionTrigger<T>).Select(c => (KeyCounterActionTrigger<T>)c.Trigger))
+                foreach (var c in Target.Triggers.OfType<KeyCounterActionTrigger<T>>())
                     c.OnReleased(e.Action, Clock.Rate >= 0);
             }
         }

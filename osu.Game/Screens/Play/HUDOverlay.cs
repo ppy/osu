@@ -16,8 +16,10 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -26,8 +28,6 @@ using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Localisation;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Play
 {
@@ -54,13 +54,15 @@ namespace osu.Game.Screens.Play
             return child == bottomRightElements;
         }
 
-        public readonly KeyCounterDisplay KeyCounter;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         [Cached]
         private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+
+        [Cached]
+        public readonly KeyCounterController KeyCounter;
 
         [Cached]
         private readonly JudgementTally tally;
@@ -145,7 +147,6 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
@@ -157,9 +158,10 @@ namespace osu.Game.Screens.Play
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
+                KeyCounter = new KeyCounterController()
             };
 
-            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, KeyCounter, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -321,7 +323,6 @@ namespace osu.Game.Screens.Play
             {
                 attachTarget.Attach(KeyCounter);
                 attachTarget.Attach(clicksPerSecondCalculator);
-                mainComponents.SetAttachTarget(attachTarget);
             }
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
@@ -330,12 +331,6 @@ namespace osu.Game.Screens.Play
         protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
             ShowHealth = { BindTarget = ShowHealthBar }
-        };
-
-        protected KeyCounterDisplay CreateKeyCounter() => new DefaultKeyCounterDisplay
-        {
-            Anchor = Anchor.BottomRight,
-            Origin = Anchor.BottomRight,
         };
 
         protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton

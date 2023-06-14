@@ -438,7 +438,6 @@ namespace osu.Game.Screens.Play
                             {
                                 Value = false
                             },
-                            AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
