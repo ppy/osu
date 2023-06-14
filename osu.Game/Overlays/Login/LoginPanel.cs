@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Login
                     {
                         new OsuSpriteText
                         {
-                            Text = LoginPanelStrings.Account,
+                            Text = LoginPanelStrings.Account.ToUpper(),
                             Margin = new MarginPadding { Bottom = 5 },
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
