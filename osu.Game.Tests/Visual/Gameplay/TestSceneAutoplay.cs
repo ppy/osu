@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users.Drawables;
 
@@ -35,14 +36,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             var referenceBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Counters.Any(kc => kc.CountPresses.Value > 2));
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault()?.Counters.Any(kc => kc.CountPresses.Value > 2) ?? false);
 
             seekTo(referenceBeatmap.Breaks[0].StartTime);
-            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting.Value);
+            AddAssert("keys not counting", () => !Player.HUDOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault()?.IsCounting.Value ?? false);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
 
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
-            AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Counters.All(kc => kc.CountPresses.Value == 0));
+            AddUntilStep("key counter reset", () => Player.HUDOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault()?.Counters.All(kc => kc.CountPresses.Value == 0) ?? false);
 
             seekTo(referenceBeatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);

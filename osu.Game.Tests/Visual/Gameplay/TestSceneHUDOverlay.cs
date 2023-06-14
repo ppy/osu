@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -44,8 +45,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.KeyCounter;
-        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First();
+        private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -138,7 +139,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("hide key overlay", () =>
             {
                 localConfig.SetValue(OsuSetting.KeyOverlay, false);
-                hudOverlay.KeyCounter.AlwaysVisible.Value = false;
+                var kcd = hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault();
+                if (kcd != null)
+                    kcd.AlwaysVisible.Value = false;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
@@ -267,7 +270,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
-                hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
+                hudOverlay.ChildrenOfType<KeyCounterDisplay>().ForEach(k => k.Add(new KeyCounterKeyboardTrigger(Key.Space)));
 
                 scoreProcessor.Combo.Value = 1;
 

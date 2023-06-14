@@ -43,8 +43,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.KeyCounter;
-        private Drawable keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First();
+        private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
+                    hudOverlay.ChildrenOfType<KeyCounterDisplay>().ForEach(k => k.Add(new KeyCounterKeyboardTrigger(Key.Space)));
 
                     action?.Invoke(hudOverlay);
 

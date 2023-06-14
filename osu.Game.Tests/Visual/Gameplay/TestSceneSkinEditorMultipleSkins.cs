@@ -14,9 +14,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Gameplay;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -56,10 +54,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     };
-
-                    // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
-                    scoreProcessor.Combo.Value = 1;
 
                     return new Container
                     {
