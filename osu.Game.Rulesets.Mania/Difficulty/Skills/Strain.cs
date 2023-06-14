@@ -134,8 +134,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private readonly double[] prevEndTimes;
 
         /// <summary>
-        /// Column note strains. Indices correspond to columns.
-        /// The semantic meaning is the "strain" of each column.
+        /// Per-Column Strains. Indices correspond to columns
         /// </summary>
         private readonly double[] columnStrains;
 
@@ -145,8 +144,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private double prevColumnStrain;
 
         /// <summary>
-        /// Current Global Strain.
-        /// The semantic meaning is the "strain" of all fingers.
+        /// Global Strain: The "strain" of all fingers.
         /// </summary>
         private double globalStrain;
 
