@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.ChildrenOfType<KeyCounterDisplay>().ForEach(k => k.Add(new KeyCounterKeyboardTrigger(Key.Space)));
+                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                     action?.Invoke(hudOverlay);
 

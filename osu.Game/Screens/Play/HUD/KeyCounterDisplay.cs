@@ -1,18 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
-using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -34,37 +29,12 @@ namespace osu.Game.Screens.Play.HUD
 
         protected abstract FillFlowContainer<KeyCounter> KeyFlow { get; }
 
-        /// <summary>
-        /// Whether the actions reported by all <see cref="InputTrigger"/>s within this <see cref="KeyCounterDisplay"/> should be counted.
-        /// </summary>
-        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
-
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
+        [Resolved]
+        private KeyCounterController controller { get; set; } = null!;
+
         protected abstract void UpdateVisibility();
-
-        private Receptor? receptor;
-
-        /// <summary>
-        /// Sets a <see cref="Receptor"/> that will populate keybinding events to this <see cref="KeyCounterDisplay"/>.
-        /// </summary>
-        /// <param name="receptor">The receptor to set</param>
-        /// <exception cref="InvalidOperationException">When a <see cref="Receptor"/> is already active on this <see cref="KeyCounterDisplay"/></exception>
-        public void SetReceptor(Receptor receptor)
-        {
-            if (this.receptor != null)
-                throw new InvalidOperationException("Cannot set a new receptor when one is already active");
-
-            this.receptor = receptor;
-        }
-
-        /// <summary>
-        /// Clears any <see cref="Receptor"/> active
-        /// </summary>
-        public void ClearReceptor()
-        {
-            receptor = null;
-        }
 
         /// <summary>
         /// Add a <see cref="InputTrigger"/> to this display.
@@ -74,8 +44,6 @@ namespace osu.Game.Screens.Play.HUD
             var keyCounter = CreateCounter(trigger);
 
             KeyFlow.Add(keyCounter);
-
-            IsCounting.BindTo(keyCounter.IsCounting);
         }
 
         /// <summary>
@@ -86,49 +54,29 @@ namespace osu.Game.Screens.Play.HUD
         protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, DrawableRuleset? drawableRuleset)
         {
             config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
+
+            if (drawableRuleset != null)
+                AlwaysVisible.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            controller.OnNewTrigger += Add;
+            AddRange(controller.Triggers);
+
             AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
             ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
         }
 
-        public override bool HandleNonPositionalInput => receptor == null;
-
-        public override bool HandlePositionalInput => receptor == null;
-
-        public partial class Receptor : Drawable
+        protected override void Dispose(bool isDisposing)
         {
-            protected readonly KeyCounterDisplay Target;
-
-            public Receptor(KeyCounterDisplay target)
-            {
-                RelativeSizeAxes = Axes.Both;
-                Depth = float.MinValue;
-                Target = target;
-            }
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            protected override bool Handle(UIEvent e)
-            {
-                switch (e)
-                {
-                    case KeyDownEvent:
-                    case KeyUpEvent:
-                    case MouseDownEvent:
-                    case MouseUpEvent:
-                        return Target.InternalChildren.Any(c => c.TriggerEvent(e));
-                }
-
-                return base.Handle(e);
-            }
+            base.Dispose(isDisposing);
+            controller.OnNewTrigger -= Add;
         }
     }
 }

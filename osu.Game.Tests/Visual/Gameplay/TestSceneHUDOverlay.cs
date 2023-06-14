@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -270,7 +269,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
-                hudOverlay.ChildrenOfType<KeyCounterDisplay>().ForEach(k => k.Add(new KeyCounterKeyboardTrigger(Key.Space)));
+                hudOverlay.KeyCounter.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                 scoreProcessor.Combo.Value = 1;
 
