@@ -241,7 +241,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
              * 1) We decay the strain given deltaTime
              * 2) Increase strain given information of note and surroundings
              *
-             * Only in Global Strain, we include endOnBodyBias as a design choice.
+             * (!) Only in Global Strain, we include endOnBodyBias as a design choice.
+             *
+             *                  Column  Global
+             *                  Strain  Strain
+             * Default        : +2      +1
+             * If EndAfterTail: +2.5    +1.25
+             * If EndOnBody   :         +1    + (0, 1)
+             * If Both        :         +1.25 + (0, 1.25)
              */
             columnStrains[column] = applyDecay(columnStrains[column], startTime - prevStartTimes[column], decay_base);
             columnStrains[column] += 2 * endAfterTailWeight;
