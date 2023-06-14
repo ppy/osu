@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -53,7 +52,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationManager localisationManager)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
