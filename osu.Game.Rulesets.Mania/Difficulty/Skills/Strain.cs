@@ -23,14 +23,48 @@ using osu.Game.Rulesets.Mods;
 /* Previous Note States
  * When calculating strain by its history, there's these possible states.
  *
- * The last row of each cell shows the current note
- * the 2nd last              shows the previous note
- *
  * The column describes where the previous note's end time is.
  * E.g. E3 states that the previous note's end time is on the body (of the current note)
  *
- * Invalid/Impossible states are marked with X
- * These states are not possible as their head is AFTER our current offset.
+ * Impossible states are marked with X, as their head is AFTER our current offset.
+ *
+ * Legend
+ * ┌──────────────┐
+ * │ (State Name) │
+ * │ Prev Note    │
+ * │ This Note    │
+ * └──────────────┘
+ *                 ┌─────────────┬─────────────┬─────────────┬─────────────┬──────────────┐
+ *                 │ Before Head │ On Head     │ On Body     │  On Tail    │ After Tail   │
+ *                 │ (1)         │ (2)         │ (3)         │  (4)        │ (5)          │
+ * ┌───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Note      (A) │ (A1)        │ (A2)        │             │             │              │
+ * │ Before        │ O           │      O      │      X      │      X      │      X       │
+ * │ Note          │      O      │      O      │             │             │              │
+ * ├───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Long Note (B) │ (B1)        │ (B2)        │             │             │ (B5)         │
+ * │ Before        │ [==]        │ [====]      │      X      │      X      │ [==========] │
+ * │ Note          │      O      │      O      │             │             │      O       │
+ * ├───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Long Note (C) │             │             │             │             │ (C5)         │
+ * │ Before        │      X      │      x      │      X      │      X      │      [===]   │
+ * │ Note          │             │             │             │             │      O       │
+ * ├───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Note      (D) │ (D1)        │ (D2)        │             │             │              │
+ * │ Before        │ O           │      O      │      X      │      X      │      X       │
+ * │ Long Note     │      [===]  │      [===]  │             │             │              │
+ * ├───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Long Note (E) │ (E1)        │ (E2)        │ (E3)        │ (E4)        │ (E5)         │
+ * │ Before        │ [==]        │ [====]      │ [======]    │ [=========] │ [==========] │
+ * │ Long Note     │      [===]  │      [===]  │      [===]  │       [===] │      [===]   │
+ * ├───────────────┼─────────────┼─────────────┼─────────────┼─────────────┼──────────────┤
+ * │ Long Note (F) │             │             │ (F3)        │ (F4)        │ (F5)         │
+ * │ Before        │      X      │      X      │      [=]    │       [===] │      [=====] │
+ * │ Long Note     │             │             │      [===]  │       [===] │      [===]   │
+ * └───────────────┴─────────────┴─────────────┴─────────────┴─────────────┴──────────────┘
+ */
+
+/* Intuition of Global, Column Strains and How Final Strain is calculated
  *
  * E.g. D2 implies that our current note is a Hold. The previous note is a note, on the same offset.
  *
