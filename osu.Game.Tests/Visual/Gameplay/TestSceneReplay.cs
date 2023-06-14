@@ -6,11 +6,13 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -27,7 +29,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Counters.Any(kc => kc.CountPresses.Value > 0));
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault()?.Counters.Any(kc => kc.CountPresses
+                .Value > 0) ?? false);
             AddAssert("cannot fail", () => !((ScoreAccessibleReplayPlayer)Player).AllowFail);
         }
 
