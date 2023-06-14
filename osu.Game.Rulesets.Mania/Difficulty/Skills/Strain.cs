@@ -179,17 +179,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             double startTime = hitObject.StartTime;
             double endTime = hitObject.EndTime;
             int column = hitObject.BaseObject.Column;
-
             double holdLength = Math.Abs(endTime - startTime);
-            double endOnBodyBias = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
-            double endAfterTailWeight = 1.0; // Factor to all additional strains in case something else is held
+
+            // See top of file for interpretation
+            double endOnBodyBias = 0; // Strain Bias for Column 3 states
+            double endAfterTailWeight = 1.0; // Strain Weight for Column 5 states
+            bool isEndOnBody = false; // Flag for Column 3 states
+            bool isEndAfterTail = false; // Flag for Column 5 states
 
             // The closest end time, currently, is the current note's end time, which is its length
             double closestEndTime = holdLength;
-
-            // See top of file for interpretation
-            bool isEndOnBody = false;
-            bool isEndAfterTail = false;
 
             for (int i = 0; i < prevEndTimes.Length; ++i)
             {
