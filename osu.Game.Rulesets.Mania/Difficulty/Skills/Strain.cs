@@ -188,6 +188,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             bool isEndAfterTail = false; // Flag for Column 5 states
 
             // The closest end time, currently, is the current note's end time, which is its length
+            // This is used for endOnBodyBias calculation.
             double closestEndTime = holdLength;
 
             for (int i = 0; i < prevEndTimes.Length; ++i)
