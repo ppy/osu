@@ -12,6 +12,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
@@ -113,6 +114,7 @@ namespace osu.Game.Skinning
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
+                                var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -168,6 +170,13 @@ namespace osu.Game.Skinning
                                     {
                                         songProgress.Position = new Vector2(0, -10);
                                         songProgress.Scale = new Vector2(0.9f, 1);
+
+                                        if (keyCounter != null)
+                                        {
+                                            keyCounter.Anchor = Anchor.BottomLeft;
+                                            keyCounter.Origin = Anchor.BottomLeft;
+                                            keyCounter.Position = new Vector2(50, -57);
+                                        }
                                     }
                                 }
                             })
@@ -179,6 +188,7 @@ namespace osu.Game.Skinning
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
                                     new ArgonSongProgress(),
+                                    new ArgonKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()

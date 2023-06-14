@@ -8,13 +8,14 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : CompositeDrawable, IAttachableSkinComponent
+    public abstract partial class KeyCounterDisplay : CompositeDrawable, IAttachableSkinComponent, ISerialisableDrawable
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
@@ -78,5 +79,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Dispose(isDisposing);
             controller.OnNewTrigger -= Add;
         }
+
+        public bool UsesFixedAnchor { get; set; }
     }
 }
