@@ -177,11 +177,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             for (int i = 0; i < prevEndTimes.Length; ++i)
             {
                 isEndOnBody |= // Accepts Col 3 States
-                    prevEndTimes[i] + 1 >= startTime && // Accepts Col 3-5
-                    prevEndTimes[i] <= endTime + 1; // Accepts Col 1 & D2:F3
+                    prevEndTimes[i] - 1 > startTime && // Accepts Col 3-5
+                    prevEndTimes[i] < endTime - 1; // Accepts Col 1 & D2:F3
 
-                // Accepts Column 5 States
-                isEndAfterTail |= prevEndTimes[i] + 1 >= endTime;
+                // Accepts Col 5 States
+                isEndAfterTail |= prevEndTimes[i] - 1 > endTime;
 
                 // Update closest end time by looking through previous LNs
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
