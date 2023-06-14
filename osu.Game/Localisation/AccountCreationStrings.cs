@@ -37,14 +37,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!"
         /// </summary>
-        public static LocalisableString UsernameDescription => new TranslatableString(getKey(@"username_description"),
-            @"This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
+        public static LocalisableString UsernameDescription => new TranslatableString(getKey(@"username_description"), @"This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
         /// <summary>
         /// "Will be used for notifications, account verification and in the case you forget your password. No spam, ever."
         /// </summary>
-        public static LocalisableString EmailDescription1 =>
-            new TranslatableString(getKey(@"email_description_1"), @"Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
+        public static LocalisableString EmailDescription1 => new TranslatableString(getKey(@"email_description_1"), @"Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
 
         /// <summary>
         /// " Make sure to get it right!"
