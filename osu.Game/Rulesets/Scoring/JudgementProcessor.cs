@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <remarks>This provided temporarily. DO NOT USE.</remarks>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
-        protected virtual void SimulateAutoplay(IBeatmap beatmap)
+        protected void SimulateAutoplay(IBeatmap beatmap)
         {
             IsSimulating = true;
 
