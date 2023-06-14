@@ -90,6 +90,8 @@ namespace osu.Game.Skinning
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -141,6 +143,13 @@ namespace osu.Game.Skinning
                                         hitError2.Origin = Anchor.CentreLeft;
                                     }
                                 }
+
+                                if (songProgress != null && keyCounter != null)
+                                {
+                                    keyCounter.Anchor = Anchor.BottomRight;
+                                    keyCounter.Origin = Anchor.BottomRight;
+                                    keyCounter.Position = new Vector2(10, songProgress.Height + 10);
+                                }
                             })
                             {
                                 Children = new Drawable[]
@@ -150,6 +159,7 @@ namespace osu.Game.Skinning
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
                                     new DefaultSongProgress(),
+                                    new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()
