@@ -139,12 +139,9 @@ namespace osu.Game.Overlays.AccountCreation
             emailAddressDescription.AddText(AccountCreationStrings.EmailUsage);
             emailAddressDescription.AddText(AccountCreationStrings.MakeSureToGetIt, cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
-            string[] passwordReq = localisationManager.GetLocalisedBindableString(AccountCreationStrings.PasswordRequirements("{}")).Value.Split("{}");
-            if (passwordReq.Length != 2) passwordReq = AccountCreationStrings.PasswordRequirements("{}").ToString().Split("{}");
-
-            passwordDescription.AddText(passwordReq[0]);
-            characterCheckText = passwordDescription.AddText(AccountCreationStrings.CharactersLong);
-            passwordDescription.AddText(passwordReq[1]);
+            passwordDescription.AddText("At least ");
+            characterCheckText = passwordDescription.AddText("8 characters long");
+            passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
 
             passwordTextBox.Current.BindValueChanged(_ => updateCharacterCheckTextColour(), true);
             characterCheckText.DrawablePartsRecreated += _ => updateCharacterCheckTextColour();
