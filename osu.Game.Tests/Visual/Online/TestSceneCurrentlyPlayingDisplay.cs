@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -24,8 +22,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
-        private TestSpectatorClient spectatorClient;
-        private CurrentlyPlayingDisplay currentlyPlaying;
+        private TestSpectatorClient spectatorClient = null!;
+        private CurrentlyPlayingDisplay currentlyPlaying = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -88,13 +86,13 @@ namespace osu.Game.Tests.Visual.Online
                 "pishifat"
             };
 
-            protected override Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)
+            protected override Task<APIUser?> ComputeValueAsync(int lookup, CancellationToken token = default)
             {
                 // tests against failed lookups
                 if (lookup == 13)
-                    return Task.FromResult<APIUser>(null);
+                    return Task.FromResult<APIUser?>(null);
 
-                return Task.FromResult(new APIUser
+                return Task.FromResult<APIUser?>(new APIUser
                 {
                     Id = lookup,
                     Username = usernames[lookup % usernames.Length],

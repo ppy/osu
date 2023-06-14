@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
@@ -101,7 +102,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-            Height = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
+
+            // to prevent unnecessary invalidations of the song progress graph due to changes in size, apply tolerance when updating the height.
+            float newHeight = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
+
+            if (!Precision.AlmostEquals(Height, newHeight, 5f))
+                Height = newHeight;
         }
 
         private void updateBarVisibility()

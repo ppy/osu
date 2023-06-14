@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -539,6 +540,11 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
+
+            AddStep("exit lounge", () => Game.ScreenStack.Exit());
+            // `TestMultiplayerComponents` registers a request handler in its BDL, but never unregisters it.
+            // to prevent the handler living for longer than it should be, clean up manually.
+            AddStep("clean up multiplayer request handler", () => ((DummyAPIAccess)API).HandleRequest = null);
         }
 
         [Test]
