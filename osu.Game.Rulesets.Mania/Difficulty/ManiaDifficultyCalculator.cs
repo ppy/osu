@@ -67,14 +67,24 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return 1;
         }
 
+        /// <summary>
+        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        /// <remarks>
+        /// Notes are sorted by LN length due to an assumption held in <see cref="Strain"/>.
+        /// Also see Issue: https://github.com/ppy/osu/issues/22756
+        /// </remarks>
+        /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            var sortedObjects = beatmap.HitObjects.ToArray();
-
-            LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
+            var sortedObjects = beatmap.HitObjects
+                                       .OrderBy(o => o.StartTime) // Sort By Head Offset
+                                       .ThenByDescending(o => o.GetEndTime() - o.StartTime) // Sort By Desc Length
+                                       .ToArray();
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
-
             for (int i = 1; i < sortedObjects.Length; i++)
                 objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, objects.Count));
 
