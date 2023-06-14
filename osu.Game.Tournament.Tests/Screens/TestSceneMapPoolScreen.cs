@@ -134,7 +134,7 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
-        public void TestDisableMapsPerMod()
+        public void TestSplitMapPoolByMods()
         {
             AddStep("load many maps", () =>
             {
@@ -144,7 +144,7 @@ namespace osu.Game.Tournament.Tests.Screens
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
             });
 
-            AddStep("disable maps per mod", () => Ladder.SplitMapPoolByMods.Value = false);
+            AddStep("disable splitting map pool by mods", () => Ladder.SplitMapPoolByMods.Value = false);
 
             AddStep("reset match", () =>
             {
