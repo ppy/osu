@@ -22,15 +22,10 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
-        private readonly Bindable<int> countPresses = new BindableInt
-        {
-            MinValue = 0
-        };
-
         /// <summary>
         /// The current count of registered key presses.
         /// </summary>
-        public IBindable<int> CountPresses => countPresses;
+        public IBindable<int> CountPresses => Trigger.ActivationCount;
 
         private readonly Container content;
 
@@ -49,46 +44,28 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                Trigger = trigger,
             };
+
+            Trigger = trigger;
 
             Trigger.OnActivate += Activate;
             Trigger.OnDeactivate += Deactivate;
         }
 
-        private void increment()
-        {
-            if (!IsCounting.Value)
-                return;
-
-            countPresses.Value++;
-        }
-
-        private void decrement()
-        {
-            if (!IsCounting.Value)
-                return;
-
-            countPresses.Value--;
-        }
-
         protected virtual void Activate(bool forwardPlayback = true)
         {
             IsActive.Value = true;
-            if (forwardPlayback)
-                increment();
         }
 
         protected virtual void Deactivate(bool forwardPlayback = true)
         {
             IsActive.Value = false;
-            if (!forwardPlayback)
-                decrement();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             Trigger.OnActivate -= Activate;
             Trigger.OnDeactivate -= Deactivate;
         }
