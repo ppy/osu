@@ -27,29 +27,29 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Help, I can&#39;t access my account!"
         /// </summary>
-        public static LocalisableString HelpICantAccess => new TranslatableString(getKey(@"help_icant_access"), @"Help, I can't access my account!");
+        public static LocalisableString MultiAccountWarningHelp => new TranslatableString(getKey(@"multi_account_warning_help"), @"Help, I can't access my account!");
 
         /// <summary>
         /// "I understand. This account isn&#39;t for me."
         /// </summary>
-        public static LocalisableString AccountIsntForMe => new TranslatableString(getKey(@"account_isnt_for_me"), @"I understand. This account isn't for me.");
+        public static LocalisableString MultiAccountWarningAccept => new TranslatableString(getKey(@"multi_account_warning_accept"), @"I understand. This account isn't for me.");
 
         /// <summary>
         /// "This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!"
         /// </summary>
-        public static LocalisableString ThisWillBeYourPublic => new TranslatableString(getKey(@"this_will_be_your_public"),
+        public static LocalisableString UsernameDescription => new TranslatableString(getKey(@"username_description"),
             @"This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
         /// <summary>
         /// "Will be used for notifications, account verification and in the case you forget your password. No spam, ever."
         /// </summary>
-        public static LocalisableString EmailUsage =>
-            new TranslatableString(getKey(@"email_usage"), @"Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
+        public static LocalisableString EmailDescription1 =>
+            new TranslatableString(getKey(@"email_description_1"), @"Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
 
         /// <summary>
         /// " Make sure to get it right!"
         /// </summary>
-        public static LocalisableString MakeSureToGetIt => new TranslatableString(getKey(@"make_sure_to_get_it"), @" Make sure to get it right!");
+        public static LocalisableString EmailDescription2 => new TranslatableString(getKey(@"email_description_2"), @" Make sure to get it right!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

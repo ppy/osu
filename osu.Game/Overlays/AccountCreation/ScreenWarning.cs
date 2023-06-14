@@ -102,13 +102,13 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         new SettingsButton
                         {
-                            Text = AccountCreationStrings.HelpICantAccess,
+                            Text = AccountCreationStrings.MultiAccountWarningHelp,
                             Margin = new MarginPadding { Top = 50 },
                             Action = () => game?.OpenUrlExternally(help_centre_url)
                         },
                         new DangerousSettingsButton
                         {
-                            Text = AccountCreationStrings.AccountIsntForMe,
+                            Text = AccountCreationStrings.MultiAccountWarningAccept,
                             Action = () => this.Push(new ScreenEntry())
                         },
                         furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
