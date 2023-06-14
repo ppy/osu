@@ -65,7 +65,7 @@ using osu.Game.Rulesets.Mods;
  */
 
 /* Strain Calculation Intuition
- * 
+ *
  * How Global, Column and Final Strains are calculated
  *
  * E.g. Given a map with Columns 0 0 1 2 1 0
