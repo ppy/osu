@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             for (int i = 0; i < prevEndTimes.Length; ++i)
             {
-                /* True for Column 3 Scenarios:
+                /* True for Column 3 States:
                  *      Criterion 1 accepts Col 3-5
                  *      Criterion 2 accepts Col 1, D2:F3,
                  *      Thus, AND accepts Col 3 Only.
@@ -200,14 +200,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 isEndOnBody |= Precision.DefinitelyBigger(prevEndTimes[i], startTime, 1) &&
                                Precision.DefinitelyBigger(endTime, prevEndTimes[i], 1);
 
-                // True for Column 5 Scenarios
+                // True for Column 5 States
                 isEndAfterTail |= Precision.DefinitelyBigger(prevEndTimes[i], endTime, 1);
 
                 // Update closest end time by looking through previous LNs
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
             }
 
-            /* Give Hold Addition for Scenario Column 3.
+            /* Strain Bias for Column 3 States
              * Releasing multiple notes is as easy as releasing one.
              * Halves hold addition if closest release is release_threshold away.
              *
@@ -223,8 +223,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (isEndOnBody)
                 endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
 
-            // Bonus for Holds that end after our tail.
-            // We give a slight bonus to everything if something is held meanwhile
+            /* Strain Weight for Column 5 States
+             * Bonus for Holds that end after our tail.
+             * We give a slight bonus to everything if something is held meanwhile
+             */
             if (isEndAfterTail)
                 endAfterTailWeight = 1.25;
 
@@ -243,8 +245,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
              *
              * --- Problem
              *
-             * Given a scenario with a 4 note chord with:
-             * - Global Strains (GS) [A, B, C, D]  <- Strains are different in a chord as we add to global strain every note. A < B < C < D
+             * Given a state with a 4 note chord with:
+             * - Global Strains (GS) [A, B, C, D]  <- Strains are different in chords, global strains are added every note. A < B < C < D
              * - Column Strains (CS) [1, 2, 3, 4]
              *
              * The maximum strain evaluated should be D + 4 = max(GS) + max(CS)
