@@ -24,6 +24,9 @@ namespace osu.Game.Tournament.Tests.Screens
             Add(screen = new MapPoolScreen { Width = 0.7f });
         }
 
+        [SetUp]
+        public void SetUp() => Schedule(() => Ladder.SplitMapPoolByMods.Value = true);
+
         [Test]
         public void TestFewMaps()
         {
@@ -92,7 +95,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
 
                 for (int i = 0; i < 11; i++)
-                    addBeatmap(i > 4 ? $"M{i}" : "NM");
+                    addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
             });
 
             AddStep("reset match", () =>
@@ -118,7 +121,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
 
                 for (int i = 0; i < 12; i++)
-                    addBeatmap(i > 4 ? $"M{i}" : "NM");
+                    addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
             });
 
             AddStep("reset match", () =>
@@ -130,7 +133,27 @@ namespace osu.Game.Tournament.Tests.Screens
             assertThreeWide();
         }
 
-        private void addBeatmap(string mods = "nm")
+        [Test]
+        public void TestSplitMapPoolByMods()
+        {
+            AddStep("load many maps", () =>
+            {
+                Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
+
+                for (int i = 0; i < 12; i++)
+                    addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
+            });
+
+            AddStep("disable splitting map pool by mods", () => Ladder.SplitMapPoolByMods.Value = false);
+
+            AddStep("reset match", () =>
+            {
+                Ladder.CurrentMatch.Value = new TournamentMatch();
+                Ladder.CurrentMatch.Value = Ladder.Matches.First();
+            });
+        }
+
+        private void addBeatmap(string mods = "NM")
         {
             Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Add(new RoundBeatmap
             {
