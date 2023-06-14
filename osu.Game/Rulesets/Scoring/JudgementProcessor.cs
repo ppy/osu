@@ -138,13 +138,6 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
-
-        /// <summary>
         /// Simulates an autoplay of the <see cref="IBeatmap"/> to determine scoring values.
         /// </summary>
         /// <remarks>This provided temporarily. DO NOT USE.</remarks>
@@ -174,6 +167,20 @@ namespace osu.Game.Rulesets.Scoring
             IsSimulating = false;
         }
 
+        /// <summary>
+        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
+        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
+        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
+
+        /// <summary>
+        /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
+        /// </summary>
+        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
+        /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
+        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
+
         protected override void Update()
         {
             base.Update();
@@ -184,12 +191,5 @@ namespace osu.Game.Rulesets.Scoring
                     // Last applied result is guaranteed to be non-null when JudgedHits > 0.
                     || lastAppliedResult.AsNonNull().TimeAbsolute < Clock.CurrentTime);
         }
-
-        /// <summary>
-        /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
-        /// </summary>
-        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
-        /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
-        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
     }
 }
