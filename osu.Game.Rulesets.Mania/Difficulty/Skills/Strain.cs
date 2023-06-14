@@ -272,9 +272,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             prevEndTimes[column] = endTime;
             prevColumnStrain = columnStrain;
 
-            // We substract CurrentStrain, because we add back the CurrentStrain on the outside function.
-            // * This redundancy can be fixed in another PR
-            // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
             return strain;
         }
 
