@@ -73,7 +73,5 @@ namespace osu.Game.Tests.Rulesets
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
             public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
         }
-
-#nullable enable
     }
 }
