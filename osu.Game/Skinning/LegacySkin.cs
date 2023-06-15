@@ -385,7 +385,7 @@ namespace osu.Game.Skinning
                                     {
                                         keyCounter.Anchor = Anchor.BottomRight;
                                         keyCounter.Origin = Anchor.BottomRight;
-                                        keyCounter.Position = new Vector2(10, -10 - hitError.Width);
+                                        keyCounter.Position = new Vector2(-10, -10 - hitError.Width);
                                     }
                                 }
                             })
