@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
@@ -27,10 +26,6 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public IBindable<int> CountPresses => Trigger.ActivationCount;
 
-        private readonly Container content;
-
-        protected override Container<Drawable> Content => content;
-
         /// <summary>
         /// Whether this <see cref="KeyCounter"/> is currently in the "activated" state because the associated key is currently pressed.
         /// </summary>
@@ -38,14 +33,6 @@ namespace osu.Game.Screens.Play.HUD
 
         protected KeyCounter(InputTrigger trigger)
         {
-            InternalChildren = new Drawable[]
-            {
-                content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-            };
-
             Trigger = trigger;
 
             Trigger.OnActivate += Activate;
