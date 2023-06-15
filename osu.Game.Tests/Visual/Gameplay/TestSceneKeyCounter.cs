@@ -22,8 +22,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly KeyCounterController controller;
 
-        private readonly KeyCounterDisplay defaultDisplay;
-
         public TestSceneKeyCounter()
         {
             Children = new Drawable[]
@@ -36,9 +34,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(72.7f),
-                    Children = new[]
+                    Children = new KeyCounterDisplay[]
                     {
-                        defaultDisplay = new DefaultKeyCounterDisplay
+                        new DefaultKeyCounterDisplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
@@ -59,12 +57,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 new KeyCounterMouseTrigger(MouseButton.Left),
                 new KeyCounterMouseTrigger(MouseButton.Right),
             });
-        }
-
-        [Test]
-        public void TestDoThings()
-        {
-            var testCounter = (DefaultKeyCounter)defaultDisplay.Counters.First();
 
             AddStep("Add random", () =>
             {
@@ -72,15 +64,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 controller.Add(new KeyCounterKeyboardTrigger(key));
             });
 
-            Key testKey = ((KeyCounterKeyboardTrigger)controller.Triggers.First()).Key;
+            InputTrigger testTrigger = controller.Triggers.First();
+            Key testKey = ((KeyCounterKeyboardTrigger)testTrigger).Key;
 
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
+            AddAssert($"Check {testKey} counter after keypress", () => testTrigger.ActivationCount.Value == 1);
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
+            AddAssert($"Check {testKey} counter after keypress", () => testTrigger.ActivationCount.Value == 2);
             AddStep("Disable counting", () => controller.IsCounting.Value = false);
             addPressKeyStep();
-            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
+            AddAssert($"Check {testKey} count has not changed", () => testTrigger.ActivationCount.Value == 2);
 
             void addPressKeyStep() => AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
         }
