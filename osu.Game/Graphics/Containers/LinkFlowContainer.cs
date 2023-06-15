@@ -6,14 +6,11 @@
 using osu.Game.Online.Chat;
 using System;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osu.Game.Online;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -24,14 +21,6 @@ namespace osu.Game.Graphics.Containers
             : base(defaultCreationParameters)
         {
         }
-
-        [Resolved(CanBeNull = true)]
-        private ILinkHandler linkHandler { get; set; }
-
-        private Link currentLink { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -48,7 +37,6 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                currentLink = link;
                 AddText(text[previousLinkEnd..link.Index]);
 
                 string displayText = text.Substring(link.Index, link.Length);
@@ -72,40 +60,27 @@ namespace osu.Game.Graphics.Containers
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
         public void AddLink(IEnumerable<SpriteText> text, LinkAction action, object linkArgument, string tooltipText = null)
-        {
-            createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
-        }
+            => createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
 
         public void AddUserLink(IUser user, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), "view profile");
 
-        private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
-        {
-            Action onClickAction = () =>
-            {
-                if (action != null)
-                    action();
-                else if (linkHandler != null)
-                    linkHandler.HandleLink(link);
-                // fallback to handle cases where OsuGame is not available, ie. tournament client.
-                else if (link.Action == LinkAction.External)
-                    host.OpenUrlExternally(link.Argument.ToString());
-            };
-
-            AddPart(new TextLink(textPart, tooltipText, onClickAction));
-        }
+        private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action customAction = null)
+            => AddPart(new TextLink(textPart, link, tooltipText, customAction));
 
         private class TextLink : TextPart
         {
             private readonly ITextPart innerPart;
+            private readonly LinkDetails link;
             private readonly LocalisableString tooltipText;
-            private readonly Action action;
+            private readonly Action customAction;
 
-            public TextLink(ITextPart innerPart, LocalisableString tooltipText, Action action)
+            public TextLink(ITextPart innerPart, LinkDetails link, LocalisableString tooltipText, Action customAction = null)
             {
                 this.innerPart = innerPart;
+                this.link = link;
                 this.tooltipText = tooltipText;
-                this.action = action;
+                this.customAction = customAction;
             }
 
             protected override IEnumerable<Drawable> CreateDrawablesFor(TextFlowContainer textFlowContainer)
@@ -115,18 +90,20 @@ namespace osu.Game.Graphics.Containers
                 innerPart.RecreateDrawablesFor(linkFlowContainer);
                 var drawables = innerPart.Drawables.ToList();
 
-                drawables.Add(linkFlowContainer.CreateLinkCompiler(innerPart).With(c =>
+                drawables.Add(linkFlowContainer.CreateLinkCompiler(innerPart, link).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.TooltipText = tooltipText;
-                    c.Action = action;
+
+                    if (customAction != null)
+                        c.Action = customAction;
                 }));
 
                 return drawables;
             }
         }
 
-        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart, currentLink);
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart, LinkDetails link) => new DrawableLinkCompiler(textPart, link);
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
         // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.

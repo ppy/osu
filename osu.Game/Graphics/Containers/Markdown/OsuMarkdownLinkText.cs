@@ -22,6 +22,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         private readonly string text;
         private readonly string title;
 
+        private OsuMarkdownLinkCompiler markdownLink;
+
         public OsuMarkdownLinkText(string text, LinkInline linkInline)
             : base(text, linkInline)
         {
@@ -44,20 +46,19 @@ namespace osu.Game.Graphics.Containers.Markdown
             InternalChildren = new Drawable[]
             {
                 textDrawable,
-                new OsuMarkdownLinkCompiler(new[] { textDrawable }, new Link(Url, 0, 0, linkDetails.Action, linkDetails.Argument))
+                markdownLink = new OsuMarkdownLinkCompiler(new[] { textDrawable }, linkDetails)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Action = OnLinkPressed,
                     TooltipText = title ?? Url,
                 }
             };
         }
 
-        protected override void OnLinkPressed() => linkHandler?.HandleLink(Url);
+        protected override void OnLinkPressed() => markdownLink.Action?.Invoke();
 
         private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts, Link link)
+            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts, LinkDetails link)
                 : base(parts, link)
             {
             }

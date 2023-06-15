@@ -324,12 +324,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 AutoSizeAxes = Axes.Y;
             }
 
-            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new MetadataLinkCompiler(textPart);
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart, LinkDetails link) => new MetadataLinkCompiler(textPart, link);
 
             public partial class MetadataLinkCompiler : DrawableLinkCompiler
             {
-                public MetadataLinkCompiler(ITextPart part)
-                    : base(part)
+                public MetadataLinkCompiler(ITextPart part, LinkDetails link)
+                    : base(part, link)
                 {
                 }
 

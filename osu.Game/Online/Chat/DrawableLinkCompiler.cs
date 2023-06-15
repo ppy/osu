@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -29,7 +30,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public readonly List<Drawable> Parts;
 
-        private Link? link { get; set; }
+        public readonly LinkDetails Link;
 
         [Resolved]
         private OverlayColourProvider? overlayColourProvider { get; set; }
@@ -47,32 +48,32 @@ namespace osu.Game.Online.Chat
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
-        public DrawableLinkCompiler(ITextPart part, Link link)
-            : this(part.Drawables.OfType<SpriteText>())
-        {
-            this.link = link;
-        }
-
-        public DrawableLinkCompiler(ITextPart part)
-            : this(part.Drawables.OfType<SpriteText>())
+        public DrawableLinkCompiler(ITextPart part, LinkDetails link)
+            : this(part.Drawables.OfType<SpriteText>(), link)
         {
         }
 
-        public DrawableLinkCompiler(IEnumerable<Drawable> parts, Link link)
+        public DrawableLinkCompiler(IEnumerable<Drawable> parts, LinkDetails link)
         {
             Parts = parts.ToList();
-            this.link = link;
-        }
-
-        public DrawableLinkCompiler(IEnumerable<Drawable> parts)
-        {
-            Parts = parts.ToList();
+            Link = link;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
+
+            Action ??= () =>
+            {
+                Debug.Assert(Link.Action != LinkAction.Custom);
+
+                if (linkHandler != null)
+                    linkHandler.HandleLink(Link);
+                // fallback to handle cases where OsuGame is not available, ie. tournament client.
+                else if (Link.Action == LinkAction.External)
+                    host.OpenUrlExternally(Link.Argument.ToString());
+            };
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
@@ -81,33 +82,18 @@ namespace osu.Game.Online.Chat
         {
             get
             {
-                List<MenuItem> items = new List<MenuItem>();
-
-                if (link is not null)
+                List<MenuItem> items = new List<MenuItem>
                 {
-                    string text;
+                    new OsuMenuItem("Open", MenuItemType.Highlighted, Action)
+                };
 
-                    switch (link.Action)
-                    {
-                        case LinkAction.OpenChannel:
-                        case LinkAction.JoinMultiplayerMatch:
-                            text = "Join";
-                            break;
+                string? url = MessageFormatter.GetUrl(Link);
 
-                        case LinkAction.External:
-                            text = "Visit";
-                            break;
-
-                        default:
-                            text = "Open";
-                            break;
-                    }
-
-                    items.Add(new OsuMenuItem(text, MenuItemType.Highlighted, () => linkHandler?.HandleLink(link.Url)));
-
+                if (url != null)
+                {
                     items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
                     {
-                        host.GetClipboard()?.SetText(link.Url);
+                        host.GetClipboard()?.SetText(url);
                         onScreenDisplay?.Display(new CopyUrlToast());
                     }));
                 }
