@@ -330,9 +330,6 @@ namespace osu.Game.Rulesets.UI
         public void Attach(IAttachableSkinComponent skinComponent) =>
             (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(skinComponent);
 
-        public void Detach(IAttachableSkinComponent skinComponent) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Detach(skinComponent);
-
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
         /// </summary>
