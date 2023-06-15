@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double multiplier = mods.Where(m => m is not (ModHidden or ModHardRock or ModDoubleTime or ModFlashlight or ManiaModFadeIn))
                                     .Select(m => m.ScoreMultiplier)
-                                    .Aggregate((c, n) => c * n);
+                                    .Aggregate(1.0, (c, n) => c * n);
 
             TotalScore = (int)(1000000 * multiplier);
         }
