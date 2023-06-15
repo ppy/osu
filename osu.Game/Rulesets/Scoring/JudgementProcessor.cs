@@ -31,6 +31,11 @@ namespace osu.Game.Rulesets.Scoring
         protected int MaxHits { get; private set; }
 
         /// <summary>
+        /// Whether <see cref="SimulateAutoplay"/> is currently running.
+        /// </summary>
+        protected bool IsSimulating { get; private set; }
+
+        /// <summary>
         /// The total number of judged <see cref="HitObject"/>s at the current point in time.
         /// </summary>
         public int JudgedHits { get; private set; }
@@ -146,6 +151,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
         protected virtual void SimulateAutoplay(IBeatmap beatmap)
         {
+            IsSimulating = true;
+
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
 
@@ -163,6 +170,8 @@ namespace osu.Game.Rulesets.Scoring
                 result.Type = GetSimulatedHitResult(judgement);
                 ApplyResult(result);
             }
+
+            IsSimulating = false;
         }
 
         protected override void Update()
