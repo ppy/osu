@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -372,12 +373,20 @@ namespace osu.Game.Skinning
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+
+                                    if (keyCounter != null)
+                                    {
+                                        keyCounter.Anchor = Anchor.BottomRight;
+                                        keyCounter.Origin = Anchor.BottomRight;
+                                        keyCounter.Position = new Vector2(10, -10 - hitError.Width);
+                                    }
                                 }
                             })
                             {
@@ -389,6 +398,7 @@ namespace osu.Game.Skinning
                                     new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
                                     new BarHitErrorMeter(),
+                                    new DefaultKeyCounterDisplay()
                                 }
                             };
                     }
