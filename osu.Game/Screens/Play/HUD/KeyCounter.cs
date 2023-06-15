@@ -17,11 +17,6 @@ namespace osu.Game.Screens.Play.HUD
         public readonly InputTrigger Trigger;
 
         /// <summary>
-        /// Whether the actions reported by <see cref="Trigger"/> should be counted.
-        /// </summary>
-        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
-
-        /// <summary>
         /// The current count of registered key presses.
         /// </summary>
         public IBindable<int> CountPresses => Trigger.ActivationCount;
