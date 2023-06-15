@@ -246,6 +246,44 @@ namespace osu.Game.Online.Chat
             return new LinkDetails(LinkAction.External, url);
         }
 
+        public static string? GetUrl(LinkDetails link)
+        {
+            switch (link.Action)
+            {
+                case LinkAction.External:
+                    return (string)link.Argument;
+
+                case LinkAction.OpenBeatmap:
+                    return $@"https://{WebsiteRootUrl}/beatmaps/{link.Argument}";
+
+                case LinkAction.OpenBeatmapSet:
+                    return $@"https://{WebsiteRootUrl}/beatmapsets/{link.Argument}";
+
+                case LinkAction.OpenUserProfile:
+                    return $@"https://{WebsiteRootUrl}/users/{link.Argument}";
+
+                case LinkAction.OpenWiki:
+                    return $@"https://{WebsiteRootUrl}/wiki/{link.Argument}";
+
+                case LinkAction.OpenChangelog:
+                    return $@"https://{WebsiteRootUrl}/home/changelog/{link.Argument}";
+
+                case LinkAction.OpenChannel:
+                    return $@"osu://chan/{link.Argument}";
+
+                case LinkAction.OpenEditorTimestamp:
+                    return $@"osu://edit/{link.Argument}";
+
+                case LinkAction.Spectate:
+                    return $@"osu://spectate/{link.Argument}";
+
+                case LinkAction.JoinMultiplayerMatch:
+                    return $@"osump://{link.Argument}";
+            }
+
+            return null;
+        }
+
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
         {
             var result = new MessageFormatterResult(toFormat);
