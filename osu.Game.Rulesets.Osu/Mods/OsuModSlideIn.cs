@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var currentHitObject = osuHitObjects[i];
                 var nextHitObject = osuHitObjects[i + 1];
 
-                // This is the TailCircle position if it is a slider
                 Vector2 effectiveStartPosition = currentHitObject.Position;
 
                 if (currentHitObject is Slider currentSlider)
