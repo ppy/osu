@@ -30,7 +30,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
+    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>, IAnimationTimeReference
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -357,13 +357,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (samples.Length <= 0)
                 return;
 
-            if (HitObject.SampleControlPoint == null)
-            {
-                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-            }
-
-            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            Samples.Samples = samples.Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
@@ -431,11 +425,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             LifetimeEnd = double.MaxValue;
 
-            double transformTime = HitObject.StartTime - InitialLifetimeOffset;
-
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime))
+            double initialTransformsTime = HitObject.StartTime - InitialLifetimeOffset;
+
+            AnimationStartTime.Value = initialTransformsTime;
+
+            using (BeginAbsoluteSequence(initialTransformsTime))
                 UpdateInitialTransforms();
 
             using (BeginAbsoluteSequence(StateUpdateTime))
@@ -727,6 +723,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (CurrentSkin != null)
                 CurrentSkin.SourceChanged -= skinSourceChanged;
         }
+
+        public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
     }
 
     public abstract partial class DrawableHitObject<TObject> : DrawableHitObject

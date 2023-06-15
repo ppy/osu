@@ -6,13 +6,14 @@
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset, IHasSliderVelocity
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -40,13 +41,21 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Velocity = 1;
 
+        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1);
+
+        public double SliderVelocity
+        {
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
+        }
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }

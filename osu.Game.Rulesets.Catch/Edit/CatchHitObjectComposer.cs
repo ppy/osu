@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private InputManager inputManager = null!;
 
+        private CatchBeatSnapGrid beatSnapGrid = null!;
+
         private readonly BindableDouble timeRangeMultiplier = new BindableDouble(1)
         {
             MinValue = 1,
@@ -65,6 +67,8 @@ namespace osu.Game.Rulesets.Catch.Edit
                 Catcher.BASE_DASH_SPEED, -Catcher.BASE_DASH_SPEED,
                 Catcher.BASE_WALK_SPEED, -Catcher.BASE_WALK_SPEED,
             }));
+
+            AddInternal(beatSnapGrid = new CatchBeatSnapGrid());
         }
 
         protected override void LoadComplete()
@@ -72,6 +76,29 @@ namespace osu.Game.Rulesets.Catch.Edit
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                }
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+            else
+            {
+                var result = FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
         }
 
         protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
@@ -132,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
-            if (snapType.HasFlagFast(SnapType.Grids))
+            if (snapType.HasFlagFast(SnapType.RelativeGrids))
             {
                 if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
                     Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
