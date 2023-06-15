@@ -165,24 +165,11 @@ namespace osu.Game.Rulesets.UI
             switch (skinComponent)
             {
                 case KeyCounterController keyCounterDisplay:
-                    attachKeyCounter(keyCounterDisplay); break;
+                    attachKeyCounter(keyCounterDisplay);
+                    break;
 
                 case ClicksPerSecondCalculator clicksPerSecondCalculator:
                     attachClicksPerSecond(clicksPerSecondCalculator);
-                    break;
-            }
-        }
-
-        public void Detach(IAttachableSkinComponent skinComponent)
-        {
-            switch (skinComponent)
-            {
-                case KeyCounterController keyCounterDisplay:
-                    detachKeyCounter(keyCounterDisplay);
-                    break;
-
-                case ClicksPerSecondCalculator clicksPerSecondCalculator:
-                    detachClicksPerSecond(clicksPerSecondCalculator);
                     break;
             }
         }
@@ -203,11 +190,6 @@ namespace osu.Game.Rulesets.UI
                                                    .Distinct()
                                                    .OrderBy(action => action)
                                                    .Select(action => new KeyCounterActionTrigger<T>(action)));
-        }
-
-        private void detachKeyCounter(KeyCounterController keyCounter)
-        {
-            keyCounter.ClearReceptor();
         }
 
         private partial class ActionReceptor : KeyCounterController.Receptor, IKeyBindingHandler<T>
@@ -237,10 +219,6 @@ namespace osu.Game.Rulesets.UI
             var listener = new ActionListener(calculator);
 
             KeyBindingContainer.Add(listener);
-        }
-
-        private void detachClicksPerSecond(ClicksPerSecondCalculator calculator)
-        {
         }
 
         private partial class ActionListener : Component, IKeyBindingHandler<T>
@@ -306,7 +284,6 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachHUDPieces
     {
         void Attach(IAttachableSkinComponent component);
-        void Detach(IAttachableSkinComponent component);
     }
 
     public interface IAttachableSkinComponent
