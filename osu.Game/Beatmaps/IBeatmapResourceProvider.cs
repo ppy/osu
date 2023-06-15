@@ -9,12 +9,17 @@ using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
-    public interface IBeatmapResourceProvider : IStorageResourceProvider
+    internal interface IBeatmapResourceProvider : IStorageResourceProvider
     {
         /// <summary>
         /// Retrieve a global large texture store, used for loading beatmap backgrounds.
         /// </summary>
         TextureStore LargeTextureStore { get; }
+
+        /// <summary>
+        /// Retrieve a global large texture store, used specifically for retrieving cropped beatmap panel backgrounds.
+        /// </summary>
+        TextureStore BeatmapPanelTextureStore { get; }
 
         /// <summary>
         /// Access a global track store for retrieving beatmap tracks from.
