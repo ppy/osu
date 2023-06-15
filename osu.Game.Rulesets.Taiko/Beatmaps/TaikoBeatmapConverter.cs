@@ -64,7 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 foreach (HitObject hitObject in original.HitObjects)
                 {
-                    double nextScrollSpeed = hitObject.DifficultyControlPoint.SliderVelocity;
+                    if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
+
+                    double nextScrollSpeed = hasSliderVelocity.SliderVelocity;
                     EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
                     if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
@@ -89,6 +91,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     return first;
                 }).ToList();
             }
+
+            // TODO: stable makes the last tick of a drumroll non-required when the next object is too close.
+            // This probably needs to be reimplemented:
+            //
+            // List<HitObject> hitobjects = hitObjectManager.hitObjects;
+            // int ind = hitobjects.IndexOf(this);
+            // if (i < hitobjects.Count - 1 && hitobjects[i + 1].HittableStartTime - (EndTime + (int)TickSpacing) <= (int)TickSpacing)
+            //     lastTickHittable = false;
 
             return converted;
         }
@@ -131,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            TickRate = beatmap.Difficulty.SliderTickRate == 3 ? 3 : 4
+                            SliderVelocity = obj is IHasSliderVelocity velocityData ? velocityData.SliderVelocity : 1
                         };
                     }
 
@@ -177,15 +187,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
-            DifficultyControlPoint difficultyPoint = obj.DifficultyControlPoint;
 
             double beatLength;
-#pragma warning disable 618
-            if (difficultyPoint is LegacyBeatmapDecoder.LegacyDifficultyControlPoint legacyDifficultyPoint)
-#pragma warning restore 618
-                beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
+            if (obj.LegacyBpmMultiplier.HasValue)
+                beatLength = timingPoint.BeatLength * obj.LegacyBpmMultiplier.Value;
+            else if (obj is IHasSliderVelocity hasSliderVelocity)
+                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
+                beatLength = timingPoint.BeatLength;
 
             double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.SliderMultiplier / beatmap.Difficulty.SliderTickRate;
 

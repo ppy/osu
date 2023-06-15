@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets.Edit
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime <= EditorClock.CurrentTime)?.HitObject;
+            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < EditorClock.CurrentTime)?.HitObject;
 
             if (lastBefore == null)
                 return null;
@@ -124,6 +125,7 @@ namespace osu.Game.Rulesets.Edit
             if (currentSnap > DistanceSpacingMultiplier.MinValue)
             {
                 currentDistanceSpacingButton.Enabled.Value = currentDistanceSpacingButton.Expanded.Value
+                                                             && !DistanceSpacingMultiplier.Disabled
                                                              && !Precision.AlmostEquals(currentSnap, DistanceSpacingMultiplier.Value, DistanceSpacingMultiplier.Precision / 2);
                 currentDistanceSpacingButton.ContractedLabelText = $"current {currentSnap:N2}x";
                 currentDistanceSpacingButton.ExpandedLabelText = $"Use current ({currentSnap:N2}x)";
@@ -140,28 +142,31 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            if (!DistanceSpacingMultiplier.Disabled)
+            if (DistanceSpacingMultiplier.Disabled)
             {
-                DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
-                DistanceSpacingMultiplier.BindValueChanged(multiplier =>
-                {
-                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
-                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
-
-                    if (multiplier.NewValue != multiplier.OldValue)
-                        onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
-
-                    EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
-                }, true);
-
-                // Manual binding to handle enabling distance spacing when the slider is interacted with.
-                distanceSpacingSlider.Current.BindValueChanged(spacing =>
-                {
-                    DistanceSpacingMultiplier.Value = spacing.NewValue;
-                    DistanceSnapToggle.Value = TernaryState.True;
-                });
-                DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
+                distanceSpacingSlider.Hide();
+                return;
             }
+
+            DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
+            DistanceSpacingMultiplier.BindValueChanged(multiplier =>
+            {
+                distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
+                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
+
+                if (multiplier.NewValue != multiplier.OldValue)
+                    onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
+
+                EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
+            }, true);
+
+            // Manual binding to handle enabling distance spacing when the slider is interacted with.
+            distanceSpacingSlider.Current.BindValueChanged(spacing =>
+            {
+                DistanceSpacingMultiplier.Value = spacing.NewValue;
+                DistanceSnapToggle.Value = TernaryState.True;
+            });
+            DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
         }
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
@@ -239,7 +244,7 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
         {
-            return (float)(100 * (useReferenceSliderVelocity ? referenceObject.DifficultyControlPoint.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
+            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
                            / BeatSnapProvider.BeatDivisor);
         }
 

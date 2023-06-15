@@ -29,7 +29,9 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The <see cref="KeyCounter"/>s contained in this <see cref="KeyCounterDisplay"/>.
         /// </summary>
-        public abstract IEnumerable<KeyCounter> Counters { get; }
+        public IEnumerable<KeyCounter> Counters => KeyFlow;
+
+        protected abstract FillFlowContainer<KeyCounter> KeyFlow { get; }
 
         /// <summary>
         /// Whether the actions reported by all <see cref="InputTrigger"/>s within this <see cref="KeyCounterDisplay"/> should be counted.
@@ -53,12 +55,21 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Add a <see cref="InputTrigger"/> to this display.
         /// </summary>
-        public abstract void Add(InputTrigger trigger);
+        public void Add(InputTrigger trigger)
+        {
+            var keyCounter = CreateCounter(trigger);
+
+            KeyFlow.Add(keyCounter);
+
+            IsCounting.BindTo(keyCounter.IsCounting);
+        }
 
         /// <summary>
         /// Add a range of <see cref="InputTrigger"/> to this display.
         /// </summary>
         public void AddRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(Add);
+
+        protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

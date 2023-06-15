@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Edit
                                                     AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                                new BeatDivisorControl(this.beatDivisor) { RelativeSizeAxes = Axes.Both }
                                             },
                                         },
                                         RowDimensions = new[]

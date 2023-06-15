@@ -12,6 +12,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class TimeSlider : RoundedSliderBar<double>
     {
-        public override LocalisableString TooltipText => $"{Current.Value:N0} ms";
+        public override LocalisableString TooltipText => $"{base.TooltipText} ms";
     }
 }

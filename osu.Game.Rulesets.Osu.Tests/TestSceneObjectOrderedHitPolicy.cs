@@ -439,7 +439,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
-                DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f };
+                SliderVelocity = 0.1f;
 
                 DefaultsApplied += _ =>
                 {
