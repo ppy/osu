@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : CompositeDrawable, IAttachableSkinComponent, ISerialisableDrawable
+    public abstract partial class KeyCounterDisplay : CompositeDrawable, ISerialisableDrawable
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
