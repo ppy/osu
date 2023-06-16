@@ -272,7 +272,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             prevEndTimes[column] = endTime;
             prevColumnStrain = columnStrain;
 
-            return strain;
+            // We substract CurrentStrain, because we add back the CurrentStrain on the outside function.
+            return strain - CurrentStrain;
         }
 
         protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
