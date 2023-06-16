@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // Calculate the movement vectors and animation durations
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
                 double timeDiff = nextHitObject.StartTime - currentHitObject.GetEndTime();
-                double animationDuration = ((-slideFactor.Value) + 2) * timeDiff;
+                double animationDuration = ((-slideFactor.Value) + 2.5) * timeDiff;
 
                 movementVectors.Add(movementVector);
                 originalPositions.Add(effectiveStartPosition);
