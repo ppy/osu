@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -82,23 +83,20 @@ namespace osu.Game.Online.Chat
         {
             get
             {
-                List<MenuItem> items = new List<MenuItem>
-                {
-                    new OsuMenuItem("Open", MenuItemType.Highlighted, Action)
-                };
-
                 string? url = MessageFormatter.GetUrl(Link);
 
-                if (url != null)
+                if (url == null)
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
                 {
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
+                    new OsuMenuItem("Open", MenuItemType.Highlighted, Action),
+                    new OsuMenuItem("Copy URL", MenuItemType.Standard, () =>
                     {
                         host.GetClipboard()?.SetText(url);
                         onScreenDisplay?.Display(new CopyUrlToast());
-                    }));
-                }
-
-                return items.ToArray();
+                    })
+                };
             }
         }
 
