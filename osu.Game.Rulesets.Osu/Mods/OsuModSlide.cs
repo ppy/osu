@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         drawable.MoveTo(originalPosition);
 
                         Vector2 movementVector = movementVectors[counter - 1];
-                        drawable.MoveTo(originalPosition + movementVector, Math.Min(animationDurations[counter - 1], 0.8 * osuHitObject.TimePreempt), Easing.None);
+                        drawable.MoveTo(originalPosition + movementVector, Math.Min(animationDurations[counter - 1], 0.8 * osuHitObject.TimePreempt), Easing.OutQuad);
                     }
 
                     break;
