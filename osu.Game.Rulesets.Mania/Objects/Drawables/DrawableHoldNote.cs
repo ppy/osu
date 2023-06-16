@@ -254,6 +254,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
                 sizingContainer.Height = 1 - yOffset / DrawHeight;
             }
+            else
+                sizingContainer.Height = 1;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
