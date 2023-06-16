@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Slide";
         public override string Acronym => "SL";
-        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Wheeeeee.";
         public override double ScoreMultiplier => 1;
