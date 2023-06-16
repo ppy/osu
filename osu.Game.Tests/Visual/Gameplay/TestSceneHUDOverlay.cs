@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [BackgroundDependencyLoader]
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("showhud is set", () => hudOverlay.ShowHud.Value);
 
-            AddAssert("hidetarget is visible", () => hideTarget.IsPresent);
+            AddAssert("hidetarget is visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
             AddAssert("key counter flow is visible", () => keyCounterFlow.IsPresent);
             AddAssert("pause button is visible", () => hudOverlay.HoldToQuit.IsPresent);
         }
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
 
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
@@ -109,13 +109,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
 
-            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+            AddUntilStep("wait for fade", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
             AddStep("trigger momentary show", () => InputManager.PressKey(Key.ControlLeft));
-            AddUntilStep("wait for visible", () => hideTarget.IsPresent);
+            AddUntilStep("wait for visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
 
             AddStep("stop trigering", () => InputManager.ReleaseKey(Key.ControlLeft));
-            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+            AddUntilStep("wait for fade", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
         }
 
         [Test]
@@ -144,11 +144,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
             AddAssert("key counters hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
-            AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
+            AddUntilStep("hidetarget is visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
         }
 
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
             AddStep("attempt activate", () =>
             {
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
             AddStep("attempt seek", () =>
             {
