@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -38,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private DefaultKeyCounter rightKeyCounter = null!;
 
+        private KeyCounterController controller = null!;
+
         private OsuInputManager osuInputManager = null!;
 
         private Container mainContent = null!;
@@ -53,35 +56,50 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     osuInputManager = new OsuInputManager(new OsuRuleset().RulesetInfo)
                     {
-                        Child = mainContent = new Container
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Children = new Drawable[]
+                            controller = new KeyCounterController(),
+                            mainContent = new DependencyProvidingContainer
                             {
-                                leftKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.LeftButton))
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                CachedDependencies = new (Type, object)[] { (typeof(KeyCounterController), controller) },
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.CentreRight,
-                                    Depth = float.MinValue,
-                                    X = -100,
+                                    new OsuCursorContainer
+                                    {
+                                        Depth = float.MinValue,
+                                    }
                                 },
-                                rightKeyCounter = new DefaultKeyCounter(new TestActionKeyCounterTrigger(OsuAction.RightButton))
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.CentreLeft,
-                                    Depth = float.MinValue,
-                                    X = 100,
-                                },
-                                new OsuCursorContainer
-                                {
-                                    Depth = float.MinValue,
-                                }
                             },
                         }
                     },
                     new TouchVisualiser(),
                 };
+
+                InputTrigger triggerLeft;
+                InputTrigger triggerRight;
+
+                controller.Add(triggerLeft = new TestActionKeyCounterTrigger(OsuAction.LeftButton));
+                controller.Add(triggerRight = new TestActionKeyCounterTrigger(OsuAction.RightButton));
+
+                mainContent.AddRange(new[]
+                {
+                    leftKeyCounter = new DefaultKeyCounter(triggerLeft)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreRight,
+                        Depth = float.MinValue,
+                        X = -100,
+                    },
+                    rightKeyCounter = new DefaultKeyCounter(triggerRight)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreLeft,
+                        Depth = float.MinValue,
+                        X = 100,
+                    },
+                });
             });
         }
 
