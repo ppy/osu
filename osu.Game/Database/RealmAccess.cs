@@ -77,8 +77,9 @@ namespace osu.Game.Database
         /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
         /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
+        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
         /// </summary>
-        private const int schema_version = 29;
+        private const int schema_version = 30;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -938,6 +939,7 @@ namespace osu.Game.Database
                 }
 
                 case 29:
+                case 30:
                 {
                     var scores = migration.NewRealm
                                           .All<ScoreInfo>()
