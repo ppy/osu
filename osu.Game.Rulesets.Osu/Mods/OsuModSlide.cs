@@ -97,10 +97,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 default:
                     if (!drawable.Judged)
                     {
-                        if (osuHitObject is Slider or HitCircle)
-                        {
-                            counter++;
-                        }
+                        if (osuHitObject is Slider or HitCircle) counter++;
 
                         if (counter == 0) return;
 
