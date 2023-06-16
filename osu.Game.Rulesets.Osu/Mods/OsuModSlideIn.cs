@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -67,8 +70,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 // Calculate the movement vectors and animation durations
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
-                double timeDiff = nextHitObject.StartTime - currentHitObject.StartTime;
-                double animationDuration = timeDiff * 0.8;
+                double timeDiff = nextHitObject.StartTime - currentHitObject.GetEndTime();
+                double animationDuration = timeDiff;
 
                 movementVectors.Add(movementVector);
                 originalPositions.Add(effectiveStartPosition);
