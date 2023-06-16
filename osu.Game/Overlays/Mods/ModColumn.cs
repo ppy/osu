@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Mods
                     dequeuedAction();
 
                     // each time we play an animation, we decrease the time until the next animation (to ramp the visual and audible elements).
-                    selectionDelay = Math.Max(30, selectionDelay * 0.8f);
+                    selectionDelay = Math.Max(ModSelectPanel.SAMPLE_PLAYBACK_DELAY, selectionDelay * 0.8f);
                     lastSelection = Time.Current;
                 }
                 else
