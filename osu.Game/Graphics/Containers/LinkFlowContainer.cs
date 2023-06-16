@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -150,7 +151,7 @@ namespace osu.Game.Graphics.Containers
             [Resolved]
             private GameHost host { get; set; } = null!;
 
-            [Resolved]
+            [Resolved(canBeNull: true)]
             private OnScreenDisplay onScreenDisplay { get; set; }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
