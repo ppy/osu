@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
@@ -21,8 +22,6 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private readonly string text;
         private readonly string title;
-
-        private OsuMarkdownLinkCompiler markdownLink;
 
         public OsuMarkdownLinkText(string text, LinkInline linkInline)
             : base(text, linkInline)
@@ -41,25 +40,27 @@ namespace osu.Game.Graphics.Containers.Markdown
         private void load()
         {
             var textDrawable = CreateSpriteText().With(t => t.Text = text);
-            var linkDetails = MessageFormatter.GetLinkDetails(Url);
+            var parts = new[] { textDrawable };
 
             InternalChildren = new Drawable[]
             {
                 textDrawable,
-                markdownLink = new OsuMarkdownLinkCompiler(new[] { textDrawable }, linkDetails)
+                new OsuMarkdownLinkCompiler(parts)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Action = OnLinkPressed,
                     TooltipText = title ?? Url,
-                }
+                },
+                new LinkFlowContainer.LinkContextMenuProvider(parts, Url, OnLinkPressed),
             };
         }
 
-        protected override void OnLinkPressed() => markdownLink.Action?.Invoke();
+        protected override void OnLinkPressed() => linkHandler?.HandleLink(Url);
 
         private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts, LinkDetails link)
-                : base(parts, link)
+            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts)
+                : base(parts)
             {
             }
 
