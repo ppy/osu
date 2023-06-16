@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -251,7 +252,12 @@ namespace osu.Game.Online.Chat
             switch (link.Action)
             {
                 case LinkAction.External:
-                    return (string)link.Argument;
+                    string url = (string)link.Argument;
+
+                    if (url.StartsWith('/'))
+                        url = $"https://{WebsiteRootUrl}{url}";
+
+                    return url;
 
                 case LinkAction.OpenBeatmap:
                     return $@"https://{WebsiteRootUrl}/beatmaps/{link.Argument}";
@@ -260,7 +266,10 @@ namespace osu.Game.Online.Chat
                     return $@"https://{WebsiteRootUrl}/beatmapsets/{link.Argument}";
 
                 case LinkAction.OpenUserProfile:
-                    return $@"https://{WebsiteRootUrl}/users/{link.Argument}";
+                    // todo: this is awkward. there should *only* be one type of argument per link action, but alas.
+                    return link.Argument is IUser user
+                        ? $@"https://{WebsiteRootUrl}/users/{user.Username}"
+                        : $@"https://{WebsiteRootUrl}/users/{link.Argument}";
 
                 case LinkAction.OpenWiki:
                     return $@"https://{WebsiteRootUrl}/wiki/{link.Argument}";
