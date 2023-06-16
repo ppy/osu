@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,6 +46,8 @@ namespace osu.Game.Overlays.Mods
         public const float CORNER_RADIUS = 7;
         public const float HEIGHT = 42;
 
+        public const double SAMPLE_PLAYBACK_DELAY = 30;
+
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;
         protected virtual Colour4 BackgroundColour => Active.Value ? AccentColour.Darken(0.3f) : ColourProvider.Background3;
@@ -68,6 +71,8 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool();
         private Sample? sampleOff;
         private Sample? sampleOn;
+
+        private Bindable<double?> lastPlaybackTime = null!;
 
         protected ModSelectPanel()
         {
@@ -118,23 +123,23 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Vertical,
                                 Children = new[]
                                 {
-                                    titleText = new OsuSpriteText
+                                    titleText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
                                             Left = -18 * ShearedOverlayContainer.SHEAR
-                                        }
+                                        },
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     },
-                                    descriptionText = new OsuSpriteText
+                                    descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     }
                                 }
                             }
@@ -163,13 +168,15 @@ namespace osu.Game.Overlays.Mods
         protected abstract void Deselect();
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)
+        private void load(AudioManager audio, SessionStatics statics, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             if (samplePlaybackDisabler != null)
                 ((IBindable<bool>)samplePlaybackDisabled).BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
         }
 
         protected sealed override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -192,10 +199,17 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
-            if (Active.Value)
-                sampleOn?.Play();
-            else
-                sampleOff?.Play();
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= SAMPLE_PLAYBACK_DELAY;
+
+            if (enoughTimePassedSinceLastPlayback)
+            {
+                if (Active.Value)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
+
+                lastPlaybackTime.Value = Time.Current;
+            }
         }
 
         protected override bool OnHover(HoverEvent e)

@@ -16,7 +16,13 @@ namespace osu.Game.Scoring.Legacy
             => getDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
 
         public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
-            => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
+        {
+            // Temporary to not scale stable scores that are already in the XX-millions with the classic scoring mode.
+            if (scoreInfo.IsLegacyScore)
+                return scoreInfo.TotalScore;
+
+            return getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
+        }
 
         private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
         {
