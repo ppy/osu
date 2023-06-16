@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModWiggle), typeof(OsuModSpinIn), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame) };
 
-        [SettingSource("Slide Rate", "How fast the objects slide in.")]
+        [SettingSource("Slide Speed", "How fast the objects slide in.")]
         public BindableNumber<double> slideFactor { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
