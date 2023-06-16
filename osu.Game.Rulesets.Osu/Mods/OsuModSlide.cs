@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -24,6 +26,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Wheeeeee.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModWiggle), typeof(OsuModSpinIn), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame) };
+
+        [SettingSource("Slide Rate", "How fast the objects slide in.")]
+        public BindableNumber<double> slideFactor { get; } = new BindableDouble(1)
+        {
+            MinValue = 0.5,
+            MaxValue = 1.5,
+            Precision = 0.01,
+        };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
@@ -67,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // Calculate the movement vectors and animation durations
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
                 double timeDiff = nextHitObject.StartTime - currentHitObject.GetEndTime();
-                double animationDuration = timeDiff;
+                double animationDuration = ((-slideFactor.Value) + 2) * timeDiff;
 
                 movementVectors.Add(movementVector);
                 originalPositions.Add(effectiveStartPosition);
