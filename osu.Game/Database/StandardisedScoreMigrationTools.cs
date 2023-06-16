@@ -182,7 +182,7 @@ namespace osu.Game.Database
             foreach (var mod in score.Mods)
                 modMultiplier *= mod.ScoreMultiplier;
 
-            return (long)((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+            return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
         }
 
         private class FakeHit : HitObject
