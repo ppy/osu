@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         [Test]
@@ -73,7 +74,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlays.ForEach(h => h.ShowHud.Value = false));
 
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
