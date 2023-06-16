@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// When enabled, distance snap should only snap to the current time (as per the editor clock).
         /// This is to emulate stable behaviour.
         /// </summary>
-        protected Bindable<bool> LimitedDistanceSnap;
+        protected Bindable<bool> LimitedDistanceSnap { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
