@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSlideIn()
+                        new OsuModSlide()
                     };
 
                 case ModType.System:

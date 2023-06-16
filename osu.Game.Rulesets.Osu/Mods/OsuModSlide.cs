@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -19,13 +17,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSlideIn : ModWithVisibilityAdjustment
+    public class OsuModSlide : ModWithVisibilityAdjustment
     {
-        public override string Name => "Slide In";
-        public override string Acronym => "SI";
+        public override string Name => "Slide";
+        public override string Acronym => "SL";
         public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
-        public override LocalisableString Description => "The circles are coming for you...";
+        public override LocalisableString Description => "Wheeeeee.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
