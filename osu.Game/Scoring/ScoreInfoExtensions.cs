@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
@@ -26,5 +25,12 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.OnlineID)
                      // Local scores may not have an online ID. Fall back to date in these cases.
                      .ThenBy(s => s.Date);
+
+        /// <summary>
+        /// Retrieves the maximum achievable combo for the provided score.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
+        /// <returns>The maximum achievable combo.</returns>
+        public static int GetMaximumAchievableCombo(this ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
     }
 }

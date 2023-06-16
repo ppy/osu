@@ -90,13 +90,6 @@ namespace osu.Game.Scoring
         public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
 
         /// <summary>
-        /// Retrieves the maximum achievable combo for the provided score.
-        /// </summary>
-        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
-        /// <returns>The maximum achievable combo.</returns>
-        public int GetMaximumAchievableCombo([NotNull] ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-
-        /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
         /// </summary>
         private class TotalScoreBindable : Bindable<long>
