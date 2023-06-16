@@ -17,6 +17,7 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Development;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
@@ -27,11 +28,10 @@ namespace osu.Desktop
 {
     internal partial class OsuGameDesktop : OsuGame
     {
-        private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
-        private ArchiveImportIPCChannel? archiveImportIPCChannel;
+        private OsuInstanceIPCChannel? osuInstanceIPCChannel;
 
-        public OsuGameDesktop(string[]? args = null)
-            : base(args)
+        public OsuGameDesktop(string? cwd = null, string[]? args = null)
+            : base(cwd, args)
         {
         }
 
@@ -122,8 +122,16 @@ namespace osu.Desktop
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
-            osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
-            archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
+            osuInstanceIPCChannel = new OsuInstanceIPCChannel(Host);
+            osuInstanceIPCChannel.MessageReceived += msg =>
+            {
+                bool handled = HandleCommandLineArgs(msg.Cwd, msg.Args);
+
+                if (handled || (msg.Args.Length == 0 && !DebugUtils.IsDebugBuild))
+                    Window?.Raise();
+
+                return new OsuInstanceIPCMessage(handled);
+            };
         }
 
         public override void SetHost(GameHost host)
@@ -187,8 +195,7 @@ namespace osu.Desktop
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            osuSchemeLinkIPCChannel?.Dispose();
-            archiveImportIPCChannel?.Dispose();
+            osuInstanceIPCChannel?.Dispose();
         }
 
         private class SDL2BatteryInfo : BatteryInfo

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -188,6 +189,7 @@ namespace osu.Game
 
         private Bindable<string> configSkin;
 
+        private readonly string cwd;
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -195,10 +197,10 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
-        public OsuGame(string[] args = null)
+        public OsuGame(string cwd = null, string[] args = null)
         {
+            this.cwd = cwd;
             this.args = args;
-
             forwardGeneralLogsToNotifications();
             forwardTabletLogsToNotifications();
 
@@ -1038,29 +1040,30 @@ namespace osu.Game
             };
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
-            handleStartupImport();
+            HandleCommandLineArgs(cwd, args);
         }
 
-        private void handleStartupImport()
+        protected bool HandleCommandLineArgs(string cwd, [CanBeNull] string[] args)
         {
+            // return true if a link was opened or if any files have been queued for import (regardless of the success of the import)
             if (args?.Length > 0)
             {
                 string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
 
                 if (paths.Length > 0)
                 {
-                    string firstPath = paths.First();
-
-                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(firstPath);
-                    }
+                    if (paths.Length == 1 && paths[0].StartsWith(OSU_PROTOCOL, StringComparison.Ordinal)) HandleLink(paths[0]);
                     else
                     {
+                        paths = paths.Where(a => a.Contains('.')).Select(a => Path.GetFullPath(a, cwd)).ToArray();
                         Task.Run(() => Import(paths));
                     }
+
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
