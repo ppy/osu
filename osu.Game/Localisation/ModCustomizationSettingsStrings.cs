@@ -10,14 +10,14 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.ModCustomizationSettings";
 
         /// <summary>
-        /// "From Previous Note"
+        /// "From Previous Hit Circle"
         /// </summary>
-        public static LocalisableString FromPrevious => new TranslatableString(getKey(@"from_previous_note"), @"From Previous Note");
+        public static LocalisableString FromPrevious => new TranslatableString(getKey(@"from_previous"), @"From Previous Hit Circle");
 
         /// <summary>
-        /// "Towards Previous Note"
+        /// "Towards Previous Hit Circle"
         /// </summary>
-        public static LocalisableString TowardsPrevious => new TranslatableString(getKey(@"towards_previous_note"), @"Towards Previous Note");
+        public static LocalisableString TowardsPrevious => new TranslatableString(getKey(@"towards_previous"), @"Towards Previous Hit Circle");
 
 
         /// <summary>
