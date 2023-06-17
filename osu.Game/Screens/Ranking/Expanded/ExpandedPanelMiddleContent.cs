@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
+                new ComboStatistic(score.MaxCombo, score.GetMaximumAchievableCombo()),
                 new PerformanceStatistic(score),
             };
 
@@ -101,23 +101,21 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            new TruncatingSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                                Truncate = true,
                             },
-                            new OsuSpriteText
+                            new TruncatingSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                 MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                                Truncate = true,
                             },
                             new Container
                             {
@@ -156,14 +154,13 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    new TruncatingSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                         MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                                        Truncate = true,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {

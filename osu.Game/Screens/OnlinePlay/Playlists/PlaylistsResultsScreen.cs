@@ -197,7 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 }
             }
 
-            scoreInfos = scoreManager.OrderByTotalScore(scoreInfos).ToArray();
+            scoreInfos.OrderByTotalScore().ToArray();
 
             // Select a score if we don't already have one selected.
             // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
