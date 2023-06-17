@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -864,7 +863,7 @@ namespace osu.Game.Screens.Select
         {
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
-            FilterControl.InformationalText = $"{"match".ToQuantity(Carousel.CountDisplayed, "#,0")}";
+            FilterControl.InformationalText = Carousel.CountDisplayed != 1 ? $"{Carousel.CountDisplayed:#,0} matches" : $"{Carousel.CountDisplayed:#,0} match";
         }
 
         private bool boundLocalBindables;
