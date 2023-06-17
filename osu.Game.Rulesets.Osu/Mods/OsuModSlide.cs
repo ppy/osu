@@ -69,18 +69,18 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var currentHitObject = osuHitObjects[i];
                 var nextHitObject = osuHitObjects[i + 1];
 
-                Vector2 effectiveStartPosition = currentHitObject.Position;
+                Vector2 effectiveStartPosition = currentHitObject.StackedPosition;
 
                 if (currentHitObject is Slider currentSlider)
                 {
-                    effectiveStartPosition = currentSlider.TailCircle.Position;
+                    effectiveStartPosition = currentSlider.TailCircle.StackedPosition;
                 }
 
-                Vector2 effectiveEndPosition = nextHitObject.Position;
+                Vector2 effectiveEndPosition = nextHitObject.StackedPosition;
 
                 if (nextHitObject is Slider nextSlider)
                 {
-                    effectiveEndPosition = nextSlider.HeadCircle.Position;
+                    effectiveEndPosition = nextSlider.HeadCircle.StackedPosition;
                 }
 
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
