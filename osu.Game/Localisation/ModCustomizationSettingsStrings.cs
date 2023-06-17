@@ -19,7 +19,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TowardsPrevious => new TranslatableString(getKey(@"towards_previous"), @"Towards Previous Hit Circle");
 
-
         /// <summary>
         /// "Random"
         /// </summary>
