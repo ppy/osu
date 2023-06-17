@@ -93,7 +93,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     case SlideDirectionEnum.Random:
-                        // todo: figure out math
+                        float length = movementVector.Length;
+                        Random random = new Random();
+                        Vector2 directionVector = new Vector2(2 * random.NextSingle() - 1, 2 * random.NextSingle() - 1).Normalized();
+                        Vector2 randomVector = directionVector * length;
+                        movementVectors.Add(randomVector);
+                        originalPositions.Add(effectiveEndPosition - randomVector);
                         break;
                 }
 
