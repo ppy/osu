@@ -6,6 +6,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays.Login
                     {
                         new OsuSpriteText
                         {
-                            Text = "ACCOUNT",
+                            Text = LoginPanelStrings.Account.ToUpper(),
                             Margin = new MarginPadding { Bottom = 5 },
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
@@ -115,7 +116,7 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    linkFlow.AddLink("cancel", api.Logout, string.Empty);
+                    linkFlow.AddLink(Resources.Localisation.Web.CommonStrings.ButtonsCancel.ToLower(), api.Logout, string.Empty);
                     break;
 
                 case APIState.Online:
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.Login
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Signed in",
+                                            Text = LoginPanelStrings.SignedIn,
                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },

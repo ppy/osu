@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -13,6 +14,19 @@ namespace osu.Game.Database
 {
     public static class StandardisedScoreMigrationTools
     {
+        public static bool ShouldMigrateToNewStandardised(ScoreInfo score)
+        {
+            if (score.IsLegacyScore)
+                return false;
+
+            // Recalculate the old-style standardised score to see if this was an old lazer score.
+            bool oldScoreMatchesExpectations = GetOldStandardised(score) == score.TotalScore;
+            // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
+            bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
+
+            return oldScoreMatchesExpectations || scoreIsVeryOld;
+        }
+
         public static long GetNewStandardised(ScoreInfo score)
         {
             int maxJudgementIndex = 0;
@@ -168,7 +182,7 @@ namespace osu.Game.Database
             foreach (var mod in score.Mods)
                 modMultiplier *= mod.ScoreMultiplier;
 
-            return (long)((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+            return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
         }
 
         private class FakeHit : HitObject
