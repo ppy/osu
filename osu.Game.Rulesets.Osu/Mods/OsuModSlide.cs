@@ -7,9 +7,11 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Slide Direction", "Change where the circles slide in from.", 1)]
         public Bindable<SlideDirectionEnum> SlideDirection { get; } = new Bindable<SlideDirectionEnum>(SlideDirectionEnum.FromPrevious);
+
+        [SettingSource("Seed", "Use a custom seed for randomization (only applicable if Slide Direction is Random)", SettingControlType = typeof(SettingsNumberBox))]
+        public Bindable<int?> Seed { get; } = new Bindable<int?>();
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
@@ -136,9 +141,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         if (SlideDirection.Value == SlideDirectionEnum.Random)
                         {
+                            Seed.Value ??= RNG.Next();
+                            Random random = new Random(Seed.Value.Value);
+
                             float length = movementVector.Length;
-                            Random random = new Random();
                             Vector2 directionVector = new Vector2(2 * random.NextSingle() - 1, 2 * random.NextSingle() - 1).Normalized();
+
                             movementVector = directionVector * length;
                             originalPosition = originalPosition - movementVector;
                         }
