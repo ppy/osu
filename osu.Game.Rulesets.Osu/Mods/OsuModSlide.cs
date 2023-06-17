@@ -134,9 +134,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         if (counter == 0) return;
 
-                        Vector2 originalPosition = osuHitObject is Slider slider
-                            ? originalPositions[counter - 1] + (slider.Position - slider.HeadCircle.Position)
-                            : originalPositions[counter - 1];
+                        Vector2 originalPosition = originalPositions[counter - 1];
 
                         drawable.MoveTo(originalPosition);
 
@@ -152,8 +150,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.FromPrevious))]
             FromPrevious,
+
             [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.TowardsPrevious))]
             TowardsPrevious,
+
             [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.RandomDirection))]
             Random
         }
