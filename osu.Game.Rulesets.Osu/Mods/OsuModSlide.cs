@@ -93,12 +93,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     case SlideDirectionEnum.Random:
-                        float length = movementVector.Length;
-                        Random random = new Random();
-                        Vector2 directionVector = new Vector2(2 * random.NextSingle() - 1, 2 * random.NextSingle() - 1).Normalized();
-                        Vector2 randomVector = directionVector * length;
-                        movementVectors.Add(randomVector);
-                        originalPositions.Add(effectiveEndPosition - randomVector);
+                        // Actual logic is in ApplySlideIn to make randomness "per play" rather than "per map load"
+                        movementVectors.Add(movementVector);
+                        originalPositions.Add(effectiveEndPosition);
                         break;
                 }
 
@@ -135,10 +132,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (counter == 0) return;
 
                         Vector2 originalPosition = originalPositions[counter - 1];
+                        Vector2 movementVector = movementVectors[counter - 1];
+
+                        if (SlideDirection.Value == SlideDirectionEnum.Random)
+                        {
+                            float length = movementVector.Length;
+                            Random random = new Random();
+                            Vector2 directionVector = new Vector2(2 * random.NextSingle() - 1, 2 * random.NextSingle() - 1).Normalized();
+                            movementVector = directionVector * length;
+                            originalPosition = originalPosition - movementVector;
+                        }
 
                         drawable.MoveTo(originalPosition);
 
-                        Vector2 movementVector = movementVectors[counter - 1];
                         drawable.MoveTo(originalPosition + movementVector, Math.Min(animationDurations[counter - 1], 0.8 * osuHitObject.TimePreempt), Easing.OutQuad);
                     }
 
