@@ -171,7 +171,6 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
-
         private Func<ScoreInfo, double> scoreMultiplierCalculator;
 
         public Func<ScoreInfo, double> ScoreMultiplierCalculator

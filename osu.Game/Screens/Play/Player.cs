@@ -823,14 +823,14 @@ namespace osu.Game.Screens.Play
             // with default score multiplier which should always be used when importing or submitting scores.
             var gameplayScoreMultiplierCalculator = ScoreProcessor.ScoreMultiplierCalculator;
             ScoreProcessor.ScoreMultiplierCalculator = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
-            var actualTotalScore = ScoreProcessor.TotalScore.Value;
+            long actualTotalScore = ScoreProcessor.TotalScore.Value;
             ScoreProcessor.ScoreMultiplierCalculator = gameplayScoreMultiplierCalculator;
 
             return prepareScoreForDisplayTask = Task.Run(async () =>
             {
                 var scoreCopy = Score.DeepClone();
 
-                var gameplayScore = scoreCopy.ScoreInfo.TotalScore;
+                long gameplayScore = scoreCopy.ScoreInfo.TotalScore;
                 scoreCopy.ScoreInfo.TotalScore = actualTotalScore;
 
                 try

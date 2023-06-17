@@ -192,12 +192,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 foreach (var scoreInfo in scoreInfos)
                 {
-                    var scoreMultiplier = scoreInfo.ScoreMultiplierCalculator(scoreInfo);
+                    double scoreMultiplier = scoreInfo.ScoreMultiplierCalculator(scoreInfo);
                     scoreInfo.TotalScore = (long)Math.Round(scoreInfo.TotalScore / scoreMultiplier);
                 }
             }
 
-            scoreInfos.OrderByTotalScore().ToArray();
+            scoreInfos.OrderByTotalScore();
 
             // Select a score if we don't already have one selected.
             // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
