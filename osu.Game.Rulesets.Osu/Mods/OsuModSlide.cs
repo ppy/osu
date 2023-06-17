@@ -73,15 +73,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (currentHitObject is Slider currentSlider)
                 {
-                    effectiveStartPosition = currentSlider.TailCircle.StackedPosition;
+                    effectiveStartPosition = currentSlider.StackedEndPosition;
                 }
 
                 Vector2 effectiveEndPosition = nextHitObject.StackedPosition;
-
-                if (nextHitObject is Slider nextSlider)
-                {
-                    effectiveEndPosition = nextSlider.HeadCircle.StackedPosition;
-                }
 
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
 
