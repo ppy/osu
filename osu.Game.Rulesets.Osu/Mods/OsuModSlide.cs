@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private int counter = -1;
 
-        private readonly List<Vector2> movementVectors = new List<Vector2>(); // A list to store the movement vectors for each hit object
-        private readonly List<Vector2> originalPositions = new List<Vector2>(); // A list to store the original positions of each hit object
-        private readonly List<double> animationDurations = new List<double>(); // A list to store the animation durations for each hit object
+        private readonly List<Vector2> movementVectors = new List<Vector2>();
+        private readonly List<Vector2> originalPositions = new List<Vector2>();
+        private readonly List<double> animationDurations = new List<double>();
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
