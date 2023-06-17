@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -28,12 +29,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModWiggle), typeof(OsuModSpinIn), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame) };
 
         [SettingSource("Slide Speed", "How fast the objects slide in.")]
-        public BindableNumber<double> slideFactor { get; } = new BindableDouble(1)
+        public BindableNumber<double> SlideFactor { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
             MaxValue = 1.5,
             Precision = 0.01,
         };
+
+        [SettingSource("Slide Direction", "Change where the circles slide in from.", 1)]
+        public Bindable<SlideDirectionEnum> SlideDirection { get; } = new Bindable<SlideDirectionEnum>(SlideDirectionEnum.FromPrevious);
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applySlideIn(hitObject, state);
@@ -74,13 +78,29 @@ namespace osu.Game.Rulesets.Osu.Mods
                     effectiveEndPosition = nextSlider.HeadCircle.Position;
                 }
 
-                // Calculate the movement vectors and animation durations
                 Vector2 movementVector = effectiveEndPosition - effectiveStartPosition;
-                double timeDiff = nextHitObject.StartTime - currentHitObject.GetEndTime();
-                double animationDuration = ((-slideFactor.Value) + 2.5) * timeDiff;
 
-                movementVectors.Add(movementVector);
-                originalPositions.Add(effectiveStartPosition);
+                switch (SlideDirection.Value)
+                {
+                    case SlideDirectionEnum.FromPrevious:
+                        movementVectors.Add(movementVector);
+                        originalPositions.Add(effectiveStartPosition);
+                        break;
+
+                    case SlideDirectionEnum.TowardsPrevious:
+                        movementVectors.Add(-movementVector);
+                        originalPositions.Add(effectiveStartPosition + 2 * movementVector);
+                        break;
+
+                    case SlideDirectionEnum.Random:
+                        // todo: figure out math
+                        break;
+                }
+
+                // Calculate the animation durations
+                double timeDiff = nextHitObject.StartTime - currentHitObject.GetEndTime();
+                double animationDuration = ((-SlideFactor.Value) + 2.5) * timeDiff;
+
                 animationDurations.Add(animationDuration);
             }
 
@@ -121,6 +141,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     break;
             }
+        }
+
+        public enum SlideDirectionEnum
+        {
+            [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.FromPrevious))]
+            FromPrevious,
+            [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.TowardsPrevious))]
+            TowardsPrevious,
+            [LocalisableDescription(typeof(ModCustomizationSettingsStrings), nameof(ModCustomizationSettingsStrings.RandomDirection))]
+            Random
         }
     }
 }
