@@ -264,7 +264,7 @@ namespace osu.Game.Beatmaps
                     if (beatmapFileStream == null)
                     {
                         Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} not found on disk at expected location {fileStorePath})", level: LogLevel.Error);
-                        return null;
+                        return new Storyboard();
                     }
 
                     using (var reader = new LineBufferedReader(beatmapFileStream))

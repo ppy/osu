@@ -453,6 +453,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
         }
 
+        [Test]
+        public void TestRewindToDeletedBeatmap()
+        {
+            loadBeatmaps();
+
+            var firstAdded = TestResources.CreateTestBeatmapSetInfo();
+
+            AddStep("add new set", () => carousel.UpdateBeatmapSet(firstAdded));
+            AddStep("select set", () => carousel.SelectBeatmap(firstAdded.Beatmaps.First()));
+
+            nextRandom();
+
+            AddStep("delete set", () => carousel.RemoveBeatmapSet(firstAdded));
+
+            prevRandom();
+
+            AddAssert("deleted set not selected", () => carousel.SelectedBeatmapSet?.Equals(firstAdded) == false);
+        }
+
         /// <summary>
         /// Test adding and removing beatmap sets
         /// </summary>

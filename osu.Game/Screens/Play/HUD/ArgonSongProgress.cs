@@ -95,7 +95,6 @@ namespace osu.Game.Screens.Play.HUD
         private void updateGraphVisibility()
         {
             graph.FadeTo(ShowGraph.Value ? 1 : 0, 200, Easing.In);
-            bar.ShowBackground = !ShowGraph.Value;
         }
 
         protected override void Update()
