@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             modState.ValidForSelection.BindValueChanged(_ => updateFilterState());
-            modState.MatchingFilter.BindValueChanged(_ => updateFilterState(), true);
+            modState.MatchingTextFilter.BindValueChanged(_ => updateFilterState(), true);
         }
 
         protected override void Select()
@@ -100,13 +100,13 @@ namespace osu.Game.Overlays.Mods
 
         public override bool MatchingFilter
         {
-            get => modState.MatchingFilter.Value;
+            get => modState.MatchingTextFilter.Value;
             set
             {
-                if (modState.MatchingFilter.Value == value)
+                if (modState.MatchingTextFilter.Value == value)
                     return;
 
-                modState.MatchingFilter.Value = value;
+                modState.MatchingTextFilter.Value = value;
             }
         }
 
