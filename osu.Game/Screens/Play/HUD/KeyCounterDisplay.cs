@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
@@ -77,7 +78,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            controller.OnNewTrigger -= Add;
+
+            if (controller.IsNotNull())
+                controller.OnNewTrigger -= Add;
         }
 
         public bool UsesFixedAnchor { get; set; }
