@@ -3,14 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterController : CompositeComponent, IAttachableSkinComponent
+    public partial class KeyCounterController : CompositeComponent, IKeybindingListener
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
 
@@ -36,5 +38,22 @@ namespace osu.Game.Screens.Play.HUD
         public override bool HandleNonPositionalInput => true;
 
         public override bool HandlePositionalInput => true;
+
+        #region IKeybindingListener
+
+        bool IKeybindingListener.CanHandleKeybindings => true;
+
+        void IKeybindingListener.Setup<T>(IEnumerable<T> actions)
+            => AddRange(actions.Select(a => new KeyCounterActionTrigger<T>(a)));
+
+        void IKeybindingListener.OnPressed<T>(KeyBindingPressEvent<T> action)
+        {
+        }
+
+        void IKeybindingListener.OnReleased<T>(KeyBindingReleaseEvent<T> action)
+        {
+        }
+
+        #endregion
     }
 }
