@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
+    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, IKeybindingEventsEmitter
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -327,8 +327,8 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(IAttachableSkinComponent skinComponent) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(skinComponent);
+        public void Attach(IKeybindingListener skinComponent) =>
+            (KeyBindingInputManager as IKeybindingEventsEmitter)?.Attach(skinComponent);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.

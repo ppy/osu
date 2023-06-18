@@ -4,11 +4,12 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCalculator : Component, IAttachableSkinComponent
+    public partial class ClicksPerSecondCalculator : Component, IKeybindingListener
     {
         private readonly List<double> timestamps = new List<double>();
 
@@ -53,5 +54,21 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
             Value = count;
         }
+
+        #region IKeybindingListener
+
+        bool IKeybindingListener.CanHandleKeybindings => false;
+
+        void IKeybindingListener.Setup<T>(IEnumerable<T> actions)
+        {
+        }
+
+        void IKeybindingListener.OnPressed<T>(KeyBindingPressEvent<T> action) => AddInputTimestamp();
+
+        void IKeybindingListener.OnReleased<T>(KeyBindingReleaseEvent<T> action)
+        {
+        }
+
+        #endregion
     }
 }

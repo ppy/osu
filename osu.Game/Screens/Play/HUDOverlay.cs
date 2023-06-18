@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -102,6 +103,8 @@ namespace osu.Game.Screens.Play
 
         private readonly List<Drawable> hideTargets;
 
+        private readonly IEnumerable<IKeybindingListener> actionInjectionCandidates;
+
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
             Drawable rulesetComponents;
@@ -162,6 +165,8 @@ namespace osu.Game.Screens.Play
             KeyCounter = new KeyCounterController();
 
             hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
+
+            actionInjectionCandidates = new IKeybindingListener[] { clicksPerSecondCalculator, KeyCounter };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -319,11 +324,8 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            if (drawableRuleset is ICanAttachHUDPieces attachTarget)
-            {
-                attachTarget.Attach(KeyCounter);
-                attachTarget.Attach(clicksPerSecondCalculator);
-            }
+            if (drawableRuleset is IKeybindingEventsEmitter attachTarget)
+                actionInjectionCandidates.ForEach(attachTarget.Attach);
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
