@@ -158,8 +158,8 @@ namespace osu.Game.Screens.Play
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
-                KeyCounter = new KeyCounterController()
             };
+            KeyCounter = new KeyCounterController();
 
             hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
 
