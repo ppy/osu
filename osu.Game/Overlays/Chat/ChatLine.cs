@@ -70,8 +70,16 @@ namespace osu.Game.Overlays.Chat
         private Container? highlight;
 
         /// <summary>
-        /// if set, it will override <see cref="APIUser.Colour"/> or <see cref="default_colours"/>.
+        /// The colour to use to paint the chat mesasge author's username.
         /// </summary>
+        /// <remarks>
+        /// The colour can be set explicitly by consumers via the property initialiser.
+        /// If unspecified, the colour is by default initialised to:
+        /// <list type="bullet">
+        /// <item><see cref="APIUser.Colour">message.Sender.Colour</see>, if non-empty,</item>
+        /// <item>a random colour from <see cref="default_colours"/> if the above is empty.</item>
+        /// </list>
+        /// </remarks>
         public Color4 UsernameColour { get; init; }
 
         public ChatLine(Message message)
@@ -81,7 +89,8 @@ namespace osu.Game.Overlays.Chat
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            // If we have custom value, this value will be override.
+            // initialise using sane defaults.
+            // consumers can use the initialiser of `UsernameColour` to override this if they wish to.
             UsernameColour = !string.IsNullOrEmpty(message.Sender.Colour)
                 ? Color4Extensions.FromHex(message.Sender.Colour)
                 : default_colours[message.SenderId % default_colours.Length];
