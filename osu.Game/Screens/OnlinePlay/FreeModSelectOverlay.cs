@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Game.Overlays;
 using System.Collections.Generic;
@@ -36,11 +34,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override IEnumerable<ShearedButton> CreateFooterButtons()
             => base.CreateFooterButtons()
-                   .Prepend(
-                       SelectAllModsButton = new SelectAllModsButton(this)
-                       {
-                           Anchor = Anchor.BottomLeft,
-                           Origin = Anchor.BottomLeft,
-                       });
+                   .Prepend(SelectAllModsButton = new SelectAllModsButton(this)
+                   {
+                       Anchor = Anchor.BottomLeft,
+                       Origin = Anchor.BottomLeft,
+                   });
     }
 }
