@@ -94,6 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(typeof(OsuModHidden), typeof(OsuModTraceable))] // Incompatible.
         public void TestAllowedModDeselectedWhenRequired(Type allowedMod, Type requiredMod)
         {
+            AddStep("change ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
             AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod) });
             AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
 
@@ -102,17 +103,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // A previous test's mod overlay could still be fading out.
             AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
 
-            assertHasFreeModButton(allowedMod, false);
-            assertHasFreeModButton(requiredMod, false);
+            assertFreeModNotShown(allowedMod);
+            assertFreeModNotShown(requiredMod);
         }
 
-        private void assertHasFreeModButton(Type type, bool hasButton = true)
+        private void assertFreeModNotShown(Type type)
         {
-            AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
+            AddAssert($"{type.ReadableName()} not displayed in freemod overlay",
                 () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()
-                          .Where(panel => panel.MatchingFilter)
+                          .Where(panel => panel.Visible)
                           .All(b => b.Mod.GetType() != type));
         }
 
