@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Mods
                 foreach (var mod in availableMods)
                 {
                     mod.Active.BindValueChanged(_ => updateState());
-                    mod.MatchingFilter.BindValueChanged(_ => updateState());
+                    mod.MatchingTextFilter.BindValueChanged(_ => updateState());
                     mod.ValidForSelection.BindValueChanged(_ => updateState());
                 }
 
