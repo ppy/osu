@@ -77,18 +77,6 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public bool Visible => modState.Visible;
 
-        public bool ValidForSelection
-        {
-            get => modState.ValidForSelection.Value;
-            set
-            {
-                if (modState.ValidForSelection.Value == value)
-                    return;
-
-                modState.ValidForSelection.Value = value;
-            }
-        }
-
         #region Filtering support
 
         public override IEnumerable<LocalisableString> FilterTerms => new[]
