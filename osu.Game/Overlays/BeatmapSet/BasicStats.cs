@@ -68,13 +68,13 @@ namespace osu.Game.Overlays.BeatmapSet
             }
             else
             {
-                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration());
                 length.Value = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
 
-                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                if (beatmapInfo is not IBeatmapOnlineInfo onlineInfo) return;
 
-                circleCount.Value = (onlineInfo?.CircleCount ?? 0).ToLocalisableString(@"N0");
-                sliderCount.Value = (onlineInfo?.SliderCount ?? 0).ToLocalisableString(@"N0");
+                circleCount.Value = onlineInfo.CircleCount.ToLocalisableString(@"N0");
+                sliderCount.Value = onlineInfo.SliderCount.ToLocalisableString(@"N0");
+                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(onlineInfo.HitLength).ToFormattedDuration());
             }
         }
 
