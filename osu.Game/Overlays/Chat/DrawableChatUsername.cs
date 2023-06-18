@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Chat
     {
         public Action? ReportRequested;
 
-        public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
+        public Color4 AccentColour { get; init; }
 
         public bool Inverted { get; init; }
 
@@ -146,11 +146,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
             drawableText.Colour = colours.ChatBlue;
-
-            AccentColour.BindValueChanged(c =>
-            {
-                colouredDrawable.Colour = c.NewValue;
-            }, true);
+            colouredDrawable.Colour = AccentColour;
         }
 
         public MenuItem[] ContextMenuItems
@@ -196,7 +192,7 @@ namespace osu.Game.Overlays.Chat
 
         protected override bool OnHover(HoverEvent e)
         {
-            colouredDrawable.FadeColour(AccentColour.Value.Lighten(0.6f), 30, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour.Lighten(0.6f), 30, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -205,7 +201,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.OnHoverLost(e);
 
-            colouredDrawable.FadeColour(AccentColour.Value, 800, Easing.OutQuint);
+            colouredDrawable.FadeColour(AccentColour, 800, Easing.OutQuint);
         }
     }
 }
