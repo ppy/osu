@@ -286,7 +286,7 @@ namespace osu.Game.Overlays.Mods
 
         public abstract IEnumerable<LocalisableString> FilterTerms { get; }
 
-        private bool matchingFilter;
+        private bool matchingFilter = true;
 
         public virtual bool MatchingFilter
         {
