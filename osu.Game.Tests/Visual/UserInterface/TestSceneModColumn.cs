@@ -334,7 +334,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void setFilter(Func<Mod, bool>? filter)
         {
             foreach (var modState in this.ChildrenOfType<ModColumn>().Single().AvailableMods)
-                modState.ValidForSelection.Value = filter?.Invoke(modState.Mod) ?? true;
+                modState.ValidForSelection.Value = filter?.Invoke(modState.Mod) != false;
         }
 
         private partial class TestModColumn : ModColumn
