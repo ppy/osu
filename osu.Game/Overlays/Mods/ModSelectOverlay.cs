@@ -247,7 +247,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.Hide();
 
-            //We want to clear search for next user interaction with mod overlay
+            // clear search for next user interaction with mod overlay
             SearchTextBox.Current.Value = string.Empty;
         }
 
@@ -615,7 +615,9 @@ namespace osu.Game.Overlays.Mods
                     hideOverlay(true);
                     return true;
 
-                //This is handled locally here to prevent search box from coupling in DeselectAllModsButton
+                // This is handled locally here due to conflicts in input handling between the search text box and the deselect all mods button.
+                // Attempting to handle this action locally in both places leads to a possible scenario
+                // wherein activating the binding will both change the contents of the search text box and deselect all mods.
                 case GlobalAction.DeselectAllMods:
                 {
                     if (!SearchTextBox.HasFocus)
@@ -664,7 +666,9 @@ namespace osu.Game.Overlays.Mods
 
         /// <inheritdoc cref="IKeyBindingHandler{PlatformAction}"/>
         /// <remarks>
-        /// This is handled locally here to allow <see cref="SearchTextBox"/> handle <see cref="PlatformAction"/> first
+        /// This is handled locally here due to conflicts in input handling between the search text box and the select all mods button.
+        /// Attempting to handle this action locally in both places leads to a possible scenario
+        /// wherein activating the "select all" platform binding will both select all text in the search box and select all mods.
         /// </remarks>>
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -832,8 +836,7 @@ namespace osu.Game.Overlays.Mods
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
 
-                //By doing this we kill the focus on SearchTextBox.
-                //Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
+                // Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
                 Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
 
                 return true;
