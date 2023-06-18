@@ -33,8 +33,15 @@ namespace osu.Game.Overlays.Chat
     {
         public Action? ReportRequested;
 
+        /// <summary>
+        /// The primary colour to use for the username.
+        /// </summary>
         public Color4 AccentColour { get; init; }
 
+        /// <summary>
+        /// If set to <see langword="false"/>, the username will be drawn as plain text in <see cref="AccentColour"/>.
+        /// If set to <see langword="true"/>, the username will be drawn as black text inside a rounded rectangle in <see cref="AccentColour"/>.
+        /// </summary>
         public bool Inverted { get; init; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
