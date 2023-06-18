@@ -150,10 +150,12 @@ namespace osu.Game.Overlays.Mods
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = availableMods.Any(panel => panel.Visible) ? 1 : 0;
+                bool anyPanelsVisible = availableMods.Any(panel => panel.Visible);
 
-                //Prevent checkbox from checking when column have on valid panels
-                if (availableMods.Any(panel => panel.Visible))
+                toggleAllCheckbox.Alpha = anyPanelsVisible ? 1 : 0;
+
+                // checking `anyPanelsVisible` is important since `.All()` returns `true` for empty enumerables.
+                if (anyPanelsVisible)
                     toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.Visible).All(panel => panel.Active.Value);
             }
         }
