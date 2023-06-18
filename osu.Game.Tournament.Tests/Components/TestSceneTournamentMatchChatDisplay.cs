@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -90,7 +91,7 @@ namespace osu.Game.Tournament.Tests.Components
             }));
 
             AddUntilStep("message from team red is red color", () =>
-                this.ChildrenOfType<DrawableChatUsername>().Any(s => s.AccentColour == TournamentGame.COLOUR_RED));
+                this.ChildrenOfType<DrawableChatUsername>().Last().AccentColour, () => Is.EqualTo(TournamentGame.COLOUR_RED));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
@@ -105,7 +106,7 @@ namespace osu.Game.Tournament.Tests.Components
             }));
 
             AddUntilStep("message from team blue is blue color", () =>
-                this.ChildrenOfType<DrawableChatUsername>().Any(s => s.AccentColour == TournamentGame.COLOUR_BLUE));
+                this.ChildrenOfType<DrawableChatUsername>().Last().AccentColour, () => Is.EqualTo(TournamentGame.COLOUR_BLUE));
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
