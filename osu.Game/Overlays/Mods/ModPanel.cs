@@ -89,13 +89,7 @@ namespace osu.Game.Overlays.Mods
         public override bool MatchingFilter
         {
             get => modState.MatchingTextFilter.Value;
-            set
-            {
-                if (modState.MatchingTextFilter.Value == value)
-                    return;
-
-                modState.MatchingTextFilter.Value = value;
-            }
+            set => modState.MatchingTextFilter.Value = value;
         }
 
         private void updateFilterState()
