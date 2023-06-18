@@ -678,10 +678,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Internal search applies from code by setting <see cref="ModSelectOverlay.IsValidMod"/>
+        /// Covers columns hiding/unhiding on changes of <see cref="ModSelectOverlay.IsValidMod"/>.
         /// </summary>
         [Test]
-        public void TestColumnHidingOnInternalSearch()
+        public void TestColumnHidingOnIsValidChange()
         {
             AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
@@ -711,10 +711,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// External search applies by user by entering search term into search bar
+        /// Covers columns hiding/unhiding on changes of <see cref="ModSelectOverlay.SearchTerm"/>.
         /// </summary>
         [Test]
-        public void TestColumnHidingOnExternalSearch()
+        public void TestColumnHidingOnTextFilterChange()
         {
             AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
@@ -738,7 +738,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestHidingOverlayClearsSearch()
+        public void TestHidingOverlayClearsTextSearch()
         {
             AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
