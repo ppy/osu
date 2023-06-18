@@ -693,6 +693,7 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat || e.Key != Key.Tab)
                 return false;
 
+            // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
             if (SearchTextBox.HasFocus)
                 SearchTextBox.KillFocus();
             else
