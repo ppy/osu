@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Chat
         /// If unspecified, the colour is by default initialised to:
         /// <list type="bullet">
         /// <item><see cref="APIUser.Colour">message.Sender.Colour</see>, if non-empty,</item>
-        /// <item>a random colour from <see cref="default_colours"/> if the above is empty.</item>
+        /// <item>a random colour from <see cref="default_username_colours"/> if the above is empty.</item>
         /// </list>
         /// </remarks>
         public Color4 UsernameColour { get; init; }
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Chat
             // consumers can use the initialiser of `UsernameColour` to override this if they wish to.
             UsernameColour = !string.IsNullOrEmpty(message.Sender.Colour)
                 ? Color4Extensions.FromHex(message.Sender.Colour)
-                : default_colours[message.SenderId % default_colours.Length];
+                : default_username_colours[message.SenderId % default_username_colours.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.Chat
             drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
 
-        private static readonly Color4[] default_colours =
+        private static readonly Color4[] default_username_colours =
         {
             Color4Extensions.FromHex("588c7e"),
             Color4Extensions.FromHex("b2a367"),
