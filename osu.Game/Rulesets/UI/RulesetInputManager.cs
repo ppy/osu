@@ -180,34 +180,13 @@ namespace osu.Game.Rulesets.UI
 
         private void attachKeyCounter(KeyCounterController keyCounter)
         {
-            var receptor = new ActionReceptor(keyCounter);
+            KeyBindingContainer.Add(keyCounter);
 
-            KeyBindingContainer.Add(receptor);
-
-            keyCounter.SetReceptor(receptor);
             keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
                                                    .OrderBy(action => action)
                                                    .Select(action => new KeyCounterActionTrigger<T>(action)));
-        }
-
-        private partial class ActionReceptor : KeyCounterController.Receptor, IKeyBindingHandler<T>
-        {
-            public ActionReceptor(KeyCounterController target)
-                : base(target)
-            {
-            }
-
-            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Triggers
-                                                                      .OfType<KeyCounterActionTrigger<T>>()
-                                                                      .Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
-
-            public void OnReleased(KeyBindingReleaseEvent<T> e)
-            {
-                foreach (var c in Target.Triggers.OfType<KeyCounterActionTrigger<T>>())
-                    c.OnReleased(e.Action, Clock.Rate >= 0);
-            }
         }
 
         #endregion
