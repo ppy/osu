@@ -93,19 +93,6 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
-            drawableUsername = new DrawableChatUsername(message.Sender)
-            {
-                Width = UsernameWidth,
-                FontSize = FontSize,
-                AutoSizeAxes = Axes.Y,
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
-                Margin = new MarginPadding { Horizontal = Spacing },
-                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
-            };
-
-            drawableUsername.AccentColour.Value = UsernameColour;
-
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -129,7 +116,17 @@ namespace osu.Game.Overlays.Chat
                             Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                             AlwaysPresent = true,
                         },
-                        drawableUsername,
+                        drawableUsername = new DrawableChatUsername(message.Sender)
+                        {
+                            Width = UsernameWidth,
+                            FontSize = FontSize,
+                            AutoSizeAxes = Axes.Y,
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Margin = new MarginPadding { Horizontal = Spacing },
+                            AccentColour = UsernameColour,
+                            Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                        },
                         drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
                             AutoSizeAxes = Axes.Y,
@@ -175,7 +172,7 @@ namespace osu.Game.Overlays.Chat
                     CornerRadius = 2f,
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = drawableUsername.AccentColour.Value.Darken(1f),
+                    Colour = drawableUsername.AccentColour.Darken(1f),
                     Depth = float.MaxValue,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
