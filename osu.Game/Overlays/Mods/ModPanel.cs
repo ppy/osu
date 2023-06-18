@@ -72,12 +72,10 @@ namespace osu.Game.Overlays.Mods
             Active.Value = false;
         }
 
-        /// <summary>
-        /// Whether the <see cref="ModPanel"/> is passing all filters and visible for user
-        /// </summary>
-        public bool Visible => modState.Visible;
-
         #region Filtering support
+
+        /// <seealso cref="ModState.Visible"/>
+        public bool Visible => modState.Visible;
 
         public override IEnumerable<LocalisableString> FilterTerms => new[]
         {
