@@ -54,14 +54,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override void PopIn()
         {
-            base.PopIn();
             Settings.MoveToY(0, TRANSITION_DURATION, Easing.OutQuint);
             Settings.FadeIn(TRANSITION_DURATION / 2);
         }
 
         protected override void PopOut()
         {
-            base.PopOut();
             Settings.MoveToY(-1, TRANSITION_DURATION, Easing.InSine);
             Settings.Delay(TRANSITION_DURATION / 2).FadeOut(TRANSITION_DURATION / 2);
         }
