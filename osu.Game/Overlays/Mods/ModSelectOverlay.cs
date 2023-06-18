@@ -303,6 +303,13 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
+        }
+
         /// <summary>
         /// Select all visible mods in all columns.
         /// </summary>
