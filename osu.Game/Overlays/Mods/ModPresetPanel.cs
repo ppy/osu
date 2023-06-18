@@ -88,10 +88,12 @@ namespace osu.Game.Overlays.Mods
 
         private IEnumerable<LocalisableString> getFilterTerms()
         {
-            yield return Preset.Value.Name;
-            yield return Preset.Value.Description;
+            var preset = Preset.Value;
 
-            foreach (Mod mod in Preset.Value.Mods)
+            yield return preset.Name;
+            yield return preset.Description;
+
+            foreach (Mod mod in preset.Mods)
             {
                 yield return mod.Name;
                 yield return mod.Acronym;
