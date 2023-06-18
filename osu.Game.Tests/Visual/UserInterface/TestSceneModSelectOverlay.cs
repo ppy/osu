@@ -550,11 +550,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             createScreen();
 
-            AddStep("click on mod column", navigateAndClick<ModColumn>);
-            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
-
             AddStep("click on search", navigateAndClick<ShearedSearchTextBox>);
             AddAssert("focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("click on mod column", navigateAndClick<ModColumn>);
+            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
 
             void navigateAndClick<T>() where T : Drawable
             {
@@ -571,10 +571,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             const Key focus_switch_key = Key.Tab;
 
             AddStep("press tab", () => InputManager.Key(focus_switch_key));
-            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
+            AddAssert("focused", () => modSelectOverlay.SearchTextBox.HasFocus);
 
             AddStep("press tab", () => InputManager.Key(focus_switch_key));
-            AddAssert("focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
         }
 
         [Test]
