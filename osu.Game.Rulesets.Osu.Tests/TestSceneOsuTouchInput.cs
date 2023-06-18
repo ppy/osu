@@ -66,8 +66,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                                 {
                                     Depth = float.MinValue,
                                 },
-                                triggerLeft = new TestActionKeyCounterTrigger(OsuAction.LeftButton),
+                                triggerLeft = new TestActionKeyCounterTrigger(OsuAction.LeftButton)
+                                {
+                                    Depth = float.MinValue
+                                },
                                 triggerRight = new TestActionKeyCounterTrigger(OsuAction.RightButton)
+                                {
+                                    Depth = float.MinValue
+                                }
                             },
                         },
                     },
@@ -80,14 +86,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.CentreRight,
-                        Depth = float.MinValue,
                         X = -100,
                     },
                     rightKeyCounter = new DefaultKeyCounter(triggerRight)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.CentreLeft,
-                        Depth = float.MinValue,
                         X = 100,
                     },
                 });
