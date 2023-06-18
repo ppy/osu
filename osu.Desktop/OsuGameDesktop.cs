@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
@@ -17,7 +15,6 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
-using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Utils;
@@ -138,51 +135,9 @@ namespace osu.Desktop
 
             desktopWindow.CursorState |= CursorState.Hidden;
             desktopWindow.Title = Name;
-            desktopWindow.DragDrop += f =>
-            {
-                // on macOS, URL associations are handled via SDL_DROPFILE events.
-                if (f.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                {
-                    HandleLink(f);
-                    return;
-                }
-
-                fileDrop(new[] { f });
-            };
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
-
-        private readonly List<string> importableFiles = new List<string>();
-        private ScheduledDelegate? importSchedule;
-
-        private void fileDrop(string[] filePaths)
-        {
-            lock (importableFiles)
-            {
-                importableFiles.AddRange(filePaths);
-
-                Logger.Log($"Adding {filePaths.Length} files for import");
-
-                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
-                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
-                importSchedule?.Cancel();
-                importSchedule = Scheduler.AddDelayed(handlePendingImports, 100);
-            }
-        }
-
-        private void handlePendingImports()
-        {
-            lock (importableFiles)
-            {
-                Logger.Log($"Handling batch import of {importableFiles.Count} files");
-
-                string[] paths = importableFiles.ToArray();
-                importableFiles.Clear();
-
-                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
-            }
-        }
 
         protected override void Dispose(bool isDisposing)
         {
