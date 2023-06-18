@@ -70,13 +70,7 @@ namespace osu.Game.Overlays.Mods
         public string SearchTerm
         {
             get => SearchTextBox.Current.Value;
-            set
-            {
-                if (SearchTextBox.Current.Value == value)
-                    return;
-
-                SearchTextBox.Current.Value = value;
-            }
+            set => SearchTextBox.Current.Value = value;
         }
 
         public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
