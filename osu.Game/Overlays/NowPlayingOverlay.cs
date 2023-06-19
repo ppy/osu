@@ -229,8 +229,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             this.FadeIn(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
         }

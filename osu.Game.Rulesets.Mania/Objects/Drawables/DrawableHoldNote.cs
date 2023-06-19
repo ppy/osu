@@ -242,18 +242,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
 
-            // As the note is being held, adjust the size of the sizing container. This has two effects:
-            // 1. The contained masking container will mask the body and ticks.
-            // 2. The head note will move along with the new "head position" in the container.
-            //
-            // As per stable, this should not apply for early hits, waiting until the object starts to touch the
-            // judgement area first.
-            if (Head.IsHit && releaseTime == null && DrawHeight > 0 && Time.Current >= HitObject.StartTime)
+            if (Time.Current >= HitObject.StartTime)
             {
-                // How far past the hit target this hold note is.
-                float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
-                sizingContainer.Height = 1 - yOffset / DrawHeight;
+                // As the note is being held, adjust the size of the sizing container. This has two effects:
+                // 1. The contained masking container will mask the body and ticks.
+                // 2. The head note will move along with the new "head position" in the container.
+                //
+                // As per stable, this should not apply for early hits, waiting until the object starts to touch the
+                // judgement area first.
+                if (Head.IsHit && releaseTime == null && DrawHeight > 0)
+                {
+                    // How far past the hit target this hold note is.
+                    float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
+                    sizingContainer.Height = 1 - yOffset / DrawHeight;
+                }
             }
+            else
+                sizingContainer.Height = 1;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

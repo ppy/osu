@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -59,6 +60,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
+
+        /// <summary>
+        /// When enabled, distance snap should only snap to the current time (as per the editor clock).
+        /// This is to emulate stable behaviour.
+        /// </summary>
+        protected Bindable<bool> LimitedDistanceSnap { get; private set; }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            LimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+        }
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 

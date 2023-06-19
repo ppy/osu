@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
+                new ComboStatistic(score.MaxCombo, score.GetMaximumAchievableCombo()),
                 new PerformanceStatistic(score),
             };
 
