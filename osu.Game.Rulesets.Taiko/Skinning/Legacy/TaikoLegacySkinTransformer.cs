@@ -2,8 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
@@ -138,6 +142,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
 
             return base.GetDrawableComponent(lookup);
+        }
+
+        public override ISample? GetSample(ISampleInfo sampleInfo)
+        {
+            if (sampleInfo is TaikoHitSampleInfo taikoSample)
+            {
+                Debug.Assert(taikoSample.WithTaikoPrefix);
+
+                // first try with taiko prefix (default).
+                var sample = base.GetSample(taikoSample);
+
+                if (sample != null)
+                    return sample;
+
+                // then try without.
+                return base.GetSample(new TaikoHitSampleInfo(taikoSample.Name, taikoSample.Bank, taikoSample.Suffix, taikoSample.Volume, false));
+            }
+
+            return base.GetSample(sampleInfo);
         }
 
         private string getHitName(TaikoSkinComponents component)

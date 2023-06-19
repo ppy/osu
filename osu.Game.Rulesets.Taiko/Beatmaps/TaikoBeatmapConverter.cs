@@ -3,20 +3,20 @@
 
 #nullable disable
 
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Utils;
 using System.Threading;
 using JetBrains.Annotations;
+using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Audio;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -131,8 +131,8 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         lastFlourish = h.StartTime;
 
-                        if (h.Samples.All(s => s.Name != TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH))
-                            h.Samples.Add(h.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
+                        if (h.Samples.All(s => s.Name != TaikoHitSampleInfo.STRONG_FLOURISH))
+                            h.Samples.Add(h.CreateHitSampleInfo(TaikoHitSampleInfo.STRONG_FLOURISH));
                     }
                 }
             }

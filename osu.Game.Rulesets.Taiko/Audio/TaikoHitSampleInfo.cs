@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Taiko.Audio
 {
     public class TaikoHitSampleInfo : HitSampleInfo
     {
-        public const string TAIKO_STRONG_HIT = @"taiko-strong-hit";
-        public const string TAIKO_STRONG_CLAP = @"taiko-strong-clap";
-        public const string TAIKO_STRONG_FLOURISH = @"taiko-strong-flourish";
+        public const string STRONG_HIT = @"strong-hit";
+        public const string STRONG_CLAP = @"strong-clap";
+        public const string STRONG_FLOURISH = @"strong-flourish";
 
         public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
@@ -23,9 +23,15 @@ namespace osu.Game.Rulesets.Taiko.Audio
         /// </summary>
         public readonly string VolumeSuffix;
 
-        public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0)
+        /// <summary>
+        /// Whether the `taiko-` prefix has been appended to lookups.
+        /// </summary>
+        public readonly bool WithTaikoPrefix;
+
+        public TaikoHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 0, bool withTaikoPrefix = true)
             : base(name, bank, suffix, volume)
         {
+            WithTaikoPrefix = withTaikoPrefix;
             VolumeSuffix = getVolumeSuffix(name, volume);
         }
 
@@ -56,45 +62,42 @@ namespace osu.Game.Rulesets.Taiko.Audio
             {
                 List<string> lookupNames = new List<string>();
 
-                // Custom sample sets should still take priority
+                // Custom sample sets (with a suffix) should always take priority
                 if (!string.IsNullOrEmpty(Suffix))
-                    lookupNames.Add($"Gameplay/{Bank}-{Name}{Suffix}");
+                    lookupNames.Add($"{Bank}-{Name}{Suffix}");
+
+                string prefix = WithTaikoPrefix ? "Gameplay/taiko-" : "Gameplay/";
 
                 switch (Name)
                 {
                     // Flourish shouldn't fallback to anything, it should just not play if missing
-                    case TAIKO_STRONG_FLOURISH:
-                        lookupNames.Add(@$"Gameplay/{Name}");
+                    case STRONG_FLOURISH:
+                        lookupNames.Add(@$"{prefix}{Name}");
+                        break;
 
-                        return lookupNames;
+                    // Strong hits should fallback to normals (for non-Argon skins, etc), so the hits remain audible.
+                    // Playback of strong hits cancels playback of the triggering normal hits (to prevent overlapping samples) - see DrumSamplePlayer
+                    case STRONG_HIT:
+                        lookupNames.Add(@$"{prefix}{Name}");
+                        lookupNames.Add(@$"{prefix}{Bank}-{HIT_NORMAL}");
+                        break;
 
-                    // Strongs should fallback to normals (for non-Argon skins, etc), so the hits remain audible. Playback of strongs cancels playback of the triggering
-                    // normal hits (to prevent overlapping samples) - see DrumSamplePlayer
-                    case TAIKO_STRONG_HIT:
-                    case TAIKO_STRONG_CLAP:
-                        lookupNames.Add(@$"Gameplay/{Name}");
-
-                        if (Name == TAIKO_STRONG_HIT)
-                        {
-                            lookupNames.Add($"Gameplay/taiko-{Bank}-{HIT_NORMAL}");
-                            lookupNames.Add($"Gameplay/{Bank}-{HIT_NORMAL}");
-                        }
-                        else if (Name == TAIKO_STRONG_CLAP)
-                        {
-                            lookupNames.Add($"Gameplay/taiko-{Bank}-{HIT_CLAP}");
-                            lookupNames.Add($"Gameplay/{Bank}-{HIT_CLAP}");
-                        }
-
-                        return lookupNames;
+                    case STRONG_CLAP:
+                        lookupNames.Add(@$"{prefix}{Name}");
+                        lookupNames.Add(@$"{prefix}{Bank}-{HIT_CLAP}");
+                        break;
 
                     case HIT_NORMAL:
                     case HIT_CLAP:
-                        lookupNames.Add($"Gameplay/taiko-{Name}{VolumeSuffix}");
+                        lookupNames.Add(@$"{prefix}{Name}{VolumeSuffix}");
+                        lookupNames.Add(@$"{prefix}{Bank}-{Name}");
+                        lookupNames.Add(@$"{prefix}{Name}");
                         break;
+
+                    default:
+                        return base.LookupNames;
                 }
 
-                lookupNames.Add($"Gameplay/taiko-{Bank}-{Name}");
-                lookupNames.Add($"Gameplay/{Bank}-{Name}");
                 return lookupNames;
             }
         }

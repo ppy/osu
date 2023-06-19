@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitSampleInfo.HIT_FINISH,
                 HitSampleInfo.HIT_WHISTLE,
                 HitSampleInfo.HIT_WHISTLE,
-                $"{HitSampleInfo.HIT_WHISTLE},{TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH}",
+                $"{HitSampleInfo.HIT_WHISTLE},{TaikoHitSampleInfo.STRONG_FLOURISH}",
             };
 
             var actualSampleNames = new List<string>();
