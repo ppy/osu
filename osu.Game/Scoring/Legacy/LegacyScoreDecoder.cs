@@ -46,6 +46,9 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo = scoreInfo;
 
                 int version = sr.ReadInt32();
+
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
                 string beatmapHash = sr.ReadString();
 
                 workingBeatmap = GetBeatmap(beatmapHash);

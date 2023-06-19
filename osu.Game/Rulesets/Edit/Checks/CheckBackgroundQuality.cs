@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (backgroundFile == null)
                 yield break;
 
-            var texture = context.WorkingBeatmap.Background;
+            var texture = context.WorkingBeatmap.GetBackground();
             if (texture == null)
                 yield break;
 

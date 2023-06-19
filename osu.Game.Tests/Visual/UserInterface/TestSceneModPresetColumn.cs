@@ -392,6 +392,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
         }
 
+        [Test]
+        public void TestTextFiltering()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("set text filter", () => modPresetColumn.SearchTerm = "First");
+            AddUntilStep("one panel visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(1));
+
+            AddStep("set mania ruleset", () => Ruleset.Value = rulesets.GetRuleset(3));
+            AddUntilStep("no panels visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(0));
+        }
+
         private ICollection<ModPreset> createTestPresets() => new[]
         {
             new ModPreset

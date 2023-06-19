@@ -120,7 +120,7 @@ namespace osu.Game.Overlays
                 if (lastSection != section.NewValue)
                 {
                     lastSection = section.NewValue;
-                    tabs.Current.Value = lastSection;
+                    tabs.Current.Value = lastSection!;
                 }
             };
 
@@ -249,12 +249,14 @@ namespace osu.Game.Overlays
 
         private partial class ProfileSectionsContainer : SectionsContainer<ProfileSection>
         {
+            private OverlayScrollContainer scroll = null!;
+
             public ProfileSectionsContainer()
             {
                 RelativeSizeAxes = Axes.Both;
             }
 
-            protected override UserTrackingScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
+            protected override UserTrackingScrollContainer CreateScrollContainer() => scroll = new OverlayScrollContainer();
 
             // Reverse child ID is required so expanding beatmap panels can appear above sections below them.
             // This can also be done by setting Depth when adding new sections above if using ReverseChildID turns out to have any issues.
@@ -267,6 +269,14 @@ namespace osu.Game.Overlays
                 Padding = new MarginPadding { Horizontal = 10 },
                 Margin = new MarginPadding { Bottom = 10 },
             };
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // Ensure the scroll-to-top button is displayed above the fixed header.
+                AddInternal(scroll.Button.CreateProxy());
+            }
         }
     }
 }

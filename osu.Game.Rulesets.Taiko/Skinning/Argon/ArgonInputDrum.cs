@@ -19,6 +19,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     public partial class ArgonInputDrum : AspectContainer
     {
+        public static readonly ColourInfo RIM_HIT_GRADIENT = ColourInfo.GradientHorizontal(
+            new Color4(227, 248, 255, 255),
+            new Color4(198, 245, 255, 255)
+        );
+
+        public static readonly Colour4 RIM_HIT_GLOW = new Color4(126, 215, 253, 255);
+
+        public static readonly ColourInfo CENTRE_HIT_GRADIENT = ColourInfo.GradientHorizontal(
+            new Color4(255, 227, 236, 255),
+            new Color4(255, 198, 211, 255)
+        );
+
+        public static readonly Colour4 CENTRE_HIT_GLOW = new Color4(255, 147, 199, 255);
+
         private const float rim_size = 0.3f;
 
         public ArgonInputDrum()
@@ -141,14 +155,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                                 Anchor = anchor,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(
-                                    new Color4(227, 248, 255, 255),
-                                    new Color4(198, 245, 255, 255)
-                                ),
+                                Colour = RIM_HIT_GRADIENT,
                                 EdgeEffect = new EdgeEffectParameters
                                 {
                                     Type = EdgeEffectType.Glow,
-                                    Colour = new Color4(126, 215, 253, 170),
+                                    Colour = RIM_HIT_GLOW.Opacity(0.66f),
                                     Radius = 50,
                                 },
                                 Alpha = 0,
@@ -166,14 +177,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                                 Anchor = anchor,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(
-                                    new Color4(255, 227, 236, 255),
-                                    new Color4(255, 198, 211, 255)
-                                ),
+                                Colour = CENTRE_HIT_GRADIENT,
                                 EdgeEffect = new EdgeEffectParameters
                                 {
                                     Type = EdgeEffectType.Glow,
-                                    Colour = new Color4(255, 147, 199, 255),
+                                    Colour = CENTRE_HIT_GLOW,
                                     Radius = 50,
                                 },
                                 Size = new Vector2(1 - rim_size),

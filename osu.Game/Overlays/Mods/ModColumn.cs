@@ -46,7 +46,8 @@ namespace osu.Game.Overlays.Mods
                 foreach (var mod in availableMods)
                 {
                     mod.Active.BindValueChanged(_ => updateState());
-                    mod.Filtered.BindValueChanged(_ => updateState());
+                    mod.MatchingTextFilter.BindValueChanged(_ => updateState());
+                    mod.ValidForSelection.BindValueChanged(_ => updateState());
                 }
 
                 updateState();
@@ -145,12 +146,17 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => mod.Filtered.Value) ? 0 : 1;
+            Alpha = availableMods.All(mod => !mod.Visible) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = availableMods.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = availableMods.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+                bool anyPanelsVisible = availableMods.Any(panel => panel.Visible);
+
+                toggleAllCheckbox.Alpha = anyPanelsVisible ? 1 : 0;
+
+                // checking `anyPanelsVisible` is important since `.All()` returns `true` for empty enumerables.
+                if (anyPanelsVisible)
+                    toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.Visible).All(panel => panel.Active.Value);
             }
         }
 
@@ -176,7 +182,7 @@ namespace osu.Game.Overlays.Mods
                     dequeuedAction();
 
                     // each time we play an animation, we decrease the time until the next animation (to ramp the visual and audible elements).
-                    selectionDelay = Math.Max(30, selectionDelay * 0.8f);
+                    selectionDelay = Math.Max(ModSelectPanel.SAMPLE_PLAYBACK_DELAY, selectionDelay * 0.8f);
                     lastSelection = Time.Current;
                 }
                 else
@@ -195,7 +201,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => !b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && b.Visible))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
@@ -206,8 +212,13 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in availableMods.Where(b => b.Active.Value && !b.Filtered.Value))
-                pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
+            foreach (var button in availableMods.Where(b => b.Active.Value))
+            {
+                if (!button.Visible)
+                    button.Active.Value = false;
+                else
+                    pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
+            }
         }
 
         /// <summary>

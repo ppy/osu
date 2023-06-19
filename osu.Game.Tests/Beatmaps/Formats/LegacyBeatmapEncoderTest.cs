@@ -231,7 +231,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override IBeatmap GetBeatmap() => beatmap;
 
-            protected override Texture GetBackground() => throw new NotImplementedException();
+            public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
