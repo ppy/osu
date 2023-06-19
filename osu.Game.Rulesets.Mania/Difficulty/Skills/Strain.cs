@@ -43,13 +43,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             globalStrain = 1;
         }
 
-        /// <summary>
-        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
-        ///
-        /// <remarks>
-        /// The function documentation references the README.md in the same directory.
-        /// </remarks>
-        /// </summary>
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var hitObject = (ManiaDifficultyHitObject)current;
