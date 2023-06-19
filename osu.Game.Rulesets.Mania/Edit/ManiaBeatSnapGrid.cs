@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 }
 
                 Color4 colour = BindableBeatDivisor.GetColourFor(
-                    BindableBeatDivisor.GetDivisorForBeatIndex(Math.Max(1, beat), beatDivisor.Value), colours);
+                    BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value), colours);
 
                 foreach (var grid in grids)
                 {

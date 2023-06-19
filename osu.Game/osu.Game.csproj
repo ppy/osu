@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
     <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
@@ -36,8 +36,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.20.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2023.531.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.602.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2023.618.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.605.0" />
     <PackageReference Include="Sentry" Version="3.28.1" />
     <PackageReference Include="SharpCompress" Version="0.32.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
