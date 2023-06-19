@@ -57,7 +57,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.ApplySampleInfo(hitSound, samples);
 
-            hitSound.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
             hitSound.Balance.Value = -0.05 + RNG.NextDouble(0.1);
         }
 
