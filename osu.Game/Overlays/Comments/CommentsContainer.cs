@@ -410,9 +410,11 @@ namespace osu.Game.Overlays.Comments
             //TODO should match web, left empty due to no multiline support
             protected override LocalisableString FooterText => default;
 
-            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
+            protected override LocalisableString GetCommitButtonText(bool isLoggedIn) =>
+                isLoggedIn ? CommonStrings.ButtonsPost : CommentsStrings.GuestButtonNew;
 
-            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+            protected override LocalisableString GetTextBoxPlaceholder(bool isLoggedIn) =>
+                isLoggedIn ? CommentsStrings.PlaceholderNew : AuthorizationStrings.RequireLogin;
 
             protected override void OnCommit(string text)
             {

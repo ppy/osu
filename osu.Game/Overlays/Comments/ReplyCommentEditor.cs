@@ -22,8 +22,12 @@ namespace osu.Game.Overlays.Comments
         public Action<DrawableComment[]>? OnPost;
 
         protected override LocalisableString FooterText => default;
-        protected override LocalisableString CommitButtonText => CommonStrings.ButtonsReply;
-        protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderReply;
+
+        protected override LocalisableString GetCommitButtonText(bool isLoggedIn) =>
+            isLoggedIn ? CommonStrings.ButtonsReply : CommentsStrings.GuestButtonReply;
+
+        protected override LocalisableString GetTextBoxPlaceholder(bool isLoggedIn) =>
+            isLoggedIn ? CommentsStrings.PlaceholderReply : AuthorizationStrings.RequireLogin;
 
         public ReplyCommentEditor(Comment parent)
         {
