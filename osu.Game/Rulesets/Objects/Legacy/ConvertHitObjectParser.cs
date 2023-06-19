@@ -527,6 +527,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public bool BankSpecified;
 
+            public LegacyHitSampleInfo(string name, string bank, int volume, string? suffix, bool isLayered)
+                : base(name, bank, suffix, volume)
+            {
+                BankSpecified = !string.IsNullOrEmpty(bank);
+                IsLayered = isLayered;
+            }
+
             public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
                 : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
             {
@@ -536,7 +543,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
 
             public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
-                => With(newName, newBank, newVolume);
+                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newSuffix.GetOr(Suffix), IsLayered);
 
             public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<int> newCustomSampleBank = default,
@@ -574,8 +581,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             };
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
-                                                            Optional<int> newCustomSampleBank = default,
-                                                            Optional<bool> newIsLayered = default)
+                                                            Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
                 => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
 
             public bool Equals(FileHitSampleInfo? other)
