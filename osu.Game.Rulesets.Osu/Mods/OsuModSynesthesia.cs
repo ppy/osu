@@ -6,6 +6,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 
@@ -33,7 +34,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             Color4? timingBasedColour = null;
 
-            d.HitObjectApplied += _ => timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
+            d.HitObjectApplied += _ =>
+            {
+                // slider tails are a painful edge case, as their start time is offset 36ms back (see `LegacyLastTick`).
+                // to work around this, look up the slider tail's parenting slider's end time instead to ensure proper snap.
+                double snapTime = d is DrawableSliderTail tail
+                    ? tail.Slider.GetEndTime()
+                    : d.HitObject.StartTime;
+                timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(snapTime), colours);
+            };
 
             // Need to set this every update to ensure it doesn't get overwritten by DrawableHitObject.OnApply() -> UpdateComboColour().
             d.OnUpdate += _ =>
