@@ -274,8 +274,3 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 However, it didn't matter that $S$ is different, because [`Process`](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs) that governs Strain value handling for all modes actually aggregated strain by `SectionLength` ms windows before calculating star rating.
 
 Therefore only $\max(S)$ mattered, which is already made deterministic by the above algorithm.
-
-### Decay
-
-Decay is applied BEFORE adding any note 
-- b
