@@ -132,9 +132,11 @@ Legend             E.g.
 | This Note    |   |      O      | then ended on the same time as us.
 +--------------+   +-------------+
 
+       The column titles are with respect to the previous note.
+       E.g. B2: Long Note End is On the Head of the current Note 
       +-------------+-------------+-------------+-------------+--------------+
-      | Before Head | On Head     | On Body     |  On Tail    | After Tail   |
-      | (1)         | (2)         | (3)         |  (4)        | (5)          |
+      | Before Head | On Head     | On Body     | On Tail     | After Tail   |
+      | (1)         | (2)         | (3)         | (4)         | (5)          |
 +-----+-------------+-------------+-------------+-------------+--------------+
 | (A) | (A1)        | (A2)        |             |             |              |
 |     | O           |      O      |      X      |      X      |      X       |
@@ -167,8 +169,6 @@ In our script, we trigger strain bonuses under 2 conditions
 - Column 3: `endOnBodyBias`
 - Column 5: `endAfterTailWeight`
 
-> The variable name `endOnBody` can be interpreted as the previous note **ended on the current note's body**
->
 > Weight and bias refers to the multiplication and addition of strain respectively
 
 #### End On Body Bias
