@@ -109,9 +109,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyAccuracyScore = sv1Processor.AccuracyScore,
                 LegacyComboScore = sv1Processor.ComboScore,
-                LegacyBonusScore = sv1Processor.BonusScore
+                LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio
             };
         }
 

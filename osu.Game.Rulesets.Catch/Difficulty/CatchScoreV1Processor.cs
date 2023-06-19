@@ -6,31 +6,34 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
     internal class CatchScoreV1Processor
     {
-        public int TotalScore => BaseScore + ComboScore + BonusScore;
+        /// <summary>
+        /// The accuracy portion of the legacy (ScoreV1) total score.
+        /// </summary>
+        public int AccuracyScore { get; private set; }
 
         /// <summary>
-        /// Amount of score that is combo-and-difficulty-multiplied, excluding mod multipliers.
+        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
         /// </summary>
         public int ComboScore { get; private set; }
 
         /// <summary>
-        /// Amount of score that is NOT combo-and-difficulty-multiplied.
+        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
+        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
         /// </summary>
-        public int BaseScore { get; private set; }
+        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
 
-        /// <summary>
-        /// Amount of score whose judgements would be treated as "bonus" in ScoreV2.
-        /// </summary>
-        public int BonusScore { get; private set; }
-
+        private int legacyBonusScore;
+        private int modernBonusScore;
         private int combo;
 
         private readonly double scoreMultiplier;
@@ -77,7 +80,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
+
             bool isBonus = false;
+            HitResult bonusResult = HitResult.None;
 
             int scoreIncrease = 0;
 
@@ -102,6 +107,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     scoreIncrease = 1100;
                     increaseCombo = false;
                     isBonus = true;
+                    bonusResult = HitResult.LargeBonus;
                     break;
 
                 case JuiceStream:
@@ -122,9 +128,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             if (isBonus)
-                BonusScore += scoreIncrease;
+            {
+                legacyBonusScore += scoreIncrease;
+                modernBonusScore += Judgement.ToNumericResult(bonusResult);
+            }
             else
-                BaseScore += scoreIncrease;
+                AccuracyScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
