@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
@@ -53,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private readonly List<Vector2> originalPositions = new List<Vector2>();
         private readonly List<double> animationDurations = new List<double>();
 
+        private Random? random;
+
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             movementVectors.Clear();
@@ -85,17 +88,29 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case SlideDirectionEnum.FromPrevious:
                         movementVectors.Add(movementVector);
                         originalPositions.Add(effectiveStartPosition);
+
                         break;
 
                     case SlideDirectionEnum.TowardsPrevious:
                         movementVectors.Add(-movementVector);
                         originalPositions.Add(effectiveStartPosition + 2 * movementVector);
+
                         break;
 
                     case SlideDirectionEnum.Random:
-                        // Actual logic is in ApplySlideIn to make randomness "per play" rather than "per map load"
+                        if (random.IsNull())
+                        {
+                            Seed.Value ??= RNG.Next();
+                            random = new Random(Seed.Value.Value);
+                        }
+
+                        float length = movementVector.Length;
+                        Vector2 directionVector = new Vector2(2 * random!.NextSingle() - 1, 2 * random!.NextSingle() - 1).Normalized();
+                        movementVector = directionVector * length;
+
                         movementVectors.Add(movementVector);
-                        originalPositions.Add(effectiveEndPosition);
+                        originalPositions.Add(effectiveEndPosition - movementVector);
+
                         break;
                 }
 
@@ -128,26 +143,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (!drawable.Judged)
                     {
                         counter++;
-
                         if (counter == 0) return;
 
                         Vector2 originalPosition = originalPositions[counter - 1];
                         Vector2 movementVector = movementVectors[counter - 1];
 
-                        if (SlideDirection.Value == SlideDirectionEnum.Random)
-                        {
-                            Seed.Value ??= RNG.Next();
-                            Random random = new Random(Seed.Value.Value);
-
-                            float length = movementVector.Length;
-                            Vector2 directionVector = new Vector2(2 * random.NextSingle() - 1, 2 * random.NextSingle() - 1).Normalized();
-
-                            movementVector = directionVector * length;
-                            originalPosition = originalPosition - movementVector;
-                        }
-
                         drawable.MoveTo(originalPosition);
-
                         drawable.MoveTo(originalPosition + movementVector, Math.Min(animationDurations[counter - 1], 0.8 * osuHitObject.TimePreempt), Easing.OutQuad);
                     }
 
