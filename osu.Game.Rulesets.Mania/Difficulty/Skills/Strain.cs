@@ -13,10 +13,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Strain : StrainDecaySkill
     {
-        /// <summary> Column Strain Decay Exponent Base. Used in <see cref="applyDecay"/> </summary>
         private const double column_decay_base = 0.125;
-
-        /// <summary> Global Strain Decay Exponent Base. Used in <see cref="applyDecay"/> </summary>
         private const double global_decay_base = 0.30;
 
         /// <summary> Center of our endOnBodyBias sigmoid function. </summary>
