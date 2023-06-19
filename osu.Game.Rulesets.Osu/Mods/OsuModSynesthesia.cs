@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Edit;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -26,14 +27,20 @@ namespace osu.Game.Rulesets.Osu.Mods
                 currentBeatmap = beatmap;
         }
 
-        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        public void ApplyToDrawableHitObject(DrawableHitObject d)
         {
             if (currentBeatmap == null) return;
 
-            drawable.OnUpdate += _ =>
-                drawable.AccentColour.Value = BindableBeatDivisor.GetColourFor(
-                    currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(drawable.HitObject.StartTime),
-                    colours);
+            Color4? timingBasedColour = null;
+
+            d.HitObjectApplied += _ => timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
+
+            // Need to set this every update to ensure it doesn't get overwritten by DrawableHitObject.OnApply() -> UpdateComboColour().
+            d.OnUpdate += _ =>
+            {
+                if (timingBasedColour != null)
+                    d.AccentColour.Value = timingBasedColour.Value;
+            };
         }
     }
 }
