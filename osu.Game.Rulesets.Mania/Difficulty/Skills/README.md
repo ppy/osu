@@ -110,7 +110,7 @@ Notes fed into `StrainValueOf` follow these rules:
     > don't iterate into `StrainValueOf` deterministically.
 > - The 2nd rule implies the note time, if it's not a long note.
 > - The 3rd rule is due to a requirement that all notes need to have a reference.
-    See [`CreateDifficultyHitObjects`](../ManiaDifficultyCalculator.cs).
+    See [CreateDifficultyHitObjects](../ManiaDifficultyCalculator.cs).
 
 ### LN Strain Bonus Triggers
 
@@ -271,6 +271,6 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
 `max(9,CS)=max(9,(5,))=9`. $S=[11,15,24]$.
 
-However, it didn't matter that $S$ is different, because [`Process`](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs) that governs Strain value handling for all modes actually aggregated strain by `SectionLength` ms windows before calculating star rating.
+However, it didn't matter that $S$ is different, because [Process](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs) that governs Strain value handling for all modes actually aggregated strain by `SectionLength` ms windows before calculating star rating.
 
 Therefore only $\max(S)$ mattered, which is already made deterministic by the above algorithm.
