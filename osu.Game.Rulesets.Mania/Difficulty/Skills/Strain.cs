@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             /* For notes at the same time (in a chord), strain is the maximum column strain + global strain out of those columns
              *
              * 1) Why we want the maxima is to make the largest strain in the chord column invariant
-             * 2) The other strains in the chord is not important due to Strain binning (see function remarks) taking the maximal strain.
+             * 2) The other strains in the chord are not important due to Strain binning (see function remarks) taking the maximal strain.
              *
              * i.e. We want max(GS) + max(CS): Global Strain (GS), Column Strain (CS)
              *
