@@ -5,9 +5,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -16,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osuTK.Graphics;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
@@ -72,6 +75,14 @@ namespace osu.Game.Overlays
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = Color4.Black.Opacity(0),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 10,
+                        Hollow = true,
+                    },
                     Children = new Drawable[]
                     {
                         new Box
@@ -195,10 +206,9 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             toastTray.FlushAllToasts();
         }
@@ -211,6 +221,7 @@ namespace osu.Game.Overlays
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 
         private void notificationClosed() => Schedule(() =>

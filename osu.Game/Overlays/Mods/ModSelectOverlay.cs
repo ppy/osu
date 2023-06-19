@@ -12,6 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -25,10 +27,11 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
+    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
     {
         public const int BUTTON_WIDTH = 200;
 
@@ -64,6 +67,14 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        public string SearchTerm
+        {
+            get => SearchTextBox.Current.Value;
+            set => SearchTextBox.Current.Value = value;
+        }
+
+        public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
+
         /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
         /// </summary>
@@ -94,7 +105,7 @@ namespace osu.Game.Overlays.Mods
                 };
             }
 
-            yield return new DeselectAllModsButton(this);
+            yield return deselectAllModsButton = new DeselectAllModsButton(this);
         }
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> globalAvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -107,11 +118,14 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private DeselectAllModsButton deselectAllModsButton = null!;
 
+        private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
+        protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
         private Sample? columnAppearSample;
 
@@ -146,6 +160,17 @@ namespace osu.Game.Overlays.Mods
 
             MainAreaContent.AddRange(new Drawable[]
             {
+                aboveColumnsContent = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = ModsEffectDisplay.HEIGHT,
+                    Padding = new MarginPadding { Horizontal = 100 },
+                    Child = SearchTextBox = new ShearedSearchTextBox
+                    {
+                        HoldFocus = false,
+                        Width = 300
+                    }
+                },
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -153,7 +178,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = (ShowTotalMultiplier ? ModsEffectDisplay.HEIGHT : 0) + PADDING,
+                            Top = ModsEffectDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -186,18 +211,10 @@ namespace osu.Game.Overlays.Mods
 
             if (ShowTotalMultiplier)
             {
-                MainAreaContent.Add(new Container
+                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
                 {
                     Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.X,
-                    Height = ModsEffectDisplay.HEIGHT,
-                    Margin = new MarginPadding { Horizontal = 100 },
-                    Child = multiplierDisplay = new DifficultyMultiplierDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    },
+                    Origin = Anchor.TopRight
                 });
             }
 
@@ -224,6 +241,14 @@ namespace osu.Game.Overlays.Mods
             };
 
             globalAvailableMods.BindTo(game.AvailableMods);
+        }
+
+        public override void Hide()
+        {
+            base.Hide();
+
+            // clear search for next user interaction with mod overlay
+            SearchTextBox.Current.Value = string.Empty;
         }
 
         private ModSettingChangeTracker? modSettingChangeTracker;
@@ -263,6 +288,12 @@ namespace osu.Game.Overlays.Mods
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
+            SearchTextBox.Current.BindValueChanged(query =>
+            {
+                foreach (var column in columnFlow.Columns)
+                    column.SearchTerm = query.NewValue;
+            }, true);
+
             // Start scrolled slightly to the right to give the user a sense that
             // there is more horizontal content available.
             ScheduleAfterChildren(() =>
@@ -270,6 +301,13 @@ namespace osu.Game.Overlays.Mods
                 columnScroll.ScrollTo(200, false);
                 columnScroll.ScrollToStart();
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
         }
 
         /// <summary>
@@ -344,7 +382,7 @@ namespace osu.Game.Overlays.Mods
         private void filterMods()
         {
             foreach (var modState in allAvailableMods)
-                modState.Filtered.Value = !modState.Mod.HasImplementation || !IsValidMod.Invoke(modState.Mod);
+                modState.ValidForSelection.Value = modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
         private void updateMultiplier()
@@ -469,7 +507,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopIn();
 
-            multiplierDisplay?
+            aboveColumnsContent
                 .FadeIn(fade_in_duration, Easing.OutQuint)
                 .MoveToY(0, fade_in_duration, Easing.OutQuint);
 
@@ -479,7 +517,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => !modState.Visible);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -527,7 +565,7 @@ namespace osu.Game.Overlays.Mods
 
             base.PopOut();
 
-            multiplierDisplay?
+            aboveColumnsContent
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .MoveToY(-distance, fade_out_duration / 2, Easing.OutQuint);
 
@@ -541,7 +579,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (column is ModColumn modColumn)
                 {
-                    allFiltered = modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                    allFiltered = modColumn.AvailableMods.All(modState => !modState.Visible);
                     modColumn.FlushPendingSelections();
                 }
 
@@ -578,10 +616,38 @@ namespace osu.Game.Overlays.Mods
                 // This is handled locally here because this overlay is being registered at the game level
                 // and therefore takes away keyboard focus from the screen stack.
                 case GlobalAction.ToggleModSelection:
+                    // Pressing toggle should completely hide the overlay in one shot.
+                    hideOverlay(true);
+                    return true;
+
+                // This is handled locally here due to conflicts in input handling between the search text box and the deselect all mods button.
+                // Attempting to handle this action locally in both places leads to a possible scenario
+                // wherein activating the binding will both change the contents of the search text box and deselect all mods.
+                case GlobalAction.DeselectAllMods:
+                {
+                    if (!SearchTextBox.HasFocus)
+                    {
+                        deselectAllModsButton.TriggerClick();
+                        return true;
+                    }
+
+                    break;
+                }
+
                 case GlobalAction.Select:
                 {
-                    // Pressing toggle or select should completely hide the overlay in one shot.
-                    hideOverlay(true);
+                    // Pressing select should select first filtered mod or completely hide the overlay in one shot if search term is empty.
+                    if (string.IsNullOrEmpty(SearchTerm))
+                    {
+                        hideOverlay(true);
+                        return true;
+                    }
+
+                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
+
+                    if (firstMod is not null)
+                        firstMod.Active.Value = !firstMod.Active.Value;
+
                     return true;
                 }
             }
@@ -601,6 +667,39 @@ namespace osu.Game.Overlays.Mods
 
                 BackButton.TriggerClick();
             }
+        }
+
+        /// <inheritdoc cref="IKeyBindingHandler{PlatformAction}"/>
+        /// <remarks>
+        /// This is handled locally here due to conflicts in input handling between the search text box and the select all mods button.
+        /// Attempting to handle this action locally in both places leads to a possible scenario
+        /// wherein activating the "select all" platform binding will both select all text in the search box and select all mods.
+        /// </remarks>>
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton is null)
+                return false;
+
+            SelectAllModsButton.TriggerClick();
+            return true;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || e.Key != Key.Tab)
+                return false;
+
+            // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
+            if (SearchTextBox.HasFocus)
+                SearchTextBox.KillFocus();
+            else
+                SearchTextBox.TakeFocus();
+
+            return true;
         }
 
         #endregion
@@ -742,6 +841,9 @@ namespace osu.Game.Overlays.Mods
             {
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
+
+                // Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
+                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
 
                 return true;
             }

@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
+            Container columnBackgrounds;
             Container topLevelContainer;
 
             InternalChildren = new Drawable[]
@@ -77,9 +78,10 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        columnFlow = new ColumnFlow<Column>(definition)
+                        columnBackgrounds = new Container
                         {
-                            RelativeSizeAxes = Axes.Y,
+                            Name = "Column backgrounds",
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new Container
                         {
@@ -97,6 +99,10 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                             }
+                        },
+                        columnFlow = new ColumnFlow<Column>(definition)
+                        {
+                            RelativeSizeAxes = Axes.Y,
                         },
                         new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground), _ => null)
                         {
@@ -126,6 +132,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
+                columnBackgrounds.Add(column.BackgroundContainer.CreateProxy());
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }

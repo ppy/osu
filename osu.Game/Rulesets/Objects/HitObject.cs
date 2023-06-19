@@ -206,14 +206,20 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Create a SampleInfo based on the sample settings of the hit normal sample in <see cref="Samples"/>.
+        /// Create a <see cref="HitSampleInfo"/> based on the sample settings of the first <see cref="HitSampleInfo.HIT_NORMAL"/> sample in <see cref="Samples"/>.
+        /// If no sample is available, sane default settings will be used instead.
         /// </summary>
+        /// <remarks>
+        /// In the case an existing sample exists, all settings apart from the sample name will be inherited. This includes volume, bank and suffix.
+        /// </remarks>
         /// <param name="sampleName">The name of the sample.</param>
         /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
-        protected HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
+        public HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
         {
-            var hitnormalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
-            return hitnormalSample == null ? new HitSampleInfo(sampleName) : hitnormalSample.With(newName: sampleName);
+            if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingSample)
+                return existingSample.With(newName: sampleName);
+
+            return new HitSampleInfo(sampleName);
         }
     }
 

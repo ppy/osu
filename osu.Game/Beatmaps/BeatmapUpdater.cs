@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
@@ -11,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
@@ -74,27 +72,13 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(working);
 
                 beatmap.StarRating = calculator.Calculate().StarRating;
-                beatmap.Length = calculateLength(working.Beatmap);
+                beatmap.Length = working.Beatmap.CalculatePlayableLength();
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
             }
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapSet);
         });
-
-        private double calculateLength(IBeatmap b)
-        {
-            if (!b.HitObjects.Any())
-                return 0;
-
-            var lastObject = b.HitObjects.Last();
-
-            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-            double endTime = lastObject.GetEndTime();
-            double startTime = b.HitObjects.First().StartTime;
-
-            return endTime - startTime;
-        }
 
         #region Implementation of IDisposable
 

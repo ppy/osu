@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             if (isRimType != rimSamples.Any())
             {
                 if (isRimType)
-                    Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
+                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_CLAP));
                 else
                 {
                     foreach (var sample in rimSamples)
@@ -72,10 +72,18 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this)
+        {
+            StartTime = startTime,
+            Samples = Samples
+        };
 
         public class StrongNestedHit : StrongNestedHitObject
         {
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
     }
 }
