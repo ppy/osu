@@ -60,7 +60,7 @@ To define our behavior robustly, we'll use math notations:
 - $K$: Total keys
 - $N$: Total notes
 
-Where $GS$ is a vector, and $CS$ is a matrix of strains.
+Where $GS$, $S$ are vectors, and $CS$ is a matrix of strains
 
 $$
 GS\in\mathbb R^N, CS\in\mathbb R^{N\times K}, S\in\mathbb R^N
@@ -189,6 +189,7 @@ To visualize this,
             0.5 + - - - -  /  
                 |         /|
             0.0-+----------+---------------> Intersection Length / ms
+                |          R
 State E3  [=============]
 State F3        [=======]
 This            [============================]
