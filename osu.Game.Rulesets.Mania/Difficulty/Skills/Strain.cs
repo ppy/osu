@@ -64,30 +64,30 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             double holdLength = Math.Abs(endTime - startTime);
 
             // See README Section: LN Strain Bonus Triggers
-            double endOnBodyBias = 0; // Strain Bias for Column 3 states
-            double endAfterTailWeight = 1.0; // Strain Weight for Column 5 states
-            bool isEndOnBody = false; // Flag for Column 3 states
-            bool isEndAfterTail = false; // Flag for Column 5 states
+            double endOnBodyBias = 0; //        Column 3 states Strain Bias
+            double endAfterTailWeight = 1.0; // Column 5 states Strain Weight
+            bool isEndOnBody = false; //        Column 3 states Flag
+            bool isEndAfterTail = false; //     Column 5 states Flag
 
-            // The closest end time, currently, is the current note's end time, which is its length
-            // This is used for endOnBodyBias calculation.
-            double closestEndTime = holdLength;
+            // The size of the Hold Intersection, used in endOnBodyBias
+            double minHoldIntersectionLength = holdLength;
 
             for (int i = 0; i < prevEndTimes.Length; ++i)
             {
-                isEndOnBody |= // Accepts Col 3 States
-                    prevEndTimes[i] - 1 > startTime && // Accepts Col 3-5
-                    prevEndTimes[i] < endTime - 1; // Accepts Col 1 & D2:F3
+                // Accepts Col 3 States
+                isEndOnBody |= prevEndTimes[i] - 1 > startTime && // Accepts Col 3-5
+                               prevEndTimes[i] < endTime - 1; // Accepts Col 1 & D2:F3
 
                 // Accepts Col 5 States
                 isEndAfterTail |= prevEndTimes[i] - 1 > endTime;
 
-                // Update closest end time by looking through previous LNs
-                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - prevEndTimes[i]));
+                // Update minimum intersection length given other hold notes.
+                minHoldIntersectionLength = Math.Min(minHoldIntersectionLength, Math.Abs(endTime - prevEndTimes[i]));
             }
 
+            // See README Section:
             if (isEndOnBody)
-                endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
+                endOnBodyBias = 1 / (1 + Math.Exp(0.5 * (release_threshold - minHoldIntersectionLength)));
 
             if (isEndAfterTail)
                 endAfterTailWeight = 1.25;
