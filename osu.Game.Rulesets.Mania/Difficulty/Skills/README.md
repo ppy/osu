@@ -189,8 +189,6 @@ To visualize this,
             0.5 + - - - -  /  
                 |         /|
             0.0-+----------+---------------> Intersection Length / ms
-                |   release_threshold
-                |
 State E3  [=============]
 State F3        [=======]
 This            [============================]
