@@ -46,11 +46,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (hitType)
             {
                 case HitType.Centre:
-                    sampleName = strong ? TaikoHitSampleInfo.STRONG_HIT : HitSampleInfo.HIT_NORMAL;
+                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_HIT : HitSampleInfo.HIT_NORMAL;
                     break;
 
                 case HitType.Rim:
-                    sampleName = strong ? TaikoHitSampleInfo.STRONG_CLAP : HitSampleInfo.HIT_CLAP;
+                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_CLAP : HitSampleInfo.HIT_CLAP;
                     break;
 
                 default:

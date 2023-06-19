@@ -35,7 +35,6 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Taiko.Configuration;
-using osu.Game.Rulesets.Taiko.Skinning.Default;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -58,9 +57,6 @@ namespace osu.Game.Rulesets.Taiko
 
                 case LegacySkin:
                     return new TaikoLegacySkinTransformer(skin);
-
-                case TrianglesSkin:
-                    return new TaikoTrianglesSkinTransformer(skin);
             }
 
             return null;
