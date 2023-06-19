@@ -23,7 +23,7 @@ Take for example a simple strain calculator:
 
 | Obj # | GS | CS0 | CS1 | CS2 | S    | K0 | K1 | K2 |
 |-------|----|-----|-----|-----|------|----|----|----|
-| 0     | 1  | 0   | 0   | 0   | .    |    |    |    |
+| Init  | 1  | 0   | 0   | 0   | .    |    |    |    |
 | 1     | 6  |     |     | 5   | 6+5  |    |    | X  |
 |       | 5  |     |     | 4   | .    |    |    |    |
 | 2     | 10 |     | 5   | 3   | 10+5 |    | X  |    |
@@ -88,17 +88,19 @@ Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 
 To evaluate $GS_i$:
 
-1) We decay $GS_{i-1}$: $GS^*_{i-1}=GS_{i-1}\times \alpha_{GS}^{\Delta_i}$
+1) We decay $GS_{i-1}$: $GS^*_{i-1}=GS_{i-1}\times (\alpha_{GS})^{\Delta_i}$
 2) Add bonuses given the current note and its neighbours: $GS_i=GS^*_{i-1}w+b|O_{i+}$
 
 Similarly for $CS_i$:
 
-1) We decay $CS_{i-1}$: $CS^*_{i-1}=CS_{i-1}\times \alpha_{CS}^{\Delta_{i,k}}$
+1) We decay $CS_{i-1}$: $CS^*_{i-1}=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}}$
 2) Add bonuses given the current note and its neighbours: $CS_i=CS^*_{i-1}w+b|O_{i+}$
 
-> The bonuses are explained in the [following section](#implementation)
+> The bonuses are explained in the [following section](#ln-strain-bonus-triggers)
 
 ## Implementation
+
+### Rules
 
 Notes fed into `StrainValueOf` follow these rules:
 
@@ -114,13 +116,13 @@ Notes fed into `StrainValueOf` follow these rules:
 
 ### LN Strain Bonus Triggers
 
-We have LNs trigger a strain bonus given its interaction with the current note.
+LNs trigger a strain bonus given its interaction with the current note.
 
-Bounded by the [rules](#implementation) above, LN handling is non-trivial as
+Bounded by the [rules](#rules) above, LN handling is non-trivial as
 we are only allowed to see previous notes.
 
 To better understand what are the possibilities, we illustrate all possible states.
-Impossible cases are marked with `X`
+Impossible cases are marked with `X` as [notes are sorted](#rules)
 
 ```
 Legend             E.g. 
@@ -171,15 +173,11 @@ In our script, we trigger strain bonuses under 2 conditions
 
 #### End On Body Bias
 
-Given Column 3 [states](#ln-strain-bonus-triggers), the bias is:
-$$
-b(r)=1/\left(1+\exp(0.5(R-r))\right)
-$$
+Given Column 3 [states](#ln-strain-bonus-triggers), the bias is $b(r)=1/\left(1+\exp(0.5(R-r))\right)$,
+used in [Evaluating Strains](#evaluating-strains)
 
 - $r$ is measure of the LN intersection in milliseconds
 - $R$ is the Release Threshold, a constant
-
-> The function is known as a sigmoid.
 
 To visualize this,
 
@@ -188,9 +186,9 @@ To visualize this,
                 ^
             1.0 + - - - - -  ------------
                 |           /
-            0.5 + - - - -  /   Sigmoid Curve
+            0.5 + - - - -  /  
                 |         /|
-            0.0-+----------+---------------> Closest End Time / ms
+            0.0-+----------+---------------> Intersection Length / ms
                 |   release_threshold
                 |
 State E3  [=============]
@@ -202,11 +200,12 @@ This            [============================]
 
 #### End After Tail Weight
 
-Given Column 5 [states](#ln-strain-bonus-triggers), the weight is $w=1.25$.
+Given Column 5 [states](#ln-strain-bonus-triggers), the weight is $w=1.25$, used
+in [Evaluating Strains](#evaluating-strains)
 
-#### LN Evaluation
+#### LN Bonuses Evaluation
 
-Considering the above triggers, we evaluate the scenarios where strain bonuses are applied.
+We evaluate the scenarios where strain bonuses are applied.
 
 |                 | CS    | GS           |
 |-----------------|-------|--------------|
@@ -217,7 +216,7 @@ Considering the above triggers, we evaluate the scenarios where strain bonuses a
 
 ### Maximizing Strain Summation for Deterministic Chord Strains
 
-We know that $S_i=GS_i+CS_{i,k}$. However, given our [2nd Rule](#implementation)
+We know $S_i=GS_i+CS_{i,k}$. However, given our [2nd Rule](#rules)
 and [LN Strain Bonuses](#ln-strain-bonus-triggers). $S_i$ within a chord can be non-deterministic given a fixed map.
 
 For example, if we had a 2K map that had a single note, followed by a 2-note chord.
@@ -226,7 +225,6 @@ We'll illustrate this with the [table we had earlier with the same conditions](#
 
 | Obj # | GS | CS0 | CS1 | S    | K0 | K1 |
 |-------|----|-----|-----|------|----|----|
-| 0     | 1  | 0   | 0   | .    |    |    |
 | 1     | 6  |     | 5   | 6+5  |    | X  |
 |       | 5  |     | 4   | .    |    |    |
 | 2     | 10 |     | 9   | 10+9 |    | X  |
@@ -234,12 +232,11 @@ We'll illustrate this with the [table we had earlier with the same conditions](#
 
 Our resulting $S$ would be $[11, 19, 20]$
 
-Because of our [2nd Rule](#implementation), the order of note fed is non-deterministic.
+Because of our [2nd Rule](#rules), the order of note fed is non-deterministic.
 Thus the following is also possible.
 
 | Obj # | GS | CS0 | CS1 | S    | K0 | K1 |
 |-------|----|-----|-----|------|----|----|
-| 0     | 1  | 0   | 0   | .    |    |    |
 | 1     | 6  |     | 5   | 6+5  |    | X  |
 |       | 5  |     | 4   | .    |    |    |
 | 2     | 10 | 5   |     | 10+5 | X  |    |
@@ -253,7 +250,6 @@ In order to solve this problem, when for notes within a chord, we always take th
 
 | Obj # | GS | CS0         | CS1 | S    | K0 | K1 |
 |-------|----|-------------|-----|------|----|----|
-| 0     | 1  | 0           | 0   | .    |    |    |
 | 1     | 6  |             | 5   | 6+5  |    | X  |
 |       | 5  |             | 4   | .    |    |    |
 | 2     | 10 |             | 9   | 10+9 |    | X  |
@@ -263,7 +259,6 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
 | Obj # | GS | CS0 | CS1         | S    | K0 | K1 |
 |-------|----|-----|-------------|------|----|----|
-| 0     | 1  | 0   | 0           | .    |    |    |
 | 1     | 6  |     | 5           | 6+5  |    | X  |
 |       | 5  |     | 4           | .    |    |    |
 | 2     | 10 | 5   |             | 10+5 | X  |    |
@@ -271,6 +266,8 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
 `max(9,CS)=max(9,(5,))=9`. $S=[11,15,24]$.
 
-However, it didn't matter that $S$ is different, because [Process](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs) that governs Strain value handling for all modes actually aggregated strain by `SectionLength` ms windows before calculating star rating.
+However, it didn't matter that $S$ is different, because the
+function [Process](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs), aggregates strain by `SectionLength` ms
+windows before calculating star rating.
 
 Therefore only $\max(S)$ mattered, which is already made deterministic by the above algorithm.
