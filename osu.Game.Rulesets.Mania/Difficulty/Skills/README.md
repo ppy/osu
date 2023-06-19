@@ -2,6 +2,8 @@
 
 `StrainValueOf` governs how note strain is evaluated, which in-turn affects how star rating is calculated.
 
+---
+
 ## Theory
 
 Strain refers to the difficulty of the note.
@@ -89,14 +91,16 @@ Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 To evaluate $GS_i$:
 
 1) We decay: $x=GS_{i-1}\times (\alpha_{GS})^{\Delta_i}$
-2) Add bonuses given the current and past notes: $GS_i=xw+b|O_{i, i-1, ...}$
+2) Add bonus $B$ given the current and past notes: $GS_i=x+B|O_{i, i-1, ...}$
 
 Similarly for $CS_i$:
 
 1) We decay: $x=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}}$
-2) Add bonuses given the current and past notes: $CS_i=xw+b|O_{i, i-1, ...}$
+2) Add bonus $B$ given the current and past notes: $CS_i=x+B|O_{i, i-1, ...}$
 
-> The bonuses are explained in the [following section](#hold-strain-bonus-triggers)
+> The bonuses are explained in the [Hold Bonus Evaluation](#hold-bonuses-evaluation)
+
+---
 
 ## Implementation
 
@@ -113,6 +117,8 @@ Notes fed into `StrainValueOf` follow these rules:
 > - The 2nd rule implies the note time, if it's not a long note.
 > - The 3rd rule is due to a requirement that all notes need to have a reference.
     See [CreateDifficultyHitObjects](../ManiaDifficultyCalculator.cs).
+
+---
 
 ### Hold Strain Bonus Triggers
 
@@ -173,8 +179,7 @@ In our script, we trigger strain bonuses under 2 conditions
 
 #### End On Body Bias
 
-Given Column 3 [states](#hold-strain-bonus-triggers), the bias is $b(r)=1/\left(1+\exp(0.5(R-r))\right)$,
-used in [Evaluating Strains](#evaluating-strains)
+Given Column 3 [states](#hold-strain-bonus-triggers), the bias is $b(r)=1/\left(1+\exp(0.5(R-r))\right)$
 
 - $r$ is measure of the Hold intersection in milliseconds
 - $R$ is the Release Threshold, a constant
@@ -199,12 +204,11 @@ This            [============================]
 
 #### End After Tail Weight
 
-Given Column 5 [states](#hold-strain-bonus-triggers), the weight is $w=1.25$, used
-in [Evaluating Strains](#evaluating-strains)
+Given Column 5 [states](#hold-strain-bonus-triggers), the weight is $w=1.25$ else $w=1$
 
-#### Hold Bonuses Evaluation
+### Bonuses Evaluation
 
-We evaluate the scenarios where strain bonuses are applied.
+We evaluate the scenarios including [Hold Bonus Triggers](#hold-strain-bonus-triggers) to find strain bonus $B$ used in [Evaluating Strains](#evaluating-strains)
 
 |                 | CS    | GS           |
 |-----------------|-------|--------------|
@@ -212,6 +216,8 @@ We evaluate the scenarios where strain bonuses are applied.
 | If EndAfterTail | $+2w$ | $+w$         |      
 | If EndOnBody    |       | $+1+b(r)$    |     
 | If Both         |       | $+w(1+b(r))$ |  
+
+---
 
 ### Maximizing Strain Summation for Deterministic Chord Strains
 
