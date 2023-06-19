@@ -71,16 +71,16 @@ The 1st $GS_0$ is initialized with a value $GS_0=1$
 Subsequent GS depends on
 
 - Previous value $GS_{i-1}$
-- Current and Neighbouring Notes $O_{i+}$
+- Current and Past Notes $O_{i, i-1, ...}$
 - Strain Decay $Decay$
 
-$$GS_i=f(GS_{i-1}, O_{i+}, Decay(\Delta_i,\alpha_{GS}))$$
+$$GS_i=f(GS_{i-1}, O_{i, i-1, ...}, Decay(\Delta_i,\alpha_{GS}))$$
 
 The 1st $CS_0$ is initialized with $CS_0=(0,0,...,0)\in\mathbb R^K$
 
 Subsequent $CS_t,k$ values depend on
 
-$$CS_i=f(CS_{i-1}, O_{i+}, Decay(\Delta_{i,k},\alpha_{CS}))$$
+$$CS_i=f(CS_{i-1}, O_{i, i-1, ...}, Decay(\Delta_{i,k},\alpha_{CS}))$$
 
 Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 
