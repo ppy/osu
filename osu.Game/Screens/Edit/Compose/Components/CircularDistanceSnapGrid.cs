@@ -65,14 +65,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             for (int i = 0; i < requiredCircles; i++)
             {
-                float diameter = (offset + (i + 1) * DistanceBetweenTicks) * 2;
+                const float thickness = 4;
+                float diameter = (offset + (i + 1) * DistanceBetweenTicks + thickness / 2) * 2;
 
                 AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
                 {
                     Position = StartPosition,
                     Origin = Anchor.Centre,
                     Size = new Vector2(diameter),
-                    InnerRadius = 4 * 1f / diameter,
+                    InnerRadius = thickness * 1f / diameter,
                 });
             }
         }
