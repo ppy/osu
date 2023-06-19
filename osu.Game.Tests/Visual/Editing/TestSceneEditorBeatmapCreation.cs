@@ -383,6 +383,25 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestDifferentRulesetUpdatesGameWide()
+        {
+            var rulesetInfo = new TaikoRuleset().RulesetInfo;
+
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = "New Difficulty");
+            AddStep("save beatmap", () => Editor.Save());
+
+            AddAssert("game-wide ruleset is osu", () => Ruleset.Value.OnlineID == 0);
+            AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(rulesetInfo));
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != "New Difficulty";
+            });
+
+            AddAssert("game-wide ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
+        }
+
+        [Test]
         public void TestCreateMultipleNewDifficultiesSucceeds()
         {
             Guid setId = Guid.Empty;
