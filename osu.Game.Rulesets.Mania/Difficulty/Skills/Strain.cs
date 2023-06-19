@@ -112,9 +112,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             return strain - CurrentStrain;
         }
 
-        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
-            => applyDecay(prevColumnStrain, offset - current.Previous(0).StartTime, column_decay_base)
-               + applyDecay(globalStrain, offset - current.Previous(0).StartTime, global_decay_base);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
+            => applyDecay(prevColumnStrain, time - current.Previous(0).StartTime, column_decay_base)
+               + applyDecay(globalStrain, time - current.Previous(0).StartTime, global_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

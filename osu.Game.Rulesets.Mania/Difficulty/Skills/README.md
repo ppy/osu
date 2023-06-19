@@ -103,7 +103,7 @@ Similarly for $CS_i$:
 Notes fed into `StrainValueOf` follow these rules:
 
 - Only 1 note is fed in at a time.
-- They are offset sorted by the note head.
+- They are time sorted by the note head.
 - The first note is omitted.
 
 > - The 1st & 2nd rule implies that notes at the same time (e.g. in a chord)
@@ -127,7 +127,7 @@ Legend             E.g.
 +--------------+   +-------------+
 | (State Name) |   | (B2)        | Currently, 
 | Prev Note    |   | [====]      | we have a note (O) & an LN started before this note 
-| This Note    |   |      O      | then ended on the same offset as us.
+| This Note    |   |      O      | then ended on the same time as us.
 +--------------+   +-------------+
 
       +-------------+-------------+-------------+-------------+--------------+
