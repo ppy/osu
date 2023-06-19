@@ -58,16 +58,18 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            bpm.Value = BeatmapSet?.BPM.ToLocalisableString(@"0.##") ?? (LocalisableString)"-";
-
             if (beatmapInfo == null)
             {
+                bpm.Value = "-";
+
                 length.Value = string.Empty;
                 circleCount.Value = string.Empty;
                 sliderCount.Value = string.Empty;
             }
             else
             {
+                bpm.Value = beatmapInfo.BPM.ToLocalisableString(@"0.##");
+
                 length.Value = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
 
                 if (beatmapInfo is not IBeatmapOnlineInfo onlineInfo) return;
