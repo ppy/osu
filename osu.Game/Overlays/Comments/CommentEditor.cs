@@ -88,9 +88,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = GetTextBoxPlaceholder(API.IsLoggedIn),
-                            Current = Current,
-                            ReadOnly = !API.IsLoggedIn
+                            Current = Current
                         },
                         new Container
                         {
@@ -126,7 +124,6 @@ namespace osu.Game.Overlays.Comments
                                             Spacing = new Vector2(5, 0),
                                             Child = commitButton = new EditorButton
                                             {
-                                                Text = GetCommitButtonText(API.IsLoggedIn),
                                                 Action = () => commitOrLogIn(Current.Value)
                                             }
                                         },
@@ -152,7 +149,7 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
             Current.BindValueChanged(_ => updateCommitButtonState(), true);
-            User.BindValueChanged(_ => updateStateForLoggedIn());
+            User.BindValueChanged(_ => updateStateForLoggedIn(), true);
         }
 
         protected abstract void OnCommit(string text);
