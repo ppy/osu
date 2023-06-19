@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,12 +25,6 @@ namespace osu.Game.Overlays.Comments
         private const int side_padding = 8;
 
         protected abstract LocalisableString FooterText { get; }
-
-        protected abstract LocalisableString CommitButtonText { get; }
-
-        private LocalisableString textBoxPlaceholderLoggedOut => AuthorizationStrings.RequireLogin;
-
-        protected abstract LocalisableString TextBoxPlaceholder { get; }
 
         protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
 
@@ -47,7 +40,12 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
 
-        private LocalisableString placeholderText => API.IsLoggedIn ? TextBoxPlaceholder : textBoxPlaceholderLoggedOut;
+        [Resolved]
+        private LoginOverlay? loginOverlay { get; set; }
+
+        protected abstract LocalisableString GetCommitButtonText(bool isLoggedIn);
+
+        protected abstract LocalisableString GetTextBoxPlaceholder(bool isLoggedIn);
 
         protected bool ShowLoadingSpinner
         {
@@ -90,7 +88,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = placeholderText,
+                            PlaceholderText = GetTextBoxPlaceholder(API.IsLoggedIn),
                             Current = Current,
                             ReadOnly = !API.IsLoggedIn
                         },
@@ -128,8 +126,8 @@ namespace osu.Game.Overlays.Comments
                                             Spacing = new Vector2(5, 0),
                                             Child = commitButton = new EditorButton
                                             {
-                                                Text = CommitButtonText,
-                                                Action = () => OnCommit(Current.Value)
+                                                Text = GetCommitButtonText(API.IsLoggedIn),
+                                                Action = () => commitOrLogIn(Current.Value)
                                             }
                                         },
                                         loadingSpinner = new LoadingSpinner
@@ -154,18 +152,34 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
             Current.BindValueChanged(_ => updateCommitButtonState(), true);
-            User.BindValueChanged(_ => updateTextBoxState());
+            User.BindValueChanged(_ => updateStateForLoggedIn());
         }
 
         protected abstract void OnCommit(string text);
 
-        private void updateCommitButtonState() =>
-            commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
-
-        private void updateTextBoxState()
+        private void commitOrLogIn(string text)
         {
-            TextBox.PlaceholderText = placeholderText;
+            if (!API.IsLoggedIn)
+            {
+                loginOverlay?.Show();
+                return;
+            }
+
+            OnCommit(text);
+        }
+
+        private void updateCommitButtonState()
+        {
+            bool textBoxValid = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
+            commitButton.Enabled.Value = textBoxValid || !API.IsLoggedIn;
+        }
+
+        private void updateStateForLoggedIn()
+        {
+            TextBox.PlaceholderText = GetTextBoxPlaceholder(API.IsLoggedIn);
             TextBox.ReadOnly = !API.IsLoggedIn;
+            commitButton.Text = GetCommitButtonText(API.IsLoggedIn);
+            updateCommitButtonState();
         }
 
         private partial class EditorTextBox : OsuTextBox
