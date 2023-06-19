@@ -405,9 +405,6 @@ namespace osu.Game.Overlays.Comments
             [Resolved]
             private CommentsContainer commentsContainer { get; set; }
 
-            [Resolved]
-            private IAPIProvider api { get; set; }
-
             public Action<CommentBundle> OnPost;
 
             //TODO should match web, left empty due to no multiline support
@@ -432,7 +429,7 @@ namespace osu.Game.Overlays.Comments
                     Current.Value = string.Empty;
                     OnPost?.Invoke(cb);
                 });
-                api.Queue(req);
+                API.Queue(req);
             }
         }
     }

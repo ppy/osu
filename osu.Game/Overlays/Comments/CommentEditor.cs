@@ -45,9 +45,9 @@ namespace osu.Game.Overlays.Comments
         protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        protected IAPIProvider API { get; private set; } = null!;
 
-        private LocalisableString placeholderText => api.IsLoggedIn ? TextBoxPlaceholder : textBoxPlaceholderLoggedOut;
+        private LocalisableString placeholderText => API.IsLoggedIn ? TextBoxPlaceholder : textBoxPlaceholderLoggedOut;
 
         protected bool ShowLoadingSpinner
         {
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Comments
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = placeholderText,
                             Current = Current,
-                            ReadOnly = !api.IsLoggedIn
+                            ReadOnly = !API.IsLoggedIn
                         },
                         new Container
                         {
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Comments
             });
 
             TextBox.OnCommit += (_, _) => commitButton.TriggerClick();
-            User.BindTo(api.LocalUser);
+            User.BindTo(API.LocalUser);
         }
 
         protected override void LoadComplete()
@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Comments
         private void updateTextBoxState()
         {
             TextBox.PlaceholderText = placeholderText;
-            TextBox.ReadOnly = !api.IsLoggedIn;
+            TextBox.ReadOnly = !API.IsLoggedIn;
         }
 
         private partial class EditorTextBox : OsuTextBox
