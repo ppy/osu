@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
@@ -155,6 +158,32 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
 
             throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
+        }
+
+        public override ISample? GetSample(ISampleInfo sampleInfo)
+        {
+            if (sampleInfo is HitSampleInfo hitSampleInfo)
+                return base.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
+
+            return base.GetSample(sampleInfo);
+        }
+
+        private class LegacyTaikoSampleInfo : HitSampleInfo
+        {
+            public LegacyTaikoSampleInfo(HitSampleInfo sampleInfo)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
+
+            {
+            }
+
+            public override IEnumerable<string> LookupNames
+            {
+                get
+                {
+                    foreach (string name in base.LookupNames)
+                        yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
+                }
+            }
         }
     }
 }
