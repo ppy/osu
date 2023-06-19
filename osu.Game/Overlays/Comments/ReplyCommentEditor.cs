@@ -38,7 +38,8 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            GetContainingInputManager().ChangeFocus(TextBox);
+            if (!TextBox.ReadOnly)
+                GetContainingInputManager().ChangeFocus(TextBox);
         }
 
         protected override void OnCommit(string text)

@@ -13,6 +13,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +29,8 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract LocalisableString CommitButtonText { get; }
 
+        private LocalisableString textBoxPlaceholderLoggedOut => AuthorizationStrings.RequireLogin;
+
         protected abstract LocalisableString TextBoxPlaceholder { get; }
 
         protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
@@ -36,6 +41,13 @@ namespace osu.Game.Overlays.Comments
         private LoadingSpinner loadingSpinner = null!;
 
         protected TextBox TextBox { get; private set; } = null!;
+
+        protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private LocalisableString placeholderText => api.IsLoggedIn ? TextBoxPlaceholder : textBoxPlaceholderLoggedOut;
 
         protected bool ShowLoadingSpinner
         {
@@ -78,8 +90,9 @@ namespace osu.Game.Overlays.Comments
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = TextBoxPlaceholder,
-                            Current = Current
+                            PlaceholderText = placeholderText,
+                            Current = Current,
+                            ReadOnly = !api.IsLoggedIn
                         },
                         new Container
                         {
@@ -134,18 +147,26 @@ namespace osu.Game.Overlays.Comments
             });
 
             TextBox.OnCommit += (_, _) => commitButton.TriggerClick();
+            User.BindTo(api.LocalUser);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Current.BindValueChanged(_ => updateCommitButtonState(), true);
+            User.BindValueChanged(_ => updateTextBoxState());
         }
 
         protected abstract void OnCommit(string text);
 
         private void updateCommitButtonState() =>
             commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
+
+        private void updateTextBoxState()
+        {
+            TextBox.PlaceholderText = placeholderText;
+            TextBox.ReadOnly = !api.IsLoggedIn;
+        }
 
         private partial class EditorTextBox : OsuTextBox
         {
