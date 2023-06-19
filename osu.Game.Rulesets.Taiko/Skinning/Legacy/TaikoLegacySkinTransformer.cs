@@ -163,14 +163,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is HitSampleInfo hitSampleInfo)
-                return base.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
+                return base.GetSample(new TaikoPrefixedSampleInfo(hitSampleInfo));
 
             return base.GetSample(sampleInfo);
         }
 
-        private class LegacyTaikoSampleInfo : HitSampleInfo
+        private class TaikoPrefixedSampleInfo : HitSampleInfo
         {
-            public LegacyTaikoSampleInfo(HitSampleInfo sampleInfo)
+            public TaikoPrefixedSampleInfo(HitSampleInfo sampleInfo)
                 : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
 
             {

@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -73,6 +76,61 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             }
 
             return base.GetDrawableComponent(component);
+        }
+
+        public override ISample? GetSample(ISampleInfo sampleInfo)
+        {
+            if (sampleInfo is HitSampleInfo hitSampleInfo)
+                return base.GetSample(new VolumeAwareHitSampleInfo(hitSampleInfo));
+
+            return base.GetSample(sampleInfo);
+        }
+
+        private class VolumeAwareHitSampleInfo : HitSampleInfo
+        {
+            public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
+            public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
+
+            public VolumeAwareHitSampleInfo(HitSampleInfo sampleInfo)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix ?? getVolumeSuffix(sampleInfo.Name, sampleInfo.Volume), sampleInfo.Volume)
+            {
+            }
+
+            /// <summary>
+            /// - Adds taiko prefix.
+            /// - Ignores bank name (weird but let's go with it for now).
+            /// </summary>
+            public override IEnumerable<string> LookupNames
+            {
+                get
+                {
+                    if (!string.IsNullOrEmpty(Suffix))
+                        yield return $"Gameplay/taiko-{Name}{Suffix}";
+
+                    yield return $"Gameplay/taiko-{Name}";
+                }
+            }
+
+            private static string getVolumeSuffix(string name, int volume)
+            {
+                switch (name)
+                {
+                    case HIT_NORMAL:
+                    case HIT_CLAP:
+                    {
+                        if (volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
+                            return "-hard";
+
+                        if (volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
+                            return "-medium";
+
+                        return "-soft";
+                    }
+
+                    default:
+                        return string.Empty;
+                }
+            }
         }
     }
 }

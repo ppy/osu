@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Utils;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -41,26 +40,17 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (hitObject == null)
                 return;
 
-            string sampleName;
-
-            switch (hitType)
-            {
-                case HitType.Centre:
-                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_HIT : HitSampleInfo.HIT_NORMAL;
-                    break;
-
-                case HitType.Rim:
-                    sampleName = strong ? TaikoHitSampleInfo.TAIKO_STRONG_CLAP : HitSampleInfo.HIT_CLAP;
-                    break;
-
-                default:
-                    throw new InvalidOperationException(@"Attempted to trigger sample playback of an invalid HitType");
-            }
+            var sample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
 
             if (strong)
+            {
                 StopAllPlayback();
-
-            PlaySamples(new ISampleInfo[] { hitObject.CreateHitSampleInfo(sampleName) });
+                PlaySamples(new ISampleInfo[] { sample.With(newSuffix: "-strong") });
+            }
+            else
+            {
+                PlaySamples(new ISampleInfo[] { sample });
+            }
         }
 
         protected override void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)

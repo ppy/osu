@@ -16,7 +16,6 @@ using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -122,17 +121,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 var h = hitObjects[i];
 
-                // Switch to using `TaikoHitSampleInfo` for all samples. This adds additional fallback lookup paths and velocity support.
-                h.Samples = h.Samples.Select(s => (HitSampleInfo)new TaikoHitSampleInfo(s.Name, s.Bank, s.Suffix, s.Volume)).ToArray();
-
                 if (h is Hit hit && hit.IsStrong && hit.Type == HitType.Rim)
                 {
                     if (lastFlourish == null || lastFlourish - hit.StartTime >= time_between_flourishes)
                     {
                         lastFlourish = h.StartTime;
 
-                        if (h.Samples.All(s => s.Name != TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH))
-                            h.Samples.Add(h.CreateHitSampleInfo(TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH));
+                        if (h.Samples.All(s => s.Name != HitSampleInfo.HIT_FLOURISH))
+                            h.Samples.Add(h.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH));
                     }
                 }
             }

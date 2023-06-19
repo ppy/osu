@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitSampleInfo.HIT_FINISH,
                 HitSampleInfo.HIT_WHISTLE,
                 HitSampleInfo.HIT_WHISTLE,
-                $"{HitSampleInfo.HIT_WHISTLE},{TaikoHitSampleInfo.TAIKO_STRONG_FLOURISH}",
+                $"{HitSampleInfo.HIT_WHISTLE},{HitSampleInfo.HIT_FLOURISH}",
             };
 
             var actualSampleNames = new List<string>();

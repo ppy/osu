@@ -20,6 +20,9 @@ namespace osu.Game.Audio
         public const string HIT_FINISH = @"hitfinish";
         public const string HIT_CLAP = @"hitclap";
 
+        // new sample used exclusively by taiko for now.
+        public const string HIT_FLOURISH = "hitflourish";
+
         public const string BANK_NORMAL = @"normal";
         public const string BANK_SOFT = @"soft";
         public const string BANK_DRUM = @"drum";
