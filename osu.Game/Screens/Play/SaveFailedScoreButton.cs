@@ -8,15 +8,18 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online;
 using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class SaveFailedScoreButton : CompositeDrawable
+    public partial class SaveFailedScoreButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
@@ -86,6 +89,22 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             }, true);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.SaveReplay:
+                    button.TriggerClick();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }
