@@ -88,13 +88,13 @@ Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 
 To evaluate $GS_i$:
 
-1) We decay $GS_{i-1}$: $GS^*_{i-1}=GS_{i-1}\times (\alpha_{GS})^{\Delta_i}$
-2) Add bonuses given the current note and its neighbours: $GS_i=GS^*_{i-1}w+b|O_{i+}$
+1) We decay: $x=GS_{i-1}\times (\alpha_{GS})^{\Delta_i}$
+2) Add bonuses given the current and past notes: $GS_i=xw+b|O_{i, i-1, ...}$
 
 Similarly for $CS_i$:
 
-1) We decay $CS_{i-1}$: $CS^*_{i-1}=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}}$
-2) Add bonuses given the current note and its neighbours: $CS_i=CS^*_{i-1}w+b|O_{i+}$
+1) We decay: $x=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}}$
+2) Add bonuses given the current and past notes: $CS_i=xw+b|O_{i, i-1, ...}$
 
 > The bonuses are explained in the [following section](#hold-strain-bonus-triggers)
 
