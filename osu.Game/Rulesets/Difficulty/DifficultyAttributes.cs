@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
-        protected const int ATTRIB_ID_LEGACY_TOTAL_SCORE = 23;
+        protected const int ATTRIB_ID_LEGACY_ACCURACY_SCORE = 23;
         protected const int ATTRIB_ID_LEGACY_COMBO_SCORE = 25;
-        protected const int ATTRIB_ID_LEGACY_BONUS_SCORE = 27;
+        protected const int ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO = 27;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
@@ -49,22 +49,23 @@ namespace osu.Game.Rulesets.Difficulty
         public int MaxCombo { get; set; }
 
         /// <summary>
-        /// The maximum achievable legacy total score.
+        /// The accuracy portion of the legacy (ScoreV1) total score.
         /// </summary>
-        [JsonProperty("legacy_total_score", Order = -5)]
-        public int LegacyTotalScore { get; set; }
+        [JsonProperty("legacy_accuracy_score", Order = -5)]
+        public int LegacyAccuracyScore { get; set; }
 
         /// <summary>
-        /// The combo-multiplied portion of <see cref="LegacyTotalScore"/>.
+        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
         /// </summary>
         [JsonProperty("legacy_combo_score", Order = -4)]
         public int LegacyComboScore { get; set; }
 
         /// <summary>
-        /// The "bonus" portion of <see cref="LegacyTotalScore"/> consisting of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
+        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
+        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
         /// </summary>
-        [JsonProperty("legacy_bonus_score", Order = -3)]
-        public int LegacyBonusScore { get; set; }
+        [JsonProperty("legacy_bonus_score_ratio", Order = -3)]
+        public double LegacyBonusScoreRatio { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
@@ -93,9 +94,9 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_LEGACY_TOTAL_SCORE, LegacyTotalScore);
+            yield return (ATTRIB_ID_LEGACY_ACCURACY_SCORE, LegacyAccuracyScore);
             yield return (ATTRIB_ID_LEGACY_COMBO_SCORE, LegacyComboScore);
-            yield return (ATTRIB_ID_LEGACY_BONUS_SCORE, LegacyBonusScore);
+            yield return (ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO, LegacyBonusScoreRatio);
         }
 
         /// <summary>
@@ -106,9 +107,9 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            LegacyTotalScore = (int)values[ATTRIB_ID_LEGACY_TOTAL_SCORE];
+            LegacyAccuracyScore = (int)values[ATTRIB_ID_LEGACY_ACCURACY_SCORE];
             LegacyComboScore = (int)values[ATTRIB_ID_LEGACY_COMBO_SCORE];
-            LegacyBonusScore = (int)values[ATTRIB_ID_LEGACY_BONUS_SCORE];
+            LegacyBonusScoreRatio = (int)values[ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO];
         }
     }
 }

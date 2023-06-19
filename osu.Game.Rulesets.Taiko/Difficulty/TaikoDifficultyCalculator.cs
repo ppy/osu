@@ -101,9 +101,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
-                LegacyTotalScore = sv1Processor.TotalScore,
+                LegacyAccuracyScore = sv1Processor.AccuracyScore,
                 LegacyComboScore = sv1Processor.ComboScore,
-                LegacyBonusScore = sv1Processor.BonusScore
+                LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio
             };
         }
 
