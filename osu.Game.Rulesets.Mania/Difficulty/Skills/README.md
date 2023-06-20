@@ -90,12 +90,12 @@ Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 
 To evaluate $GS_i$:
 
-1) We decay: $x=GS_{i-1}\times (\alpha_{GS})^{\Delta_i}$
+1) We decay: $x=GS_{i-1}\times (\alpha_{GS})^{\Delta_i} : \alpha_{GS} < 1$
 2) Add bonus $B$ given the current and past notes: $GS_i=x+B|O_{i, i-1, ...}$
 
 Similarly for $CS_i$:
 
-1) We decay: $x=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}}$
+1) We decay: $x=CS_{i-1}\times (\alpha_{CS})^{\Delta_{i,k}} : \alpha_{CS} < 1$
 2) Add bonus $B$ given the current and past notes: $CS_i=x+B|O_{i, i-1, ...}$
 
 > The bonuses are explained in the [Hold Bonus Evaluation](#hold-bonuses-evaluation)
