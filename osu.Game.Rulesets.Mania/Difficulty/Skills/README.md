@@ -70,7 +70,7 @@ $$
 
 The 1st $GS_0$ is initialized with a value $GS_0=1$
 
-Subsequent GS depends on
+Subsequent $GS_i$ depends on
 
 - Previous value $GS_{i-1}$
 - Current and Past Notes $O_{i, i-1, ...}$
@@ -80,7 +80,7 @@ $$GS_i=f(GS_{i-1}, O_{i, i-1, ...}, Decay(\Delta_i,\alpha_{GS}))$$
 
 The 1st $CS_0$ is initialized with $CS_0=(0,0,...,0)\in\mathbb R^K$
 
-Subsequent $CS_t,k$ values depend on
+Subsequent $CS_{i,k}$ values depend on
 
 $$CS_i=f(CS_{i-1}, O_{i, i-1, ...}, Decay(\Delta_{i,k},\alpha_{CS}))$$
 
