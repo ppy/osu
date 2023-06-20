@@ -21,6 +21,12 @@ namespace osu.Game.Screens.Play
 {
     public partial class SaveFailedScoreButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
+
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
         private readonly Func<Task<ScoreInfo>> importFailedScore;
@@ -37,7 +43,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game, Player? player, RealmAccess realm)
+        private void load(OsuGame? game, Player? player)
         {
             InternalChild = button = new DownloadButton
             {
@@ -97,6 +103,15 @@ namespace osu.Game.Screens.Play
             {
                 case GlobalAction.SaveReplay:
                     button.TriggerClick();
+                    return true;
+
+                case GlobalAction.ExportReplay:
+                    Task.Run(importFailedScore).ContinueWith(t =>
+                    {
+                        importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
+                        Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
+                        scoreManager.Export(importedScore);
+                    });
                     return true;
             }
 

@@ -27,6 +27,9 @@ namespace osu.Game.Screens.Ranking
 
         private ScoreDownloadTracker? downloadTracker;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
+
         private ReplayAvailability replayAvailability
         {
             get
@@ -48,7 +51,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game, ScoreModelDownloader scores)
+        private void load(OsuGame? game, ScoreModelDownloader scoreDownloader)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
@@ -68,7 +71,7 @@ namespace osu.Game.Screens.Ranking
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Score.Value);
+                        scoreDownloader.Download(Score.Value);
                         break;
 
                     case DownloadState.Importing:
@@ -106,6 +109,22 @@ namespace osu.Game.Screens.Ranking
             {
                 case GlobalAction.SaveReplay:
                     button.TriggerClick();
+                    return true;
+
+                case GlobalAction.ExportReplay:
+                    if (State.Value == DownloadState.NotDownloaded)
+                    {
+                        button.TriggerClick();
+                    }
+
+                    State.ValueChanged += importAfterDownload;
+
+                    void importAfterDownload(ValueChangedEvent<DownloadState> valueChangedEvent)
+                    {
+                        scoreManager.Export(Score.Value);
+                        State.ValueChanged -= importAfterDownload;
+                    }
+
                     return true;
             }
 
