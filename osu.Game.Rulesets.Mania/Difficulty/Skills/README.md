@@ -224,7 +224,9 @@ in [Evaluating Strains](#evaluating-strains)
 We know $S_i=GS_i+CS_{i,k}$. However, given our [2nd Rule](#rules)
 and [Hold Strain Bonuses](#hold-strain-bonus-triggers). $S_i$ within a chord can be non-deterministic given a fixed map.
 
-For example, if we had a 2K map that had a single note, followed by a 2-note chord.
+For example, if we had a 2K map with 3 notes:
+- A single note: Column 1 at Time 0
+- A 2-note chord: Column 0 & 1 at Time 2
 
 We'll illustrate this with the [table we had earlier with the same conditions](#intuition).
 
@@ -233,7 +235,7 @@ We'll illustrate this with the [table we had earlier with the same conditions](#
 | 0    | 6  |     | 5   | 6+5  |    | X  |
 | 1    | 5  |     | 4   | .    |    |    |
 | 2    | 10 |     | 9   | 10+9 |    | X  |
-| 3    | 15 | 5   | 9   | 15+5 | X  |    |
+| 2    | 15 | 5   | 9   | 15+5 | X  |    |
 
 Our resulting $S$ would be $[11, 19, 20]$
 
@@ -245,7 +247,7 @@ Thus the following is also possible.
 | 0    | 6  |     | 5   | 6+5  |    | X  |
 | 1    | 5  |     | 4   | .    |    |    |
 | 2    | 10 | 5   |     | 10+5 | X  |    |
-| 3    | 15 | 5   | 9   | 15+9 |    | X  |
+| 2    | 15 | 5   | 9   | 15+9 |    | X  |
 
 Our resulting $S$ would be $[11, 15, 24]$.
 
@@ -258,7 +260,7 @@ In order to solve this problem, we take the maximum CS within a chord.
 | 0    | 6  |             | 5   | 6+5  |    | X  |
 | 1    | 5  |             | 4   | .    |    |    |
 | 2    | 10 |             | 9   | 10+9 |    | X  |
-| 3    | 15 | max(5,CS)=9 | 9   | 15+9 | X  |    |
+| 2    | 15 | max(5,CS)=9 | 9   | 15+9 | X  |    |
 
 Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
@@ -267,7 +269,7 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 | 0    | 6  |     | 5           | 6+5  |    | X  |
 | 1    | 5  |     | 4           | .    |    |    |
 | 2    | 10 | 5   |             | 10+5 | X  |    |
-| 3    | 15 | 5   | max(9,CS)=9 | 15+9 |    | X  |
+| 2    | 15 | 5   | max(9,CS)=9 | 15+9 |    | X  |
 
 `max(9,CS)=max(9,(5,))=9`. $S=[11,15,24]$.
 
