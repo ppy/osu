@@ -813,9 +813,6 @@ namespace osu.Game.Screens.Select
             if (!ControlGlobalMusic)
                 return;
 
-            if (Beatmap.Value is DummyWorkingBeatmap)
-                return;
-
             ITrack track = music.CurrentTrack;
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
