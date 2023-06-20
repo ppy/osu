@@ -413,7 +413,7 @@ namespace osu.Game.Overlays.Comments
             protected override LocalisableString GetCommitButtonText(bool isLoggedIn) =>
                 isLoggedIn ? CommonStrings.ButtonsPost : CommentsStrings.GuestButtonNew;
 
-            protected override LocalisableString GetTextBoxPlaceholder(bool isLoggedIn) =>
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
                 isLoggedIn ? CommentsStrings.PlaceholderNew : AuthorizationStrings.RequireLogin;
 
             protected override void OnCommit(string text)
