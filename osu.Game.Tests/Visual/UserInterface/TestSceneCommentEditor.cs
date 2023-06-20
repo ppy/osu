@@ -125,8 +125,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";
-            protected override LocalisableString CommitButtonText => @"Commit";
-            protected override LocalisableString TextBoxPlaceholder => @"This text box is empty";
+            protected override LocalisableString GetCommitButtonText(bool isLoggedIn) => @"Commit";
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) => @"This text box is empty";
         }
 
         private partial class TestCancellableCommentEditor : CancellableCommentEditor
@@ -146,8 +146,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override LocalisableString CommitButtonText => @"Save";
-            protected override LocalisableString TextBoxPlaceholder => @"Multiline textboxes soon";
+            protected override LocalisableString GetCommitButtonText(bool isLoggedIn) => @"Save";
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) => @"Multiline textboxes soon";
         }
     }
 }
