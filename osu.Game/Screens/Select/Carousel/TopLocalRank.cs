@@ -30,9 +30,6 @@ namespace osu.Game.Screens.Select.Carousel
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
-
-        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private IDisposable? scoreSubscription;
@@ -78,7 +75,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
+                ScoreInfo? topScore = sender.Detach().OrderByTotalScore().FirstOrDefault();
 
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;

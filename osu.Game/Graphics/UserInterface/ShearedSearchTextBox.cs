@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -36,6 +37,14 @@ namespace osu.Game.Graphics.UserInterface
             get => textBox.HoldFocus;
             set => textBox.HoldFocus = value;
         }
+
+        public LocalisableString PlaceholderText
+        {
+            get => textBox.PlaceholderText;
+            set => textBox.PlaceholderText = value;
+        }
+
+        public new bool HasFocus => textBox.HasFocus;
 
         public void TakeFocus() => textBox.TakeFocus();
 
