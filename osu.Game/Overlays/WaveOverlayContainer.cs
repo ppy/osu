@@ -34,8 +34,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             Waves.Show();
             this.FadeIn(100, Easing.OutQuint);
         }

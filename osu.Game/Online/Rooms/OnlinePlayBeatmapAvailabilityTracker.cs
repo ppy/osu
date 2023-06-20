@@ -67,7 +67,7 @@ namespace osu.Game.Online.Rooms
                 {
                     var beatmap = task.GetResultSafely();
 
-                    if (SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
+                    if (beatmap != null && SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
                     {
                         selectedBeatmap = beatmap;
                         beginTracking();
