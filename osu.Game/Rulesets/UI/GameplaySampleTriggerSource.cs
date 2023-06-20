@@ -71,17 +71,26 @@ namespace osu.Game.Rulesets.UI
             {
                 // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
                 // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
-                var candidate = hitObjectContainer.Entries.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime);
+                var candidate =
+                    // Use alive entries first as an optimisation.
+                    hitObjectContainer.AliveEntries.Select(tuple => tuple.Entry).Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
+                    ?? hitObjectContainer.Entries.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime);
 
                 // In the case there are no non-judged objects, the last hit object should be used instead.
                 if (candidate == null)
+                {
                     mostValidObject = hitObjectContainer.Entries.LastOrDefault();
+                }
                 else
                 {
                     if (isCloseEnoughToCurrentTime(candidate))
+                    {
                         mostValidObject = candidate;
+                    }
                     else
+                    {
                         mostValidObject ??= hitObjectContainer.Entries.FirstOrDefault();
+                    }
                 }
             }
 
@@ -98,7 +107,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
-        private bool isCloseEnoughToCurrentTime(HitObjectLifetimeEntry h) => Time.Current > h.HitObject.StartTime - h.HitObject.HitWindows.WindowFor(HitResult.Miss) * 1.5;
+        private bool isCloseEnoughToCurrentTime(HitObjectLifetimeEntry h) => Time.Current >= h.HitObject.StartTime - h.HitObject.HitWindows.WindowFor(HitResult.Miss) * 2;
 
         private HitObject getEarliestNestedObject(HitObject hitObject)
         {
