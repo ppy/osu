@@ -252,7 +252,7 @@ Our resulting $S$ would be $[11, 15, 24]$.
 
 #### Solution
 
-In order to solve this problem, when for notes within a chord, we always take the maximum CS.
+In order to solve this problem, we take the maximum CS within a chord.
 
 | Time | GS | CS0         | CS1 | S    | K0 | K1 |
 |------|----|-------------|-----|------|----|----|
@@ -272,7 +272,7 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
 `max(9,CS)=max(9,(5,))=9`. $S=[11,15,24]$.
 
-However, it didn't matter that $S$ is different, because the
+It didn't matter that $S$ is different, because the
 function [Process](../../../osu.Game/Rulesets/Difficulty/Skills/StrainSkill.cs), aggregates strain by `SectionLength` ms
 windows before calculating star rating.
 
