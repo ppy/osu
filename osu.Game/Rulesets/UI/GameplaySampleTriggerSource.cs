@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -101,19 +102,23 @@ namespace osu.Game.Rulesets.UI
             if (isAlreadyHit(mostValidObject))
                 return mostValidObject.HitObject;
 
-            // Else we want the earliest (including nested).
+            // Else we want the earliest valid nested.
             // In cases of nested objects, they will always have earlier sample data than their parent object.
-            return getEarliestNestedObject(mostValidObject.HitObject);
+            return getAllNested(mostValidObject.HitObject).OrderBy(h => h.StartTime).FirstOrDefault(h => h.StartTime > Time.Current) ?? mostValidObject.HitObject;
         }
 
         private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
         private bool isCloseEnoughToCurrentTime(HitObjectLifetimeEntry h) => Time.Current >= h.HitObject.StartTime - h.HitObject.HitWindows.WindowFor(HitResult.Miss) * 2;
 
-        private HitObject getEarliestNestedObject(HitObject hitObject)
+        private IEnumerable<HitObject> getAllNested(HitObject hitObject)
         {
-            var nested = hitObject.NestedHitObjects.FirstOrDefault();
+            foreach (var h in hitObject.NestedHitObjects)
+            {
+                yield return h;
 
-            return nested != null ? getEarliestNestedObject(nested) : hitObject;
+                foreach (var n in getAllNested(h))
+                    yield return n;
+            }
         }
 
         private SkinnableSound getNextSample()
