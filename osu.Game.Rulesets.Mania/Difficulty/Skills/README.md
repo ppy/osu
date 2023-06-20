@@ -112,8 +112,7 @@ Notes fed into `StrainValueOf` follow these rules:
 - They are time sorted by the note head.
 - The first note is omitted.
 
-> - The 1st & 2nd rule implies that notes at the same time (e.g. in a chord)
-    > don't iterate into `StrainValueOf` deterministically.
+> - The 1st & 2nd rule implies that notes at the same time (e.g. in a chord) don't iterate into `StrainValueOf` deterministically.
 > - The 2nd rule implies the note time, if it's not a long note.
 > - The 3rd rule is due to a requirement that all notes need to have a reference.
     See [CreateDifficultyHitObjects](../ManiaDifficultyCalculator.cs).
