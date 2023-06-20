@@ -10,8 +10,9 @@ Strain refers to the difficulty of the note.
 
 There are 3 strain values present.
 
-- **Global Strain** $GS$: depends on all previous notes.
-- **Column Strain** $CS$: depends on all previous notes in the same column.
+- **Global Strain** $GS$: the overall running strain, depends on all previous notes.
+- **Column Strain** $CS$: the per-column running strain, depends on all previous notes in the same column.
+  - $CS_k$: the $k^{th}$ column running strain. 
 - **Strain** $S$: a function of GS and CS. $S=S(GS, CS)$
 
 ### Intuition
