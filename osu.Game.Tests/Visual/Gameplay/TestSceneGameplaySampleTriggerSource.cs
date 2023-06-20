@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
-            AddStep("Add trigger source", () => Player.HUDOverlay.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
+            AddStep("Add trigger source", () => Player.GameplayClockContainer.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
         }
 
         [Test]
