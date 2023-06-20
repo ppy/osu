@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -31,8 +29,10 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container<SkinnableSound> hitSounds;
 
+        private HitObjectLifetimeEntry? mostValidObject;
+
         [Resolved]
-        private IGameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; } = null!;
 
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
@@ -45,14 +45,12 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        private HitObjectLifetimeEntry mostValidObject;
-
         /// <summary>
         /// Play the most appropriate hit sound for the current point in time.
         /// </summary>
         public virtual void Play()
         {
-            var nextObject = GetMostValidObject();
+            HitObject? nextObject = GetMostValidObject();
 
             if (nextObject == null)
                 return;
@@ -71,7 +69,7 @@ namespace osu.Game.Rulesets.UI
             hitSound.Play();
         });
 
-        protected HitObject GetMostValidObject()
+        protected HitObject? GetMostValidObject()
         {
             if (mostValidObject == null || isAlreadyHit(mostValidObject))
             {
