@@ -18,33 +18,32 @@ There are 3 strain values present.
 
 Take for example a simple strain calculator:
 
-- An UPSCROLL 3K Map denoted on the last 3 columns, with 3 notes, denoted by X
+- A 2K Map denoted on the columns K0, K1, with 3 notes, marked by X
 - Each note increments both strains by 5
-- Each timestep decays both strain by 1 till 0
+- Each time step decays both strain by 1 till 0
 - Strain is the sum of Global and the note's column-th Column Strain
 
-| Obj # | GS | CS0 | CS1 | CS2 | S    | K0 | K1 | K2 |
-|-------|----|-----|-----|-----|------|----|----|----|
-| Init  | 1  | 0   | 0   | 0   | .    |    |    |    |
-| 1     | 6  |     |     | 5   | 6+5  |    |    | X  |
-|       | 5  |     |     | 4   | .    |    |    |    |
-| 2     | 10 |     | 5   | 3   | 10+5 |    | X  |    |
-|       | 9  |     | 4   | 2   | .    |    |    |    |
-| 3     | 14 |     | 3   | 6   | 14+6 |    |    | X  |
-|       | 13 |     | 2   | 5   | .    |    |    |    |
+| Time | GS | CS0 | CS1 | S    | K0 | K1 | Desc.                                   |
+|------|----|-----|-----|------|----|----|-----------------------------------------|
+| -1   | 1  | 0   | 0   |      |    |    | Initialize Strains                      |
+| 0    | 6  |     | 5   | 6+5  |    | X  | 1st Note on Column 1, add to GS and CS1 |
+| 1    | 5  |     | 4   |      |    |    | Apply Decay                             |
+| 2    | 10 | 5   | 3   | 10+5 | X  |    | 2nd Note on Column 0, add to GS and CS0 |
+| 3    | 9  | 4   | 2   |      |    |    | Apply Decay                             |
+| 4    | 14 | 3   | 7   | 14+7 |    | X  | 3rd Note on Column 1, add to GS and CS1 |
+| 5    | 13 | 2   | 6   |      |    |    | Apply Decay                             |
 
-Notice that:
-
-- GS increments every note regardless of column, while only the CS increments.
-- S is dependent on GS and CS, never itself.
-    - On the 2nd note, S=GS+CS1 ignoring CS2 because the note's column is 1
-    - Same goes for the 3rd note, S=GS+CS2
+- GS increments on every note regardless of column, while CS only increments for their respective column.
+- S depends on GS and CS, never itself.
+    - On the 2nd note, S=GS+CS0 ignoring CS1 because the note's column is 0
+    - Same goes for the 3rd note, S=GS+CS1
 - CS is a matrix, GS is a vector.
 
-While the actual script is non-trivial, it has similar concepts from the above example:
+Though the actual script is non-trivial, it has similar concepts from the above example:
 
-- Our decay is exponential, so high strain values are exponentially rarer
-- We consider Hold body interactions, notes in complex Hold scenarios are have boosted strains.
+- Our decay is [exponential](#evaluating-strains), so high strain values are exponentially rarer
+- We consider [Hold Interactions](#hold-strain-bonus-triggers), notes in complex Hold scenarios are have boosted
+  strains.
 - Decay is zero when evaluating notes at the same time (e.g. chords)
 - Strain is still the sum of Global and Column Strain
 
@@ -208,7 +207,8 @@ Given Column 5 [states](#hold-strain-bonus-triggers), the weight is $w=1.25$ els
 
 ### Bonuses Evaluation
 
-We evaluate the scenarios including [Hold Bonus Triggers](#hold-strain-bonus-triggers) to find strain bonus $B$ used in [Evaluating Strains](#evaluating-strains)
+We evaluate the scenarios including [Hold Bonus Triggers](#hold-strain-bonus-triggers) to find strain bonus $B$ used
+in [Evaluating Strains](#evaluating-strains)
 
 |                 | CS    | GS           |
 |-----------------|-------|--------------|
@@ -228,24 +228,24 @@ For example, if we had a 2K map that had a single note, followed by a 2-note cho
 
 We'll illustrate this with the [table we had earlier with the same conditions](#intuition).
 
-| Obj # | GS | CS0 | CS1 | S    | K0 | K1 |
-|-------|----|-----|-----|------|----|----|
-| 1     | 6  |     | 5   | 6+5  |    | X  |
-|       | 5  |     | 4   | .    |    |    |
-| 2     | 10 |     | 9   | 10+9 |    | X  |
-| 3     | 15 | 5   | 9   | 15+5 | X  |    |
+| Time | GS | CS0 | CS1 | S    | K0 | K1 |
+|------|----|-----|-----|------|----|----|
+| 0    | 6  |     | 5   | 6+5  |    | X  |
+| 1    | 5  |     | 4   | .    |    |    |
+| 2    | 10 |     | 9   | 10+9 |    | X  |
+| 3    | 15 | 5   | 9   | 15+5 | X  |    |
 
 Our resulting $S$ would be $[11, 19, 20]$
 
 Because of our [2nd Rule](#rules), the order of note fed is non-deterministic.
 Thus the following is also possible.
 
-| Obj # | GS | CS0 | CS1 | S    | K0 | K1 |
-|-------|----|-----|-----|------|----|----|
-| 1     | 6  |     | 5   | 6+5  |    | X  |
-|       | 5  |     | 4   | .    |    |    |
-| 2     | 10 | 5   |     | 10+5 | X  |    |
-| 3     | 15 | 5   | 9   | 15+9 |    | X  |
+| Time | GS | CS0 | CS1 | S    | K0 | K1 |
+|------|----|-----|-----|------|----|----|
+| 0    | 6  |     | 5   | 6+5  |    | X  |
+| 1    | 5  |     | 4   | .    |    |    |
+| 2    | 10 | 5   |     | 10+5 | X  |    |
+| 3    | 15 | 5   | 9   | 15+9 |    | X  |
 
 Our resulting $S$ would be $[11, 15, 24]$.
 
@@ -253,21 +253,21 @@ Our resulting $S$ would be $[11, 15, 24]$.
 
 In order to solve this problem, when for notes within a chord, we always take the maximum CS.
 
-| Obj # | GS | CS0         | CS1 | S    | K0 | K1 |
-|-------|----|-------------|-----|------|----|----|
-| 1     | 6  |             | 5   | 6+5  |    | X  |
-|       | 5  |             | 4   | .    |    |    |
-| 2     | 10 |             | 9   | 10+9 |    | X  |
-| 3     | 15 | max(5,CS)=9 | 9   | 15+9 | X  |    |
+| Time | GS | CS0         | CS1 | S    | K0 | K1 |
+|------|----|-------------|-----|------|----|----|
+| 0    | 6  |             | 5   | 6+5  |    | X  |
+| 1    | 5  |             | 4   | .    |    |    |
+| 2    | 10 |             | 9   | 10+9 |    | X  |
+| 3    | 15 | max(5,CS)=9 | 9   | 15+9 | X  |    |
 
 Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 
-| Obj # | GS | CS0 | CS1         | S    | K0 | K1 |
-|-------|----|-----|-------------|------|----|----|
-| 1     | 6  |     | 5           | 6+5  |    | X  |
-|       | 5  |     | 4           | .    |    |    |
-| 2     | 10 | 5   |             | 10+5 | X  |    |
-| 3     | 15 | 5   | max(9,CS)=9 | 15+9 |    | X  |
+| Time | GS | CS0 | CS1         | S    | K0 | K1 |
+|------|----|-----|-------------|------|----|----|
+| 0    | 6  |     | 5           | 6+5  |    | X  |
+| 1    | 5  |     | 4           | .    |    |    |
+| 2    | 10 | 5   |             | 10+5 | X  |    |
+| 3    | 15 | 5   | max(9,CS)=9 | 15+9 |    | X  |
 
 `max(9,CS)=max(9,(5,))=9`. $S=[11,15,24]$.
 
