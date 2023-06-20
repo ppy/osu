@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract LocalisableString GetCommitButtonText(bool isLoggedIn);
 
-        protected abstract LocalisableString GetTextBoxPlaceholder(bool isLoggedIn);
+        protected abstract LocalisableString GetPlaceholderText(bool isLoggedIn);
 
         protected bool ShowLoadingSpinner
         {
@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.Comments
 
         private void updateStateForLoggedIn()
         {
-            TextBox.PlaceholderText = GetTextBoxPlaceholder(API.IsLoggedIn);
+            TextBox.PlaceholderText = GetPlaceholderText(API.IsLoggedIn);
             TextBox.ReadOnly = !API.IsLoggedIn;
             commitButton.Text = GetCommitButtonText(API.IsLoggedIn);
             updateCommitButtonState();
