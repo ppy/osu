@@ -3,16 +3,19 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -43,6 +46,12 @@ namespace osu.Game.Overlays.SkinEditor
         {
             this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -147,17 +156,24 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         public void SetTarget(OsuScreen screen)
         {
-            lastTargetScreen = screen;
+            try
+            {
+                lastTargetScreen = screen;
 
-            if (skinEditor == null) return;
+                if (skinEditor == null) return;
 
-            skinEditor.Save(userTriggered: false);
+                skinEditor.Save(userTriggered: false);
 
-            // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
-            updateComponentVisibility();
+                // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
+                updateComponentVisibility();
 
-            // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
-            Scheduler.AddOnce(setTarget, screen);
+                // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
+                Scheduler.AddOnce(setTarget, screen);
+            }
+            finally
+            {
+                globallyReenableBeatmapSkinSetting();
+            }
         }
 
         private void setTarget(OsuScreen? target)
@@ -173,6 +189,9 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
+            if (target is Player)
+                globallyDisableBeatmapSkinSetting();
+
             if (skinEditor.State.Value == Visibility.Visible)
                 skinEditor.UpdateTargetScreen(target);
             else
@@ -181,6 +200,31 @@ namespace osu.Game.Overlays.SkinEditor
                 skinEditor.Expire();
                 skinEditor = null;
             }
+        }
+
+        private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
+        private bool beatmapSkinsOriginalState;
+
+        private void globallyDisableBeatmapSkinSetting()
+        {
+            if (beatmapSkins.Disabled)
+                return;
+
+            // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
+            // To keep things simple, disable the setting game-wide while using the skin editor.
+            beatmapSkinsOriginalState = beatmapSkins.Value;
+
+            beatmapSkins.Value = false;
+            beatmapSkins.Disabled = true;
+        }
+
+        private void globallyReenableBeatmapSkinSetting()
+        {
+            if (!beatmapSkins.Disabled)
+                return;
+
+            beatmapSkins.Disabled = false;
+            beatmapSkins.Value = beatmapSkinsOriginalState;
         }
     }
 }
