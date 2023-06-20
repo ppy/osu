@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public new HitObject GetMostValidObject() => base.GetMostValidObject();
+            public new HitObject? GetMostValidObject() => base.GetMostValidObject();
         }
     }
 }

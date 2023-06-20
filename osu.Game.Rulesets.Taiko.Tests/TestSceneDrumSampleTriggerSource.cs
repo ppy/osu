@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 LastPlayedSamples = samples;
             }
 
-            public new HitObject GetMostValidObject() => base.GetMostValidObject();
+            public new HitObject? GetMostValidObject() => base.GetMostValidObject();
         }
     }
 }
