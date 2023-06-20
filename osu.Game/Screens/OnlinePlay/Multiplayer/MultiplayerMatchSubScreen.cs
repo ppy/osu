@@ -337,10 +337,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             updateCurrentItem();
 
-            addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
+            addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
         }
+
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {
@@ -404,6 +406,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
             if (!this.IsCurrentScreen())
+                return;
+
+            if (!localUserCanAddItem)
                 return;
 
             // If there's only one playlist item and we are the host, assume we want to change it. Else we're add a new one.
