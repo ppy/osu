@@ -154,6 +154,11 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;
 
+        // Assume worst-case scenario from a scoring/difficulty perspective.
+        public double GetAverageRate() => min_allowable_rate;
+
+        public double GetTimeAt(double time) => time / min_allowable_rate;
+
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             drawable.OnNewResult += (_, result) =>

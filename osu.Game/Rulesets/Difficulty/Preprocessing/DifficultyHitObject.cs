@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Objects;
@@ -51,18 +50,18 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        /// <param name="clock">The rate-adjusted gameplay clock.</param>
         /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="index">The index of this <see cref="DifficultyHitObject"/> in <paramref name="objects"/> list.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, ClockWithMods clock, List<DifficultyHitObject> objects, int index)
         {
             difficultyHitObjects = objects;
             Index = index;
+            StartTime = clock.GetTimeAt(hitObject.StartTime);
+            EndTime = clock.GetTimeAt(hitObject.GetEndTime());
             BaseObject = hitObject;
             LastObject = lastObject;
-            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
-            StartTime = hitObject.StartTime / clockRate;
-            EndTime = hitObject.GetEndTime() / clockRate;
+            DeltaTime = StartTime - clock.GetTimeAt(lastObject.StartTime);
         }
 
         public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index - (backwardsIndex + 1));

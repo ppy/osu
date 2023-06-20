@@ -224,17 +224,17 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock)
             {
                 throw new NotImplementedException();
             }
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock)
             {
                 throw new NotImplementedException();
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock)
             {
                 throw new NotImplementedException();
             }

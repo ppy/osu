@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock)
         {
             return new Skill[]
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock)
         {
             List<DifficultyHitObject> difficultyHitObjects = new List<DifficultyHitObject>();
             List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 difficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObjects,
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clock, difficultyHitObjects,
                         centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
                 );
             }
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
@@ -83,6 +83,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double combinedRating = combined.DifficultyValue() * difficulty_multiplier;
             double starRating = rescale(combinedRating * 1.4);
 
+            // For the time being, we will use the average clockrate for OD and AR attributes
+            double baseClockRate = clock.GetAverageRate();
+
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
@@ -94,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 RhythmDifficulty = rhythmRating,
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
-                GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
+                GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / baseClockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
             };
         }

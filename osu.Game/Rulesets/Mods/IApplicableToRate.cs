@@ -16,5 +16,18 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="rate">The playback rate before applying this mod.</param>
         /// <returns>The playback rate after applying this mod.</returns>
         double ApplyToRate(double time, double rate = 1);
+
+        /// <summary>
+        /// Returns the average rate that this mod applies.
+        /// </summary>
+        /// <returns>The average rate after applying this mod over the entire duration of the track.</returns>
+        double GetAverageRate();
+
+        /// <summary>
+        /// Returns the converted time at <paramref name="time"/> after this mod is applied.
+        /// </summary>
+        /// <param name="time">The beatmap time instant at which the converted time is queried.</param>
+        /// <returns>The converted time after applying this mod.</returns>
+        double GetTimeAt(double time);
     }
 }

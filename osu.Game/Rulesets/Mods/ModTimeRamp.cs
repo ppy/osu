@@ -85,6 +85,25 @@ namespace osu.Game.Rulesets.Mods
             return rate * Math.Round(ramp, 2);
         }
 
+        public double GetAverageRate() => ((3 * InitialRate.Value) + (5 * FinalRate.Value)) / 8;
+
+        public double GetTimeAt(double time)
+        {
+            if (time < beginRampTime)
+            {
+                return time / InitialRate.Value;
+            }
+            else if (time <= finalRateTime)
+            {
+                var amount = ((1 / FinalRate.Value) - (1 / InitialRate.Value)) / (finalRateTime - beginRampTime);
+                return (time / InitialRate.Value) + (0.5 * amount * (Math.Pow(Math.Max(time - beginRampTime, 0), 2)));
+            }
+            else
+            {
+                return GetTimeAt(finalRateTime) + ((time - finalRateTime) / FinalRate.Value);
+            }
+        }
+
         public virtual void Update(Playfield playfield)
         {
             applyRateAdjustment(playfield.Clock.CurrentTime);
