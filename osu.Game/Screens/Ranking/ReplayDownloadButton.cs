@@ -103,6 +103,8 @@ namespace osu.Game.Screens.Ranking
             }, true);
         }
 
+        #region Export via hotkey logic (also in SaveFailedScoreButton)
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
@@ -112,18 +114,11 @@ namespace osu.Game.Screens.Ranking
                     return true;
 
                 case GlobalAction.ExportReplay:
-                    if (State.Value == DownloadState.NotDownloaded)
-                    {
+                    State.BindValueChanged(exportWhenReady, true);
+
+                    // start the import via button
+                    if (State.Value != DownloadState.LocallyAvailable)
                         button.TriggerClick();
-                    }
-
-                    State.ValueChanged += importAfterDownload;
-
-                    void importAfterDownload(ValueChangedEvent<DownloadState> valueChangedEvent)
-                    {
-                        scoreManager.Export(Score.Value);
-                        State.ValueChanged -= importAfterDownload;
-                    }
 
                     return true;
             }
@@ -134,6 +129,17 @@ namespace osu.Game.Screens.Ranking
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+
+        private void exportWhenReady(ValueChangedEvent<DownloadState> state)
+        {
+            if (state.NewValue != DownloadState.LocallyAvailable) return;
+
+            scoreManager.Export(Score.Value);
+
+            State.ValueChanged -= exportWhenReady;
+        }
+
+        #endregion
 
         private void updateState()
         {
