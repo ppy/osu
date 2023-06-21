@@ -214,6 +214,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public virtual IBindable<int> UnreadCount => null;
+
+            public bool HasOngoingOperations => false;
         }
 
         // interface mocks break hot reload, mocking this stub implementation instead works around it.

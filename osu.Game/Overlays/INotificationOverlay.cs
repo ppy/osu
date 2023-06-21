@@ -30,5 +30,10 @@ namespace osu.Game.Overlays
         /// Current number of unread notifications.
         /// </summary>
         IBindable<int> UnreadCount { get; }
+
+        /// <summary>
+        /// Whether there are any ongoing operations, such as imports or downloads.
+        /// </summary>
+        bool HasOngoingOperations { get; }
     }
 }

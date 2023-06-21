@@ -250,6 +250,8 @@ namespace osu.Game.Tests.Visual.Menus
             }
 
             public virtual IBindable<int> UnreadCount => null;
+
+            public bool HasOngoingOperations => false;
         }
     }
 }

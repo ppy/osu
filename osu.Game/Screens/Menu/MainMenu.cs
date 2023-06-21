@@ -54,6 +54,9 @@ namespace osu.Game.Screens.Menu
         private GameHost host { get; set; }
 
         [Resolved]
+        private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
         private MusicController musicController { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -74,6 +77,9 @@ namespace osu.Game.Screens.Menu
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
+        private bool exitConfirmedViaDialog;
+        private bool exitConfirmedViaHoldOrClick;
+
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
 
@@ -89,10 +95,8 @@ namespace osu.Game.Screens.Menu
                 {
                     Action = () =>
                     {
-                        if (holdDelay.Value > 0)
-                            confirmAndExit();
-                        else
-                            this.Exit();
+                        exitConfirmedViaHoldOrClick = holdDelay.Value > 0;
+                        this.Exit();
                     }
                 });
             }
@@ -114,7 +118,11 @@ namespace osu.Game.Screens.Menu
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
-                            OnExit = confirmAndExit,
+                            OnExit = () =>
+                            {
+                                exitConfirmedViaHoldOrClick = true;
+                                this.Exit();
+                            }
                         }
                     }
                 },
@@ -154,13 +162,11 @@ namespace osu.Game.Screens.Menu
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
 
-        public void ExitWithoutConfirmation() => confirmAndExit();
-
         private void confirmAndExit()
         {
-            if (exitConfirmed) return;
+            if (exitConfirmedViaDialog) return;
 
-            exitConfirmed = true;
+            exitConfirmedViaDialog = true;
             performer?.PerformFromScreen(menu => menu.Exit());
         }
 
@@ -202,8 +208,6 @@ namespace osu.Game.Screens.Menu
             if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
                 dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
-
-        private bool exitConfirmed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
@@ -281,12 +285,29 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            if (!exitConfirmed && dialogOverlay != null)
+            bool requiresConfirmation =
+                // we need to have a dialog overlay to confirm in the first place.
+                dialogOverlay != null
+                // if the dialog has already displayed and been accepted by the user, we are good.
+                && !exitConfirmedViaDialog
+                // Only require confirmation if there is either an ongoing operation or the user exited via a non-hold escape press.
+                && (notifications.HasOngoingOperations || !exitConfirmedViaHoldOrClick);
+
+            if (requiresConfirmation)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
                     exitDialog.PerformOkAction();
                 else
-                    dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                {
+                    dialogOverlay.Push(new ConfirmExitDialog(() =>
+                    {
+                        exitConfirmedViaDialog = true;
+                        this.Exit();
+                    }, () =>
+                    {
+                        exitConfirmOverlay.Abort();
+                    }));
+                }
 
                 return true;
             }
