@@ -154,6 +154,8 @@ namespace osu.Game.Screens.Menu
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
 
+        public void ExitWithoutConfirmation() => confirmAndExit();
+
         private void confirmAndExit()
         {
             if (exitConfirmed) return;
