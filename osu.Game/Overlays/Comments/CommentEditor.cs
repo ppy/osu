@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Comments
         protected readonly Bindable<string> Current = new Bindable<string>(string.Empty);
 
         private RoundedButton commitButton = null!;
+        private RoundedButton logInButton = null!;
         private LoadingSpinner loadingSpinner = null!;
 
         protected TextBox TextBox { get; private set; } = null!;
@@ -122,9 +123,19 @@ namespace osu.Game.Overlays.Comments
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5, 0),
-                                            Child = commitButton = new EditorButton
+                                            Children = new Drawable[]
                                             {
-                                                Action = () => commitOrLogIn(Current.Value)
+                                                commitButton = new EditorButton
+                                                {
+                                                    Action = () => OnCommit(Current.Value),
+                                                    Text = GetCommitButtonText(true)
+                                                },
+                                                logInButton = new EditorButton
+                                                {
+                                                    Width = 100,
+                                                    Action = () => loginOverlay?.Show(),
+                                                    Text = GetCommitButtonText(false)
+                                                }
                                             }
                                         },
                                         loadingSpinner = new LoadingSpinner
@@ -154,29 +165,24 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract void OnCommit(string text);
 
-        private void commitOrLogIn(string text)
-        {
-            if (!API.IsLoggedIn)
-            {
-                loginOverlay?.Show();
-                return;
-            }
-
-            OnCommit(text);
-        }
-
-        private void updateCommitButtonState()
-        {
-            bool textBoxValid = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
-            commitButton.Enabled.Value = textBoxValid || !API.IsLoggedIn;
-            commitButton.Text = GetCommitButtonText(API.IsLoggedIn);
-        }
+        private void updateCommitButtonState() =>
+            commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
         private void updateStateForLoggedIn()
         {
             TextBox.PlaceholderText = GetPlaceholderText(API.IsLoggedIn);
             TextBox.ReadOnly = !API.IsLoggedIn;
-            updateCommitButtonState();
+
+            if (API.IsLoggedIn)
+            {
+                commitButton.Show();
+                logInButton.Hide();
+            }
+            else
+            {
+                commitButton.Hide();
+                logInButton.Show();
+            }
         }
 
         private partial class EditorTextBox : OsuTextBox
