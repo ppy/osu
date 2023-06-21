@@ -86,7 +86,7 @@ $$CS_i=f(CS_{i-1}, O_{i, i-1, ...}, Decay(\Delta_{i,k},\alpha_{CS}))$$
 
 Finally, $S_i=GS_i+CS_{i,k}$ where $k$ is the note column
 
-## Evaluating Strains
+#### Evaluating Strains
 
 To evaluate $GS_i$:
 
@@ -233,7 +233,7 @@ We'll illustrate this with the [table we had earlier with the same conditions](#
 | Time | GS | CS0 | CS1 | S    | K0 | K1 |
 |------|----|-----|-----|------|----|----|
 | 0    | 6  |     | 5   | 6+5  |    | X  |
-| 1    | 5  |     | 4   | .    |    |    |
+| 1    | 5  |     | 4   |      |    |    |
 | 2    | 10 |     | 9   | 10+9 |    | X  |
 | 2    | 15 | 5   | 9   | 15+5 | X  |    |
 
@@ -245,7 +245,7 @@ Thus the following is also possible.
 | Time | GS | CS0 | CS1 | S    | K0 | K1 |
 |------|----|-----|-----|------|----|----|
 | 0    | 6  |     | 5   | 6+5  |    | X  |
-| 1    | 5  |     | 4   | .    |    |    |
+| 1    | 5  |     | 4   |      |    |    |
 | 2    | 10 | 5   |     | 10+5 | X  |    |
 | 2    | 15 | 5   | 9   | 15+9 |    | X  |
 
@@ -258,7 +258,7 @@ In order to solve this problem, we take the maximum CS within a chord.
 | Time | GS | CS0         | CS1 | S    | K0 | K1 |
 |------|----|-------------|-----|------|----|----|
 | 0    | 6  |             | 5   | 6+5  |    | X  |
-| 1    | 5  |             | 4   | .    |    |    |
+| 1    | 5  |             | 4   |      |    |    |
 | 2    | 10 |             | 9   | 10+9 |    | X  |
 | 2    | 15 | max(5,CS)=9 | 9   | 15+9 | X  |    |
 
@@ -267,7 +267,7 @@ Here, `max(5,CS)=max(5,(9,))=9`, $S=[11,19,24]$
 | Time | GS | CS0 | CS1         | S    | K0 | K1 |
 |------|----|-----|-------------|------|----|----|
 | 0    | 6  |     | 5           | 6+5  |    | X  |
-| 1    | 5  |     | 4           | .    |    |    |
+| 1    | 5  |     | 4           |      |    |    |
 | 2    | 10 | 5   |             | 10+5 | X  |    |
 | 2    | 15 | 5   | max(9,CS)=9 | 15+9 |    | X  |
 
