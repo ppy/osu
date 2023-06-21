@@ -169,13 +169,13 @@ namespace osu.Game.Overlays.Comments
         {
             bool textBoxValid = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
             commitButton.Enabled.Value = textBoxValid || !API.IsLoggedIn;
+            commitButton.Text = GetCommitButtonText(API.IsLoggedIn);
         }
 
         private void updateStateForLoggedIn()
         {
             TextBox.PlaceholderText = GetPlaceholderText(API.IsLoggedIn);
             TextBox.ReadOnly = !API.IsLoggedIn;
-            commitButton.Text = GetCommitButtonText(API.IsLoggedIn);
             updateCommitButtonState();
         }
 
