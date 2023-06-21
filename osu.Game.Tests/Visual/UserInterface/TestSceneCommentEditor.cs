@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click cancel button", () =>
             {
-                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer[1]);
+                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer[2]);
                 InputManager.Click(MouseButton.Left);
             });
 
