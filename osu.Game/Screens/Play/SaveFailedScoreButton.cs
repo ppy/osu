@@ -15,6 +15,7 @@ using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Play
                             {
                                 importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
                                 Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
-                            });
+                            }).FireAndForget();
                             break;
                     }
                 }
