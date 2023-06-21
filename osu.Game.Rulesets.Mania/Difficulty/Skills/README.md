@@ -50,7 +50,7 @@ Though the actual script is non-trivial, it has similar concepts from the above 
 
 ### Strains
 
-To define our behavior robustly, we'll use math notations:
+We'll use math notations to define our strain robustly:
 
 - $GS_i$: GS on the $i^{th}$ object
 - $CS_{i,k}$: CS on the $i^{th}$ object on column $k$.
