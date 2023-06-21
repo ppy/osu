@@ -71,6 +71,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopIn()
         {
+            globallyDisableBeatmapSkinSetting();
+
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -96,7 +98,13 @@ namespace osu.Game.Overlays.SkinEditor
             });
         }
 
-        protected override void PopOut() => skinEditor?.Hide();
+        protected override void PopOut()
+        {
+            skinEditor?.Save(false);
+            skinEditor?.Hide();
+
+            globallyReenableBeatmapSkinSetting();
+        }
 
         protected override void Update()
         {
@@ -156,24 +164,15 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         public void SetTarget(OsuScreen screen)
         {
-            try
-            {
-                lastTargetScreen = screen;
+            lastTargetScreen = screen;
 
-                if (skinEditor == null) return;
+            if (skinEditor == null) return;
 
-                skinEditor.Save(userTriggered: false);
+            // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
+            updateComponentVisibility();
 
-                // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
-                updateComponentVisibility();
-
-                // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
-                Scheduler.AddOnce(setTarget, screen);
-            }
-            finally
-            {
-                globallyReenableBeatmapSkinSetting();
-            }
+            // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
+            Scheduler.AddOnce(setTarget, screen);
         }
 
         private void setTarget(OsuScreen? target)
@@ -188,9 +187,6 @@ namespace osu.Game.Overlays.SkinEditor
                 Scheduler.AddOnce(setTarget, target);
                 return;
             }
-
-            if (target is Player)
-                globallyDisableBeatmapSkinSetting();
 
             if (skinEditor.State.Value == Visibility.Visible)
                 skinEditor.UpdateTargetScreen(target);
