@@ -778,18 +778,8 @@ namespace osu.Game
 
         public override void AttemptExit()
         {
-            bool requiresConfirmationToExit = Notifications.HasOngoingOperations;
-
-            PerformFromScreen(menu =>
-            {
-                var mainMenu = ((MainMenu)menu);
-
-                // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
-                if (requiresConfirmationToExit)
-                    mainMenu.Exit();
-                else
-                    mainMenu.ExitWithoutConfirmation();
-            }, new[] { typeof(MainMenu) });
+            // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
 
         /// <summary>
