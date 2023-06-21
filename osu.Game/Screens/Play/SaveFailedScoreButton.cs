@@ -97,6 +97,8 @@ namespace osu.Game.Screens.Play
             }, true);
         }
 
+        #region Export via hotkey logic (also in ReplayDownloadButton)
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
@@ -106,12 +108,12 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.ExportReplay:
-                    Task.Run(importFailedScore).ContinueWith(t =>
-                    {
-                        importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
-                        Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
-                        scoreManager.Export(importedScore);
-                    });
+                    state.BindValueChanged(exportWhenReady, true);
+
+                    // start the import via button
+                    if (state.Value != DownloadState.LocallyAvailable)
+                        button.TriggerClick();
+
                     return true;
             }
 
@@ -121,5 +123,16 @@ namespace osu.Game.Screens.Play
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+
+        private void exportWhenReady(ValueChangedEvent<DownloadState> state)
+        {
+            if (state.NewValue != DownloadState.LocallyAvailable) return;
+
+            scoreManager.Export(importedScore);
+
+            this.state.ValueChanged -= exportWhenReady;
+        }
+
+        #endregion
     }
 }
