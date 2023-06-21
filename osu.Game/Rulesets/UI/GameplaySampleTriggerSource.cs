@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.UI
         private HitObjectLifetimeEntry? mostValidObject;
 
         [Resolved]
-        private IGameplayClock gameplayClock { get; set; } = null!;
+        private IGameplayClock? gameplayClock { get; set; }
 
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.UI
                 }
                 else
                 {
-                    if (isCloseEnoughToCurrentTime(candidate))
+                    if (isCloseEnoughToCurrentTime(candidate.HitObject))
                     {
                         mostValidObject = candidate;
                     }
@@ -107,11 +107,13 @@ namespace osu.Game.Rulesets.UI
 
             // Else we want the earliest valid nested.
             // In cases of nested objects, they will always have earlier sample data than their parent object.
-            return getAllNested(mostValidObject.HitObject).OrderBy(h => h.StartTime).FirstOrDefault(h => h.StartTime > gameplayClock.CurrentTime) ?? mostValidObject.HitObject;
+            return getAllNested(mostValidObject.HitObject).OrderBy(h => h.StartTime).FirstOrDefault(h => h.StartTime > getReferenceTime()) ?? mostValidObject.HitObject;
         }
 
         private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
-        private bool isCloseEnoughToCurrentTime(HitObjectLifetimeEntry h) => gameplayClock.CurrentTime >= h.HitObject.StartTime - h.HitObject.HitWindows.WindowFor(HitResult.Miss) * 2;
+        private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
+
+        private double getReferenceTime() => (gameplayClock?.CurrentTime ?? Clock.CurrentTime);
 
         private IEnumerable<HitObject> getAllNested(HitObject hitObject)
         {
