@@ -33,6 +33,8 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
+        public bool HasOngoingOperations => sections.Any(s => s.Children.OfType<ProgressNotification>().Any());
+
         private FlowContainer<NotificationSection> sections = null!;
 
         [Resolved]
