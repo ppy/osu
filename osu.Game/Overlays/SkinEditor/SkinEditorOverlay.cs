@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
-        private bool beatmapSkinsOriginalState;
+        private LeasedBindable<bool>? leasedBeatmapSkins;
 
         private void globallyDisableBeatmapSkinSetting()
         {
@@ -212,19 +212,14 @@ namespace osu.Game.Overlays.SkinEditor
 
             // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
             // To keep things simple, disable the setting game-wide while using the skin editor.
-            beatmapSkinsOriginalState = beatmapSkins.Value;
-
-            beatmapSkins.Value = false;
-            beatmapSkins.Disabled = true;
+            leasedBeatmapSkins = beatmapSkins.BeginLease(true);
+            leasedBeatmapSkins.Value = false;
         }
 
         private void globallyReenableBeatmapSkinSetting()
         {
-            if (!beatmapSkins.Disabled)
-                return;
-
-            beatmapSkins.Disabled = false;
-            beatmapSkins.Value = beatmapSkinsOriginalState;
+            leasedBeatmapSkins?.Return();
+            leasedBeatmapSkins = null;
         }
     }
 }
