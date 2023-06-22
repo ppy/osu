@@ -101,14 +101,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestLoggingInAndOut()
         {
-            void addLoggedInAsserts()
+            void assertLoggedInState()
             {
                 AddAssert("commit button visible", () => commentEditor.ButtonsContainer[0].Alpha == 1);
                 AddAssert("login button hidden", () => commentEditor.ButtonsContainer[1].Alpha == 0);
                 AddAssert("text box editable", () => !commentEditor.TextBox.ReadOnly);
             }
 
-            void addLoggedOutAsserts()
+            void assertLoggedOutState()
             {
                 AddAssert("commit button hidden", () => commentEditor.ButtonsContainer[0].Alpha == 0);
                 AddAssert("login button visible", () => commentEditor.ButtonsContainer[1].Alpha == 1);
@@ -118,15 +118,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             // there's also the case of starting logged out, but more annoying to test.
 
             // starting logged in
-            addLoggedInAsserts();
+            assertLoggedInState();
 
             // moving from logged in -> logged out
             AddStep("log out", () => dummyAPI.Logout());
-            addLoggedOutAsserts();
+            assertLoggedOutState();
 
             // moving from logged out -> logged in
             AddStep("log back in", () => dummyAPI.Login("username", "password"));
-            addLoggedInAsserts();
+            assertLoggedInState();
         }
 
         [Test]
