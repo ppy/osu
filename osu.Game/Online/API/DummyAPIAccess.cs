@@ -34,6 +34,7 @@ namespace osu.Game.Online.API
 
         public string AccessToken => "token";
 
+        /// <seealso cref="APIAccess.IsLoggedIn"/>
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public string ProvidedUsername => LocalUser.Value.Username;
@@ -115,6 +116,8 @@ namespace osu.Game.Online.API
         public void Logout()
         {
             state.Value = APIState.Offline;
+            // must happen after `state.Value` is changed such that subscribers to that bindable's value changes see the correct user.
+            // compare: `APIAccess.Logout()`.
             LocalUser.Value = new GuestUser();
         }
 
