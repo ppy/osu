@@ -34,7 +34,7 @@ namespace osu.Game.Online.API
 
         public string AccessToken => "token";
 
-        public bool IsLoggedIn => State.Value == APIState.Online;
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
@@ -114,8 +114,8 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            LocalUser.Value = new GuestUser();
             state.Value = APIState.Offline;
+            LocalUser.Value = new GuestUser();
         }
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
