@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override LocalisableString FooterText => default;
 
-        protected override LocalisableString GetCommitButtonText(bool isLoggedIn) =>
+        protected override LocalisableString GetButtonText(bool isLoggedIn) =>
             isLoggedIn ? CommonStrings.ButtonsReply : CommentsStrings.GuestButtonReply;
 
         protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>

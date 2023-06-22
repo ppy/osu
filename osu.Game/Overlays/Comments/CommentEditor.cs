@@ -44,8 +44,17 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private LoginOverlay? loginOverlay { get; set; }
 
-        protected abstract LocalisableString GetCommitButtonText(bool isLoggedIn);
+        /// <summary>
+        /// Returns the text content of the main action button.
+        /// When <paramref name="isLoggedIn"/> is <see langword="true"/>, the text will apply to a button that posts a comment.
+        /// When <paramref name="isLoggedIn"/> is <see langword="false"/>, the text will apply to a button that directs the user to the login overlay.
+        /// </summary>
+        protected abstract LocalisableString GetButtonText(bool isLoggedIn);
 
+        /// <summary>
+        /// Returns the placeholder text for the comment box.
+        /// </summary>
+        /// <param name="isLoggedIn">Whether the current user is logged in.</param>
         protected abstract LocalisableString GetPlaceholderText(bool isLoggedIn);
 
         protected bool ShowLoadingSpinner
@@ -128,13 +137,13 @@ namespace osu.Game.Overlays.Comments
                                                 commitButton = new EditorButton
                                                 {
                                                     Action = () => OnCommit(Current.Value),
-                                                    Text = GetCommitButtonText(true)
+                                                    Text = GetButtonText(true)
                                                 },
                                                 logInButton = new EditorButton
                                                 {
                                                     Width = 100,
                                                     Action = () => loginOverlay?.Show(),
-                                                    Text = GetCommitButtonText(false)
+                                                    Text = GetButtonText(false)
                                                 }
                                             }
                                         },
