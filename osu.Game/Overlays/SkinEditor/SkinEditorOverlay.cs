@@ -3,11 +3,13 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
@@ -45,6 +47,12 @@ namespace osu.Game.Overlays.SkinEditor
             RelativeSizeAxes = Axes.Both;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
@@ -62,6 +70,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopIn()
         {
+            globallyDisableBeatmapSkinSetting();
+
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -87,7 +97,13 @@ namespace osu.Game.Overlays.SkinEditor
             });
         }
 
-        protected override void PopOut() => skinEditor?.Hide();
+        protected override void PopOut()
+        {
+            skinEditor?.Save(false);
+            skinEditor?.Hide();
+
+            globallyReenableBeatmapSkinSetting();
+        }
 
         protected override void Update()
         {
@@ -151,8 +167,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (skinEditor == null) return;
 
-            skinEditor.Save(userTriggered: false);
-
             // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
             updateComponentVisibility();
 
@@ -181,6 +195,26 @@ namespace osu.Game.Overlays.SkinEditor
                 skinEditor.Expire();
                 skinEditor = null;
             }
+        }
+
+        private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
+        private LeasedBindable<bool>? leasedBeatmapSkins;
+
+        private void globallyDisableBeatmapSkinSetting()
+        {
+            if (beatmapSkins.Disabled)
+                return;
+
+            // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
+            // To keep things simple, disable the setting game-wide while using the skin editor.
+            leasedBeatmapSkins = beatmapSkins.BeginLease(true);
+            leasedBeatmapSkins.Value = false;
+        }
+
+        private void globallyReenableBeatmapSkinSetting()
+        {
+            leasedBeatmapSkins?.Return();
+            leasedBeatmapSkins = null;
         }
     }
 }

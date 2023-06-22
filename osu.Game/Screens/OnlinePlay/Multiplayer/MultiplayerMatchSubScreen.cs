@@ -49,6 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
+
         private AddItemButton addItemButton;
 
         public MultiplayerMatchSubScreen(Room room)
@@ -334,10 +337,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             updateCurrentItem();
 
-            addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
+            addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
         }
+
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {
@@ -403,18 +408,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            if (client.Room == null)
+            if (!localUserCanAddItem)
                 return;
 
-            if (!client.IsHost)
-            {
-                // todo: should handle this when the request queue is implemented.
-                // if we decide that the presentation should exit the user from the multiplayer game, the PresentBeatmap
-                // flow may need to change to support an "unable to present" return value.
-                return;
-            }
+            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
+            PlaylistItem itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
 
-            this.Push(new MultiplayerMatchSongSelect(Room, Room.Playlist.Single(item => item.ID == client.Room.Settings.PlaylistItemId)));
+            OpenSongSelection(itemToEdit);
+
+            // Re-run PresentBeatmap now that we've pushed a song select that can handle it.
+            game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
         }
 
         protected override void Dispose(bool isDisposing)

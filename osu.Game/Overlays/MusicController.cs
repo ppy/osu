@@ -316,6 +316,8 @@ namespace osu.Game.Overlays
             var queuedTrack = getQueuedTrack();
 
             var lastTrack = CurrentTrack;
+            lastTrack.Completed -= onTrackCompleted;
+
             CurrentTrack = queuedTrack;
 
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
@@ -344,16 +346,12 @@ namespace osu.Game.Overlays
             // Important to keep this in its own method to avoid inadvertently capturing unnecessary variables in the callback.
             // Can lead to leaks.
             var queuedTrack = new DrawableTrack(current.LoadTrack());
-            queuedTrack.Completed += () => onTrackCompleted(current);
+            queuedTrack.Completed += onTrackCompleted;
             return queuedTrack;
         }
 
-        private void onTrackCompleted(WorkingBeatmap workingBeatmap)
+        private void onTrackCompleted()
         {
-            // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-            if (current != workingBeatmap)
-                return;
-
             if (!CurrentTrack.Looping && !beatmap.Disabled)
                 NextTrack();
         }
