@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";
 
-            protected override LocalisableString GetCommitButtonText(bool isLoggedIn) =>
+            protected override LocalisableString GetButtonText(bool isLoggedIn) =>
                 isLoggedIn ? @"Commit" : "You're logged out!";
 
             protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override LocalisableString GetCommitButtonText(bool isLoggedIn) => @"Save";
+            protected override LocalisableString GetButtonText(bool isLoggedIn) => @"Save";
             protected override LocalisableString GetPlaceholderText(bool isLoggedIn) => @"Multiline textboxes soon";
         }
     }
