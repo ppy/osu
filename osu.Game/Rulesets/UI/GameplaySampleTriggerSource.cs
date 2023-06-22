@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.UI
         private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
         private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
 
-        private double getReferenceTime() => (gameplayClock?.CurrentTime ?? Clock.CurrentTime);
+        private double getReferenceTime() => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
 
         private IEnumerable<HitObject> getAllNested(HitObject hitObject)
         {
