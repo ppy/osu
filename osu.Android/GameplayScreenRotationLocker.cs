@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Android.Content.PM;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,7 +14,7 @@ namespace osu.Android
         private Bindable<bool> localUserPlaying;
 
         [Resolved]
-        private OsuGameActivity gameActivity { get; set; }
+        private OsuGameActivity gameActivity { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuGame game)

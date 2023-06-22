@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -25,7 +23,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         public DrawableEditorRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -43,8 +41,8 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
-        [Resolved(canBeNull: true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
         protected override void LoadComplete()
         {
