@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -39,10 +37,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [Resolved]
-        private TextureStore textures { get; set; }
+        private TextureStore textures { get; set; } = null!;
 
         [Resolved]
-        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
         public void SetIcon(string texture) =>
             SetIcon(new Sprite
@@ -81,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         protected ToolbarButton()
         {
