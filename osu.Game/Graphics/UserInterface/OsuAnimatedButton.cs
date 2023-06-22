@@ -111,6 +111,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
+            // Handle case where a click is triggered via TriggerClick().
+            if (!IsHovered)
+                hover.FadeOutFromOne(1600);
+
             hover.FlashColour(FlashColour, 800, Easing.OutQuint);
             return base.OnClick(e);
         }
