@@ -171,6 +171,18 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
+        private Func<ScoreInfo, double> scoreMultiplierCalculator;
+
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator
+        {
+            get => scoreMultiplierCalculator;
+            set
+            {
+                scoreMultiplierCalculator = value;
+                updateScoreFull();
+            }
+        }
+
         public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
@@ -183,15 +195,9 @@ namespace osu.Game.Rulesets.Scoring
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
-            Mods.ValueChanged += mods =>
-            {
-                scoreMultiplier = 1;
+            scoreMultiplierCalculator = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
 
-                foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
-
-                updateScore();
-            };
+            Mods.ValueChanged += _ => updateScoreFull();
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
@@ -301,6 +307,12 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual void RemoveScoreChange(JudgementResult result)
         {
+        }
+
+        private void updateScoreFull()
+        {
+            scoreMultiplier = ScoreMultiplierCalculator(new ScoreInfo { Mods = Mods.Value.ToArray() });
+            updateScore();
         }
 
         private void updateScore()

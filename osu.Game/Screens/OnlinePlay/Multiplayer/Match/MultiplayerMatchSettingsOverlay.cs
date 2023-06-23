@@ -65,6 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
             public OsuTextBox PasswordTextBox = null!;
             public OsuCheckbox AutoSkipCheckbox = null!;
+            public OsuCheckbox NoScoreMultiplierCheckbox = null!;
             public RoundedButton ApplyButton = null!;
 
             public OsuSpriteText ErrorText = null!;
@@ -247,9 +248,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Other")
                                                                 {
-                                                                    Child = AutoSkipCheckbox = new OsuCheckbox
+                                                                    Child = new FillFlowContainer
                                                                     {
-                                                                        LabelText = "Automatically skip the beatmap intro"
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Direction = FillDirection.Vertical,
+                                                                        Spacing = new Vector2(5),
+                                                                        Children = new[]
+                                                                        {
+                                                                            AutoSkipCheckbox = new OsuCheckbox
+                                                                            {
+                                                                                LabelText = "Automatically skip the beatmap intro"
+                                                                            },
+                                                                            NoScoreMultiplierCheckbox = new OsuCheckbox
+                                                                            {
+                                                                                LabelText = "No mod multipliers"
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -351,6 +366,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 QueueMode.BindValueChanged(mode => QueueModeDropdown.Current.Value = mode.NewValue, true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
                 AutoSkip.BindValueChanged(autoSkip => AutoSkipCheckbox.Current.Value = autoSkip.NewValue, true);
+                NoScoreMultiplier.BindValueChanged(noMultiplier => NoScoreMultiplierCheckbox.Current.Value = noMultiplier.NewValue, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
@@ -399,7 +415,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
                               autoStartDuration: autoStartDuration,
-                              autoSkip: AutoSkipCheckbox.Current.Value)
+                              autoSkip: AutoSkipCheckbox.Current.Value,
+                              noScoreMultiplier: NoScoreMultiplierCheckbox.Current.Value)
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
@@ -416,6 +433,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration.Value = autoStartDuration;
                     room.AutoSkip.Value = AutoSkipCheckbox.Current.Value;
+                    room.NoScoreMultiplier.Value = NoScoreMultiplierCheckbox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         room.MaxParticipants.Value = max;

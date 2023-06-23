@@ -76,6 +76,7 @@ namespace osu.Game.Screens.Play
             };
             Mods = mods ?? Array.Empty<Mod>();
             ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
+            ScoreProcessor.ScoreMultiplierCalculator = Score.ScoreInfo.ScoreMultiplierCalculator;
         }
 
         /// <summary>

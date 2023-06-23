@@ -301,6 +301,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     new MatchTypePill(),
                     new QueueModePill(),
+                    new NoScoreMultiplierPill()
                 });
             }
 

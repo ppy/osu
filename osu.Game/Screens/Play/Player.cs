@@ -227,6 +227,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor.ScoreMultiplierCalculator = Configuration.ScoreMultiplierCalculator;
             ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
 
@@ -248,6 +249,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.BeatmapHash = Beatmap.Value.BeatmapInfo.Hash;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
+            Score.ScoreInfo.ScoreMultiplierCalculator = Configuration.ScoreMultiplierCalculator;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor));
 
@@ -817,9 +819,19 @@ namespace osu.Game.Screens.Play
             if (!canShowResults && !forceImport)
                 return Task.FromResult<ScoreInfo>(null);
 
+            // If non-default score multiplier calculator was used we want to recalculate actual score
+            // with default score multiplier which should always be used when importing or submitting scores.
+            var gameplayScoreMultiplierCalculator = ScoreProcessor.ScoreMultiplierCalculator;
+            ScoreProcessor.ScoreMultiplierCalculator = ScoreInfo.DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
+            long actualTotalScore = ScoreProcessor.TotalScore.Value;
+            ScoreProcessor.ScoreMultiplierCalculator = gameplayScoreMultiplierCalculator;
+
             return prepareScoreForDisplayTask = Task.Run(async () =>
             {
                 var scoreCopy = Score.DeepClone();
+
+                long gameplayScore = scoreCopy.ScoreInfo.TotalScore;
+                scoreCopy.ScoreInfo.TotalScore = actualTotalScore;
 
                 try
                 {
@@ -838,6 +850,8 @@ namespace osu.Game.Screens.Play
                 {
                     Logger.Error(ex, @"Score import failed!");
                 }
+
+                scoreCopy.ScoreInfo.TotalScore = gameplayScore;
 
                 return scoreCopy.ScoreInfo;
             });

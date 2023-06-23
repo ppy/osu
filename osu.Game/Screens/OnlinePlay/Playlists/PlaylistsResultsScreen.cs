@@ -17,6 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -40,6 +41,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
@@ -182,7 +186,18 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null) => Schedule(() =>
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).ToArray();
+
+            if (multiplayerClient?.Room?.Settings.NoScoreMultiplier == true)
+            {
+                foreach (var scoreInfo in scoreInfos)
+                {
+                    double scoreMultiplier = scoreInfo.ScoreMultiplierCalculator(scoreInfo);
+                    scoreInfo.TotalScore = (long)Math.Round(scoreInfo.TotalScore / scoreMultiplier);
+                }
+            }
+
+            scoreInfos.OrderByTotalScore();
 
             // Select a score if we don't already have one selected.
             // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).

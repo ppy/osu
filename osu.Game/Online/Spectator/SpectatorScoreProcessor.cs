@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -66,6 +67,9 @@ namespace osu.Game.Online.Spectator
         private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
 
         private readonly IBindableDictionary<int, SpectatorState> spectatorStates = new BindableDictionary<int, SpectatorState>();
@@ -117,6 +121,11 @@ namespace osu.Game.Online.Spectator
                 Ruleset = rulesetInfo,
                 Mods = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray()
             };
+
+            if (multiplayerClient.Room?.Settings.NoScoreMultiplier == true)
+            {
+                scoreInfo.ScoreMultiplierCalculator = _ => 1;
+            }
         }
 
         private void onNewFrames(int incomingUserId, FrameDataBundle bundle)

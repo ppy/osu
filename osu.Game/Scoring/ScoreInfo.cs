@@ -183,6 +183,21 @@ namespace osu.Game.Scoring
         /// </summary>
         public bool IsLegacyScore { get; set; }
 
+        [Ignored]
+        public Func<ScoreInfo, double> ScoreMultiplierCalculator { get; set; } = DEFAULT_SCORE_MULTIPLIER_CALCULATOR;
+
+        public static readonly Func<ScoreInfo, double> DEFAULT_SCORE_MULTIPLIER_CALCULATOR = s =>
+        {
+            double scoreMultiplier = 1;
+
+            foreach (var mod in s.Mods)
+            {
+                scoreMultiplier *= mod.ScoreMultiplier;
+            }
+
+            return scoreMultiplier;
+        };
+
         private Dictionary<HitResult, int>? statistics;
 
         [Ignored]
