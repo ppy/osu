@@ -86,6 +86,7 @@ namespace osu.Game.Tests.Visual.Online
                             StarRating = 9.99,
                             DifficultyName = @"TEST",
                             Length = 456000,
+                            HitLength = 400000,
                             RulesetID = 3,
                             CircleSize = 1,
                             DrainRate = 2.3f,

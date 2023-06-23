@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
 using osuTK;
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
     /// <summary>
     /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
     /// </summary>
-    public partial class LegacyCatchComboCounter : CompositeDrawable, ICatchComboCounter
+    public partial class LegacyCatchComboCounter : UprightAspectMaintainingContainer, ICatchComboCounter
     {
         private readonly LegacyRollingCounter counter;
 
