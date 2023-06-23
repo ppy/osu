@@ -206,5 +206,9 @@ namespace osu.Game.Database
                 MaxResult = maxResult;
             }
         }
+
+        public static long ChangeComboRatio(ScoreInfo score, double oldComboPortion, double newComboPortion)
+        {
+        }
     }
 }
