@@ -92,8 +92,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
             public VolumeAwareHitSampleInfo(HitSampleInfo sampleInfo)
-                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix ?? getVolumeSuffix(sampleInfo.Name, sampleInfo.Volume), sampleInfo.Volume)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix ?? getVolumeSuffix(sampleInfo.Name, sampleInfo.Volume), getAdjustedVolume(sampleInfo.Name, sampleInfo.Volume))
             {
+            }
+
+            private static int getAdjustedVolume(string name, int volume)
+            {
+                switch (name)
+                {
+                    // These samples are to be ignored for argon.
+                    case HIT_FINISH:
+                    case HIT_WHISTLE:
+                        return 0;
+                }
+
+                return volume;
             }
 
             /// <summary>
