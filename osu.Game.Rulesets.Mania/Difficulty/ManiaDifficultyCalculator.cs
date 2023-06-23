@@ -48,9 +48,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            ManiaScoreV1Processor sv1Processor = new ManiaScoreV1Processor(mods);
-
-            return new ManiaDifficultyAttributes
+            ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
@@ -58,8 +56,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
-                LegacyComboScore = sv1Processor.TotalScore
             };
+
+            if (ComputeLegacyScoringValues)
+            {
+                ManiaScoreV1Processor sv1Processor = new ManiaScoreV1Processor(mods);
+                attributes.LegacyComboScore = sv1Processor.TotalScore;
+            }
+
+            return attributes;
         }
 
         private static int maxComboForObject(HitObject hitObject)
