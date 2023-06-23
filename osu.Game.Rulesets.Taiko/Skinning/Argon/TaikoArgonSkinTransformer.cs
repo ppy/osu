@@ -109,18 +109,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 return volume;
             }
 
-            /// <summary>
-            /// - Adds taiko prefix.
-            /// - Ignores bank name (weird but let's go with it for now).
-            /// </summary>
             public override IEnumerable<string> LookupNames
             {
                 get
                 {
-                    if (!string.IsNullOrEmpty(Suffix))
-                        yield return $"Gameplay/taiko-{Name}{Suffix}";
-
-                    yield return $"Gameplay/taiko-{Name}";
+                    foreach (string name in base.LookupNames)
+                        yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
                 }
             }
 
