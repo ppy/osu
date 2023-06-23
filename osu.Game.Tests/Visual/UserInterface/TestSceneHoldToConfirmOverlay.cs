@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Alpha = 0,
             };
 
-            var overlay = new TestHoldToConfirmOverlay
+            var overlay = new TestHoldToExitGameOverlay
             {
                 Action = () =>
                 {
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait until fired again", () => overlay.Fired);
         }
 
-        private partial class TestHoldToConfirmOverlay : ExitConfirmOverlay
+        private partial class TestHoldToExitGameOverlay : HoldToExitGameOverlay
         {
             public void Begin() => BeginConfirm();
         }

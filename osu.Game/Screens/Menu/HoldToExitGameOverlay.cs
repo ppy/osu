@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
@@ -10,13 +8,13 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class ExitConfirmOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
+    public partial class HoldToExitGameOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
         protected override bool AllowMultipleFires => true;
 
         public void Abort() => AbortConfirm();
 
-        public ExitConfirmOverlay()
+        public HoldToExitGameOverlay()
             : base(0.7f)
         {
         }
