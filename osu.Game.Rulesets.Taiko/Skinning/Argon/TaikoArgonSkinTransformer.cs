@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
             public VolumeAwareHitSampleInfo(HitSampleInfo sampleInfo)
-                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix ?? getVolumeSuffix(sampleInfo.Name, sampleInfo.Volume), getAdjustedVolume(sampleInfo.Name, sampleInfo.Volume))
+                : base(sampleInfo.Name, getBank(sampleInfo.Bank, sampleInfo.Name, sampleInfo.Volume), sampleInfo.Suffix, getAdjustedVolume(sampleInfo.Name, sampleInfo.Volume))
             {
             }
 
@@ -124,24 +124,27 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 }
             }
 
-            private static string getVolumeSuffix(string name, int volume)
+            private static string getBank(string originalBank, string sampleName, int volume)
             {
-                switch (name)
+                // So basically we're overwriting mapper's bank intentions here.
+                // The rationale is that most taiko beatmaps only use a single bank, but regularly adjust volume.
+
+                switch (sampleName)
                 {
                     case HIT_NORMAL:
                     case HIT_CLAP:
                     {
                         if (volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
-                            return "-hard";
+                            return BANK_DRUM;
 
                         if (volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
-                            return "-medium";
+                            return BANK_NORMAL;
 
-                        return "-soft";
+                        return BANK_SOFT;
                     }
 
                     default:
-                        return string.Empty;
+                        return originalBank;
                 }
             }
         }
