@@ -178,6 +178,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
+            SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -383,5 +384,6 @@ namespace osu.Game.Configuration
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
+        EditorLimitedDistanceSnap
     }
 }

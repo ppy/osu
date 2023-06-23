@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -25,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract partial class ModSelectPanel : OsuClickableContainer, IHasAccentColour
+    public abstract partial class ModSelectPanel : OsuClickableContainer, IHasAccentColour, IFilterable
     {
         public abstract BindableBool Active { get; }
 
@@ -199,6 +200,9 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
+            if (!IsPresent)
+                return;
+
             bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= SAMPLE_PLAYBACK_DELAY;
 
             if (enoughTimePassedSinceLastPlayback)
@@ -277,5 +281,28 @@ namespace osu.Game.Overlays.Mods
             TextBackground.FadeColour(foregroundColour, transitionDuration, Easing.OutQuint);
             TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
+
+        #region IFilterable
+
+        public abstract IEnumerable<LocalisableString> FilterTerms { get; }
+
+        private bool matchingFilter = true;
+
+        public virtual bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                if (matchingFilter == value)
+                    return;
+
+                matchingFilter = value;
+                this.FadeTo(value ? 1 : 0);
+            }
+        }
+
+        public bool FilteringActive { set { } }
+
+        #endregion
     }
 }

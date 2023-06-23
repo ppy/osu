@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -280,6 +282,52 @@ namespace osu.Game
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        private readonly List<string> dragDropFiles = new List<string>();
+        private ScheduledDelegate dragDropImportSchedule;
+
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            if (host.Window is SDL2Window sdlWindow)
+            {
+                sdlWindow.DragDrop += path =>
+                {
+                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(path);
+                        return;
+                    }
+
+                    lock (dragDropFiles)
+                    {
+                        dragDropFiles.Add(path);
+
+                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
+
+                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                        dragDropImportSchedule?.Cancel();
+                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+                    }
+                };
+            }
+        }
+
+        private void handlePendingDragDropImports()
+        {
+            lock (dragDropFiles)
+            {
+                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                string[] paths = dragDropFiles.ToArray();
+                dragDropFiles.Clear();
+
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
