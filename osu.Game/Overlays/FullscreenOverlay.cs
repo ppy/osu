@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -81,7 +80,6 @@ namespace osu.Game.Overlays
             Waves.FourthWaveColour = ColourProvider.Dark3;
         }
 
-        [NotNull]
         protected abstract T CreateHeader();
 
         public override void Show()

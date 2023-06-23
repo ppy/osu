@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         protected override Container<Drawable> Content => blueprints ?? base.Content;
 
-        private readonly Container blueprints;
+        private readonly Container? blueprints;
 
         [Cached(typeof(Playfield))]
         public Playfield Playfield { get; }

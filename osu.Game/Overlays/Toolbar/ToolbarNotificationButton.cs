@@ -41,8 +41,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             StateContainer = notificationOverlay as NotificationOverlay;
 
-            if (notificationOverlay != null)
-                NotificationCount.BindTo(notificationOverlay.UnreadCount);
+            NotificationCount.BindTo(notificationOverlay.UnreadCount);
 
             NotificationCount.ValueChanged += count =>
             {

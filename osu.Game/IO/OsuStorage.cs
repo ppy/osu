@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -20,13 +19,11 @@ namespace osu.Game.IO
         /// <summary>
         /// The custom storage path as selected by the user.
         /// </summary>
-        [CanBeNull]
-        public string CustomStoragePath => storageConfig.Get<string>(StorageConfig.FullPath);
+        public string? CustomStoragePath => storageConfig.Get<string>(StorageConfig.FullPath);
 
         /// <summary>
         /// The default storage path to be used if a custom storage path hasn't been selected or is not accessible.
         /// </summary>
-        [NotNull]
         public string DefaultStoragePath => defaultStorage.GetFullPath(".");
 
         private readonly GameHost host;

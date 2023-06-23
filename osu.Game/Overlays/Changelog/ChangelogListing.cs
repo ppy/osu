@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Changelog
 {
     public partial class ChangelogListing : ChangelogContent
     {
-        private readonly List<APIChangelogBuild> entries;
+        private readonly List<APIChangelogBuild>? entries;
 
         public ChangelogListing(List<APIChangelogBuild> entries)
         {

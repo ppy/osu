@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly Box background, progress;
         private readonly PlayButton playButton;
 
-        private PreviewTrack preview => playButton.Preview;
+        private PreviewTrack? preview => playButton.Preview;
 
         public IBindable<bool> Playing => playButton.Playing;
 

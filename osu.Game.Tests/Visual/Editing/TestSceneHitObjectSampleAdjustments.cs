@@ -358,7 +358,7 @@ namespace osu.Game.Tests.Visual.Editing
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
 
-            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox?.PlaceholderText.ToString());
+            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
         });
 
         private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>

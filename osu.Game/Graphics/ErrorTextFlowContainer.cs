@@ -23,7 +23,7 @@ namespace osu.Game.Graphics
                 RemovePart(textPart);
         }
 
-        public void AddErrors(string[] errors)
+        public void AddErrors(string[]? errors)
         {
             ClearErrors();
 

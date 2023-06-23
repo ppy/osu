@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
+            Sprite.Texture = Beatmap.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
         public override bool Equals(Background other)

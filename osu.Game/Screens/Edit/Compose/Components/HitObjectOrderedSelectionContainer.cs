@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Dispose(isDisposing);
 
-            if (editorBeatmap != null)
+            if (editorBeatmap.IsNotNull())
                 editorBeatmap.BeatmapReprocessed -= SortInternal;
         }
     }

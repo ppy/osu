@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
-        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject)
+        public override HitObjectSelectionBlueprint? CreateHitObjectBlueprintFor(HitObject hitObject)
         {
             switch (hitObject)
             {

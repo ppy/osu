@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics.CodeAnalysis;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +21,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Creates a new <see cref="StatisticContainer"/>.
         /// </summary>
         /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
-        public StatisticContainer([NotNull] StatisticItem item)
+        public StatisticContainer(StatisticItem item)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

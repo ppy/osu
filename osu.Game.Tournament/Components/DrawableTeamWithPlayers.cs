@@ -13,7 +13,7 @@ namespace osu.Game.Tournament.Components
 {
     public partial class DrawableTeamWithPlayers : CompositeDrawable
     {
-        public DrawableTeamWithPlayers(TournamentTeam team, TeamColour colour)
+        public DrawableTeamWithPlayers(TournamentTeam? team, TeamColour colour)
         {
             AutoSizeAxes = Axes.Both;
 

@@ -257,7 +257,7 @@ namespace osu.Game.Configuration
                     string skinName = string.Empty;
 
                     if (Guid.TryParse(skin, out var id))
-                        skinName = LookupSkinName(id) ?? string.Empty;
+                        skinName = LookupSkinName(id);
 
                     return new SettingDescription(
                         rawValue: skinName,

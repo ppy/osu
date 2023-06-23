@@ -12,7 +12,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public abstract partial class ManiaInputTestScene : OsuTestScene
     {
-        private readonly Container<Drawable> content;
+        private readonly Container<Drawable>? content;
+
         protected override Container<Drawable> Content => content ?? base.Content;
 
         protected ManiaInputTestScene(int keys)
