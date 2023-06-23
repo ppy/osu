@@ -81,18 +81,18 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is HitSampleInfo hitSampleInfo)
-                return base.GetSample(new VolumeAwareHitSampleInfo(hitSampleInfo));
+                return base.GetSample(new AdjustedHitSampleInfo(hitSampleInfo));
 
             return base.GetSample(sampleInfo);
         }
 
-        private class VolumeAwareHitSampleInfo : HitSampleInfo
+        private class AdjustedHitSampleInfo : HitSampleInfo
         {
-            public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
-            public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
-
-            public VolumeAwareHitSampleInfo(HitSampleInfo sampleInfo)
-                : base(sampleInfo.Name, getBank(sampleInfo.Bank, sampleInfo.Name, sampleInfo.Volume), sampleInfo.Suffix, getAdjustedVolume(sampleInfo.Name, sampleInfo.Volume))
+            // public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
+            // public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
+            //
+            public AdjustedHitSampleInfo(HitSampleInfo sampleInfo)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, getAdjustedVolume(sampleInfo.Name, sampleInfo.Volume))
             {
             }
 
@@ -118,29 +118,29 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 }
             }
 
-            private static string getBank(string originalBank, string sampleName, int volume)
-            {
-                // So basically we're overwriting mapper's bank intentions here.
-                // The rationale is that most taiko beatmaps only use a single bank, but regularly adjust volume.
-
-                switch (sampleName)
-                {
-                    case HIT_NORMAL:
-                    case HIT_CLAP:
-                    {
-                        if (volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
-                            return BANK_DRUM;
-
-                        if (volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
-                            return BANK_NORMAL;
-
-                        return BANK_SOFT;
-                    }
-
-                    default:
-                        return originalBank;
-                }
-            }
+            // private static string getBank(string originalBank, string sampleName, int volume)
+            // {
+            //     // So basically we're overwriting mapper's bank intentions here.
+            //     // The rationale is that most taiko beatmaps only use a single bank, but regularly adjust volume.
+            //
+            //     switch (sampleName)
+            //     {
+            //         case HIT_NORMAL:
+            //         case HIT_CLAP:
+            //         {
+            //             if (volume >= SAMPLE_VOLUME_THRESHOLD_HARD)
+            //                 return BANK_DRUM;
+            //
+            //             if (volume >= SAMPLE_VOLUME_THRESHOLD_MEDIUM)
+            //                 return BANK_NORMAL;
+            //
+            //             return BANK_SOFT;
+            //         }
+            //
+            //         default:
+            //             return originalBank;
+            //     }
+            // }
         }
     }
 }
