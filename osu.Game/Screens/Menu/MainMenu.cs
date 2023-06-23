@@ -59,11 +59,14 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private MusicController musicController { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private LoginOverlay login { get; set; }
-
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private LoginOverlay login { get; set; }
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
@@ -173,9 +176,6 @@ namespace osu.Game.Screens.Menu
             songSelect = null;
             return s;
         }
-
-        [Resolved]
-        private Storage storage { get; set; }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
