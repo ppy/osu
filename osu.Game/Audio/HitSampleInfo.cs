@@ -27,6 +27,9 @@ namespace osu.Game.Audio
         public const string BANK_SOFT = @"soft";
         public const string BANK_DRUM = @"drum";
 
+        // new bank used exclusively by taiko for now.
+        public const string BANK_STRONG = @"strong";
+
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>

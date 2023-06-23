@@ -121,14 +121,21 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 var h = hitObjects[i];
 
-                if (h is Hit hit && hit.IsStrong && hit.Type == HitType.Rim)
+                if (h is Hit hit && hit.IsStrong)
                 {
-                    if (lastFlourish == null || lastFlourish - hit.StartTime >= time_between_flourishes)
-                    {
-                        lastFlourish = h.StartTime;
+                    // For the sake of the argon skin, add a sample with the strong bank here.
+                    // This ensures it's correctly pooled for future usage.
+                    h.Samples.Add(h.Samples.First().With(newBank: HitSampleInfo.BANK_STRONG));
 
-                        if (h.Samples.All(s => s.Name != HitSampleInfo.HIT_FLOURISH))
-                            h.Samples.Add(h.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH));
+                    if (hit.Type == HitType.Rim)
+                    {
+                        if (lastFlourish == null || lastFlourish - hit.StartTime >= time_between_flourishes)
+                        {
+                            lastFlourish = h.StartTime;
+
+                            if (h.Samples.All(s => s.Name != HitSampleInfo.HIT_FLOURISH))
+                                h.Samples.Add(h.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH));
+                        }
                     }
                 }
             }
