@@ -157,18 +157,7 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
         }
 
-        [Resolved(canBeNull: true)]
-        private IPerformFromScreenRunner performer { get; set; }
-
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
-
-        private void confirmAndExit()
-        {
-            if (exitConfirmedViaDialog) return;
-
-            exitConfirmedViaDialog = true;
-            performer?.PerformFromScreen(menu => menu.Exit());
-        }
 
         private void preloadSongSelect()
         {
