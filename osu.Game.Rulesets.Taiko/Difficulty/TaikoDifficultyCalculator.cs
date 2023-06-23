@@ -89,9 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            TaikoScoreV1Processor sv1Processor = new TaikoScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
-
-            return new TaikoDifficultyAttributes
+            TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
@@ -101,10 +99,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
-                LegacyAccuracyScore = sv1Processor.AccuracyScore,
-                LegacyComboScore = sv1Processor.ComboScore,
-                LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio
             };
+
+            if (ComputeLegacyScoringValues)
+            {
+                TaikoScoreV1Processor sv1Processor = new TaikoScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
+                attributes.LegacyComboScore = sv1Processor.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio;
+            }
+
+            return attributes;
         }
 
         /// <summary>

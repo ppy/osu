@@ -91,9 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
-            OsuScoreV1Processor sv1Processor = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
-
-            return new OsuDifficultyAttributes
+            OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
@@ -109,10 +107,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                LegacyAccuracyScore = sv1Processor.AccuracyScore,
-                LegacyComboScore = sv1Processor.ComboScore,
-                LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio
             };
+
+            if (ComputeLegacyScoringValues)
+            {
+                OsuScoreV1Processor sv1Processor = new OsuScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
+                attributes.LegacyComboScore = sv1Processor.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio;
+            }
+
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
