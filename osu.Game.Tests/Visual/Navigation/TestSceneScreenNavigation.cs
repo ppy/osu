@@ -22,6 +22,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -684,6 +685,44 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestExitWithOperationInProgress()
+        {
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            ProgressNotification progressNotification = null!;
+
+            AddStep("start ongoing operation", () =>
+            {
+                progressNotification = new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                };
+                Game.Notifications.Post(progressNotification);
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddStep("cancel exit", () => InputManager.Key(Key.Escape));
+            AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+            AddStep("complete operation", () =>
+            {
+                progressNotification.Progress = 100;
+                progressNotification.State = ProgressNotificationState.Completed;
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
+        }
+
+        [Test]
         public void TestExitGameFromSongSelect()
         {
             PushAndConfirm(() => new TestPlaySongSelect());
@@ -699,7 +738,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestRapidBackButtonExit()
+        public void TestExitWithHoldDisabled()
         {
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
 
@@ -711,7 +750,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             pushEscape();
 
-            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
+            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
         }
 
         private Func<Player> playToResults()
