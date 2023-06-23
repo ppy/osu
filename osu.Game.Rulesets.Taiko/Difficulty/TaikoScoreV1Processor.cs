@@ -70,11 +70,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             int objectCount = countNormal + countSlider + countSpinner;
 
+            int drainLength = 0;
+
+            if (baseBeatmap.HitObjects.Count > 0)
+            {
+                int breakLength = baseBeatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
+                drainLength = ((int)Math.Round(baseBeatmap.HitObjects[^1].StartTime) - (int)Math.Round(baseBeatmap.HitObjects[0].StartTime) - breakLength) / 1000;
+            }
+
             difficultyPeppyStars = (int)Math.Round(
                 (baseBeatmap.Difficulty.DrainRate
                  + baseBeatmap.Difficulty.OverallDifficulty
                  + baseBeatmap.Difficulty.CircleSize
-                 + Math.Clamp(objectCount / baseBeatmap.Difficulty.DrainRate * 8, 0, 16)) / 38 * 5);
+                 + Math.Clamp(objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
             modMultiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
 
