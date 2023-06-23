@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
@@ -251,7 +252,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             public virtual IBindable<int> UnreadCount => null;
 
-            public bool HasOngoingOperations => false;
+            public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }
     }
 }

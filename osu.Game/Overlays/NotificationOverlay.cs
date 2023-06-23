@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -33,7 +34,8 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public bool HasOngoingOperations => sections.Any(s => s.Children.OfType<ProgressNotification>().Any());
+        public IEnumerable<Notification> AllNotifications =>
+            toastTray.Notifications.Concat(sections.SelectMany(s => s.Notifications));
 
         private FlowContainer<NotificationSection> sections = null!;
 

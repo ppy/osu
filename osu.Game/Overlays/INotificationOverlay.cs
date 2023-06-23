@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Overlays.Notifications;
@@ -34,6 +36,16 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Whether there are any ongoing operations, such as imports or downloads.
         /// </summary>
-        bool HasOngoingOperations { get; }
+        public bool HasOngoingOperations => OngoingOperations.Any();
+
+        /// <summary>
+        /// All current displayed notifications, whether in the toast tray or a section.
+        /// </summary>
+        IEnumerable<Notification> AllNotifications { get; }
+
+        /// <summary>
+        /// All ongoing operations (ie. any <see cref="ProgressNotification"/> not in a completed state).
+        /// </summary>
+        public IEnumerable<ProgressNotification> OngoingOperations => AllNotifications.OfType<ProgressNotification>().Where(p => p.State != ProgressNotificationState.Completed);
     }
 }
