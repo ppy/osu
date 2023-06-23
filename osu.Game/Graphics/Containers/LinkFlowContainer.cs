@@ -8,7 +8,6 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
