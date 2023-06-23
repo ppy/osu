@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
 
-        private ExitConfirmOverlay exitConfirmOverlay;
+        private HoldToExitGameOverlay holdToExitGameOverlay;
 
         private bool exitConfirmedViaDialog;
         private bool exitConfirmedViaHoldOrClick;
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Menu
 
             if (host.CanExit)
             {
-                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
+                AddInternal(holdToExitGameOverlay = new HoldToExitGameOverlay
                 {
                     Action = () =>
                     {
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                exitConfirmOverlay?.CreateProxy() ?? Empty()
+                holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
             Buttons.StateChanged += state =>
@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Menu
                         this.Exit();
                     }, () =>
                     {
-                        exitConfirmOverlay.Abort();
+                        holdToExitGameOverlay.Abort();
                     }));
                 }
 
