@@ -27,7 +27,9 @@ namespace osu.Game.Database
             return oldScoreMatchesExpectations || scoreIsVeryOld;
         }
 
-        public static long GetNewStandardised(ScoreInfo score)
+        public static long GetNewStandardised(ScoreInfo score) => runBestCaseScoreProcessor(score).TotalScore.Value;
+
+        private static ScoreProcessor runBestCaseScoreProcessor(ScoreInfo score)
         {
             int maxJudgementIndex = 0;
 
@@ -109,7 +111,7 @@ namespace osu.Game.Database
             // Not true for all scores for whatever reason. Oh well.
             // Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
 
-            return processor.TotalScore.Value;
+            return processor;
 
             void insertMiss()
             {
@@ -185,6 +187,36 @@ namespace osu.Game.Database
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
         }
 
+        public static long ChangeComboRatio(ScoreInfo score, double oldComboPortion, double newComboPortion)
+        {
+            // Assume the incoming score already has a total score in the newest standardised calculation method.
+            double totalScore = score.TotalScore;
+
+            // Undo mod multiplier to leave us with combo and accuracy portions.
+            double scoreMultiplier = 1;
+            foreach (var m in score.Mods)
+                scoreMultiplier *= m.ScoreMultiplier;
+
+            totalScore /= scoreMultiplier;
+
+            var processor = runBestCaseScoreProcessor(score);
+
+            // Remove the accuracy and bonus portions (which we can recalculate)
+            totalScore -= processor.AccuracyPortion * Math.Pow(processor.Accuracy.Value, 10) * (1000000 * (1 - oldComboPortion));
+            totalScore -= processor.BonusPortion;
+
+            // We're left with the combo portion.
+            totalScore /= oldComboPortion;
+            totalScore *= newComboPortion;
+
+            totalScore += processor.AccuracyPortion * Math.Pow(processor.Accuracy.Value, 10) * (1000000 * (1 - newComboPortion));
+            totalScore += processor.BonusPortion;
+
+            totalScore *= scoreMultiplier;
+
+            return (long)Math.Round(totalScore);
+        }
+
         private class FakeHit : HitObject
         {
             private readonly Judgement judgement;
@@ -205,10 +237,6 @@ namespace osu.Game.Database
             {
                 MaxResult = maxResult;
             }
-        }
-
-        public static long ChangeComboRatio(ScoreInfo score, double oldComboPortion, double newComboPortion)
-        {
         }
     }
 }

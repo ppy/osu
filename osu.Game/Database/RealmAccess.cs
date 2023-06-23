@@ -972,22 +972,19 @@ namespace osu.Game.Database
                 {
                     var scores = migration.NewRealm
                                           .All<ScoreInfo>()
+                                          .Where(s => !s.IsLegacyScore)
                                           .Where(s => s.RulesetID == 0);
 
                     foreach (var score in scores)
                     {
                         try
                         {
-                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
+                            try
                             {
-                                try
-                                {
-                                    long calculatedNew = StandardisedScoreMigrationTools.ChangeComboRatio(score, 0.7, 0.5);
-                                    score.TotalScore = calculatedNew;
-                                }
-                                catch
-                                {
-                                }
+                                score.TotalScore = StandardisedScoreMigrationTools.ChangeComboRatio(score, 0.7, 0.5);
+                            }
+                            catch
+                            {
                             }
                         }
                         catch { }
