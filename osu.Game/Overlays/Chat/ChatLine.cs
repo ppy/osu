@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Chat
         private Container? highlight;
 
         /// <summary>
-        /// The colour to use to paint the chat mesasge author's username.
+        /// The colour used to paint the author's username.
         /// </summary>
         /// <remarks>
         /// The colour can be set explicitly by consumers via the property initialiser.
