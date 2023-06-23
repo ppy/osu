@@ -101,6 +101,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 };
             }
+
+            protected override void PopIn()
+            {
+            }
         }
     }
 }
