@@ -43,6 +43,12 @@ namespace osu.Game.Tournament.Tests.Components
             OnlineID = 4,
         };
 
+        private readonly TournamentUser blueUserWithCustomColour = new TournamentUser
+        {
+            Username = "nekodex",
+            OnlineID = 5,
+        };
+
         [Cached]
         private LadderInfo ladderInfo = new LadderInfo();
 
@@ -67,7 +73,7 @@ namespace osu.Game.Tournament.Tests.Components
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser, blueUserWithCustomColour } }
                 }
             };
 
@@ -107,6 +113,21 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddUntilStep("message from team blue is blue color", () =>
                 this.ChildrenOfType<DrawableChatUsername>().Last().AccentColour, () => Is.EqualTo(TournamentGame.COLOUR_BLUE));
+
+            var userWithCustomColour = blueUserWithCustomColour.ToAPIUser();
+            userWithCustomColour.Colour = "#e45678";
+
+            AddStep("message from team blue with custom colour", () => testChannel.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = userWithCustomColour,
+                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
+            }));
+
+            AddUntilStep("message from team blue is blue color", () =>
+                this.ChildrenOfType<DrawableChatUsername>().Last().AccentColour, () => Is.EqualTo(TournamentGame.COLOUR_BLUE));
+
+            AddUntilStep("message from user with custom colour is inverted", () =>
+                this.ChildrenOfType<DrawableChatUsername>().Last().Inverted, () => Is.EqualTo(true));
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
