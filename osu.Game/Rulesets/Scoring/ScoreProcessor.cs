@@ -49,6 +49,21 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
+        /// The portion of the total score attributed from combo (before mod multiplier and any scaling is applied).
+        /// </summary>
+        public double ComboPortion { get; private set; }
+
+        /// <summary>
+        /// The portion of the total score attributed from accuracy (before mod multiplier and any scaling is applied).
+        /// </summary>
+        public double AccuracyPortion { get; private set; }
+
+        /// <summary>
+        /// The portion of the total score attributed from bonus (before mod multiplier and any scaling is applied).
+        /// </summary>
+        public double BonusPortion { get; private set; }
+
+        /// <summary>
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -309,10 +324,11 @@ namespace osu.Game.Rulesets.Scoring
             MinimumAccuracy.Value = maximumBaseScore > 0 ? currentBaseScore / maximumBaseScore : 0;
             MaximumAccuracy.Value = maximumBaseScore > 0 ? (currentBaseScore + (maximumBaseScore - currentMaximumBaseScore)) / maximumBaseScore : 1;
 
-            double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
-            double accuracyProcess = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
+            ComboPortion = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
+            AccuracyPortion = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
+            BonusPortion = currentBonusPortion;
 
-            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
+            TotalScore.Value = (long)Math.Round(ComputeTotalScore(ComboPortion, AccuracyPortion, currentBonusPortion) * scoreMultiplier);
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
@@ -356,6 +372,10 @@ namespace osu.Game.Rulesets.Scoring
             currentAccuracyJudgementCount = 0;
             currentComboPortion = 0;
             currentBonusPortion = 0;
+
+            AccuracyPortion = 0;
+            ComboPortion = 0;
+            BonusPortion = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
