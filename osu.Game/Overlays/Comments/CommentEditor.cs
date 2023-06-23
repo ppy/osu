@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Comments
         private void updateCommitButtonState() =>
             commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
-        private void updateStateForLoggedIn(ValueChangedEvent<APIState> state)
+        private void updateStateForLoggedIn(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             bool isAvailable = state.NewValue > APIState.Offline;
 
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Comments
                 commitButton.Hide();
                 logInButton.Show();
             }
-        }
+        });
 
         private partial class EditorTextBox : OsuTextBox
         {
