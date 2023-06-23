@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
@@ -24,7 +23,6 @@ namespace osu.Game.Beatmaps.Legacy
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        [NotNull]
         public SampleControlPoint SamplePointAt(double time) => BinarySearchWithFallback(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : SampleControlPoint.DEFAULT);
 
         /// <summary>
@@ -40,7 +38,6 @@ namespace osu.Game.Beatmaps.Legacy
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        [NotNull]
         public DifficultyControlPoint DifficultyPointAt(double time) => BinarySearchWithFallback(DifficultyPoints, time, DifficultyControlPoint.DEFAULT);
 
         public override void Clear()

@@ -92,8 +92,8 @@ namespace osu.Game.Overlays.Settings
                 Height = 20;
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load(ChangelogOverlay changelog)
+            [BackgroundDependencyLoader]
+            private void load(ChangelogOverlay? changelog)
             {
                 Action = () => changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
 

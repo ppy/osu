@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float hover_duration = 500;
         private const float click_duration = 200;
 
-        public event Action<SelectionState> StateChanged;
+        public event Action<SelectionState>? StateChanged;
 
         private SelectionState state;
 

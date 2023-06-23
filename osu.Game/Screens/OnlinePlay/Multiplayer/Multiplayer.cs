@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.Dispose(isDisposing);
 
-            if (client != null)
+            if (client.IsNotNull())
                 client.RoomUpdated -= onRoomUpdated;
         }
     }

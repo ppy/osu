@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
-        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>();
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public Bindable<IReadOnlyList<Mod>> Current
         {
@@ -62,8 +62,6 @@ namespace osu.Game.Screens.Play.HUD
         private void updateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             iconsContainer.Clear();
-
-            if (mods.NewValue == null) return;
 
             foreach (Mod mod in mods.NewValue)
                 iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });

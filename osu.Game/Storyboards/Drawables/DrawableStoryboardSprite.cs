@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -106,7 +107,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= skinSourceChanged;
         }
     }

@@ -52,12 +52,12 @@ namespace osu.Game.Screens
             ScreenChanged(prev, next);
         }
 
-        protected virtual void ScreenChanged(IScreen prev, IScreen next)
+        protected virtual void ScreenChanged(IScreen prev, IScreen? next)
         {
             setParallax(next);
         }
 
-        private void setParallax(IScreen next) =>
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * (((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f);
+        private void setParallax(IScreen? next) =>
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((next as IOsuScreen)?.BackgroundParallaxAmount ?? 1.0f);
     }
 }

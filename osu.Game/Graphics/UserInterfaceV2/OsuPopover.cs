@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -39,7 +38,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeaFoamDarker;
         }

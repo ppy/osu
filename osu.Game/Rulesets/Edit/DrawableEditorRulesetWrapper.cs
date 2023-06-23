@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Dispose(isDisposing);
 
-            if (beatmap != null)
+            if (beatmap.IsNotNull())
             {
                 beatmap.HitObjectAdded -= addHitObject;
                 beatmap.HitObjectRemoved -= removeHitObject;

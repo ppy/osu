@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -75,10 +76,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor == null) return;
-
-            scoreProcessor.NewJudgement -= updateDisplay;
-            scoreProcessor.JudgementReverted -= updateDisplay;
+            if (scoreProcessor.IsNotNull())
+            {
+                scoreProcessor.NewJudgement -= updateDisplay;
+                scoreProcessor.JudgementReverted -= updateDisplay;
+            }
         }
 
         private partial class TextComponent : CompositeDrawable, IHasText

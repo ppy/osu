@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
             return drawable;
         }
 
-        private Drawable getDrawableForModel(IBeatmapInfo model)
+        private Drawable getDrawableForModel(IBeatmapInfo? model)
         {
             // prefer online cover where available.
             if (model?.BeatmapSet is IBeatmapSetOnlineInfo online)

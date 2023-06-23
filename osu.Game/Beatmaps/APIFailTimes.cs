@@ -15,12 +15,12 @@ namespace osu.Game.Beatmaps
         /// Points of failure on a relative time scale (usually 0..100).
         /// </summary>
         [JsonProperty(@"fail")]
-        public int[] Fails { get; set; } = Array.Empty<int>();
+        public int[]? Fails { get; set; } = Array.Empty<int>();
 
         /// <summary>
         /// Points of retry on a relative time scale (usually 0..100).
         /// </summary>
         [JsonProperty(@"exit")]
-        public int[] Retries { get; set; } = Array.Empty<int>();
+        public int[]? Retries { get; set; } = Array.Empty<int>();
     }
 }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace osu.Game.Database
 {
@@ -13,7 +12,6 @@ namespace osu.Game.Database
     public interface IHasFiles<TFile>
         where TFile : INamedFileInfo
     {
-        [NotNull]
         List<TFile> Files { get; }
 
         string Hash { get; set; }

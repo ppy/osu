@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new OsuSelectionHandler();
 
-        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject)
+        public override HitObjectSelectionBlueprint? CreateHitObjectBlueprintFor(HitObject hitObject)
         {
             switch (hitObject)
             {
