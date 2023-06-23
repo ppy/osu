@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
 
@@ -36,13 +35,13 @@ namespace osu.Game.Overlays.Comments
 
         protected TextBox TextBox { get; private set; } = null!;
 
-        protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
-
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved]
         private LoginOverlay? loginOverlay { get; set; }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         /// <summary>
         /// Returns the text content of the main action button.
@@ -162,14 +161,14 @@ namespace osu.Game.Overlays.Comments
             });
 
             TextBox.OnCommit += (_, _) => commitButton.TriggerClick();
-            User.BindTo(API.LocalUser);
+            apiState.BindTo(API.State);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Current.BindValueChanged(_ => updateCommitButtonState(), true);
-            User.BindValueChanged(_ => updateStateForLoggedIn(), true);
+            apiState.BindValueChanged(updateStateForLoggedIn, true);
         }
 
         protected abstract void OnCommit(string text);
@@ -177,12 +176,14 @@ namespace osu.Game.Overlays.Comments
         private void updateCommitButtonState() =>
             commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
 
-        private void updateStateForLoggedIn()
+        private void updateStateForLoggedIn(ValueChangedEvent<APIState> state)
         {
-            TextBox.PlaceholderText = GetPlaceholderText(API.IsLoggedIn);
-            TextBox.ReadOnly = !API.IsLoggedIn;
+            bool isAvailable = state.NewValue > APIState.Offline;
 
-            if (API.IsLoggedIn)
+            TextBox.PlaceholderText = GetPlaceholderText(isAvailable);
+            TextBox.ReadOnly = !isAvailable;
+
+            if (isAvailable)
             {
                 commitButton.Show();
                 logInButton.Hide();
