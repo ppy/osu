@@ -446,15 +446,11 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (!(link.Argument is IUser user))
-                    {
-                        user = int.TryParse(argString, out int userId)
-                            ? new APIUser { Id = userId }
-                            : new APIUser { Username = argString };
-                    }
+                    var user = int.TryParse(argString, out int userId)
+                        ? new APIUser { Id = userId }
+                        : new APIUser { Username = argString };
 
                     ShowUser(user);
-
                     break;
 
                 case LinkAction.OpenWiki:
