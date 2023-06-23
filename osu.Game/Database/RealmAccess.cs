@@ -76,8 +76,10 @@ namespace osu.Game.Database
         /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
         /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
+        /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
+        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
         /// </summary>
-        private const int schema_version = 28;
+        private const int schema_version = 30;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -724,6 +726,11 @@ namespace osu.Game.Database
 
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
+            Logger.Log($"Running realm migration to version {targetVersion}...");
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
             switch (targetVersion)
             {
                 case 7:
@@ -930,7 +937,38 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 29:
+                case 30:
+                {
+                    var scores = migration.NewRealm
+                                          .All<ScoreInfo>()
+                                          .Where(s => !s.IsLegacyScore);
+
+                    foreach (var score in scores)
+                    {
+                        try
+                        {
+                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
+                            {
+                                try
+                                {
+                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                    score.TotalScore = calculatedNew;
+                                }
+                                catch
+                                {
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+
+                    break;
+                }
             }
+
+            Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId)
