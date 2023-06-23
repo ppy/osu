@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void checkSound(HitType hitType, string expectedName, string expectedBank)
         {
-            AddStep($"hit {hitType}", () => triggerSource.Play(hitType, false));
+            AddStep($"hit {hitType}", () => triggerSource.Play(hitType));
             AddAssert($"last played sample is {expectedName}", () => triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().Single().Name, () => Is.EqualTo(expectedName));
             AddAssert($"last played sample has {expectedBank} bank", () => triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().Single().Bank, () => Is.EqualTo(expectedBank));
         }

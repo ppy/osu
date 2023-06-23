@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (strong && hitType == HitType.Rim)
                 flushRimTriggerSources();
 
-            triggerSource.Play(hitType, strong);
+            triggerSource.Play(hitType);
 
             lastHitTime = Time.Current;
             lastAction = e.Action;

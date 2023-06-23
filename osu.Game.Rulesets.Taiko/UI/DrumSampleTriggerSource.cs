@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -36,28 +37,27 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        public void Play(HitType hitType, bool strong)
+        public void Play(HitType hitType)
         {
             var hitObject = GetMostValidObject();
 
             if (hitObject == null)
                 return;
 
-            var sample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
+            var strongSamples = hitObject.Samples.Where(s => s.Bank == HitSampleInfo.BANK_STRONG).Cast<ISampleInfo>().ToArray();
 
-            if (strong)
+            if (strongSamples.Any())
             {
-                var strongHitSample = sample.With(newBank: HitSampleInfo.BANK_STRONG);
-
                 // Special behaviour if the skin has strong samples available.
-                if (skinSource.GetSample(strongHitSample) != null)
+                if (skinSource.GetSample(strongSamples.First()) != null)
                 {
                     StopAllPlayback();
-                    PlaySamples(new ISampleInfo[] { strongHitSample });
+                    PlaySamples(strongSamples);
                     return;
                 }
             }
 
+            var sample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
             PlaySamples(new ISampleInfo[] { sample });
         }
 

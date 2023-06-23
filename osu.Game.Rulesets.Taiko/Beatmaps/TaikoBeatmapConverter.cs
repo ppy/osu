@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     // For the sake of the argon skin, add a sample with the strong bank here.
                     // This ensures it's correctly pooled for future usage.
-                    h.Samples.Add(h.Samples.First().With(newBank: HitSampleInfo.BANK_STRONG));
+                    h.Samples.Add(h.CreateHitSampleInfo().With(newBank: HitSampleInfo.BANK_STRONG));
 
                     if (hit.Type == HitType.Rim)
                     {
