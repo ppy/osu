@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             lastFlourish = h.StartTime;
 
                             if (h.Samples.All(s => s.Name != HitSampleInfo.HIT_FLOURISH))
-                                h.Samples.Add(h.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH));
+                                h.Samples.Add(h.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newBank: HitSampleInfo.BANK_STRONG));
                         }
                     }
                 }
