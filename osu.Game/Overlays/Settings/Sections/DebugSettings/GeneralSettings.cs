@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
     {
         protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, IPerformFromScreenRunner? performer)
         {
             Children = new Drawable[]
