@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Android
     {
         protected override Framework.Game CreateGame() => new OsuTestBrowser();
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 

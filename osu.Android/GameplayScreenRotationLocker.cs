@@ -11,7 +11,7 @@ namespace osu.Android
 {
     public partial class GameplayScreenRotationLocker : Component
     {
-        private Bindable<bool> localUserPlaying;
+        private Bindable<bool> localUserPlaying = null!;
 
         [Resolved]
         private OsuGameActivity gameActivity { get; set; } = null!;
