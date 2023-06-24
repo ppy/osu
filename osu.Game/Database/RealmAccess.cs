@@ -979,15 +979,11 @@ namespace osu.Game.Database
                     {
                         try
                         {
-                            try
-                            {
-                                score.TotalScore = StandardisedScoreMigrationTools.ChangeComboRatio(score, 0.7, 0.5);
-                            }
-                            catch
-                            {
-                            }
+                            score.TotalScore = StandardisedScoreMigrationTools.ChangeOsuComboRatio(score, 0.7, 0.5);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
 
                     break;

@@ -187,8 +187,11 @@ namespace osu.Game.Database
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
         }
 
-        public static long ChangeComboRatio(ScoreInfo score, double oldComboPortion, double newComboPortion)
+        public static long ChangeOsuComboRatio(ScoreInfo score, double oldComboPortion, double newComboPortion)
         {
+            if (score.RulesetID != 0)
+                throw new ArgumentException($"{nameof(score)} must be an osu! ruleset score");
+
             // Assume the incoming score already has a total score in the newest standardised calculation method.
             double totalScore = score.TotalScore;
 
