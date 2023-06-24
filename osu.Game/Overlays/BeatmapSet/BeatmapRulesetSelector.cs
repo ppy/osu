@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -13,9 +11,9 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public partial class BeatmapRulesetSelector : OverlayRulesetSelector
     {
-        private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
+        private readonly Bindable<APIBeatmapSet?> beatmapSet = new Bindable<APIBeatmapSet?>();
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             get => beatmapSet.Value;
             set

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,10 +28,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly Box foregroundFill;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapCardDownloadProgressBar()
         {

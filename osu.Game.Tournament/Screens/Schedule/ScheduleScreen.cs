@@ -177,7 +177,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value)
+                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value ?? string.Empty)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
