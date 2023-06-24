@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
-        public APIBeatmap BeatmapInfo
+        public APIBeatmap? BeatmapInfo
         {
             get => successRate.Beatmap;
             set => successRate.Beatmap = value;
