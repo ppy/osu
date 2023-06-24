@@ -128,14 +128,17 @@ namespace osu.Game.Scoring.Legacy
 
                 int lastTime = 0;
 
-                foreach (var f in score.Replay.Frames)
+                if (score.Replay != null)
                 {
-                    var legacyFrame = getLegacyFrame(f);
+                    foreach (var f in score.Replay.Frames)
+                    {
+                        var legacyFrame = getLegacyFrame(f);
 
-                    // Rounding because stable could only parse integral values
-                    int time = (int)Math.Round(legacyFrame.Time + offset);
-                    replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
-                    lastTime = time;
+                        // Rounding because stable could only parse integral values
+                        int time = (int)Math.Round(legacyFrame.Time + offset);
+                        replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
+                        lastTime = time;
+                    }
                 }
 
                 // Warning: this is purposefully hardcoded as a string rather than interpolating, as in some cultures the minus sign is not encoded as the standard ASCII U+00C2 codepoint,
