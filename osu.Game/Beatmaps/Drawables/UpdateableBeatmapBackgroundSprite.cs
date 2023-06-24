@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override double TransformDuration => 400;
 
-        protected override Drawable CreateDrawable(IBeatmapInfo model)
+        protected override Drawable CreateDrawable(IBeatmapInfo? model)
         {
             var drawable = getDrawableForModel(model);
             drawable.RelativeSizeAxes = Axes.Both;
