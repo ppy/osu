@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     // but markdig is a transitive dependency from framework, wherein we are locked to 0.23.0
                     // (https://github.com/ppy/osu-framework/blob/9746d7d06f48910c05a24687a25f435f30d12f8b/osu.Framework/osu.Framework.csproj#L52C1-L54)
                     // Therefore...
-                    // ReSharper disable once ConstantConditionalAccessQualifier
+                    // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
                     bool isOrdered = ((ListBlock)listItemBlock.Parent)?.IsOrdered == true;
 
                     OsuMarkdownListItem childContainer = CreateListItem(listItemBlock, level, isOrdered);
