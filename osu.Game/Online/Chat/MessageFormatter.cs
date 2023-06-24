@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -246,6 +247,14 @@ namespace osu.Game.Online.Chat
             return new LinkDetails(LinkAction.External, url);
         }
 
+        private static LinkDetails getUserLink(string argument)
+        {
+            if (int.TryParse(argument, out int userId))
+                return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
+
+            return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
+        }
+
         public static string? GetUrl(LinkDetails link)
         {
             switch (link.Action)
@@ -265,7 +274,11 @@ namespace osu.Game.Online.Chat
                     return $@"https://{WebsiteRootUrl}/beatmapsets/{link.Argument}";
 
                 case LinkAction.OpenUserProfile:
-                    return $@"https://{WebsiteRootUrl}/users/{link.Argument}";
+                    var user = (IUser)link.Argument;
+
+                    return user.OnlineID > 1
+                        ? $@"https://{WebsiteRootUrl}/users/{user.OnlineID}"
+                        : $@"https://{WebsiteRootUrl}/users/{user.Username}";
 
                 case LinkAction.OpenWiki:
                     return $@"https://{WebsiteRootUrl}/wiki/{link.Argument}";
@@ -287,14 +300,6 @@ namespace osu.Game.Online.Chat
             }
 
             return null;
-        }
-
-        private static LinkDetails getUserLink(string argument)
-        {
-            if (int.TryParse(argument, out int userId))
-                return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
-
-            return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
