@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
-        protected override bool IsValidDirectory(DirectoryInfo info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
+        protected override bool IsValidDirectory(DirectoryInfo? info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
 
         public override LocalisableString HeaderText => "Please select your osu!stable install location";
 
