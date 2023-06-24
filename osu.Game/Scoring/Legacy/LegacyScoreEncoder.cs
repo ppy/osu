@@ -126,10 +126,10 @@ namespace osu.Game.Scoring.Legacy
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
                 double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
+                int lastTime = 0;
+
                 if (score.Replay != null)
                 {
-                    int lastTime = 0;
-
                     foreach (var f in score.Replay.Frames)
                     {
                         var legacyFrame = getLegacyFrame(f);
