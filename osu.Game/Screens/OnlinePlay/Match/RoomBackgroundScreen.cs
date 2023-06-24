@@ -9,9 +9,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public partial class RoomBackgroundScreen : OnlinePlayBackgroundScreen
     {
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
-        public RoomBackgroundScreen(PlaylistItem initialPlaylistItem)
+        public RoomBackgroundScreen(PlaylistItem? initialPlaylistItem)
         {
             PlaylistItem = initialPlaylistItem;
             SelectedItem.BindValueChanged(item => PlaylistItem = item.NewValue);

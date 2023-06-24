@@ -10,9 +10,9 @@ namespace osu.Game.Online.Rooms
     public class JoinRoomRequest : APIRequest
     {
         public readonly Room Room;
-        public readonly string Password;
+        public readonly string? Password;
 
-        public JoinRoomRequest(Room room, string password)
+        public JoinRoomRequest(Room room, string? password)
         {
             Room = room;
             Password = password;
