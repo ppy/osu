@@ -30,6 +30,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, IKeybindingEventsEmitter
+    public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -327,8 +329,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(IKeybindingListener skinComponent) =>
-            (KeyBindingInputManager as IKeybindingEventsEmitter)?.Attach(skinComponent);
+        public void Attach(KeyCounterController keyCounter) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+
+        public void Attach(ClicksPerSecondCalculator calculator) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
