@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,10 +17,10 @@ namespace osu.Game.Tournament.Components
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
-        private ChannelManager manager;
+        private ChannelManager? manager;
 
         [Resolved]
-        private LadderInfo ladderInfo { get; set; }
+        private LadderInfo ladderInfo { get; set; } = null!;
 
         public TournamentMatchChatDisplay()
         {
@@ -34,8 +32,8 @@ namespace osu.Game.Tournament.Components
             CornerRadius = 0;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(MatchIPCInfo ipc, IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load(MatchIPCInfo? ipc, IAPIProvider api)
         {
             if (ipc != null)
             {
@@ -92,10 +90,13 @@ namespace osu.Game.Tournament.Components
             public MatchMessage(Message message, LadderInfo info)
                 : base(message)
             {
-                if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
-                    UsernameColour = TournamentGame.COLOUR_RED;
-                else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
-                    UsernameColour = TournamentGame.COLOUR_BLUE;
+                if (info.CurrentMatch.Value is TournamentMatch match)
+                {
+                    if (match.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                        UsernameColour = TournamentGame.COLOUR_RED;
+                    else if (match.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                        UsernameColour = TournamentGame.COLOUR_BLUE;
+                }
             }
         }
     }
