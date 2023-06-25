@@ -76,7 +76,7 @@ namespace osu.Game.Tournament.Tests.Components
                 Content = "I am a wang!"
             }));
 
-            AddStep("set Current match", () => ladderInfo.CurrentMatch.Value = new TournamentMatch
+            AddStep("set current match", () => ladderInfo.CurrentMatch.Value = new TournamentMatch
             {
                 Team1 =
                 {
