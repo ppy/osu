@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.UI
@@ -28,6 +29,11 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container<SkinnableSound> hitSounds;
 
+        private HitObjectLifetimeEntry? mostValidObject;
+
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
+
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
@@ -39,14 +45,12 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        private HitObjectLifetimeEntry fallbackObject;
-
         /// <summary>
         /// Play the most appropriate hit sound for the current point in time.
         /// </summary>
         public virtual void Play()
         {
-            var nextObject = GetMostValidObject();
+            HitObject? nextObject = GetMostValidObject();
 
             if (nextObject == null)
                 return;
@@ -65,64 +69,61 @@ namespace osu.Game.Rulesets.UI
             hitSound.Play();
         });
 
-        protected HitObject GetMostValidObject()
+        protected HitObject? GetMostValidObject()
         {
-            // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
-            var drawableHitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true);
-
-            if (drawableHitObject != null)
-            {
-                // A hit object may have a more valid nested object.
-                drawableHitObject = getMostValidNestedDrawable(drawableHitObject);
-
-                return drawableHitObject.HitObject;
-            }
-
-            // In the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
-            // This lookup can be skipped if the last entry is still valid (in the future and not yet hit).
-            if (fallbackObject == null || fallbackObject.Result?.HasResult == true)
+            if (mostValidObject == null || isAlreadyHit(mostValidObject))
             {
                 // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
                 // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
-                fallbackObject = hitObjectContainer.Entries
-                                                   .Where(e => e.Result?.HasResult != true).MinBy(e => e.HitObject.StartTime);
-
-                if (fallbackObject != null)
-                    return getEarliestNestedObject(fallbackObject.HitObject);
+                var candidate =
+                    // Use alive entries first as an optimisation.
+                    hitObjectContainer.AliveEntries.Select(tuple => tuple.Entry).Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
+                    ?? hitObjectContainer.Entries.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime);
 
                 // In the case there are no non-judged objects, the last hit object should be used instead.
-                fallbackObject ??= hitObjectContainer.Entries.LastOrDefault();
+                if (candidate == null)
+                {
+                    mostValidObject = hitObjectContainer.Entries.LastOrDefault();
+                }
+                else
+                {
+                    if (isCloseEnoughToCurrentTime(candidate.HitObject))
+                    {
+                        mostValidObject = candidate;
+                    }
+                    else
+                    {
+                        mostValidObject ??= hitObjectContainer.Entries.FirstOrDefault();
+                    }
+                }
             }
 
-            if (fallbackObject == null)
+            if (mostValidObject == null)
                 return null;
 
-            bool fallbackHasResult = fallbackObject.Result?.HasResult == true;
-
             // If the fallback has been judged then we want the sample from the object itself.
-            if (fallbackHasResult)
-                return fallbackObject.HitObject;
+            if (isAlreadyHit(mostValidObject))
+                return mostValidObject.HitObject;
 
-            // Else we want the earliest (including nested).
+            // Else we want the earliest valid nested.
             // In cases of nested objects, they will always have earlier sample data than their parent object.
-            return getEarliestNestedObject(fallbackObject.HitObject);
+            return getAllNested(mostValidObject.HitObject).OrderBy(h => h.GetEndTime()).SkipWhile(h => h.GetEndTime() <= getReferenceTime()).FirstOrDefault() ?? mostValidObject.HitObject;
         }
 
-        private DrawableHitObject getMostValidNestedDrawable(DrawableHitObject o)
+        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
+        private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
+
+        private double getReferenceTime() => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
+
+        private IEnumerable<HitObject> getAllNested(HitObject hitObject)
         {
-            var nestedWithoutResult = o.NestedHitObjects.FirstOrDefault(n => n.Result?.HasResult != true);
+            foreach (var h in hitObject.NestedHitObjects)
+            {
+                yield return h;
 
-            if (nestedWithoutResult == null)
-                return o;
-
-            return getMostValidNestedDrawable(nestedWithoutResult);
-        }
-
-        private HitObject getEarliestNestedObject(HitObject hitObject)
-        {
-            var nested = hitObject.NestedHitObjects.FirstOrDefault();
-
-            return nested != null ? getEarliestNestedObject(nested) : hitObject;
+                foreach (var n in getAllNested(h))
+                    yield return n;
+            }
         }
 
         private SkinnableSound getNextSample()
