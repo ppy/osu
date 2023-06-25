@@ -19,11 +19,13 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract partial class RulesetInputManager<T> : PassThroughInputManager, IKeybindingEventsEmitter, IHasReplayHandler, IHasRecordingHandler
+    public abstract partial class RulesetInputManager<T> : PassThroughInputManager, ICanAttachHUDPieces, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         protected override bool AllowRightClickFromLongTouch => false;
@@ -64,7 +66,6 @@ namespace osu.Game.Rulesets.UI
             InternalChild = KeyBindingContainer =
                 CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
-            KeyBindingContainer.Add(actionListener = new ActionListener());
         }
 
         [BackgroundDependencyLoader(true)]
@@ -157,49 +158,47 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        #region Component attachement
+        #region Key Counter Attachment
 
-        private readonly ActionListener actionListener;
-
-        public void Attach(IKeybindingListener skinComponent)
+        public void Attach(KeyCounterController keyCounter)
         {
-            skinComponent.Setup(KeyBindingContainer.DefaultKeyBindings
+            KeyBindingContainer.Add(keyCounter);
+
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
-                                                   .OrderBy(a => a));
+                                                   .OrderBy(action => action)
+                                                   .Select(action => new KeyCounterActionTrigger<T>(action)));
+        }
 
-            if (skinComponent.CanHandleKeybindings && skinComponent is Drawable component)
-            {
-                try
-                {
-                    KeyBindingContainer.Add(component);
-                    return;
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-            }
+        #endregion
 
-            actionListener.OnPressedEvent += skinComponent.OnPressed;
-            actionListener.OnReleasedEvent += skinComponent.OnReleased;
+        #region Keys per second Counter Attachment
+
+        public void Attach(ClicksPerSecondCalculator calculator)
+        {
+            var listener = new ActionListener(calculator);
+
+            KeyBindingContainer.Add(listener);
         }
 
         private partial class ActionListener : Component, IKeyBindingHandler<T>
         {
-            public event Action<KeyBindingPressEvent<T>> OnPressedEvent;
+            private readonly ClicksPerSecondCalculator calculator;
 
-            public event Action<KeyBindingReleaseEvent<T>> OnReleasedEvent;
+            public ActionListener(ClicksPerSecondCalculator calculator)
+            {
+                this.calculator = calculator;
+            }
 
             public bool OnPressed(KeyBindingPressEvent<T> e)
             {
-                OnPressedEvent?.Invoke(e);
+                calculator.AddInputTimestamp();
                 return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
-                OnReleasedEvent?.Invoke(e);
             }
         }
 
@@ -240,11 +239,17 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// Sends <see cref="IKeyBinding"/> events to a <see cref="IKeybindingListener"/>
+    /// Supports attaching various HUD pieces.
+    /// Keys will be populated automatically and a receptor will be injected inside.
     /// </summary>
-    public interface IKeybindingEventsEmitter
+    public interface ICanAttachHUDPieces
     {
-        void Attach(IKeybindingListener component);
+        void Attach(KeyCounterController keyCounter);
+        void Attach(ClicksPerSecondCalculator calculator);
+    }
+
+    public interface IAttachableSkinComponent
+    {
     }
 
     public class RulesetInputManagerInputState<T> : InputState
