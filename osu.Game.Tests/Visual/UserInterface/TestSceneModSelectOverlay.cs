@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dismiss mod customisation via toggle", () =>
             {
-                InputManager.MoveMouseTo(modSelectOverlay.CustomisationButton);
+                InputManager.MoveMouseTo(modSelectOverlay.CustomisationButton.AsNonNull());
                 InputManager.Click(MouseButton.Left);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -558,7 +558,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             void navigateAndClick<T>() where T : Drawable
             {
-                InputManager.MoveMouseTo(modSelectOverlay.ChildrenOfType<T>().FirstOrDefault());
+                InputManager.MoveMouseTo(modSelectOverlay.ChildrenOfType<T>().First());
                 InputManager.Click(MouseButton.Left);
             }
         }

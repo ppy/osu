@@ -825,6 +825,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Click on a filtered difficulty", () =>
             {
+                Debug.Assert(filteredIcon != null);
+
                 InputManager.MoveMouseTo(filteredIcon);
 
                 InputManager.Click(MouseButton.Left);
@@ -918,6 +920,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Click on a difficulty", () =>
             {
+                Debug.Assert(difficultyIcon != null);
+
                 InputManager.MoveMouseTo(difficultyIcon);
 
                 InputManager.Click(MouseButton.Left);
