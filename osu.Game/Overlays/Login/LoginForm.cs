@@ -43,43 +43,50 @@ namespace osu.Game.Overlays.Login
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
         {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(0, SettingsSection.ITEM_SPACING);
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
-            Padding = new MarginPadding
-            {
-                Top = 5,
-                Bottom = 24,
-            };
+
             ErrorTextFlowContainer errorText;
             LinkFlowContainer forgottenPasswordLink;
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = LoginPanelStrings.Account.ToUpper(),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                },
-                username = new OsuTextBox
-                {
-                    PlaceholderText = UsersStrings.LoginUsername.ToLower(),
-                    RelativeSizeAxes = Axes.X,
-                    Text = api.ProvidedUsername,
-                    TabbableContentContainer = this
-                },
-                password = new OsuPasswordTextBox
-                {
-                    PlaceholderText = UsersStrings.LoginPassword.ToLower(),
-                    RelativeSizeAxes = Axes.X,
-                    TabbableContentContainer = this,
-                },
-                errorText = new ErrorTextFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Alpha = 0,
+                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = LoginPanelStrings.Account.ToUpper(),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        },
+                        username = new OsuTextBox
+                        {
+                            PlaceholderText = UsersStrings.LoginUsername.ToLower(),
+                            RelativeSizeAxes = Axes.X,
+                            Text = api.ProvidedUsername,
+                            TabbableContentContainer = this
+                        },
+                        password = new OsuPasswordTextBox
+                        {
+                            PlaceholderText = UsersStrings.LoginPassword.ToLower(),
+                            RelativeSizeAxes = Axes.X,
+                            TabbableContentContainer = this,
+                        },
+                        errorText = new ErrorTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
+                        },
+                    },
                 },
                 new SettingsCheckbox
                 {
@@ -93,11 +100,7 @@ namespace osu.Game.Overlays.Login
                 },
                 forgottenPasswordLink = new LinkFlowContainer
                 {
-                    Padding = new MarginPadding
-                    {
-                        Left = SettingsPanel.CONTENT_MARGINS,
-                        Bottom = SettingsSection.ITEM_SPACING
-                    },
+                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },

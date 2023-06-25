@@ -17,6 +17,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 using osuTK;
 
@@ -89,8 +90,9 @@ namespace osu.Game.Overlays.Login
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0f, 5f),
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
                         Children = new Drawable[]
                         {
                             new LoadingSpinner
@@ -106,7 +108,6 @@ namespace osu.Game.Overlays.Login
                                 TextAnchor = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
-                                Margin = new MarginPadding { Top = 10, Bottom = 10 },
                             },
                         },
                     };
@@ -119,9 +120,9 @@ namespace osu.Game.Overlays.Login
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Left = 20, Right = 20 },
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0f, 10f),
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -130,7 +131,6 @@ namespace osu.Game.Overlays.Login
                                 Origin = Anchor.TopCentre,
                                 Text = LoginPanelStrings.SignedIn,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
                             },
                             panel = new UserGridPanel(api.LocalUser.Value)
                             {

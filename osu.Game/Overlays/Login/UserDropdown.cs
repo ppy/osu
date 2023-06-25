@@ -36,8 +36,6 @@ namespace osu.Game.Overlays.Login
                 Masking = true;
                 CornerRadius = 5;
 
-                Margin = new MarginPadding { Bottom = 5 };
-
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
@@ -86,7 +84,6 @@ namespace osu.Game.Overlays.Login
             public UserDropdownHeader()
             {
                 Foreground.Padding = new MarginPadding { Left = 10, Right = 10 };
-                Margin = new MarginPadding { Bottom = 5 };
                 Masking = true;
                 CornerRadius = 5;
                 EdgeEffect = new EdgeEffectParameters
