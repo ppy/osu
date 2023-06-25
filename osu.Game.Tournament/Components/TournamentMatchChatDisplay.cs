@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Components
             CornerRadius = 0;
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(MatchIPCInfo? ipc, IAPIProvider api)
         {
             if (ipc != null)
