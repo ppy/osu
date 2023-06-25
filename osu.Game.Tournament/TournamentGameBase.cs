@@ -15,6 +15,7 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
@@ -35,6 +36,7 @@ namespace osu.Game.Tournament
         private TournamentStorage storage;
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
+        private BeatmapLookupCache beatmapCache;
 
         protected Task BracketLoadTask => bracketLoadTaskCompletionSource.Task;
 
@@ -75,6 +77,8 @@ namespace osu.Game.Tournament
             Textures.AddTextureSource(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
+
+            beatmapCache = dependencies.Get<BeatmapLookupCache>();
         }
 
         protected override void LoadComplete()
@@ -241,9 +245,7 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
-                API.Perform(req);
-                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
+                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetAwaiter().GetResult() ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -268,9 +270,7 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
-                API.Perform(req);
-                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
+                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetAwaiter().GetResult() ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
