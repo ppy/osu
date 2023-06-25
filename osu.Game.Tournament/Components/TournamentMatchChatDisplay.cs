@@ -90,12 +90,13 @@ namespace osu.Game.Tournament.Components
             public MatchMessage(Message message, LadderInfo info)
                 : base(message)
             {
-                if (info.CurrentMatch.Value == null) return;
-
-                if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
-                    UsernameColour = TournamentGame.COLOUR_RED;
-                else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
-                    UsernameColour = TournamentGame.COLOUR_BLUE;
+                if (info.CurrentMatch.Value is TournamentMatch match)
+                {
+                    if (match.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                        UsernameColour = TournamentGame.COLOUR_RED;
+                    else if (match.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                        UsernameColour = TournamentGame.COLOUR_BLUE;
+                }
             }
         }
     }
