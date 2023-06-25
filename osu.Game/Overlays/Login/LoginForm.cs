@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
@@ -56,6 +57,11 @@ namespace osu.Game.Overlays.Login
 
             Children = new Drawable[]
             {
+                new OsuSpriteText
+                {
+                    Text = LoginPanelStrings.Account.ToUpper(),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                },
                 username = new OsuTextBox
                 {
                     PlaceholderText = UsersStrings.LoginUsername.ToLower(),

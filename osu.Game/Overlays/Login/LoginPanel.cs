@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class LoginPanel : FillFlowContainer
+    public partial class LoginPanel : Container
     {
         private bool bounding = true;
         private LoginForm form;
@@ -59,8 +59,6 @@ namespace osu.Game.Overlays.Login
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0f, 5f);
         }
 
         [BackgroundDependencyLoader]
@@ -77,18 +75,9 @@ namespace osu.Game.Overlays.Login
             switch (state.NewValue)
             {
                 case APIState.Offline:
-                    Children = new Drawable[]
+                    Child = form = new LoginForm
                     {
-                        new OsuSpriteText
-                        {
-                            Text = LoginPanelStrings.Account.ToUpper(),
-                            Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        },
-                        form = new LoginForm
-                        {
-                            RequestHide = RequestHide
-                        }
+                        RequestHide = RequestHide
                     };
                     break;
 
@@ -96,22 +85,29 @@ namespace osu.Game.Overlays.Login
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
 
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new LoadingSpinner
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, 5f),
+                        Children = new Drawable[]
                         {
-                            State = { Value = Visibility.Visible },
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        linkFlow = new LinkFlowContainer
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            TextAnchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
-                            Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                            new LoadingSpinner
+                            {
+                                State = { Value = Visibility.Visible },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            linkFlow = new LinkFlowContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                TextAnchor = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
+                                Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                            },
                         },
                     };
 
@@ -119,40 +115,37 @@ namespace osu.Game.Overlays.Login
                     break;
 
                 case APIState.Online:
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new FillFlowContainer
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Left = 20, Right = 20 },
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, 10f),
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0f, 10f),
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Children = new[]
+                                    new OsuSpriteText
                                     {
-                                        new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = LoginPanelStrings.SignedIn,
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                            Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                        },
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = LoginPanelStrings.SignedIn,
+                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                        Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                     },
                                 },
-                                panel = new UserGridPanel(api.LocalUser.Value)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Action = RequestHide
-                                },
-                                dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                             },
+                            panel = new UserGridPanel(api.LocalUser.Value)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Action = RequestHide
+                            },
+                            dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                         },
                     };
 
