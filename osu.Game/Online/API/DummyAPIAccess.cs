@@ -56,6 +56,7 @@ namespace osu.Game.Online.API
         private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
 
         private bool shouldFailNextLogin;
+        private bool stayConnectingNextLogin;
 
         /// <summary>
         /// The current connectivity state of the API.
@@ -93,6 +94,12 @@ namespace osu.Game.Online.API
         public void Login(string username, string password)
         {
             state.Value = APIState.Connecting;
+
+            if (stayConnectingNextLogin)
+            {
+                stayConnectingNextLogin = false;
+                return;
+            }
 
             if (shouldFailNextLogin)
             {
@@ -138,6 +145,7 @@ namespace osu.Game.Online.API
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
         public void FailNextLogin() => shouldFailNextLogin = true;
+        public void StayConnectingNextLogin() => stayConnectingNextLogin = true;
 
         protected override void Dispose(bool isDisposing)
         {
