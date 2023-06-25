@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays.Login;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays
                             AutoSizeEasing = Easing.OutQuint,
                             Child = panel = new LoginPanel
                             {
-                                Padding = new MarginPadding(10),
+                                Padding = new MarginPadding { Vertical = SettingsSection.ITEM_SPACING },
                                 RequestHide = Hide,
                             },
                         }
