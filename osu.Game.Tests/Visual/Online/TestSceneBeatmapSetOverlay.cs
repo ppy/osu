@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -39,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() => SelectedMods.Value = Array.Empty<Mod>());
@@ -86,6 +84,7 @@ namespace osu.Game.Tests.Visual.Online
                             StarRating = 9.99,
                             DifficultyName = @"TEST",
                             Length = 456000,
+                            HitLength = 400000,
                             RulesetID = 3,
                             CircleSize = 1,
                             DrainRate = 2.3f,

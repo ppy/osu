@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.IO;
@@ -43,7 +41,7 @@ namespace osu.Game.Beatmaps
         }
 
         protected override IBeatmap GetBeatmap() => beatmap;
-        protected override Texture GetBackground() => throw new NotImplementedException();
+        public override Texture GetBackground() => throw new NotImplementedException();
         protected override Track GetBeatmapTrack() => throw new NotImplementedException();
         protected internal override ISkin GetSkin() => throw new NotImplementedException();
         public override Stream GetStream(string storagePath) => throw new NotImplementedException();

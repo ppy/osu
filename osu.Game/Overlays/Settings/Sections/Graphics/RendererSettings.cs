@@ -67,10 +67,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
-                dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
+                if (game?.RestartAppWhenExited() == true)
                 {
-                    renderer.Value = automaticRendererInUse ? RendererType.Automatic : host.ResolvedRenderer;
-                }));
+                    game.AttemptExit();
+                }
+                else
+                {
+                    dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
+                    {
+                        renderer.Value = automaticRendererInUse ? RendererType.Automatic : host.ResolvedRenderer;
+                    }));
+                }
             });
 
             // TODO: remove this once we support SDL+android.

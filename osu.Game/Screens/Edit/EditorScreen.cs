@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,7 +15,7 @@ namespace osu.Game.Screens.Edit
     public abstract partial class EditorScreen : VisibilityContainer
     {
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;

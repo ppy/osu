@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -18,6 +16,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
+
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
         {
@@ -62,14 +63,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             for (int i = 0; i < requiredCircles; i++)
             {
-                float diameter = (offset + (i + 1) * DistanceBetweenTicks) * 2;
+                const float thickness = 4;
+                float diameter = (offset + (i + 1) * DistanceBetweenTicks + thickness / 2) * 2;
 
                 AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
                 {
                     Position = StartPosition,
                     Origin = Anchor.Centre,
                     Size = new Vector2(diameter),
-                    InnerRadius = 4 * 1f / diameter,
+                    InnerRadius = thickness * 1f / diameter,
                 });
             }
         }
@@ -98,9 +100,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (travelLength < DistanceBetweenTicks)
                 travelLength = DistanceBetweenTicks;
 
-            // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
-            // to allow for snapping at a non-multiplied ratio.
-            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
+            float snappedDistance = LimitedDistanceSnap.Value
+                ? SnapProvider.DurationToDistance(ReferenceObject, editorClock.CurrentTime - ReferenceObject.GetEndTime())
+                // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
+                // to allow for snapping at a non-multiplied ratio.
+                : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
+
             double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
 
             if (snappedTime > LatestEndTime)
@@ -120,10 +125,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private partial class Ring : CircularProgress
         {
             [Resolved]
-            private IDistanceSnapProvider snapProvider { get; set; }
+            private IDistanceSnapProvider snapProvider { get; set; } = null!;
 
-            [Resolved(canBeNull: true)]
-            private EditorClock editorClock { get; set; }
+            [Resolved]
+            private EditorClock? editorClock { get; set; }
 
             private readonly HitObject referenceObject;
 

@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -25,7 +24,6 @@ namespace osu.Game.Scoring
     /// <summary>
     /// A realm model containing metadata for a single score.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
@@ -183,8 +181,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [Ignored]
-        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+        public bool IsLegacyScore { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 

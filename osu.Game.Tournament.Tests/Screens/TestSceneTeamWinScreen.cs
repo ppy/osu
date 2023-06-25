@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -17,7 +15,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("set up match", () =>
             {
-                var match = Ladder.CurrentMatch.Value;
+                var match = Ladder.CurrentMatch.Value!;
 
                 match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
                 match.Completed.Value = true;

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -56,20 +57,53 @@ namespace osu.Game.Overlays.SkinEditor
             if (deserializedContent == null)
                 return;
 
-            SerialisedDrawableInfo[] skinnableInfo = deserializedContent.ToArray();
-            Drawable[] targetComponents = firstTarget.Components.OfType<Drawable>().ToArray();
+            SerialisedDrawableInfo[] skinnableInfos = deserializedContent.ToArray();
+            ISerialisableDrawable[] targetComponents = firstTarget.Components.ToArray();
 
-            if (!skinnableInfo.Select(s => s.Type).SequenceEqual(targetComponents.Select(d => d.GetType())))
+            // Store components based on type for later reuse
+            var componentsPerTypeLookup = new Dictionary<Type, Queue<Drawable>>();
+
+            foreach (ISerialisableDrawable component in targetComponents)
             {
-                // Perform a naive full reload for now.
-                firstTarget.Reload(skinnableInfo);
+                Type lookup = component.GetType();
+
+                if (!componentsPerTypeLookup.TryGetValue(lookup, out Queue<Drawable>? componentsOfSameType))
+                    componentsPerTypeLookup.Add(lookup, componentsOfSameType = new Queue<Drawable>());
+
+                componentsOfSameType.Enqueue((Drawable)component);
             }
-            else
-            {
-                int i = 0;
 
-                foreach (var drawable in targetComponents)
-                    drawable.ApplySerialisedInfo(skinnableInfo[i++]);
+            for (int i = targetComponents.Length - 1; i >= 0; i--)
+                firstTarget.Remove(targetComponents[i], false);
+
+            foreach (var skinnableInfo in skinnableInfos)
+            {
+                Type lookup = skinnableInfo.Type;
+
+                if (!componentsPerTypeLookup.TryGetValue(lookup, out Queue<Drawable>? componentsOfSameType))
+                {
+                    firstTarget.Add((ISerialisableDrawable)skinnableInfo.CreateInstance());
+                    continue;
+                }
+
+                // Wherever possible, attempt to reuse existing component instances.
+                if (componentsOfSameType.TryDequeue(out Drawable? component))
+                {
+                    component.ApplySerialisedInfo(skinnableInfo);
+                }
+                else
+                {
+                    component = skinnableInfo.CreateInstance();
+                }
+
+                firstTarget.Add((ISerialisableDrawable)component);
+            }
+
+            // Dispose components which were not reused.
+            foreach ((Type _, Queue<Drawable> typeComponents) in componentsPerTypeLookup)
+            {
+                foreach (var component in typeComponents)
+                    component.Dispose();
             }
         }
     }

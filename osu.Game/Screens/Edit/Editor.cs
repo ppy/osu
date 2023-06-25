@@ -20,7 +20,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -88,14 +87,14 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved]
-        private Storage storage { get; set; }
-
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay notifications { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -186,6 +185,7 @@ namespace osu.Game.Screens.Edit
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
+        private Bindable<bool> editorLimitedDistanceSnap;
 
         public Editor(EditorLoader loader = null)
         {
@@ -210,7 +210,10 @@ namespace osu.Game.Screens.Edit
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
                 // the editor has already been exited.
                 if (!ValidForPush)
+                {
+                    beatmapManager.Delete(loadableBeatmap.BeatmapSetInfo);
                     return;
+                }
             }
 
             try
@@ -274,6 +277,7 @@ namespace osu.Game.Screens.Edit
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+            editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -335,6 +339,10 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
                                             {
                                                 State = { BindTarget = editorAutoSeekOnPlacement },
+                                            },
+                                            new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
+                                            {
+                                                State = { BindTarget = editorLimitedDistanceSnap },
                                             }
                                         }
                                     },
@@ -531,6 +539,9 @@ namespace osu.Game.Screens.Edit
                 // Track traversal keys.
                 // Matching osu-stable implementations.
                 case Key.Z:
+                    if (e.Repeat)
+                        return false;
+
                     // Seek to first object time, or track start if already there.
                     double? firstObjectTime = editorBeatmap.HitObjects.FirstOrDefault()?.StartTime;
 
@@ -541,12 +552,18 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case Key.X:
+                    if (e.Repeat)
+                        return false;
+
                     // Restart playback from beginning of track.
                     clock.Seek(0);
                     clock.Start();
                     return true;
 
                 case Key.C:
+                    if (e.Repeat)
+                        return false;
+
                     // Pause or resume.
                     if (clock.IsRunning)
                         clock.Stop();
@@ -555,6 +572,9 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case Key.V:
+                    if (e.Repeat)
+                        return false;
+
                     // Seek to last object time, or track end if already there.
                     // Note that in osu-stable subsequent presses when at track end won't return to last object.
                     // This has intentionally been changed to make it more useful.
@@ -702,6 +722,13 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
+            realm.Write(r =>
+            {
+                var beatmap = r.Find<BeatmapInfo>(editorBeatmap.BeatmapInfo.ID);
+                if (beatmap != null)
+                    beatmap.EditorTimestamp = clock.CurrentTime;
+            });
+
             ApplyToBackground(b =>
             {
                 b.DimWhenUserSettingsIgnored.Value = 0;
@@ -835,7 +862,11 @@ namespace osu.Game.Screens.Edit
             {
                 double targetTime = 0;
 
-                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                if (editorBeatmap.BeatmapInfo.EditorTimestamp != null)
+                {
+                    targetTime = editorBeatmap.BeatmapInfo.EditorTimestamp.Value;
+                }
+                else if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
                 {
                     // seek to one beat length before the first hitobject
                     targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
@@ -980,7 +1011,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
+            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         /// <summary>

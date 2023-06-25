@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -23,7 +21,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private readonly EditNotePiece tailPiece;
 
         [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
+
+        protected override bool IsValidForPlacement => HitObject.Duration > 0;
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return;
 
             base.OnMouseUp(e);
-            EndPlacement(HitObject.Duration > 0);
+            EndPlacement(true);
         }
 
         private double originalStartTime;

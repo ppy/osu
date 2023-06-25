@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private BeatmapInfo createTestBeatmap([NotNull] RealmUser author)
         {
-            var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
+            var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)!).BeatmapInfo;
 
             beatmap.Metadata.Author = author;
             beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";

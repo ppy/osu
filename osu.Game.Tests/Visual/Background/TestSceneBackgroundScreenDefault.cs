@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Background
                 this.renderer = renderer;
             }
 
-            protected override Texture GetBackground() => renderer.CreateTexture(1, 1);
+            public override Texture GetBackground() => renderer.CreateTexture(1, 1);
         }
 
         private partial class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
