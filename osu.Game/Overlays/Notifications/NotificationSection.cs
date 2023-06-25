@@ -19,6 +19,11 @@ namespace osu.Game.Overlays.Notifications
 {
     public partial class NotificationSection : AlwaysUpdateFillFlowContainer<Drawable>
     {
+        /// <summary>
+        /// All notifications currently being displayed in this section.
+        /// </summary>
+        public IEnumerable<Notification> Notifications => notifications;
+
         private OsuSpriteText countDrawable = null!;
 
         private FlowContainer<Notification> notifications = null!;
