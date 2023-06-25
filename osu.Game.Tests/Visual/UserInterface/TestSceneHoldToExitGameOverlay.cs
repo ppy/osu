@@ -8,11 +8,11 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneHoldToConfirmOverlay : OsuTestScene
+    public partial class TestSceneHoldToExitGameOverlay : OsuTestScene
     {
         protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
 
-        public TestSceneHoldToConfirmOverlay()
+        public TestSceneHoldToExitGameOverlay()
         {
             bool fired = false;
 
