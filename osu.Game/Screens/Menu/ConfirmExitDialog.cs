@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Menu
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Cancel",
+                        Text = CommonStrings.Back,
                         Action = onCancel
                     },
                 };
