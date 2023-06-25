@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("attempt seek", () =>
             {
-                InputManager.MoveMouseTo(getSongProgress());
+                InputManager.MoveMouseTo(getSongProgress().AsNonNull());
                 InputManager.Click(MouseButton.Left);
             });
 

@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Ranking
 
             if (allowWatchingReplay)
             {
-                buttons.Add(new ReplayDownloadButton(null)
+                buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
                     Score = { BindTarget = SelectedScore },
                     Width = 300

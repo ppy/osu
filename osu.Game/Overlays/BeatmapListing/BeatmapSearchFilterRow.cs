@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -66,7 +63,6 @@ namespace osu.Game.Overlays.BeatmapListing
                 Current = filterWithValue.Current;
         }
 
-        [NotNull]
         protected virtual Drawable CreateFilter() => new BeatmapSearchFilter();
 
         protected partial class BeatmapSearchFilter : TabControl<T>
