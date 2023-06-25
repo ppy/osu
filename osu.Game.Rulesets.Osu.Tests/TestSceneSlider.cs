@@ -15,6 +15,10 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -22,6 +26,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -29,6 +34,27 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneSlider : OsuSkinnableTestScene
     {
         private int depthIndex;
+
+        private readonly BindableBool snakingIn = new BindableBool();
+        private readonly BindableBool snakingOut = new BindableBool();
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddToggleStep("toggle snaking", v =>
+            {
+                snakingIn.Value = v;
+                snakingOut.Value = v;
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            config.BindWith(OsuRulesetSetting.SnakingInSliders, snakingIn);
+            config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
+        }
 
         [Test]
         public void TestVariousSliders()

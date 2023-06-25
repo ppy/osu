@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Login
 {
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Login
                 Bottom = 24,
             };
             ErrorTextFlowContainer errorText;
-            LinkFlowContainer forgottenPaswordLink;
+            LinkFlowContainer forgottenPasswordLink;
 
             Children = new Drawable[]
             {
@@ -75,15 +76,15 @@ namespace osu.Game.Overlays.Login
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Remember username",
+                    LabelText = LoginPanelStrings.RememberUsername,
                     Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Stay signed in",
+                    LabelText = LoginPanelStrings.StaySignedIn,
                     Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                 },
-                forgottenPaswordLink = new LinkFlowContainer
+                forgottenPasswordLink = new LinkFlowContainer
                 {
                     Padding = new MarginPadding
                     {
@@ -113,7 +114,7 @@ namespace osu.Game.Overlays.Login
                 },
                 new SettingsButton
                 {
-                    Text = "Register",
+                    Text = LoginPanelStrings.Register,
                     Action = () =>
                     {
                         RequestHide?.Invoke();
@@ -122,7 +123,7 @@ namespace osu.Game.Overlays.Login
                 }
             };
 
-            forgottenPaswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.WebsiteRootUrl}/home/password-reset");
+            forgottenPasswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.WebsiteRootUrl}/home/password-reset");
 
             password.OnCommit += (_, _) => performLogin();
 

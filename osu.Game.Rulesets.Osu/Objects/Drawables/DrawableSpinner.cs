@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            spinningSample.Samples = HitObject.CreateSpinningSamples().Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
             spinningSample.Frequency.Value = spinning_sample_initial_frequency;
         }
 

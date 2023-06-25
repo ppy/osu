@@ -31,8 +31,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private HUDOverlay hudOverlay = null!;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor => gameplayState.ScoreProcessor;
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -213,7 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("attempt seek", () =>
             {
-                InputManager.MoveMouseTo(getSongProgress());
+                InputManager.MoveMouseTo(getSongProgress().AsNonNull());
                 InputManager.Click(MouseButton.Left);
             });
 

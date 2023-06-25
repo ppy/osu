@@ -108,12 +108,16 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
 
+            ExpandingToolboxContainer toolboxContainer = null!;
+
+            AddStep("move mouse to toolbox", () => InputManager.MoveMouseTo(toolboxContainer = hitObjectComposer.ChildrenOfType<ExpandingToolboxContainer>().First()));
+            AddUntilStep("toolbox is expanded", () => toolboxContainer.Expanded.Value);
+            AddUntilStep("wait for toolbox to expand", () => toolboxContainer.LatestTransformEndTime, () => Is.EqualTo(Time.Current));
+
             AddStep("move mouse to overlapping toggle button", () =>
             {
                 var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
-                var button = hitObjectComposer
-                             .ChildrenOfType<ExpandingToolboxContainer>().First()
-                             .ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
+                var button = toolboxContainer.ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
 
                 InputManager.MoveMouseTo(button);
             });

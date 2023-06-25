@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
@@ -17,12 +18,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void Play(HitType hitType)
         {
-            var hitObject = GetMostValidObject();
+            var hitSample = GetMostValidObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-            if (hitObject == null)
+            if (hitSample == null)
                 return;
 
-            PlaySamples(new ISampleInfo[] { hitObject.SampleControlPoint.GetSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL) });
+            PlaySamples(new ISampleInfo[] { new HitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL, hitSample.Bank, volume: hitSample.Volume) });
         }
 
         public override void Play() => throw new InvalidOperationException(@"Use override with HitType parameter instead");

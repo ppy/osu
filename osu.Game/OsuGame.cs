@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -81,7 +83,7 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
-        public Toolbar Toolbar;
+        public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
 
@@ -269,10 +271,63 @@ namespace osu.Game
             if (hideToolbar) Toolbar.Hide();
         }
 
+        protected override UserInputManager CreateUserInputManager()
+        {
+            var userInputManager = base.CreateUserInputManager();
+            (userInputManager as OsuUserInputManager)?.LocalUserPlaying.BindTo(LocalUserPlaying);
+            return userInputManager;
+        }
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        private readonly List<string> dragDropFiles = new List<string>();
+        private ScheduledDelegate dragDropImportSchedule;
+
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            if (host.Window is SDL2Window sdlWindow)
+            {
+                sdlWindow.DragDrop += path =>
+                {
+                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(path);
+                        return;
+                    }
+
+                    lock (dragDropFiles)
+                    {
+                        dragDropFiles.Add(path);
+
+                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
+
+                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                        dragDropImportSchedule?.Cancel();
+                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+                    }
+                };
+            }
+        }
+
+        private void handlePendingDragDropImports()
+        {
+            lock (dragDropFiles)
+            {
+                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                string[] paths = dragDropFiles.ToArray();
+                dragDropFiles.Clear();
+
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -723,8 +778,8 @@ namespace osu.Game
 
         public override void AttemptExit()
         {
-            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
-            PerformFromScreen(menu => menu.Exit());
+            // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
 
         /// <summary>
@@ -1129,12 +1184,22 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Schedule(() =>
                     {
-                        Text = $"Encountered tablet error: \"{message}\"",
-                        Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.RedDark,
-                    }));
+                        Notifications.Post(new SimpleNotification
+                        {
+                            Text = $"Disabling tablet support due to error: \"{message}\"",
+                            Icon = FontAwesome.Solid.PenSquare,
+                            IconColour = Colours.RedDark,
+                        });
+
+                        // We only have one tablet handler currently.
+                        // The loop here is weakly guarding against a future where more than one is added.
+                        // If this is ever the case, this logic needs adjustment as it should probably only
+                        // disable the relevant tablet handler rather than all.
+                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
+                            tabletHandler.Enabled.Value = false;
+                    });
                 }
                 else if (notifyOnWarning)
                 {

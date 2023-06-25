@@ -21,7 +21,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -188,15 +187,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 if (!lastHeaders.TryGetValue(userId, out var header))
                 {
-                    lastHeaders[userId] = header = new FrameHeader(new ScoreInfo
+                    lastHeaders[userId] = header = new FrameHeader(0, 0, 0, 0, new Dictionary<HitResult, int>
                     {
-                        Statistics = new Dictionary<HitResult, int>
-                        {
-                            [HitResult.Miss] = 0,
-                            [HitResult.Meh] = 0,
-                            [HitResult.Great] = 0
-                        }
-                    });
+                        [HitResult.Miss] = 0,
+                        [HitResult.Meh] = 0,
+                        [HitResult.Great] = 0
+                    }, new ScoreProcessorStatistics(), DateTimeOffset.Now);
                 }
 
                 switch (RNG.Next(0, 3))

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -75,6 +73,14 @@ namespace osu.Game.Overlays
             });
 
             base.Content.Add(mainContent);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Ensure the scroll-to-top button is displayed above the fixed header.
+            AddInternal(ScrollFlow.Button.CreateProxy());
         }
 
         protected override void UpdateAfterChildren()

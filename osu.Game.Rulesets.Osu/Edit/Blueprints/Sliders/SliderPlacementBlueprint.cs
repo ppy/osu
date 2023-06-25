@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -41,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
+
+        protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
         public SliderPlacementBlueprint()
             : base(new Slider())
@@ -83,11 +84,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    var nearestDifficultyPoint = editorBeatmap.HitObjects
-                                                              .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime)?
-                                                              .DifficultyControlPoint?.DeepClone() as DifficultyControlPoint;
+                    double? nearestSliderVelocity = (editorBeatmap.HitObjects
+                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocity;
 
-                    HitObject.DifficultyControlPoint = nearestDifficultyPoint ?? new DifficultyControlPoint();
+                    HitObject.SliderVelocity = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(HitObject.Path.HasValidLength);
+            EndPlacement(true);
         }
 
         protected override void Update()
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
+                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
                 cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)

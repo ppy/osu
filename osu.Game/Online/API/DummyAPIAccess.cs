@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Notifications;
 using osu.Game.Tests;
@@ -29,9 +30,12 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
+        public Language Language => Language.en;
+
         public string AccessToken => "token";
 
-        public bool IsLoggedIn => State.Value == APIState.Online;
+        /// <seealso cref="APIAccess.IsLoggedIn"/>
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
@@ -111,8 +115,10 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            LocalUser.Value = new GuestUser();
             state.Value = APIState.Offline;
+            // must happen after `state.Value` is changed such that subscribers to that bindable's value changes see the correct user.
+            // compare: `APIAccess.Logout()`.
+            LocalUser.Value = new GuestUser();
         }
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;

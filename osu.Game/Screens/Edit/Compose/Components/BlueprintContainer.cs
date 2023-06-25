@@ -16,6 +16,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// A container which provides a "blueprint" display of items.
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
-    public abstract partial class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public abstract partial class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>
         where T : class
     {
         protected DragBox DragBox { get; private set; }
@@ -91,7 +92,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             SelectionHandler = CreateSelectionHandler();
-            SelectionHandler.DeselectAll = DeselectAll;
             SelectionHandler.SelectedItems.BindTo(SelectedItems);
 
             AddRangeInternal(new[]
@@ -276,6 +276,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    if (SelectedItems.Count > 0)
+                    {
+                        DeselectAll();
+                        return true;
+                    }
+
+                    break;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

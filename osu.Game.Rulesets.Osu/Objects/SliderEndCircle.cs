@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Scoring;
@@ -39,11 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
             else
             {
-                // taken from osu-stable
-                const float first_end_circle_preempt_adjust = 2 / 3f;
-
                 // The first end circle should fade in with the slider.
-                TimePreempt = (StartTime - slider.StartTime) + slider.TimePreempt * first_end_circle_preempt_adjust;
+                TimePreempt += StartTime - slider.StartTime;
             }
         }
 
