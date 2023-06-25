@@ -8,13 +8,13 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class ExitConfirmOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
+    public partial class HoldToExitGameOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
         protected override bool AllowMultipleFires => true;
 
         public void Abort() => AbortConfirm();
 
-        public ExitConfirmOverlay()
+        public HoldToExitGameOverlay()
             : base(0.7f)
         {
         }
