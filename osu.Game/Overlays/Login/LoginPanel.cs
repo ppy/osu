@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -18,8 +19,6 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
-using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Login
 {
