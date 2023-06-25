@@ -21,6 +21,9 @@ namespace osu.Game.Tournament.Components
 
         private ChannelManager manager;
 
+        [Resolved]
+        private LadderInfo ladderInfo { get; set; }
+
         public TournamentMatchChatDisplay()
         {
             RelativeSizeAxes = Axes.X;
@@ -71,7 +74,7 @@ namespace osu.Game.Tournament.Components
 
         public void Contract() => this.FadeOut(200);
 
-        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
+        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message, ladderInfo);
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
 
@@ -86,19 +89,13 @@ namespace osu.Game.Tournament.Components
 
         protected partial class MatchMessage : StandAloneMessage
         {
-            public MatchMessage(Message message)
+            public MatchMessage(Message message, LadderInfo info)
                 : base(message)
             {
-            }
-
-            private void load(LadderInfo info)
-            {
-                // if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //     SenderText.Colour = TournamentGame.COLOUR_RED;
-                // else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //     SenderText.Colour = TournamentGame.COLOUR_BLUE;
-                // else if (Message.Sender.Colour != null)
-                //     SenderText.Colour = ColourBox.Colour = Color4Extensions.FromHex(Message.Sender.Colour);
+                if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    UsernameColour = TournamentGame.COLOUR_RED;
+                else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    UsernameColour = TournamentGame.COLOUR_BLUE;
             }
         }
     }

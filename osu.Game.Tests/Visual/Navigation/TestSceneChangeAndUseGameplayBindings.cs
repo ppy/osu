@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private OsuButton configureBindingsButton => Game.Settings
                                                          .ChildrenOfType<BindingSettings>().SingleOrDefault()?
-                                                         .ChildrenOfType<OsuButton>()?
+                                                         .ChildrenOfType<OsuButton>()
                                                          .First(b => b.Text.ToString() == "Configure");
 
         private KeyBindingPanel keyBindingPanel => Game.Settings
