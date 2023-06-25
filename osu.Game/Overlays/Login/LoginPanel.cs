@@ -124,21 +124,13 @@ namespace osu.Game.Overlays.Login
                         Spacing = new Vector2(0f, 10f),
                         Children = new Drawable[]
                         {
-                            new Container
+                            new OsuSpriteText
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Text = LoginPanelStrings.SignedIn,
-                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                        Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                    },
-                                },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = LoginPanelStrings.SignedIn,
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
                             },
                             panel = new UserGridPanel(api.LocalUser.Value)
                             {
