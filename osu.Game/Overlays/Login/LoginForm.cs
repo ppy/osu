@@ -73,6 +73,7 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Alpha = 0,
                 },
                 new SettingsCheckbox
                 {
@@ -128,7 +129,10 @@ namespace osu.Game.Overlays.Login
             password.OnCommit += (_, _) => performLogin();
 
             if (api.LastLoginError?.Message is string error)
+            {
+                errorText.Alpha = 1;
                 errorText.AddErrors(new[] { error });
+            }
         }
 
         public override bool AcceptsFocus => true;
