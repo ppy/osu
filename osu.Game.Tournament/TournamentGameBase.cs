@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -245,7 +246,7 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetAwaiter().GetResult() ?? new APIBeatmap());
+                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetResultSafely() ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -270,7 +271,7 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetAwaiter().GetResult() ?? new APIBeatmap());
+                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetResultSafely() ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
