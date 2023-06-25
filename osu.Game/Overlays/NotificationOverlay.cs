@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
         public const float TRANSITION_LENGTH = 600;
 
         public IEnumerable<Notification> AllNotifications =>
-            toastTray.Notifications.Concat(sections.SelectMany(s => s.Notifications));
+            IsLoaded ? toastTray.Notifications.Concat(sections.SelectMany(s => s.Notifications)) : Array.Empty<Notification>();
 
         private FlowContainer<NotificationSection> sections = null!;
 
