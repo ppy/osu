@@ -63,18 +63,6 @@ namespace osu.Game.Tournament.Tests.Components
                 Origin = Anchor.Centre,
             });
 
-            ladderInfo.CurrentMatch.Value = new TournamentMatch
-            {
-                Team1 =
-                {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
-                },
-                Team2 =
-                {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser, blueUserWithCustomColour } }
-                }
-            };
-
             chatDisplay.Channel.Value = testChannel;
         }
 
@@ -87,6 +75,18 @@ namespace osu.Game.Tournament.Tests.Components
                 Sender = admin,
                 Content = "I am a wang!"
             }));
+
+            AddStep("set Current match", () => ladderInfo.CurrentMatch.Value = new TournamentMatch
+            {
+                Team1 =
+                {
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
+                },
+                Team2 =
+                {
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser, blueUserWithCustomColour } }
+                }
+            });
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
