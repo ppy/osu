@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public static class MultiplayerCountdownButtonStrings
+    public static class MultiplayerMatchStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.MultiplayerCountdownButton";
+        private const string prefix = @"osu.Game.Resources.Localisation.MultiplayerMatchStrings";
 
         /// <summary>
         /// "Stop countdown"
@@ -20,9 +20,9 @@ namespace osu.Game.Localisation
         public static LocalisableString CountdownSettings => new TranslatableString(getKey(@"countdown_settings"), @"Countdown settings");
 
         /// <summary>
-        /// "Start match in {0} minute/seconds"
+        /// "Start match in {0}"
         /// </summary>
-        public static LocalisableString StartMatchInTime(string humanReadableTime) => new TranslatableString(getKey(@"start_match_in"), @"Start match in {0}", humanReadableTime);
+        public static LocalisableString StartMatchWithCountdown(string humanReadableTime) => new TranslatableString(getKey(@"start_match_width_countdown"), @"Start match in {0}", humanReadableTime);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
