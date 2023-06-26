@@ -169,6 +169,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("\"tags to\"", true)]
         [TestCase("\"version\"", false)]
         [TestCase("\"an auteur\"", true)]
+        [TestCase("\"\\\"", true)] // nasty case, covers properly escaping user input in underlying regex.
         public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
