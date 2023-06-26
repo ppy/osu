@@ -1,12 +1,10 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿#nullable enable
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Rulesets;
@@ -20,7 +18,7 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
-        public BeatmapSetInfo SelectedBeatmapSet;
+        public BeatmapSetInfo? SelectedBeatmapSet;
 
         public OptionalRange<double> StarDifficulty;
         public OptionalRange<float> ApproachRate;
@@ -42,10 +40,10 @@ namespace osu.Game.Screens.Select
 
         public string[] SearchTerms = Array.Empty<string>();
 
-        public RulesetInfo Ruleset;
+        public RulesetInfo? Ruleset;
         public bool AllowConvertedBeatmaps;
 
-        private string searchText;
+        private string searchText = string.Empty;
 
         /// <summary>
         /// <see cref="SearchText"/> as a number (if it can be parsed as one).
@@ -70,11 +68,9 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
-        [CanBeNull]
-        public IEnumerable<string> CollectionBeatmapMD5Hashes { get; set; }
+        public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
-        [CanBeNull]
-        public IRulesetFilterCriteria RulesetCriteria { get; set; }
+        public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
