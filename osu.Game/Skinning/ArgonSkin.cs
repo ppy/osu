@@ -168,14 +168,19 @@ namespace osu.Game.Skinning
 
                                     if (songProgress != null)
                                     {
-                                        songProgress.Position = new Vector2(0, -10);
+                                        const float padding = 10;
+
+                                        songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
-                                        if (keyCounter != null)
+                                        if (keyCounter != null && hitError != null)
                                         {
+                                            // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                            const float song_progress_offset_height = 36 + padding;
+
                                             keyCounter.Anchor = Anchor.BottomLeft;
                                             keyCounter.Origin = Anchor.BottomLeft;
-                                            keyCounter.Position = new Vector2(50, -57);
+                                            keyCounter.Position = new Vector2(hitError.Width + padding, -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
                                 }
