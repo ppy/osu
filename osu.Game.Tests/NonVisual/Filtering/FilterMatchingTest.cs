@@ -160,6 +160,30 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        [TestCase("\"artist\"", false)]
+        [TestCase("\"arti\"", true)]
+        [TestCase("\"artist title author\"", true)]
+        [TestCase("\"artist\" \"title\" \"author\"", false)]
+        [TestCase("\"an artist\"", true)]
+        [TestCase("\"tags too\"", false)]
+        [TestCase("\"tags to\"", true)]
+        [TestCase("\"version\"", false)]
+        [TestCase("\"an auteur\"", true)]
+        public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true,
+                SearchText = terms
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         [TestCase("", false)]
         [TestCase("The", false)]
         [TestCase("THE", false)]
