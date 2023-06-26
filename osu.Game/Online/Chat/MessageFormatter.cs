@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Chat
 {
@@ -172,7 +173,7 @@ namespace osu.Game.Online.Chat
 
                             case "u":
                             case "users":
-                                return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
+                                return getUserLink(mainArg);
 
                             case "wiki":
                                 return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
@@ -230,8 +231,7 @@ namespace osu.Game.Online.Chat
                             break;
 
                         case "u":
-                            linkType = LinkAction.OpenUserProfile;
-                            break;
+                            return getUserLink(args[2]);
 
                         default:
                             return new LinkDetails(LinkAction.External, url);
@@ -244,6 +244,14 @@ namespace osu.Game.Online.Chat
             }
 
             return new LinkDetails(LinkAction.External, url);
+        }
+
+        private static LinkDetails getUserLink(string argument)
+        {
+            if (int.TryParse(argument, out int userId))
+                return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
+
+            return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
