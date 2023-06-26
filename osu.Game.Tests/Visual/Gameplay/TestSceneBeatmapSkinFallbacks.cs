@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
                     (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
                     (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>()),
-                    (typeof(KeyCounterController), actualComponentsContainer.Dependencies.Get<KeyCounterController>())
+                    (typeof(InputCountController), actualComponentsContainer.Dependencies.Get<InputCountController>())
                 },
             };
 

@@ -18,13 +18,13 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneKeyCounter : OsuManualInputManagerTestScene
     {
         [Cached]
-        private readonly KeyCounterController controller;
+        private readonly InputCountController controller;
 
         public TestSceneKeyCounter()
         {
             Children = new Drawable[]
             {
-                controller = new KeyCounterController(),
+                controller = new InputCountController(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,

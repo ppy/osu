@@ -160,11 +160,11 @@ namespace osu.Game.Rulesets.UI
 
         #region Key Counter Attachment
 
-        public void Attach(KeyCounterController keyCounter)
+        public void Attach(InputCountController inputCountController)
         {
-            KeyBindingContainer.Add(keyCounter);
+            KeyBindingContainer.Add(inputCountController);
 
-            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
+            inputCountController.AddRange(KeyBindingContainer.DefaultKeyBindings
                                                    .Select(b => b.GetAction<T>())
                                                    .Distinct()
                                                    .OrderBy(action => action)
