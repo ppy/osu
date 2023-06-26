@@ -145,11 +145,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
             AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
-            AddAssert("key counters hidden", () => !keyCounterFlow.IsPresent);
+            AddUntilStep("key counters hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
-            AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
+            AddUntilStep("key counters still hidden", () => !keyCounterFlow.IsPresent);
         }
 
         [Test]
