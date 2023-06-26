@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
@@ -49,11 +48,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (Trigger.IsNotNull())
-            {
-                Trigger.OnActivate -= Activate;
-                Trigger.OnDeactivate -= Deactivate;
-            }
+            Trigger.OnActivate -= Activate;
+            Trigger.OnDeactivate -= Deactivate;
         }
     }
 }
