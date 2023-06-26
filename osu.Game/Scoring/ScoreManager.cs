@@ -169,6 +169,8 @@ namespace osu.Game.Scoring
         /// <param name="score">The score to populate the statistics of.</param>
         public void PopulateMaximumStatistics(ScoreInfo score) => scoreImporter.PopulateMaximumStatistics(score);
 
+        public long ConvertFromLegacyTotalScore(ScoreInfo score) => scoreImporter.ConvertFromLegacyTotalScore(score);
+
         #region Implementation of IPresentImports<ScoreInfo>
 
         public Action<IEnumerable<Live<ScoreInfo>>> PresentImport

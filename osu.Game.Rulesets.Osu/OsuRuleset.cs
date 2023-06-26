@@ -322,5 +322,7 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+
+        public override ILegacyScoreProcessor CreateLegacyScoreProcessor() => new OsuScoreV1Processor();
     }
 }
