@@ -148,9 +148,12 @@ namespace osu.Game.Skinning
                                 {
                                     const float padding = 10;
 
+                                    // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                    const float song_progress_offset_height = 73;
+
                                     keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.BottomRight;
-                                    keyCounter.Position = new Vector2(-padding, -(60 + padding));
+                                    keyCounter.Position = new Vector2(-padding, -(song_progress_offset_height + padding));
                                 }
                             })
                             {
