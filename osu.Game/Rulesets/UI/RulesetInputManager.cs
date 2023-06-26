@@ -165,10 +165,10 @@ namespace osu.Game.Rulesets.UI
             KeyBindingContainer.Add(inputCountController);
 
             inputCountController.AddRange(KeyBindingContainer.DefaultKeyBindings
-                                                   .Select(b => b.GetAction<T>())
-                                                   .Distinct()
-                                                   .OrderBy(action => action)
-                                                   .Select(action => new KeyCounterActionTrigger<T>(action)));
+                                                             .Select(b => b.GetAction<T>())
+                                                             .Distinct()
+                                                             .OrderBy(action => action)
+                                                             .Select(action => new KeyCounterActionTrigger<T>(action)));
         }
 
         #endregion
