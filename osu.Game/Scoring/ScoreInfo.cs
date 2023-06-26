@@ -15,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
@@ -62,6 +63,8 @@ namespace osu.Game.Scoring
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
+
+        public int Version { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
 
         [Indexed]
         public long OnlineID { get; set; } = -1;
