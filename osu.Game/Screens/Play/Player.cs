@@ -378,9 +378,6 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
 
-            if (Configuration.AutomaticallySkipIntro)
-                skipIntroOverlay.SkipWhenReady();
-
             loadLeaderboard();
         }
 
@@ -1087,6 +1084,9 @@ namespace osu.Game.Screens.Play
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
             GameplayClockContainer.Reset(startClock: true);
+
+            if (Configuration.AutomaticallySkipIntro)
+                skipIntroOverlay.SkipWhenReady();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
