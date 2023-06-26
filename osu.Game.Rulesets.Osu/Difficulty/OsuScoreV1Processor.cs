@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    internal class OsuScoreV1Processor
+    internal class OsuScoreV1Processor : ILegacyScoreProcessor
     {
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
@@ -36,18 +36,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int modernBonusScore;
         private int combo;
 
-        private readonly double scoreMultiplier;
-        private readonly IBeatmap playableBeatmap;
+        private double scoreMultiplier;
+        private IBeatmap playableBeatmap = null!;
 
-        public OsuScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
         {
             this.playableBeatmap = playableBeatmap;
+
+            IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
             int countNormal = 0;
             int countSlider = 0;
             int countSpinner = 0;
 
-            foreach (HitObject obj in baseBeatmap.HitObjects)
+            foreach (HitObject obj in workingBeatmap.Beatmap.HitObjects)
             {
                 switch (obj)
                 {

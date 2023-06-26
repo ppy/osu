@@ -88,6 +88,8 @@ namespace osu.Game.Scoring
             // this requires: max combo, statistics, max statistics (where available), and mods to already be populated on the score.
             if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
                 model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
+            else if (model.IsLegacyScore)
+                model.TotalScore = ConvertFromLegacyTotalScore(model);
         }
 
         /// <summary>
@@ -149,6 +151,62 @@ namespace osu.Game.Scoring
             if (attributes.MaxCombo > maxComboFromStatistics)
                 score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
 #pragma warning restore CS0618
+        }
+
+        public long ConvertFromLegacyTotalScore(ScoreInfo score)
+        {
+            var beatmap = beatmaps().GetWorkingBeatmap(score.BeatmapInfo);
+            var ruleset = score.Ruleset.CreateInstance();
+
+            var sv1Processor = ruleset.CreateLegacyScoreProcessor();
+            if (sv1Processor == null)
+                return score.TotalScore;
+
+            sv1Processor.Simulate(beatmap, beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods), score.Mods);
+
+            int maximumLegacyAccuracyScore = sv1Processor.AccuracyScore;
+            int maximumLegacyComboScore = sv1Processor.ComboScore;
+            double maximumLegacyBonusRatio = sv1Processor.BonusScoreRatio;
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+
+            // The part of total score that doesn't include bonus.
+            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+
+            // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
+            double comboProportion = Math.Min(1, (double)score.TotalScore / maximumLegacyBaseScore);
+
+            // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
+            double bonusProportion = Math.Max(0, (score.TotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            switch (ruleset.RulesetInfo.OnlineID)
+            {
+                case 0:
+                    return (long)Math.Round((
+                        700000 * comboProportion
+                        + 300000 * Math.Pow(score.Accuracy, 10)
+                        + bonusProportion) * modMultiplier);
+
+                case 1:
+                    return (long)Math.Round((
+                        250000 * comboProportion
+                        + 750000 * Math.Pow(score.Accuracy, 3.6)
+                        + bonusProportion) * modMultiplier);
+
+                case 2:
+                    return (long)Math.Round((
+                        600000 * comboProportion
+                        + 400000 * score.Accuracy
+                        + bonusProportion) * modMultiplier);
+
+                case 3:
+                    return (long)Math.Round((
+                        990000 * comboProportion
+                        + 10000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        + bonusProportion) * modMultiplier);
+
+                default:
+                    return score.TotalScore;
+            }
         }
 
         // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).

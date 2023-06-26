@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    internal class TaikoScoreV1Processor
+    internal class TaikoScoreV1Processor : ILegacyScoreProcessor
     {
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
@@ -36,15 +36,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int modernBonusScore;
         private int combo;
 
-        private readonly double modMultiplier;
-        private readonly int difficultyPeppyStars;
-        private readonly IBeatmap playableBeatmap;
-        private readonly IReadOnlyList<Mod> mods;
+        private double modMultiplier;
+        private int difficultyPeppyStars;
+        private IBeatmap playableBeatmap = null!;
+        private IReadOnlyList<Mod> mods = null!;
 
-        public TaikoScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
         {
             this.playableBeatmap = playableBeatmap;
             this.mods = mods;
+
+            IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
             int countNormal = 0;
             int countSlider = 0;
@@ -205,10 +207,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (increaseCombo)
                 combo++;
-
-            if (hitObject is Swell)
-            {
-            }
         }
     }
 }

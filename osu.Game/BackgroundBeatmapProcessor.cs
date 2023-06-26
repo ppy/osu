@@ -14,6 +14,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -40,6 +42,9 @@ namespace osu.Game
         [Resolved]
         private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
 
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
@@ -52,6 +57,7 @@ namespace osu.Game
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
+                convertLegacyTotalScoreToStandardised();
             }).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -190,6 +196,88 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                }
+            }
+        }
+
+        private void convertLegacyTotalScoreToStandardised()
+        {
+            HashSet<Guid> scoreIds = new HashSet<Guid>();
+
+            Logger.Log("Querying for scores that need total score conversion...");
+
+            realmAccess.Run(r =>
+            {
+                foreach (var score in r.All<ScoreInfo>().Where(s => s.IsLegacyScore))
+                {
+                    if (score.RulesetID is not (0 or 1 or 2 or 3))
+                        continue;
+
+                    if (score.Version >= 30000003)
+                        continue;
+
+                    scoreIds.Add(score.ID);
+                }
+            });
+
+            Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
+
+            ProgressNotification? notification = null;
+
+            if (scoreIds.Count > 0)
+                notificationOverlay?.Post(notification = new ProgressNotification { State = ProgressNotificationState.Active });
+
+            int count = 0;
+            updateNotification();
+
+            foreach (var id in scoreIds)
+            {
+                while (localUserPlayInfo?.IsPlaying.Value == true)
+                {
+                    Logger.Log("Background processing sleeping due to active gameplay...");
+                    Thread.Sleep(TimeToSleepDuringGameplay);
+                }
+
+                try
+                {
+                    var score = scoreManager.Query(s => s.ID == id);
+                    long newTotalScore = scoreManager.ConvertFromLegacyTotalScore(score);
+
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id);
+                        s.TotalScore = newTotalScore;
+                        s.Version = 30000003;
+                    });
+
+                    Logger.Log($"Converted total score for score {id}");
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to convert total score for {id}: {e}");
+                }
+
+                ++count;
+                updateNotification();
+            }
+
+            void updateNotification()
+            {
+                if (notification == null)
+                    return;
+
+                if (count == scoreIds.Count)
+                {
+                    notification.CompletionText = $"Total score updated for {scoreIds.Count} scores";
+                    notification.Progress = 1;
+                    notification.State = ProgressNotificationState.Completed;
+                }
+                else
+                {
+                    notification.Text = $"Total score updated for {count} of {scoreIds.Count} scores";
+                    notification.Progress = (float)count / scoreIds.Count;
                 }
             }
         }

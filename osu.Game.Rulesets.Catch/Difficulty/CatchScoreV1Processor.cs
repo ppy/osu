@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    internal class CatchScoreV1Processor
+    internal class CatchScoreV1Processor : ILegacyScoreProcessor
     {
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
@@ -36,10 +36,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private int modernBonusScore;
         private int combo;
 
-        private readonly double scoreMultiplier;
+        private double scoreMultiplier;
 
-        public CatchScoreV1Processor(IBeatmap baseBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
         {
+            IBeatmap baseBeatmap = workingBeatmap.Beatmap;
+
             int countNormal = 0;
             int countSlider = 0;
             int countSpinner = 0;

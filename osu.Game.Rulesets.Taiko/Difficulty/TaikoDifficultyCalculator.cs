@@ -101,7 +101,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (ComputeLegacyScoringValues)
             {
-                TaikoScoreV1Processor sv1Processor = new TaikoScoreV1Processor(workingBeatmap.Beatmap, beatmap, mods);
+                TaikoScoreV1Processor sv1Processor = new TaikoScoreV1Processor();
+                sv1Processor.Simulate(workingBeatmap, beatmap, mods);
                 attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
                 attributes.LegacyComboScore = sv1Processor.ComboScore;
                 attributes.LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio;
