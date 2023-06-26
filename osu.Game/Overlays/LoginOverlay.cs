@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -32,7 +31,7 @@ namespace osu.Game.Overlays
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = Color4.Black.Opacity(0),
+                Colour = Color4.Black,
                 Type = EdgeEffectType.Shadow,
                 Radius = 10,
                 Hollow = true,
