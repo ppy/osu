@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         public void AddRange(IEnumerable<InputTrigger> inputTriggers) => inputTriggers.ForEach(Add);
-        public override bool HandleNonPositionalInput => true;
 
+        public override bool HandleNonPositionalInput => true;
         public override bool HandlePositionalInput => true;
     }
 }
