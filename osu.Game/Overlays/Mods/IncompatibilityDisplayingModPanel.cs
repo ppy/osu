@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +17,7 @@ namespace osu.Game.Overlays.Mods
         private readonly BindableBool incompatible = new BindableBool();
 
         [Resolved]
-        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         public IncompatibilityDisplayingModPanel(ModState modState)
             : base(modState)
