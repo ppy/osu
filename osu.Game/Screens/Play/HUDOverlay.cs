@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         public readonly InputCountController InputCountController;
 
         [Cached]
-        private readonly JudgementTally tally;
+        private readonly JudgementCountController judgementCountController;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Play
             {
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
-                tally = new JudgementTally(),
+                judgementCountController = new JudgementCountController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
                     ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }

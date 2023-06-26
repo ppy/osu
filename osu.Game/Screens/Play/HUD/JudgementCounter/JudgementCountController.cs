@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
     /// Keeps track of judgements for a current play session, exposing bindable counts which can
     /// be used for display purposes.
     /// </summary>
-    public partial class JudgementTally : CompositeDrawable
+    public partial class JudgementCountController : CompositeDrawable
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
