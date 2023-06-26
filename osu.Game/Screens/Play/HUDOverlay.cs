@@ -116,6 +116,7 @@ namespace osu.Game.Screens.Play
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 tally = new JudgementTally(),
+                KeyCounter = new KeyCounterController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
                     ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
@@ -159,7 +160,6 @@ namespace osu.Game.Screens.Play
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
             };
-            KeyCounter = new KeyCounterController();
 
             hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
 
