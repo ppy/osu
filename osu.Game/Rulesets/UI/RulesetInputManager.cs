@@ -225,29 +225,6 @@ namespace osu.Game.Rulesets.UI
         }
     }
 
-    /// <summary>
-    /// Expose the <see cref="ReplayInputHandler"/>  in a capable <see cref="InputManager"/>.
-    /// </summary>
-    public interface IHasReplayHandler
-    {
-        ReplayInputHandler ReplayInputHandler { get; set; }
-    }
-
-    public interface IHasRecordingHandler
-    {
-        public ReplayRecorder Recorder { set; }
-    }
-
-    /// <summary>
-    /// Supports attaching various HUD pieces.
-    /// Keys will be populated automatically and a receptor will be injected inside.
-    /// </summary>
-    public interface ICanAttachHUDPieces
-    {
-        void Attach(KeyCounterController keyCounter);
-        void Attach(ClicksPerSecondCalculator calculator);
-    }
-
     public class RulesetInputManagerInputState<T> : InputState
         where T : struct
     {
