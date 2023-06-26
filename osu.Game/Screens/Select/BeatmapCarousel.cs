@@ -45,9 +45,14 @@ namespace osu.Game.Screens.Select
         public float BleedBottom { get; set; }
 
         /// <summary>
-        /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
+        /// Triggered when <see cref="BeatmapSets"/> finish loading, or are subsequently changed.
         /// </summary>
         public Action? BeatmapSetsChanged;
+
+        /// <summary>
+        /// Triggered after filter conditions have finished being applied to the model hierarchy.
+        /// </summary>
+        public Action? FilterApplied;
 
         /// <summary>
         /// The currently selected beatmap.
@@ -55,6 +60,11 @@ namespace osu.Game.Screens.Select
         public BeatmapInfo? SelectedBeatmapInfo => selectedBeatmap?.BeatmapInfo;
 
         private CarouselBeatmap? selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
+
+        /// <summary>
+        /// The total count of non-filtered beatmaps displayed.
+        /// </summary>
+        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.Beatmaps.Count(b => !b.Filtered.Value));
 
         /// <summary>
         /// The currently selected beatmap set.
@@ -145,7 +155,7 @@ namespace osu.Game.Screens.Select
 
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
-        private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
+        private readonly List<CarouselBeatmap> randomSelectedBeatmaps = new List<CarouselBeatmap>();
 
         private CarouselRoot root;
 
@@ -338,11 +348,18 @@ namespace osu.Game.Screens.Select
             if (!root.BeatmapSetsByID.TryGetValue(beatmapSetID, out var existingSet))
                 return;
 
+            foreach (var beatmap in existingSet.Beatmaps)
+                randomSelectedBeatmaps.Remove(beatmap);
+
+            previouslyVisitedRandomSets.Remove(existingSet);
+
             root.RemoveItem(existingSet);
             itemsCache.Invalidate();
 
             if (!Scroll.UserScrolling)
                 ScrollToSelected(true);
+
+            BeatmapSetsChanged?.Invoke();
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -489,7 +506,7 @@ namespace osu.Game.Screens.Select
 
             if (selectedBeatmap != null && selectedBeatmapSet != null)
             {
-                randomSelectedBeatmaps.Push(selectedBeatmap);
+                randomSelectedBeatmaps.Add(selectedBeatmap);
 
                 // when performing a random, we want to add the current set to the previously visited list
                 // else the user may be "randomised" to the existing selection.
@@ -526,9 +543,10 @@ namespace osu.Game.Screens.Select
         {
             while (randomSelectedBeatmaps.Any())
             {
-                var beatmap = randomSelectedBeatmaps.Pop();
+                var beatmap = randomSelectedBeatmaps[^1];
+                randomSelectedBeatmaps.Remove(beatmap);
 
-                if (!beatmap.Filtered.Value)
+                if (!beatmap.Filtered.Value && beatmap.BeatmapInfo.BeatmapSet?.DeletePending != true)
                 {
                     if (selectedBeatmapSet != null)
                     {
@@ -639,6 +657,8 @@ namespace osu.Game.Screens.Select
 
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected(true);
+
+                FilterApplied?.Invoke();
             }
         }
 

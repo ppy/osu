@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
@@ -80,8 +82,11 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
+            // Flashlight mods should always draw above any other mod adding overlays.
+            flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
+
             drawableRuleset.Overlays.Add(flashlight);
         }
 
@@ -245,6 +250,8 @@ namespace osu.Game.Rulesets.Mods
                     flashlightSmoothness = Source.flashlightSmoothness;
                 }
 
+                private IUniformBuffer<FlashlightParameters>? flashlightParametersBuffer;
+
                 public override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
@@ -259,12 +266,17 @@ namespace osu.Game.Rulesets.Mods
                         });
                     }
 
-                    shader.Bind();
+                    flashlightParametersBuffer ??= renderer.CreateUniformBuffer<FlashlightParameters>();
+                    flashlightParametersBuffer.Data = flashlightParametersBuffer.Data with
+                    {
+                        Position = flashlightPosition,
+                        Size = flashlightSize,
+                        Dim = flashlightDim,
+                        Smoothness = flashlightSmoothness
+                    };
 
-                    shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
-                    shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
-                    shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
-                    shader.GetUniform<float>("flashlightSmoothness").UpdateValue(ref flashlightSmoothness);
+                    shader.Bind();
+                    shader.BindUniformBlock(@"m_FlashlightParameters", flashlightParametersBuffer);
 
                     renderer.DrawQuad(renderer.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
 
@@ -275,6 +287,17 @@ namespace osu.Game.Rulesets.Mods
                 {
                     base.Dispose(isDisposing);
                     quadBatch?.Dispose();
+                    flashlightParametersBuffer?.Dispose();
+                }
+
+                [StructLayout(LayoutKind.Sequential, Pack = 1)]
+                private record struct FlashlightParameters
+                {
+                    public UniformVector2 Position;
+                    public UniformVector2 Size;
+                    public UniformFloat Dim;
+                    public UniformFloat Smoothness;
+                    private readonly UniformPadding8 pad1;
                 }
             }
         }

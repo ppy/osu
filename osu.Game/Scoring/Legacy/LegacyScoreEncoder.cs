@@ -28,9 +28,10 @@ namespace osu.Game.Scoring.Legacy
         /// <remarks>
         /// <list type="bullet">
         /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
+        /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000001;
+        public const int LATEST_VERSION = 30000002;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -125,10 +126,10 @@ namespace osu.Game.Scoring.Legacy
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
                 double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
+                int lastTime = 0;
+
                 if (score.Replay != null)
                 {
-                    int lastTime = 0;
-
                     foreach (var f in score.Replay.Frames)
                     {
                         var legacyFrame = getLegacyFrame(f);

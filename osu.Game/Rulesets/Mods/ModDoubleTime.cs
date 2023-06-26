@@ -24,5 +24,22 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 2,
             Precision = 0.01,
         };
+
+        public override double ScoreMultiplier
+        {
+            get
+            {
+                // Round to the nearest multiple of 0.1.
+                double value = (int)(SpeedChange.Value * 10) / 10.0;
+
+                // Offset back to 0.
+                value -= 1;
+
+                // Each 0.1 multiple changes score multiplier by 0.02.
+                value /= 5;
+
+                return 1 + value;
+            }
+        }
     }
 }

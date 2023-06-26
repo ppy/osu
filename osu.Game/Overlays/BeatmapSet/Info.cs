@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -29,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
-        public APIBeatmap BeatmapInfo
+        public APIBeatmap? BeatmapInfo
         {
             get => successRate.Beatmap;
             set => successRate.Beatmap = value;
@@ -55,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 15, Horizontal = BeatmapSetOverlay.X_PADDING },
+                    Padding = new MarginPadding { Top = 15, Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         new Container

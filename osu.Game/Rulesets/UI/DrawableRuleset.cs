@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
@@ -69,6 +70,12 @@ namespace osu.Game.Rulesets.UI
         public override IAdjustableAudioComponent Audio => audioContainer;
 
         private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
+
+        /// <summary>
+        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
+        /// ensure correct scale and position.
+        /// </summary>
+        public virtual PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; private set; }
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -177,7 +184,7 @@ namespace osu.Game.Rulesets.UI
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            CreatePlayfieldAdjustmentContainer()
+                            PlayfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield),
                             Overlays
                         })),

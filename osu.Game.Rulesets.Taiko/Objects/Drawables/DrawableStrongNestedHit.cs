@@ -1,9 +1,6 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -13,9 +10,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// </summary>
     public abstract partial class DrawableStrongNestedHit : DrawableTaikoHitObject
     {
-        public new DrawableTaikoHitObject ParentHitObject => (DrawableTaikoHitObject)base.ParentHitObject;
+        public new DrawableTaikoHitObject? ParentHitObject => base.ParentHitObject as DrawableTaikoHitObject;
 
-        protected DrawableStrongNestedHit([CanBeNull] StrongNestedHitObject nestedHit)
+        protected DrawableStrongNestedHit(StrongNestedHitObject? nestedHit)
             : base(nestedHit)
         {
         }

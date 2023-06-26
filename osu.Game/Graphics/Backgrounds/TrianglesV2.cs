@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -227,6 +226,8 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
+            private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
+
             public override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
@@ -240,9 +241,15 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
+                borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
+                borderDataBuffer.Data = borderDataBuffer.Data with
+                {
+                    Thickness = thickness,
+                    TexelSize = texelSize
+                };
+
                 shader.Bind();
-                shader.GetUniform<float>("thickness").UpdateValue(ref thickness);
-                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
+                shader.BindUniformBlock(@"m_BorderData", borderDataBuffer);
 
                 Vector2 relativeSize = Vector2.Divide(triangleSize, size);
 
@@ -259,8 +266,6 @@ namespace osu.Game.Graphics.Backgrounds
                         Vector2Extensions.Transform(triangleQuad.BottomRight * size, DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = triangleColourInfo(DrawColourInfo.Colour, triangleQuad);
-
                     RectangleF textureCoords = new RectangleF(
                         triangleQuad.TopLeft.X - topLeft.X,
                         triangleQuad.TopLeft.Y - topLeft.Y,
@@ -268,21 +273,10 @@ namespace osu.Game.Graphics.Backgrounds
                         triangleQuad.Height
                     ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour.Interpolate(triangleQuad), new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
-            }
-
-            private static ColourInfo triangleColourInfo(ColourInfo source, Quad quad)
-            {
-                return new ColourInfo
-                {
-                    TopLeft = source.Interpolate(quad.TopLeft),
-                    TopRight = source.Interpolate(quad.TopRight),
-                    BottomLeft = source.Interpolate(quad.BottomLeft),
-                    BottomRight = source.Interpolate(quad.BottomRight)
-                };
             }
 
             private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
@@ -303,6 +297,7 @@ namespace osu.Game.Graphics.Backgrounds
                 base.Dispose(isDisposing);
 
                 vertexBatch?.Dispose();
+                borderDataBuffer?.Dispose();
             }
         }
 
