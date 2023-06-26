@@ -45,7 +45,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -83,7 +82,7 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
-        public Toolbar Toolbar;
+        public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
 
@@ -446,15 +445,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (!(link.Argument is IUser user))
-                    {
-                        user = int.TryParse(argString, out int userId)
-                            ? new APIUser { Id = userId }
-                            : new APIUser { Username = argString };
-                    }
-
-                    ShowUser(user);
-
+                    ShowUser((IUser)link.Argument);
                     break;
 
                 case LinkAction.OpenWiki:
@@ -778,8 +769,8 @@ namespace osu.Game
 
         public override void AttemptExit()
         {
-            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
-            PerformFromScreen(menu => menu.Exit());
+            // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
 
         /// <summary>
