@@ -9,6 +9,10 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    /// <summary>
+    /// Keeps track of key press counts for a current play session, exposing bindable counts which can
+    /// be used for display purposes.
+    /// </summary>
     public partial class KeyCounterController : CompositeComponent
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
