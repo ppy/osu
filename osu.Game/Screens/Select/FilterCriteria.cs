@@ -1,10 +1,14 @@
-﻿#nullable enable
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+#nullable enable
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Rulesets;
@@ -38,7 +42,7 @@ namespace osu.Game.Screens.Select
             IsUpperInclusive = true
         };
 
-        public string[] SearchTerms = Array.Empty<string>();
+        public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
         public bool AllowConvertedBeatmaps;
@@ -56,11 +60,29 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+
+                List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
+
+                string remainingText = value;
+
+                // First handle quoted segments to ensure we keep inline spaces in exact matches.
+                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\")"))
+                {
+                    terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
+                // Then handle the rest splitting on any spaces.
+                terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
+                {
+                    SearchTerm = s
+                }));
+
+                SearchTerms = terms.ToArray();
 
                 SearchNumber = null;
 
-                if (SearchTerms.Length == 1 && int.TryParse(SearchTerms[0], out int parsed))
+                if (SearchTerms.Length == 1 && int.TryParse(SearchTerms[0].SearchTerm, out int parsed))
                     SearchNumber = parsed;
             }
         }
@@ -120,6 +142,8 @@ namespace osu.Game.Screens.Select
         {
             public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
 
+            public bool Exact { get; private set; }
+
             public bool Matches(string value)
             {
                 if (!HasFilter)
@@ -129,10 +153,23 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
+                if (Exact)
+                    return Regex.IsMatch(value, $@"(^|\s){searchTerm}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
                 return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            public string SearchTerm;
+            private string searchTerm;
+
+            public string SearchTerm
+            {
+                get => searchTerm;
+                set
+                {
+                    searchTerm = value.Trim('"');
+                    Exact = searchTerm != value;
+                }
+            }
 
             public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
         }
