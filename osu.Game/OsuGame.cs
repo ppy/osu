@@ -45,7 +45,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -446,15 +445,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (!(link.Argument is IUser user))
-                    {
-                        user = int.TryParse(argString, out int userId)
-                            ? new APIUser { Id = userId }
-                            : new APIUser { Username = argString };
-                    }
-
-                    ShowUser(user);
-
+                    ShowUser((IUser)link.Argument);
                     break;
 
                 case LinkAction.OpenWiki:
