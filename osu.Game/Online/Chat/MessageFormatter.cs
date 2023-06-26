@@ -255,6 +255,11 @@ namespace osu.Game.Online.Chat
             return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
         }
 
+        /// <summary>
+        /// Given a <see cref="LinkDetails"/>, return a fully formed URL which can be used to resolve the context in a browser.
+        /// </summary>
+        /// <param name="link">The link details to provide context.</param>
+        /// <returns>A valid URL, or null if the link could not be resolved into a URL.</returns>
         public static string? GetUrl(LinkDetails link)
         {
             switch (link.Action)
