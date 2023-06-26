@@ -111,12 +111,14 @@ namespace osu.Game.Screens.Play
 
             RelativeSizeAxes = Axes.Both;
 
+            // intentionally not added to hierarchy here as it will be attached via `BindDrawableRuleset()`.
+            KeyCounter = new KeyCounterController();
+
             Children = new[]
             {
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 tally = new JudgementTally(),
-                KeyCounter = new KeyCounterController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
                     ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
