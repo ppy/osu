@@ -383,9 +383,11 @@ namespace osu.Game.Skinning
 
                                     if (keyCounter != null)
                                     {
+                                        const float padding = 10;
+
                                         keyCounter.Anchor = Anchor.BottomRight;
                                         keyCounter.Origin = Anchor.BottomRight;
-                                        keyCounter.Position = new Vector2(-10, -10 - hitError.Width);
+                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
                                     }
                                 }
                             })

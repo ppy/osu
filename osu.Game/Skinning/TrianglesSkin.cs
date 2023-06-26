@@ -146,9 +146,11 @@ namespace osu.Game.Skinning
 
                                 if (songProgress != null && keyCounter != null)
                                 {
+                                    const float padding = 10;
+
                                     keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.BottomRight;
-                                    keyCounter.Position = new Vector2(-10, -60 - 10);
+                                    keyCounter.Position = new Vector2(-padding, -(60 + padding));
                                 }
                             })
                             {
