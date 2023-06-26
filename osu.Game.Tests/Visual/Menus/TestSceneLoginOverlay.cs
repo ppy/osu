@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("logout", () =>
             {
                 API.Logout();
-                ((DummyAPIAccess)API).StayConnectingNextLogin();
+                ((DummyAPIAccess)API).PauseOnConnectingNextLogin();
             });
 
             AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
