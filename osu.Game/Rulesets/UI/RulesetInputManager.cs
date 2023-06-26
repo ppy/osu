@@ -248,10 +248,6 @@ namespace osu.Game.Rulesets.UI
         void Attach(ClicksPerSecondCalculator calculator);
     }
 
-    public interface IAttachableSkinComponent
-    {
-    }
-
     public class RulesetInputManagerInputState<T> : InputState
         where T : struct
     {
