@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterController : CompositeComponent, IAttachableSkinComponent
+    public partial class KeyCounterController : CompositeComponent
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
 

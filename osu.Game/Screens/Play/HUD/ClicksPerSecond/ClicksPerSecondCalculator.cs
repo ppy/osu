@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCalculator : Component, IAttachableSkinComponent
+    public partial class ClicksPerSecondCalculator : Component
     {
         private readonly List<double> timestamps = new List<double>();
 
