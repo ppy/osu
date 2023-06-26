@@ -178,9 +178,9 @@ namespace osu.Game.Skinning
                                             // Hard to find this at runtime, so taken from the most expanded state during replay.
                                             const float song_progress_offset_height = 36 + padding;
 
-                                            keyCounter.Anchor = Anchor.BottomLeft;
-                                            keyCounter.Origin = Anchor.BottomLeft;
-                                            keyCounter.Position = new Vector2(hitError.Width + padding, -(padding * 2 + song_progress_offset_height));
+                                            keyCounter.Anchor = Anchor.BottomRight;
+                                            keyCounter.Origin = Anchor.BottomRight;
+                                            keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
                                 }
