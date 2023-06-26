@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -15,6 +13,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
     /// </summary>
     public abstract class StrongNestedHitObject : TaikoHitObject
     {
+        public readonly TaikoHitObject Parent;
+
+        protected StrongNestedHitObject(TaikoHitObject parent)
+        {
+            Parent = parent;
+        }
+
         public override Judgement CreateJudgement() => new TaikoStrongJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;

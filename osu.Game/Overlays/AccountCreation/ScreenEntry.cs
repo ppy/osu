@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays.AccountCreation
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.GetFont(size: 20),
-                            Text = "Let's create an account!",
+                            Text = AccountCreationStrings.LetsCreateAnAccount
                         },
                         usernameTextBox = new OsuTextBox
                         {
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         emailTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "email address",
+                            PlaceholderText = ModelValidationStrings.UserAttributesUserEmail.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays.AccountCreation
                                     AutoSizeAxes = Axes.Y,
                                     Child = new SettingsButton
                                     {
-                                        Text = "Register",
+                                        Text = LoginPanelStrings.Register,
                                         Margin = new MarginPadding { Vertical = 20 },
                                         Action = performRegistration
                                     }
@@ -132,10 +133,10 @@ namespace osu.Game.Overlays.AccountCreation
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
-            usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
+            usernameDescription.AddText(AccountCreationStrings.UsernameDescription);
 
-            emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
+            emailAddressDescription.AddText(AccountCreationStrings.EmailDescription1);
+            emailAddressDescription.AddText(AccountCreationStrings.EmailDescription2, cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
             passwordDescription.AddText("At least ");
             characterCheckText = passwordDescription.AddText("8 characters long");
@@ -209,7 +210,7 @@ namespace osu.Game.Overlays.AccountCreation
                                 if (!string.IsNullOrEmpty(errors.Message))
                                     passwordDescription.AddErrors(new[] { errors.Message });
 
-                                game.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}");
+                                game.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
                             }
                         }
                         else

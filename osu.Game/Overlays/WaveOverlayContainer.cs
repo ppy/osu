@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,6 +20,8 @@ namespace osu.Game.Overlays
 
         protected override string PopInSampleName => "UI/wave-pop-in";
 
+        public const float HORIZONTAL_PADDING = 50;
+
         protected WaveOverlayContainer()
         {
             AddInternal(Waves = new WaveContainer
@@ -32,8 +32,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             Waves.Show();
             this.FadeIn(100, Easing.OutQuint);
         }

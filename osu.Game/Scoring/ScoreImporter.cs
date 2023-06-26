@@ -83,6 +83,11 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.MaximumStatisticsJson))
                 model.MaximumStatisticsJson = JsonConvert.SerializeObject(model.MaximumStatistics);
+
+            // for pre-ScoreV2 lazer scores, apply a best-effort conversion of total score to ScoreV2.
+            // this requires: max combo, statistics, max statistics (where available), and mods to already be populated on the score.
+            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
+                model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
         }
 
         /// <summary>
@@ -146,16 +151,48 @@ namespace osu.Game.Scoring
 #pragma warning restore CS0618
         }
 
+        // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).
+        private readonly Dictionary<string, APIUser> usernameLookupCache = new Dictionary<string, APIUser>();
+
         protected override void PostImport(ScoreInfo model, Realm realm, ImportParameters parameters)
         {
             base.PostImport(model, realm, parameters);
 
-            var userRequest = new GetUserRequest(model.RealmUser.Username);
+            populateUserDetails(model);
+        }
+
+        /// <summary>
+        /// Legacy replays only store a username.
+        /// This will populate a user ID during import.
+        /// </summary>
+        private void populateUserDetails(ScoreInfo model)
+        {
+            string username = model.RealmUser.Username;
+
+            if (usernameLookupCache.TryGetValue(username, out var existing))
+            {
+                model.User = existing;
+                return;
+            }
+
+            var userRequest = new GetUserRequest(username);
 
             api.Perform(userRequest);
 
             if (userRequest.Response is APIUser user)
+            {
+                usernameLookupCache.TryAdd(username, new APIUser
+                {
+                    // Because this is a permanent cache, let's only store the pieces we're interested in,
+                    // rather than the full API response. If we start to store more than these three fields
+                    // in realm, this should be undone.
+                    Id = user.Id,
+                    Username = user.Username,
+                    CountryCode = user.CountryCode,
+                });
+
                 model.User = user;
+            }
         }
     }
 }

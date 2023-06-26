@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Models;
@@ -13,7 +12,6 @@ using Realms;
 
 namespace osu.Game.Skinning
 {
-    [ExcludeFromDynamicCompile]
     [MapTo("Skin")]
     [JsonObject(MemberSerialization.OptIn)]
     public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles

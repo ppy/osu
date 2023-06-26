@@ -30,9 +30,6 @@ namespace osu.Game.Screens.Select.Carousel
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
-
-        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private IDisposable? scoreSubscription;
@@ -65,6 +62,7 @@ namespace osu.Game.Screens.Select.Carousel
                         r.All<ScoreInfo>()
                          .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
                     localScoresChanged);
@@ -77,7 +75,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
+                ScoreInfo? topScore = sender.Detach().OrderByTotalScore().FirstOrDefault();
 
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -25,6 +23,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
             if (currentParameters == null)
                 Reset(SearchCategory.Leaderboard, false);
+
+            Current.BindValueChanged(_ => SortDirection.Value = Overlays.SortDirection.Descending);
         }
 
         public void Reset(SearchCategory category, bool hasQuery)
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
-        private partial class BeatmapTabButton : TabButton
+        public partial class BeatmapTabButton : TabButton
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 SortDirection.BindValueChanged(direction =>
                 {
-                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
+                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending && Active.Value ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
                 }, true);
             }
 
