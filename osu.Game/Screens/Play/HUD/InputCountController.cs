@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play.HUD
     /// Keeps track of key press counts for a current play session, exposing bindable counts which can
     /// be used for display purposes.
     /// </summary>
-    public partial class KeyCounterController : CompositeComponent
+    public partial class InputCountController : CompositeComponent
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
 
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public IReadOnlyList<InputTrigger> Triggers => triggers;
 
-        public KeyCounterController()
+        public InputCountController()
         {
             InternalChild = triggers = new Container<InputTrigger>();
         }

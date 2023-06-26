@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play
         private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
 
         [Cached]
-        public readonly KeyCounterController KeyCounter;
+        public readonly InputCountController InputCountController;
 
         [Cached]
         private readonly JudgementTally tally;
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.Both;
 
             // intentionally not added to hierarchy here as it will be attached via `BindDrawableRuleset()`.
-            KeyCounter = new KeyCounterController();
+            InputCountController = new InputCountController();
 
             Children = new[]
             {
@@ -307,13 +307,13 @@ namespace osu.Game.Screens.Play
             {
                 PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);
-                KeyCounter.Margin = new MarginPadding(10) { Bottom = 30 };
+                InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
             }
             else
             {
                 PlayerSettingsOverlay.Hide();
                 ModDisplay.Delay(2000).FadeOut(200);
-                KeyCounter.Margin = new MarginPadding(10);
+                InputCountController.Margin = new MarginPadding(10);
             }
 
             updateVisibility();
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Play
         {
             if (drawableRuleset is ICanAttachHUDPieces attachTarget)
             {
-                attachTarget.Attach(KeyCounter);
+                attachTarget.Attach(InputCountController);
                 attachTarget.Attach(clicksPerSecondCalculator);
             }
 

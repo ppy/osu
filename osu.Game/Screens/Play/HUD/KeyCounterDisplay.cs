@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
         [Resolved]
-        private KeyCounterController controller { get; set; } = null!;
+        private InputCountController controller { get; set; } = null!;
 
         protected abstract void UpdateVisibility();
 
