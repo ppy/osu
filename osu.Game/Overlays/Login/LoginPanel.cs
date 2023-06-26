@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -26,23 +24,24 @@ namespace osu.Game.Overlays.Login
     public partial class LoginPanel : Container
     {
         private bool bounding = true;
-        private LoginForm form;
+
+        private LoginForm? form;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel;
-        private UserDropdown dropdown;
+        private UserGridPanel panel = null!;
+        private UserDropdown dropdown = null!;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
         /// </summary>
-        public Action RequestHide;
+        public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
