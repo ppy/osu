@@ -144,8 +144,15 @@ namespace osu.Game.Online.API
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
+        /// <summary>
+        /// During the next simulated login, the process will fail immediately.
+        /// </summary>
         public void FailNextLogin() => shouldFailNextLogin = true;
-        public void StayConnectingNextLogin() => stayConnectingNextLogin = true;
+
+        /// <summary>
+        /// During the next simulated login, the process will pause indefinitely at "connecting".
+        /// </summary>
+        public void PauseOnConnectingNextLogin() => stayConnectingNextLogin = true;
 
         protected override void Dispose(bool isDisposing)
         {
