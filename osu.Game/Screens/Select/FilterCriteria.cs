@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select
                     return false;
 
                 if (Exact)
-                    return Regex.IsMatch(value, $@"(^|\s){searchTerm}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                    return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
                 return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
             }
