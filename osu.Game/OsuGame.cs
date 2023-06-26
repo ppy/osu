@@ -82,7 +82,7 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
-        public Toolbar Toolbar;
+        public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
 
@@ -769,8 +769,8 @@ namespace osu.Game
 
         public override void AttemptExit()
         {
-            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
-            PerformFromScreen(menu => menu.Exit());
+            // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
 
         /// <summary>

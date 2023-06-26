@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Select
 
             private void addInfoLabels()
             {
-                if (working.Beatmap?.HitObjects?.Any() != true)
+                if (working.Beatmap?.HitObjects.Any() != true)
                     return;
 
                 infoLabelContainer.Children = new Drawable[]
