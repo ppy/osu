@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Action OperationEnded;
 
         private SelectionBoxButton reverseButton;
+        private SelectionBoxButton rotateClockwiseButton;
+        private SelectionBoxButton rotateCounterClockwiseButton;
 
         private bool canReverse;
 
@@ -172,6 +174,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case Key.G:
                     return reverseButton?.TriggerClick() ?? false;
+
+                case Key.Comma:
+                    return rotateCounterClockwiseButton?.TriggerClick() ?? false;
+
+                case Key.Period:
+                    return rotateClockwiseButton?.TriggerClick() ?? false;
             }
 
             return base.OnKeyDown(e);
@@ -254,8 +262,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addRotationComponents()
         {
-            addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
-            addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
+            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
+            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
