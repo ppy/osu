@@ -48,13 +48,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             };
 
-            controller.AddRange(new InputTrigger[]
+            var inputTriggers = new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterMouseTrigger(MouseButton.Left),
                 new KeyCounterMouseTrigger(MouseButton.Right),
-            });
+            };
+
+            AddRange(inputTriggers);
+            controller.AddRange(inputTriggers);
 
             AddStep("Add random", () =>
             {

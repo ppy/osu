@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -17,25 +16,19 @@ namespace osu.Game.Screens.Play.HUD
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
 
-        public event Action<InputTrigger>? OnNewTrigger;
+        private readonly BindableList<InputTrigger> triggers = new BindableList<InputTrigger>();
 
-        private readonly Container<InputTrigger> triggers;
+        public IBindableList<InputTrigger> Triggers => triggers;
 
-        public IReadOnlyList<InputTrigger> Triggers => triggers;
-
-        public InputCountController()
-        {
-            InternalChild = triggers = new Container<InputTrigger>();
-        }
+        public void AddRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(Add);
 
         public void Add(InputTrigger trigger)
         {
+            // Note that these triggers are not added to the hierarchy here. It is presumed they are added externally at a
+            // more correct location (ie. inside a RulesetInputManager).
             triggers.Add(trigger);
             trigger.IsCounting.BindTo(IsCounting);
-            OnNewTrigger?.Invoke(trigger);
         }
-
-        public void AddRange(IEnumerable<InputTrigger> inputTriggers) => inputTriggers.ForEach(Add);
 
         public override bool HandleNonPositionalInput => true;
         public override bool HandlePositionalInput => true;

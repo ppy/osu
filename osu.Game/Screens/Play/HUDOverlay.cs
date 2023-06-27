@@ -111,9 +111,6 @@ namespace osu.Game.Screens.Play
 
             RelativeSizeAxes = Axes.Both;
 
-            // intentionally not added to hierarchy here as it will be attached via `BindDrawableRuleset()`.
-            InputCountController = new InputCountController();
-
             Children = new[]
             {
                 CreateFailingLayer(),
@@ -161,6 +158,7 @@ namespace osu.Game.Screens.Play
                     Spacing = new Vector2(5)
                 },
                 clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
+                InputCountController = new InputCountController(),
             };
 
             hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
