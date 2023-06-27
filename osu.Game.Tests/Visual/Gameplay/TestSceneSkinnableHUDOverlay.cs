@@ -96,7 +96,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                     return hudOverlay;
                 });
             });
-            AddUntilStep("wait for load", () => hudOverlay.IsAlive);
+            AddUntilStep("HUD overlay loaded", () => hudOverlay.IsAlive);
+            AddUntilStep("components container loaded",
+                () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Any(scc => scc.ComponentsLoaded));
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
