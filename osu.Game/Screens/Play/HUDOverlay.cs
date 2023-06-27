@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         [Cached]
-        private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
+        private readonly ClicksPerSecondController clicksPerSecondController;
 
         [Cached]
         public readonly InputCountController InputCountController;
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 judgementCountController = new JudgementCountController(),
-                clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
+                clicksPerSecondController = new ClicksPerSecondController(),
                 InputCountController = new InputCountController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
@@ -322,7 +322,7 @@ namespace osu.Game.Screens.Play
             if (drawableRuleset is ICanAttachHUDPieces attachTarget)
             {
                 attachTarget.Attach(InputCountController);
-                attachTarget.Attach(clicksPerSecondCalculator);
+                attachTarget.Attach(clicksPerSecondController);
             }
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
