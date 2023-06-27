@@ -48,6 +48,38 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(filterCriteria.SearchTerms[4].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
         }
 
+        [Test]
+        public void TestApplyFullPhraseQueryWithExclamationPointInTerm()
+        {
+            const string query = "looking for \"circles!\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"circles!\"!", filterCriteria.SearchText);
+            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("circles!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[2].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
+        [Test]
+        public void TestApplyBrokenFullPhraseQuery()
+        {
+            const string query = "\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("\"!", filterCriteria.SearchText);
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("\"!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
         /*
          * The following tests have been written a bit strangely (they don't check exact
          * bound equality with what the filter says).
