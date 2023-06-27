@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
+        public OptionalTextFilter Title;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {

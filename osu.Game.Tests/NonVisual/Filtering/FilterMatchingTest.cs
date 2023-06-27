@@ -33,7 +33,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 Artist = "The Artist",
                 ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
-                TitleUnicode = "Title goes here",
+                TitleUnicode = "TitleUnicode goes here",
                 Author = { Username = "The Author" },
                 Source = "unit tests",
                 Tags = "look for tags too",
@@ -200,6 +200,27 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var criteria = new FilterCriteria
             {
                 Creator = new FilterCriteria.OptionalTextFilter { SearchTerm = creatorName }
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("", false)]
+        [TestCase("Goes", false)]
+        [TestCase("GOES", false)]
+        [TestCase("goes", false)]
+        [TestCase("title goes", false)]
+        [TestCase("title goes AND then something else", true)]
+        [TestCase("titleunicode", false)]
+        [TestCase("unknown", true)]
+        public void TestCriteriaMatchingTitle(string titleName, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Title = new FilterCriteria.OptionalTextFilter { SearchTerm = titleName }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
