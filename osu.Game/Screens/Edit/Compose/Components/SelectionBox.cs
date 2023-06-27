@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Action OperationStarted;
         public Action OperationEnded;
 
+        private SelectionBoxButton reverseButton;
+
         private bool canReverse;
 
         /// <summary>
@@ -166,19 +168,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat || !e.ControlPressed)
                 return false;
 
-            bool runOperationFromHotkey(Func<bool> operation)
-            {
-                operationStarted();
-                bool result = operation?.Invoke() ?? false;
-                operationEnded();
-
-                return result;
-            }
-
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && runOperationFromHotkey(OnReverse);
+                    return reverseButton?.TriggerClick() ?? false;
             }
 
             return base.OnKeyDown(e);
@@ -256,7 +249,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
             if (CanRotate) addRotationComponents();
-            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
+            if (CanReverse) reverseButton = addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()
@@ -300,7 +293,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
         }
 
-        private void addButton(IconUsage icon, string tooltip, Action action)
+        private SelectionBoxButton addButton(IconUsage icon, string tooltip, Action action)
         {
             var button = new SelectionBoxButton(icon, tooltip)
             {
@@ -310,6 +303,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             button.OperationStarted += operationStarted;
             button.OperationEnded += operationEnded;
             buttons.Add(button);
+
+            return button;
         }
 
         private void addScaleHandle(Anchor anchor)
