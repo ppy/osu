@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,17 +22,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private const float button_padding = 5;
 
-        public Func<float, bool> OnRotation;
-        public Func<Vector2, Anchor, bool> OnScale;
-        public Func<Direction, bool, bool> OnFlip;
-        public Func<bool> OnReverse;
+        public Func<float, bool>? OnRotation;
+        public Func<Vector2, Anchor, bool>? OnScale;
+        public Func<Direction, bool, bool>? OnFlip;
+        public Func<bool>? OnReverse;
 
-        public Action OperationStarted;
-        public Action OperationEnded;
+        public Action? OperationStarted;
+        public Action? OperationEnded;
 
-        private SelectionBoxButton reverseButton;
-        private SelectionBoxButton rotateClockwiseButton;
-        private SelectionBoxButton rotateCounterClockwiseButton;
+        private SelectionBoxButton? reverseButton;
+        private SelectionBoxButton? rotateClockwiseButton;
+        private SelectionBoxButton? rotateCounterClockwiseButton;
 
         private bool canReverse;
 
@@ -138,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private string text;
+        private string text = string.Empty;
 
         public string Text
         {
@@ -154,13 +152,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private SelectionBoxDragHandleContainer dragHandles;
-        private FillFlowContainer buttons;
+        private SelectionBoxDragHandleContainer dragHandles = null!;
+        private FillFlowContainer buttons = null!;
 
-        private OsuSpriteText selectionDetailsText;
+        private OsuSpriteText? selectionDetailsText;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load() => recreate();
