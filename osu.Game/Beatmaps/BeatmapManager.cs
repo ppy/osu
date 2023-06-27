@@ -339,6 +339,8 @@ namespace osu.Game.Beatmaps
 
                 DeleteFile(setInfo, beatmapInfo.File);
                 setInfo.Beatmaps.Remove(beatmapInfo);
+                r.Remove(beatmapInfo.Metadata);
+                r.Remove(beatmapInfo);
 
                 updateHashAndMarkDirty(setInfo);
                 workingBeatmapCache.Invalidate(setInfo);
