@@ -69,9 +69,9 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString UnsupportedOrDangerousUrlProtocol(string url) => new TranslatableString(getKey(@"unsupported_or_dangerous_url_protocol"), @"The URL {0} has an unsupported or dangerous protocol and will not be opened.", url);
 
         /// <summary>
-        /// "Subsequent messages have been logged. Click to view log files"
+        /// "Subsequent messages have been logged. Click to view log files."
         /// </summary>
-        public static LocalisableString SubsequentMessagesLogged => new TranslatableString(getKey(@"subsequent_messages_logged"), @"Subsequent messages have been logged. Click to view log files");
+        public static LocalisableString SubsequentMessagesLogged => new TranslatableString(getKey(@"subsequent_messages_logged"), @"Subsequent messages have been logged. Click to view log files.");
 
         /// <summary>
         /// "Disabling tablet support due to error: &quot;{0}&quot;"
