@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
@@ -24,34 +22,16 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public Bindable<bool> AlwaysVisible { get; } = new Bindable<bool>(true);
 
-        /// <summary>
-        /// The <see cref="KeyCounter"/>s contained in this <see cref="KeyCounterDisplay"/>.
-        /// </summary>
-        public IEnumerable<KeyCounter> Counters => KeyFlow;
-
         protected abstract FillFlowContainer<KeyCounter> KeyFlow { get; }
 
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
+
+        private readonly IBindableList<InputTrigger> triggers = new BindableList<InputTrigger>();
 
         [Resolved]
         private InputCountController controller { get; set; } = null!;
 
         protected abstract void UpdateVisibility();
-
-        /// <summary>
-        /// Add a <see cref="InputTrigger"/> to this display.
-        /// </summary>
-        public void Add(InputTrigger trigger)
-        {
-            var keyCounter = CreateCounter(trigger);
-
-            KeyFlow.Add(keyCounter);
-        }
-
-        /// <summary>
-        /// Add a range of <see cref="InputTrigger"/> to this display.
-        /// </summary>
-        public void AddRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(Add);
 
         protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
@@ -68,19 +48,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            controller.OnNewTrigger += Add;
-            AddRange(controller.Triggers);
+            triggers.BindTo(controller.Triggers);
+            triggers.BindCollectionChanged(triggersChanged, true);
 
             AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
             ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
         }
 
-        protected override void Dispose(bool isDisposing)
+        private void triggersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            base.Dispose(isDisposing);
-
-            if (controller.IsNotNull())
-                controller.OnNewTrigger -= Add;
+            KeyFlow.Clear();
+            foreach (var trigger in controller.Triggers)
+                KeyFlow.Add(CreateCounter(trigger));
         }
 
         public bool UsesFixedAnchor { get; set; }

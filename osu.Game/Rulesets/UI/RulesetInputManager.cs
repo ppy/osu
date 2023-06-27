@@ -162,25 +162,22 @@ namespace osu.Game.Rulesets.UI
 
         public void Attach(InputCountController inputCountController)
         {
-            KeyBindingContainer.Add(inputCountController);
+            var triggers = KeyBindingContainer.DefaultKeyBindings
+                                              .Select(b => b.GetAction<T>())
+                                              .Distinct()
+                                              .OrderBy(action => action)
+                                              .Select(action => new KeyCounterActionTrigger<T>(action))
+                                              .ToArray();
 
-            inputCountController.AddRange(KeyBindingContainer.DefaultKeyBindings
-                                                             .Select(b => b.GetAction<T>())
-                                                             .Distinct()
-                                                             .OrderBy(action => action)
-                                                             .Select(action => new KeyCounterActionTrigger<T>(action)));
+            KeyBindingContainer.AddRange(triggers);
+            inputCountController.AddRange(triggers);
         }
 
         #endregion
 
         #region Keys per second Counter Attachment
 
-        public void Attach(ClicksPerSecondCalculator calculator)
-        {
-            var listener = new ActionListener(calculator);
-
-            KeyBindingContainer.Add(listener);
-        }
+        public void Attach(ClicksPerSecondCalculator calculator) => KeyBindingContainer.Add(new ActionListener(calculator));
 
         private partial class ActionListener : Component, IKeyBindingHandler<T>
         {
