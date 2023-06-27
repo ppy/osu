@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play.HUD
     /// Keeps track of key press counts for a current play session, exposing bindable counts which can
     /// be used for display purposes.
     /// </summary>
-    public partial class InputCountController : CompositeComponent
+    public partial class InputCountController : Component
     {
         public readonly Bindable<bool> IsCounting = new BindableBool(true);
 
@@ -29,8 +29,5 @@ namespace osu.Game.Screens.Play.HUD
             triggers.Add(trigger);
             trigger.IsCounting.BindTo(IsCounting);
         }
-
-        public override bool HandleNonPositionalInput => true;
-        public override bool HandlePositionalInput => true;
     }
 }
