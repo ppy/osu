@@ -62,7 +62,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                controller.Add(new KeyCounterKeyboardTrigger(key));
+                var trigger = new KeyCounterKeyboardTrigger(key);
+                Add(trigger);
+                controller.Add(trigger);
             });
 
             InputTrigger testTrigger = controller.Triggers.First();
