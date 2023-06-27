@@ -171,6 +171,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("\"an auteur\"", true)]
         [TestCase("\"Artist\"!", true)]
         [TestCase("\"The Artist\"!", false)]
+        [TestCase("\"the artist\"!", false)]
         [TestCase("\"\\\"", true)] // nasty case, covers properly escaping user input in underlying regex.
         public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
         {
@@ -238,6 +239,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("unknown", true)]
         [TestCase("\"Artist\"!", true)]
         [TestCase("\"The Artist\"!", false)]
+        [TestCase("\"the artist\"!", false)]
         public void TestCriteriaMatchingArtist(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
