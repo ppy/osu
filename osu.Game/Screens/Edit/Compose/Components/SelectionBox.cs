@@ -171,13 +171,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.G:
-                    return reverseButton?.TriggerClick() == true;
+                    return CanReverse && reverseButton?.TriggerClick() == true;
 
                 case Key.Comma:
-                    return rotateCounterClockwiseButton?.TriggerClick() == true;
+                    return CanRotate && rotateCounterClockwiseButton?.TriggerClick() == true;
 
                 case Key.Period:
-                    return rotateClockwiseButton?.TriggerClick() == true;
+                    return CanRotate && rotateClockwiseButton?.TriggerClick() == true;
             }
 
             return base.OnKeyDown(e);
