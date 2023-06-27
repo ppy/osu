@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -97,6 +95,33 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSaveWithDetachedBeatmap()
+        {
+            AddStep("Set overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty = 7);
+
+            SaveEditor();
+
+            AddStep("Detach beatmap from set", () =>
+            {
+                Realm.Write(r =>
+                {
+                    BeatmapSetInfo? beatmapSet = r.Find<BeatmapSetInfo>(EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+                    BeatmapInfo? beatmap = r.Find<BeatmapInfo>(EditorBeatmap.BeatmapInfo.ID);
+
+                    beatmapSet.Beatmaps.Remove(beatmap);
+                });
+            });
+
+            SaveEditor();
+
+            AddAssert("Beatmap has correct overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty == 7);
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty == 7);
+        }
+
+        [Test]
         public void TestDifficulty()
         {
             AddStep("Set overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty = 7);
@@ -130,7 +155,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestLengthAndStarRatingUpdated()
         {
-            WorkingBeatmap working = null;
+            WorkingBeatmap working = null!;
             double lastStarRating = 0;
             double lastLength = 0;
 
