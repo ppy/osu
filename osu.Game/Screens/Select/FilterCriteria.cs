@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Select
                 switch (MatchMode)
                 {
                     default:
-                    case MatchMode.None:
+                    case MatchMode.Substring:
                         return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
 
                     case MatchMode.IsolatedPhrase:
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Select
                         MatchMode = MatchMode.IsolatedPhrase;
                     }
                     else
-                        MatchMode = MatchMode.None;
+                        MatchMode = MatchMode.Substring;
                 }
             }
 
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Select
             /// <summary>
             /// Match using a simple "contains" substring match.
             /// </summary>
-            None,
+            Substring,
 
             /// <summary>
             /// Match for the search phrase being isolated by spaces, or at the start or end of the text.
