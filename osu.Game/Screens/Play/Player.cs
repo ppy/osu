@@ -429,13 +429,12 @@ namespace osu.Game.Screens.Play
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                             ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
-                        KeyCounter =
+                        InputCountController =
                         {
                             IsCounting =
                             {
                                 Value = false
                             },
-                            AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
@@ -475,7 +474,7 @@ namespace osu.Game.Screens.Play
         {
             updateGameplayState();
             updatePauseOnFocusLostState();
-            HUDOverlay.KeyCounter.IsCounting.Value = !isBreakTime.NewValue;
+            HUDOverlay.InputCountController.IsCounting.Value = !isBreakTime.NewValue;
         }
 
         private void updateGameplayState()

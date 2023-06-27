@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneJudgementCounter : OsuTestScene
     {
         private ScoreProcessor scoreProcessor = null!;
-        private JudgementTally judgementTally = null!;
+        private JudgementCountController judgementCountController = null!;
         private TestJudgementCounterDisplay counterDisplay = null!;
 
         private DependencyProvidingContainer content = null!;
@@ -47,11 +47,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), ruleset) },
                 Children = new Drawable[]
                 {
-                    judgementTally = new JudgementTally(),
+                    judgementCountController = new JudgementCountController(),
                     content = new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CachedDependencies = new (Type, object)[] { (typeof(JudgementTally), judgementTally) },
+                        CachedDependencies = new (Type, object)[] { (typeof(JudgementCountController), judgementCountController) },
                     }
                 },
             };
