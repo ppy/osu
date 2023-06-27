@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
