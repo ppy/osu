@@ -64,7 +64,7 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString ScoreOverlayDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"score_overlay_disabled"), @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
 
         /// <summary>
-        /// "The URL {0} has an unsupported or dangerous protocol and will not be opened"
+        /// "The URL {0} has an unsupported or dangerous protocol and will not be opened."
         /// </summary>
         public static LocalisableString UnsupportedOrDangerousUrlProtocol(string url) => new TranslatableString(getKey(@"unsupported_or_dangerous_url_protocol"), @"The URL {0} has an unsupported or dangerous protocol and will not be opened.", url);
 
