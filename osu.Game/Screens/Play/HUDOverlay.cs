@@ -116,6 +116,8 @@ namespace osu.Game.Screens.Play
                 CreateFailingLayer(),
                 //Needs to be initialized before skinnable drawables.
                 judgementCountController = new JudgementCountController(),
+                clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
+                InputCountController = new InputCountController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
                     ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
@@ -157,8 +159,6 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding(44), // enough margin to avoid the hit error display
                     Spacing = new Vector2(5)
                 },
-                clicksPerSecondCalculator = new ClicksPerSecondCalculator(),
-                InputCountController = new InputCountController(),
             };
 
             hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
