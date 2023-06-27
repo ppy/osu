@@ -78,7 +78,7 @@ namespace osu.Game.Database
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
         /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
         /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
-        /// 31   2023-06-26    Add Version to ScoreInfo, set to 30000002.
+        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and move TotalScore into LegacyTotalScore for legacy scores.
         /// </summary>
         private const int schema_version = 31;
 
@@ -973,7 +973,10 @@ namespace osu.Game.Database
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
+                    {
+                        score.LegacyTotalScore = score.TotalScore;
                         score.Version = 30000002; // Last version before legacy total score conversion.
+                    }
 
                     break;
                 }

@@ -54,6 +54,8 @@ namespace osu.Game.Scoring
 
         public long TotalScore { get; set; }
 
+        public long LegacyTotalScore { get; set; }
+
         public int MaxCombo { get; set; }
 
         public double Accuracy { get; set; }

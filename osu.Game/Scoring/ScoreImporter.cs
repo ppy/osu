@@ -155,6 +155,9 @@ namespace osu.Game.Scoring
 
         public long ConvertFromLegacyTotalScore(ScoreInfo score)
         {
+            if (!score.IsLegacyScore)
+                return score.TotalScore;
+
             var beatmap = beatmaps().GetWorkingBeatmap(score.BeatmapInfo);
             var ruleset = score.Ruleset.CreateInstance();
 
@@ -173,10 +176,10 @@ namespace osu.Game.Scoring
             int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
 
             // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
-            double comboProportion = Math.Min(1, (double)score.TotalScore / maximumLegacyBaseScore);
+            double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
 
             // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
-            double bonusProportion = Math.Max(0, (score.TotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+            double bonusProportion = Math.Max(0, (score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
             switch (ruleset.RulesetInfo.OnlineID)
             {
