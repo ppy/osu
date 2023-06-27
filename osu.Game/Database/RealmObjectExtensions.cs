@@ -52,10 +52,19 @@ namespace osu.Game.Database
              {
                  foreach (var beatmap in s.Beatmaps)
                  {
-                     var existing = d.Beatmaps.FirstOrDefault(b => b.ID == beatmap.ID);
+                     // Importantly, search all of realm for the beatmap (not just the set's beatmaps).
+                     // It may have gotten detached, and if that's the case let's use this opportunity to fix
+                     // things up.
+                     var existingBeatmap = d.Realm.Find<BeatmapInfo>(beatmap.ID);
 
-                     if (existing != null)
-                         copyChangesToRealm(beatmap, existing);
+                     if (existingBeatmap != null)
+                     {
+                         // As above, reattach if it happens to not be in the set's beatmaps.
+                         if (!d.Beatmaps.Contains(existingBeatmap))
+                             d.Beatmaps.Add(existingBeatmap);
+
+                         copyChangesToRealm(beatmap, existingBeatmap);
+                     }
                      else
                      {
                          var newBeatmap = new BeatmapInfo
@@ -64,6 +73,7 @@ namespace osu.Game.Database
                              BeatmapSet = d,
                              Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
                          };
+
                          d.Beatmaps.Add(newBeatmap);
                          copyChangesToRealm(beatmap, newBeatmap);
                      }
