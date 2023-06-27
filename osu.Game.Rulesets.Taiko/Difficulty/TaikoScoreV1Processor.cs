@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 (baseBeatmap.Difficulty.DrainRate
                  + baseBeatmap.Difficulty.OverallDifficulty
                  + baseBeatmap.Difficulty.CircleSize
-                 + Math.Clamp(objectCount / drainLength * 8, 0, 16)) / 38 * 5);
+                 + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
             modMultiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
 
