@@ -236,7 +236,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
             AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
             AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
 
@@ -255,7 +254,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
             AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
 
             AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Reload());
@@ -277,6 +275,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Child = hudOverlay;
             });
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components present", () => hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault() != null);
         }
 
         protected override void Dispose(bool isDisposing)
