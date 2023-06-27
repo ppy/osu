@@ -57,6 +57,8 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
+            match &= !criteria.Title.HasFilter || criteria.Title.Matches(BeatmapInfo.Metadata.Title) ||
+                     criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 

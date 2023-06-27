@@ -73,6 +73,9 @@ namespace osu.Game.Screens.Select
                 case "artist":
                     return TryUpdateCriteriaText(ref criteria.Artist, op, value);
 
+                case "title":
+                    return TryUpdateCriteriaText(ref criteria.Title, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }

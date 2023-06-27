@@ -252,6 +252,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestApplyTitleQueries()
+        {
+            const string query = "find me songs with title=\"a certain title\" please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("a certain title", filterCriteria.Title.SearchTerm);
+            Assert.That(filterCriteria.Title.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
+        [Test]
         public void TestApplyArtistQueries()
         {
             const string query = "find me songs by artist=singer please";
