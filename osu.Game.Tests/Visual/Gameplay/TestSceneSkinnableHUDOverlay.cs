@@ -63,7 +63,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             float? initialAlpha = null;
 
             createNew(h => h.OnLoadComplete += _ => initialAlpha = hideTarget.Alpha);
-            AddUntilStep("wait for load", () => hudOverlay.IsAlive);
             AddAssert("initial alpha was less than 1", () => initialAlpha < 1);
         }
 
@@ -97,6 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     return hudOverlay;
                 });
             });
+            AddUntilStep("wait for load", () => hudOverlay.IsAlive);
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
