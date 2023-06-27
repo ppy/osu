@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachHUDPieces
     {
         void Attach(InputCountController inputCountController);
-        void Attach(ClicksPerSecondCalculator calculator);
+        void Attach(ClicksPerSecondController controller);
     }
 }
