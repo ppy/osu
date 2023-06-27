@@ -169,6 +169,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("\"tags to\"", true)]
         [TestCase("\"version\"", false)]
         [TestCase("\"an auteur\"", true)]
+        [TestCase("\"Artist\"!", true)]
+        [TestCase("\"The Artist\"!", false)]
         [TestCase("\"\\\"", true)] // nasty case, covers properly escaping user input in underlying regex.
         public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
         {
@@ -213,6 +215,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("the artist AND then something else", true)]
         [TestCase("unicode too", false)]
         [TestCase("unknown", true)]
+        [TestCase("\"Artist\"!", true)]
+        [TestCase("\"The Artist\"!", false)]
         public void TestCriteriaMatchingArtist(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
