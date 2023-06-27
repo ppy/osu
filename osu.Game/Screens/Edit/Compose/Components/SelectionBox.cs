@@ -260,8 +260,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addRotationComponents()
         {
-            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
-            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
+            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => OnRotation?.Invoke(-90));
+            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => OnRotation?.Invoke(90));
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
