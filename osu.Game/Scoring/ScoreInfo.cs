@@ -54,6 +54,9 @@ namespace osu.Game.Scoring
 
         public long TotalScore { get; set; }
 
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
         public long LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
