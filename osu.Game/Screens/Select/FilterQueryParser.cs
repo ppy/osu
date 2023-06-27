@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 case Operator.Equal:
-                    textFilter.SearchTerm = value.Trim('"');
+                    textFilter.SearchTerm = value;
                     return true;
 
                 default:

@@ -23,6 +23,31 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
         }
 
+        [Test]
+        public void TestApplyQueriesBareWordsWithExactMatch()
+        {
+            const string query = "looking for \"a beatmap\" like \"this\"";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"a beatmap\" like \"this\"", filterCriteria.SearchText);
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("a beatmap"));
+            Assert.That(filterCriteria.SearchTerms[0].Exact, Is.True);
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("this"));
+            Assert.That(filterCriteria.SearchTerms[1].Exact, Is.True);
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[2].Exact, Is.False);
+
+            Assert.That(filterCriteria.SearchTerms[3].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[3].Exact, Is.False);
+
+            Assert.That(filterCriteria.SearchTerms[4].SearchTerm, Is.EqualTo("like"));
+            Assert.That(filterCriteria.SearchTerms[4].Exact, Is.False);
+        }
+
         /*
          * The following tests have been written a bit strangely (they don't check exact
          * bound equality with what the filter says).
@@ -235,6 +260,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.Exact, Is.False);
         }
 
         [Test]
@@ -246,6 +272,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.Exact, Is.True);
         }
 
         [Test]
