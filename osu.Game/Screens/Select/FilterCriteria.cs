@@ -174,15 +174,19 @@ namespace osu.Game.Screens.Select
                 {
                     searchTerm = value;
 
-                    if (searchTerm.EndsWith("\"!", StringComparison.Ordinal))
+                    if (searchTerm.StartsWith('\"'))
                     {
-                        searchTerm = searchTerm.Trim('!', '\"');
-                        MatchMode = MatchMode.FullPhrase;
-                    }
-                    else if (searchTerm.StartsWith('\"'))
-                    {
-                        searchTerm = searchTerm.Trim('\"');
-                        MatchMode = MatchMode.IsolatedPhrase;
+                        // length check ensures that the quote character in the `StartsWith()` check above and the `EndsWith()` check below is not the same character.
+                        if (searchTerm.EndsWith("\"!", StringComparison.Ordinal) && searchTerm.Length >= 3)
+                        {
+                            searchTerm = searchTerm.TrimEnd('!').Trim('\"');
+                            MatchMode = MatchMode.FullPhrase;
+                        }
+                        else
+                        {
+                            searchTerm = searchTerm.Trim('\"');
+                            MatchMode = MatchMode.IsolatedPhrase;
+                        }
                     }
                     else
                         MatchMode = MatchMode.Substring;

@@ -76,8 +76,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("\"!", filterCriteria.SearchText);
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
 
-            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("\"!"));
-            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
         /*
