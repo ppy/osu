@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,13 +22,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private const float button_padding = 5;
 
-        public Func<float, bool> OnRotation;
-        public Func<Vector2, Anchor, bool> OnScale;
-        public Func<Direction, bool, bool> OnFlip;
-        public Func<bool> OnReverse;
+        public Func<float, bool>? OnRotation;
+        public Func<Vector2, Anchor, bool>? OnScale;
+        public Func<Direction, bool, bool>? OnFlip;
+        public Func<bool>? OnReverse;
 
-        public Action OperationStarted;
-        public Action OperationEnded;
+        public Action? OperationStarted;
+        public Action? OperationEnded;
+
+        private SelectionBoxButton? reverseButton;
+        private SelectionBoxButton? rotateClockwiseButton;
+        private SelectionBoxButton? rotateCounterClockwiseButton;
 
         private bool canReverse;
 
@@ -134,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private string text;
+        private string text = string.Empty;
 
         public string Text
         {
@@ -150,13 +152,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private SelectionBoxDragHandleContainer dragHandles;
-        private FillFlowContainer buttons;
+        private SelectionBoxDragHandleContainer dragHandles = null!;
+        private FillFlowContainer buttons = null!;
 
-        private OsuSpriteText selectionDetailsText;
+        private OsuSpriteText? selectionDetailsText;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load() => recreate();
@@ -166,19 +168,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat || !e.ControlPressed)
                 return false;
 
-            bool runOperationFromHotkey(Func<bool> operation)
-            {
-                operationStarted();
-                bool result = operation?.Invoke() ?? false;
-                operationEnded();
-
-                return result;
-            }
-
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && runOperationFromHotkey(OnReverse);
+                    return CanReverse && reverseButton?.TriggerClick() == true;
+
+                case Key.Comma:
+                    return CanRotate && rotateCounterClockwiseButton?.TriggerClick() == true;
+
+                case Key.Period:
+                    return CanRotate && rotateClockwiseButton?.TriggerClick() == true;
             }
 
             return base.OnKeyDown(e);
@@ -256,13 +255,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
             if (CanRotate) addRotationComponents();
-            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
+            if (CanReverse) reverseButton = addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()
         {
-            addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
-            addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
+            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => OnRotation?.Invoke(-90));
+            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => OnRotation?.Invoke(90));
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
@@ -300,7 +299,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
         }
 
-        private void addButton(IconUsage icon, string tooltip, Action action)
+        private SelectionBoxButton addButton(IconUsage icon, string tooltip, Action action)
         {
             var button = new SelectionBoxButton(icon, tooltip)
             {
@@ -310,6 +309,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             button.OperationStarted += operationStarted;
             button.OperationEnded += operationEnded;
             buttons.Add(button);
+
+            return button;
         }
 
         private void addScaleHandle(Anchor anchor)
