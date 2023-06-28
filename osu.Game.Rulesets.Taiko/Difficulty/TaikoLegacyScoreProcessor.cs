@@ -14,22 +14,12 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    internal class TaikoScoreV1Processor : ILegacyScoreProcessor
+    internal class TaikoLegacyScoreProcessor : ILegacyScoreProcessor
     {
-        /// <summary>
-        /// The accuracy portion of the legacy (ScoreV1) total score.
-        /// </summary>
         public int AccuracyScore { get; private set; }
 
-        /// <summary>
-        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
-        /// </summary>
         public int ComboScore { get; private set; }
 
-        /// <summary>
-        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
-        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
-        /// </summary>
         public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
 
         private int legacyBonusScore;

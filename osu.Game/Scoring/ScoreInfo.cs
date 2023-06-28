@@ -57,6 +57,9 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Used to preserve the total score for legacy scores.
         /// </summary>
+        /// <remarks>
+        /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
+        /// </remarks>
         public long LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
@@ -69,6 +72,14 @@ namespace osu.Game.Scoring
 
         public double? PP { get; set; }
 
+        /// <summary>
+        /// The version of this score as stored in the database.
+        /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
+        /// then the score has not yet been updated to reflect the current scoring values.
+        /// </summary>
+        /// <remarks>
+        /// This may not match the version stored in the replay files.
+        /// </remarks>
         public int Version { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
 
         [Indexed]

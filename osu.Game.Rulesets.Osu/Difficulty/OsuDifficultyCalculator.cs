@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (ComputeLegacyScoringValues)
             {
-                OsuScoreV1Processor sv1Processor = new OsuScoreV1Processor();
+                OsuLegacyScoreProcessor sv1Processor = new OsuLegacyScoreProcessor();
                 sv1Processor.Simulate(workingBeatmap, beatmap, mods);
                 attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
                 attributes.LegacyComboScore = sv1Processor.ComboScore;
