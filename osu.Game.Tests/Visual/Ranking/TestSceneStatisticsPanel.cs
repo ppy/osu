@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -79,11 +81,12 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new StatisticsPanel
+            Child = new SoloStatisticsPanel(score)
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
-                Score = { Value = score }
+                Score = { Value = score },
+                StatisticsUpdate = { Value = new SoloStatisticsUpdate(score, new UserStatistics(), new UserStatistics()) }
             };
         });
 
