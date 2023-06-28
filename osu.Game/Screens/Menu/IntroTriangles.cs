@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -223,19 +224,21 @@ namespace osu.Game.Screens.Menu
                     using (BeginDelayedSequence(rulesets_1))
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
-                        rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
+                        rulesets.FadeIn().TransformSpacingTo(new Vector2(200));
                         welcomeText.FadeOut().Expire();
                         triangles.FadeOut().Expire();
                     }
 
                     using (BeginDelayedSequence(rulesets_2))
                     {
-                        rulesets.ScaleTo(2).TransformSpacingTo(new Vector2(30, 0));
+                        rulesets.Children.ForEach(r => r.ScaleTo(2));
+                        rulesets.TransformSpacingTo(new Vector2(60));
                     }
 
                     using (BeginDelayedSequence(rulesets_3))
                     {
-                        rulesets.ScaleTo(4).TransformSpacingTo(new Vector2(10, 0));
+                        rulesets.Children.ForEach(r => r.ScaleTo(4));
+                        rulesets.TransformSpacingTo(new Vector2(40));
                         rulesetsScale.ScaleTo(1.3f, 1000);
                     }
 
@@ -332,7 +335,8 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load(RulesetStore rulesets)
                 {
-                    AutoSizeAxes = Axes.Both;
+                    RelativeSizeAxes = Axes.X;
+                    AutoSizeAxes = Axes.Y;
 
                     Anchor = Anchor.Centre;
                     Origin = Anchor.Centre;
@@ -343,6 +347,8 @@ namespace osu.Game.Screens.Menu
                         {
                             var icon = new ConstrainedIconContainer
                             {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
                                 Icon = ruleset.CreateInstance().CreateIcon(),
                                 Size = new Vector2(30),
                             };
