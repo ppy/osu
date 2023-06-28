@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 
 namespace osu.Game
@@ -26,6 +27,9 @@ namespace osu.Game
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
@@ -241,7 +245,7 @@ namespace osu.Game
                 try
                 {
                     var score = scoreManager.Query(s => s.ID == id);
-                    long newTotalScore = scoreManager.ConvertFromLegacyTotalScore(score);
+                    long newTotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(score, beatmapManager);
 
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
@@ -249,7 +253,7 @@ namespace osu.Game
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id);
                         s.TotalScore = newTotalScore;
-                        s.Version = 30000003;
+                        s.Version = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
                     Logger.Log($"Converted total score for score {id}");

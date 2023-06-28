@@ -5,31 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Catch.Difficulty
+namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    internal class CatchScoreV1Processor : ILegacyScoreProcessor
+    internal class OsuLegacyScoreProcessor : ILegacyScoreProcessor
     {
-        /// <summary>
-        /// The accuracy portion of the legacy (ScoreV1) total score.
-        /// </summary>
         public int AccuracyScore { get; private set; }
 
-        /// <summary>
-        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
-        /// </summary>
         public int ComboScore { get; private set; }
 
-        /// <summary>
-        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
-        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
-        /// </summary>
         public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
 
         private int legacyBonusScore;
@@ -37,16 +27,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private int combo;
 
         private double scoreMultiplier;
+        private IBeatmap playableBeatmap = null!;
 
         public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
         {
+            this.playableBeatmap = playableBeatmap;
+
             IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
             int countNormal = 0;
             int countSlider = 0;
             int countSpinner = 0;
 
-            foreach (HitObject obj in baseBeatmap.HitObjects)
+            foreach (HitObject obj in workingBeatmap.Beatmap.HitObjects)
             {
                 switch (obj)
                 {
@@ -98,37 +91,69 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             switch (hitObject)
             {
-                case TinyDroplet:
+                case SliderHeadCircle:
+                case SliderTailCircle:
+                case SliderRepeat:
+                    scoreIncrease = 30;
+                    break;
+
+                case SliderTick:
                     scoreIncrease = 10;
-                    increaseCombo = false;
                     break;
 
-                case Droplet:
-                    scoreIncrease = 100;
-                    break;
-
-                case Fruit:
-                    scoreIncrease = 300;
-                    addScoreComboMultiplier = true;
-                    increaseCombo = true;
-                    break;
-
-                case Banana:
+                case SpinnerBonusTick:
                     scoreIncrease = 1100;
                     increaseCombo = false;
                     isBonus = true;
                     bonusResult = HitResult.LargeBonus;
                     break;
 
-                case JuiceStream:
-                    foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
-                    return;
+                case SpinnerTick:
+                    scoreIncrease = 100;
+                    increaseCombo = false;
+                    isBonus = true;
+                    bonusResult = HitResult.SmallBonus;
+                    break;
 
-                case BananaShower:
+                case HitCircle:
+                    scoreIncrease = 300;
+                    addScoreComboMultiplier = true;
+                    break;
+
+                case Slider:
                     foreach (var nested in hitObject.NestedHitObjects)
                         simulateHit(nested);
-                    return;
+
+                    scoreIncrease = 300;
+                    increaseCombo = false;
+                    addScoreComboMultiplier = true;
+                    break;
+
+                case Spinner spinner:
+                    // The spinner object applies a lenience because gameplay mechanics differ from osu-stable.
+                    // We'll redo the calculations to match osu-stable here...
+                    const double maximum_rotations_per_second = 477.0 / 60;
+                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(playableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
+                    double secondsDuration = spinner.Duration / 1000;
+
+                    // The total amount of half spins possible for the entire spinner.
+                    int totalHalfSpinsPossible = (int)(secondsDuration * maximum_rotations_per_second * 2);
+                    // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
+                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
+                    // To be able to receive bonus points, the spinner must be rotated another 1.5 times.
+                    int halfSpinsRequiredBeforeBonus = halfSpinsRequiredForCompletion + 3;
+
+                    for (int i = 0; i <= totalHalfSpinsPossible; i++)
+                    {
+                        if (i > halfSpinsRequiredBeforeBonus && (i - halfSpinsRequiredBeforeBonus) % 2 == 0)
+                            simulateHit(new SpinnerBonusTick());
+                        else if (i > 1 && i % 2 == 0)
+                            simulateHit(new SpinnerTick());
+                    }
+
+                    scoreIncrease = 300;
+                    addScoreComboMultiplier = true;
+                    break;
             }
 
             if (addScoreComboMultiplier)

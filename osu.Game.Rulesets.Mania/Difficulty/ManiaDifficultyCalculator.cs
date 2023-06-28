@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             if (ComputeLegacyScoringValues)
             {
-                ManiaScoreV1Processor sv1Processor = new ManiaScoreV1Processor();
+                ManiaLegacyScoreProcessor sv1Processor = new ManiaLegacyScoreProcessor();
                 sv1Processor.Simulate(workingBeatmap, beatmap, mods);
                 attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
                 attributes.LegacyComboScore = sv1Processor.ComboScore;

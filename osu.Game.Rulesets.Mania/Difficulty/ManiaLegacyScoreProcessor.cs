@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    internal class ManiaScoreV1Processor : ILegacyScoreProcessor
+    internal class ManiaLegacyScoreProcessor : ILegacyScoreProcessor
     {
         public int AccuracyScore => 0;
         public int ComboScore { get; private set; }

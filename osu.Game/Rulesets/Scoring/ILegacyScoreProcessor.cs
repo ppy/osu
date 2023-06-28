@@ -25,6 +25,13 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         double BonusScoreRatio { get; }
 
+        /// <summary>
+        /// Performs the simulation, computing the maximum <see cref="AccuracyScore"/>, <see cref="ComboScore"/>,
+        /// and <see cref="BonusScoreRatio"/> achievable for the given beatmap.
+        /// </summary>
+        /// <param name="workingBeatmap">The working beatmap.</param>
+        /// <param name="playableBeatmap">A playable version of the beatmap for the ruleset.</param>
+        /// <param name="mods">The applied mods.</param>
         void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods);
     }
 }

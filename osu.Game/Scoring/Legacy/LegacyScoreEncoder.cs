@@ -29,7 +29,7 @@ namespace osu.Game.Scoring.Legacy
         /// <list type="bullet">
         /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
         /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm.</description></item>
-        /// <item><description>30000003: First version after legacy total score migration.</description></item>
+        /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
         /// </list>
         /// </remarks>
         public const int LATEST_VERSION = 30000003;
