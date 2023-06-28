@@ -30,19 +30,19 @@ namespace osu.Game.Tests.Visual.Ranking
     public partial class TestSceneStatisticsPanel : OsuTestScene
     {
         [Test]
-        public void TestScoreWithTimeStatistics()
+        public void TestScoreWithPositionStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
-            score.HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
+            score.HitEvents = createPositionDistributedHitEvents();
 
             loadPanel(score);
         }
 
         [Test]
-        public void TestScoreWithPositionStatistics()
+        public void TestScoreWithTimeStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
-            score.HitEvents = createPositionDistributedHitEvents();
+            score.HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
 
             loadPanel(score);
         }
@@ -89,18 +89,19 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private static List<HitEvent> createPositionDistributedHitEvents()
         {
-            var hitEvents = new List<HitEvent>();
+            var hitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
+
             // Use constant seed for reproducibility
             var random = new Random(0);
 
-            for (int i = 0; i < 500; i++)
+            for (int i = 0; i < hitEvents.Count; i++)
             {
                 double angle = random.NextDouble() * 2 * Math.PI;
                 double radius = random.NextDouble() * 0.5f * OsuHitObject.OBJECT_RADIUS;
 
                 var position = new Vector2((float)(radius * Math.Cos(angle)), (float)(radius * Math.Sin(angle)));
 
-                hitEvents.Add(new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), position));
+                hitEvents[i] = hitEvents[i].With(position);
             }
 
             return hitEvents;
