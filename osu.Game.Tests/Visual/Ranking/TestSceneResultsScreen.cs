@@ -83,6 +83,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 };
 
                 var score = TestResources.CreateTestScoreInfo();
+                score.OnlineID = 1234;
                 score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
 
                 stack.Push(screen = createResultsScreen(score));
