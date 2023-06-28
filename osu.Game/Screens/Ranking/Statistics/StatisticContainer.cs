@@ -26,31 +26,20 @@ namespace osu.Game.Screens.Ranking.Statistics
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new GridContainer
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Content = new[]
+                Children = new[]
                 {
-                    new[]
+                    createHeader(item),
+                    new Container
                     {
-                        createHeader(item)
-                    },
-                    new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = 15 },
-                            Child = item.CreateContent()
-                        }
-                    },
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Top = 15 },
+                        Child = item.CreateContent()
+                    }
                 }
             };
         }
