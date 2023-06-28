@@ -107,6 +107,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBeatmapDownloadingStates()
         {
+            AddStep("set to unknown", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Unknown()));
             AddStep("set to no map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
             AddStep("set to downloading map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
 
