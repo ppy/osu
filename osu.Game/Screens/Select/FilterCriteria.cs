@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
@@ -31,6 +32,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
+        public OptionalTextFilter Title;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -62,7 +64,7 @@ namespace osu.Game.Screens.Select
                 string remainingText = value;
 
                 // First handle quoted segments to ensure we keep inline spaces in exact matches.
-                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\")"))
+                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
                 {
                     terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
                     remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.Select
         {
             public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
 
-            public bool Exact { get; private set; }
+            public MatchMode MatchMode { get; private set; }
 
             public bool Matches(string value)
             {
@@ -149,10 +151,18 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
-                if (Exact)
-                    return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                switch (MatchMode)
+                {
+                    default:
+                    case MatchMode.Substring:
+                        return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
 
-                return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+                    case MatchMode.IsolatedPhrase:
+                        return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+                    case MatchMode.FullPhrase:
+                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.IgnoreCase) == 0;
+                }
             }
 
             private string searchTerm;
@@ -162,12 +172,46 @@ namespace osu.Game.Screens.Select
                 get => searchTerm;
                 set
                 {
-                    searchTerm = value.Trim('"');
-                    Exact = searchTerm != value;
+                    searchTerm = value;
+
+                    if (searchTerm.StartsWith('\"'))
+                    {
+                        // length check ensures that the quote character in the `StartsWith()` check above and the `EndsWith()` check below is not the same character.
+                        if (searchTerm.EndsWith("\"!", StringComparison.Ordinal) && searchTerm.Length >= 3)
+                        {
+                            searchTerm = searchTerm.TrimEnd('!').Trim('\"');
+                            MatchMode = MatchMode.FullPhrase;
+                        }
+                        else
+                        {
+                            searchTerm = searchTerm.Trim('\"');
+                            MatchMode = MatchMode.IsolatedPhrase;
+                        }
+                    }
+                    else
+                        MatchMode = MatchMode.Substring;
                 }
             }
 
             public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
+        }
+
+        public enum MatchMode
+        {
+            /// <summary>
+            /// Match using a simple "contains" substring match.
+            /// </summary>
+            Substring,
+
+            /// <summary>
+            /// Match for the search phrase being isolated by spaces, or at the start or end of the text.
+            /// </summary>
+            IsolatedPhrase,
+
+            /// <summary>
+            /// Match for the search phrase matching the full text in completion.
+            /// </summary>
+            FullPhrase,
         }
     }
 }
