@@ -88,6 +88,16 @@ Please try changing your audio device to a working setting.");
         /// </summary>
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
+        /// <summary>
+        /// "You received a private message from '{0}'. Click to read it!"
+        /// </summary>
+        public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
+
+        /// <summary>
+        /// "Your name was mentioned in chat by '{0}'. Click to find out why!"
+        /// </summary>
+        public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
