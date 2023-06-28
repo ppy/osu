@@ -102,6 +102,38 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestRotateHotkeys()
+        {
+            HitCircle[] addedObjects = null;
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
+            }));
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("rotate clockwise", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Period);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("objects rotated clockwise", () => addedObjects[0].Position == new Vector2(300, 0));
+
+            AddStep("rotate counterclockwise", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Comma);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("objects reverted to original position", () => addedObjects[0].Position == new Vector2(0));
+        }
+
+        [Test]
         public void TestBasicSelect()
         {
             var addedObject = new HitCircle { StartTime = 100 };
