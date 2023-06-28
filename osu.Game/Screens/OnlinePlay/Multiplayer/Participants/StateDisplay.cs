@@ -154,6 +154,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     this.FadeOut(fade_time);
                     break;
 
+                case DownloadState.Unknown:
+                    text.Text = "checking availability";
+                    icon.Icon = FontAwesome.Solid.Question;
+                    icon.Colour = colours.Orange0;
+                    break;
+
                 case DownloadState.NotDownloaded:
                     text.Text = "no map";
                     icon.Icon = FontAwesome.Solid.MinusCircle;
