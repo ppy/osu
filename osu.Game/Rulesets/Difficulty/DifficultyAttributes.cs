@@ -39,32 +39,29 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The combined star rating of all skills.
         /// </summary>
-        [JsonProperty("star_rating", Order = -7)]
+        [JsonProperty("star_rating", Order = -3)]
         public double StarRating { get; set; }
 
         /// <summary>
         /// The maximum achievable combo.
         /// </summary>
-        [JsonProperty("max_combo", Order = -6)]
+        [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
 
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
         /// </summary>
-        [JsonProperty("legacy_accuracy_score", Order = -5)]
         public int LegacyAccuracyScore { get; set; }
 
         /// <summary>
         /// The combo-multiplied portion of the legacy (ScoreV1) total score.
         /// </summary>
-        [JsonProperty("legacy_combo_score", Order = -4)]
         public int LegacyComboScore { get; set; }
 
         /// <summary>
         /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
         /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
         /// </summary>
-        [JsonProperty("legacy_bonus_score_ratio", Order = -3)]
         public double LegacyBonusScoreRatio { get; set; }
 
         /// <summary>
