@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -61,7 +63,11 @@ namespace osu.Game.Database
                      {
                          // As above, reattach if it happens to not be in the set's beatmaps.
                          if (!d.Beatmaps.Contains(existingBeatmap))
+                         {
+                             Debug.Fail("Beatmaps should never become detached under normal circumstances. If this ever triggers, it should be investigated further.");
+                             Logger.Log("WARNING: One of the difficulties in a beatmap was detached from its set. Please save a copy of logs and report this to devs.", LoggingTarget.Database, LogLevel.Important);
                              d.Beatmaps.Add(existingBeatmap);
+                         }
 
                          copyChangesToRealm(beatmap, existingBeatmap);
                      }
