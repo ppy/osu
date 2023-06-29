@@ -55,14 +55,14 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
-            }).ContinueWith(t =>
+            }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
                 {
