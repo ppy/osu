@@ -383,6 +383,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for list to load", () => participantsList?.IsLoaded == true);
+
+            AddStep("set beatmap available", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
 
         private void checkProgressBarVisibility(bool visible) =>
