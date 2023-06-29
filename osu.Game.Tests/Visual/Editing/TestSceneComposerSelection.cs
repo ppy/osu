@@ -134,6 +134,32 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestGlobalFlipHotkeys()
+        {
+            HitCircle addedObject = null;
+
+            AddStep("add hitobjects", () => EditorBeatmap.Add(addedObject = new HitCircle { StartTime = 100 }));
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddStep("flip horizontally across playfield", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.H);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("objects flipped horizontally", () => addedObject.Position == new Vector2(OsuPlayfield.BASE_SIZE.X, 0));
+
+            AddStep("flip vertically across playfield", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.J);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("objects flipped vertically", () => addedObject.Position == OsuPlayfield.BASE_SIZE);
+        }
+
+        [Test]
         public void TestBasicSelect()
         {
             var addedObject = new HitCircle { StartTime = 100 };
