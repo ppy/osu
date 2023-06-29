@@ -123,9 +123,6 @@ namespace osu.Game.Scoring.Legacy
 
             PopulateAccuracy(score.ScoreInfo);
 
-            if (score.ScoreInfo.IsLegacyScore)
-                score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
-
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;

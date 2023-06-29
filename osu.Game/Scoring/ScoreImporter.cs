@@ -89,7 +89,10 @@ namespace osu.Game.Scoring
             if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
                 model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
             else if (model.IsLegacyScore)
+            {
+                model.LegacyTotalScore = model.TotalScore;
                 model.TotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(model, beatmaps());
+            }
         }
 
         /// <summary>
