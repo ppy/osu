@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -227,6 +228,8 @@ namespace osu.Game.Database
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
+            Debug.Assert(score.LegacyTotalScore != null);
+
             int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
             int maximumLegacyComboScore = attributes.LegacyComboScore;
             double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
@@ -239,7 +242,7 @@ namespace osu.Game.Database
             double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
 
             // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
-            double bonusProportion = Math.Max(0, (score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+            double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
             switch (score.Ruleset.OnlineID)
             {
