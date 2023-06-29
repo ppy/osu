@@ -20,6 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -198,6 +199,16 @@ namespace osu.Game.Beatmaps
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be disassociated and marked for deletion.");
                 }
+            }
+
+            //Because of specific score storing in Osu! database can already contain scores for imported beatmap.
+            //To restore scores we need to manually reassign them to new/re-exported beatmap.
+            foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
+            {
+                IQueryable<ScoreInfo> scores = realm.All<ScoreInfo>().Where(score => score.BeatmapHash == beatmap.Hash);
+
+                if (scores.Any())
+                    scores.ForEach(score => score.BeatmapInfo = beatmap); //We intentionally ignore BeatmapHash because we checked hash equality
             }
         }
 
