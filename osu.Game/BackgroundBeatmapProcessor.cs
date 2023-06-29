@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -214,7 +215,7 @@ namespace osu.Game
             {
                 foreach (var score in r.All<ScoreInfo>().Where(s => s.IsLegacyScore))
                 {
-                    if (score.RulesetID is not (0 or 1 or 2 or 3))
+                    if (!score.Ruleset.IsLegacyRuleset())
                         continue;
 
                     if (score.Version >= 30000003)
