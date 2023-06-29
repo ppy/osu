@@ -99,7 +99,7 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public virtual bool UseDevelopmentServer => false;
+        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ExperimentalEndpointConfiguration();
