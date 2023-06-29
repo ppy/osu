@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -201,7 +202,10 @@ namespace osu.Game.Database
             var beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
             var ruleset = score.Ruleset.CreateInstance();
 
-            var sv1Processor = ruleset.CreateLegacyScoreProcessor();
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
+
+            var sv1Processor = legacyRuleset.CreateLegacyScoreProcessor();
             if (sv1Processor == null)
                 return score.TotalScore;
 

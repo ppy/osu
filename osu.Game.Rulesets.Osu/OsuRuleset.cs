@@ -253,6 +253,8 @@ namespace osu.Game.Rulesets.Osu
 
         public int LegacyID => 0;
 
+        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
@@ -322,7 +324,5 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
-
-        public override ILegacyScoreProcessor CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
     }
 }

@@ -380,7 +380,5 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
-
-        public virtual ILegacyScoreProcessor? CreateLegacyScoreProcessor() => null;
     }
 }

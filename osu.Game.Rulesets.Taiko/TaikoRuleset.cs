@@ -197,6 +197,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public int LegacyID => 1;
 
+        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new TaikoLegacyScoreProcessor();
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new TaikoRulesetConfigManager(settings, RulesetInfo);
