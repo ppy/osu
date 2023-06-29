@@ -60,7 +60,7 @@ namespace osu.Game.Scoring
         /// <remarks>
         /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
         /// </remarks>
-        public long LegacyTotalScore { get; set; }
+        public long? LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
 
