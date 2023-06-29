@@ -201,7 +201,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            //Because of specific score storing in Osu! database can already contain scores for imported beatmap.
+            //Because of specific score storing in Osu! database, it can already contain scores for imported beatmap.
             //To restore scores we need to manually reassign them to new/re-exported beatmap.
             foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
             {
