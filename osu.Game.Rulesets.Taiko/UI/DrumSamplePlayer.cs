@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             InternalChildren = new Drawable[]
             {
-                leftRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
-                leftCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
-                rightCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
-                rightRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
+                leftRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
+                leftCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
+                rightRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
             };
         }
 
-        protected virtual DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer)
+        protected virtual DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance)
             => new DrumSampleTriggerSource(hitObjectContainer);
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)

@@ -10,13 +10,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     public partial class ArgonDrumSamplePlayer : DrumSamplePlayer
     {
-        protected override DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer) =>
-            new ArgonDrumSampleTriggerSource(hitObjectContainer);
+        protected override DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance) =>
+            new ArgonDrumSampleTriggerSource(hitObjectContainer, balance);
 
         public partial class ArgonDrumSampleTriggerSource : DrumSampleTriggerSource
         {
-            public ArgonDrumSampleTriggerSource(HitObjectContainer hitObjectContainer)
-                : base(hitObjectContainer)
+            public ArgonDrumSampleTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance)
+                : base(hitObjectContainer, balance)
             {
             }
 
