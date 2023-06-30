@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -12,13 +13,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
     {
-        private readonly DrumSampleTriggerSource leftRimSampleTriggerSource;
-        private readonly DrumSampleTriggerSource leftCentreSampleTriggerSource;
-        private readonly DrumSampleTriggerSource rightCentreSampleTriggerSource;
-        private readonly DrumSampleTriggerSource rightRimSampleTriggerSource;
+        private DrumSampleTriggerSource leftRimSampleTriggerSource = null!;
+        private DrumSampleTriggerSource leftCentreSampleTriggerSource = null!;
+        private DrumSampleTriggerSource rightCentreSampleTriggerSource = null!;
+        private DrumSampleTriggerSource rightRimSampleTriggerSource = null!;
 
-        public DrumSamplePlayer(HitObjectContainer hitObjectContainer)
+        [BackgroundDependencyLoader]
+        private void load(DrawableRuleset drawableRuleset)
         {
+            var hitObjectContainer = drawableRuleset.Playfield.HitObjectContainer;
+
             InternalChildren = new Drawable[]
             {
                 leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
