@@ -418,7 +418,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void TestImport_ThenChangeMapWithScore_ThenImport()
+        public void TestImport_ThenModifyMapWithScore_ThenImport()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
             {
