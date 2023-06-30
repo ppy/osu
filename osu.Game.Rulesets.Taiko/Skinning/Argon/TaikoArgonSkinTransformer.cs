@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                             return Drawable.Empty().With(d => d.Expire());
 
                         case TaikoSkinComponents.DrumSamplePlayer:
-                            return Drawable.Empty();
+                            return new ArgonDrumSamplePlayer();
 
                         case TaikoSkinComponents.TaikoExplosionGreat:
                         case TaikoSkinComponents.TaikoExplosionMiss:

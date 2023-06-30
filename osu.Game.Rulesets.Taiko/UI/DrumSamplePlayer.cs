@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+    public partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
     {
         private DrumSampleTriggerSource leftRimSampleTriggerSource = null!;
         private DrumSampleTriggerSource leftCentreSampleTriggerSource = null!;
@@ -25,12 +25,15 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             InternalChildren = new Drawable[]
             {
-                leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
-                leftCentreSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
-                rightCentreSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
-                rightRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
+                leftRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
+                leftCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
+                rightCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
+                rightRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer),
             };
         }
+
+        protected virtual DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer)
+            => new DrumSampleTriggerSource(hitObjectContainer);
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {

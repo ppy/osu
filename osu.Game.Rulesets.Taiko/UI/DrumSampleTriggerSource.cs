@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
         }
 
-        public void Play(HitType hitType)
+        public virtual void Play(HitType hitType)
         {
             TaikoHitObject? hitObject = GetMostValidObject() as TaikoHitObject;
 
