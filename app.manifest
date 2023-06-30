@@ -23,7 +23,8 @@
   </compatibility>
   <asmv3:application>
     <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
-      <dpiAware>true</dpiAware>
+      <dpiAware>per Monitor</dpiAware>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">perMonitorV2</dpiAwareness>
     </asmv3:windowsSettings>
   </asmv3:application>
 </asmv1:assembly>
