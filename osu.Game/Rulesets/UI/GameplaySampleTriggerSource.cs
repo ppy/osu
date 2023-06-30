@@ -34,14 +34,19 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
+        protected readonly AudioContainer AudioContainer;
+
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
 
-            InternalChild = hitSounds = new Container<SkinnableSound>
+            InternalChild = AudioContainer = new AudioContainer
             {
-                Name = "concurrent sample pool",
-                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                Child = hitSounds = new Container<SkinnableSound>
+                {
+                    Name = "concurrent sample pool",
+                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                }
             };
         }
 
@@ -64,9 +69,20 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
-            var hitSound = getNextSample();
-            hitSound.Samples = samples;
+            var hitSound = GetNextSample();
+            ApplySampleInfo(hitSound, samples);
             hitSound.Play();
+        });
+
+        protected virtual void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        {
+            hitSound.Samples = samples;
+        }
+
+        public void StopAllPlayback() => Schedule(() =>
+        {
+            foreach (var sound in hitSounds)
+                sound.Stop();
         });
 
         protected HitObject? GetMostValidObject()
