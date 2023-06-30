@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        public virtual void Play(HitType hitType)
+        public virtual void Play(HitType hitType, bool strong)
         {
             TaikoHitObject? hitObject = GetMostValidObject() as TaikoHitObject;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             var baseSample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
 
             // TODO: should we only play strong samples if the user correctly hits them? arguable.
-            if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true || hitObject is StrongNestedHitObject)
+            if (strong)
             {
                 PlaySamples(new ISampleInfo[]
                 {
