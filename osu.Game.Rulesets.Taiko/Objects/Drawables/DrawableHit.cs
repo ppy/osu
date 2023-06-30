@@ -4,14 +4,12 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -92,40 +90,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
             ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
             : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
-
-        public override IEnumerable<HitSampleInfo> GetSamples()
-        {
-            // normal and claps are always handled by the drum (see DrumSampleMapping).
-            // in addition, whistles are excluded as they are an alternative rim marker.
-
-            var samples = HitObject.Samples.Where(s =>
-                s.Name != HitSampleInfo.HIT_NORMAL
-                && s.Name != HitSampleInfo.HIT_CLAP
-                && s.Name != HitSampleInfo.HIT_WHISTLE);
-
-            if (HitObject.Type == HitType.Rim && HitObject.IsStrong)
-            {
-                // strong + rim always maps to whistle.
-                // TODO: this should really be in the legacy decoder, but can't be because legacy encoding parity would be broken.
-                // when we add a taiko editor, this is probably not going to play nice.
-
-                var corrected = samples.ToList();
-
-                for (int i = 0; i < corrected.Count; i++)
-                {
-                    var s = corrected[i];
-
-                    if (s.Name != HitSampleInfo.HIT_FINISH)
-                        continue;
-
-                    corrected[i] = s.With(HitSampleInfo.HIT_WHISTLE);
-                }
-
-                return corrected;
-            }
-
-            return samples;
-        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
