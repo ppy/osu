@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public partial class ArgonDrumSamplePlayer : DrumSamplePlayer
+    internal partial class ArgonDrumSamplePlayer : DrumSamplePlayer
     {
         protected override DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance) =>
             new ArgonDrumSampleTriggerSource(hitObjectContainer, balance);
@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
                 // let the magic begin...
 
+                // TODO: should we only play strong samples if the user correctly hits them? arguable.
                 if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true || hitObject is StrongNestedHitObject)
                 {
                     PlaySamples(new ISampleInfo[]

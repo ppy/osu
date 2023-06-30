@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             /// The lenience for the second key press.
             /// This does not adjust by map difficulty in ScoreV2 yet.
             /// </summary>
-            private const double second_hit_window = 30;
+            public const double SECOND_HIT_WINDOW = 30;
 
             public StrongNestedHit()
                 : this(null)
@@ -223,12 +223,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!userTriggered)
                 {
-                    if (timeOffset - ParentHitObject.Result.TimeOffset > second_hit_window)
+                    if (timeOffset - ParentHitObject.Result.TimeOffset > SECOND_HIT_WINDOW)
                         ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
-                if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= second_hit_window)
+                if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= SECOND_HIT_WINDOW)
                     ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
 

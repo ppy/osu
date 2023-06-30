@@ -7,28 +7,35 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+    internal partial class DrumSamplePlayer : CompositeDrawable, IKeyBindingHandler<TaikoAction>
     {
-        private DrumSampleTriggerSource leftRimSampleTriggerSource = null!;
-        private DrumSampleTriggerSource leftCentreSampleTriggerSource = null!;
-        private DrumSampleTriggerSource rightCentreSampleTriggerSource = null!;
-        private DrumSampleTriggerSource rightRimSampleTriggerSource = null!;
+        private DrumSampleTriggerSource leftCentreTrigger = null!;
+        private DrumSampleTriggerSource rightCentreTrigger = null!;
+        private DrumSampleTriggerSource leftRimTrigger = null!;
+        private DrumSampleTriggerSource rightRimTrigger = null!;
+        private DrumSampleTriggerSource strongCentreTrigger = null!;
+        private DrumSampleTriggerSource strongRimTrigger = null!;
+
+        private double lastHitTime;
+        private TaikoAction? lastAction;
 
         [BackgroundDependencyLoader]
         private void load(DrawableRuleset drawableRuleset)
         {
             var hitObjectContainer = drawableRuleset.Playfield.HitObjectContainer;
-
             InternalChildren = new Drawable[]
             {
-                leftRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
-                leftCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
-                rightCentreSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
-                rightRimSampleTriggerSource = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
+                leftCentreTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightCentreTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
+                leftRimTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
+                rightRimTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Right),
+                strongCentreTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Centre),
+                strongRimTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Centre)
             };
         }
 
@@ -37,26 +44,91 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
+            HitType hitType;
+
+            DrumSampleTriggerSource triggerSource;
+
+            bool strong = checkStrongValidity(e.Action, lastAction, Time.Current - lastHitTime);
+
             switch (e.Action)
             {
-                case TaikoAction.LeftRim:
-                    leftRimSampleTriggerSource.Play(HitType.Rim);
-                    break;
-
                 case TaikoAction.LeftCentre:
-                    leftCentreSampleTriggerSource.Play(HitType.Centre);
+                    hitType = HitType.Centre;
+                    triggerSource = strong ? strongCentreTrigger : leftCentreTrigger;
                     break;
 
                 case TaikoAction.RightCentre:
-                    rightCentreSampleTriggerSource.Play(HitType.Centre);
+                    hitType = HitType.Centre;
+                    triggerSource = strong ? strongCentreTrigger : rightCentreTrigger;
+                    break;
+
+                case TaikoAction.LeftRim:
+                    hitType = HitType.Rim;
+                    triggerSource = strong ? strongRimTrigger : leftRimTrigger;
                     break;
 
                 case TaikoAction.RightRim:
-                    rightRimSampleTriggerSource.Play(HitType.Rim);
+                    hitType = HitType.Rim;
+                    triggerSource = strong ? strongRimTrigger : rightRimTrigger;
                     break;
+
+                default:
+                    return false;
             }
 
+            if (strong && hitType == HitType.Centre)
+                flushCenterTriggerSources();
+
+            if (strong && hitType == HitType.Rim)
+                flushRimTriggerSources();
+
+            triggerSource.Play(hitType);
+
+            lastHitTime = Time.Current;
+            lastAction = e.Action;
+
             return false;
+        }
+
+        private bool checkStrongValidity(TaikoAction newAction, TaikoAction? lastAction, double timeBetweenActions)
+        {
+            if (lastAction == null)
+                return false;
+
+            if (timeBetweenActions > DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW)
+                return false;
+
+            switch (newAction)
+            {
+                case TaikoAction.LeftCentre:
+                    return lastAction == TaikoAction.RightCentre;
+
+                case TaikoAction.RightCentre:
+                    return lastAction == TaikoAction.LeftCentre;
+
+                case TaikoAction.LeftRim:
+                    return lastAction == TaikoAction.RightRim;
+
+                case TaikoAction.RightRim:
+                    return lastAction == TaikoAction.LeftRim;
+
+                default:
+                    return false;
+            }
+        }
+
+        private void flushCenterTriggerSources()
+        {
+            leftCentreTrigger.StopAllPlayback();
+            rightCentreTrigger.StopAllPlayback();
+            strongCentreTrigger.StopAllPlayback();
+        }
+
+        private void flushRimTriggerSources()
+        {
+            leftRimTrigger.StopAllPlayback();
+            rightRimTrigger.StopAllPlayback();
+            strongRimTrigger.StopAllPlayback();
         }
 
         public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
