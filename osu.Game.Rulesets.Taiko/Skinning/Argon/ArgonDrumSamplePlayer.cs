@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 if (hitObject == null)
                     return;
 
-                var baseSample = new VolumeAwareHitSampleInfo(hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL));
+                var originalSample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
 
                 // If the sample is provided by a legacy skin, we should not try and do anything special.
-                if (skinSource.FindProvider(s => s.GetSample(baseSample) != null) is LegacySkin)
+                if (skinSource.FindProvider(s => s.GetSample(originalSample) != null) is LegacySkinTransformer)
                 {
                     base.Play(hitType, strong);
                     return;
@@ -49,15 +49,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 {
                     PlaySamples(new ISampleInfo[]
                     {
-                        new VolumeAwareHitSampleInfo(hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL), true),
+                        new VolumeAwareHitSampleInfo(originalSample, true),
                         // TODO: flourish should only play every time_between_flourishes.
                         new VolumeAwareHitSampleInfo(hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_FLOURISH : string.Empty), true),
-                        baseSample
+                        new VolumeAwareHitSampleInfo(originalSample)
                     });
                 }
                 else
                 {
-                    PlaySamples(new ISampleInfo[] { new VolumeAwareHitSampleInfo(baseSample) });
+                    PlaySamples(new ISampleInfo[] { new VolumeAwareHitSampleInfo(new VolumeAwareHitSampleInfo(originalSample)) });
                 }
             }
 
