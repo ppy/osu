@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 // TODO: pool flourish sample
             }
 
-            public override void Play(HitType hitType)
+            public override void Play(HitType hitType, bool strong)
             {
                 TaikoHitObject? hitObject = GetMostValidObject() as TaikoHitObject;
 
@@ -39,14 +39,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 // If the sample is provided by a legacy skin, we should not try and do anything special.
                 if (skinSource.FindProvider(s => s.GetSample(baseSample) != null) is LegacySkin)
                 {
-                    base.Play(hitType);
+                    base.Play(hitType, strong);
                     return;
                 }
 
                 // let the magic begin...
 
-                // TODO: should we only play strong samples if the user correctly hits them? arguable.
-                if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true || hitObject is StrongNestedHitObject)
+                if (strong)
                 {
                     PlaySamples(new ISampleInfo[]
                     {
