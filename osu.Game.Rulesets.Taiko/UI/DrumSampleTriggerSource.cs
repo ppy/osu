@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var baseSample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);
 
+            // TODO: should we only play strong samples if the user correctly hits them? arguable.
             if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true || hitObject is StrongNestedHitObject)
             {
                 PlaySamples(new ISampleInfo[]
