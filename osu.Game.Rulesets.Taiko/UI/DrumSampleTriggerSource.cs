@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
 
             // strong + rim always maps to whistle.
-            if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true)
+            if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true || hitObject is StrongNestedHitObject)
             {
                 samplesToPlay.Add(hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_WHISTLE : HitSampleInfo.HIT_FINISH));
             }
