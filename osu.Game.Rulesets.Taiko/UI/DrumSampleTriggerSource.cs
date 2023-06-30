@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
@@ -18,12 +18,23 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void Play(HitType hitType)
         {
-            var hitSample = GetMostValidObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            TaikoHitObject? hitObject = GetMostValidObject() as TaikoHitObject;
 
-            if (hitSample == null)
+            if (hitObject == null)
                 return;
 
-            PlaySamples(new ISampleInfo[] { new HitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL, hitSample.Bank, volume: hitSample.Volume) });
+            List<ISampleInfo> samplesToPlay = new List<ISampleInfo>
+            {
+                hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL)
+            };
+
+            // strong + rim always maps to whistle.
+            if ((hitObject as TaikoStrongableHitObject)?.IsStrong == true)
+            {
+                samplesToPlay.Add(hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_WHISTLE : HitSampleInfo.HIT_FINISH));
+            }
+
+            PlaySamples(samplesToPlay.ToArray());
         }
 
         public override void Play() => throw new InvalidOperationException(@"Use override with HitType parameter instead");
