@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
             private readonly Action showBackgroundAction;
             private OsuSpriteText welcomeText;
 
-            private RulesetFlow rulesets;
+            private RulesetFlow rulesetFlow;
             private Container rulesetsScale;
             private Container logoContainerSecondary;
             private LazerLogo lazerLogo;
@@ -158,10 +158,7 @@ namespace osu.Game.Screens.Menu
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Children = new Drawable[]
-                        {
-                            rulesets = new RulesetFlow()
-                        }
+                        Child = rulesetFlow = new RulesetFlow(),
                     },
                     logoContainerSecondary = new Container
                     {
@@ -197,8 +194,9 @@ namespace osu.Game.Screens.Menu
 
                 const float scale_start = 1.2f;
                 const float scale_adjust = 0.8f;
+                const float vertical_spacing = 50;
 
-                rulesets.Hide();
+                rulesetFlow.Hide();
                 lazerLogo.Hide();
 
                 using (BeginAbsoluteSequence(0))
@@ -215,7 +213,7 @@ namespace osu.Game.Screens.Menu
                     using (BeginDelayedSequence(text_4))
                     {
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to osu!");
-                        welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(50, 0), 5000);
+                        welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(vertical_spacing, 0), 5000);
                     }
 
                     using (BeginDelayedSequence(text_glitch))
@@ -224,27 +222,28 @@ namespace osu.Game.Screens.Menu
                     using (BeginDelayedSequence(rulesets_1))
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
-                        rulesets.FadeIn().TransformSpacingTo(new Vector2(200));
+                        rulesetFlow.FadeIn().TransformSpacingTo(new Vector2(200, vertical_spacing));
+                        rulesetFlow.Children.ForEach(r => r.ScaleTo(1));
                         welcomeText.FadeOut().Expire();
                         triangles.FadeOut().Expire();
                     }
 
                     using (BeginDelayedSequence(rulesets_2))
                     {
-                        rulesets.Children.ForEach(r => r.ScaleTo(2));
-                        rulesets.TransformSpacingTo(new Vector2(60));
+                        rulesetFlow.Children.ForEach(r => r.ScaleTo(2));
+                        rulesetFlow.TransformSpacingTo(new Vector2(60, vertical_spacing));
                     }
 
                     using (BeginDelayedSequence(rulesets_3))
                     {
-                        rulesets.Children.ForEach(r => r.ScaleTo(4));
-                        rulesets.TransformSpacingTo(new Vector2(40));
+                        rulesetFlow.Children.ForEach(r => r.ScaleTo(4));
+                        rulesetFlow.TransformSpacingTo(new Vector2(40, vertical_spacing));
                         rulesetsScale.ScaleTo(1.3f, 1000);
                     }
 
                     using (BeginDelayedSequence(logo_1))
                     {
-                        rulesets.FadeOut();
+                        rulesetFlow.FadeOut();
 
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
@@ -333,9 +332,9 @@ namespace osu.Game.Screens.Menu
             private partial class RulesetFlow : FillFlowContainer
             {
                 [BackgroundDependencyLoader]
-                private void load(RulesetStore rulesets)
+                private void load(IRulesetStore rulesets)
                 {
-                    RelativeSizeAxes = Axes.X;
+                    Width = 800;
                     AutoSizeAxes = Axes.Y;
 
                     Anchor = Anchor.Centre;
