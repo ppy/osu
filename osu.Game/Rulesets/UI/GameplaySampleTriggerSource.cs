@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private SkinnableSound getNextSample()
+        protected SkinnableSound GetNextSample()
         {
             SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
 
