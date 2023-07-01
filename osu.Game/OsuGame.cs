@@ -289,9 +289,9 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (host.Window is SDL2Window sdlWindow)
+            if (host.Window != null)
             {
-                sdlWindow.DragDrop += path =>
+                host.Window.DragDrop += path =>
                 {
                     // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
                     if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))

@@ -147,14 +147,12 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var desktopWindow = (SDL2DesktopWindow)host.Window;
-
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
             if (iconStream != null)
-                desktopWindow.SetIconFromStream(iconStream);
+                host.Window.SetIconFromStream(iconStream);
 
-            desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.Title = Name;
+            host.Window.CursorState |= CursorState.Hidden;
+            host.Window.Title = Name;
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
