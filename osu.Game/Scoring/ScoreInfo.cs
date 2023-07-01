@@ -82,6 +82,7 @@ namespace osu.Game.Scoring
         {
             Ruleset = ruleset ?? new RulesetInfo();
             BeatmapInfo = beatmap ?? new BeatmapInfo();
+            BeatmapHash = BeatmapInfo.Hash;
             RealmUser = realmUser ?? new RealmUser();
             ID = Guid.NewGuid();
         }
