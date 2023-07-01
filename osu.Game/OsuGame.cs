@@ -1164,7 +1164,9 @@ namespace osu.Game
         private void forwardTabletLogsToNotifications()
         {
             const string tablet_prefix = @"[Tablet] ";
+
             bool notifyOnWarning = true;
+            bool notifyOnError = true;
 
             Logger.NewEntry += entry =>
             {
@@ -1175,6 +1177,11 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
+                    if (!notifyOnError)
+                        return;
+
+                    notifyOnError = false;
+
                     Schedule(() =>
                     {
                         Notifications.Post(new SimpleNotification
@@ -1213,7 +1220,11 @@ namespace osu.Game
             Schedule(() =>
             {
                 ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
-                tablet?.Tablet.BindValueChanged(_ => notifyOnWarning = true, true);
+                tablet?.Tablet.BindValueChanged(_ =>
+                {
+                    notifyOnWarning = true;
+                    notifyOnError = true;
+                }, true);
             });
         }
 
