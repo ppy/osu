@@ -348,7 +348,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void TestDandlingScoreTransferred()
+        public void TestDanglingScoreTransferred()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
             {
