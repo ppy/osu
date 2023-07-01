@@ -423,6 +423,7 @@ namespace osu.Game.Tests.Database
             RunTestWithRealmAsync(async (realm, storage) =>
             {
                 var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
 
                 string? temp = TestResources.GetTestBeatmapForImport();
 
