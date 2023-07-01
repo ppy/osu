@@ -432,14 +432,12 @@ namespace osu.Game.Tests.Database
                 await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
 
                 // imitate making local changes via editor
-                realm.Run(r =>
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(_ =>
                 {
-                    r.Write(() =>
-                    {
-                        BeatmapInfo beatmap = imported.Beatmaps.First();
-                        beatmap.Hash = "new_hash";
-                        beatmap.ResetOnlineInfo();
-                    });
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = "new_hash";
+                    beatmap.ResetOnlineInfo();
                 });
 
                 // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
