@@ -206,14 +206,12 @@ namespace osu.Game.Beatmaps
         {
             base.PostImport(model, realm, parameters);
 
-            //Because of specific score storing in Osu! database, it can already contain scores for imported beatmap.
-            //To restore scores we need to manually reassign them to new/re-exported beatmap.
+            // Scores are stored separately from beatmaps, and persisted when a beatmap is modified or deleted.
+            // Let's reattach any matching scores that exist in the database, based on hash.
             foreach (BeatmapInfo beatmap in model.Beatmaps)
             {
-                IQueryable<ScoreInfo> scores = realm.All<ScoreInfo>().Where(score => score.BeatmapHash == beatmap.Hash);
-
-                if (scores.Any())
-                    scores.ForEach(score => score.BeatmapInfo = beatmap); //We intentionally ignore BeatmapHash because we checked hash equality
+                foreach (var score in realm.All<ScoreInfo>().Where(score => score.BeatmapHash == beatmap.Hash))
+                    score.BeatmapInfo = beatmap;
             }
 
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
