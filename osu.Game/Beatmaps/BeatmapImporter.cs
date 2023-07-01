@@ -200,21 +200,22 @@ namespace osu.Game.Beatmaps
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be disassociated and marked for deletion.");
                 }
             }
+        }
+
+        protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
+        {
+            base.PostImport(model, realm, parameters);
 
             //Because of specific score storing in Osu! database, it can already contain scores for imported beatmap.
             //To restore scores we need to manually reassign them to new/re-exported beatmap.
-            foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
+            foreach (BeatmapInfo beatmap in model.Beatmaps)
             {
                 IQueryable<ScoreInfo> scores = realm.All<ScoreInfo>().Where(score => score.BeatmapHash == beatmap.Hash);
 
                 if (scores.Any())
                     scores.ForEach(score => score.BeatmapInfo = beatmap); //We intentionally ignore BeatmapHash because we checked hash equality
             }
-        }
 
-        protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
-        {
-            base.PostImport(model, realm, parameters);
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
         }
 
