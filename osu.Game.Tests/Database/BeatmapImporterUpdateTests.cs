@@ -348,6 +348,71 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestDandlingScoreTransferred()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchive(out string pathOnlineCopy);
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                string scoreTargetBeatmapHash = string.Empty;
+
+                //Set score
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapInfo = s.Beatmaps.First();
+
+                    scoreTargetBeatmapHash = beatmapInfo.Hash;
+
+                    s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
+                });
+
+                //Modify beatmap
+                const string new_beatmap_hash = "new_hash";
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapInfo = s.Beatmaps.First(b => b.Hash == scoreTargetBeatmapHash);
+
+                    beatmapInfo.Hash = new_beatmap_hash;
+                    beatmapInfo.ResetOnlineInfo();
+                });
+
+                realm.Run(r => r.Refresh());
+
+                checkCount<ScoreInfo>(realm, 1);
+
+                //second import matches first before modification,
+                //in other words beatmap version where score have been set
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOnlineCopy), importBeforeUpdate.Value);
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
+
+                //account modified beatmap
+                checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
+                checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
+                checkCount<BeatmapSetInfo>(realm, 2);
+
+                // score is transferred across to the new set
+                checkCount<ScoreInfo>(realm, 1);
+
+                //score is transferred to new beatmap
+                Assert.That(importBeforeUpdate.Value.Beatmaps.First(b => b.Hash == new_beatmap_hash).Scores, Has.Count.EqualTo(0));
+                Assert.That(importAfterUpdate.Value.Beatmaps.First(b => b.Hash == scoreTargetBeatmapHash).Scores, Has.Count.EqualTo(1));
+            });
+        }
+
+        [Test]
         public void TestScoreLostOnModification()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
