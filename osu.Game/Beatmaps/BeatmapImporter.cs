@@ -206,7 +206,7 @@ namespace osu.Game.Beatmaps
         {
             base.PostImport(model, realm, parameters);
 
-            // Scores are stored separately from beatmaps, and persisted when a beatmap is modified or deleted.
+            // Scores are stored separately from beatmaps, and persist even when a beatmap is modified or deleted.
             // Let's reattach any matching scores that exist in the database, based on hash.
             foreach (BeatmapInfo beatmap in model.Beatmaps)
             {

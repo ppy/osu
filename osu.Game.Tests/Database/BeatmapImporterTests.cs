@@ -431,7 +431,7 @@ namespace osu.Game.Tests.Database
 
                 await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
 
-                //editor work imitation
+                // imitate making local changes via editor
                 realm.Run(r =>
                 {
                     r.Write(() =>
@@ -442,6 +442,9 @@ namespace osu.Game.Tests.Database
                     });
                 });
 
+                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
+                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (see: https://github.com/ppy/osu/pull/22539).
+                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
                 Assert.That(imported.Beatmaps.First().Scores.Any());
 
                 var importedSecondTime = await importer.Import(new ImportTask(temp));
