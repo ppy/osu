@@ -365,7 +365,7 @@ namespace osu.Game.Tests.Database
 
                 string scoreTargetBeatmapHash = string.Empty;
 
-                //Set score
+                // set a score on the beatmap
                 importBeforeUpdate.PerformWrite(s =>
                 {
                     var beatmapInfo = s.Beatmaps.First();
@@ -375,7 +375,7 @@ namespace osu.Game.Tests.Database
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
-                //Modify beatmap
+                // locally modify beatmap
                 const string new_beatmap_hash = "new_hash";
                 importBeforeUpdate.PerformWrite(s =>
                 {
@@ -387,10 +387,12 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
 
+                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
+                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (https://github.com/ppy/osu/pull/22539).
+                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
                 checkCount<ScoreInfo>(realm, 1);
 
-                //second import matches first before modification,
-                //in other words beatmap version where score have been set
+                // reimport the original beatmap before local modifications
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOnlineCopy), importBeforeUpdate.Value);
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
@@ -398,15 +400,15 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
 
-                //account modified beatmap
+                // both original and locally modified versions present
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
                 checkCount<BeatmapSetInfo>(realm, 2);
 
-                // score is transferred across to the new set
+                // score is preserved
                 checkCount<ScoreInfo>(realm, 1);
 
-                //score is transferred to new beatmap
+                // score is transferred to new beatmap
                 Assert.That(importBeforeUpdate.Value.Beatmaps.First(b => b.Hash == new_beatmap_hash).Scores, Has.Count.EqualTo(0));
                 Assert.That(importAfterUpdate.Value.Beatmaps.First(b => b.Hash == scoreTargetBeatmapHash).Scores, Has.Count.EqualTo(1));
             });
