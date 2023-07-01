@@ -381,6 +381,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 buttons.Anchor = Anchor.BottomCentre;
                 buttons.Origin = Anchor.BottomCentre;
+                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {
