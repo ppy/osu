@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -154,7 +155,7 @@ namespace osu.Game.Online.Chat
                 : base(message, channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{message.Sender.Username}'. Click to read it!";
+                Text = NotificationsStrings.PrivateMessageReceived(message.Sender.Username);
             }
         }
 
@@ -164,7 +165,7 @@ namespace osu.Game.Online.Chat
                 : base(message, channel)
             {
                 Icon = FontAwesome.Solid.At;
-                Text = $"Your name was mentioned in chat by '{message.Sender.Username}'. Click to find out why!";
+                Text = NotificationsStrings.YourNameWasMentioned(message.Sender.Username);
             }
         }
 
