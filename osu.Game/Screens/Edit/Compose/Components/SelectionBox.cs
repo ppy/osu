@@ -377,10 +377,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float leftExcess = thisQuad.TopLeft.X - parentQuad.TopLeft.X;
             float rightExcess = parentQuad.TopRight.X - thisQuad.TopRight.X;
 
-            if (topExcess + bottomExcess < buttons.Height + button_padding)
+            float minHeight = buttons.ScreenSpaceDrawQuad.Height;
+
+            if (topExcess < minHeight && bottomExcess < minHeight)
             {
                 buttons.Anchor = Anchor.BottomCentre;
                 buttons.Origin = Anchor.BottomCentre;
+                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {
