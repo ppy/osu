@@ -160,13 +160,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat)
                 return false;
 
+            bool handled;
+
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    return HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    return HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
             }
 
             return false;
