@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                                 OnHovered = beatmap =>
                                                                 {
                                                                     showBeatmap(beatmap);
-                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.##");
+                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.00");
                                                                     starRatingContainer.FadeIn(100);
                                                                 },
                                                                 OnClicked = beatmap => { Beatmap.Value = beatmap; },
