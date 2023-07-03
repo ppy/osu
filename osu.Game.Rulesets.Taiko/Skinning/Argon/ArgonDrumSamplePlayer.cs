@@ -14,6 +14,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     internal partial class ArgonDrumSamplePlayer : DrumSamplePlayer
     {
+        [BackgroundDependencyLoader]
+        private void load(IPooledSampleProvider sampleProvider)
+        {
+            // Warm up pools for non-standard samples.
+            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_NORMAL), true));
+            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_CLAP), true));
+            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_FLOURISH), true));
+        }
+
         protected override DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance) =>
             new ArgonDrumSampleTriggerSource(hitObjectContainer, balance);
 
@@ -33,7 +42,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 : base(hitObjectContainer, balance)
             {
                 this.hitObjectContainer = hitObjectContainer;
-                // TODO: pool flourish sample
             }
 
             public override void Play(HitType hitType, bool strong)
@@ -65,8 +73,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             {
                 double? lastFlourish = null;
 
-                // TODO: check on nested strong hits. we're not accounting for them here yet.
-
                 var hitObjects = hitObjectContainer.AliveObjects
                                                    .Reverse()
                                                    .Select(d => d.HitObject)
@@ -90,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 return false;
             }
 
-            private class VolumeAwareHitSampleInfo : HitSampleInfo
+            public class VolumeAwareHitSampleInfo : HitSampleInfo
             {
                 public const int SAMPLE_VOLUME_THRESHOLD_HARD = 90;
                 public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
