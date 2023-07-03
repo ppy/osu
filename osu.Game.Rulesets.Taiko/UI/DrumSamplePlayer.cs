@@ -44,6 +44,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
+            if (Time.Elapsed < 0)
+                return false;
+
             HitType hitType;
 
             DrumSampleTriggerSource triggerSource;
