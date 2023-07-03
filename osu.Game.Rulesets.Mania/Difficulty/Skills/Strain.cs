@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     {
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
-        private const double release_threshold = 24;
+        private const double release_threshold = 30;
 
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             // 0.0 +--------+-+---------------> Release Difference / ms
             //         release_threshold
             if (isOverlapping)
-                holdAddition = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
+                holdAddition = 1 / (1 + Math.Exp(0.27 * (release_threshold - closestEndTime)));
 
             // Decay and increase individualStrains in own column
             individualStrains[column] = applyDecay(individualStrains[column], startTime - startTimes[column], individual_decay_base);
