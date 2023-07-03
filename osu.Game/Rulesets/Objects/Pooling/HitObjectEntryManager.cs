@@ -65,8 +65,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             OnEntryAdded?.Invoke(entry, parent);
         }
 
-        public void Remove(HitObjectLifetimeEntry entry)
+        public bool Remove(HitObjectLifetimeEntry entry)
         {
+            if (entry is SyntheticHitObjectEntry)
+                return false;
+
             HitObject hitObject = entry.HitObject;
 
             if (!entryMap.ContainsKey(hitObject))
@@ -84,6 +87,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
             hitObject.DefaultsApplied -= onDefaultsApplied;
             OnEntryRemoved?.Invoke(entry, parent);
+            return true;
         }
 
         public bool TryGet(HitObject hitObject, [MaybeNullWhen(false)] out HitObjectLifetimeEntry entry)
