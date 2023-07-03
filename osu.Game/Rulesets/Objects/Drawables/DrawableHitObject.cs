@@ -98,9 +98,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual bool DisplayResult => true;
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
+        /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
+        public JudgementResult Result => Entry?.Result;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
@@ -112,12 +112,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Result?.HasResult ?? true;
+        public bool Judged => Entry?.Judged ?? true;
 
         /// <summary>
-        /// The scoring result of this <see cref="DrawableHitObject"/>.
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public JudgementResult Result => Entry?.Result;
+        public bool AllJudged => Entry?.AllJudged ?? true;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
