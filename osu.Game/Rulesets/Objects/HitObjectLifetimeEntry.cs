@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -18,6 +19,11 @@ namespace osu.Game.Rulesets.Objects
         /// The <see cref="HitObject"/>.
         /// </summary>
         public readonly HitObject HitObject;
+
+        /// <summary>
+        /// The list of <see cref="HitObjectLifetimeEntry"/> for the <see cref="HitObject"/>'s nested objects (if any).
+        /// </summary>
+        public readonly List<HitObjectLifetimeEntry> NestedEntries = new List<HitObjectLifetimeEntry>();
 
         /// <summary>
         /// The result that <see cref="HitObject"/> was judged with.
