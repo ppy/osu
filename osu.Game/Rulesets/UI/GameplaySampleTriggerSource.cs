@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.UI
             return getAllNested(mostValidObject.HitObject).OrderBy(h => h.GetEndTime()).SkipWhile(h => h.GetEndTime() <= getReferenceTime()).FirstOrDefault() ?? mostValidObject.HitObject;
         }
 
-        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
+        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.AllJudged;
         private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
 
         private double getReferenceTime() => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
