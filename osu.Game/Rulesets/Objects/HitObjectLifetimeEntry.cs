@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The list of <see cref="HitObjectLifetimeEntry"/> for the <see cref="HitObject"/>'s nested objects (if any).
         /// </summary>
-        public readonly List<HitObjectLifetimeEntry> NestedEntries = new List<HitObjectLifetimeEntry>();
+        public List<HitObjectLifetimeEntry> NestedEntries { get; internal set; } = new List<HitObjectLifetimeEntry>();
 
         /// <summary>
         /// The result that <see cref="HitObject"/> was judged with.
