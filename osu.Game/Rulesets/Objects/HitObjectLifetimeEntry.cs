@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -30,6 +31,17 @@ namespace osu.Game.Rulesets.Objects
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
         internal JudgementResult? Result;
+
+        /// <summary>
+        /// Whether <see cref="HitObject"/> has been judged.
+        /// Note: This does NOT include nested hitobjects.
+        /// </summary>
+        public bool Judged => Result?.HasResult ?? true;
+
+        /// <summary>
+        /// Whether <see cref="HitObject"/> and all of its nested objects have been judged.
+        /// </summary>
+        public bool AllJudged => Judged && NestedEntries.All(h => h.AllJudged);
 
         private readonly IBindable<double> startTimeBindable = new BindableDouble();
 
