@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Osu
 
         public int LegacyID => 0;
 
-        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new OsuLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 

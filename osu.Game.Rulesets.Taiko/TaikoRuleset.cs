@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public int LegacyID => 1;
 
-        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new TaikoLegacyScoreProcessor();
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new TaikoLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 

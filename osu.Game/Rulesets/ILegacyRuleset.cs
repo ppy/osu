@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets
         /// </summary>
         int LegacyID { get; }
 
-        ILegacyScoreProcessor CreateLegacyScoreProcessor();
+        ILegacyScoreSimulator CreateLegacyScoreSimulator();
     }
 }

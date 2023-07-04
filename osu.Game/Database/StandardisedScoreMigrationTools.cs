@@ -205,15 +205,15 @@ namespace osu.Game.Database
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
 
-            ILegacyScoreProcessor sv1Processor = legacyRuleset.CreateLegacyScoreProcessor();
+            ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
 
-            sv1Processor.Simulate(beatmap, beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods), score.Mods);
+            sv1Simulator.Simulate(beatmap, beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods), score.Mods);
 
             return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
             {
-                LegacyAccuracyScore = sv1Processor.AccuracyScore,
-                LegacyComboScore = sv1Processor.ComboScore,
-                LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio
+                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
+                LegacyComboScore = sv1Simulator.ComboScore,
+                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
             });
         }
 

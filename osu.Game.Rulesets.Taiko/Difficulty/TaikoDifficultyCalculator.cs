@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (ComputeLegacyScoringValues)
             {
-                TaikoLegacyScoreProcessor sv1Processor = new TaikoLegacyScoreProcessor();
-                sv1Processor.Simulate(workingBeatmap, beatmap, mods);
-                attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
-                attributes.LegacyComboScore = sv1Processor.ComboScore;
-                attributes.LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio;
+                TaikoLegacyScoreSimulator sv1Simulator = new TaikoLegacyScoreSimulator();
+                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
+                attributes.LegacyComboScore = sv1Simulator.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
             }
 
             return attributes;

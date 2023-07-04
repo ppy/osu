@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Catch
 
         public int LegacyID => 2;
 
-        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new CatchLegacyScoreProcessor();
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new CatchLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 

@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    internal class TaikoLegacyScoreProcessor : ILegacyScoreProcessor
+    internal class TaikoLegacyScoreSimulator : ILegacyScoreSimulator
     {
         public int AccuracyScore { get; private set; }
 

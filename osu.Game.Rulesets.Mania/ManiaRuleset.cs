@@ -302,7 +302,7 @@ namespace osu.Game.Rulesets.Mania
 
         public int LegacyID => 3;
 
-        public ILegacyScoreProcessor CreateLegacyScoreProcessor() => new ManiaLegacyScoreProcessor();
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new ManiaLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 

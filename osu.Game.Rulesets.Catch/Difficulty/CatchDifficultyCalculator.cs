@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (ComputeLegacyScoringValues)
             {
-                CatchLegacyScoreProcessor sv1Processor = new CatchLegacyScoreProcessor();
-                sv1Processor.Simulate(workingBeatmap, beatmap, mods);
-                attributes.LegacyAccuracyScore = sv1Processor.AccuracyScore;
-                attributes.LegacyComboScore = sv1Processor.ComboScore;
-                attributes.LegacyBonusScoreRatio = sv1Processor.BonusScoreRatio;
+                CatchLegacyScoreSimulator sv1Simulator = new CatchLegacyScoreSimulator();
+                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
+                attributes.LegacyComboScore = sv1Simulator.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
             }
 
             return attributes;
