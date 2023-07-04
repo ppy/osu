@@ -383,6 +383,7 @@ namespace osu.Game.Tests.Database
 
                     beatmapInfo.Hash = new_beatmap_hash;
                     beatmapInfo.ResetOnlineInfo();
+                    beatmapInfo.UpdateLocalScores(s.Realm);
                 });
 
                 realm.Run(r => r.Refresh());
