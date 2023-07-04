@@ -1,9 +1,11 @@
 
 
-# techclicker!
+TechBrittish's learning programming
+
+This is a fork of osu by ppy and I am working on this so I can learn GitHub Gist
 
 
-(https://discord.gg/UHVd7BUSS)
+(My discord server, where we can chat! https://discord.gg/UHVd7BUSS)
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
