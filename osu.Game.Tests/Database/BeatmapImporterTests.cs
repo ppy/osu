@@ -440,6 +440,7 @@ namespace osu.Game.Tests.Database
                     BeatmapInfo beatmap = imported.Beatmaps.First();
                     beatmap.Hash = "new_hash";
                     beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
                 });
 
                 Assert.That(!imported.Beatmaps.First().Scores.Any());
