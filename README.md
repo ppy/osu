@@ -9,18 +9,18 @@ This is a fork of osu by ppy and I am working on this so I can learn GitHub Gist
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
+The future of [osu! https://osu.ppy.sh and the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
 This project is under constant development, but we aim to keep things in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
 
-**IMPORTANT:** Gameplay mechanics (and other features which you may have come to know and love) are in a constant state of flux. Game balance and final quality-of-life passes come at the end of development, preceded by experimentation and changes which may potentially **reduce playability or usability**. This is done in order to allow us to move forward as developers and designers more efficiently. If this offends you, please consider sticking to a [stable release](https://osu.ppy.sh/home/download) of osu!. We are not yet open to heated discussion over game mechanics and will not be using github as a forum for such discussions just yet.
+**IMPORTANT:** Gameplay mechanics (and other features which you may have come to know and love) are in a constant state of flux. Game balance and final quality-of-life passes come at the end of development, preceded by experimentation and changes which may potentially **reduce playability or usability**. This is done in order to allow us to move forward as developers and designers more efficiently. If this offends you, please consider sticking to a [stable release] (https://osu.ppy.sh/home/download) of osu!. We are not yet open to heated discussion over game mechanics and will not be using github as a forum for such discussions just yet.
 
 We are accepting bug reports (please report with as much detail as possible and follow the existing issue templates). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features. A few resources are available as starting points to getting involved and understanding the project:
 
-- Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
-- You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
+- Detailed release changelogs are available on the [official osu! site] (https://osu.ppy.sh/home/changelog/lazer).
+- You can learn more about our approach to [project management] (https://github.com/ppy/osu/wiki/Project-management).
 
 ## Running osu!
 
