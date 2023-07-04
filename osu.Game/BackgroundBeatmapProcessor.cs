@@ -216,6 +216,7 @@ namespace osu.Game
             notificationOverlay?.Post(notification);
 
             int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
@@ -251,6 +252,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
+                    ++failedCount;
                 }
             }
 
@@ -262,7 +264,12 @@ namespace osu.Game
             }
             else
             {
-                notification.CompletionText = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm. Check logs for issues with remaining scores.";
+                notification.Text = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm.";
+
+                // We may have arrived here due to user cancellation or completion with failures.
+                if (failedCount > 0)
+                    notification.Text += $" Check logs for issues with {failedCount} failed upgrades.";
+
                 notification.State = ProgressNotificationState.Cancelled;
             }
         }
