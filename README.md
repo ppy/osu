@@ -3,7 +3,7 @@
 # techclicker!
 
 
-[![dev chat](https://discord.gg/UHVd7BUSSx)](https://discord.gg/UHVd7BUSSx)
+(https://discord.gg/UHVd7BUSSxhttps://discord.gg/UHVd7BUSSx)]
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
