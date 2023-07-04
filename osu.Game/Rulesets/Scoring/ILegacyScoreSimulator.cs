@@ -7,7 +7,10 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public interface ILegacyScoreProcessor
+    /// <summary>
+    /// Generates attributes which are required to calculate old-style Score V1 scores.
+    /// </summary>
+    public interface ILegacyScoreSimulator
     {
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
