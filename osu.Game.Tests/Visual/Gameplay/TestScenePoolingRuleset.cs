@@ -242,18 +242,23 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("skip to middle of object", () => clock.CurrentTime = (hitObjectWithNested.StartTime + hitObjectWithNested.GetEndTime()) / 2);
             AddAssert("2 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(2));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
 
             AddStep("skip to before end of object", () => clock.CurrentTime = hitObjectWithNested.GetEndTime() - 1);
             AddAssert("3 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
 
             AddStep("removing object doesn't crash", () => playfield.Remove(hitObjectWithNested));
             AddStep("clear judged", () => playfield.JudgedObjects.Clear());
+
             AddStep("add object back", () => playfield.Add(hitObjectWithNested));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
 
             AddStep("skip to long past object", () => clock.CurrentTime = 100_000);
             // the parent entry should still be linked to nested entries of pooled objects that are managed externally
             // but not contain synthetic entries that were created for the non-pooled objects.
             AddAssert("entry still has non-synthetic nested entries", () => playfield.HitObjectContainer.Entries.Single().NestedEntries, () => Has.Count.EqualTo(1));
+            AddAssert("entry all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.True);
         }
 
         private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null)
