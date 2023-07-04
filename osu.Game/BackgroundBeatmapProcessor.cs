@@ -132,11 +132,7 @@ namespace osu.Game
 
             foreach (var id in beatmapSetIds)
             {
-                while (localUserPlayInfo?.IsPlaying.Value == true)
-                {
-                    Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
-                }
+                sleepIfRequired();
 
                 realmAccess.Run(r =>
                 {
@@ -177,11 +173,7 @@ namespace osu.Game
 
             foreach (var id in scoreIds)
             {
-                while (localUserPlayInfo?.IsPlaying.Value == true)
-                {
-                    Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
-                }
+                sleepIfRequired();
 
                 try
                 {
@@ -229,19 +221,17 @@ namespace osu.Game
 
             ProgressNotification? notification = null;
 
-            if (scoreIds.Count > 0)
-                notificationOverlay?.Post(notification = new ProgressNotification { State = ProgressNotificationState.Active });
+            if (scoreIds.Count == 0)
+                return;
+
+            notificationOverlay?.Post(notification = new ProgressNotification { State = ProgressNotificationState.Active });
 
             int count = 0;
             updateNotification();
 
             foreach (var id in scoreIds)
             {
-                while (localUserPlayInfo?.IsPlaying.Value == true)
-                {
-                    Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
-                }
+                sleepIfRequired();
 
                 try
                 {
@@ -284,6 +274,15 @@ namespace osu.Game
                     notification.Text = $"Total score updated for {count} of {scoreIds.Count} scores";
                     notification.Progress = (float)count / scoreIds.Count;
                 }
+            }
+        }
+
+        private void sleepIfRequired()
+        {
+            while (localUserPlayInfo?.IsPlaying.Value == true)
+            {
+                Logger.Log("Background processing sleeping due to active gameplay...");
+                Thread.Sleep(TimeToSleepDuringGameplay);
             }
         }
     }
