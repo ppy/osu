@@ -975,13 +975,13 @@ namespace osu.Game.Database
                         if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
                         {
                             // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
-                            score.Version = 30000002;
+                            score.TotalScoreVersion = 30000002;
 
                             // Transfer known legacy scores to a permanent storage field for preservation.
                             score.LegacyTotalScore = score.TotalScore;
                         }
                         else
-                            score.Version = LegacyScoreEncoder.LATEST_VERSION;
+                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     }
 
                     break;
