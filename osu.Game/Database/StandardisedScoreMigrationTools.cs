@@ -205,9 +205,14 @@ namespace osu.Game.Database
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
 
+            var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
+
+            if (playableBeatmap.HitObjects.Count == 0)
+                throw new InvalidOperationException("Beatmap contains no hit objects!");
+
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
 
-            sv1Simulator.Simulate(beatmap, beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods), score.Mods);
+            sv1Simulator.Simulate(beatmap, playableBeatmap, score.Mods);
 
             return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
             {
