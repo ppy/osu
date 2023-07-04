@@ -970,16 +970,15 @@ namespace osu.Game.Database
 
                 case 31:
                 {
-                    var scores = migration.NewRealm.All<ScoreInfo>();
-
-                    foreach (var score in scores)
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
                     {
-                        if (score.IsLegacyScore)
+                        if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
                         {
-                            score.LegacyTotalScore = score.TotalScore;
-
-                            // Scores with this version will trigger the update process in BackgroundBeatmapProcessor.
+                            // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
                             score.Version = 30000002;
+
+                            // Set a sane default while background processing runs.
+                            score.LegacyTotalScore = score.TotalScore;
                         }
                         else
                             score.Version = LegacyScoreEncoder.LATEST_VERSION;
