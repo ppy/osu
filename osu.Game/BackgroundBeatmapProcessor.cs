@@ -189,6 +189,10 @@ namespace osu.Game
 
                     Logger.Log($"Populated maximum statistics for score {id}");
                 }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
@@ -236,6 +240,10 @@ namespace osu.Game
 
                     Logger.Log($"Converted total score for score {id}");
                     ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
