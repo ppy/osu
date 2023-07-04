@@ -36,7 +36,7 @@ namespace osu.Game.Scoring
         /// <remarks>
         /// When setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
         /// </remarks>
-        public BeatmapInfo BeatmapInfo { get; set; } = null!;
+        public BeatmapInfo? BeatmapInfo { get; set; }
 
         /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
@@ -129,13 +129,11 @@ namespace osu.Game.Scoring
         public int RankInt { get; set; }
 
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
+        IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
-
-        public Guid BeatmapInfoID => BeatmapInfo.ID;
 
         public int UserID => RealmUser.OnlineID;
 
