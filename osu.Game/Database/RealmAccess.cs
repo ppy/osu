@@ -977,7 +977,7 @@ namespace osu.Game.Database
                             // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
                             score.Version = 30000002;
 
-                            // Set a sane default while background processing runs.
+                            // Transfer known legacy scores to a permanent storage field for preservation.
                             score.LegacyTotalScore = score.TotalScore;
                         }
                         else
