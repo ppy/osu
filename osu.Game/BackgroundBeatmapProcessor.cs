@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -199,23 +198,9 @@ namespace osu.Game
 
         private void convertLegacyTotalScoreToStandardised()
         {
-            HashSet<Guid> scoreIds = new HashSet<Guid>();
-
             Logger.Log("Querying for scores that need total score conversion...");
 
-            realmAccess.Run(r =>
-            {
-                foreach (var score in r.All<ScoreInfo>().Where(s => s.IsLegacyScore))
-                {
-                    if (!score.Ruleset.IsLegacyRuleset())
-                        continue;
-
-                    if (score.Version >= 30000003)
-                        continue;
-
-                    scoreIds.Add(score.ID);
-                }
-            });
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>().Where(s => s.Version == 30000002).Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
