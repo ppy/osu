@@ -199,15 +199,13 @@ namespace osu.Game.Database
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
-            var beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
-            var ruleset = score.Ruleset.CreateInstance();
+            WorkingBeatmap beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
 
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
 
-            var sv1Processor = legacyRuleset.CreateLegacyScoreProcessor();
-            if (sv1Processor == null)
-                return score.TotalScore;
+            ILegacyScoreProcessor sv1Processor = legacyRuleset.CreateLegacyScoreProcessor();
 
             sv1Processor.Simulate(beatmap, beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods), score.Mods);
 
