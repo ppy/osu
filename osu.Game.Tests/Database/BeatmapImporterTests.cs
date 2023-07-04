@@ -454,7 +454,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(score.BeatmapInfo, Is.Null);
                 Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
 
-                // imitate making local changes via editor
+                // imitate reverting the local changes made above
                 // ReSharper disable once MethodHasAsyncOverload
                 realm.Write(r =>
                 {
