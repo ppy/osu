@@ -23,6 +23,63 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
         }
 
+        [Test]
+        public void TestApplyQueriesBareWordsWithExactMatch()
+        {
+            const string query = "looking for \"a beatmap\"! like \"this\"";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"a beatmap\"! like \"this\"", filterCriteria.SearchText);
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("a beatmap"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("this"));
+            Assert.That(filterCriteria.SearchTerms[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[2].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[3].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[3].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[4].SearchTerm, Is.EqualTo("like"));
+            Assert.That(filterCriteria.SearchTerms[4].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
+        [Test]
+        public void TestApplyFullPhraseQueryWithExclamationPointInTerm()
+        {
+            const string query = "looking for \"circles!\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"circles!\"!", filterCriteria.SearchText);
+            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("circles!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[2].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
+        [Test]
+        public void TestApplyBrokenFullPhraseQuery()
+        {
+            const string query = "\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("\"!", filterCriteria.SearchText);
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
         /*
          * The following tests have been written a bit strangely (they don't check exact
          * bound equality with what the filter says).
@@ -227,6 +284,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestApplyTitleQueries()
+        {
+            const string query = "find me songs with title=\"a certain title\" please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("a certain title", filterCriteria.Title.SearchTerm);
+            Assert.That(filterCriteria.Title.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
+        [Test]
         public void TestApplyArtistQueries()
         {
             const string query = "find me songs by artist=singer please";
@@ -235,6 +304,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
         }
 
         [Test]
@@ -246,6 +316,19 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
+        [Test]
+        public void TestApplyArtistQueriesWithSpacesFullPhrase()
+        {
+            const string query = "artist=\"The Only One\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.SearchText.Trim(), Is.Empty);
+            Assert.AreEqual(0, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("The Only One", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
 
         [Test]
