@@ -219,6 +219,9 @@ namespace osu.Game
 
             foreach (var id in scoreIds)
             {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    break;
+
                 notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
                 notification.Progress = (float)processedCount / scoreIds.Count;
 
