@@ -60,6 +60,15 @@ namespace osu.Game.Online.Rooms
                 if (item.NewValue == null)
                     return;
 
+                // Initially set to unknown until we have attained a good state.
+                // This has the wanted side effect of forcing a state change when the current playlist
+                // item changes at the server but our local availability doesn't necessarily change
+                // (ie. we have both the previous and next item LocallyAvailable).
+                //
+                // Note that even without this, the server will trigger a state change and things will work.
+                // This is just for safety.
+                availability.Value = BeatmapAvailability.Unknown();
+
                 downloadTracker?.RemoveAndDisposeImmediately();
                 selectedBeatmap = null;
 
@@ -115,6 +124,9 @@ namespace osu.Game.Online.Rooms
             switch (downloadTracker.State.Value)
             {
                 case DownloadState.Unknown:
+                    availability.Value = BeatmapAvailability.Unknown();
+                    break;
+
                 case DownloadState.NotDownloaded:
                     availability.Value = BeatmapAvailability.NotDownloaded();
                     break;

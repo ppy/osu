@@ -348,6 +348,73 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestDanglingScoreTransferred()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchive(out string pathOnlineCopy);
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                string scoreTargetBeatmapHash = string.Empty;
+
+                // set a score on the beatmap
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapInfo = s.Beatmaps.First();
+
+                    scoreTargetBeatmapHash = beatmapInfo.Hash;
+
+                    s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
+                });
+
+                // locally modify beatmap
+                const string new_beatmap_hash = "new_hash";
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapInfo = s.Beatmaps.First(b => b.Hash == scoreTargetBeatmapHash);
+
+                    beatmapInfo.Hash = new_beatmap_hash;
+                    beatmapInfo.ResetOnlineInfo();
+                });
+
+                realm.Run(r => r.Refresh());
+
+                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
+                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (https://github.com/ppy/osu/pull/22539).
+                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
+                checkCount<ScoreInfo>(realm, 1);
+
+                // reimport the original beatmap before local modifications
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOnlineCopy), importBeforeUpdate.Value);
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
+
+                // both original and locally modified versions present
+                checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
+                checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
+                checkCount<BeatmapSetInfo>(realm, 2);
+
+                // score is preserved
+                checkCount<ScoreInfo>(realm, 1);
+
+                // score is transferred to new beatmap
+                Assert.That(importBeforeUpdate.Value.Beatmaps.First(b => b.Hash == new_beatmap_hash).Scores, Has.Count.EqualTo(0));
+                Assert.That(importAfterUpdate.Value.Beatmaps.First(b => b.Hash == scoreTargetBeatmapHash).Scores, Has.Count.EqualTo(1));
+            });
+        }
+
+        [Test]
         public void TestScoreLostOnModification()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
