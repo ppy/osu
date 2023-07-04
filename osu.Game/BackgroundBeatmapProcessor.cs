@@ -219,18 +219,20 @@ namespace osu.Game
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
-            ProgressNotification? notification = null;
-
             if (scoreIds.Count == 0)
                 return;
 
-            notificationOverlay?.Post(notification = new ProgressNotification { State = ProgressNotificationState.Active });
+            ProgressNotification notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
-            int count = 0;
-            updateNotification();
+            notificationOverlay?.Post(notification);
+
+            int processedCount = 0;
 
             foreach (var id in scoreIds)
             {
+                notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
+                notification.Progress = (float)processedCount / scoreIds.Count;
+
                 sleepIfRequired();
 
                 try
@@ -248,32 +250,24 @@ namespace osu.Game
                     });
 
                     Logger.Log($"Converted total score for score {id}");
+                    ++processedCount;
                 }
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
                 }
-
-                ++count;
-                updateNotification();
             }
 
-            void updateNotification()
+            if (processedCount == scoreIds.Count)
             {
-                if (notification == null)
-                    return;
-
-                if (count == scoreIds.Count)
-                {
-                    notification.CompletionText = $"Total score updated for {scoreIds.Count} scores";
-                    notification.Progress = 1;
-                    notification.State = ProgressNotificationState.Completed;
-                }
-                else
-                {
-                    notification.Text = $"Total score updated for {count} of {scoreIds.Count} scores";
-                    notification.Progress = (float)count / scoreIds.Count;
-                }
+                notification.CompletionText = $"{processedCount} score(s) have been upgraded to the new scoring algorithm";
+                notification.Progress = 1;
+                notification.State = ProgressNotificationState.Completed;
+            }
+            else
+            {
+                notification.CompletionText = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm. Check logs for issues with remaining scores.";
+                notification.State = ProgressNotificationState.Cancelled;
             }
         }
 
