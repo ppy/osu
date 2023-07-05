@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private TaikoAction? lastAction;
 
         [BackgroundDependencyLoader]
-        private void load(DrawableRuleset drawableRuleset)
+        private void load(Playfield playfield)
         {
-            var hitObjectContainer = drawableRuleset.Playfield.HitObjectContainer;
+            var hitObjectContainer = playfield.HitObjectContainer;
             InternalChildren = new Drawable[]
             {
                 leftCentreTrigger = CreateTriggerSource(hitObjectContainer, SampleBalance.Left),
