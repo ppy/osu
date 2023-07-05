@@ -372,7 +372,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void checkSamples(HitType hitType, string expectedSamplesCsv, string expectedBank)
         {
-            AddStep($"hit {hitType}", () => triggerSource.Play(hitType));
+            AddStep($"hit {hitType}", () => triggerSource.Play(hitType, false));
             AddAssert($"last played sample is {expectedSamplesCsv}", () => string.Join(',', triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().Select(s => s.Name)),
                 () => Is.EqualTo(expectedSamplesCsv));
             AddAssert($"last played sample has {expectedBank} bank", () => triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().First().Bank, () => Is.EqualTo(expectedBank));
