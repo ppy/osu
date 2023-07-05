@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Objects
         /// Whether <see cref="HitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Result?.HasResult ?? true;
+        public bool Judged => Result?.HasResult ?? false;
 
         /// <summary>
         /// Whether <see cref="HitObject"/> and all of its nested objects have been judged.
