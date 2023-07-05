@@ -58,6 +58,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
 
+                    // For sliders, we also want to consider the start position.
+                    if (osuCurrent.BaseObject is Slider)
+                        jumpDistance = Math.Min(jumpDistance, (osuHitObject.StackedPosition - currentHitObject.StackedPosition).Length);
+
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
                         smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
