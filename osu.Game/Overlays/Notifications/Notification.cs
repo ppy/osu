@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public virtual bool DisplayOnTop => true;
 
-        public virtual string PopInSampleName => "UI/notification-pop-in";
+        public virtual string PopInSampleName => "UI/notification-default";
 
         protected NotificationLight Light;
 
