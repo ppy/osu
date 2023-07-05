@@ -87,10 +87,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             result = Math.Pow(smallDistNerf * result, 2.0);
 
-            // Additional bonus for Hidden due to there being no approach circles.
-            if (hidden)
-                result *= 1.0 + hidden_bonus;
-
             // Nerf patterns with repeated angles.
             result *= min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
 
@@ -110,6 +106,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             result += sliderBonus * slider_multiplier;
+
+            // Additional bonus for Hidden due to there being no approach circles and fading sliders.
+            if (hidden)
+                result *= 1.0 + hidden_bonus;
 
             return result;
         }
