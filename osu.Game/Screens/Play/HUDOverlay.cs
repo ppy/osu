@@ -357,6 +357,10 @@ namespace osu.Game.Screens.Play
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleReplaySettings:
+                    configSettingsOverlay.Value = !configSettingsOverlay.Value;
+                    return true;
+
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
                     return true;
