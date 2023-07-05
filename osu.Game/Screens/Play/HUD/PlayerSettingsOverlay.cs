@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Play.HUD
                 Spacing = new Vector2(0, 20),
                 Children = new PlayerSettingsGroup[]
                 {
-                    //CollectionSettings = new CollectionSettings(),
-                    //DiscussionSettings = new DiscussionSettings(),
                     PlaybackSettings = new PlaybackSettings { Expanded = { Value = false } },
                     VisualSettings = new VisualSettings { Expanded = { Value = false } },
                     new AudioSettings { Expanded = { Value = false } }
