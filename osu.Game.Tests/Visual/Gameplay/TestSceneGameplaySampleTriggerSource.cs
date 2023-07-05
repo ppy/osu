@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void checkValidObjectIndex(int index) =>
-            AddAssert($"check valid object is {index}", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[index]));
+            AddAssert($"check object at index {index} is correct", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[index]));
 
         private DrawableHitObject? getNextAliveObject() =>
             Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
