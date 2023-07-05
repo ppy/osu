@@ -72,13 +72,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
             seekTo(200);
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
         }
 
         [Test]
@@ -100,13 +100,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             seekTo(200);
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
         }
 
         [Test]
@@ -145,23 +145,23 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is first hit", () => triggerSource.GetMostValidObject(), () => Is.EqualTo(first));
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_NORMAL);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_NORMAL);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_NORMAL);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_NORMAL);
 
             seekTo(120);
             AddAssert("most valid object is first hit", () => triggerSource.GetMostValidObject(), () => Is.EqualTo(first));
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_NORMAL);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_NORMAL);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_NORMAL);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_NORMAL);
 
             seekTo(480);
             AddAssert("most valid object is second hit", () => triggerSource.GetMostValidObject(), () => Is.EqualTo(second));
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             seekTo(700);
             AddAssert("most valid object is second hit", () => triggerSource.GetMostValidObject(), () => Is.EqualTo(second));
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
         }
 
         [Test]
@@ -184,13 +184,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is nested strong hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit.StrongNestedHit>);
-            checkSamples(HitType.Centre, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, true, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, true, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
 
             seekTo(200);
             AddAssert("most valid object is hit", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Hit>);
-            checkSamples(HitType.Centre, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, true, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, true, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
@@ -213,18 +213,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
             seekTo(600);
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
             seekTo(1200);
             AddAssert("most valid object is drum roll", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRoll>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
         }
 
         [Test]
@@ -247,18 +247,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             seekTo(600);
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
 
             seekTo(1200);
             AddAssert("most valid object is drum roll", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRoll>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT);
         }
 
         [Test]
@@ -282,18 +282,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             });
 
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, true, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, true, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
 
             seekTo(600);
             AddAssert("most valid object is drum roll tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRollTick>);
-            checkSamples(HitType.Centre, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, true, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, true, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
 
             seekTo(1200);
             AddAssert("most valid object is drum roll", () => triggerSource.GetMostValidObject(), Is.InstanceOf<DrumRoll>);
-            checkSamples(HitType.Centre, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, true, $"{HitSampleInfo.HIT_NORMAL},{HitSampleInfo.HIT_FINISH}", HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, true, $"{HitSampleInfo.HIT_CLAP},{HitSampleInfo.HIT_WHISTLE}", HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
@@ -319,18 +319,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             // This works fine in gameplay because they are judged whenever the user pressed, rather than being timed hits.
             // But for sample playback purposes they can be ignored as noise.
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
             seekTo(600);
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
             seekTo(1200);
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
         }
 
         [Test]
@@ -356,23 +356,23 @@ namespace osu.Game.Rulesets.Taiko.Tests
             // This works fine in gameplay because they are judged whenever the user pressed, rather than being timed hits.
             // But for sample playback purposes they can be ignored as noise.
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
 
             seekTo(600);
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
 
             seekTo(1200);
             AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
-            checkSamples(HitType.Centre, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
-            checkSamples(HitType.Rim, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
+            checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
         }
 
-        private void checkSamples(HitType hitType, string expectedSamplesCsv, string expectedBank)
+        private void checkSamples(HitType hitType, bool strong, string expectedSamplesCsv, string expectedBank)
         {
-            AddStep($"hit {hitType}", () => triggerSource.Play(hitType, false));
+            AddStep($"hit {hitType}", () => triggerSource.Play(hitType, strong));
             AddAssert($"last played sample is {expectedSamplesCsv}", () => string.Join(',', triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().Select(s => s.Name)),
                 () => Is.EqualTo(expectedSamplesCsv));
             AddAssert($"last played sample has {expectedBank} bank", () => triggerSource.LastPlayedSamples!.OfType<HitSampleInfo>().First().Bank, () => Is.EqualTo(expectedBank));
