@@ -28,7 +28,6 @@ using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
-using MarginPadding = osu.Framework.Graphics.MarginPadding;
 
 namespace osu.Game.Screens.Play
 {
