@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -183,6 +186,100 @@ namespace osu.Game.Database
                 modMultiplier *= mod.ScoreMultiplier;
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+        }
+
+        /// <summary>
+        /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="score">The score to convert the total score of.</param>
+        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
+        /// <returns>The standardised total score.</returns>
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
+        {
+            if (!score.IsLegacyScore)
+                return score.TotalScore;
+
+            WorkingBeatmap beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
+
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
+
+            var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
+
+            if (playableBeatmap.HitObjects.Count == 0)
+                throw new InvalidOperationException("Beatmap contains no hit objects!");
+
+            ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
+
+            sv1Simulator.Simulate(beatmap, playableBeatmap, score.Mods);
+
+            return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
+            {
+                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
+                LegacyComboScore = sv1Simulator.ComboScore,
+                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
+            });
+        }
+
+        /// <summary>
+        /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="score">The score to convert the total score of.</param>
+        /// <param name="attributes">Difficulty attributes providing the legacy scoring values
+        /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
+        /// for the beatmap which the score was set on.</param>
+        /// <returns>The standardised total score.</returns>
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, DifficultyAttributes attributes)
+        {
+            if (!score.IsLegacyScore)
+                return score.TotalScore;
+
+            Debug.Assert(score.LegacyTotalScore != null);
+
+            int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
+            int maximumLegacyComboScore = attributes.LegacyComboScore;
+            double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+
+            // The part of total score that doesn't include bonus.
+            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+
+            // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
+            double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
+
+            // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
+            double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            switch (score.Ruleset.OnlineID)
+            {
+                case 0:
+                    return (long)Math.Round((
+                        700000 * comboProportion
+                        + 300000 * Math.Pow(score.Accuracy, 10)
+                        + bonusProportion) * modMultiplier);
+
+                case 1:
+                    return (long)Math.Round((
+                        250000 * comboProportion
+                        + 750000 * Math.Pow(score.Accuracy, 3.6)
+                        + bonusProportion) * modMultiplier);
+
+                case 2:
+                    return (long)Math.Round((
+                        600000 * comboProportion
+                        + 400000 * score.Accuracy
+                        + bonusProportion) * modMultiplier);
+
+                case 3:
+                    return (long)Math.Round((
+                        990000 * comboProportion
+                        + 10000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        + bonusProportion) * modMultiplier);
+
+                default:
+                    return score.TotalScore;
+            }
         }
 
         private class FakeHit : HitObject
