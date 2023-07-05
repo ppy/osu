@@ -64,7 +64,7 @@ namespace osu.Game.Scoring
         /// <remarks>
         /// This may not match the version stored in the replay files.
         /// </remarks>
-        internal int TotalScoreVersion { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
+        public int TotalScoreVersion { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
 
         /// <summary>
         /// Used to preserve the total score for legacy scores.
@@ -72,7 +72,7 @@ namespace osu.Game.Scoring
         /// <remarks>
         /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
         /// </remarks>
-        internal long? LegacyTotalScore { get; set; }
+        public long? LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
 
