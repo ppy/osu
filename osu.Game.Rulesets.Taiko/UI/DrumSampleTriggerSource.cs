@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 PlaySamples(new ISampleInfo[]
                 {
-                    hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_WHISTLE : HitSampleInfo.HIT_FINISH),
-                    baseSample
+                    baseSample,
+                    hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_WHISTLE : HitSampleInfo.HIT_FINISH)
                 });
             }
             else
