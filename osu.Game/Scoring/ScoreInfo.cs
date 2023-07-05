@@ -15,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
@@ -52,6 +53,26 @@ namespace osu.Game.Scoring
         public bool DeletePending { get; set; }
 
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The version of processing applied to calculate total score as stored in the database.
+        /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
+        /// the total score has not yet been updated to reflect the current scoring values.
+        ///
+        /// See <see cref="BackgroundBeatmapProcessor"/>'s conversion logic.
+        /// </summary>
+        /// <remarks>
+        /// This may not match the version stored in the replay files.
+        /// </remarks>
+        internal int TotalScoreVersion { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
+
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        /// <remarks>
+        /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
+        /// </remarks>
+        internal long? LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
 
