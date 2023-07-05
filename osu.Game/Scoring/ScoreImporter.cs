@@ -98,10 +98,12 @@ namespace osu.Game.Scoring
         /// <param name="score">The score to populate the statistics of.</param>
         public void PopulateMaximumStatistics(ScoreInfo score)
         {
+            Debug.Assert(score.BeatmapInfo != null);
+
             if (score.MaximumStatistics.Select(kvp => kvp.Value).Sum() > 0)
                 return;
 
-            var beatmap = score.BeatmapInfo?.Detach();
+            var beatmap = score.BeatmapInfo!.Detach();
             var ruleset = score.Ruleset.Detach();
             var rulesetInstance = ruleset.CreateInstance();
 
