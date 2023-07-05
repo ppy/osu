@@ -188,7 +188,7 @@ namespace osu.Game.Collections
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                    X = -OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Scale = new Vector2(0.65f),
                     Action = addOrRemove,
                 });
