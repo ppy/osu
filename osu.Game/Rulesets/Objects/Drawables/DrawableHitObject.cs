@@ -112,12 +112,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Entry?.Judged ?? true;
+        public bool Judged => Entry?.Judged ?? false;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => Entry?.AllJudged ?? true;
+        public bool AllJudged => Entry?.AllJudged ?? false;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
