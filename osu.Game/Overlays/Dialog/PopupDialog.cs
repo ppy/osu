@@ -225,7 +225,12 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first button of the provided type.
         /// </summary>
-        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
+        public void PerformAction<T>() where T : PopupDialogButton
+        {
+            // Buttons are regularly added in BDL or LoadComplete, so let's schedule to ensure
+            // they are ready to be pressed.
+            Schedule(() => Buttons.OfType<T>().First().TriggerClick());
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
