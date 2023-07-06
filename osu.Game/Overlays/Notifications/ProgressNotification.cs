@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.Notifications
 
         protected override bool AllowFlingDismiss => false;
 
+        public override string PopOutSampleName => State is ProgressNotificationState.Cancelled ? base.PopOutSampleName : "";
+
         /// <summary>
         /// The function to post completion notifications back to.
         /// </summary>
