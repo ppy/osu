@@ -98,9 +98,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual bool DisplayResult => true;
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
+        /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
+        public JudgementResult Result => Entry?.Result;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
@@ -112,12 +112,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Result?.HasResult ?? true;
+        public bool Judged => Entry?.Judged ?? false;
 
         /// <summary>
-        /// The scoring result of this <see cref="DrawableHitObject"/>.
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public JudgementResult Result => Entry?.Result;
+        public bool AllJudged => Entry?.AllJudged ?? false;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
@@ -218,6 +218,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected sealed override void OnApply(HitObjectLifetimeEntry entry)
         {
+            Debug.Assert(Entry != null);
+
             // LifetimeStart is already computed using HitObjectLifetimeEntry's InitialLifetimeOffset.
             // We override this with DHO's InitialLifetimeOffset for a non-pooled DHO.
             if (entry is SyntheticHitObjectEntry)
@@ -247,6 +249,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 drawableNested.ParentHitObject = this;
 
                 nestedHitObjects.Add(drawableNested);
+
+                // assume that synthetic entries are not pooled and therefore need to be managed from within the DHO.
+                // this is important for the correctness of value of flags such as `AllJudged`.
+                if (drawableNested.Entry is SyntheticHitObjectEntry syntheticNestedEntry)
+                    Entry.NestedEntries.Add(syntheticNestedEntry);
+
                 AddNestedHitObject(drawableNested);
             }
 
@@ -290,6 +298,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
         {
+            Debug.Assert(Entry != null);
+
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
 
             if (HitObject is IHasComboInformation combo)
@@ -318,6 +328,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             nestedHitObjects.Clear();
+            // clean up synthetic entries manually added in `Apply()`.
+            Entry.NestedEntries.RemoveAll(nestedEntry => nestedEntry is SyntheticHitObjectEntry);
             ClearNestedHitObjects();
 
             HitObject.DefaultsApplied -= onDefaultsApplied;
