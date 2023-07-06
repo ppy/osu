@@ -282,8 +282,6 @@ namespace osu.Game.Database
         /// <returns>
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
         /// To stop receiving notifications, call <see cref="M:System.IDisposable.Dispose" />.
-        ///
-        /// May be null in the case the provided collection is not managed.
         /// </returns>
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0})" />
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0})" />
