@@ -267,6 +267,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = beatmapOffset;
+            bool skipFramesPresent = false;
             ReplayFrame currentFrame = null;
 
             // the negative time amount that must be "paid back" by positive frames before we start including frames again.
@@ -298,18 +299,31 @@ namespace osu.Game.Scoring.Legacy
                 lastTime += diff;
 
                 if (i < 2 && mouseX == 256 && mouseY == -500)
+                {
                     // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
                     // both frames use a position of (256, -500).
                     // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
+                    skipFramesPresent = true;
                     continue;
+                }
 
-                timeDeficit += diff;
-                timeDeficit = Math.Min(0, timeDeficit);
+                // if the skip frames inserted by stable are present, the third frame will have a large negative time
+                // roughly equal to SkipBoundary. We don't want this to count towards the deficit: doing so would cause
+                // the replay data before the skip to be, well, skipped.
+                // In other words, this frame, if present, is a different kind of negative frame. It sets the "offset"
+                // for the beginning of the replay. This is the only negative frame to be handled in such a way.
+                bool isNegativeBreakFrame = i == 2 && skipFramesPresent && diff < 0;
+
+                if (!isNegativeBreakFrame)
+                {
+                    timeDeficit += diff;
+                    timeDeficit = Math.Min(0, timeDeficit);
+                }
 
                 // still paying back the deficit from a negative frame. Skip this frame.
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames
-                if (timeDeficit < 0)
+                if (timeDeficit < 0 || isNegativeBreakFrame)
                     continue;
 
                 currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
