@@ -171,6 +171,9 @@ namespace osu.Game.Rulesets.UI
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
             framedClock.ProcessFrame();
+
+            if (framedClock.ElapsedFrameTime != 0)
+                IsRewinding = framedClock.ElapsedFrameTime < 0;
         }
 
         /// <summary>
@@ -246,6 +249,8 @@ namespace osu.Game.Rulesets.UI
         #region Delegation of IGameplayClock
 
         public IBindable<bool> IsPaused { get; } = new BindableBool();
+
+        public bool IsRewinding { get; private set; }
 
         public double CurrentTime => framedClock.CurrentTime;
 
