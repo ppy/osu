@@ -76,14 +76,12 @@ namespace osu.Game.Screens.Select
         protected override void PopIn()
         {
             this.MoveToX(0, animation_duration, Easing.OutQuint);
-            this.RotateTo(0, animation_duration, Easing.OutQuint);
             this.FadeIn(transition_duration);
         }
 
         protected override void PopOut()
         {
             this.MoveToX(-100, animation_duration, Easing.In);
-            this.RotateTo(10, animation_duration, Easing.In);
             this.FadeOut(transition_duration * 2, Easing.In);
         }
 
