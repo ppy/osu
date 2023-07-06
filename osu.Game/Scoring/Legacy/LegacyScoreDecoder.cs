@@ -269,6 +269,13 @@ namespace osu.Game.Scoring.Legacy
             float lastTime = beatmapOffset;
             ReplayFrame currentFrame = null;
 
+            // the negative time amount that must be "paid back" by positive frames before we start including frames again.
+            // When a negative frame occurs in a replay, all future frames are skipped until the sum total of their times
+            // is equal to or greater than the time of that negative frame.
+            // This value will be negative if we are in a time deficit, ie we have a negative frame that must be paid back.
+            // Otherwise it will be 0.
+            float timeDeficit = 0;
+
             string[] frames = reader.ReadToEnd().Split(',');
 
             for (int i = 0; i < frames.Length; i++)
@@ -296,9 +303,13 @@ namespace osu.Game.Scoring.Legacy
                     // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
                     continue;
 
+                timeDeficit += diff;
+                timeDeficit = Math.Min(0, timeDeficit);
+
+                // still paying back the deficit from a negative frame. Skip this frame.
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames
-                if (diff < 0)
+                if (timeDeficit < 0)
                     continue;
 
                 currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
