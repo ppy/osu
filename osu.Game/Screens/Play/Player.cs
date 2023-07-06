@@ -11,8 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -114,7 +112,7 @@ namespace osu.Game.Screens.Play
 
         private Ruleset ruleset;
 
-        private Sample sampleRestart;
+        private SkinnableSound sampleRestart;
 
         public BreakOverlay BreakOverlay;
 
@@ -195,7 +193,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
+        private void load(OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
         {
             var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
@@ -212,8 +210,6 @@ namespace osu.Game.Screens.Play
 
             if (playableBeatmap == null)
                 return;
-
-            sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -295,15 +291,19 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AllowRestart)
             {
-                rulesetSkinProvider.Add(new HotkeyRetryOverlay
+                rulesetSkinProvider.AddRange(new Drawable[]
                 {
-                    Action = () =>
+                    new HotkeyRetryOverlay
                     {
-                        if (!this.IsCurrentScreen()) return;
+                        Action = () =>
+                        {
+                            if (!this.IsCurrentScreen()) return;
 
-                        fadeOut(true);
-                        Restart(true);
+                            fadeOut(true);
+                            Restart(true);
+                        },
                     },
+                    sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
                 });
             }
 
