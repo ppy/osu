@@ -102,7 +102,7 @@ namespace osu.Game
                             }
                         }
 
-                        r.Find<RulesetInfo>(ruleset.ShortName).LastAppliedDifficultyVersion = currentVersion;
+                        r.Find<RulesetInfo>(ruleset.ShortName)!.LastAppliedDifficultyVersion = currentVersion;
                     });
 
                     Logger.Log($"Finished resetting {countReset} beatmap sets for {ruleset.Name}");
@@ -184,7 +184,7 @@ namespace osu.Game
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
-                        r.Find<ScoreInfo>(id).MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                        r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
                     Logger.Log($"Populated maximum statistics for score {id}");
@@ -237,7 +237,7 @@ namespace osu.Game
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
-                        ScoreInfo s = r.Find<ScoreInfo>(id);
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
                         s.TotalScore = newTotalScore;
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });

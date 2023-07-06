@@ -208,7 +208,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
@@ -227,7 +227,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = false;
                     transaction.Commit();
@@ -330,7 +330,7 @@ namespace osu.Game.Beatmaps
             Realm.Write(r =>
             {
                 if (!beatmapInfo.IsManaged)
-                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
                 Debug.Assert(beatmapInfo.File != null);
@@ -460,7 +460,7 @@ namespace osu.Game.Beatmaps
 
                 Realm.Write(r =>
                 {
-                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
