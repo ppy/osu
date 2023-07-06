@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Notifications
@@ -38,16 +39,16 @@ namespace osu.Game.Overlays.Notifications
 
         public IEnumerable<Type> AcceptedNotificationTypes { get; }
 
-        private readonly LocalisableString clearButtonText;
-
         private readonly LocalisableString titleText;
 
-        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes, LocalisableString clearButtonText)
+        private readonly bool allowClear;
+
+        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes, bool allowClear)
         {
             AcceptedNotificationTypes = acceptedNotificationTypes.ToArray();
 
-            this.clearButtonText = clearButtonText.ToUpper();
             titleText = title;
+            this.allowClear = allowClear;
         }
 
         [BackgroundDependencyLoader]
@@ -71,15 +72,17 @@ namespace osu.Game.Overlays.Notifications
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        new ClearAllButton
-                        {
-                            Text = clearButtonText,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Action = clearAll
-                        },
+                        allowClear
+                            ? new ClearAllButton
+                            {
+                                Text = NotificationsStrings.ClearAll,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Action = clearAll
+                            }
+                            : Empty(),
                         new FillFlowContainer
                         {
                             Margin = new MarginPadding
@@ -115,10 +118,7 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        private void clearAll()
-        {
-            notifications.Children.ForEach(c => c.Close(true));
-        }
+        private void clearAll() => notifications.Children.ForEach(c => c.Close(true));
 
         protected override void Update()
         {
