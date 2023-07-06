@@ -66,10 +66,10 @@ namespace osu.Game.Scoring
         {
             // Ensure the beatmap is not detached.
             if (!model.BeatmapInfo.IsManaged)
-                model.BeatmapInfo = realm.Find<BeatmapInfo>(model.BeatmapInfo.ID);
+                model.BeatmapInfo = realm.Find<BeatmapInfo>(model.BeatmapInfo.ID)!;
 
             if (!model.Ruleset.IsManaged)
-                model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName);
+                model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName)!;
 
             // These properties are known to be non-null, but these final checks ensure a null hasn't come from somewhere (or the refetch has failed).
             // Under no circumstance do we want these to be written to realm as null.
