@@ -163,8 +163,12 @@ namespace osu.Game
             {
                 foreach (var score in r.All<ScoreInfo>())
                 {
-                    if (score.Statistics.Sum(kvp => kvp.Value) > 0 && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    if (score.BeatmapInfo != null
+                        && score.Statistics.Sum(kvp => kvp.Value) > 0
+                        && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    {
                         scoreIds.Add(score.ID);
+                    }
                 }
             });
 
