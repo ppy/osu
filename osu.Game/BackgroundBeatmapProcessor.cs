@@ -208,7 +208,9 @@ namespace osu.Game
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>().Where(s => s.TotalScoreVersion == 30000002).AsEnumerable().Select(s => s.ID)));
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
+                                                                             .Where(s => s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .AsEnumerable().Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
