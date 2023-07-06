@@ -79,11 +79,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return false;
             }
 
-            if (strong && hitType == HitType.Centre)
-                flushCenterTriggerSources();
+            if (strong)
+            {
+                switch (hitType)
+                {
+                    case HitType.Centre:
+                        flushCenterTriggerSources();
+                        break;
 
-            if (strong && hitType == HitType.Rim)
-                flushRimTriggerSources();
+                    case HitType.Rim:
+                        flushRimTriggerSources();
+                        break;
+                }
+            }
 
             triggerSource.Play(hitType, strong);
 
@@ -124,14 +132,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             leftCentreTrigger.StopAllPlayback();
             rightCentreTrigger.StopAllPlayback();
-            strongCentreTrigger.StopAllPlayback();
         }
 
         private void flushRimTriggerSources()
         {
             leftRimTrigger.StopAllPlayback();
             rightRimTrigger.StopAllPlayback();
-            strongRimTrigger.StopAllPlayback();
         }
 
         public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
