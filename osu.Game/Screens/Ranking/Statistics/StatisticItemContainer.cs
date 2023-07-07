@@ -16,13 +16,13 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Wraps a <see cref="StatisticItem"/> to add a header and suitable layout for use in <see cref="ResultsScreen"/>.
     /// </summary>
-    internal partial class StatisticContainer : CompositeDrawable
+    internal partial class StatisticItemContainer : CompositeDrawable
     {
         /// <summary>
-        /// Creates a new <see cref="StatisticContainer"/>.
+        /// Creates a new <see cref="StatisticItemContainer"/>.
         /// </summary>
         /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
-        public StatisticContainer(StatisticItem item)
+        public StatisticItemContainer(StatisticItem item)
         {
             RelativeSizeAxes = Axes.Both;
             Size = item.RelativeSize;

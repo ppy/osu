@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             continue;
                         }
 
-                        flow.Add(new StatisticContainer(item));
+                        flow.Add(new StatisticItemContainer(item));
                     }
 
                     if (anyRequiredHitEvents)
