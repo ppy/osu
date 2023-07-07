@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         private void load(IPooledSampleProvider sampleProvider)
         {
             // Warm up pools for non-standard samples.
-            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_NORMAL), true));
-            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_CLAP), true));
-            sampleProvider.GetPooledSample(new ArgonDrumSampleTriggerSource.VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_FLOURISH), true));
+            sampleProvider.GetPooledSample(new VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_NORMAL), true));
+            sampleProvider.GetPooledSample(new VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_CLAP), true));
+            sampleProvider.GetPooledSample(new VolumeAwareHitSampleInfo(new HitSampleInfo(HitSampleInfo.HIT_FLOURISH), true));
         }
 
         protected override DrumSampleTriggerSource CreateTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance) =>
