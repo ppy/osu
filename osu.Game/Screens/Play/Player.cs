@@ -112,8 +112,6 @@ namespace osu.Game.Screens.Play
 
         private Ruleset ruleset;
 
-        private SkinnableSound sampleRestart;
-
         public BreakOverlay BreakOverlay;
 
         /// <summary>
@@ -303,7 +301,6 @@ namespace osu.Game.Screens.Play
                             Restart(true);
                         },
                     },
-                    sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
                 });
             }
 
@@ -673,7 +670,6 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            sampleRestart?.Play();
             RestartRequested?.Invoke(quickRestart);
 
             PerformExit(false);
