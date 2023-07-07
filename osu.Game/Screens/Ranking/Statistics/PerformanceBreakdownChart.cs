@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                                         Text = "Achieved PP",
                                         Colour = Color4Extensions.FromHex("#66FFCC")
                                     },
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 14),
                                         Colour = Color4Extensions.FromHex("#66FFCC")
                                     }
                                 },
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                                         Text = "Maximum",
                                         Colour = OsuColour.Gray(0.7f)
                                     },
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                                         Colour = OsuColour.Gray(0.7f)
                                     }
                                 }
@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                     Text = attribute.DisplayName,
                     Colour = Colour4.White
                 },
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 14),
                     Text = percentage.ToLocalisableString("0%"),
                     Colour = Colour4.White
                 }
