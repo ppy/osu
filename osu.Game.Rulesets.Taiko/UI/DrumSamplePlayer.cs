@@ -93,13 +93,16 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             }
 
-            triggerSource.Play(hitType, strong);
+            Play(triggerSource, hitType, strong);
 
             lastHitTime = Time.Current;
             lastAction = e.Action;
 
             return false;
         }
+
+        protected virtual void Play(DrumSampleTriggerSource triggerSource, HitType hitType, bool strong) =>
+            triggerSource.Play(hitType, strong);
 
         private bool checkStrongValidity(TaikoAction newAction, TaikoAction? lastAction, double timeBetweenActions)
         {

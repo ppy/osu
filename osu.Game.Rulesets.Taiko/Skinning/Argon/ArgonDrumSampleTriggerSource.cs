@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -14,20 +13,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     public partial class ArgonDrumSampleTriggerSource : DrumSampleTriggerSource
     {
-        private readonly HitObjectContainer hitObjectContainer;
-
         [Resolved]
         private ISkinSource skinSource { get; set; } = null!;
-
-        /// <summary>
-        /// The minimum time to leave between flourishes that are added to strong rim hits.
-        /// </summary>
-        private const double time_between_flourishes = 2000;
 
         public ArgonDrumSampleTriggerSource(HitObjectContainer hitObjectContainer, SampleBalance balance)
             : base(hitObjectContainer, balance)
         {
-            this.hitObjectContainer = hitObjectContainer;
         }
 
         public override void Play(HitType hitType, bool strong)
@@ -49,37 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             // let the magic begin...
             var samplesToPlay = new List<ISampleInfo> { new VolumeAwareHitSampleInfo(originalSample, strong) };
 
-            if (strong && hitType == HitType.Rim && canPlayFlourish(hitObject))
-                samplesToPlay.Add(new VolumeAwareHitSampleInfo(hitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH), true));
-
             PlaySamples(samplesToPlay.ToArray());
-        }
-
-        private bool canPlayFlourish(TaikoHitObject hitObject)
-        {
-            double? lastFlourish = null;
-
-            var hitObjects = hitObjectContainer.AliveObjects
-                                               .Reverse()
-                                               .Select(d => d.HitObject)
-                                               .OfType<Hit>()
-                                               .Where(h => h.IsStrong && h.Type == HitType.Rim);
-
-            // Add an additional 'flourish' sample to strong rim hits (that are at least `time_between_flourishes` apart).
-            // This is applied to hitobjects in reverse order, as to sound more musically coherent by biasing towards to
-            // end of groups/combos of strong rim hits instead of the start.
-            foreach (var h in hitObjects)
-            {
-                bool canFlourish = lastFlourish == null || lastFlourish - h.StartTime >= time_between_flourishes;
-
-                if (canFlourish)
-                    lastFlourish = h.StartTime;
-
-                if (h == hitObject)
-                    return canFlourish;
-            }
-
-            return false;
         }
     }
 }
