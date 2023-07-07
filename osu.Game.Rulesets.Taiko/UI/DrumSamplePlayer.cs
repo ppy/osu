@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             leftRimTrigger.StopAllPlayback();
             rightRimTrigger.StopAllPlayback();
-            strongCentreTrigger.StopAllPlayback();
+            strongRimTrigger.StopAllPlayback();
         }
 
         public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
