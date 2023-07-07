@@ -418,6 +418,60 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImport_Modify_Revert()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                var imported = await LoadOszIntoStore(importer, realm.Realm);
+
+                await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
+
+                var score = realm.Run(r => r.All<ScoreInfo>().Single());
+
+                string originalHash = imported.Beatmaps.First().Hash;
+                const string modified_hash = "new_hash";
+
+                Assert.That(imported.Beatmaps.First().Scores.Single(), Is.EqualTo(score));
+
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+                Assert.That(score.BeatmapInfo, Is.EqualTo(imported.Beatmaps.First()));
+
+                // imitate making local changes via editor
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(r =>
+                {
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = modified_hash;
+                    beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
+                });
+
+                Assert.That(!imported.Beatmaps.First().Scores.Any());
+
+                Assert.That(score.BeatmapInfo, Is.Null);
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+
+                // imitate reverting the local changes made above
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(r =>
+                {
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = originalHash;
+                    beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
+                });
+
+                Assert.That(imported.Beatmaps.First().Scores.Single(), Is.EqualTo(score));
+
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+                Assert.That(score.BeatmapInfo, Is.EqualTo(imported.Beatmaps.First()));
+            });
+        }
+
+        [Test]
         public void TestImport_ThenModifyMapWithScore_ThenImport()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -431,19 +485,19 @@ namespace osu.Game.Tests.Database
 
                 await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
 
+                Assert.That(imported.Beatmaps.First().Scores.Any());
+
                 // imitate making local changes via editor
                 // ReSharper disable once MethodHasAsyncOverload
-                realm.Write(_ =>
+                realm.Write(r =>
                 {
                     BeatmapInfo beatmap = imported.Beatmaps.First();
                     beatmap.Hash = "new_hash";
                     beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
                 });
 
-                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
-                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (see: https://github.com/ppy/osu/pull/22539).
-                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
-                Assert.That(imported.Beatmaps.First().Scores.Any());
+                Assert.That(!imported.Beatmaps.First().Scores.Any());
 
                 var importedSecondTime = await importer.Import(new ImportTask(temp));
 
@@ -461,6 +515,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(importedFirstTimeBeatmap.Hash != importedSecondTimeBeatmap.Hash);
                 Assert.That(!importedFirstTimeBeatmap.Scores.Any());
                 Assert.That(importedSecondTimeBeatmap.Scores.Count() == 1);
+                Assert.That(importedSecondTimeBeatmap.Scores.Single().BeatmapInfo, Is.EqualTo(importedSecondTimeBeatmap));
             });
         }
 
