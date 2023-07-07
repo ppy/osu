@@ -3,13 +3,13 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -33,13 +33,16 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                CornerRadius = 10,
+                CornerRadius = 6,
                 Children = new Drawable[]
                 {
                     new Box
                     {
-                        Colour = Color4.Black,
-                        Alpha = 0.5f,
+                        Colour = ColourInfo.GradientVertical(
+                            OsuColour.Gray(0.25f),
+                            OsuColour.Gray(0.18f)
+                        ),
+                        Alpha = 0.95f,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Container
