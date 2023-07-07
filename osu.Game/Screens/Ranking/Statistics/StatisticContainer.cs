@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -26,15 +27,36 @@ namespace osu.Game.Screens.Ranking.Statistics
             RelativeSizeAxes = Axes.Both;
             Size = item.RelativeSize;
 
-            InternalChildren = new[]
+            Padding = new MarginPadding(5);
+
+            InternalChild = new Container
             {
-                createHeader(item),
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 10,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 15 },
-                    Masking = true,
-                    Child = item.CreateContent().With(d => d.RelativeSizeAxes = Axes.Both)
+                    new Box
+                    {
+                        Colour = Color4.Black,
+                        Alpha = 0.5f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(5),
+                        Children = new[]
+                        {
+                            createHeader(item),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(5) { Top = 20 },
+                                Child = item.CreateContent().With(d => d.RelativeSizeAxes = Axes.Both)
+                            }
+                        }
+                    },
                 }
             };
         }
