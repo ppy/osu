@@ -169,7 +169,7 @@ namespace osu.Game.Overlays
 
             Logger.Log($"⚠️ {notification.Text}");
 
-            notification.Closed += notificationClosed;
+            notification.Closed += () => notificationClosed(notification);
 
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
@@ -229,17 +229,20 @@ namespace osu.Game.Overlays
             mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 
-        private void notificationClosed() => Schedule(() =>
+        private void notificationClosed(Notification notification) => Schedule(() =>
         {
             updateCounts();
 
             // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
             // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
-            playDebouncedSample("UI/overlay-pop-out");
+            playDebouncedSample(notification.PopOutSampleName);
         });
 
         private void playDebouncedSample(string sampleName)
         {
+            if (string.IsNullOrEmpty(sampleName))
+                return;
+
             if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 audio.Samples.Get(sampleName)?.Play();
