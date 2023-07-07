@@ -133,30 +133,6 @@ namespace osu.Game.Tests.Visual.Ranking
 
             public override string ShortName => string.Empty;
 
-            protected static Drawable CreatePlaceholderStatistic(string message) => new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                Masking = true,
-                CornerRadius = 20,
-                Height = 250,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.5f),
-                        Alpha = 0.5f
-                    },
-                    new OsuSpriteText
-                    {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        Text = message,
-                        Margin = new MarginPadding { Left = 20 }
-                    }
-                }
-            };
-
             private class TestBeatmapConverter : IBeatmapConverter
             {
 #pragma warning disable CS0067 // The event is never used
@@ -180,8 +156,8 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
             {
-                new StatisticItem("Statistic Requiring Hit Events 1", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true),
-                new StatisticItem("Statistic Requiring Hit Events 2", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
+                new StatisticItem("Statistic Requiring Hit Events 1", () => createPlaceholderStatistic("Placeholder statistic. Requires hit events"), true, new Vector2(1, 0.2f)),
+                new StatisticItem("Statistic Requiring Hit Events 2", () => createPlaceholderStatistic("Placeholder statistic. Requires hit events"), true, new Vector2(1, 0.2f))
             };
         }
 
@@ -191,8 +167,8 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 return new[]
                 {
-                    new StatisticItem("Statistic Not Requiring Hit Events 1", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events")),
-                    new StatisticItem("Statistic Not Requiring Hit Events 2", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
+                    new StatisticItem("Statistic Not Requiring Hit Events 1", () => createPlaceholderStatistic("Placeholder statistic. Does not require hit events"), false, new Vector2(1, 0.2f)),
+                    new StatisticItem("Statistic Not Requiring Hit Events 2", () => createPlaceholderStatistic("Placeholder statistic. Does not require hit events"), false, new Vector2(1, 0.2f))
                 };
             }
         }
@@ -203,10 +179,33 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 return new[]
                 {
-                    new StatisticItem("Statistic Requiring Hit Events", () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true),
-                    new StatisticItem("Statistic Not Requiring Hit Events", () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
+                    new StatisticItem("Statistic Requiring Hit Events", () => createPlaceholderStatistic("Placeholder statistic. Requires hit events"), true, new Vector2(1, 0.2f)),
+                    new StatisticItem("Statistic Not Requiring Hit Events", () => createPlaceholderStatistic("Placeholder statistic. Does not require hit events"), false, new Vector2(1, 0.2f))
                 };
             }
         }
+
+        private static Drawable createPlaceholderStatistic(string message) => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Masking = true,
+            CornerRadius = 20,
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.5f),
+                    Alpha = 0.5f
+                },
+                new OsuSpriteText
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Text = message,
+                    Margin = new MarginPadding { Left = 20 }
+                }
+            }
+        };
     }
 }

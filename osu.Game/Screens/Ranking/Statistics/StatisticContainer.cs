@@ -23,23 +23,18 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
         public StatisticContainer(StatisticItem item)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
+            Size = item.RelativeSize;
 
-            InternalChild = new FillFlowContainer
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new[]
+                createHeader(item),
+                new Container
                 {
-                    createHeader(item),
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Top = 15 },
-                        Child = item.CreateContent()
-                    }
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 15 },
+                    Masking = true,
+                    Child = item.CreateContent().With(d => d.RelativeSizeAxes = Axes.Both)
                 }
             };
         }
@@ -52,7 +47,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             return new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                Height = 15,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]

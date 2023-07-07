@@ -4,11 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
+using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -34,12 +34,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 items = items.Append(new StatisticItem("Overall Ranking", () => new OverallRanking
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 0.5f,
                     StatisticsUpdate = { BindTarget = StatisticsUpdate }
-                })).ToArray();
+                }, relativeSize: new Vector2(1, 0.4f))).ToArray();
             }
 
             return items;

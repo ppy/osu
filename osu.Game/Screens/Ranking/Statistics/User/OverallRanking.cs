@@ -23,10 +23,6 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Y;
-            AutoSizeEasing = Easing.OutQuint;
-            AutoSizeDuration = transition_duration;
-
             InternalChildren = new Drawable[]
             {
                 loadingLayer = new LoadingLayer(withBox: false)

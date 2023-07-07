@@ -26,7 +26,10 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -218,5 +221,13 @@ namespace osu.Game.Rulesets.Catch
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
+
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            return new[]
+            {
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
+            };
+        }
     }
 }
