@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         new GlobalRankChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
