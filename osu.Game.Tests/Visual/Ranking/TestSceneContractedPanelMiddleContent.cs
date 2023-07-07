@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("show excess mods score", () =>
             {
                 var score = TestResources.CreateTestScoreInfo();
-                score.Mods = score.BeatmapInfo.Ruleset.CreateInstance().CreateAllMods().ToArray();
+                score.Mods = score.BeatmapInfo!.Ruleset.CreateInstance().CreateAllMods().ToArray();
                 showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), score);
             });
         }

@@ -440,7 +440,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         private void updateStoreFromButton(KeyButton button) =>
-            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID).KeyCombinationString = button.KeyBinding.KeyCombinationString);
+            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID)!.KeyCombinationString = button.KeyBinding.KeyCombinationString);
 
         private void updateIsDefaultValue()
         {

@@ -78,8 +78,9 @@ namespace osu.Game.Database
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
         /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
         /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
+        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
         /// </summary>
-        private const int schema_version = 30;
+        private const int schema_version = 31;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -534,7 +535,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -754,10 +755,10 @@ namespace osu.Game.Database
 
                         for (int i = 0; i < itemCount; i++)
                         {
-                            dynamic? oldItem = oldItems.ElementAt(i);
-                            dynamic? newItem = newItems.ElementAt(i);
+                            dynamic oldItem = oldItems.ElementAt(i);
+                            dynamic newItem = newItems.ElementAt(i);
 
-                            long? nullableOnlineID = oldItem?.OnlineID;
+                            long? nullableOnlineID = oldItem.OnlineID;
                             newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                         }
                     }
@@ -794,7 +795,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        dynamic oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
@@ -817,7 +818,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newSettings.Count; i++)
                     {
-                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        dynamic oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
@@ -842,7 +843,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newKeyBindings.Count; i++)
                     {
-                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        dynamic oldItem = oldKeyBindings.ElementAt(i);
                         var newItem = newKeyBindings.ElementAt(i);
 
                         if (oldItem.RulesetID == null)
@@ -896,7 +897,7 @@ namespace osu.Game.Database
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
-                        score.BeatmapHash = score.BeatmapInfo.Hash;
+                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
 
                     break;
                 }
@@ -962,6 +963,25 @@ namespace osu.Game.Database
                             }
                         }
                         catch { }
+                    }
+
+                    break;
+                }
+
+                case 31:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
+                        {
+                            // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
+                            score.TotalScoreVersion = 30000002;
+
+                            // Transfer known legacy scores to a permanent storage field for preservation.
+                            score.LegacyTotalScore = score.TotalScore;
+                        }
+                        else
+                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     }
 
                     break;
