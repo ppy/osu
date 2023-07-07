@@ -43,7 +43,7 @@ namespace osu.Game.Database
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
-                 d.Ruleset = d.Realm.Find<RulesetInfo>(s.Ruleset.ShortName);
+                 d.Ruleset = d.Realm!.Find<RulesetInfo>(s.Ruleset.ShortName)!;
                  copyChangesToRealm(s.Difficulty, d.Difficulty);
                  copyChangesToRealm(s.Metadata, d.Metadata);
              });
@@ -57,7 +57,7 @@ namespace osu.Game.Database
                      // Importantly, search all of realm for the beatmap (not just the set's beatmaps).
                      // It may have gotten detached, and if that's the case let's use this opportunity to fix
                      // things up.
-                     var existingBeatmap = d.Realm.Find<BeatmapInfo>(beatmap.ID);
+                     var existingBeatmap = d.Realm!.Find<BeatmapInfo>(beatmap.ID);
 
                      if (existingBeatmap != null)
                      {
@@ -77,7 +77,7 @@ namespace osu.Game.Database
                          {
                              ID = beatmap.ID,
                              BeatmapSet = d,
-                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
+                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)!
                          };
 
                          d.Beatmaps.Add(newBeatmap);
@@ -282,12 +282,10 @@ namespace osu.Game.Database
         /// <returns>
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
         /// To stop receiving notifications, call <see cref="M:System.IDisposable.Dispose" />.
-        ///
-        /// May be null in the case the provided collection is not managed.
         /// </returns>
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0})" />
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0})" />
-        public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
+        public static IDisposable QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
             if (!RealmAccess.CurrentThreadSubscriptionsAllowed)

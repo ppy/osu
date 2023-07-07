@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -20,10 +22,26 @@ namespace osu.Game.Rulesets.Objects
         public readonly HitObject HitObject;
 
         /// <summary>
+        /// The list of <see cref="HitObjectLifetimeEntry"/> for the <see cref="HitObject"/>'s nested objects (if any).
+        /// </summary>
+        public List<HitObjectLifetimeEntry> NestedEntries { get; internal set; } = new List<HitObjectLifetimeEntry>();
+
+        /// <summary>
         /// The result that <see cref="HitObject"/> was judged with.
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
         internal JudgementResult? Result;
+
+        /// <summary>
+        /// Whether <see cref="HitObject"/> has been judged.
+        /// Note: This does NOT include nested hitobjects.
+        /// </summary>
+        public bool Judged => Result?.HasResult ?? false;
+
+        /// <summary>
+        /// Whether <see cref="HitObject"/> and all of its nested objects have been judged.
+        /// </summary>
+        public bool AllJudged => Judged && NestedEntries.All(h => h.AllJudged);
 
         private readonly IBindable<double> startTimeBindable = new BindableDouble();
 
