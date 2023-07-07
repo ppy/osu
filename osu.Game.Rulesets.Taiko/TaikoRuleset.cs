@@ -249,11 +249,11 @@ namespace osu.Game.Rulesets.Taiko
             {
                 new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
                 new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents), true, relativeSize: new Vector2(1, 0.2f)),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)
-                }), true, new Vector2(1, 0.2f))
+                }), true, new Vector2(1, 0.1f))
             };
         }
     }

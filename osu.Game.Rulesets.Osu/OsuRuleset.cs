@@ -311,11 +311,11 @@ namespace osu.Game.Rulesets.Osu
                 {
                     RelativeSizeAxes = Axes.Both,
                 }, true, relativeSize: new Vector2(0.25f, 0.2f)),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)
-                }), true, new Vector2(1, 0.2f))
+                }), true, new Vector2(1, 0.1f))
             };
         }
 

@@ -405,11 +405,11 @@ namespace osu.Game.Rulesets.Mania
         {
             new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
             new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents), true, relativeSize: new Vector2(1, 0.2f)),
-            new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+            new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
             {
                 new AverageHitError(score.HitEvents),
                 new UnstableRate(score.HitEvents)
-            }), true, new Vector2(1, 0.2f))
+            }), true, new Vector2(1, 0.1f))
         };
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
