@@ -223,7 +223,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopIn()
         {
-            this.FadeIn(150, Easing.OutQuint);
+            this.FadeIn(350, Easing.OutQuint);
 
             popInSample?.Play();
             wasOpened = true;
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopOut()
         {
-            this.FadeOut(150, Easing.OutQuint);
+            this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
                 popOutSample?.Play();
