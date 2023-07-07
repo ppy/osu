@@ -41,14 +41,11 @@ namespace osu.Game.Overlays.Notifications
 
         private readonly LocalisableString titleText;
 
-        private readonly bool allowClear;
-
-        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes, bool allowClear)
+        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes)
         {
             AcceptedNotificationTypes = acceptedNotificationTypes.ToArray();
 
             titleText = title;
-            this.allowClear = allowClear;
         }
 
         [BackgroundDependencyLoader]
@@ -72,17 +69,15 @@ namespace osu.Game.Overlays.Notifications
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        allowClear
-                            ? new ClearAllButton
-                            {
-                                Text = NotificationsStrings.ClearAll,
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Action = clearAll
-                            }
-                            : Empty(),
+                        new ClearAllButton
+                        {
+                            Text = NotificationsStrings.ClearAll,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Action = clearAll
+                        },
                         new FillFlowContainer
                         {
                             Margin = new MarginPadding
@@ -118,7 +113,11 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        private void clearAll() => notifications.Children.ForEach(c => c.Close(true));
+        private void clearAll() => notifications.Children.ForEach(c =>
+        {
+            if (c is not ProgressNotification p || p.CompletedOrCancelled)
+                c.Close(true);
+        });
 
         protected override void Update()
         {
