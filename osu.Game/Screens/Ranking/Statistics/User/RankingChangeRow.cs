@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                 new OsuSpriteText
                 {
                     Text = Label,
-                    Font = OsuFont.Default.With(size: 14)
+                    Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE)
                 },
                 new FillFlowContainer
                 {
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold)
+                                    Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                                 },
                             }
                         },

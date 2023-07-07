@@ -14,6 +14,11 @@ namespace osu.Game.Screens.Ranking.Statistics
     public class StatisticItem
     {
         /// <summary>
+        /// The recommended font size to use in statistic items to make sure they match others.
+        /// </summary>
+        public const float FONT_SIZE = 13;
+
+        /// <summary>
         /// The name of this item.
         /// </summary>
         public readonly LocalisableString Name;

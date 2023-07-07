@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Text = item.Name,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                        Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold),
                     }
                 }
             };
