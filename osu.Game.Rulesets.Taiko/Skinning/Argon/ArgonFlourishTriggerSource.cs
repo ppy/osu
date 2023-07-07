@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    internal partial class ArgonFlourishTriggerSource : ArgonDrumSampleTriggerSource
+    internal partial class ArgonFlourishTriggerSource : DrumSampleTriggerSource
     {
         private readonly HitObjectContainer hitObjectContainer;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         private const double time_between_flourishes = 2000;
 
         public ArgonFlourishTriggerSource(HitObjectContainer hitObjectContainer)
-            : base(hitObjectContainer, SampleBalance.Centre)
+            : base(hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
         }
