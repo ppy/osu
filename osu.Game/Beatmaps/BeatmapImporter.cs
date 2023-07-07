@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
 
                 Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
 
-                original = realm.Find<BeatmapSetInfo>(original.ID);
+                original = realm!.Find<BeatmapSetInfo>(original.ID)!;
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).

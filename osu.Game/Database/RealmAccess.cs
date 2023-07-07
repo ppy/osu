@@ -535,7 +535,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -755,10 +755,10 @@ namespace osu.Game.Database
 
                         for (int i = 0; i < itemCount; i++)
                         {
-                            dynamic? oldItem = oldItems.ElementAt(i);
-                            dynamic? newItem = newItems.ElementAt(i);
+                            dynamic oldItem = oldItems.ElementAt(i);
+                            dynamic newItem = newItems.ElementAt(i);
 
-                            long? nullableOnlineID = oldItem?.OnlineID;
+                            long? nullableOnlineID = oldItem.OnlineID;
                             newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                         }
                     }
@@ -795,7 +795,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        dynamic oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
@@ -818,7 +818,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newSettings.Count; i++)
                     {
-                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        dynamic oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
@@ -843,7 +843,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newKeyBindings.Count; i++)
                     {
-                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        dynamic oldItem = oldKeyBindings.ElementAt(i);
                         var newItem = newKeyBindings.ElementAt(i);
 
                         if (oldItem.RulesetID == null)
