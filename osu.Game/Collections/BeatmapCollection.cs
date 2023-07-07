@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using Realms;
 
 namespace osu.Game.Collections
@@ -44,7 +45,9 @@ namespace osu.Game.Collections
         {
             ID = Guid.NewGuid();
             Name = name ?? string.Empty;
-            BeatmapMD5Hashes = beatmapMD5Hashes ?? new List<string>();
+
+            if (beatmapMD5Hashes != null)
+                BeatmapMD5Hashes.AddRange(beatmapMD5Hashes);
 
             LastModified = DateTimeOffset.UtcNow;
         }
