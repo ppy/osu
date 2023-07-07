@@ -187,7 +187,7 @@ namespace osu.Desktop
                     return edit.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.WatchingReplay watching:
-                    return watching.BeatmapInfo.ToString();
+                    return watching.BeatmapInfo?.ToString() ?? string.Empty;
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
