@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.Catch
         {
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.25f)),
             };
         }
     }

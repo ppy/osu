@@ -305,13 +305,13 @@ namespace osu.Game.Rulesets.Osu
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents), true, relativeSize: new Vector2(0.75f, 0.2f)),
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.25f)),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents), true, relativeSize: new Vector2(0.6f, 0.25f)),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, true, relativeSize: new Vector2(0.25f, 0.2f)),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                }, true, relativeSize: new Vector2(0.4f, 0.25f)),
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)

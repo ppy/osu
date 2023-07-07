@@ -403,9 +403,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.2f)),
+            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.25f)),
             new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents), true, relativeSize: new Vector2(1, 0.2f)),
-            new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
             {
                 new AverageHitError(score.HitEvents),
                 new UnstableRate(score.HitEvents)
