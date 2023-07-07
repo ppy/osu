@@ -44,6 +44,6 @@ namespace osu.Game.Overlays
         /// <summary>
         /// All ongoing operations (ie. any <see cref="ProgressNotification"/> not in a completed state).
         /// </summary>
-        public IEnumerable<ProgressNotification> OngoingOperations => AllNotifications.OfType<ProgressNotification>().Where(p => p.State != ProgressNotificationState.Completed && p.State != ProgressNotificationState.Cancelled);
+        public IEnumerable<ProgressNotification> OngoingOperations => AllNotifications.OfType<ProgressNotification>().Where(p => !p.CompletedOrCancelled);
     }
 }

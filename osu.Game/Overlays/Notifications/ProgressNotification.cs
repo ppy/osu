@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Notifications
 
         public Func<bool>? CancelRequested { get; set; }
 
+        public bool CompletedOrCancelled => State == ProgressNotificationState.Completed || State == ProgressNotificationState.Cancelled;
+
         protected override bool AllowFlingDismiss => false;
 
         /// <summary>
