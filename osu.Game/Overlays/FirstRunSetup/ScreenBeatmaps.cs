@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             beatmapSubscription?.Dispose();
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => Schedule(() =>
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes) => Schedule(() =>
         {
             currentlyLoadedBeatmaps.Text = FirstRunSetupBeatmapScreenStrings.CurrentlyLoadedBeatmaps(sender.Count);
 

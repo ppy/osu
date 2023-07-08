@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -688,7 +689,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected bool UpdateResult(bool userTriggered)
         {
             // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
-            if (Time.Elapsed < 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return false;
 
             if (Judged)

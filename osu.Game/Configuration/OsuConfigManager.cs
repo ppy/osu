@@ -129,6 +129,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -382,6 +383,7 @@ namespace osu.Game.Configuration
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
-        EditorLimitedDistanceSnap
+        EditorLimitedDistanceSnap,
+        ReplaySettingsOverlay
     }
 }
