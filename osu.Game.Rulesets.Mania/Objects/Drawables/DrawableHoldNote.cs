@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -298,7 +299,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if (Time.Elapsed < 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -337,7 +338,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if (Time.Elapsed < 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return;
 
             Tail.UpdateResult();
