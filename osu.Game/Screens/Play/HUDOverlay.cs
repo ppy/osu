@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
+        private Bindable<bool> configSettingsOverlay;
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
@@ -178,6 +179,7 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.Value = mods;
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
+            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -204,9 +206,24 @@ namespace osu.Game.Screens.Play
 
             holdingForHUD.BindValueChanged(_ => updateVisibility());
             IsPlaying.BindValueChanged(_ => updateVisibility());
-            configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
+            configVisibilityMode.BindValueChanged(_ => updateVisibility());
+            configSettingsOverlay.BindValueChanged(_ => updateVisibility());
 
-            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+            replayLoaded.BindValueChanged(e =>
+            {
+                if (e.NewValue)
+                {
+                    ModDisplay.FadeIn(200);
+                    InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
+                }
+                else
+                {
+                    ModDisplay.Delay(2000).FadeOut(200);
+                    InputCountController.Margin = new MarginPadding(10);
+                }
+
+                updateVisibility();
+            }, true);
         }
 
         protected override void Update()
@@ -280,6 +297,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            if (configSettingsOverlay.Value && replayLoaded.Value)
+                PlayerSettingsOverlay.Show();
+            else
+                PlayerSettingsOverlay.Hide();
+
             switch (configVisibilityMode.Value)
             {
                 case HUDVisibilityMode.Never:
@@ -295,26 +317,6 @@ namespace osu.Game.Screens.Play
                     ShowHud.Value = true;
                     break;
             }
-        }
-
-        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
-        {
-            PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
-
-            if (e.NewValue)
-            {
-                PlayerSettingsOverlay.Show();
-                ModDisplay.FadeIn(200);
-                InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
-            }
-            else
-            {
-                PlayerSettingsOverlay.Hide();
-                ModDisplay.Delay(2000).FadeOut(200);
-                InputCountController.Margin = new MarginPadding(10);
-            }
-
-            updateVisibility();
         }
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
@@ -354,6 +356,10 @@ namespace osu.Game.Screens.Play
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleReplaySettings:
+                    configSettingsOverlay.Value = !configSettingsOverlay.Value;
+                    return true;
+
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
                     return true;

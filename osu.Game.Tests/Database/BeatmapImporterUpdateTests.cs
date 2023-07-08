@@ -323,7 +323,7 @@ namespace osu.Game.Tests.Database
                     var beatmapInfo = s.Beatmaps.First(b => b.File?.Filename != removedFilename);
 
                     scoreTargetBeatmapHash = beatmapInfo.Hash;
-                    s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
+                    s.Realm!.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
                 realm.Run(r => r.Refresh());
@@ -372,7 +372,7 @@ namespace osu.Game.Tests.Database
 
                     scoreTargetBeatmapHash = beatmapInfo.Hash;
 
-                    s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
+                    s.Realm!.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
                 // locally modify beatmap
@@ -383,14 +383,14 @@ namespace osu.Game.Tests.Database
 
                     beatmapInfo.Hash = new_beatmap_hash;
                     beatmapInfo.ResetOnlineInfo();
+                    beatmapInfo.UpdateLocalScores(s.Realm!);
                 });
 
                 realm.Run(r => r.Refresh());
 
-                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
-                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (https://github.com/ppy/osu/pull/22539).
-                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
+                // making changes to a beatmap doesn't remove the score from realm, but should disassociate the beatmap.
                 checkCount<ScoreInfo>(realm, 1);
+                Assert.That(realm.Run(r => r.All<ScoreInfo>().First().BeatmapInfo), Is.Null);
 
                 // reimport the original beatmap before local modifications
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOnlineCopy), importBeforeUpdate.Value);
@@ -435,7 +435,7 @@ namespace osu.Game.Tests.Database
                 {
                     var beatmapInfo = s.Beatmaps.Last();
                     scoreTargetFilename = beatmapInfo.File?.Filename;
-                    s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
+                    s.Realm!.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
                 realm.Run(r => r.Refresh());
@@ -528,7 +528,7 @@ namespace osu.Game.Tests.Database
 
                 importBeforeUpdate.PerformWrite(s =>
                 {
-                    var beatmapCollection = s.Realm.Add(new BeatmapCollection("test collection"));
+                    var beatmapCollection = s.Realm!.Add(new BeatmapCollection("test collection"));
                     beatmapsToAddToCollection = s.Beatmaps.Count - (allOriginalBeatmapsInCollection ? 0 : 1);
 
                     for (int i = 0; i < beatmapsToAddToCollection; i++)
@@ -543,7 +543,7 @@ namespace osu.Game.Tests.Database
 
                 importAfterUpdate.PerformRead(updated =>
                 {
-                    updated.Realm.Refresh();
+                    updated.Realm!.Refresh();
 
                     string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
 
@@ -593,7 +593,7 @@ namespace osu.Game.Tests.Database
 
                 importBeforeUpdate.PerformWrite(s =>
                 {
-                    var beatmapCollection = s.Realm.Add(new BeatmapCollection("test collection"));
+                    var beatmapCollection = s.Realm!.Add(new BeatmapCollection("test collection"));
                     originalHash = s.Beatmaps.Single(b => b.DifficultyName == "Hard").MD5Hash;
 
                     beatmapCollection.BeatmapMD5Hashes.Add(originalHash);
@@ -607,7 +607,7 @@ namespace osu.Game.Tests.Database
 
                 importAfterUpdate.PerformRead(updated =>
                 {
-                    updated.Realm.Refresh();
+                    updated.Realm!.Refresh();
 
                     string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
                     string updatedHash = updated.Beatmaps.Single(b => b.DifficultyName == "Hard").MD5Hash;
