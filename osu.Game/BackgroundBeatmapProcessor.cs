@@ -102,7 +102,7 @@ namespace osu.Game
                             }
                         }
 
-                        r.Find<RulesetInfo>(ruleset.ShortName).LastAppliedDifficultyVersion = currentVersion;
+                        r.Find<RulesetInfo>(ruleset.ShortName)!.LastAppliedDifficultyVersion = currentVersion;
                     });
 
                     Logger.Log($"Finished resetting {countReset} beatmap sets for {ruleset.Name}");
@@ -163,8 +163,12 @@ namespace osu.Game
             {
                 foreach (var score in r.All<ScoreInfo>())
                 {
-                    if (score.Statistics.Sum(kvp => kvp.Value) > 0 && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    if (score.BeatmapInfo != null
+                        && score.Statistics.Sum(kvp => kvp.Value) > 0
+                        && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    {
                         scoreIds.Add(score.ID);
+                    }
                 }
             });
 
@@ -184,7 +188,7 @@ namespace osu.Game
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
-                        r.Find<ScoreInfo>(id).MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                        r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
                     Logger.Log($"Populated maximum statistics for score {id}");
@@ -204,7 +208,9 @@ namespace osu.Game
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>().Where(s => s.TotalScoreVersion == 30000002).AsEnumerable().Select(s => s.ID)));
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
+                                                                             .Where(s => s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .AsEnumerable().Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
@@ -237,7 +243,7 @@ namespace osu.Game
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
-                        ScoreInfo s = r.Find<ScoreInfo>(id);
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
                         s.TotalScore = newTotalScore;
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });

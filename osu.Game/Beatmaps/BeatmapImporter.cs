@@ -20,7 +20,6 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Scoring;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -69,7 +68,7 @@ namespace osu.Game.Beatmaps
 
                 Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
 
-                original = realm.Find<BeatmapSetInfo>(original.ID);
+                original = realm!.Find<BeatmapSetInfo>(original.ID)!;
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
@@ -210,8 +209,7 @@ namespace osu.Game.Beatmaps
             // Let's reattach any matching scores that exist in the database, based on hash.
             foreach (BeatmapInfo beatmap in model.Beatmaps)
             {
-                foreach (var score in realm.All<ScoreInfo>().Where(score => score.BeatmapHash == beatmap.Hash))
-                    score.BeatmapInfo = beatmap;
+                beatmap.UpdateLocalScores(realm);
             }
 
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
