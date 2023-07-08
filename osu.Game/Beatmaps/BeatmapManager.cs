@@ -208,7 +208,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
@@ -227,7 +227,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = false;
                     transaction.Commit();
@@ -330,7 +330,7 @@ namespace osu.Game.Beatmaps
             Realm.Write(r =>
             {
                 if (!beatmapInfo.IsManaged)
-                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
                 Debug.Assert(beatmapInfo.File != null);
@@ -339,6 +339,8 @@ namespace osu.Game.Beatmaps
 
                 DeleteFile(setInfo, beatmapInfo.File);
                 setInfo.Beatmaps.Remove(beatmapInfo);
+                r.Remove(beatmapInfo.Metadata);
+                r.Remove(beatmapInfo);
 
                 updateHashAndMarkDirty(setInfo);
                 workingBeatmapCache.Invalidate(setInfo);
@@ -458,12 +460,15 @@ namespace osu.Game.Beatmaps
 
                 Realm.Write(r =>
                 {
-                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
                     if (transferCollections)
                         beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+
+                    liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
+                                  .UpdateLocalScores(r);
 
                     // do not look up metadata.
                     // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.

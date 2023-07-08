@@ -48,7 +48,7 @@ namespace osu.Game.Online
             realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s =>
                 ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID)
                  || (!string.IsNullOrEmpty(s.Hash) && s.Hash == TrackedItem.Hash))
-                && !s.DeletePending), (items, _, _) =>
+                && !s.DeletePending), (items, _) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

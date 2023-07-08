@@ -64,6 +64,8 @@ namespace osu.Game.Beatmaps
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        public bool IsRewinding { get; private set; }
+
         public bool IsCoupled
         {
             get => decoupledClock.IsCoupled;
@@ -133,6 +135,9 @@ namespace osu.Game.Beatmaps
             }
             else
                 finalClockSource.ProcessFrame();
+
+            if (Clock.ElapsedFrameTime != 0)
+                IsRewinding = Clock.ElapsedFrameTime < 0;
         }
 
         public double TotalAppliedOffset

@@ -119,6 +119,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
             new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
+            new KeyBinding(InputKey.F1, GlobalAction.SaveReplay),
+            new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
         };
 
         public IEnumerable<KeyBinding> ReplayKeyBindings => new[]
@@ -127,6 +129,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
+            new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
         };
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
@@ -366,5 +369,14 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleNextBeatSnapDivisor))]
         EditorCycleNextBeatSnapDivisor,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SaveReplay))]
+        SaveReplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExportReplay))]
+        ExportReplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleReplaySettings))]
+        ToggleReplaySettings,
     }
 }

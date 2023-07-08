@@ -35,14 +35,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             var referenceBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Counters.Any(kc => kc.CountPresses.Value > 2));
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.InputCountController.Triggers.Any(kc => kc.ActivationCount.Value > 2));
 
             seekTo(referenceBeatmap.Breaks[0].StartTime);
-            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting.Value);
+            AddAssert("keys not counting", () => !Player.HUDOverlay.InputCountController.IsCounting.Value);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
 
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
-            AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Counters.All(kc => kc.CountPresses.Value == 0));
+            AddUntilStep("key counter reset", () => Player.HUDOverlay.InputCountController.Triggers.All(kc => kc.ActivationCount.Value == 0));
 
             seekTo(referenceBeatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);

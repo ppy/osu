@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -32,6 +34,9 @@ namespace osu.Game.Overlays
         public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
+
+        public IEnumerable<Notification> AllNotifications =>
+            IsLoaded ? toastTray.Notifications.Concat(sections.SelectMany(s => s.Notifications)) : Array.Empty<Notification>();
 
         private FlowContainer<NotificationSection> sections = null!;
 
@@ -103,8 +108,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, NotificationsStrings.ClearAll),
-                                        new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }, NotificationsStrings.CancelAll),
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }),
+                                        new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }
                             }
@@ -118,7 +123,7 @@ namespace osu.Game.Overlays
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value != OverlayActivation.Disabled || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -164,7 +169,7 @@ namespace osu.Game.Overlays
 
             Logger.Log($"⚠️ {notification.Text}");
 
-            notification.Closed += notificationClosed;
+            notification.Closed += () => notificationClosed(notification);
 
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
@@ -224,17 +229,20 @@ namespace osu.Game.Overlays
             mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 
-        private void notificationClosed() => Schedule(() =>
+        private void notificationClosed(Notification notification) => Schedule(() =>
         {
             updateCounts();
 
             // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
             // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
-            playDebouncedSample("UI/overlay-pop-out");
+            playDebouncedSample(notification.PopOutSampleName);
         });
 
         private void playDebouncedSample(string sampleName)
         {
+            if (string.IsNullOrEmpty(sampleName))
+                return;
+
             if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 audio.Samples.Get(sampleName)?.Play();
