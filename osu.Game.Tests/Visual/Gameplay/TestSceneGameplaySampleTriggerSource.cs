@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
-            AddStep("Add trigger source", () => Player.GameplayClockContainer.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
+            AddStep("Add trigger source", () => Player.DrawableRuleset.FrameStableComponents.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
         }
 
         [Test]
@@ -152,6 +152,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekBeforeIndex(2);
             waitForAliveObjectIndex(2);
             checkValidObjectIndex(2);
+
+            // test rewinding
+            seekBeforeIndex(1);
+            waitForAliveObjectIndex(1);
+            checkValidObjectIndex(1);
+
+            seekBeforeIndex(1, 400);
+            checkValidObjectIndex(0);
 
             seekBeforeIndex(3);
             waitForAliveObjectIndex(3);

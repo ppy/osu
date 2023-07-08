@@ -69,6 +69,14 @@ namespace osu.Game.Rulesets.UI
             hitSound.Play();
         });
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (gameplayClock?.IsRewinding == true)
+                mostValidObject = null;
+        }
+
         protected HitObject? GetMostValidObject()
         {
             if (mostValidObject == null || isAlreadyHit(mostValidObject))
