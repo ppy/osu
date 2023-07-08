@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            if (Time.Elapsed < 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return false;
 
             HitType hitType;
