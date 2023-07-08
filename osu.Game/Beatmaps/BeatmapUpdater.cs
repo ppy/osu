@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
         /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
-        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapSet.Realm.Write(r =>
+        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapSet.Realm!.Write(_ =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);

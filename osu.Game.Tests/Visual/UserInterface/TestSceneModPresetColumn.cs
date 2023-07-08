@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     var testPresets = createTestPresets();
                     foreach (var preset in testPresets)
-                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName);
+                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName)!;
 
                     realm.Add(testPresets);
                 });
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ManiaModNightcore(),
                     new ManiaModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("mania")
+                Ruleset = r.Find<RulesetInfo>("mania")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuModHidden(),
                     new OsuModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("osu")
+                Ruleset = r.Find<RulesetInfo>("osu")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
