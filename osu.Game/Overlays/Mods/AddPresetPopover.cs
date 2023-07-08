@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Mods
                 Name = nameTextBox.Current.Value,
                 Description = descriptionTextBox.Current.Value,
                 Mods = selectedMods.Value.ToArray(),
-                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)
+                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)!
             }));
 
             this.HidePopover();
