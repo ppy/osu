@@ -317,8 +317,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            return 700000 * comboProgress +
-                   300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress +
+            return 700000 * Accuracy.Value * comboProgress +
+                   300000 * Math.Pow(Accuracy.Value, 8) * accuracyProgress +
                    bonusPortion;
         }
 
