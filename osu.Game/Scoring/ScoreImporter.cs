@@ -64,6 +64,8 @@ namespace osu.Game.Scoring
 
         protected override void Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
+            Debug.Assert(model.BeatmapInfo != null);
+
             // Ensure the beatmap is not detached.
             if (!model.BeatmapInfo.IsManaged)
                 model.BeatmapInfo = realm.Find<BeatmapInfo>(model.BeatmapInfo.ID)!;
@@ -101,10 +103,12 @@ namespace osu.Game.Scoring
         /// <param name="score">The score to populate the statistics of.</param>
         public void PopulateMaximumStatistics(ScoreInfo score)
         {
+            Debug.Assert(score.BeatmapInfo != null);
+
             if (score.MaximumStatistics.Select(kvp => kvp.Value).Sum() > 0)
                 return;
 
-            var beatmap = score.BeatmapInfo.Detach();
+            var beatmap = score.BeatmapInfo!.Detach();
             var ruleset = score.Ruleset.Detach();
             var rulesetInstance = ruleset.CreateInstance();
 
