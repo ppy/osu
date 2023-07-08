@@ -34,14 +34,19 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
+        protected readonly AudioContainer AudioContainer;
+
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
 
-            InternalChild = hitSounds = new Container<SkinnableSound>
+            InternalChild = AudioContainer = new AudioContainer
             {
-                Name = "concurrent sample pool",
-                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                Child = hitSounds = new Container<SkinnableSound>
+                {
+                    Name = "concurrent sample pool",
+                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                }
             };
         }
 
@@ -64,9 +69,20 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
-            var hitSound = getNextSample();
-            hitSound.Samples = samples;
+            var hitSound = GetNextSample();
+            ApplySampleInfo(hitSound, samples);
             hitSound.Play();
+        });
+
+        protected virtual void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        {
+            hitSound.Samples = samples;
+        }
+
+        public void StopAllPlayback() => Schedule(() =>
+        {
+            foreach (var sound in hitSounds)
+                sound.Stop();
         });
 
         protected override void Update()
@@ -118,7 +134,7 @@ namespace osu.Game.Rulesets.UI
             return getAllNested(mostValidObject.HitObject).OrderBy(h => h.GetEndTime()).SkipWhile(h => h.GetEndTime() <= getReferenceTime()).FirstOrDefault() ?? mostValidObject.HitObject;
         }
 
-        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
+        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.AllJudged;
         private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
 
         private double getReferenceTime() => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
@@ -134,7 +150,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private SkinnableSound getNextSample()
+        protected SkinnableSound GetNextSample()
         {
             SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
 
