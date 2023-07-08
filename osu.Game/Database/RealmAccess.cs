@@ -897,7 +897,7 @@ namespace osu.Game.Database
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
-                        score.BeatmapHash = score.BeatmapInfo.Hash;
+                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
 
                     break;
                 }

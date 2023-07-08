@@ -171,6 +171,8 @@ namespace osu.Game.Online.Chat
 
         public abstract partial class HighlightMessageNotification : SimpleNotification
         {
+            public override string PopInSampleName => "UI/notification-mention";
+
             protected HighlightMessageNotification(Message message, Channel channel)
             {
                 this.message = message;

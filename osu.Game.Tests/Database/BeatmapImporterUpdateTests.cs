@@ -383,14 +383,14 @@ namespace osu.Game.Tests.Database
 
                     beatmapInfo.Hash = new_beatmap_hash;
                     beatmapInfo.ResetOnlineInfo();
+                    beatmapInfo.UpdateLocalScores(s.Realm!);
                 });
 
                 realm.Run(r => r.Refresh());
 
-                // for now, making changes to a beatmap doesn't remove the backlink from the score to the beatmap.
-                // the logic of ensuring that scores match the beatmap is upheld via comparing the hash in usages (https://github.com/ppy/osu/pull/22539).
-                // TODO: revisit when fixing https://github.com/ppy/osu/issues/24069.
+                // making changes to a beatmap doesn't remove the score from realm, but should disassociate the beatmap.
                 checkCount<ScoreInfo>(realm, 1);
+                Assert.That(realm.Run(r => r.All<ScoreInfo>().First().BeatmapInfo), Is.Null);
 
                 // reimport the original beatmap before local modifications
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOnlineCopy), importBeforeUpdate.Value);

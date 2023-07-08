@@ -467,6 +467,9 @@ namespace osu.Game.Beatmaps
                     if (transferCollections)
                         beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
+                    liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
+                                  .UpdateLocalScores(r);
+
                     // do not look up metadata.
                     // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
                     ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
