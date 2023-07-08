@@ -26,8 +26,6 @@ namespace osu.Game.Tests.Visual
 
         protected readonly ManualInputManager InputManager;
 
-        private readonly RoundedButton buttonLocal;
-
         private readonly Container takeControlOverlay;
 
         /// <summary>
@@ -109,7 +107,7 @@ namespace osu.Game.Tests.Visual
 
                                     Children = new Drawable[]
                                     {
-                                        buttonLocal = new RoundedButton
+                                        new RoundedButton
                                         {
                                             Text = "Take control back",
                                             Size = new Vector2(180, 30),
