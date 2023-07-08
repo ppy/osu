@@ -66,7 +66,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                 if (canFlourish)
                     lastFlourish = h.StartTime;
 
-                if (h == hitObject)
+                // hitObject can be either the strong hit itself (if hit late), or its nested strong object (if hit early)
+                // due to `GetMostValidObject()` idiosyncrasies.
+                // whichever it is, if we encounter it during iteration, stop looking.
+                if (h == hitObject || h.NestedHitObjects.Contains(hitObject))
                     return canFlourish;
             }
 
