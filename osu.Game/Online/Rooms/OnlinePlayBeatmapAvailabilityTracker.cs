@@ -107,7 +107,7 @@ namespace osu.Game.Online.Rooms
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes, _) =>
+            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes) =>
             {
                 if (changes == null)
                     return;

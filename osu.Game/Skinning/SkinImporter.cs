@@ -198,7 +198,7 @@ namespace osu.Game.Skinning
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
                 {
-                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm);
+                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm!);
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
@@ -213,9 +213,9 @@ namespace osu.Game.Skinning
                         var oldFile = s.GetFile(filename);
 
                         if (oldFile != null)
-                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm);
+                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm!);
                         else
-                            modelManager.AddFile(s, streamContent, filename, s.Realm);
+                            modelManager.AddFile(s, streamContent, filename, s.Realm!);
                     }
                 }
 
