@@ -5,6 +5,7 @@
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Ewav/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=2A66DD92_002DADB1_002D4994_002D89E2_002DC94E04ACDA0D_002Fd_003AMigrations/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D9A367C9_002D4C1A_002D489F_002D9B05_002DA0CEA2B53B58/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/GeneratedCode/GeneratedFileMasks/=g_005F_002A_002Ecs/@EntryIndexedValue">g_*.cs</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/AnalysisEnabled/@EntryValue">SOLUTION</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeAccessorOwnerBody/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeDefaultValueWhenTypeEvident/@EntryIndexedValue">WARNING</s:String>
