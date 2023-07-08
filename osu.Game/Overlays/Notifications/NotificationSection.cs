@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Notifications
 
         private void clearAll() => notifications.Children.ForEach(c =>
         {
-            if (c is not ProgressNotification p || p.CompletedOrCancelled)
+            if (c is not ProgressNotification p || !p.Ongoing)
                 c.Close(true);
         });
 
