@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         new ClearAllButton
                         {
-                            Text = NotificationsStrings.ClearAll,
+                            Text = NotificationsStrings.ClearAll.ToUpper(),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Action = clearAll
