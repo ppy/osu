@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -205,6 +206,10 @@ namespace osu.Game.Database
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
 
+            var mods = score.Mods;
+            if (mods.Any(mod => mod is ModScoreV2))
+                return score.TotalScore;
+
             var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
             if (playableBeatmap.HitObjects.Count == 0)
@@ -212,7 +217,7 @@ namespace osu.Game.Database
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
 
-            sv1Simulator.Simulate(beatmap, playableBeatmap, score.Mods);
+            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
 
             return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
             {
