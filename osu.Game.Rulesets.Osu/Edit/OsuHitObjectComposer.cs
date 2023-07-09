@@ -85,6 +85,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
+
+            RightToolbox.Add(new TransformToolboxGroup
+            {
+                RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler
+            });
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
