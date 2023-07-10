@@ -26,7 +26,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
-using osu.Game.IO.Legacy;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -914,31 +913,13 @@ namespace osu.Game.Database
 
                     foreach (var score in scores)
                     {
-                        string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
-                        if (replayFilename == null)
-                            continue;
-
-                        try
+                        score.PopulateFromReplay(files, sr =>
                         {
-                            using (var stream = files.Store.GetStream(replayFilename))
-                            {
-                                if (stream == null)
-                                    continue;
-
-                                // Trimmed down logic from LegacyScoreDecoder to extract the version from replays.
-                                using (SerializationReader sr = new SerializationReader(stream))
-                                {
-                                    sr.ReadByte(); // Ruleset.
-                                    int version = sr.ReadInt32();
-                                    if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                                        score.IsLegacyScore = true;
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
-                        }
+                            sr.ReadByte(); // Ruleset.
+                            int version = sr.ReadInt32();
+                            if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                score.IsLegacyScore = true;
+                        });
                     }
 
                     break;
@@ -999,52 +980,34 @@ namespace osu.Game.Database
                         if (!score.IsLegacyScore || !score.Ruleset.IsLegacyRuleset())
                             continue;
 
-                        string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
-                        if (replayFilename == null)
-                            continue;
-
-                        try
+                        score.PopulateFromReplay(files, sr =>
                         {
-                            using (var stream = files.Store.GetStream(replayFilename))
-                            {
-                                if (stream == null)
-                                    continue;
+                            sr.ReadByte(); // Ruleset.
+                            sr.ReadInt32(); // Version.
+                            sr.ReadString(); // Beatmap hash.
+                            sr.ReadString(); // Username.
+                            sr.ReadString(); // MD5Hash.
+                            sr.ReadUInt16(); // Count300.
+                            sr.ReadUInt16(); // Count100.
+                            sr.ReadUInt16(); // Count50.
+                            sr.ReadUInt16(); // CountGeki.
+                            sr.ReadUInt16(); // CountKatu.
+                            sr.ReadUInt16(); // CountMiss.
 
-                                // Trimmed down logic from LegacyScoreDecoder to extract the mods bitmask.
-                                using (SerializationReader sr = new SerializationReader(stream))
-                                {
-                                    sr.ReadByte(); // Ruleset.
-                                    sr.ReadInt32(); // Version.
-                                    sr.ReadString(); // Beatmap hash.
-                                    sr.ReadString(); // Username.
-                                    sr.ReadString(); // MD5Hash.
-                                    sr.ReadUInt16(); // Count300.
-                                    sr.ReadUInt16(); // Count100.
-                                    sr.ReadUInt16(); // Count50.
-                                    sr.ReadUInt16(); // CountGeki.
-                                    sr.ReadUInt16(); // CountKatu.
-                                    sr.ReadUInt16(); // CountMiss.
+                            // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
+                            int totalScore = sr.ReadInt32();
 
-                                    // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
-                                    int totalScore = sr.ReadInt32();
+                            sr.ReadUInt16(); // Max combo.
+                            sr.ReadBoolean(); // Perfect.
 
-                                    sr.ReadUInt16(); // Max combo.
-                                    sr.ReadBoolean(); // Perfect.
+                            var legacyMods = (LegacyMods)sr.ReadInt32();
 
-                                    var legacyMods = (LegacyMods)sr.ReadInt32();
+                            if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                                return;
 
-                                    if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
-                                        continue;
-
-                                    score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
-                                    score.LegacyTotalScore = score.TotalScore = totalScore;
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
-                        }
+                            score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
+                            score.LegacyTotalScore = score.TotalScore = totalScore;
+                        });
                     }
 
                     break;
