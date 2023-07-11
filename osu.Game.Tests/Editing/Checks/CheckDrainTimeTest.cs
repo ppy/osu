@@ -26,35 +26,25 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestDrainTimeShort()
         {
-            assertShortDrainTime(getShortDrainTimeBeatmap());
-        }
-
-        [Test]
-        public void TestDrainTimeBreak()
-        {
-            assertShortDrainTime(getLongBreakBeatmap());
-        }
-
-        [Test]
-        public void TestDrainTimeCorrect()
-        {
-            assertOk(getCorrectDrainTimeBeatmap());
-        }
-
-        private IBeatmap getShortDrainTimeBeatmap()
-        {
-            return new Beatmap<HitObject>
+            var beatmap = new Beatmap<HitObject>
             {
                 HitObjects =
                 {
                     new HitCircle { StartTime = 0 }
                 }
             };
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckDrainTime.IssueTemplateTooShort);
         }
 
-        private IBeatmap getLongBreakBeatmap()
+        [Test]
+        public void TestDrainTimeBreak()
         {
-            return new Beatmap<HitObject>
+            var beatmap = new Beatmap<HitObject>
             {
                 HitObjects =
                 {
@@ -62,41 +52,28 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 30 }
                 }
             };
-        }
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
 
-        private IBeatmap getCorrectDrainTimeBeatmap()
-        {
-            var hitObjects = new List<HitObject>();
-
-            for (int i = 0; i <= 30; ++i)
-            {
-                hitObjects.Add(new HitCircle { StartTime = 1000 * i });
-            }
-
-            return new Beatmap<HitObject>
-            {
-                HitObjects = hitObjects
-            };
-        }
-
-        private void assertShortDrainTime(IBeatmap beatmap)
-        {
-            var issues = check.Run(getContext(beatmap)).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckDrainTime.IssueTemplateTooShort);
         }
 
-        private void assertOk(IBeatmap beatmap)
+        [Test]
+        public void TestDrainTimeCorrect()
         {
-            var issues = check.Run(getContext(beatmap)).ToList();
+            var hitObjects = new List<HitObject>();
+
+            for (int i = 0; i <= 30; ++i)
+                hitObjects.Add(new HitCircle { StartTime = 1000 * i });
+
+            var beatmap = new Beatmap<HitObject> { HitObjects = hitObjects };
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Is.Empty);
-        }
-
-        private BeatmapVerifierContext getContext(IBeatmap beatmap)
-        {
-            return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }
     }
 }
