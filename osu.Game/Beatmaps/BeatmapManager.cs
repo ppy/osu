@@ -44,7 +44,9 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        private readonly LegacyBeatmapExporter beatmapExporter;
+        private readonly BeatmapExporter beatmapExporter;
+
+        private readonly LegacyBeatmapExporter legacyBeatmapExporter;
 
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
@@ -81,7 +83,12 @@ namespace osu.Game.Beatmaps
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
-            beatmapExporter = new LegacyBeatmapExporter(storage)
+            beatmapExporter = new BeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
+
+            legacyBeatmapExporter = new LegacyBeatmapExporter(storage)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -443,7 +450,7 @@ namespace osu.Game.Beatmaps
                 });
             }
 
-            return beatmapExporter.ExportAsync(new RealmLiveUnmanaged<BeatmapSetInfo>(clone));
+            return legacyBeatmapExporter.ExportAsync(new RealmLiveUnmanaged<BeatmapSetInfo>(clone));
         }
 
         private void convertAndEncodeLegacyBeatmap(IBeatmap beatmapContent, ISkin beatmapSkin, Stream stream)

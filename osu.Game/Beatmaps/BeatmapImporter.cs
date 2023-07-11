@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz", ".osz2" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
@@ -145,7 +145,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
+        protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
