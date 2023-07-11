@@ -90,6 +90,19 @@ namespace osu.Game.Beatmaps
             return ID == other.ID;
         }
 
+        public BeatmapSetInfo Clone()
+        {
+            var clone = (BeatmapSetInfo)this.Detach().MemberwiseClone();
+
+            for (int i = 0; i < clone.Beatmaps.Count; i++)
+                clone.Beatmaps[i] = clone.Beatmaps[i].Clone();
+
+            for (int i = 0; i < clone.Files.Count; i++)
+                clone.Files[i] = new RealmNamedFileUsage(clone.Files[i].File, clone.Files[i].Filename);
+
+            return clone;
+        }
+
         public override string ToString() => Metadata.GetDisplayString();
 
         public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);

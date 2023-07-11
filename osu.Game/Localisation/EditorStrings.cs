@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportPackage => new TranslatableString(getKey(@"export_package"), @"Export package");
 
         /// <summary>
+        /// "Export legacy package"
+        /// </summary>
+        public static LocalisableString ExportLegacyPackage => new TranslatableString(getKey(@"export_legacy_package"), @"Export legacy package");
+
+        /// <summary>
         /// "Create new difficulty"
         /// </summary>
         public static LocalisableString CreateNewDifficulty => new TranslatableString(getKey(@"create_new_difficulty"), @"Create new difficulty");

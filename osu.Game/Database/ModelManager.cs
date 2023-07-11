@@ -33,6 +33,8 @@ namespace osu.Game.Database
             Realm = realm;
         }
 
+        public Stream ReadFile(RealmNamedFileUsage file) => realmFileStore.Storage.GetStream(file.File.GetStoragePath());
+
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
             performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm));
 
