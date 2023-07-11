@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score);
+            double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
             double totalValue =
                 Math.Pow(
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
 
-            aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+            aimValue *= 1.0 + approachRateFactor;
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
@@ -138,8 +138,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
-
-            aimValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
 
             return aimValue;
         }
@@ -165,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
 
-            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+            speedValue *= 1.0 + approachRateFactor;
 
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
@@ -184,12 +182,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedValue;
         }
 
-        private double computeAccuracyValue(ScoreInfo score)
+        private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (score.Mods.Any(h => h is OsuModRelax) || totalSuccessfulHits == 0)
                 return 0.0;
 
-            double accuracyValue = 477.793 * Math.Exp(-0.197612 * deviation);
+            double od = attributes.OverallDifficulty;
+            double n = attributes.HitCircleCount;
+
+            double liveLengthBonus = Math.Min(1.15, Math.Pow(n / 1000, 0.3)); // Should eventually be removed.
+
+            // Some fancy stuff to ensure SS values stay the same.
+            double scaling = -Math.Sqrt(2) * SpecialFunctions.ErfInv(n / (n + 1)) * Math.Log(Math.Pow(1.52163, od - 40.0 / 3) * liveLengthBonus) / (80 - 6 * od);
+
+            // Accuracy pp formula that's roughly the same as live.
+            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * Math.Exp(-scaling * deviation);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
