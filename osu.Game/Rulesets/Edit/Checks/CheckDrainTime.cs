@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double drainTime = context.Beatmap.CalculatePlayableLength();
+            double drainTime = context.Beatmap.CalculatePlayableLength() - context.Beatmap.TotalBreakTime;
 
             if (drainTime < min_drain_threshold)
                 yield return new IssueTemplateTooShort(this).Create((int)(drainTime / 1000));
