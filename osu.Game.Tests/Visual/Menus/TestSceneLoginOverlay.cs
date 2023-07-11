@@ -3,10 +3,14 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Users.Drawables;
@@ -18,6 +22,9 @@ namespace osu.Game.Tests.Visual.Menus
     public partial class TestSceneLoginOverlay : OsuManualInputManagerTestScene
     {
         private LoginOverlay loginOverlay = null!;
+
+        [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
 
         private OsuPasswordTextBox passwordTextBox => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First();
 
@@ -84,5 +91,29 @@ namespace osu.Game.Tests.Visual.Menus
             });
             AddAssert("login overlay is hidden", () => loginOverlay.State.Value == Visibility.Hidden);
         }
+
+        [Test]
+        public void TestPastePasswordWithTouch()
+        {
+            const string sample_password = "hunter2";
+
+            AddStep("logout", () => API.Logout());
+            AddStep("set clipboard text", () => clipboard.SetText(sample_password));
+
+            AddStep("begin touch for right click", () => InputManager.BeginTouch(getCenteredTouch(passwordTextBox)));
+            AddUntilStep("wait for context menu to show", () => loginOverlay.ChildrenOfType<OsuContextMenu>().First().IsPresent);
+            AddStep("end touch", () => InputManager.EndTouch(getCenteredTouch(passwordTextBox)));
+
+            AddStep("touch 'Paste'", () =>
+            {
+                var pasteMenuItem = loginOverlay.ChildrenOfType<DrawableOsuMenuItem>().First(d => d.Item.Text.Value == CommonStrings.Paste);
+                InputManager.BeginTouch(getCenteredTouch(pasteMenuItem));
+                InputManager.EndTouch(getCenteredTouch(pasteMenuItem));
+            });
+
+            AddAssert("pasted from clipboard", () => passwordTextBox.Text, () => Is.EqualTo(sample_password));
+        }
+
+        private static Touch getCenteredTouch(Drawable drawable) => new Touch(TouchSource.Touch1, drawable.ToScreenSpace(drawable.LayoutRectangle.Centre));
     }
 }
