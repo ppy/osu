@@ -14,17 +14,20 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuTextBox : BasicTextBox
+    public partial class OsuTextBox : BasicTextBox, IHasContextMenu
     {
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
@@ -35,6 +38,31 @@ namespace osu.Game.Graphics.UserInterface
         protected override float LeftRightPadding => 10;
 
         protected override float CaretWidth => 3;
+
+        [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
+
+        public MenuItem[]? ContextMenuItems
+        {
+            get
+            {
+                if (ReadOnly)
+                    return null;
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem(CommonStrings.Paste, MenuItemType.Highlighted, () =>
+                    {
+                        InsertString(clipboard.GetText());
+                        Schedule(() => GetContainingInputManager()?.ChangeFocus(this));
+                    })
+                    {
+                        // disable the item if there's nothing to paste.
+                        Action = { Disabled = string.IsNullOrEmpty(clipboard.GetText()) }
+                    }
+                };
+            }
+        }
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
