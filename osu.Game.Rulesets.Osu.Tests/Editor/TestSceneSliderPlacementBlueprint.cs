@@ -62,6 +62,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestPlaceWithMouseMovementOutsidePlayfield()
+        {
+            addMovementStep(new Vector2(200));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(1400, 200));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertLength(1200);
+            assertControlPointCount(2);
+            assertControlPointType(0, PathType.Linear);
+        }
+
+        [Test]
         public void TestPlaceNormalControlPoint()
         {
             addMovementStep(new Vector2(200));
