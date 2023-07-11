@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
@@ -125,8 +125,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", Color4.YellowGreen, new ScoreProcessor(new OsuRuleset()), ScoringMode.Standardised);
-            runForProcessor("lazer-classic", Color4.MediumPurple, new ScoreProcessor(new OsuRuleset()), ScoringMode.Classic);
+            runForProcessor("lazer-standardised", Color4.YellowGreen, new OsuScoreProcessor(), ScoringMode.Standardised);
+            runForProcessor("lazer-classic", Color4.MediumPurple, new OsuScoreProcessor(), ScoringMode.Classic);
 
             runScoreV1();
             runScoreV2();
