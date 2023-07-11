@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -20,19 +19,19 @@ namespace osu.Game.Tests.Visual.Menus
     {
         private LoginOverlay loginOverlay = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = loginOverlay = new LoginOverlay
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
-        }
+        private OsuPasswordTextBox passwordTextBox => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First();
 
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("create login overlay", () =>
+            {
+                Child = loginOverlay = new LoginOverlay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
             AddStep("show login overlay", () => loginOverlay.Show());
         }
 
@@ -41,7 +40,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             AddStep("logout", () => API.Logout());
 
-            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("enter password", () => passwordTextBox.Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
         }
 
@@ -54,7 +53,7 @@ namespace osu.Game.Tests.Visual.Menus
                 ((DummyAPIAccess)API).FailNextLogin();
             });
 
-            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("enter password", () => passwordTextBox.Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
         }
 
@@ -67,7 +66,7 @@ namespace osu.Game.Tests.Visual.Menus
                 ((DummyAPIAccess)API).PauseOnConnectingNextLogin();
             });
 
-            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("enter password", () => passwordTextBox.Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
         }
 
@@ -75,7 +74,7 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestClickingOnFlagClosesOverlay()
         {
             AddStep("logout", () => API.Logout());
-            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("enter password", () => passwordTextBox.Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
 
             AddStep("click on flag", () =>
