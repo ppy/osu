@@ -966,6 +966,7 @@ namespace osu.Game.Screens.Edit
         {
             new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
             new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            new EditorMenuItem(EditorStrings.ExportLegacyPackage, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
             new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
@@ -979,6 +980,12 @@ namespace osu.Game.Screens.Edit
         {
             Save();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void exportLegacyBeatmap()
+        {
+            Save();
+            beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
         }
 
         /// <summary>
