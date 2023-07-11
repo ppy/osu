@@ -31,7 +31,8 @@ namespace osu.Game.Tests.Editing.Checks
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 0 }
+                    new HitCircle { StartTime = 0 },
+                    new HitCircle { StartTime = 29_999 }
                 }
             };
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
