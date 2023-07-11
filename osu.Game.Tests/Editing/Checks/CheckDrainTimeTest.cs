@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -49,7 +50,11 @@ namespace osu.Game.Tests.Editing.Checks
                 HitObjects =
                 {
                     new HitCircle { StartTime = 0 },
-                    new HitCircle { StartTime = 30 }
+                    new HitCircle { StartTime = 40_000 }
+                },
+                Breaks = new List<BreakPeriod>
+                {
+                    new BreakPeriod(10_000, 21_000)
                 }
             };
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
