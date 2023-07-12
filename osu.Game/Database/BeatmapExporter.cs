@@ -6,6 +6,10 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// Exporter for beatmap archives.
+    /// This is not for legacy purposes and works for lazer only.
+    /// </summary>
     public class BeatmapExporter : LegacyArchiveExporter<BeatmapSetInfo>
     {
         public BeatmapExporter(Storage storage)
