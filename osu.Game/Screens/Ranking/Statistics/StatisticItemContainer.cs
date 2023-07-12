@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(5) { Top = 20 },
+                                Padding = new MarginPadding(10) { Top = 30 },
                                 Child = item.CreateContent().With(d => d.RelativeSizeAxes = Axes.Both)
                             }
                         }
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             return new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 15,
+                Height = 20,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
