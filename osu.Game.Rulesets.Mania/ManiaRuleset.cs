@@ -157,6 +157,9 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlagFast(LegacyMods.Mirror))
                 yield return new ManiaModMirror();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -283,6 +286,12 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new ManiaModMuted(),
                         new ModAdaptiveSpeed()
+                    };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
                     };
 
                 default:
