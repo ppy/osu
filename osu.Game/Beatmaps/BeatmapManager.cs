@@ -18,18 +18,14 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Beatmaps
 {
@@ -411,86 +407,7 @@ namespace osu.Game.Beatmaps
 
         public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
-        /// <summary>
-        /// Creates a copy of the <see cref="BeatmapSetInfo"/> and converts all beatmaps to legacy format, then exports it as a legacy package.
-        /// </summary>
-        /// <param name="beatmapSetInfo"></param>
-        /// <returns></returns>
-        public Task ExportLegacy(BeatmapSetInfo beatmapSetInfo)
-        {
-            // Create a clone of the original beatmap set which we will convert to legacy format and then export
-            var clone = new BeatmapSetInfo(beatmapSetInfo.Beatmaps.Select(b => b.Clone()));
-            clone.Files.AddRange(beatmapSetInfo.Files.Select(f => new RealmNamedFileUsage(f.File, f.Filename)));
-
-            // convert all beatmaps in the cloned beatmap set to legacy format
-            foreach (var beatmapInfo in clone.Beatmaps)
-            {
-                beatmapInfo.BeatmapSet = clone;
-                beatmapInfo.ID = Guid.NewGuid();
-
-                var file = beatmapInfo.File;
-                if (file == null)
-                    continue;
-
-                using var contentStream = RealmFileStore.Storage.GetStream(file.File.GetStoragePath());
-                using var contentStreamReader = new LineBufferedReader(contentStream);
-                var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
-
-                using var skinStream = RealmFileStore.Storage.GetStream(file.File.GetStoragePath());
-                using var skinStreamReader = new LineBufferedReader(contentStream);
-                var beatmapSkin = new LegacySkin(new SkinInfo(), null!)
-                {
-                    Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
-                };
-
-                Realm.Realm.Write(realm =>
-                {
-                    using var stream = new MemoryStream();
-                    convertAndEncodeLegacyBeatmap(beatmapContent, beatmapSkin, stream);
-
-                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
-                    beatmapInfo.Hash = stream.ComputeSHA2Hash();
-
-                    file.File = RealmFileStore.Add(stream, realm).Detach();
-                });
-            }
-
-            return legacyBeatmapExporter.ExportAsync(new RealmLiveUnmanaged<BeatmapSetInfo>(clone));
-        }
-
-        private void convertAndEncodeLegacyBeatmap(IBeatmap beatmapContent, ISkin beatmapSkin, Stream stream)
-        {
-            // Convert beatmap elements to be compatible with legacy format
-            // So we truncate time and position values to integers, and convert paths with multiple segments to bezier curves
-            foreach (var controlPoint in beatmapContent.ControlPointInfo.AllControlPoints)
-                controlPoint.Time = Math.Floor(controlPoint.Time);
-
-            foreach (var hitObject in beatmapContent.HitObjects)
-            {
-                hitObject.StartTime = Math.Floor(hitObject.StartTime);
-
-                if (hitObject is not IHasPath hasPath || BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
-
-                var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
-
-                // Truncate control points to integer positions
-                foreach (var pathControlPoint in newControlPoints)
-                {
-                    pathControlPoint.Position = new Vector2(
-                        (float)Math.Floor(pathControlPoint.Position.X),
-                        (float)Math.Floor(pathControlPoint.Position.Y));
-                }
-
-                hasPath.Path.ControlPoints.Clear();
-                hasPath.Path.ControlPoints.AddRange(newControlPoints);
-            }
-
-            // Encode to legacy format
-            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
-
-            stream.Seek(0, SeekOrigin.Begin);
-        }
+        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
