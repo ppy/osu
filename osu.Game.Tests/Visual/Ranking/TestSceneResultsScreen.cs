@@ -82,7 +82,10 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both
                 };
 
-                stack.Push(screen = createResultsScreen());
+                var score = TestResources.CreateTestScoreInfo();
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+
+                stack.Push(screen = createResultsScreen(score));
             });
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay not present", () => screen.RetryOverlay == null);
