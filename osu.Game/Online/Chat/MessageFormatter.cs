@@ -279,10 +279,6 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
-            string empty = "";
-            while (space-- > 0)
-                empty += "\0";
-
             return result;
         }
 
