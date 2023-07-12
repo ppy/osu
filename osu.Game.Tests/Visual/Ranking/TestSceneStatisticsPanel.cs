@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestScoreWithPositionStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
-            score.HitEvents = createPositionDistributedHitEvents();
+            score.HitEvents = CreatePositionDistributedHitEvents();
 
             loadPanel(score);
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        private static List<HitEvent> createPositionDistributedHitEvents()
+        public static List<HitEvent> CreatePositionDistributedHitEvents()
         {
             var hitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
 
