@@ -183,7 +183,6 @@ namespace osu.Game.Tests.Resources
             Accuracy = 0.95,
             MaxCombo = 999,
             Position = 1,
-            OnlineID = 1234,
             Rank = ScoreRank.S,
             Date = DateTimeOffset.Now,
             Statistics = new Dictionary<HitResult, int>

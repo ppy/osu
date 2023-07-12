@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestScoreWithPositionStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
+            score.OnlineID = 1234;
             score.HitEvents = CreatePositionDistributedHitEvents();
 
             loadPanel(score);
