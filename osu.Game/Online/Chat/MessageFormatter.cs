@@ -283,8 +283,6 @@ namespace osu.Game.Online.Chat
             while (space-- > 0)
                 empty += "\0";
 
-            handleMatches(emoji_regex, empty, "{0}", result, startIndex);
-
             return result;
         }
 
