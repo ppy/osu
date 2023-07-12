@@ -5,10 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
+using osu.Game.IO.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -205,6 +209,10 @@ namespace osu.Game.Database
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
 
+            var mods = score.Mods;
+            if (mods.Any(mod => mod is ModScoreV2))
+                return score.TotalScore;
+
             var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
             if (playableBeatmap.HitObjects.Count == 0)
@@ -212,7 +220,7 @@ namespace osu.Game.Database
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
 
-            sv1Simulator.Simulate(beatmap, playableBeatmap, score.Mods);
+            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
 
             return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
             {
@@ -279,6 +287,38 @@ namespace osu.Game.Database
 
                 default:
                     return score.TotalScore;
+            }
+        }
+
+        /// <summary>
+        /// Used to populate the <paramref name="score"/> model using data parsed from its corresponding replay file.
+        /// </summary>
+        /// <param name="score">The score to run population from replay for.</param>
+        /// <param name="files">A <see cref="RealmFileStore"/> instance to use for fetching replay.</param>
+        /// <param name="populationFunc">
+        /// Delegate describing the population to execute.
+        /// The delegate's argument is a <see cref="SerializationReader"/> instance which permits to read data from the replay stream.
+        /// </param>
+        public static void PopulateFromReplay(this ScoreInfo score, RealmFileStore files, Action<SerializationReader> populationFunc)
+        {
+            string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
+            if (replayFilename == null)
+                return;
+
+            try
+            {
+                using (var stream = files.Store.GetStream(replayFilename))
+                {
+                    if (stream == null)
+                        return;
+
+                    using (SerializationReader sr = new SerializationReader(stream))
+                        populationFunc.Invoke(sr);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
             }
         }
 
