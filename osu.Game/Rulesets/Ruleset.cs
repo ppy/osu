@@ -192,6 +192,10 @@ namespace osu.Game.Rulesets
                     case ModAutoplay:
                         value |= LegacyMods.Autoplay;
                         break;
+
+                    case ModScoreV2:
+                        value |= LegacyMods.ScoreV2;
+                        break;
                 }
             }
 
