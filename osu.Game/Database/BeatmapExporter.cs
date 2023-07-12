@@ -17,6 +17,6 @@ namespace osu.Game.Database
         {
         }
 
-        protected override string FileExtension => @".osz2";
+        protected override string FileExtension => @".olz";
     }
 }
