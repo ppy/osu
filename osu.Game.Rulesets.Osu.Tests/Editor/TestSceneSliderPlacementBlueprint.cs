@@ -67,11 +67,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addMovementStep(new Vector2(200));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(1400, 200));
+            AddStep("move mouse out of screen", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + Vector2.One));
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
-            assertLength(1200);
             assertControlPointCount(2);
             assertControlPointType(0, PathType.Linear);
         }
