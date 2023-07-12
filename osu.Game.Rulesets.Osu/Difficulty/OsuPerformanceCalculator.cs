@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14;
 
+        private const double od_to_normalize_into = 10;
+        private const double normalized_hit_window300 = 80 - 6 * od_to_normalize_into;
+        private const double normalized_hit_window100 = 140 - 8 * od_to_normalize_into;
+        private const double normalized_hit_window50 = 200 - 10 * od_to_normalize_into;
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -119,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
 
-            aimValue *= 1.0 + approachRateFactor;
+            aimValue *= 1.0 + approachRateFactor * lengthBonus;
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
@@ -139,7 +144,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= sliderNerfFactor;
             }
 
-            aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
+            aimValue *= 0.98 + Math.Pow(od_to_normalize_into, 2) / 2500;
+
+            double deviationRoot2 = Math.Sqrt(2) * deviation;
+            double accuracyOnNormalizedOd = 2.0 / 3 * SpecialFunctions.Erf(normalized_hit_window300 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window100 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window50 / deviationRoot2);
+
+            aimValue *= accuracyOnNormalizedOd;
 
             return aimValue;
         }
@@ -165,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
 
-            speedValue *= 1.0 + approachRateFactor;
+            speedValue *= 1.0 + approachRateFactor * lengthBonus;
 
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
@@ -178,10 +190,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            // Scale the speed value with speed deviation
-            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation));
+            double deviationRoot2 = Math.Sqrt(2) * deviation;
+            double speedDeviationRoot2 = Math.Sqrt(2) * speedDeviation;
 
-            speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
+            double accuracyOnNormalizedOd = 2.0 / 3 * SpecialFunctions.Erf(normalized_hit_window300 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window100 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window50 / deviationRoot2);
+
+            double speedAccuracyOnNormalizedOd = 2.0 / 3 * SpecialFunctions.Erf(normalized_hit_window300 / speedDeviationRoot2) +
+                                                 1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window100 / speedDeviationRoot2) +
+                                                 1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window50 / speedDeviationRoot2);
+
+            speedValue *= (0.95 + Math.Pow(od_to_normalize_into, 2) / 750) * Math.Pow((accuracyOnNormalizedOd + speedAccuracyOnNormalizedOd) / 2, (14.5 - Math.Max(8, od_to_normalize_into)) / 2);
 
             return speedValue;
         }
@@ -194,13 +214,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double liveLengthBonus = Math.Min(1.15, Math.Pow(hitCircleCount / 1000.0, 0.3)); // Should eventually be removed.
-            double threshold = 1000 * Math.Pow(1.15, 1 / 0.3); // Number of objects until length bonus caps.
 
-            // Some fancy stuff to ensure SS values stay the same.
-            double scaling = Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(hitCircleCount, threshold))) / 6;
+            double deviationRoot2 = Math.Sqrt(2) * deviation;
+            double accuracyOnNormalizedOd = 2.0 / 3 * SpecialFunctions.Erf(normalized_hit_window300 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window100 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window50 / deviationRoot2);
 
-            // Accuracy pp formula that's roughly the same as live.
-            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * deviation);
+            // Accuracy pp formula that's the same as live.
+            double accuracyValue = 2.83 * Math.Pow(1.52163, od_to_normalize_into) * liveLengthBonus * Math.Pow(accuracyOnNormalizedOd, 24);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -231,8 +252,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
-            // Scale the flashlight value with deviation
-            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
+            flashlightValue *= 0.98 + Math.Pow(od_to_normalize_into, 2) / 2500;
+
+            double deviationRoot2 = Math.Sqrt(2) * deviation;
+            double accuracyOnNormalizedOd = 2.0 / 3 * SpecialFunctions.Erf(normalized_hit_window300 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window100 / deviationRoot2) +
+                                            1.0 / 6 * SpecialFunctions.Erf(normalized_hit_window50 / deviationRoot2);
+
+            flashlightValue *= 0.5 + accuracyOnNormalizedOd / 2.0;
 
             return flashlightValue;
         }
