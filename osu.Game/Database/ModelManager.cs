@@ -25,11 +25,11 @@ namespace osu.Game.Database
 
         protected RealmAccess Realm { get; }
 
-        protected readonly RealmFileStore RealmFileStore;
+        private readonly RealmFileStore realmFileStore;
 
         public ModelManager(Storage storage, RealmAccess realm)
         {
-            RealmFileStore = new RealmFileStore(realm, storage);
+            realmFileStore = new RealmFileStore(realm, storage);
             Realm = realm;
         }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Database
         /// </summary>
         public void ReplaceFile(RealmNamedFileUsage file, Stream contents, Realm realm)
         {
-            file.File = RealmFileStore.Add(contents, realm);
+            file.File = realmFileStore.Add(contents, realm);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            var file = RealmFileStore.Add(contents, realm);
+            var file = realmFileStore.Add(contents, realm);
             var namedUsage = new RealmNamedFileUsage(file, filename);
 
             item.Files.Add(namedUsage);
