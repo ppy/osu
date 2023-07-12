@@ -87,7 +87,44 @@ namespace osu.Game.Tests.Visual.Ranking
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
                 Score = { Value = score },
-                StatisticsUpdate = { Value = new SoloStatisticsUpdate(score, new UserStatistics(), new UserStatistics()) }
+                StatisticsUpdate =
+                {
+                    Value = new SoloStatisticsUpdate(score, new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 20,
+                        },
+                        GlobalRank = 38000,
+                        CountryRank = 12006,
+                        PP = 2134,
+                        RankedScore = 21123849,
+                        Accuracy = 0.985,
+                        PlayCount = 13375,
+                        PlayTime = 354490,
+                        TotalScore = 128749597,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    }, new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 30,
+                        },
+                        GlobalRank = 36000,
+                        CountryRank = 12000,
+                        PP = (decimal)2134.5,
+                        RankedScore = 23897015,
+                        Accuracy = 0.984,
+                        PlayCount = 13376,
+                        PlayTime = 35789,
+                        TotalScore = 132218497,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    })
+                }
             };
         });
 
