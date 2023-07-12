@@ -54,7 +54,8 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = StatisticItem.FONT_SIZE * 2,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -98,7 +99,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Font = OsuFont.Default.With(weight: FontWeight.Bold)
+                            Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                         }
                     }
                 }

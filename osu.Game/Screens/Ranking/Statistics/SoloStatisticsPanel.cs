@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 items = items.Append(new StatisticItem("Overall Ranking", () => new OverallRanking
                 {
                     StatisticsUpdate = { BindTarget = StatisticsUpdate }
-                }, relativeSize: new Vector2(1, 0.25f))).ToArray();
+                }, relativeSize: new Vector2(1, 0.22f))).ToArray();
             }
 
             return items;
