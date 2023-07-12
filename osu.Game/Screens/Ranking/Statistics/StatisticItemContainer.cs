@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
         public StatisticItemContainer(StatisticItem item)
         {
-            RelativeSizeAxes = Axes.Both;
-            Size = item.RelativeSize;
+            RelativeSizeAxes = Axes.X;
+            Size = item.RelativeSize * new Vector2(1, 720);
 
             Padding = new MarginPadding(5);
 

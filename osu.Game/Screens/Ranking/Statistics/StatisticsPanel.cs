@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     content = new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 640,
+                        AutoSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
@@ -113,11 +113,12 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 if (!hitEventsAvailable && statisticItems.All(c => c.RequiresHitEvents))
                 {
-                    container = new FillFlowContainer
+                    container = flow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
@@ -135,13 +136,18 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     container = new GridContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Alpha = 0,
                         ColumnDimensions = new[]
                         {
                             new Dimension(),
                             new Dimension(GridSizeMode.Distributed, 540, 540, 720),
                             new Dimension(),
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize)
                         },
                         Content = new[]
                         {
@@ -150,12 +156,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 Empty(),
                                 scroll = new OsuScrollContainer(Direction.Vertical)
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = false,
+                                    RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
                                         flow = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Full,
                                         }
                                     }
@@ -223,7 +231,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             base.Update();
             if (flow != null)
-                flow.Height = scroll.DrawHeight;
+                scroll.Height = flow.DrawHeight;
         }
 
         protected override bool OnClick(ClickEvent e)
