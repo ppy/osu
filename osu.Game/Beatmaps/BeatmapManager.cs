@@ -432,10 +432,15 @@ namespace osu.Game.Beatmaps
                 if (file == null)
                     continue;
 
-                var beatmapContent = new LegacyBeatmapDecoder().Decode(new LineBufferedReader(RealmFileStore.Storage.GetStream(file.File.GetStoragePath())));
+                using var contentStream = RealmFileStore.Storage.GetStream(file.File.GetStoragePath());
+                using var contentStreamReader = new LineBufferedReader(contentStream);
+                var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
+
+                using var skinStream = RealmFileStore.Storage.GetStream(file.File.GetStoragePath());
+                using var skinStreamReader = new LineBufferedReader(contentStream);
                 var beatmapSkin = new LegacySkin(new SkinInfo(), null!)
                 {
-                    Configuration = new LegacySkinDecoder().Decode(new LineBufferedReader(RealmFileStore.Storage.GetStream(file.File.GetStoragePath())))
+                    Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
                 };
 
                 Realm.Realm.Write(realm =>
