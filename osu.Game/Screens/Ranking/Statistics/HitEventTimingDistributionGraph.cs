@@ -211,7 +211,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly bool isCentre;
             private readonly float totalValue;
 
-            private float basalHeight;
+            private const float minimum_height = 0.02f;
+
             private float offsetAdjustment;
 
             private Circle[] boxOriginals = null!;
@@ -256,15 +257,17 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     // A bin with no value draws a grey dot instead.
-                    Circle dot = new Circle
+                    InternalChildren = boxOriginals = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Colour = isCentre ? Color4.White : Color4.Gray,
-                        Height = 0,
+                        new Circle
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Colour = isCentre ? Color4.White : Color4.Gray,
+                            Height = 0,
+                        }
                     };
-                    InternalChildren = boxOriginals = new[] { dot };
                 }
             }
 
@@ -272,31 +275,24 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 base.LoadComplete();
 
-                if (!values.Any())
-                    return;
-
-                updateBasalHeight();
-
-                foreach (var boxOriginal in boxOriginals)
-                {
-                    boxOriginal.Y = 0;
-                    boxOriginal.Height = basalHeight;
-                }
-
                 float offsetValue = 0;
 
-                for (int i = 0; i < values.Count; i++)
+                for (int i = 0; i < boxOriginals.Length; i++)
                 {
-                    boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
-                    boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
-                    offsetValue -= values[i].Value;
-                }
-            }
+                    int value = i < values.Count ? values[i].Value : 0;
 
-            protected override void Update()
-            {
-                base.Update();
-                updateBasalHeight();
+                    var box = boxOriginals[i];
+
+                    box.Y = 0;
+                    box.Height = 0;
+
+                    box.MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
+                    box.ResizeHeightTo(heightForValue(value), duration, Easing.OutQuint);
+                    offsetValue -= value;
+                }
+
+                if (boxAdjustment != null)
+                    drawAdjustmentBar();
             }
 
             public void UpdateOffset(float adjustment)
@@ -324,43 +320,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 drawAdjustmentBar();
             }
 
-            private void updateBasalHeight()
-            {
-                float newBasalHeight = DrawHeight > DrawWidth ? DrawWidth / DrawHeight : 1;
+            private float offsetForValue(float value) => (1 - minimum_height) * value / maxValue;
 
-                if (newBasalHeight == basalHeight)
-                    return;
-
-                basalHeight = newBasalHeight;
-                foreach (var dot in boxOriginals)
-                    dot.Height = basalHeight;
-
-                draw();
-            }
-
-            private float offsetForValue(float value) => (1 - basalHeight) * value / maxValue;
-
-            private float heightForValue(float value) => MathF.Max(basalHeight + offsetForValue(value), 0);
-
-            private void draw()
-            {
-                resizeBars();
-
-                if (boxAdjustment != null)
-                    drawAdjustmentBar();
-            }
-
-            private void resizeBars()
-            {
-                float offsetValue = 0;
-
-                for (int i = 0; i < values.Count; i++)
-                {
-                    boxOriginals[i].Y = offsetForValue(offsetValue) * DrawHeight;
-                    boxOriginals[i].Height = heightForValue(values[i].Value);
-                    offsetValue -= values[i].Value;
-                }
-            }
+            private float heightForValue(float value) => minimum_height + offsetForValue(value);
 
             private void drawAdjustmentBar()
             {
