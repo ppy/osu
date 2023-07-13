@@ -116,6 +116,9 @@ namespace osu.Game.Rulesets.Taiko
 
             if (mods.HasFlagFast(LegacyMods.Random))
                 yield return new TaikoModRandom();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -174,6 +177,12 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new TaikoModMuted(),
                         new ModAdaptiveSpeed()
+                    };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
                     };
 
                 default:
@@ -247,7 +256,7 @@ namespace osu.Game.Rulesets.Taiko
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)

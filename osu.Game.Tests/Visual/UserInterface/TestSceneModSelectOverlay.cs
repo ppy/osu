@@ -542,7 +542,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("clear search", () => modSelectOverlay.SearchTerm = string.Empty);
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-            AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod select still visible", () => modSelectOverlay.State.Value == Visibility.Visible);
         }
 
         [Test]
