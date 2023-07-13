@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
-        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+        protected Container Content { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
@@ -87,11 +88,9 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        VerticalScrollContent = new VerticalScrollContainer
+                        new UIScaleReductionContainer(0.2f)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            ScrollbarVisible = false,
-                            Child = new Container
+                            Child = Content = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
@@ -379,6 +378,42 @@ namespace osu.Game.Screens.Ranking
             {
                 base.Update();
                 content.Height = Math.Max(screen_height, DrawHeight);
+            }
+        }
+
+        /// <summary>
+        /// Applies UI scale in reduced amounts.
+        /// </summary>
+        private partial class UIScaleReductionContainer : DrawSizePreservingFillContainer
+        {
+            private readonly float reductionFactor;
+
+            private Bindable<float> uiScaleSetting;
+
+            private float transformedScale = 1;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public UIScaleReductionContainer(float reductionFactor)
+            {
+                this.reductionFactor = reductionFactor;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager osuConfig)
+            {
+                uiScaleSetting = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+                uiScaleSetting.BindValueChanged(args => this.TransformTo(nameof(transformedScale), args.NewValue, ScalingContainer.TRANSITION_DURATION, Easing.OutQuart), true);
+            }
+
+            protected override void Update()
+            {
+                float application = 1 + (transformedScale - 1) * reductionFactor;
+
+                Scale = new Vector2(application);
+                Size = new Vector2(1 / application);
+
+                base.Update();
             }
         }
     }

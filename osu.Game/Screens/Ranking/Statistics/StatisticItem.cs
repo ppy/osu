@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -13,6 +14,11 @@ namespace osu.Game.Screens.Ranking.Statistics
     public class StatisticItem
     {
         /// <summary>
+        /// The recommended font size to use in statistic items to make sure they match others.
+        /// </summary>
+        public const float FONT_SIZE = 13;
+
+        /// <summary>
         /// The name of this item.
         /// </summary>
         public readonly LocalisableString Name;
@@ -21,6 +27,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// A function returning the <see cref="Drawable"/> content to be displayed.
         /// </summary>
         public readonly Func<Drawable> CreateContent;
+
+        /// <summary>
+        /// The relative size of the statistics panel which should be consumed by this item.
+        /// </summary>
+        /// <remarks>
+        /// A relative size of (1, 1) implies one full screen (before scrolling).
+        /// </remarks>
+        public readonly Vector2 RelativeSize;
 
         /// <summary>
         /// Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.
@@ -33,11 +47,13 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="name">The name of the item. Can be <see langword="null"/> to hide the item header.</param>
         /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="requiresHitEvents">Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.</param>
-        public StatisticItem(LocalisableString name, Func<Drawable> createContent, bool requiresHitEvents = false)
+        /// <param name="relativeSize">The relative size of the statistics panel which should be consumed by this item.</param>
+        public StatisticItem(LocalisableString name, Func<Drawable> createContent, bool requiresHitEvents = false, Vector2? relativeSize = null)
         {
             Name = name;
             RequiresHitEvents = requiresHitEvents;
             CreateContent = createContent;
+            RelativeSize = relativeSize ?? Vector2.One;
         }
     }
 }

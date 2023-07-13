@@ -98,12 +98,11 @@ namespace osu.Game.Screens.Ranking.Statistics
             Direction = FillDirection.Vertical
         };
 
-        private partial class Spacer : CompositeDrawable
+        public partial class Spacer : CompositeDrawable
         {
             public Spacer()
             {
                 RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Vertical = 4 };
 
                 InternalChild = new CircularContainer
                 {

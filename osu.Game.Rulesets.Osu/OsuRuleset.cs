@@ -38,6 +38,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -304,26 +305,17 @@ namespace osu.Game.Rulesets.Osu
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
-                }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.25f)),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents), true, relativeSize: new Vector2(0.6f, 0.25f)),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    RelativeSizeAxes = Axes.Both,
+                }, true, relativeSize: new Vector2(0.4f, 0.25f)),
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)
-                }), true)
+                }), true, new Vector2(1, 0.1f))
             };
         }
 

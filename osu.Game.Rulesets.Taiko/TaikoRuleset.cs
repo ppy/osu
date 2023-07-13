@@ -35,6 +35,7 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Taiko.Configuration;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -246,21 +247,13 @@ namespace osu.Game.Rulesets.Taiko
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
-                }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap), relativeSize: new Vector2(1, 0.25f)),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents), true, relativeSize: new Vector2(1, 0.2f)),
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)
-                }), true)
+                }), true, new Vector2(1, 0.1f))
             };
         }
     }
