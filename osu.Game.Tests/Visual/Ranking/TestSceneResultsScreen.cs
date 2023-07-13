@@ -69,6 +69,8 @@ namespace osu.Game.Tests.Visual.Ranking
             }));
         }
 
+        private int onlineScoreID = 1;
+
         [TestCase(1, ScoreRank.X)]
         [TestCase(0.9999, ScoreRank.S)]
         [TestCase(0.975, ScoreRank.S)]
@@ -81,14 +83,17 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            var score = TestResources.CreateTestScoreInfo();
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
 
-            score.OnlineID = 1234;
-            score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
-            score.Accuracy = accuracy;
-            score.Rank = rank;
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Accuracy = accuracy;
+                score.Rank = rank;
 
-            loadResultsScreen(() => screen = createResultsScreen(score));
+                return screen = createResultsScreen(score);
+            });
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
