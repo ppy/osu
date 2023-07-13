@@ -256,6 +256,9 @@ namespace osu.Game.Online.Chat
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
         {
+            // see: https://github.com/ppy/osu/pull/24190
+            toFormat = Regex.Replace(toFormat, emoji_regex.ToString(), string.Empty);
+
             var result = new MessageFormatterResult(toFormat);
 
             // handle the [link display] format
