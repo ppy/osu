@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestStates()
         {
-            CreateThemedContent(OverlayColourScheme.Purple);
+            AddStep("create content", () => CreateThemedContent(OverlayColourScheme.Purple));
             AddSliderStep("set scale", 1, 4, 1, scale =>
             {
                 this.scale = scale;
