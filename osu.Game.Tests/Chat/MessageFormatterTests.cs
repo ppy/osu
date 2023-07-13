@@ -511,6 +511,14 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestEmojiWithSuccessiveParens()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "\uD83D\uDE10(let's hope this doesn't accidentally turn into a link)" });
+            Assert.AreEqual("[emoji](let's hope this doesn't accidentally turn into a link)", result.DisplayContent);
+            Assert.AreEqual(result.Links.Count, 0);
+        }
+
+        [Test]
         public void TestAbsoluteExternalLinks()
         {
             LinkDetails result = MessageFormatter.GetLinkDetails("https://google.com");
