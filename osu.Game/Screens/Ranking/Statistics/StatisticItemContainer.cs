@@ -3,6 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
@@ -15,31 +16,53 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Wraps a <see cref="StatisticItem"/> to add a header and suitable layout for use in <see cref="ResultsScreen"/>.
     /// </summary>
-    internal partial class StatisticContainer : CompositeDrawable
+    internal partial class StatisticItemContainer : CompositeDrawable
     {
         /// <summary>
-        /// Creates a new <see cref="StatisticContainer"/>.
+        /// Creates a new <see cref="StatisticItemContainer"/>.
         /// </summary>
         /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
-        public StatisticContainer(StatisticItem item)
+        public StatisticItemContainer(StatisticItem item)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new FillFlowContainer
+            Padding = new MarginPadding(5);
+
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Children = new[]
+                Masking = true,
+                CornerRadius = 6,
+                Children = new Drawable[]
                 {
-                    createHeader(item),
+                    new Box
+                    {
+                        Colour = ColourInfo.GradientVertical(
+                            OsuColour.Gray(0.25f),
+                            OsuColour.Gray(0.18f)
+                        ),
+                        Alpha = 0.95f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Top = 15 },
-                        Child = item.CreateContent()
-                    }
+                        Padding = new MarginPadding(5),
+                        Children = new[]
+                        {
+                            createHeader(item),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding(10) { Top = 30 },
+                                Child = item.CreateContent()
+                            }
+                        }
+                    },
                 }
             };
         }
@@ -52,7 +75,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             return new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                Height = 20,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
