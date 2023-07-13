@@ -136,6 +136,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
+                new KiaiMenuFountains(),
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
