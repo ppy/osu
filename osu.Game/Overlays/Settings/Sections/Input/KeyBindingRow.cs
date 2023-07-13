@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsPanel.CONTENT_MARGINS,
-                    Child = new RestoreDefaultValueButton<bool>
+                    Child = new RevertToDefaultButton<bool>
                     {
                         Current = isDefault,
                         Action = RestoreDefaults,
