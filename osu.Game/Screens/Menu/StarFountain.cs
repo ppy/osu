@@ -28,29 +28,42 @@ namespace osu.Game.Screens.Menu
 
         public void Shoot()
         {
-            int dir = RNG.Next(-1, 2);
+            // left centre or right movement.
+            int direction = RNG.Next(-1, 2);
 
-            for (int i = 0; i < 192; i++)
+            const int total_stars = 192;
+
+            const float x_velocity_from_direction = 0.6f;
+            const float x_velocity_random_variance = 0.25f;
+
+            const float y_velocity_base = -2.0f;
+            const float y_velocity_random_variance = 0.25f;
+
+            const float x_spawn_position_variance = 10;
+            const float y_spawn_position_offset = 50;
+
+            for (int i = 0; i < total_stars; i++)
             {
-                double offset = i * 3;
+                double initialOffset = i * 3;
 
                 starContainer.Add(starPool.Get(s =>
                 {
-                    s.Velocity = new Vector2(dir * 0.6f + RNG.NextSingle(-0.25f, 0.25f), -RNG.NextSingle(2.2f, 2.4f));
-                    s.Position = new Vector2(RNG.NextSingle(-5, 5), 50);
+                    s.Velocity = new Vector2(
+                        direction * x_velocity_from_direction + getRandomVariance(x_velocity_random_variance),
+                        y_velocity_base + getRandomVariance(y_velocity_random_variance));
+
+                    s.Position = new Vector2(getRandomVariance(x_spawn_position_variance), y_spawn_position_offset);
+
                     s.Hide();
 
-                    using (s.BeginDelayedSequence(offset))
+                    using (s.BeginDelayedSequence(initialOffset))
                     {
-                        s.FadeIn();
-                        s.ScaleTo(1);
-
                         double duration = RNG.Next(300, 1300);
 
-                        s.FadeOutFromOne(duration, Easing.Out);
-                        s.ScaleTo(RNG.NextSingle(1, 2.8f), duration, Easing.Out);
-
-                        s.Expire();
+                        s.ScaleTo(1)
+                         .ScaleTo(RNG.NextSingle(1, 2.8f), duration, Easing.Out)
+                         .FadeOutFromOne(duration, Easing.Out)
+                         .Expire();
                     }
                 }));
             }
@@ -78,12 +91,12 @@ namespace osu.Game.Screens.Menu
                     }
                 };
 
-                rotation = RNG.NextSingle(-2f, 2f);
+                rotation = getRandomVariance(2);
             }
 
             protected override void Update()
             {
-                const float gravity = 0.004f;
+                const float gravity = 0.003f;
 
                 base.Update();
 
@@ -95,5 +108,7 @@ namespace osu.Game.Screens.Menu
                 Rotation += rotation * elapsed;
             }
         }
+
+        private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);
     }
 }
