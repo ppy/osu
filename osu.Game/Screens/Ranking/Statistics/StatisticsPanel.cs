@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <summary>
         /// The usable absolute screen region which can be filled with statistics items.
         /// </summary>
-        public static readonly Vector2 USABLE_SPACE = new Vector2(720, 720);
+        public static readonly Vector2 USABLE_SPACE = new Vector2(960, 720);
 
         public const float SIDE_PADDING = 30;
 
