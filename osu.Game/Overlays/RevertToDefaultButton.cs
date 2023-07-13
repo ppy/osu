@@ -64,7 +64,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            // size intentionally much larger than actual drawn content, so that the button is easier to click.
             Size = new Vector2(14);
 
             AddRange(new Drawable[]
