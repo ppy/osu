@@ -131,13 +131,11 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             Container axisFlow;
 
+            Padding = new MarginPadding { Horizontal = 5 };
 
             InternalChild = new GridContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Width = 0.8f,
                 Content = new[]
                 {
                     new Drawable[]
