@@ -2,22 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
+using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public partial class TestSceneRevertToDefaultButton : OsuTestScene
+    public partial class TestSceneRevertToDefaultButton : ThemeComparisonTestScene
     {
         private float scale = 1;
-
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private readonly Bindable<float> current = new Bindable<float>
         {
@@ -25,35 +22,29 @@ namespace osu.Game.Tests.Visual.Settings
             Value = 1,
         };
 
-        [Test]
-        public void TestBasic()
+        protected override Drawable CreateContent() => new Container
         {
-            RevertToDefaultButton<float> revertToDefaultButton = null!;
-
-            AddStep("create button", () => Child = new Container
+            AutoSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Child = new RevertToDefaultButton<float>
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
-                    },
-                    revertToDefaultButton = new RevertToDefaultButton<float>
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(scale),
-                        Current = current,
-                    }
-                }
-            });
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(scale),
+                Current = current,
+            }
+        };
+
+        [Test]
+        public void TestStates()
+        {
+            CreateThemedContent(OverlayColourScheme.Purple);
             AddSliderStep("set scale", 1, 4, 1, scale =>
             {
                 this.scale = scale;
-                if (revertToDefaultButton != null)
-                    revertToDefaultButton.Scale = new Vector2(scale);
+                foreach (var revertToDefaultButton in this.ChildrenOfType<RevertToDefaultButton<float>>())
+                    revertToDefaultButton.Parent!.Scale = new Vector2(scale);
             });
             AddToggleStep("toggle default state", state => current.Value = state ? default : 1);
             AddToggleStep("toggle disabled state", state => current.Disabled = state);
