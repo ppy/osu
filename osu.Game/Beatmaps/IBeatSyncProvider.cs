@@ -24,6 +24,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Access a clock currently responsible for providing beat sync. If <c>null</c>, no current provider is available.
         /// </summary>
-        IClock? Clock { get; }
+        IClock Clock { get; }
     }
 }
