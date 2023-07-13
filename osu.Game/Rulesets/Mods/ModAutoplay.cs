@@ -11,7 +11,7 @@ using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplayData
+    public abstract class ModAutoplay : Mod, ICreateReplayData
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
-
-        public bool PerformFail() => false;
 
         public bool RestartOnFail => false;
 
