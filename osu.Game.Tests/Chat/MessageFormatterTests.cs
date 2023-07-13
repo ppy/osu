@@ -478,7 +478,7 @@ namespace osu.Game.Tests.Chat
                 Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12"
             });
 
-            Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now!", result.DisplayContent);
+            Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now![emoji]", result.DisplayContent);
             Assert.AreEqual(4, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://dev.ppy.sh/wiki/wiki links");
@@ -503,11 +503,10 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
-        [Ignore("https://github.com/ppy/osu/pull/24190")]
         public void TestEmoji()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "Hello world\uD83D\uDE12<--This is an emoji,There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20" });
-            Assert.AreEqual("Hello world\0\0\0<--This is an emoji,There are more:\0\0\0\0\0\0,\0\0\0", result.DisplayContent);
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "Hello world\uD83D\uDE12<--This is an emoji,There are more emojis among us:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20" });
+            Assert.AreEqual("Hello world[emoji]<--This is an emoji,There are more emojis among us:[emoji][emoji],[emoji]", result.DisplayContent);
             Assert.AreEqual(result.Links.Count, 4);
             Assert.AreEqual(result.Links[0].Index, 11);
             Assert.AreEqual(result.Links[1].Index, 49);
