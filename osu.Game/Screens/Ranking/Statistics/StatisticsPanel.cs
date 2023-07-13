@@ -157,8 +157,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                         flow.Add(new StatisticItemContainer(item)
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                         });
                     }
 
