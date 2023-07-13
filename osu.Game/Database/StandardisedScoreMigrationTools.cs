@@ -1,10 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
+using osu.Game.IO.Legacy;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -13,6 +21,19 @@ namespace osu.Game.Database
 {
     public static class StandardisedScoreMigrationTools
     {
+        public static bool ShouldMigrateToNewStandardised(ScoreInfo score)
+        {
+            if (score.IsLegacyScore)
+                return false;
+
+            // Recalculate the old-style standardised score to see if this was an old lazer score.
+            bool oldScoreMatchesExpectations = GetOldStandardised(score) == score.TotalScore;
+            // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
+            bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
+
+            return oldScoreMatchesExpectations || scoreIsVeryOld;
+        }
+
         public static long GetNewStandardised(ScoreInfo score)
         {
             int maxJudgementIndex = 0;
@@ -168,7 +189,137 @@ namespace osu.Game.Database
             foreach (var mod in score.Mods)
                 modMultiplier *= mod.ScoreMultiplier;
 
-            return (long)((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+            return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+        }
+
+        /// <summary>
+        /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="score">The score to convert the total score of.</param>
+        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
+        /// <returns>The standardised total score.</returns>
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
+        {
+            if (!score.IsLegacyScore)
+                return score.TotalScore;
+
+            WorkingBeatmap beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
+
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
+
+            var mods = score.Mods;
+            if (mods.Any(mod => mod is ModScoreV2))
+                return score.TotalScore;
+
+            var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
+
+            if (playableBeatmap.HitObjects.Count == 0)
+                throw new InvalidOperationException("Beatmap contains no hit objects!");
+
+            ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
+
+            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
+
+            return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
+            {
+                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
+                LegacyComboScore = sv1Simulator.ComboScore,
+                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
+            });
+        }
+
+        /// <summary>
+        /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="score">The score to convert the total score of.</param>
+        /// <param name="attributes">Difficulty attributes providing the legacy scoring values
+        /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
+        /// for the beatmap which the score was set on.</param>
+        /// <returns>The standardised total score.</returns>
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, DifficultyAttributes attributes)
+        {
+            if (!score.IsLegacyScore)
+                return score.TotalScore;
+
+            Debug.Assert(score.LegacyTotalScore != null);
+
+            int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
+            int maximumLegacyComboScore = attributes.LegacyComboScore;
+            double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+
+            // The part of total score that doesn't include bonus.
+            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+
+            // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
+            double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
+
+            // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
+            double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            switch (score.Ruleset.OnlineID)
+            {
+                case 0:
+                    return (long)Math.Round((
+                        700000 * comboProportion
+                        + 300000 * Math.Pow(score.Accuracy, 10)
+                        + bonusProportion) * modMultiplier);
+
+                case 1:
+                    return (long)Math.Round((
+                        250000 * comboProportion
+                        + 750000 * Math.Pow(score.Accuracy, 3.6)
+                        + bonusProportion) * modMultiplier);
+
+                case 2:
+                    return (long)Math.Round((
+                        600000 * comboProportion
+                        + 400000 * score.Accuracy
+                        + bonusProportion) * modMultiplier);
+
+                case 3:
+                    return (long)Math.Round((
+                        990000 * comboProportion
+                        + 10000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        + bonusProportion) * modMultiplier);
+
+                default:
+                    return score.TotalScore;
+            }
+        }
+
+        /// <summary>
+        /// Used to populate the <paramref name="score"/> model using data parsed from its corresponding replay file.
+        /// </summary>
+        /// <param name="score">The score to run population from replay for.</param>
+        /// <param name="files">A <see cref="RealmFileStore"/> instance to use for fetching replay.</param>
+        /// <param name="populationFunc">
+        /// Delegate describing the population to execute.
+        /// The delegate's argument is a <see cref="SerializationReader"/> instance which permits to read data from the replay stream.
+        /// </param>
+        public static void PopulateFromReplay(this ScoreInfo score, RealmFileStore files, Action<SerializationReader> populationFunc)
+        {
+            string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
+            if (replayFilename == null)
+                return;
+
+            try
+            {
+                using (var stream = files.Store.GetStream(replayFilename))
+                {
+                    if (stream == null)
+                        return;
+
+                    using (SerializationReader sr = new SerializationReader(stream))
+                        populationFunc.Invoke(sr);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
+            }
         }
 
         private class FakeHit : HitObject

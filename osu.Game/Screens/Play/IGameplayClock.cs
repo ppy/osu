@@ -23,6 +23,14 @@ namespace osu.Game.Screens.Play
         /// </summary>
         IAdjustableAudioComponent AdjustmentsFromMods { get; }
 
+        /// <summary>
+        /// Whether gameplay is paused.
+        /// </summary>
         IBindable<bool> IsPaused { get; }
+
+        /// <summary>
+        /// Whether the clock is currently rewinding.
+        /// </summary>
+        bool IsRewinding { get; }
     }
 }

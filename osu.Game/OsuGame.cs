@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -43,7 +45,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -81,7 +82,7 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
-        public Toolbar Toolbar;
+        public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
 
@@ -281,6 +282,52 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        private readonly List<string> dragDropFiles = new List<string>();
+        private ScheduledDelegate dragDropImportSchedule;
+
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            if (host.Window != null)
+            {
+                host.Window.DragDrop += path =>
+                {
+                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(path);
+                        return;
+                    }
+
+                    lock (dragDropFiles)
+                    {
+                        dragDropFiles.Add(path);
+
+                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
+
+                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                        dragDropImportSchedule?.Cancel();
+                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+                    }
+                };
+            }
+        }
+
+        private void handlePendingDragDropImports()
+        {
+            lock (dragDropFiles)
+            {
+                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                string[] paths = dragDropFiles.ToArray();
+                dragDropFiles.Clear();
+
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -388,7 +435,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = NotificationsStrings.LinkTypeNotSupported,
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -398,15 +445,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (!(link.Argument is IUser user))
-                    {
-                        user = int.TryParse(argString, out int userId)
-                            ? new APIUser { Id = userId }
-                            : new APIUser { Username = argString };
-                    }
-
-                    ShowUser(user);
-
+                    ShowUser((IUser)link.Argument);
                     break;
 
                 case LinkAction.OpenWiki:
@@ -438,7 +477,7 @@ namespace osu.Game
             {
                 Notifications.Post(new SimpleErrorNotification
                 {
-                    Text = $"The URL {url} has an unsupported or dangerous protocol and will not be opened.",
+                    Text = NotificationsStrings.UnsupportedOrDangerousUrlProtocol(url),
                 });
 
                 return;
@@ -730,8 +769,8 @@ namespace osu.Game
 
         public override void AttemptExit()
         {
-            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
-            PerformFromScreen(menu => menu.Exit());
+            // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
 
         /// <summary>
@@ -1108,7 +1147,7 @@ namespace osu.Game
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "Subsequent messages have been logged. Click to view log files.",
+                        Text = NotificationsStrings.SubsequentMessagesLogged,
                         Activated = () =>
                         {
                             Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
@@ -1125,7 +1164,9 @@ namespace osu.Game
         private void forwardTabletLogsToNotifications()
         {
             const string tablet_prefix = @"[Tablet] ";
+
             bool notifyOnWarning = true;
+            bool notifyOnError = true;
 
             Logger.NewEntry += entry =>
             {
@@ -1136,11 +1177,16 @@ namespace osu.Game
 
                 if (entry.Level == LogLevel.Error)
                 {
+                    if (!notifyOnError)
+                        return;
+
+                    notifyOnError = false;
+
                     Schedule(() =>
                     {
                         Notifications.Post(new SimpleNotification
                         {
-                            Text = $"Disabling tablet support due to error: \"{message}\"",
+                            Text = NotificationsStrings.TabletSupportDisabledDueToError(message),
                             Icon = FontAwesome.Solid.PenSquare,
                             IconColour = Colours.RedDark,
                         });
@@ -1157,7 +1203,7 @@ namespace osu.Game
                 {
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
-                        Text = @"Encountered tablet warning, your tablet may not function correctly. Click here for a list of all tablets supported.",
+                        Text = NotificationsStrings.EncounteredTabletWarning,
                         Icon = FontAwesome.Solid.PenSquare,
                         IconColour = Colours.YellowDark,
                         Activated = () =>
@@ -1174,7 +1220,11 @@ namespace osu.Game
             Schedule(() =>
             {
                 ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
-                tablet?.Tablet.BindValueChanged(_ => notifyOnWarning = true, true);
+                tablet?.Tablet.BindValueChanged(_ =>
+                {
+                    notifyOnWarning = true;
+                    notifyOnError = true;
+                }, true);
             });
         }
 

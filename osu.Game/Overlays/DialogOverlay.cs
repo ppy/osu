@@ -99,7 +99,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 

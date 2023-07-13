@@ -53,6 +53,32 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestBasicFlow()
+        {
+            setState(Visibility.Visible);
+            AddStep(@"simple #1", sendHelloNotification);
+            AddStep(@"simple #2", sendAmazingNotification);
+            AddStep(@"progress #1", sendUploadProgress);
+            AddStep(@"progress #2", sendDownloadProgress);
+
+            checkProgressingCount(2);
+
+            setState(Visibility.Hidden);
+
+            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
+
+            waitForCompletion();
+
+            AddStep(@"progress #3", sendUploadProgress);
+
+            checkProgressingCount(1);
+
+            checkDisplayedCount(33);
+
+            waitForCompletion();
+        }
+
+        [Test]
         public void TestForwardWithFlingRight()
         {
             bool activated = false;
@@ -409,32 +435,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("click notification", () => completionNotification?.TriggerClick());
 
             AddUntilStep("wait for update applied", () => applyUpdate);
-        }
-
-        [Test]
-        public void TestBasicFlow()
-        {
-            setState(Visibility.Visible);
-            AddStep(@"simple #1", sendHelloNotification);
-            AddStep(@"simple #2", sendAmazingNotification);
-            AddStep(@"progress #1", sendUploadProgress);
-            AddStep(@"progress #2", sendDownloadProgress);
-
-            checkProgressingCount(2);
-
-            setState(Visibility.Hidden);
-
-            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
-
-            waitForCompletion();
-
-            AddStep(@"progress #3", sendUploadProgress);
-
-            checkProgressingCount(1);
-
-            checkDisplayedCount(33);
-
-            waitForCompletion();
         }
 
         [Test]

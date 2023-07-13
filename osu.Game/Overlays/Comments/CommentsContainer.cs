@@ -405,17 +405,16 @@ namespace osu.Game.Overlays.Comments
             [Resolved]
             private CommentsContainer commentsContainer { get; set; }
 
-            [Resolved]
-            private IAPIProvider api { get; set; }
-
             public Action<CommentBundle> OnPost;
 
             //TODO should match web, left empty due to no multiline support
             protected override LocalisableString FooterText => default;
 
-            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
+            protected override LocalisableString GetButtonText(bool isLoggedIn) =>
+                isLoggedIn ? CommonStrings.ButtonsPost : CommentsStrings.GuestButtonNew;
 
-            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
+                isLoggedIn ? CommentsStrings.PlaceholderNew : AuthorizationStrings.RequireLogin;
 
             protected override void OnCommit(string text)
             {
@@ -432,7 +431,7 @@ namespace osu.Game.Overlays.Comments
                     Current.Value = string.Empty;
                     OnPost?.Invoke(cb);
                 });
-                api.Queue(req);
+                API.Queue(req);
             }
         }
     }

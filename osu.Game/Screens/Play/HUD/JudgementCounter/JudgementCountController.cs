@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
     /// Keeps track of judgements for a current play session, exposing bindable counts which can
     /// be used for display purposes.
     /// </summary>
-    public partial class JudgementTally : CompositeDrawable
+    public partial class JudgementCountController : Component
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;

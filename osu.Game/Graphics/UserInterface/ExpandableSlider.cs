@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -106,8 +104,8 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        [Resolved(canBeNull: true)]
-        private IExpandingContainer expandingContainer { get; set; }
+        [Resolved]
+        private IExpandingContainer? expandingContainer { get; set; }
 
         protected override void LoadComplete()
         {

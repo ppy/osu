@@ -12,6 +12,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
@@ -113,6 +114,7 @@ namespace osu.Game.Skinning
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
+                                var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -166,8 +168,20 @@ namespace osu.Game.Skinning
 
                                     if (songProgress != null)
                                     {
-                                        songProgress.Position = new Vector2(0, -10);
+                                        const float padding = 10;
+
+                                        songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
+
+                                        if (keyCounter != null && hitError != null)
+                                        {
+                                            // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                            const float song_progress_offset_height = 36 + padding;
+
+                                            keyCounter.Anchor = Anchor.BottomRight;
+                                            keyCounter.Origin = Anchor.BottomRight;
+                                            keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
+                                        }
                                     }
                                 }
                             })
@@ -179,6 +193,7 @@ namespace osu.Game.Skinning
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
                                     new ArgonSongProgress(),
+                                    new ArgonKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()

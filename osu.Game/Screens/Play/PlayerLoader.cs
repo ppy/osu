@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -25,6 +26,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -75,6 +77,8 @@ namespace osu.Game.Screens.Play
 
         private AudioFilter lowPassFilter = null!;
         private AudioFilter highPassFilter = null!;
+
+        private SkinnableSound sampleRestart = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -199,7 +203,8 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
-                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
+                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
@@ -264,6 +269,8 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = null;
             playerConsumed = false;
             cancelLoad();
+
+            sampleRestart.Play();
 
             contentIn();
         }

@@ -19,10 +19,9 @@ namespace osu.Game.Screens.Play
     [Cached(typeof(IGameplayClock))]
     public partial class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
-        /// <summary>
-        /// Whether gameplay is paused.
-        /// </summary>
         public IBindable<bool> IsPaused => isPaused;
+
+        public bool IsRewinding => GameplayClock.IsRewinding;
 
         /// <summary>
         /// The source clock. Should generally not be used for any timekeeping purposes.
