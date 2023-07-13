@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -33,7 +34,10 @@ namespace osu.Game.Overlays
         private Circle circle = null!;
 
         [Resolved]
-        private OverlayColourProvider colours { get; set; } = null!;
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider? colourProvider { get; set; }
 
         public Bindable<T> Current
         {
@@ -124,16 +128,16 @@ namespace osu.Game.Overlays
             {
                 icon.RotateTo(-40, 500, Easing.OutQuint);
 
-                icon.FadeColour(colours.Light1, 300, Easing.OutQuint);
-                circle.FadeColour(colours.Background2, 300, Easing.OutQuint);
+                icon.FadeColour(colourProvider?.Light1 ?? colours.YellowLight, 300, Easing.OutQuint);
+                circle.FadeColour(colourProvider?.Background2 ?? colours.Gray6, 300, Easing.OutQuint);
                 this.ScaleTo(1.2f, 300, Easing.OutQuint);
             }
             else
             {
                 icon.RotateTo(0, 100, Easing.OutQuint);
 
-                icon.FadeColour(colours.Colour0, 100, Easing.OutQuint);
-                circle.FadeColour(colours.Background3, 100, Easing.OutQuint);
+                icon.FadeColour(colourProvider?.Colour0 ?? colours.Yellow, 100, Easing.OutQuint);
+                circle.FadeColour(colourProvider?.Background3 ?? colours.Gray3, 100, Easing.OutQuint);
                 this.ScaleTo(1f, 100, Easing.OutQuint);
             }
         }
