@@ -330,9 +330,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     var box = boxOriginals[i];
 
-                    box.Y = 0;
-                    box.Height = 0;
-
                     box.MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
                     box.ResizeHeightTo(heightForValue(value), duration, Easing.OutQuint);
                     offsetValue -= value;
