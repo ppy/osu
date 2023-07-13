@@ -66,14 +66,14 @@ namespace osu.Game.Screens.Ranking.Expanded
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache beatmapDifficultyCache)
         {
-            var beatmap = score.BeatmapInfo;
+            var beatmap = score.BeatmapInfo!;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, scoreManager.GetMaximumAchievableCombo(score)),
+                new ComboStatistic(score.MaxCombo, score.GetMaximumAchievableCombo()),
                 new PerformanceStatistic(score),
             };
 

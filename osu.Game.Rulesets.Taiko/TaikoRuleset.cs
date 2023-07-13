@@ -116,6 +116,9 @@ namespace osu.Game.Rulesets.Taiko
 
             if (mods.HasFlagFast(LegacyMods.Random))
                 yield return new TaikoModRandom();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -176,6 +179,12 @@ namespace osu.Game.Rulesets.Taiko
                         new ModAdaptiveSpeed()
                     };
 
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }
@@ -196,6 +205,8 @@ namespace osu.Game.Rulesets.Taiko
         public override PerformanceCalculator CreatePerformanceCalculator() => new TaikoPerformanceCalculator();
 
         public int LegacyID => 1;
+
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new TaikoLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 

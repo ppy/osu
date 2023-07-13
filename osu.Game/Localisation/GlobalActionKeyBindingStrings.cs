@@ -324,6 +324,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
 
+        /// <summary>
+        /// "Toggle replay settings"
+        /// </summary>
+        public static LocalisableString ToggleReplaySettings => new TranslatableString(getKey(@"toggle_replay_settings"), @"Toggle replay settings");
+
+        /// <summary>
+        /// "Save replay"
+        /// </summary>
+        public static LocalisableString SaveReplay => new TranslatableString(getKey(@"save_replay"), @"Save replay");
+
+        /// <summary>
+        /// "Export replay"
+        /// </summary>
+        public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

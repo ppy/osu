@@ -91,6 +91,9 @@ namespace osu.Game.Rulesets.Catch
 
             if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new CatchModRelax();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -138,6 +141,12 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
                         new CatchModNoScope(),
+                    };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
                     };
 
                 default:
@@ -201,6 +210,8 @@ namespace osu.Game.Rulesets.Catch
         public override PerformanceCalculator CreatePerformanceCalculator() => new CatchPerformanceCalculator();
 
         public int LegacyID => 2;
+
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new CatchLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 

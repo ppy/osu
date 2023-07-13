@@ -15,17 +15,19 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
-using osu.Game.IO.Legacy;
 using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -77,8 +79,11 @@ namespace osu.Game.Database
         /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
         /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
         /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
+        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
+        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
+        /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
         /// </summary>
-        private const int schema_version = 29;
+        private const int schema_version = 32;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -533,7 +538,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -728,6 +733,8 @@ namespace osu.Game.Database
             Logger.Log($"Running realm migration to version {targetVersion}...");
             Stopwatch stopwatch = new Stopwatch();
 
+            var files = new RealmFileStore(this, storage);
+
             stopwatch.Start();
 
             switch (targetVersion)
@@ -753,10 +760,10 @@ namespace osu.Game.Database
 
                         for (int i = 0; i < itemCount; i++)
                         {
-                            dynamic? oldItem = oldItems.ElementAt(i);
-                            dynamic? newItem = newItems.ElementAt(i);
+                            dynamic oldItem = oldItems.ElementAt(i);
+                            dynamic newItem = newItems.ElementAt(i);
 
-                            long? nullableOnlineID = oldItem?.OnlineID;
+                            long? nullableOnlineID = oldItem.OnlineID;
                             newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                         }
                     }
@@ -793,7 +800,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        dynamic oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
@@ -816,7 +823,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newSettings.Count; i++)
                     {
-                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        dynamic oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
@@ -841,7 +848,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newKeyBindings.Count; i++)
                     {
-                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        dynamic oldItem = oldKeyBindings.ElementAt(i);
                         var newItem = newKeyBindings.ElementAt(i);
 
                         if (oldItem.RulesetID == null)
@@ -895,49 +902,31 @@ namespace osu.Game.Database
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
-                        score.BeatmapHash = score.BeatmapInfo.Hash;
+                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
 
                     break;
                 }
 
                 case 28:
                 {
-                    var files = new RealmFileStore(this, storage);
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
                     {
-                        string? replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(@".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
-                        if (replayFilename == null)
-                            continue;
-
-                        try
+                        score.PopulateFromReplay(files, sr =>
                         {
-                            using (var stream = files.Store.GetStream(replayFilename))
-                            {
-                                if (stream == null)
-                                    continue;
-
-                                // Trimmed down logic from LegacyScoreDecoder to extract the version from replays.
-                                using (SerializationReader sr = new SerializationReader(stream))
-                                {
-                                    sr.ReadByte(); // Ruleset.
-                                    int version = sr.ReadInt32();
-                                    if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                                        score.IsLegacyScore = true;
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
-                        }
+                            sr.ReadByte(); // Ruleset.
+                            int version = sr.ReadInt32();
+                            if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                score.IsLegacyScore = true;
+                        });
                     }
 
                     break;
                 }
 
                 case 29:
+                case 30:
                 {
                     var scores = migration.NewRealm
                                           .All<ScoreInfo>()
@@ -945,22 +934,80 @@ namespace osu.Game.Database
 
                     foreach (var score in scores)
                     {
-                        // Recalculate the old-style standardised score to see if this was an old lazer score.
-                        bool oldScoreMatchesExpectations = StandardisedScoreMigrationTools.GetOldStandardised(score) == score.TotalScore;
-                        // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
-                        bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
-
-                        if (oldScoreMatchesExpectations || scoreIsVeryOld)
+                        try
                         {
-                            try
+                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
                             {
-                                long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
-                                score.TotalScore = calculatedNew;
-                            }
-                            catch
-                            {
+                                try
+                                {
+                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                    score.TotalScore = calculatedNew;
+                                }
+                                catch
+                                {
+                                }
                             }
                         }
+                        catch { }
+                    }
+
+                    break;
+                }
+
+                case 31:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
+                        {
+                            // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
+                            score.TotalScoreVersion = 30000002;
+
+                            // Transfer known legacy scores to a permanent storage field for preservation.
+                            score.LegacyTotalScore = score.TotalScore;
+                        }
+                        else
+                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    }
+
+                    break;
+                }
+
+                case 32:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (!score.IsLegacyScore || !score.Ruleset.IsLegacyRuleset())
+                            continue;
+
+                        score.PopulateFromReplay(files, sr =>
+                        {
+                            sr.ReadByte(); // Ruleset.
+                            sr.ReadInt32(); // Version.
+                            sr.ReadString(); // Beatmap hash.
+                            sr.ReadString(); // Username.
+                            sr.ReadString(); // MD5Hash.
+                            sr.ReadUInt16(); // Count300.
+                            sr.ReadUInt16(); // Count100.
+                            sr.ReadUInt16(); // Count50.
+                            sr.ReadUInt16(); // CountGeki.
+                            sr.ReadUInt16(); // CountKatu.
+                            sr.ReadUInt16(); // CountMiss.
+
+                            // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
+                            int totalScore = sr.ReadInt32();
+
+                            sr.ReadUInt16(); // Max combo.
+                            sr.ReadBoolean(); // Perfect.
+
+                            var legacyMods = (LegacyMods)sr.ReadInt32();
+
+                            if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                                return;
+
+                            score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
+                            score.LegacyTotalScore = score.TotalScore = totalScore;
+                        });
                     }
 
                     break;
