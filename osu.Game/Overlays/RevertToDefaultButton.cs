@@ -121,7 +121,7 @@ namespace osu.Game.Overlays
 
             Enabled.Value = !current.Disabled;
 
-            this.FadeTo(current.Disabled ? 0.2f : (Current.IsDefault ? 0 : 1), fade_duration, Easing.OutQuint);
+            this.FadeTo(current.Disabled ? 0.2f : (current.IsDefault ? 0 : 1), fade_duration, Easing.OutQuint);
 
             if (IsHovered && Enabled.Value)
             {
