@@ -5,9 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Menu
@@ -64,20 +63,18 @@ namespace osu.Game.Screens.Menu
             private float rotation;
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
                 AutoSizeAxes = Axes.Both;
                 Origin = Anchor.Centre;
 
                 InternalChildren = new Drawable[]
                 {
-                    new Sprite
+                    new SkinnableSprite("star2")
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Blending = BlendingParameters.Additive,
-                        Scale = new Vector2(0.5f),
-                        Texture = textures.Get("Menu/fountain-star")
                     }
                 };
 
