@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
 
                 InternalChildren = new Drawable[]
                 {
-                    new SkinnableSprite("star2")
+                    new SkinnableSprite("Menu/fountain-star")
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

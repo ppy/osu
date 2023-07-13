@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
 using static osu.Game.Skinning.SkinConfiguration;
@@ -21,6 +22,18 @@ namespace osu.Game.Skinning
         protected LegacySkinTransformer(ISkin skin)
             : base(skin)
         {
+        }
+
+        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+        {
+            switch (componentName)
+            {
+                case "fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
+            return base.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
