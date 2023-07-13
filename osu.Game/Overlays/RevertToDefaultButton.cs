@@ -22,7 +22,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public partial class RestoreDefaultValueButton<T> : OsuClickableContainer, IHasCurrentValue<T>
+    public partial class RevertToDefaultButton<T> : OsuClickableContainer, IHasCurrentValue<T>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
         private CircularContainer circle = null!;
         private Box background = null!;
 
-        public RestoreDefaultValueButton()
+        public RevertToDefaultButton()
             : base(HoverSampleSet.Button)
         {
         }

@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                defaultValueIndicatorContainer.Add(new RestoreDefaultValueButton<T>
+                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,
