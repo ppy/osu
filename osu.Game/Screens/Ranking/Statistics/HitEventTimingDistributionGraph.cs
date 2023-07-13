@@ -113,94 +113,95 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
             }
 
-            if (barDrawables != null)
-            {
-                for (int i = 0; i < barDrawables.Length; i++)
-                {
-                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
-                }
-            }
+            if (barDrawables == null)
+                createBarDrawables();
             else
             {
-                int maxCount = bins.Max(b => b.Values.Sum());
-                barDrawables = bins.Select((bin, i) => new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index)).ToArray();
+                for (int i = 0; i < barDrawables.Length; i++)
+                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
+            }
+        }
 
-                Container axisFlow;
+        private void createBarDrawables()
+        {
+            int maxCount = bins.Max(b => b.Values.Sum());
+            barDrawables = bins.Select((_, i) => new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index)).ToArray();
 
-                const float axis_font_size = 12;
+            Container axisFlow;
 
-                InternalChild = new GridContainer
+            const float axis_font_size = 12;
+
+            InternalChild = new GridContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Width = 0.8f,
+                Content = new[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.8f,
-                    Content = new[]
+                    new Drawable[]
                     {
-                        new Drawable[]
+                        new GridContainer
                         {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Content = new[] { barDrawables }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            axisFlow = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = axis_font_size,
-                            }
-                        },
+                            RelativeSizeAxes = Axes.Both,
+                            Content = new[] { barDrawables }
+                        }
                     },
-                    RowDimensions = new[]
+                    new Drawable[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                    }
-                };
+                        axisFlow = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = axis_font_size,
+                        }
+                    },
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize),
+                }
+            };
 
-                // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
-                double maxValue = timing_distribution_bins * binSize;
-                double axisValueStep = maxValue / axis_points;
+            // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
+            double maxValue = timing_distribution_bins * binSize;
+            double axisValueStep = maxValue / axis_points;
+
+            axisFlow.Add(new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = "0",
+                Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+            });
+
+            for (int i = 1; i <= axis_points; i++)
+            {
+                double axisValue = i * axisValueStep;
+                float position = (float)(axisValue / maxValue);
+                float alpha = 1f - position * 0.8f;
 
                 axisFlow.Add(new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = "0",
+                    RelativePositionAxes = Axes.X,
+                    X = -position / 2,
+                    Alpha = alpha,
+                    Text = axisValue.ToString("-0"),
                     Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
                 });
 
-                for (int i = 1; i <= axis_points; i++)
+                axisFlow.Add(new OsuSpriteText
                 {
-                    double axisValue = i * axisValueStep;
-                    float position = (float)(axisValue / maxValue);
-                    float alpha = 1f - position * 0.8f;
-
-                    axisFlow.Add(new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = -position / 2,
-                        Alpha = alpha,
-                        Text = axisValue.ToString("-0"),
-                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
-                    });
-
-                    axisFlow.Add(new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = position / 2,
-                        Alpha = alpha,
-                        Text = axisValue.ToString("+0"),
-                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
-                    });
-                }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = position / 2,
+                    Alpha = alpha,
+                    Text = axisValue.ToString("+0"),
+                    Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+                });
             }
         }
 
