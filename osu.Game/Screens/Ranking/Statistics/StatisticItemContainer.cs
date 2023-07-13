@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         public StatisticItemContainer(StatisticItem item)
         {
             RelativeSizeAxes = Axes.X;
-            Size = item.RelativeSize * new Vector2(1, 720);
+            Size = item.RelativeSize * new Vector2(1, StatisticsPanel.USABLE_SPACE.Y);
 
             Padding = new MarginPadding(5);
 

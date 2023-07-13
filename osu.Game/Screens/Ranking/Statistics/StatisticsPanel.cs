@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,6 +27,11 @@ namespace osu.Game.Screens.Ranking.Statistics
 {
     public partial class StatisticsPanel : VisibilityContainer
     {
+        /// <summary>
+        /// The usable absolute screen region which can be filled with statistics items.
+        /// </summary>
+        public static readonly Vector2 USABLE_SPACE = new Vector2(720, 720);
+
         public const float SIDE_PADDING = 30;
 
         public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
@@ -142,7 +148,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         ColumnDimensions = new[]
                         {
                             new Dimension(),
-                            new Dimension(GridSizeMode.Distributed, 540, 540, 720),
+                            new Dimension(GridSizeMode.Distributed, 540, 540, USABLE_SPACE.X),
                             new Dimension(),
                         },
                         RowDimensions = new[]
@@ -231,7 +237,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             base.Update();
             if (flow != null)
-                scroll.Height = flow.DrawHeight;
+                scroll.Height = Math.Min(flow.DrawHeight, USABLE_SPACE.Y);
         }
 
         protected override bool OnClick(ClickEvent e)
