@@ -479,7 +479,7 @@ namespace osu.Game.Tests.Chat
             });
 
             Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now!", result.DisplayContent);
-            Assert.AreEqual(5, result.Links.Count);
+            Assert.AreEqual(4, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://dev.ppy.sh/wiki/wiki links");
             Assert.That(f, Is.Not.Null);
