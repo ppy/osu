@@ -103,7 +103,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             public Spacer()
             {
                 RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Vertical = 4 };
 
                 InternalChild = new CircularContainer
                 {
