@@ -319,7 +319,7 @@ namespace osu.Game.Rulesets.Osu
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem(string.Empty, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)
