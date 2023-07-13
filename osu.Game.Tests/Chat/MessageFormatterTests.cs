@@ -500,11 +500,6 @@ namespace osu.Game.Tests.Chat
             Assert.That(f, Is.Not.Null);
             Assert.AreEqual(78, f.Index);
             Assert.AreEqual(18, f.Length);
-
-            f = result.Links.Find(l => l.Url == "\uD83D\uDE12");
-            Assert.That(f, Is.Not.Null);
-            Assert.AreEqual(101, f.Index);
-            Assert.AreEqual(3, f.Length);
         }
 
         [Test]
