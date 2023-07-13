@@ -431,8 +431,9 @@ namespace osu.Game.Beatmaps
             beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
             beatmapInfo.ResetOnlineInfo();
 
-            using (var stream = new MemoryStream())
+            Realm.Write(r =>
             {
+                using var stream = new MemoryStream();
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
 
@@ -458,23 +459,20 @@ namespace osu.Game.Beatmaps
 
                 updateHashAndMarkDirty(setInfo);
 
-                Realm.Write(r =>
-                {
-                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
+                var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
 
-                    setInfo.CopyChangesToRealm(liveBeatmapSet);
+                setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    if (transferCollections)
-                        beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+                if (transferCollections)
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
-                    liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
-                                  .UpdateLocalScores(r);
+                liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
+                              .UpdateLocalScores(r);
 
-                    // do not look up metadata.
-                    // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
-                    ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
-                });
-            }
+                // do not look up metadata.
+                // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
+                ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
+            });
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
