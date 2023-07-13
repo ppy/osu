@@ -1,24 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 using osu.Game.Localisation;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -31,11 +27,17 @@ namespace osu.Game.Overlays
 
         // this is intentionally not using BindableWithCurrent, as it can use the wrong IsDefault implementation when passed a BindableNumber.
         // using GetBoundCopy() ensures that the received bindable is of the exact same type as the source bindable and uses the proper IsDefault implementation.
-        private Bindable<T> current;
+        private Bindable<T>? current;
+
+        private SpriteIcon icon = null!;
+        private Circle circle = null!;
+
+        [Resolved]
+        private OverlayColourProvider colours { get; set; } = null!;
 
         public Bindable<T> Current
         {
-            get => current;
+            get => current.AsNonNull();
             set
             {
                 current?.UnbindAll();
@@ -50,43 +52,37 @@ namespace osu.Game.Overlays
             }
         }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        private const float size = 4;
-
-        private CircularContainer circle = null!;
-        private Box background = null!;
-
         public RevertToDefaultButton()
             : base(HoverSampleSet.Button)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load()
         {
             // size intentionally much larger than actual drawn content, so that the button is easier to click.
-            Size = new Vector2(3 * size);
+            Size = new Vector2(14);
 
-            Add(circle = new CircularContainer
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(size),
-                Masking = true,
-                Child = background = new Box
+                circle = new Circle
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colour.Lime1
+                },
+                icon = new SpriteIcon
+                {
+                    Icon = FontAwesome.Solid.Undo,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(8),
                 }
             });
 
-            Alpha = 0f;
-
             Action += () =>
             {
-                if (!current.Disabled)
+                if (current?.Disabled == false)
                     current.SetDefault();
             };
         }
@@ -120,28 +116,25 @@ namespace osu.Game.Overlays
             if (current == null)
                 return;
 
-            Enabled.Value = !Current.Disabled;
+            Enabled.Value = !current.Disabled;
 
-            if (!Current.Disabled)
+            this.FadeTo(current.Disabled ? 0.2f : (Current.IsDefault ? 0 : 1), fade_duration, Easing.OutQuint);
+
+            if (IsHovered && Enabled.Value)
             {
-                this.FadeTo(Current.IsDefault ? 0 : 1, fade_duration, Easing.OutQuint);
-                background.FadeColour(IsHovered ? colours.Lime0 : colours.Lime1, fade_duration, Easing.OutQuint);
-                circle.TweenEdgeEffectTo(new EdgeEffectParameters
-                {
-                    Colour = (IsHovered ? colours.Lime1 : colours.Lime3).Opacity(0.4f),
-                    Radius = IsHovered ? 8 : 4,
-                    Type = EdgeEffectType.Glow
-                }, fade_duration, Easing.OutQuint);
+                icon.RotateTo(-40, 500, Easing.OutQuint);
+
+                icon.FadeColour(colours.Light1, 300, Easing.OutQuint);
+                circle.FadeColour(colours.Background2, 300, Easing.OutQuint);
+                this.ScaleTo(1.2f, 300, Easing.OutQuint);
             }
             else
             {
-                background.FadeColour(colours.Lime3, fade_duration, Easing.OutQuint);
-                circle.TweenEdgeEffectTo(new EdgeEffectParameters
-                {
-                    Colour = colours.Lime3.Opacity(0.1f),
-                    Radius = 2,
-                    Type = EdgeEffectType.Glow
-                }, fade_duration, Easing.OutQuint);
+                icon.RotateTo(0, 100, Easing.OutQuint);
+
+                icon.FadeColour(colours.Colour0, 100, Easing.OutQuint);
+                circle.FadeColour(colours.Background3, 100, Easing.OutQuint);
+                this.ScaleTo(1f, 100, Easing.OutQuint);
             }
         }
     }

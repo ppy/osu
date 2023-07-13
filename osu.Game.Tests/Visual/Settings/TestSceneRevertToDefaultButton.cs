@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -17,10 +14,10 @@ namespace osu.Game.Tests.Visual.Settings
 {
     public partial class TestSceneRevertToDefaultButton : OsuTestScene
     {
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private float scale = 1;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private readonly Bindable<float> current = new Bindable<float>
         {
@@ -31,7 +28,7 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestBasic()
         {
-            RevertToDefaultButton<float> revertToDefaultButton = null;
+            RevertToDefaultButton<float> revertToDefaultButton = null!;
 
             AddStep("create button", () => Child = new Container
             {
@@ -41,7 +38,7 @@ namespace osu.Game.Tests.Visual.Settings
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoam
+                        Colour = colourProvider.Background2,
                     },
                     revertToDefaultButton = new RevertToDefaultButton<float>
                     {
