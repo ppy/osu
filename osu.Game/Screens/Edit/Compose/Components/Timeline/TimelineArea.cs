@@ -48,14 +48,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, 140),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(GridSizeMode.Absolute, 110),
+                    },
                     Content = new[]
                     {
                         new Drawable[]
                         {
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Both,
                                 Name = @"Toggle controls",
                                 Children = new Drawable[]
                                 {
@@ -92,31 +102,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
+                            Timeline = new Timeline(userContent),
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Both,
                                 Name = @"Zoom controls",
+                                Padding = new MarginPadding { Right = 5 },
                                 Children = new Drawable[]
                                 {
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background3,
+                                        Colour = colourProvider.Background2,
                                     },
                                     new Container<TimelineButton>
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.Y,
-                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Both,
                                         Masking = true,
                                         Children = new[]
                                         {
                                             new TimelineButton
                                             {
-                                                RelativeSizeAxes = Axes.Y,
-                                                Height = 0.5f,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Size = new Vector2(1, 0.5f),
                                                 Icon = FontAwesome.Solid.SearchPlus,
                                                 Action = () => Timeline.AdjustZoomRelatively(1)
                                             },
@@ -124,8 +134,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             {
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
-                                                RelativeSizeAxes = Axes.Y,
-                                                Height = 0.5f,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Size = new Vector2(1, 0.5f),
                                                 Icon = FontAwesome.Solid.SearchMinus,
                                                 Action = () => Timeline.AdjustZoomRelatively(-1)
                                             },
@@ -133,19 +143,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            Timeline = new Timeline(userContent),
+                            new BeatDivisorControl { RelativeSizeAxes = Axes.Both }
                         },
                     },
-                    RowDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                    }
                 }
             };
 

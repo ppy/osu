@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
@@ -30,6 +29,9 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider colourProvider)
         {
+            // Grid with only two rows.
+            // First is the timeline area, which should be allowed to expand as required.
+            // Second is the main editor content, including the playfield and side toolbars (but not the bottom).
             Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -74,7 +76,6 @@ namespace osu.Game.Screens.Edit
                                                     AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl { RelativeSizeAxes = Axes.Both }
                                             },
                                         },
                                         RowDimensions = new[]
