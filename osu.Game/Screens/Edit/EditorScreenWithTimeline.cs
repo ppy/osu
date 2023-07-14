@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit
 {
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
-        private const float padding = 10;
+        private const float padding = 15;
 
         private Container timelineContainer = null!;
 
@@ -74,7 +74,6 @@ namespace osu.Game.Screens.Edit
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
-                                                    Padding = new MarginPadding { Right = 5 },
                                                 },
                                             },
                                         },
