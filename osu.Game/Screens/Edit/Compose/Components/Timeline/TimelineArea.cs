@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,16 +16,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineArea : CompositeDrawable
     {
-        public Timeline Timeline;
+        public Timeline Timeline = null!;
 
         private readonly Drawable userContent;
 
-        public TimelineArea(Drawable content = null)
+        public TimelineArea(Drawable? content = null)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            userContent = content ?? Drawable.Empty();
+            userContent = content ?? Empty();
         }
 
         [BackgroundDependencyLoader]
