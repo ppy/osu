@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,8 +18,6 @@ namespace osu.Game.Screens.Edit
     {
         private const float padding = 10;
 
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-
         private Container timelineContainer;
 
         protected EditorScreenWithTimeline(EditorScreenMode type)
@@ -33,11 +30,8 @@ namespace osu.Game.Screens.Edit
         private LoadingSpinner spinner;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider, [CanBeNull] BindableBeatDivisor beatDivisor)
+        private void load(OverlayColourProvider colourProvider)
         {
-            if (beatDivisor != null)
-                this.beatDivisor.BindTo(beatDivisor);
-
             Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -82,7 +76,7 @@ namespace osu.Game.Screens.Edit
                                                     AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl(this.beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                                new BeatDivisorControl { RelativeSizeAxes = Axes.Both }
                                             },
                                         },
                                         RowDimensions = new[]

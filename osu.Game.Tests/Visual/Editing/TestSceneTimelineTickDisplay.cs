@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             BeatDivisor.Value = 4;
 
-            Add(new BeatDivisorControl(BeatDivisor)
+            Add(new BeatDivisorControl
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
