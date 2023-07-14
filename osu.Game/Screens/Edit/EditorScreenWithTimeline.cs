@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,16 +16,16 @@ namespace osu.Game.Screens.Edit
     {
         private const float padding = 10;
 
-        private Container timelineContainer;
+        private Container timelineContainer = null!;
+
+        private Container mainContent = null!;
+
+        private LoadingSpinner spinner = null!;
 
         protected EditorScreenWithTimeline(EditorScreenMode type)
             : base(type)
         {
         }
-
-        private Container mainContent;
-
-        private LoadingSpinner spinner;
 
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider colourProvider)
