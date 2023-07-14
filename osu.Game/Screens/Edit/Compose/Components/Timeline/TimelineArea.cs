@@ -39,11 +39,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5
-                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -76,24 +71,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     },
                                     new FillFlowContainer
                                     {
-                                        AutoSizeAxes = Axes.Y,
-                                        Width = 160,
+                                        RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding(10),
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            waveformCheckbox = new OsuCheckbox
+                                            waveformCheckbox = new OsuCheckbox(nubSize: 30f)
                                             {
                                                 LabelText = EditorStrings.TimelineWaveform,
                                                 Current = { Value = true },
                                             },
-                                            ticksCheckbox = new OsuCheckbox
+                                            ticksCheckbox = new OsuCheckbox(nubSize: 30f)
                                             {
                                                 LabelText = EditorStrings.TimelineTicks,
                                                 Current = { Value = true },
                                             },
-                                            controlPointsCheckbox = new OsuCheckbox
+                                            controlPointsCheckbox = new OsuCheckbox(nubSize: 30f)
                                             {
                                                 LabelText = BeatmapsetsStrings.ShowStatsBpm,
                                                 Current = { Value = true },
@@ -102,7 +96,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            Timeline = new Timeline(userContent),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Depth = float.MaxValue,
+                                        Colour = colourProvider.Background5
+                                    },
+                                    Timeline = new Timeline(userContent),
+                                }
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
