@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -29,10 +30,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            Masking = true;
-
             OsuCheckbox waveformCheckbox;
             OsuCheckbox controlPointsCheckbox;
             OsuCheckbox ticksCheckbox;
@@ -51,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         new Dimension(GridSizeMode.Absolute, 140),
                         new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(GridSizeMode.Absolute, 35),
                         new Dimension(GridSizeMode.Absolute, 110),
                     },
                     Content = new[]
@@ -102,6 +101,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
+                                    // the out-of-bounds portion of the centre marker.
+                                    new Box
+                                    {
+                                        Width = 24,
+                                        Height = EditorScreenWithTimeline.PADDING,
+                                        Depth = float.MaxValue,
+                                        Colour = colours.Red1,
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.BottomCentre,
+                                    },
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -115,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Name = @"Zoom controls",
-                                Padding = new MarginPadding { Right = 5 },
+                                Padding = new MarginPadding { Right = 10 },
                                 Children = new Drawable[]
                                 {
                                     new Box
@@ -128,7 +137,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         RelativeSizeAxes = Axes.Both,
-                                        Masking = true,
                                         Children = new[]
                                         {
                                             new TimelineButton

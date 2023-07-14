@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit
 {
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
-        private const float padding = 15;
+        public const float PADDING = 10;
 
         private Container timelineContainer = null!;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = padding, Top = padding },
+                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
                                     Child = new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
