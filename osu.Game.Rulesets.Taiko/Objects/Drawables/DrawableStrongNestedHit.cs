@@ -16,5 +16,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(nestedHit)
         {
         }
+
+        public override void OnKilled()
+        {
+            base.OnKilled();
+
+            if (!Judged)
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
+        }
     }
 }
