@@ -48,14 +48,13 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 if (result != 0)
                     return result;
 
-                var xNote = x as Note;
-                var yNote = y as Note;
-
                 // due to the way input is handled in mania, notes take precedence over ticks in judging order.
-                if (xNote != null && yNote == null) return -1;
-                if (xNote == null && yNote != null) return 1;
+                if (x is Note && y is not Note) return -1;
+                if (x is not Note && y is Note) return 1;
 
-                return xNote!.Column.CompareTo(yNote!.Column);
+                return x is ManiaHitObject maniaX && y is ManiaHitObject maniaY
+                    ? maniaX.Column.CompareTo(maniaY.Column)
+                    : 0;
             }
         }
     }
