@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
 
@@ -161,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
-        public void TestStrongHitWithHidden()
+        public void TestStrongHitOneKeyWithHidden()
         {
             const double hit_time = 1000;
 
@@ -184,6 +185,33 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AssertJudgementCount(2);
             AssertResult<Hit>(0, HitResult.Ok);
             AssertResult<Hit.StrongNestedHit>(0, HitResult.IgnoreMiss);
+        }
+
+        [Test]
+        public void TestStrongHitTwoKeysWithHidden()
+        {
+            const double hit_time = 1000;
+
+            var beatmap = CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = hit_time,
+                IsStrong = true
+            });
+
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) + DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW - 2, TaikoAction.LeftCentre, TaikoAction.RightCentre),
+            }, beatmap, new[] { new TaikoModHidden() });
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Ok);
+            AssertResult<Hit.StrongNestedHit>(0, HitResult.LargeBonus);
         }
     }
 }
