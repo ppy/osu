@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.OnKilled();
 
-            if (!Judged)
+            if (!Judged && Time.Current > ParentHitObject?.HitObject.GetEndTime())
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
     }
