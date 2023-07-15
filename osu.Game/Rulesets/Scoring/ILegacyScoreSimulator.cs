@@ -23,8 +23,18 @@ namespace osu.Game.Rulesets.Scoring
         int ComboScore { get; }
 
         /// <summary>
-        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
+        /// The bonus portion of the legacy (ScoreV1) total score.
         /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
+        /// </summary>
+        int LegacyBonusScore { get; }
+
+        /// <summary>
+        /// The maximum combo of the legacy (ScoreV1) total score.
+        /// </summary>
+        int MaxCombo { get; }
+
+        /// <summary>
+        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
         /// </summary>
         double BonusScoreRatio { get; }
 

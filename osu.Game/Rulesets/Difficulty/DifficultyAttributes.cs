@@ -65,6 +65,16 @@ namespace osu.Game.Rulesets.Difficulty
         public double LegacyBonusScoreRatio { get; set; }
 
         /// <summary>
+        /// The bonus portion of the legacy (ScoreV1) total score.
+        /// </summary>
+        public int LegacyBonusScore { get; set; }
+
+        /// <summary>
+        /// The maximum combo of the legacy (ScoreV1) total score.
+        /// </summary>
+        public int LegacyMaxCombo { get; set; }
+
+        /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
         /// </summary>
         public DifficultyAttributes()
