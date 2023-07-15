@@ -17,12 +17,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
-
-        protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
-        {
-            return 700000 * comboProgress
-                   + 300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress
-                   + bonusPortion;
-        }
     }
 }
