@@ -6,8 +6,10 @@ using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
@@ -156,6 +158,32 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 
             AssertJudgementCount(1);
             AssertResult<Hit>(0, HitResult.Ok);
+        }
+
+        [Test]
+        public void TestStrongHitWithHidden()
+        {
+            const double hit_time = 1000;
+
+            var beatmap = CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = hit_time,
+                IsStrong = true
+            });
+
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
+            }, beatmap, new[] { new TaikoModHidden() });
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Ok);
+            AssertResult<Hit.StrongNestedHit>(0, HitResult.IgnoreMiss);
         }
     }
 }
