@@ -218,7 +218,9 @@ namespace osu.Game.Database
             {
                 LegacyAccuracyScore = sv1Simulator.AccuracyScore,
                 LegacyComboScore = sv1Simulator.ComboScore,
-                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
+                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio,
+                LegacyBonusScore = sv1Simulator.LegacyBonusScore,
+                LegacyMaxCombo = sv1Simulator.MaxCombo,
             });
         }
 
@@ -240,13 +242,16 @@ namespace osu.Game.Database
             int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
             int maximumLegacyComboScore = attributes.LegacyComboScore;
             double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
+            int maximumLegacyBonusScore = attributes.LegacyBonusScore;
+            int maximumLegacyCombo = attributes.LegacyMaxCombo;
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
             // The part of total score that doesn't include bonus.
             int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+            int maximumLegacyTotalScore = maximumLegacyBaseScore + maximumLegacyBonusScore;
 
-            // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
-            double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
+            // The combo proportion is calculated as a proportion of maximumLegacyTotalScore.
+            double comboProportion = (double)score.LegacyTotalScore / maximumLegacyTotalScore;
 
             // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
@@ -254,9 +259,63 @@ namespace osu.Game.Database
             switch (score.Ruleset.OnlineID)
             {
                 case 0:
+                    if(score.MaxCombo == 0 || score.Accuracy == 0)
+                        return (long)Math.Round((
+                            0
+                            + 300000 * Math.Pow(score.Accuracy, 8)
+                            + bonusProportion) * modMultiplier);
+
+                    double v3exp = 0.5; // Scorev3 combo exponent
+
+                    // Assumption :
+                    // - sliders and slider-ticks are uniformly spread arround the beatmap
+                    //      thus we can ignore them without losing much precision (consider a map of hit-circles only !)
+                    // - the Ok/Meh hit results are uniformly spread in the score
+                    //      thus we can simplify and consider each hit result to be score.Accuracy without losing much precision
+                    // What is strippedV1/strippedV3 :
+                    // This is the ComboScore of v1/v3 were we remove all (map-)constant multipliers and accuracy multipliers (including hit results),
+                    // based on the previous assumptions. For Scorev1, this is basically the sum of squared combos (because without sliders: object_count == combo).
+                    double maxStrippedV1 = Math.Pow(maximumLegacyCombo, 2);
+                    double maxStrippedV3 = Math.Pow(maximumLegacyCombo, 1 + v3exp);
+
+                    double strippedV1 = maxStrippedV1 * comboProportion / score.Accuracy;
+
+                    double strippedV1FromMaxCombo = Math.Pow(score.MaxCombo, 2);
+                    double strippedV3FromMaxCombo = Math.Pow(score.MaxCombo, 1 + v3exp);
+
+                    // Compute approximate lower estimate scorev3 for that play
+                    // That is, a play were we made biggest amount of big combos (Repeat MaxCombo + 1 remaining big combo)
+                    // And didn't combo anything in the reminder of the map
+                    double possibleMaxComboRepeat = Math.Floor(strippedV1 / strippedV1FromMaxCombo);
+                    double strippedV1FromMaxComboRepeat = possibleMaxComboRepeat * strippedV1FromMaxCombo;
+                    double remainingStrippedV1 = strippedV1 - strippedV1FromMaxComboRepeat;
+                    double remainingCombo = Math.Sqrt(remainingStrippedV1);
+                    double remainingStrippedV3 = Math.Pow(remainingCombo, 1 + v3exp);
+
+                    double newLowerStrippedV3 = (possibleMaxComboRepeat * strippedV3FromMaxCombo) + remainingStrippedV3;
+
+                    // Compute approximate upper estimate scorev3 for that play
+                    // That is, a play were all combos were equal (except MaxCombo)
+                    remainingStrippedV1 = strippedV1 - strippedV1FromMaxCombo;
+                    double remainingComboObjects = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
+                    double remainingAverageCombo = remainingComboObjects > 0 ? remainingStrippedV1 / remainingComboObjects : 0;
+                    remainingStrippedV3 = remainingComboObjects * Math.Pow(remainingAverageCombo, v3exp);
+
+                    double newUpperStrippedV3 = strippedV3FromMaxCombo + remainingStrippedV3;
+
+                    // Approximate by combining lower and upper estimates
+                    // As the lower-estimate is very pessimistic, we use a 30/70 ratio
+                    // And cap it with 1.2 times the middle-point to avoid overstimates
+                    double strippedV3 = Math.Min(
+                        0.3 * newLowerStrippedV3 + 0.7 * newUpperStrippedV3,
+                        1.2 * (newLowerStrippedV3 + newUpperStrippedV3) / 2
+                    );
+
+                    double newComboScoreProportion = (strippedV3 / maxStrippedV3) * score.Accuracy;
+
                     return (long)Math.Round((
-                        700000 * comboProportion
-                        + 300000 * Math.Pow(score.Accuracy, 10)
+                        700000 * newComboScoreProportion * score.Accuracy
+                        + 300000 * Math.Pow(score.Accuracy, 8)
                         + bonusProportion) * modMultiplier);
 
                 case 1:
