@@ -11,12 +11,14 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -39,6 +41,13 @@ namespace osu.Game.Tournament
         private Bindable<WindowMode> windowMode;
         private LoadingSpinner loadingSpinner;
 
+        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
+        private DependencyContainer dependencies;
+        private Container topMostOverlayContent;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
         {
@@ -51,6 +60,8 @@ namespace osu.Game.Tournament
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(40),
             });
+
+            dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
 
             // in order to have the OS mouse cursor visible, relative mode needs to be disabled.
             // can potentially be removed when https://github.com/ppy/osu-framework/issues/4309 is resolved.
@@ -90,12 +101,14 @@ namespace osu.Game.Tournament
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new TournamentSceneManager()
-                    }
+                    },
+                    topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both }
                 }, drawables =>
                 {
                     loadingSpinner.Hide();
                     loadingSpinner.Expire();
 
+                    topMostOverlayContent.Add(dialogOverlay);
                     AddRange(drawables);
 
                     windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>

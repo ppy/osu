@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,8 +14,10 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
+using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -30,6 +33,10 @@ namespace osu.Game.Tournament.Screens.Editors
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
         private WarningBox rightClickMessage;
+
+        [Resolved]
+        [CanBeNull]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         protected override bool DrawLoserPaths => true;
 
@@ -73,8 +80,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
-                        foreach (var p in MatchesContainer)
-                            p.Match.Reset();
+                        dialogOverlay?.Push(new BracketResetTeamsDialog(MatchesContainer));
                     })
                 };
             }
