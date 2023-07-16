@@ -38,4 +38,9 @@
     <Copyright>Copyright (c) 2022 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' != 'Release'">
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzers>false</RunAnalyzers>
+  </PropertyGroup>
 </Project>
