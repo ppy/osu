@@ -728,17 +728,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
             AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
 
-            ProgressNotification progressNotification = null!;
-
             AddStep("start ongoing operation", () =>
             {
-                progressNotification = new ProgressNotification
+                Game.Notifications.Post(new ProgressNotification
                 {
                     Text = "Something is still running",
                     Progress = 0.5f,
                     State = ProgressNotificationState.Active,
-                };
-                Game.Notifications.Post(progressNotification);
+                });
             });
 
             AddStep("attempt exit", () =>
