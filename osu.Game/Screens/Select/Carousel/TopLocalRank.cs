@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -74,8 +75,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = sender.MaxByTopScore();
-
+                ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;
             }
