@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
@@ -180,7 +181,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
-            }, beatmap, new[] { new TaikoModHidden() });
+            }, beatmap, new Mod[] { new TaikoModHidden() });
 
             AssertJudgementCount(2);
             AssertResult<Hit>(0, HitResult.Ok);
@@ -207,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) + DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW - 2, TaikoAction.LeftCentre, TaikoAction.RightCentre),
-            }, beatmap, new[] { new TaikoModHidden() });
+            }, beatmap, new Mod[] { new TaikoModHidden() });
 
             AssertJudgementCount(2);
             AssertResult<Hit>(0, HitResult.Ok);
