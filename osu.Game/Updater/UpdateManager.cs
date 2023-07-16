@@ -134,7 +134,7 @@ namespace osu.Game.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
+                        Icon = FontAwesome.Solid.Download,
                         Size = new Vector2(34),
                         Colour = OsuColour.Gray(0.2f),
                         Depth = float.MaxValue,
