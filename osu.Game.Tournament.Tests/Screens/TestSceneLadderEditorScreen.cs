@@ -33,6 +33,37 @@ namespace osu.Game.Tournament.Tests.Screens
         });
 
         [Test]
+        public void TestResetBracketTeamsCancelled()
+        {
+            AddStep("pull up context menu", () =>
+            {
+                InputManager.MoveMouseTo(ladderEditorScreen);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("click Reset teams button", () =>
+            {
+                InputManager.MoveMouseTo(osuContextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().Last(p =>
+                    ((OsuMenuItem)p.Item).Type == MenuItemType.Destructive), new Vector2(5, 0));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is LadderResetTeamsDialog);
+            AddStep("click cancel", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("dialog dismissed", () => dialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
+
+            AddAssert("assert ladder teams unchanged", () =>
+            {
+                return !Ladder.Matches.Any(m => m.Team1.Value == null && m.Team2.Value == null);
+            });
+        }
+
+        [Test]
         public void TestResetBracketTeams()
         {
             AddStep("pull up context menu", () =>
@@ -63,37 +94,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddAssert("assert ladder teams reset", () =>
             {
                 return Ladder.Matches.All(m => m.Team1.Value == null && m.Team2.Value == null);
-            });
-        }
-
-        [Test]
-        public void TestResetBracketTeamsCancelled()
-        {
-            AddStep("pull up context menu", () =>
-            {
-                InputManager.MoveMouseTo(ladderEditorScreen);
-                InputManager.Click(MouseButton.Right);
-            });
-
-            AddStep("click Reset teams button", () =>
-            {
-                InputManager.MoveMouseTo(osuContextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().Last(p =>
-                    ((OsuMenuItem)p.Item).Type == MenuItemType.Destructive), new Vector2(5, 0));
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is LadderResetTeamsDialog);
-            AddStep("click cancel", () =>
-            {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("dialog dismissed", () => dialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
-
-            AddAssert("assert ladder teams unchanged", () =>
-            {
-                return !Ladder.Matches.Any(m => m.Team1.Value == null && m.Team2.Value == null);
             });
         }
     }
