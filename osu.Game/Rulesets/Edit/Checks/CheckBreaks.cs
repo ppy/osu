@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         // Breaks may be off by 1 ms.
         private const int leniency_threshold = 1;
-        private const double min_start_threshold = 200;
+        private const double minimum_gap_before_break = 200;
 
         // Break end time depends on the upcoming object's pre-empt time.
         // As things stand, "pre-empt time" is only defined for osu! standard
@@ -40,13 +40,13 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 foreach (var breakPeriod in context.Beatmap.Breaks)
                 {
-                    double diffStart = breakPeriod.StartTime - hitObject.GetEndTime();
-                    double diffEnd = hitObject.StartTime - breakPeriod.EndTime;
+                    double gapBeforeBreak = breakPeriod.StartTime - hitObject.GetEndTime();
+                    double gapAfterBreak = hitObject.StartTime - breakPeriod.EndTime;
 
-                    if (diffStart < min_start_threshold - leniency_threshold && diffStart > 0)
-                        yield return new IssueTemplateEarlyStart(this).Create(breakPeriod.StartTime, min_start_threshold - diffStart);
-                    else if (diffEnd < min_end_threshold - leniency_threshold && diffEnd > 0)
-                        yield return new IssueTemplateLateEnd(this).Create(breakPeriod.StartTime, min_end_threshold - diffEnd);
+                    if (gapBeforeBreak < minimum_gap_before_break - leniency_threshold && gapBeforeBreak > 0)
+                        yield return new IssueTemplateEarlyStart(this).Create(breakPeriod.StartTime, minimum_gap_before_break - gapBeforeBreak);
+                    else if (gapAfterBreak < min_end_threshold - leniency_threshold && gapAfterBreak > 0)
+                        yield return new IssueTemplateLateEnd(this).Create(breakPeriod.StartTime, min_end_threshold - gapAfterBreak);
                 }
             }
         }
@@ -74,11 +74,11 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooShort : IssueTemplate
         {
             public IssueTemplateTooShort(ICheck check)
-                : base(check, IssueType.Warning, "Break is non-functional due to being less than 650ms.")
+                : base(check, IssueType.Warning, "Break is non-functional due to being less than {0} ms.")
             {
             }
 
-            public Issue Create(double startTime) => new Issue(startTime, this);
+            public Issue Create(double startTime) => new Issue(startTime, this, BreakPeriod.MIN_BREAK_DURATION);
         }
     }
 }
