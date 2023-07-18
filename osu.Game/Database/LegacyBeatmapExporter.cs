@@ -44,7 +44,11 @@ namespace osu.Game.Database
             var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
 
             using var skinStream = base.GetFileContents(model, file);
-            using var skinStreamReader = new LineBufferedReader(contentStream);
+
+            if (skinStream == null)
+                return null;
+
+            using var skinStreamReader = new LineBufferedReader(skinStream);
             var beatmapSkin = new LegacySkin(new SkinInfo(), null!)
             {
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
