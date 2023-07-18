@@ -33,30 +33,30 @@ namespace osu.Game.Screens.Menu
             // left centre or right movement.
             int direction = RNG.Next(-1, 2);
 
-            const float x_velocity_from_direction = 0.6f;
-            const float x_velocity_random_variance = 0.25f;
+            const float x_velocity_from_direction = 0.8f;
+            const float x_velocity_random_variance = 0.15f;
 
             const float y_velocity_base = -2.0f;
-            const float y_velocity_random_variance = 0.25f;
+            const float y_velocity_random_variance = 0.15f;
 
             const float x_spawn_position_variance = 10;
             const float y_spawn_position_offset = 50;
 
             for (int i = 0; i < stars_per_shoot; i++)
             {
-                double initialOffset = i * 3;
+                double capturedIndex = i;
 
                 starContainer.Add(starPool.Get(s =>
                 {
                     s.Velocity = new Vector2(
-                        direction * x_velocity_from_direction + getRandomVariance(x_velocity_random_variance),
+                        direction * x_velocity_from_direction * (1 - 2 * ((float)capturedIndex / stars_per_shoot)) + getRandomVariance(x_velocity_random_variance),
                         y_velocity_base + getRandomVariance(y_velocity_random_variance));
 
                     s.Position = new Vector2(getRandomVariance(x_spawn_position_variance), y_spawn_position_offset);
 
                     s.Hide();
 
-                    using (s.BeginDelayedSequence(initialOffset))
+                    using (s.BeginDelayedSequence(capturedIndex * 3))
                     {
                         double duration = RNG.Next(300, 1300);
 
