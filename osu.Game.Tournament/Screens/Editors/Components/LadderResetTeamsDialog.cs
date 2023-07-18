@@ -4,8 +4,9 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Tournament.Screens.Ladder.Components;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Screens.Editors.Components
 {
     public partial class LadderResetTeamsDialog : DangerousActionDialog
     {
