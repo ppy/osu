@@ -58,10 +58,11 @@ namespace osu.Game.Database
 
             foreach (var hitObject in beatmapContent.HitObjects)
             {
-                hitObject.StartTime = Math.Floor(hitObject.StartTime);
-
+                // Truncate end time before truncating start time because end time is dependent on start time
                 if (hitObject is IHasDuration hasDuration && hitObject is not IHasPath)
-                    hasDuration.Duration = Math.Floor(hasDuration.Duration);
+                    hasDuration.Duration = Math.Floor(hasDuration.EndTime) - Math.Floor(hitObject.StartTime);
+
+                hitObject.StartTime = Math.Floor(hitObject.StartTime);
 
                 if (hitObject is not IHasPath hasPath || BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
 
