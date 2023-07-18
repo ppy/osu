@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
     {
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
-        public IEnumerable<DrawableHitObject> AliveObjects => AliveEntries.Select(pair => pair.Drawable).OrderBy(h => h.HitObject.StartTime);
+        public IList<DrawableHitObject> AliveObjects => AliveEntries.Select(pair => pair.Drawable).OrderBy(h => h.HitObject.StartTime).ToList();
 
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.

@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
         {
-            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.IsHittable;
+            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.CheckHittable;
 
             Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
             drawable.OnLoadComplete += onDrawableHitObjectLoaded;

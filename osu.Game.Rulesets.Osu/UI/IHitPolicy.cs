@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to check.</param>
         /// <param name="time">The time to check.</param>
         /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
-        bool IsHittable(DrawableHitObject hitObject, double time);
+        ClickAction CheckHittable(DrawableHitObject hitObject, double time);
 
         /// <summary>
         /// Handles a <see cref="HitObject"/> being hit.

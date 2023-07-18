@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
-        public bool IsHittable(DrawableHitObject hitObject, double time)
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time)
         {
             DrawableHitObject blockingObject = null;
 
@@ -36,13 +36,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
             // If there is no previous hitobject, allow the hit.
             if (blockingObject == null)
-                return true;
+                return ClickAction.Hit;
 
             // A hit is allowed if:
             // 1. The last blocking hitobject has been judged.
             // 2. The current time is after the last hitobject's start time.
             // Hits at exactly the same time as the blocking hitobject are allowed for maps that contain simultaneous hitobjects (e.g. /b/372245).
-            return blockingObject.Judged || time >= blockingObject.HitObject.StartTime;
+            return (blockingObject.Judged || time >= blockingObject.HitObject.StartTime) ? ClickAction.Hit : ClickAction.Shake;
         }
 
         public void HandleHit(DrawableHitObject hitObject)
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!hitObjectCanBlockFutureHits(hitObject))
                 return;
 
-            if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
+            if (CheckHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset) != ClickAction.Hit)
                 throw new InvalidOperationException($"A {hitObject} was hit before it became hittable!");
 
             // Miss all hitobjects prior to the hit one.

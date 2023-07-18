@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
-        public bool IsHittable(DrawableHitObject hitObject, double time) => true;
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time) => ClickAction.Hit;
 
         public void HandleHit(DrawableHitObject hitObject)
         {
