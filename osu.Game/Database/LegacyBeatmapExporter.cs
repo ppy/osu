@@ -8,7 +8,6 @@ using System.Text;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -36,7 +35,7 @@ namespace osu.Game.Database
                 return base.GetFileContents(model, file);
 
             // Read the beatmap contents and skin
-            using var contentStream = UserFileStorage.GetStream(file.File.GetStoragePath());
+            using var contentStream = base.GetFileContents(model, file);
 
             if (contentStream == null)
                 return null;
@@ -44,7 +43,7 @@ namespace osu.Game.Database
             using var contentStreamReader = new LineBufferedReader(contentStream);
             var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
 
-            using var skinStream = UserFileStorage.GetStream(file.File.GetStoragePath());
+            using var skinStream = base.GetFileContents(model, file);
             using var skinStreamReader = new LineBufferedReader(contentStream);
             var beatmapSkin = new LegacySkin(new SkinInfo(), null!)
             {
