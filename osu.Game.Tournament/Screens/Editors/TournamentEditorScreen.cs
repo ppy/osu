@@ -6,6 +6,7 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -15,8 +16,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
@@ -26,6 +29,10 @@ namespace osu.Game.Tournament.Screens.Editors
         where TModel : class, new()
     {
         protected abstract BindableList<TModel> Storage { get; }
+
+        [Resolved]
+        [CanBeNull]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private FillFlowContainer<TDrawable> flow;
 
@@ -79,7 +86,10 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Clear all",
-                            Action = Storage.Clear
+                            Action = () =>
+                            {
+                                dialogOverlay?.Push(new TournamentClearAllDialog(Storage));
+                            }
                         },
                     }
                 }

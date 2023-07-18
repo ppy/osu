@@ -7,13 +7,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
@@ -21,6 +25,38 @@ namespace osu.Game.Tournament.Screens.Editors
     public partial class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
     {
         protected override BindableList<TournamentRound> Storage => LadderInfo.Rounds;
+        //
+        // [Resolved]
+        // private IDialogOverlay? dialogOverlay { get; set; }
+        //
+        // [BackgroundDependencyLoader]
+        // private void load()
+        // {
+        //     // ControlPanel.Add(new TourneyButton
+        //     // {
+        //     //     RelativeSizeAxes = Axes.X,
+        //     //     Text = "aaaaaa",
+        //     //     Action = () =>
+        //     //     {
+        //     //         Logger.Log("asdaf", LoggingTarget.Runtime, LogLevel.Important);
+        //     //     }
+        //     // });
+        //     // Logger.Log($"Current action is {.Action}", LoggingTarget.Runtime, LogLevel.Important);
+        //
+        //     dialogOverlay?.Push(new TournamentClearAllDialog(Storage));
+        //
+        //     var clearAllButton = ControlPanel.ChildrenOfType<DangerousSettingsButton>().FirstOrDefault();
+        //
+        //     if (clearAllButton != null)
+        //     {
+        //         clearAllButton.Action = () =>
+        //         {
+        //             Logger.Log("doing the thing!", LoggingTarget.Runtime, LogLevel.Important);
+        //             Logger.Log($"currently, dialogOverlay is {dialogOverlay}", LoggingTarget.Runtime, LogLevel.Important);
+        //             dialogOverlay?.Push(new TournamentClearAllDialog(Storage));
+        //         };
+        //     }
+        // }
 
         public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
