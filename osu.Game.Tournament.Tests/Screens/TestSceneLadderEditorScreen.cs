@@ -11,7 +11,7 @@ using osu.Game.Tournament.Screens.Editors;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 using osuTK.Input;
 
