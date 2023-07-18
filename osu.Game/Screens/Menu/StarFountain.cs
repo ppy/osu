@@ -13,6 +13,8 @@ namespace osu.Game.Screens.Menu
 {
     public partial class StarFountain : CompositeDrawable
     {
+        private const int stars_per_shoot = 192;
+
         private DrawablePool<Star> starPool = null!;
         private Container starContainer = null!;
 
@@ -21,7 +23,7 @@ namespace osu.Game.Screens.Menu
         {
             InternalChildren = new Drawable[]
             {
-                starPool = new DrawablePool<Star>(192),
+                starPool = new DrawablePool<Star>(stars_per_shoot),
                 starContainer = new Container()
             };
         }
@@ -30,8 +32,6 @@ namespace osu.Game.Screens.Menu
         {
             // left centre or right movement.
             int direction = RNG.Next(-1, 2);
-
-            const int total_stars = 192;
 
             const float x_velocity_from_direction = 0.6f;
             const float x_velocity_random_variance = 0.25f;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Menu
             const float x_spawn_position_variance = 10;
             const float y_spawn_position_offset = 50;
 
-            for (int i = 0; i < total_stars; i++)
+            for (int i = 0; i < stars_per_shoot; i++)
             {
                 double initialOffset = i * 3;
 
