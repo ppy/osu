@@ -20,9 +20,9 @@ namespace osu.Game.Graphics
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
-        private double lastParticleAdded;
+        private double? lastParticleAdded;
 
-        private readonly double cooldown;
+        private readonly double timeBetweenSpawns;
         private readonly double maxDuration;
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics
 
             particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
 
-            cooldown = 1000f / perSecond;
+            timeBetweenSpawns = 1000f / perSecond;
             this.maxDuration = maxDuration;
         }
 
@@ -52,18 +52,27 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - lastParticleAdded) > cooldown)
+            Invalidate(Invalidation.DrawNode);
+
+            if (!Active.Value || !CanSpawnParticles)
             {
+                lastParticleAdded = null;
+                return;
+            }
+
+            while (lastParticleAdded == null || Math.Abs(Time.Current - lastParticleAdded.Value) > timeBetweenSpawns)
+            {
+                lastParticleAdded ??= Time.Current;
+
                 var newParticle = CreateParticle();
-                newParticle.StartTime = (float)Time.Current;
+                newParticle.StartTime = (float)lastParticleAdded;
 
                 particles[currentIndex] = newParticle;
 
                 currentIndex = (currentIndex + 1) % particles.Length;
-                lastParticleAdded = Time.Current;
-            }
 
-            Invalidate(Invalidation.DrawNode);
+                lastParticleAdded += timeBetweenSpawns;
+            }
         }
 
         /// <summary>
