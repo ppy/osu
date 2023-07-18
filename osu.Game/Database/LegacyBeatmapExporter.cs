@@ -60,6 +60,9 @@ namespace osu.Game.Database
             {
                 hitObject.StartTime = Math.Floor(hitObject.StartTime);
 
+                if (hitObject is IHasDuration hasDuration && hitObject is not IHasPath)
+                    hasDuration.Duration = Math.Floor(hasDuration.Duration);
+
                 if (hitObject is not IHasPath hasPath || BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
 
                 var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
