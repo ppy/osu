@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="IHitObjectContainer"/> uses pooled objects, this is equivalent to <see cref="Objects"/>.
         /// </remarks>
-        IEnumerable<DrawableHitObject> AliveObjects { get; }
+        IList<DrawableHitObject> AliveObjects { get; }
     }
 }

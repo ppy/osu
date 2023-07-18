@@ -3,8 +3,7 @@
 
 #nullable disable
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -22,35 +21,41 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
-        public bool IsHittable(DrawableHitObject hitObject, double time) => enumerateHitObjectsUpTo(hitObject.HitObject.StartTime).All(obj => obj.AllJudged);
-
         public void HandleHit(DrawableHitObject hitObject)
         {
         }
 
-        private IEnumerable<DrawableHitObject> enumerateHitObjectsUpTo(double targetTime)
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time)
         {
-            foreach (var obj in HitObjectContainer.AliveObjects)
+            int index = HitObjectContainer.AliveObjects.IndexOf(hitObject);
+
+            if (index > 0)
             {
-                if (obj.HitObject.StartTime >= targetTime)
-                    yield break;
-
-                switch (obj)
-                {
-                    case DrawableSpinner:
-                        continue;
-
-                    case DrawableSlider slider:
-                        yield return slider.HeadCircle;
-
-                        break;
-
-                    default:
-                        yield return obj;
-
-                        break;
-                }
+                var previousHitObject = (DrawableOsuHitObject)HitObjectContainer.AliveObjects[index - 1];
+                if (previousHitObject.HitObject.StackHeight > 0 && !previousHitObject.AllJudged)
+                    return ClickAction.Ignore;
             }
+
+            foreach (DrawableHitObject testObject in HitObjectContainer.AliveObjects)
+            {
+                if (testObject.AllJudged)
+                    continue;
+
+                // if we found the object being checked, we can move on to the final timing test.
+                if (testObject == hitObject)
+                    break;
+
+                // for all other objects, we check for validity and block the hit if any are still valid.
+                // 3ms of extra leniency to account for slightly unsnapped objects.
+                if (testObject.HitObject.GetEndTime() + 3 < hitObject.HitObject.StartTime)
+                    return ClickAction.Shake;
+            }
+
+            // stable has `const HitObjectManager.HITTABLE_RANGE = 400;`, which is only used for notelock code.
+            // probably not a coincidence that this is equivalent to lazer's OsuHitWindows.MISS_WINDOW.
+
+            // TODO stable compares to 200 when autopilot is enabled, instead of 400.
+            return Math.Abs(hitObject.HitObject.StartTime - time) < 400 ? ClickAction.Hit : ClickAction.Shake;
         }
     }
 }
