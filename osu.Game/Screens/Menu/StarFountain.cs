@@ -2,113 +2,92 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class StarFountain : CompositeDrawable
+    public partial class StarFountain : SkinReloadableDrawable
     {
-        private const int stars_per_shoot = 192;
+        private StarFountainSpewer spewer = null!;
 
-        private DrawablePool<Star> starPool = null!;
-        private Container starContainer = null!;
+        [Resolved]
+        private TextureStore textures { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
-            {
-                starPool = new DrawablePool<Star>(stars_per_shoot),
-                starContainer = new Container()
-            };
+            InternalChild = spewer = new StarFountainSpewer();
         }
 
-        public void Shoot()
+        public void Shoot() => spewer.Shoot();
+
+        protected override void SkinChanged(ISkinSource skin)
         {
-            // left centre or right movement.
-            int direction = RNG.Next(-1, 2);
+            base.SkinChanged(skin);
+            spewer.Texture = skin.GetTexture("Menu/fountain-star") ?? textures.Get("Menu/fountain-star");
+        }
 
-            const float x_velocity_from_direction = 0.8f;
-            const float x_velocity_random_variance = 0.15f;
+        public partial class StarFountainSpewer : ParticleSpewer
+        {
+            private const int particle_duration_min = 300;
+            private const int particle_duration_max = 1000;
 
-            const float y_velocity_base = -2.0f;
-            const float y_velocity_random_variance = 0.15f;
+            private double? lastShootTime;
+            private int lastShootDirection;
 
-            const float x_spawn_position_variance = 10;
-            const float y_spawn_position_offset = 50;
+            protected override float ParticleGravity => 800;
 
-            for (int i = 0; i < stars_per_shoot; i++)
+            private const double shoot_duration = 800;
+
+            protected override bool CanSpawnParticles => lastShootTime != null && Time.Current - lastShootTime < shoot_duration;
+
+            [Resolved]
+            private ISkinSource skin { get; set; } = null!;
+
+            public StarFountainSpewer()
+                : base(null, 240, particle_duration_max)
             {
-                double capturedIndex = i;
-
-                starContainer.Add(starPool.Get(s =>
-                {
-                    s.Velocity = new Vector2(
-                        direction * x_velocity_from_direction * (1 - 2 * ((float)capturedIndex / stars_per_shoot)) + getRandomVariance(x_velocity_random_variance),
-                        y_velocity_base + getRandomVariance(y_velocity_random_variance));
-
-                    s.Position = new Vector2(getRandomVariance(x_spawn_position_variance), y_spawn_position_offset);
-
-                    s.Hide();
-
-                    using (s.BeginDelayedSequence(capturedIndex * 3))
-                    {
-                        double duration = RNG.Next(300, 1300);
-
-                        s.ScaleTo(1)
-                         .ScaleTo(RNG.NextSingle(1, 2.8f), duration, Easing.Out)
-                         .FadeOutFromOne(duration, Easing.Out)
-                         .Expire();
-                    }
-                }));
             }
-        }
-
-        private partial class Star : PoolableDrawable
-        {
-            public Vector2 Velocity = Vector2.Zero;
-
-            private float rotation;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(TextureStore textures)
             {
-                AutoSizeAxes = Axes.Both;
-                Origin = Anchor.Centre;
+                Texture = skin.GetTexture("Menu/fountain-star") ?? textures.Get("Menu/fountain-star");
+                Active.Value = true;
+            }
 
-                InternalChildren = new Drawable[]
+            protected override FallingParticle CreateParticle()
+            {
+                return new FallingParticle
                 {
-                    new SkinnableSprite("Menu/fountain-star")
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Blending = BlendingParameters.Additive,
-                    }
+                    StartPosition = new Vector2(0, 50),
+                    Duration = RNG.NextSingle(particle_duration_min, particle_duration_max),
+                    StartAngle = getRandomVariance(4),
+                    EndAngle = getRandomVariance(2),
+                    EndScale = 1.4f + getRandomVariance(0.4f),
+                    Velocity = new Vector2(getCurrentAngle(), -1200 + getRandomVariance(100)),
                 };
-
-                rotation = getRandomVariance(2);
             }
 
-            protected override void Update()
+            private float getCurrentAngle()
             {
-                const float gravity = 0.003f;
+                const float x_velocity_from_direction = 500;
+                const float x_velocity_random_variance = 60;
 
-                base.Update();
-
-                float elapsed = (float)Time.Elapsed;
-
-                Position += Velocity * elapsed;
-                Velocity += new Vector2(0, elapsed * gravity);
-
-                Rotation += rotation * elapsed;
+                return lastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / shoot_duration) + getRandomVariance(x_velocity_random_variance);
             }
-        }
 
-        private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);
+            public void Shoot()
+            {
+                lastShootTime = Clock.CurrentTime;
+                lastShootDirection = RNG.Next(-1, 2);
+            }
+
+            private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);
+        }
     }
 }
