@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -216,17 +214,24 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         ? currSlider.Position + currSlider.Path.PositionAt(1)
                         : currHitObject.Position;
 
+                    // Note the use of `StartTime` in the code below doesn't match stable's use of `EndTime`.
+                    // This is because in the stable implementation, `UpdateCalculations` is not called on the inner-loop hitobject (j)
+                    // and therefore it does not have a correct `EndTime`, but instead the default of `EndTime = StartTime`.
+                    //
+                    // Effects of this can be seen on https://osu.ppy.sh/beatmapsets/243#osu/1146 at sliders around 86647 ms, where
+                    // if we use `EndTime` here it would result in unexpected stacking.
+
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = beatmap.HitObjects[j].GetEndTime();
+                        startTime = beatmap.HitObjects[j].StartTime;
                     }
                     else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         // Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = beatmap.HitObjects[j].GetEndTime();
+                        startTime = beatmap.HitObjects[j].StartTime;
                     }
                 }
             }

@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Backgrounds
             if (nextBackground == background)
                 return false;
 
-            Logger.Log("🌅 Background change queued");
+            Logger.Log(@"🌅 Global background change queued");
 
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Backgrounds
             nextTask?.Cancel();
             nextTask = Scheduler.AddDelayed(() =>
             {
+                Logger.Log(@"🌅 Global background loading");
                 LoadComponentAsync(nextBackground, displayNext, cancellationTokenSource.Token);
             }, 500);
 

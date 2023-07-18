@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
 
                 Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
 
-                original = realm.Find<BeatmapSetInfo>(original.ID);
+                original = realm!.Find<BeatmapSetInfo>(original.ID)!;
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
@@ -204,6 +204,14 @@ namespace osu.Game.Beatmaps
         protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
         {
             base.PostImport(model, realm, parameters);
+
+            // Scores are stored separately from beatmaps, and persist even when a beatmap is modified or deleted.
+            // Let's reattach any matching scores that exist in the database, based on hash.
+            foreach (BeatmapInfo beatmap in model.Beatmaps)
+            {
+                beatmap.UpdateLocalScores(realm);
+            }
+
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
         }
 

@@ -30,9 +30,6 @@ namespace osu.Game.Screens.Select.Carousel
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
-
-        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private IDisposable? scoreSubscription;
@@ -71,15 +68,14 @@ namespace osu.Game.Screens.Select.Carousel
                     localScoresChanged);
             }, true);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception _)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 // This subscription may fire from changes to linked beatmaps, which we don't care about.
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
-
+                ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;
             }

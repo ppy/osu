@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsPanel.CONTENT_MARGINS,
-                    Child = new RestoreDefaultValueButton<bool>
+                    Child = new RevertToDefaultButton<bool>
                     {
                         Current = isDefault,
                         Action = RestoreDefaults,
@@ -440,7 +440,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         private void updateStoreFromButton(KeyButton button) =>
-            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID).KeyCombinationString = button.KeyBinding.KeyCombinationString);
+            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID)!.KeyCombinationString = button.KeyBinding.KeyCombinationString);
 
         private void updateIsDefaultValue()
         {

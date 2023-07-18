@@ -9,8 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     var testPresets = createTestPresets();
                     foreach (var preset in testPresets)
-                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName);
+                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName)!;
 
                     realm.Add(testPresets);
                 });
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ManiaModNightcore(),
                     new ManiaModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("mania")
+                Ruleset = r.Find<RulesetInfo>("mania")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuModHidden(),
                     new OsuModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("osu")
+                Ruleset = r.Find<RulesetInfo>("osu")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -304,11 +304,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("preset is not changed", () => panel.Preset.Value.Name == presetName);
             AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
             AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
-            AddStep("attempt preset edit", () =>
-            {
-                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
-                InputManager.Click(MouseButton.Left);
-            });
+            AddStep("commit changes to textbox", () => InputManager.Key(Key.Enter));
+            AddStep("attempt preset edit via select binding", () => InputManager.Key(Key.Enter));
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
             AddAssert("preset is changed", () => panel.Preset.Value.Name != presetName);
         }
@@ -390,6 +387,28 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("preset mod is changed", () =>
                 new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
+        }
+
+        [Test]
+        public void TestTextFiltering()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("set text filter", () => modPresetColumn.SearchTerm = "First");
+            AddUntilStep("one panel visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(1));
+
+            AddStep("set mania ruleset", () => Ruleset.Value = rulesets.GetRuleset(3));
+            AddUntilStep("no panels visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(0));
         }
 
         private ICollection<ModPreset> createTestPresets() => new[]

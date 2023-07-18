@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Mods.Input
             if (!mod_type_lookup.TryGetValue(e.Key, out var typesToMatch))
                 return false;
 
-            var matchingMods = availableMods.Where(modState => matches(modState, typesToMatch) && !modState.Filtered.Value).ToArray();
+            var matchingMods = availableMods.Where(modState => matches(modState, typesToMatch) && modState.Visible).ToArray();
 
             if (matchingMods.Length == 0)
                 return false;

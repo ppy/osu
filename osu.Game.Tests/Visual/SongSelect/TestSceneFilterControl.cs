@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes.Any());
+            AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes?.Any() == true);
 
             AddAssert("filter request not fired", () => !received);
         }

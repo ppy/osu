@@ -76,14 +76,12 @@ namespace osu.Game.Screens.Select
         protected override void PopIn()
         {
             this.MoveToX(0, animation_duration, Easing.OutQuint);
-            this.RotateTo(0, animation_duration, Easing.OutQuint);
             this.FadeIn(transition_duration);
         }
 
         protected override void PopOut()
         {
             this.MoveToX(-100, animation_duration, Easing.In);
-            this.RotateTo(10, animation_duration, Easing.In);
             this.FadeOut(transition_duration * 2, Easing.In);
         }
 
@@ -233,12 +231,11 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
-                            VersionLabel = new OsuSpriteText
+                            VersionLabel = new TruncatingSpriteText
                             {
                                 Text = beatmapInfo.DifficultyName,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                         }
                     },
@@ -286,19 +283,17 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
-                            TitleLabel = new OsuSpriteText
+                            TitleLabel = new TruncatingSpriteText
                             {
                                 Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
-                            ArtistLabel = new OsuSpriteText
+                            ArtistLabel = new TruncatingSpriteText
                             {
                                 Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                             MapperContainer = new FillFlowContainer
                             {
@@ -354,7 +349,7 @@ namespace osu.Game.Screens.Select
 
             private void addInfoLabels()
             {
-                if (working.Beatmap?.HitObjects?.Any() != true)
+                if (working.Beatmap?.HitObjects.Any() != true)
                     return;
 
                 infoLabelContainer.Children = new Drawable[]

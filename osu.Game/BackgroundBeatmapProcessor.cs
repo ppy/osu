@@ -14,8 +14,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 
 namespace osu.Game
@@ -24,6 +27,9 @@ namespace osu.Game
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
@@ -40,19 +46,23 @@ namespace osu.Game
         [Resolved]
         private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
 
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
-            }).ContinueWith(t =>
+                convertLegacyTotalScoreToStandardised();
+            }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
                 {
@@ -92,7 +102,7 @@ namespace osu.Game
                             }
                         }
 
-                        r.Find<RulesetInfo>(ruleset.ShortName).LastAppliedDifficultyVersion = currentVersion;
+                        r.Find<RulesetInfo>(ruleset.ShortName)!.LastAppliedDifficultyVersion = currentVersion;
                     });
 
                     Logger.Log($"Finished resetting {countReset} beatmap sets for {ruleset.Name}");
@@ -121,11 +131,7 @@ namespace osu.Game
 
             foreach (var id in beatmapSetIds)
             {
-                while (localUserPlayInfo?.IsPlaying.Value == true)
-                {
-                    Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
-                }
+                sleepIfRequired();
 
                 realmAccess.Run(r =>
                 {
@@ -157,8 +163,12 @@ namespace osu.Game
             {
                 foreach (var score in r.All<ScoreInfo>())
                 {
-                    if (score.Statistics.Sum(kvp => kvp.Value) > 0 && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    if (score.BeatmapInfo != null
+                        && score.Statistics.Sum(kvp => kvp.Value) > 0
+                        && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
+                    {
                         scoreIds.Add(score.ID);
+                    }
                 }
             });
 
@@ -166,11 +176,7 @@ namespace osu.Game
 
             foreach (var id in scoreIds)
             {
-                while (localUserPlayInfo?.IsPlaying.Value == true)
-                {
-                    Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
-                }
+                sleepIfRequired();
 
                 try
                 {
@@ -182,15 +188,104 @@ namespace osu.Game
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
-                        r.Find<ScoreInfo>(id).MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                        r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
                     Logger.Log($"Populated maximum statistics for score {id}");
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
                 }
+            }
+        }
+
+        private void convertLegacyTotalScoreToStandardised()
+        {
+            Logger.Log("Querying for scores that need total score conversion...");
+
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
+                                                                             .Where(s => s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .AsEnumerable().Select(s => s.ID)));
+
+            Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
+
+            if (scoreIds.Count == 0)
+                return;
+
+            ProgressNotification notification = new ProgressNotification { State = ProgressNotificationState.Active };
+
+            notificationOverlay?.Post(notification);
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in scoreIds)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
+                notification.Progress = (float)processedCount / scoreIds.Count;
+
+                sleepIfRequired();
+
+                try
+                {
+                    var score = scoreManager.Query(s => s.ID == id);
+                    long newTotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(score, beatmapManager);
+
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        s.TotalScore = newTotalScore;
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
+
+                    Logger.Log($"Converted total score for score {id}");
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to convert total score for {id}: {e}");
+                    ++failedCount;
+                }
+            }
+
+            if (processedCount == scoreIds.Count)
+            {
+                notification.CompletionText = $"{processedCount} score(s) have been upgraded to the new scoring algorithm";
+                notification.Progress = 1;
+                notification.State = ProgressNotificationState.Completed;
+            }
+            else
+            {
+                notification.Text = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm.";
+
+                // We may have arrived here due to user cancellation or completion with failures.
+                if (failedCount > 0)
+                    notification.Text += $" Check logs for issues with {failedCount} failed upgrades.";
+
+                notification.State = ProgressNotificationState.Cancelled;
+            }
+        }
+
+        private void sleepIfRequired()
+        {
+            while (localUserPlayInfo?.IsPlaying.Value == true)
+            {
+                Logger.Log("Background processing sleeping due to active gameplay...");
+                Thread.Sleep(TimeToSleepDuringGameplay);
             }
         }
     }

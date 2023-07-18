@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             FormatVersion = formatVersion;
         }
 
-        [CanBeNull]
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
@@ -586,7 +585,5 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
-
-#nullable disable
     }
 }
