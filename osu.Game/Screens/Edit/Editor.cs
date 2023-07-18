@@ -998,8 +998,7 @@ namespace osu.Game.Screens.Edit
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
             new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-            new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-            new EditorMenuItem(EditorStrings.ExportLegacyPackage, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            createExportPackageMenu(),
             new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
@@ -1008,6 +1007,17 @@ namespace osu.Game.Screens.Edit
             new EditorMenuItemSpacer(),
             new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
+
+        private EditorMenuItem createExportPackageMenu()
+        {
+            var exportItems = new List<MenuItem>
+            {
+                new EditorMenuItem(EditorStrings.ExportNewFormat, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportLegacyFormat, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            };
+
+            return new EditorMenuItem(EditorStrings.ExportPackage) { Items = exportItems };
+        }
 
         private void exportBeatmap()
         {
