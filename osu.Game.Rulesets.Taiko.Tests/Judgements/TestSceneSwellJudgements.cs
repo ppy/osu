@@ -114,5 +114,75 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 
             AddAssert("all tick offsets are 0", () => JudgementResults.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
         }
+
+        /// <summary>
+        /// Ensure input is correctly sent to subsequent hits if a swell is fully completed.
+        /// </summary>
+        [Test]
+        public void TestHitSwellThenHitHit()
+        {
+            const double swell_time = 1000;
+            const double hit_time = 1150;
+
+            Swell swell = new Swell
+            {
+                StartTime = swell_time,
+                Duration = 100,
+                RequiredHits = 1
+            };
+
+            Hit hit = new Hit
+            {
+                StartTime = hit_time
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(swell_time, TaikoAction.LeftRim),
+                new TaikoReplayFrame(hit_time, TaikoAction.RightCentre),
+            };
+
+            PerformTest(frames, CreateBeatmap(swell, hit));
+
+            AssertJudgementCount(3);
+
+            AssertResult<SwellTick>(0, HitResult.IgnoreHit);
+            AssertResult<Swell>(0, HitResult.LargeBonus);
+            AssertResult<Hit>(0, HitResult.Great);
+        }
+
+        [Test]
+        public void TestMissSwellThenHitHit()
+        {
+            const double swell_time = 1000;
+            const double hit_time = 1150;
+
+            Swell swell = new Swell
+            {
+                StartTime = swell_time,
+                Duration = 100,
+                RequiredHits = 1
+            };
+
+            Hit hit = new Hit
+            {
+                StartTime = hit_time
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time, TaikoAction.RightCentre),
+            };
+
+            PerformTest(frames, CreateBeatmap(swell, hit));
+
+            AssertJudgementCount(3);
+
+            AssertResult<SwellTick>(0, HitResult.IgnoreMiss);
+            AssertResult<Swell>(0, HitResult.IgnoreMiss);
+            AssertResult<Hit>(0, HitResult.Great);
+        }
     }
 }

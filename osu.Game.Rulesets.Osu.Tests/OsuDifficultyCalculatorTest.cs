@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -19,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         [TestCase(6.7115569159190587d, 206, "diffcalc-test")]
         [TestCase(1.4391311903612753d, 45, "zero-length-sliders")]
+        [TestCase(0.14102693012101306d, 1, "nan-slider")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 

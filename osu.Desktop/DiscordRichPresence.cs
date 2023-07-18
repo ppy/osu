@@ -54,9 +54,6 @@ namespace osu.Desktop
 
             client.OnReady += onReady;
 
-            // safety measure for now, until we performance test / improve backoff for failed connections.
-            client.OnConnectionFailed += (_, _) => client.Deinitialize();
-
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
@@ -187,7 +184,7 @@ namespace osu.Desktop
                     return edit.BeatmapInfo.ToString() ?? string.Empty;
 
                 case UserActivity.WatchingReplay watching:
-                    return watching.BeatmapInfo.ToString();
+                    return watching.BeatmapInfo?.ToString() ?? string.Empty;
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
