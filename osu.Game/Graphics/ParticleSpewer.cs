@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -60,19 +61,43 @@ namespace osu.Game.Graphics
                 return;
             }
 
-            while (lastParticleAdded == null || Math.Abs(Time.Current - lastParticleAdded.Value) > timeBetweenSpawns)
+            // Always want to spawn the first particle in an activation immediately.
+            if (lastParticleAdded == null)
             {
-                lastParticleAdded ??= Time.Current;
-
-                var newParticle = CreateParticle();
-                newParticle.StartTime = (float)lastParticleAdded;
-
-                particles[currentIndex] = newParticle;
-
-                currentIndex = (currentIndex + 1) % particles.Length;
-
-                lastParticleAdded += timeBetweenSpawns;
+                lastParticleAdded = Time.Current;
+                spawnParticle();
             }
+
+            double timeElapsed = Math.Abs(Time.Current - lastParticleAdded.Value);
+
+            // Avoid spawning too many particles if a long amount of time has passed.
+            if (timeElapsed > maxDuration)
+            {
+                lastParticleAdded = Time.Current;
+                spawnParticle();
+                return;
+            }
+
+            Debug.Assert(lastParticleAdded != null);
+
+            for (int i = 0; i < timeElapsed / timeBetweenSpawns; i++)
+            {
+                lastParticleAdded += timeBetweenSpawns;
+                spawnParticle();
+            }
+        }
+
+        private void spawnParticle()
+        {
+            Debug.Assert(lastParticleAdded != null);
+
+            var newParticle = CreateParticle();
+
+            newParticle.StartTime = (float)lastParticleAdded.Value;
+
+            particles[currentIndex] = newParticle;
+
+            currentIndex = (currentIndex + 1) % particles.Length;
         }
 
         /// <summary>
