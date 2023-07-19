@@ -48,7 +48,8 @@ namespace osu.Game.Overlays.Mods
         /// Contrary to <see cref="OsuGameBase.AvailableMods"/> and <see cref="globalAvailableMods"/>, the <see cref="Mod"/> instances
         /// inside the <see cref="ModState"/> objects are owned solely by this <see cref="ModSelectOverlay"/> instance.
         /// </remarks>
-        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
+        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } =
+            new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
         private Func<Mod, bool> isValidMod = _ => true;
 
@@ -636,12 +637,9 @@ namespace osu.Game.Overlays.Mods
 
                 case GlobalAction.Select:
                 {
-                    // Pressing select should select first filtered mod or completely hide the overlay in one shot if search term is empty.
+                    // Pressing select should select first filtered mod if a search is in progress.
                     if (string.IsNullOrEmpty(SearchTerm))
-                    {
-                        hideOverlay(true);
                         return true;
-                    }
 
                     ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
 
