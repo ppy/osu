@@ -89,6 +89,30 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestBreakMultipleObjectsEarly()
+        {
+            var beatmap = new Beatmap<HitObject>
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 0 },
+                    new HitCircle { StartTime = 1_297 },
+                    new HitCircle { StartTime = 1_298 }
+                },
+                Breaks = new List<BreakPeriod>
+                {
+                    new BreakPeriod(200, 850)
+                }
+            };
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckBreaks.IssueTemplateLateEnd);
+        }
+
+        [Test]
         public void TestBreaksCorrect()
         {
             var beatmap = new Beatmap<HitObject>
