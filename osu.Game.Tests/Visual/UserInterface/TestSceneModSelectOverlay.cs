@@ -542,7 +542,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("clear search", () => modSelectOverlay.SearchTerm = string.Empty);
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-            AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod select still visible", () => modSelectOverlay.State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -793,7 +793,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
-                                                                              .ChildrenOfType<RestoreDefaultValueButton<double>>().Single().TriggerClick());
+                                                                              .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
             AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
         }
 

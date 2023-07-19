@@ -279,11 +279,8 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
-            string empty = "";
-            while (space-- > 0)
-                empty += "\0";
-
-            handleMatches(emoji_regex, empty, "{0}", result, startIndex);
+            // see: https://github.com/ppy/osu/pull/24190
+            result.Text = Regex.Replace(result.Text, emoji_regex.ToString(), "[emoji]");
 
             return result;
         }

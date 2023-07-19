@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -46,14 +47,15 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                 new OsuSpriteText
                 {
                     Text = Label,
-                    Font = OsuFont.Default.With(size: 18)
+                    Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE)
                 },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = StatisticItem.FONT_SIZE * 2,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -65,17 +67,31 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                changeIcon = new SpriteIcon
+                                new Container
                                 {
+                                    Size = new Vector2(14),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Size = new Vector2(18)
+                                    Children = new Drawable[]
+                                    {
+                                        new Circle
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colours.Gray1
+                                        },
+                                        changeIcon = new SpriteIcon
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Size = new Vector2(10),
+                                        },
+                                    }
                                 },
                                 currentValueText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold)
+                                    Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                                 },
                             }
                         },
@@ -83,7 +99,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Font = OsuFont.Default.With(weight: FontWeight.Bold)
+                            Font = OsuFont.Default.With(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                         }
                     }
                 }
@@ -123,7 +139,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             }
             else
             {
-                comparisonColour = colours.Orange1;
+                comparisonColour = colours.Gray4;
                 icon = FontAwesome.Solid.Minus;
             }
 
