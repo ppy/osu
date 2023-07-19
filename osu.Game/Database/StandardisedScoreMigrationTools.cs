@@ -26,6 +26,9 @@ namespace osu.Game.Database
             if (score.IsLegacyScore)
                 return false;
 
+            if (score.TotalScoreVersion > 30000002)
+                return false;
+
             // Recalculate the old-style standardised score to see if this was an old lazer score.
             bool oldScoreMatchesExpectations = GetOldStandardised(score) == score.TotalScore;
             // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.

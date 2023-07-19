@@ -75,8 +75,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = sender.Detach().OrderByTotalScore().FirstOrDefault();
-
+                ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;
             }
