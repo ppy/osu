@@ -107,7 +107,7 @@ namespace osu.Game.Graphics
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
-        # region DrawNode
+        #region DrawNode
 
         private class ParticleSpewerDrawNode : SpriteDrawNode
         {
