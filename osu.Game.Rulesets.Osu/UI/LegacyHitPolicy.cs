@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.UI
     /// Hits will be blocked until the previous <see cref="HitObject"/>s have been judged.
     /// </remarks>
     /// </summary>
-    public class ObjectOrderedHitPolicy : IHitPolicy
+    public class LegacyHitPolicy : IHitPolicy
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
