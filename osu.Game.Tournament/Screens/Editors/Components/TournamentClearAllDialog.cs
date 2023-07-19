@@ -8,7 +8,6 @@ using osu.Game.Overlays.Dialog;
 namespace osu.Game.Tournament.Screens.Editors.Components
 {
     public partial class TournamentClearAllDialog : DangerousActionDialog
-
     {
         public TournamentClearAllDialog(IList storage)
         {
