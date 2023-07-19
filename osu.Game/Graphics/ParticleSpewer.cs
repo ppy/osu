@@ -66,12 +66,13 @@ namespace osu.Game.Graphics
             {
                 lastParticleAdded = Time.Current;
                 spawnParticle();
+                return;
             }
 
-            double timeElapsed = Math.Abs(Time.Current - lastParticleAdded.Value);
+            double timeElapsed = Time.Current - lastParticleAdded.Value;
 
             // Avoid spawning too many particles if a long amount of time has passed.
-            if (timeElapsed > maxDuration)
+            if (Math.Abs(timeElapsed) > maxDuration)
             {
                 lastParticleAdded = Time.Current;
                 spawnParticle();
