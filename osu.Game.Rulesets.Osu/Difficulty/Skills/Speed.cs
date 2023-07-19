@@ -5,9 +5,9 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -16,11 +16,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private double skillMultiplier => 1375;
-        private double strainDecayBase => 0.3;
+        private const double skill_multiplier = 1375;
+        private const double strain_decay_base = 0.3;
 
-        private double currentStrain;
         private double currentRhythm;
+
+        private readonly DecayingValue currentStrain = DecayingValue.FromDecayMultiplierPerSecond(strain_decay_base);
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
@@ -32,18 +33,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double StrainAtTime(double time) => currentRhythm * currentStrain.ValueAtTime(time);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            currentStrain.IncrementValueAtTime(current.StartTime, SpeedEvaluator.EvaluateDifficultyOf(current) * skill_multiplier);
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
-            double totalStrain = currentStrain * currentRhythm;
+            double totalStrain = currentStrain.Value * currentRhythm;
 
             objectStrains.Add(totalStrain);
 

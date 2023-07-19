@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
@@ -24,21 +24,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
-        private double skillMultiplier => 0.052;
-        private double strainDecayBase => 0.15;
+        private const double skill_multiplier = 0.052;
 
-        private double currentStrain;
+        private const double strain_decay_base = 0.15;
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private readonly DecayingValue currentStrain = DecayingValue.FromDecayMultiplierPerSecond(strain_decay_base);
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double StrainAtTime(double time) => currentStrain.ValueAtTime(time);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
-
-            return currentStrain;
+            double difficulty = FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skill_multiplier;
+            return currentStrain.IncrementValueAtTime(current.StartTime, difficulty);
         }
 
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum() * OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER;

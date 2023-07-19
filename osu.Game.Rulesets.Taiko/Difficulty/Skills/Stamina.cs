@@ -14,14 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Stamina : StrainDecaySkill
     {
         protected override double SkillMultiplier => 1.1;
-        protected override double StrainDecayBase => 0.4;
 
         /// <summary>
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
         /// <param name="mods">Mods for use in skill calculations.</param>
         public Stamina(Mod[] mods)
-            : base(mods)
+            : base(mods, strainDecayBase: 0.4)
         {
         }
 

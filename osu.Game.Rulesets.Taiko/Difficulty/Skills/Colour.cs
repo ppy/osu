@@ -18,10 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         // This is set to decay slower than other skills, due to the fact that only the first note of each encoding class
         //  having any difficulty values, and we want to allow colour difficulty to be able to build up even on
         // slower maps.
-        protected override double StrainDecayBase => 0.8;
 
         public Colour(Mod[] mods)
-            : base(mods)
+            : base(mods, strainDecayBase: 0.8)
         {
         }
 

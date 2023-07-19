@@ -14,17 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the rhythm coefficient of taiko difficulty.
     /// </summary>
-    public class Rhythm : StrainDecaySkill
+    public class Rhythm : StrainSkill
     {
-        protected override double SkillMultiplier => 10;
-        protected override double StrainDecayBase => 0;
+        private const double skill_multiplier = 10;
 
         /// <summary>
         /// The note-based decay for rhythm strain.
         /// </summary>
-        /// <remarks>
-        /// <see cref="StrainDecayBase"/> is not used here, as it's time- and not note-based.
-        /// </remarks>
         private const double strain_decay = 0.96;
 
         /// <summary>
@@ -53,7 +49,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainAtTime(double time) => 0;
+
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
             // drum rolls and swells are exempt.
             if (!(current.BaseObject is Hit))
@@ -83,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             notesSinceRhythmChange = 0;
 
             currentStrain += objectStrain;
-            return currentStrain;
+            return skill_multiplier * currentStrain;
         }
 
         /// <summary>
