@@ -25,7 +25,10 @@ namespace osu.Game.Screens.Edit.Components.Menus
             RelativeSizeAxes = Axes.X;
 
             MaskingContainer.CornerRadius = 0;
-            ItemsContainer.Padding = new MarginPadding { Left = heading_area };
+            ItemsContainer.Padding = new MarginPadding();
+
+            ContentContainer.Margin = new MarginPadding { Left = heading_area };
+            ContentContainer.Masking = true;
         }
 
         [BackgroundDependencyLoader]
