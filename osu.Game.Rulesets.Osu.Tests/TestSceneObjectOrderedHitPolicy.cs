@@ -213,10 +213,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Tests clicking a future circle after a slider's start time, but hitting all slider ticks.
+        /// Tests clicking a future circle after a slider's start time, but hitting the slider head and all slider ticks.
         /// </summary>
         [Test]
-        public void TestMissSliderHeadAndHitAllSliderTicks()
+        public void TestHitCircleBeforeSliderHead()
         {
             const double time_slider = 1500;
             const double time_circle = 1510;
@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_slider + 10, Position = positionSlider, Actions = { OsuAction.RightButton } }
             });
 
-            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Great);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
