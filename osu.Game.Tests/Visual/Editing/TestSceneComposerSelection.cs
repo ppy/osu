@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -82,7 +80,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestNudgeSelection()
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -104,7 +102,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestRotateHotkeys()
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -136,7 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestGlobalFlipHotkeys()
         {
-            HitCircle addedObject = null;
+            HitCircle addedObject = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.Add(addedObject = new HitCircle { StartTime = 100 }));
 
@@ -369,7 +367,7 @@ namespace osu.Game.Tests.Visual.Editing
         [TestCase(true)]
         public void TestMultiSelectFromDrag(bool alreadySelectedBeforeDrag)
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -468,7 +466,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestQuickDeleteRemovesSliderControlPoint()
         {
-            Slider slider = null;
+            Slider slider = null!;
 
             PathControlPoint[] points =
             {
