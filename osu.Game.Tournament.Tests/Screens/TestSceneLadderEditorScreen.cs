@@ -3,9 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Screens.Editors;
 using osu.Framework.Testing;
@@ -35,12 +39,16 @@ namespace osu.Game.Tournament.Tests.Screens
         [Test]
         public void TestResetBracketTeamsCancelled()
         {
+            Bindable<string> matchBeforeReset = new Bindable<string>();
+            AddStep("save current match state", () =>
+            {
+                matchBeforeReset.Value = JsonConvert.SerializeObject(Ladder.CurrentMatch.Value);
+            });
             AddStep("pull up context menu", () =>
             {
                 InputManager.MoveMouseTo(ladderEditorScreen);
                 InputManager.Click(MouseButton.Right);
             });
-
             AddStep("click Reset teams button", () =>
             {
                 InputManager.MoveMouseTo(osuContextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().Last(p =>
@@ -48,19 +56,16 @@ namespace osu.Game.Tournament.Tests.Screens
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is LadderResetTeamsDialog);
+            AddAssert("dialog displayed", () => DialogOverlay.CurrentDialog is LadderResetTeamsDialog);
             AddStep("click cancel", () =>
             {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
+                InputManager.MoveMouseTo(DialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("dialog dismissed", () => dialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
+            AddUntilStep("dialog dismissed", () => DialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
 
-            AddAssert("assert ladder teams unchanged", () =>
-            {
-                return !Ladder.Matches.Any(m => m.Team1.Value == null && m.Team2.Value == null);
-            });
+            AddAssert("assert ladder teams unchanged", () => string.Equals(matchBeforeReset.Value, JsonConvert.SerializeObject(Ladder.CurrentMatch.Value), StringComparison.Ordinal));
         }
 
         [Test]
@@ -79,22 +84,19 @@ namespace osu.Game.Tournament.Tests.Screens
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is LadderResetTeamsDialog);
+            AddAssert("dialog displayed", () => DialogOverlay.CurrentDialog is LadderResetTeamsDialog);
 
             AddStep("click confirmation", () =>
             {
-                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.MoveMouseTo(DialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddUntilStep("dialog dismissed", () => dialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
+            AddUntilStep("dialog dismissed", () => DialogOverlay.CurrentDialog is not LadderResetTeamsDialog);
 
             AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("assert ladder teams reset", () =>
-            {
-                return Ladder.Matches.All(m => m.Team1.Value == null && m.Team2.Value == null);
-            });
+            AddAssert("assert ladder teams reset", () => Ladder.CurrentMatch.Value.Team1.Value == null && Ladder.CurrentMatch.Value.Team2.Value == null);
         }
     }
 }

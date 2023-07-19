@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Tests
     public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
         private TournamentMatch match;
-        protected DialogOverlay dialogOverlay;
+        protected DialogOverlay DialogOverlay;
 
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
@@ -48,9 +48,9 @@ namespace osu.Game.Tournament.Tests
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
 
-            Add(dialogOverlay = new DialogOverlay { Depth = -1 });
+            Add(DialogOverlay = new DialogOverlay { Depth = -1 });
 
-            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(DialogOverlay);
         }
 
         [SetUpSteps]
