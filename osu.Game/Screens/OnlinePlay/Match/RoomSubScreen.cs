@@ -365,7 +365,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!IsConnected)
                 return true;
 
-            if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
+            bool hasUnsavedChanges = Room.RoomID.Value == null && Room.Playlist.Count > 0;
+
+            if (dialogOverlay == null || !hasUnsavedChanges)
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
