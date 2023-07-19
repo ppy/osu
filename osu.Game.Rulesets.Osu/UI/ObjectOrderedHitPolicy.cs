@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -27,16 +28,17 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public ClickAction CheckHittable(DrawableHitObject hitObject, double time)
         {
-            int index = HitObjectContainer.AliveObjects.IndexOf(hitObject);
+            var aliveObjects = HitObjectContainer.AliveObjects.ToList();
+            int index = aliveObjects.IndexOf(hitObject);
 
             if (index > 0)
             {
-                var previousHitObject = (DrawableOsuHitObject)HitObjectContainer.AliveObjects[index - 1];
+                var previousHitObject = (DrawableOsuHitObject)aliveObjects[index - 1];
                 if (previousHitObject.HitObject.StackHeight > 0 && !previousHitObject.AllJudged)
                     return ClickAction.Ignore;
             }
 
-            foreach (DrawableHitObject testObject in HitObjectContainer.AliveObjects)
+            foreach (DrawableHitObject testObject in aliveObjects)
             {
                 if (testObject.AllJudged)
                     continue;
