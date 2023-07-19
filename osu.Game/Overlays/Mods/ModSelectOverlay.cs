@@ -111,6 +111,10 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> globalAvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
+        public IEnumerable<Mod> AllAvailableAndValidMods => allAvailableMods
+                                                            .Select(s => s.Mod)
+                                                            .Where(m => isValidMod(m));
+
         private IEnumerable<ModState> allAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
         private readonly BindableBool customisationVisible = new BindableBool();
