@@ -23,6 +23,7 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
@@ -284,6 +288,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        protected virtual bool IsConnected => api.State.Value == APIState.Online;
+
         public override bool OnBackButton()
         {
             if (Room.RoomID.Value == null)
@@ -354,6 +360,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private bool ensureExitConfirmed()
         {
             if (ExitConfirmed)
+                return true;
+
+            if (!IsConnected)
                 return true;
 
             if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
