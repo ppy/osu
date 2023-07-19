@@ -397,8 +397,8 @@ namespace osu.Game.Skinning
                                     new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
-                                    new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
                                     new DefaultKeyCounterDisplay()
                                 }
