@@ -57,6 +57,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     {
                         hitObject.FadeOut(duration);
 
+                        // Keep updating the object even after it stopped being visible.
+                        // This is required because of the custom logic in DrawableHit's Update method.
+                        // Specifically, pressHandledThisFrame wasn't reset, which caused further hits
+                        // within the object's lifetime to be rejected.
+                        hitObject.AlwaysPresent = true;
+
                         // DrawableHitObject sets LifetimeEnd to LatestTransformEndTime if it isn't manually changed.
                         // in order for the object to not be killed before its actual end time (as the latest transform ends earlier), set lifetime end explicitly.
                         hitObject.LifetimeEnd = state == ArmedState.Idle || !hitObject.AllJudged
