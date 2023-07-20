@@ -363,6 +363,20 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
         }
 
+        [Test]
+        public void TestDoubleClickToSeek()
+        {
+            var hitCircle = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { hitCircle }));
+
+            moveMouseToObject(() => hitCircle);
+
+            AddRepeatStep("double click", () => InputManager.Click(MouseButton.Left), 2);
+
+            AddUntilStep("seeked to circle", () => EditorClock.CurrentTime, () => Is.EqualTo(600));
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestMultiSelectFromDrag(bool alreadySelectedBeforeDrag)
