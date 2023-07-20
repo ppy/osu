@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
         [Cached(typeof(ScoreProcessor))]
-        private ScoreProcessor scoreProcessor => gameplayState.ScoreProcessor;
+        private ScoreProcessor scoreProcessor { get; set; }
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -36,6 +36,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        public TestSceneSkinEditorMultipleSkins()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
