@@ -88,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             Text = "Clear all",
                             Action = () =>
                             {
-                                dialogOverlay?.Push(new TournamentClearAllDialog(Storage));
+                                dialogOverlay?.Push(new TournamentClearAllDialog(() => Storage.Clear()));
                             }
                         },
                     }
