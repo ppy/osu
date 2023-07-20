@@ -111,16 +111,19 @@ namespace osu.Game.Screens.OnlinePlay
             if (current == allAvailableAndValidMods.Count())
             {
                 count.Text = "all";
+                count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
                 circle.FadeColour(colours.Yellow, 200, Easing.OutQuint);
             }
             else if (current > 0)
             {
                 count.Text = $"{current} mods";
+                count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
                 circle.FadeColour(colours.YellowDark, 200, Easing.OutQuint);
             }
             else
             {
                 count.Text = "off";
+                count.FadeColour(colours.GrayF, 200, Easing.OutQuint);
                 circle.FadeColour(colours.Gray4, 200, Easing.OutQuint);
             }
         }
