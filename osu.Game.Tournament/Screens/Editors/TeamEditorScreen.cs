@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
@@ -75,10 +74,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
-                PlayerEditor playerEditor = new PlayerEditor(Model)
-                {
-                    Width = 0.95f
-                };
+                PlayerEditor playerEditor = new PlayerEditor(Model);
 
                 InternalChildren = new Drawable[]
                 {
@@ -89,14 +85,15 @@ namespace osu.Game.Tournament.Screens.Editors
                     },
                     new GroupTeam(team)
                     {
-                        Margin = new MarginPadding(32),
+                        Margin = new MarginPadding(16),
+                        Scale = new Vector2(2),
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
                     new FillFlowContainer
                     {
-                        Margin = new MarginPadding(5),
                         Spacing = new Vector2(5),
+                        Padding = new MarginPadding(10),
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -136,29 +133,36 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
-                                Text = "Add player",
-                                Action = () => playerEditor.CreateNew()
-                            },
-                            new DangerousSettingsButton
-                            {
-                                Width = 0.2f,
-                                Text = "Delete Team",
-                                Margin = new MarginPadding(10),
-                                Action = () =>
-                                {
-                                    Expire();
-                                    ladderInfo.Teams.Remove(Model);
-                                },
-                            },
-                            playerEditor,
-                            new SettingsButton
-                            {
-                                Width = 0.2f,
-                                Margin = new MarginPadding(10),
                                 Text = "Edit seeding results",
                                 Action = () =>
                                 {
                                     sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
+                                }
+                            },
+                            playerEditor,
+                            new SettingsButton
+                            {
+                                Text = "Add player",
+                                Action = () => playerEditor.CreateNew()
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    new DangerousSettingsButton
+                                    {
+                                        Width = 0.2f,
+                                        Text = "Delete Team",
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Action = () =>
+                                        {
+                                            Expire();
+                                            ladderInfo.Teams.Remove(Model);
+                                        },
+                                    },
                                 }
                             },
                         }
@@ -183,6 +187,8 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(5),
+                        Spacing = new Vector2(5),
                         ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
                     };
                 }
@@ -199,9 +205,6 @@ namespace osu.Game.Tournament.Screens.Editors
                     private readonly TournamentUser user;
 
                     [Resolved]
-                    protected IAPIProvider API { get; private set; } = null!;
-
-                    [Resolved]
                     private TournamentGameBase game { get; set; } = null!;
 
                     private readonly Bindable<int?> playerId = new Bindable<int?>();
@@ -211,8 +214,6 @@ namespace osu.Game.Tournament.Screens.Editors
                     public PlayerRow(TournamentTeam team, TournamentUser user)
                     {
                         this.user = user;
-
-                        Margin = new MarginPadding(10);
 
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
@@ -246,7 +247,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     },
                                     userPanelContainer = new Container
                                     {
-                                        Width = 500,
+                                        Width = 400,
                                         RelativeSizeAxes = Axes.Y,
                                     },
                                 }
@@ -292,8 +293,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         userPanelContainer.Child = new UserListPanel(user.ToAPIUser())
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Scale = new Vector2(1.7f),
                         };
                     });
                 }
