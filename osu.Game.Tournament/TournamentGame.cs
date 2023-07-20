@@ -43,7 +43,6 @@ namespace osu.Game.Tournament
 
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
         private DependencyContainer dependencies;
-        private Container topMostOverlayContent;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -102,13 +101,11 @@ namespace osu.Game.Tournament
                         RelativeSizeAxes = Axes.Both,
                         Child = new TournamentSceneManager()
                     },
-                    topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both }
+                    new Container { RelativeSizeAxes = Axes.Both, Child = dialogOverlay }
                 }, drawables =>
                 {
                     loadingSpinner.Hide();
                     loadingSpinner.Expire();
-
-                    topMostOverlayContent.Add(dialogOverlay);
                     AddRange(drawables);
 
                     windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
