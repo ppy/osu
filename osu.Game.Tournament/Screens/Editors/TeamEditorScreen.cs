@@ -15,6 +15,10 @@ using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Drawings.Components;
+using osu.Game.Tournament.Screens.Gameplay.Components;
+using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Screens.TeamIntro;
 using osu.Game.Users;
 using osuTK;
 
@@ -59,8 +63,6 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             public TournamentTeam Model { get; }
 
-            private readonly Container drawableContainer;
-
             [Resolved]
             private TournamentSceneManager? sceneManager { get; set; }
 
@@ -74,6 +76,9 @@ namespace osu.Game.Tournament.Screens.Editors
                 Masking = true;
                 CornerRadius = 10;
 
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+
                 PlayerEditor playerEditor = new PlayerEditor(Model)
                 {
                     Width = 0.95f
@@ -86,10 +91,9 @@ namespace osu.Game.Tournament.Screens.Editors
                         Colour = OsuColour.Gray(0.1f),
                         RelativeSizeAxes = Axes.Both,
                     },
-                    drawableContainer = new Container
+                    new GroupTeam(team)
                     {
-                        Size = new Vector2(100, 50),
-                        Margin = new MarginPadding(10),
+                        Margin = new MarginPadding(32),
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
@@ -134,14 +138,14 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsButton
                             {
-                                Width = 0.11f,
+                                Width = 0.2f,
                                 Margin = new MarginPadding(10),
                                 Text = "Add player",
                                 Action = () => playerEditor.CreateNew()
                             },
                             new DangerousSettingsButton
                             {
-                                Width = 0.11f,
+                                Width = 0.2f,
                                 Text = "Delete Team",
                                 Margin = new MarginPadding(10),
                                 Action = () =>
@@ -164,16 +168,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         }
                     },
                 };
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                Model.FlagName.BindValueChanged(updateDrawable, true);
-            }
-
-            private void updateDrawable(ValueChangedEvent<string> flag)
-            {
-                drawableContainer.Child = new DrawableTeamFlag(Model);
             }
 
             public partial class PlayerEditor : CompositeDrawable
@@ -216,7 +210,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Bindable<int?> playerId = new Bindable<int?>();
 
-                    private readonly Container drawableContainer;
+                    private readonly Container userPanelContainer;
 
                     public PlayerRow(TournamentTeam team, TournamentUser user)
                     {
@@ -228,7 +222,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         AutoSizeAxes = Axes.Y;
 
                         Masking = true;
-                        CornerRadius = 5;
+                        CornerRadius = 10;
 
                         InternalChildren = new Drawable[]
                         {
@@ -240,10 +234,11 @@ namespace osu.Game.Tournament.Screens.Editors
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding(5),
-                                Padding = new MarginPadding { Right = 160 },
+                                Padding = new MarginPadding { Right = 60 },
                                 Spacing = new Vector2(5),
                                 Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
                                     new SettingsNumberBox
@@ -253,9 +248,10 @@ namespace osu.Game.Tournament.Screens.Editors
                                         Width = 200,
                                         Current = playerId,
                                     },
-                                    drawableContainer = new Container
+                                    userPanelContainer = new Container
                                     {
-                                        Size = new Vector2(100, 70),
+                                        Width = 500,
+                                        RelativeSizeAxes = Axes.Y,
                                     },
                                 }
                             },
@@ -298,7 +294,11 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private void updatePanel() => Scheduler.AddOnce(() =>
                     {
-                        drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
+                        userPanelContainer.Child = new UserListPanel(user.ToAPIUser())
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        };
                     });
                 }
             }
