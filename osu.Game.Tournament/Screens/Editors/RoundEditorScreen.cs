@@ -11,9 +11,11 @@ using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
@@ -28,6 +30,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; } = null!;
+
+            [Resolved(canBeNull: true)]
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             public RoundRow(TournamentRound round)
             {
@@ -99,11 +104,13 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
                         Text = "Delete Round",
-                        Action = () =>
-                        {
-                            Expire();
-                            ladderInfo.Rounds.Remove(Model);
-                        },
+                        Action = () => dialogOverlay?.Push(
+                            new RoundEditorDeleteRoundDialog(
+                                Model.Name.Value, () =>
+                                {
+                                    Expire();
+                                    ladderInfo.Rounds.Remove(Model);
+                                }))
                     }
                 };
 

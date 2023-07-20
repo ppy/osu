@@ -12,9 +12,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -63,6 +65,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
             [Resolved]
             private TournamentSceneManager? sceneManager { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; } = null!;
@@ -144,11 +149,16 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.11f,
                                 Text = "Delete Team",
                                 Margin = new MarginPadding(10),
-                                Action = () =>
-                                {
-                                    Expire();
-                                    ladderInfo.Teams.Remove(Model);
-                                },
+                                Action = () => dialogOverlay?.Push(
+                                    new TeamEditorDeleteTeamDialog(Model.FullName.Value,
+                                        Model.Acronym.Value,
+                                        () =>
+                                        {
+                                            Expire();
+                                            ladderInfo.Teams.Remove(Model);
+                                        }
+                                    )
+                                )
                             },
                             playerEditor,
                             new SettingsButton
