@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a click selection was active.</returns>
         private bool endClickSelection(MouseButtonEvent e)
         {
-            // If already handled a selection or drag, we don't want to perform a mouse up / click action.
+            // If already handled a selection, double-click, or drag, we don't want to perform a mouse up / click action.
             if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint) return true;
 
             if (e.Button != MouseButton.Left) return false;
