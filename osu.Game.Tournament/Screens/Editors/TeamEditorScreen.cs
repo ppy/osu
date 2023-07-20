@@ -13,12 +13,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
-using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
-using osu.Game.Tournament.Screens.Gameplay.Components;
-using osu.Game.Tournament.Screens.Ladder.Components;
-using osu.Game.Tournament.Screens.TeamIntro;
 using osu.Game.Users;
 using osuTK;
 
