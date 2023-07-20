@@ -320,7 +320,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             moveMouseToObject(() => firstObject);
 
-            AddStep("seek near first", () => EditorClock.Seek(320));
+            AddStep("seek near second", () => EditorClock.Seek(320));
 
             AddStep("left click", () => InputManager.Click(MouseButton.Left));
             AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
@@ -347,7 +347,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             moveMouseToObject(() => firstObject);
 
-            AddStep("seek near first", () => EditorClock.Seek(600));
+            AddStep("seek to third", () => EditorClock.Seek(600));
 
             AddStep("left click", () => InputManager.Click(MouseButton.Left));
             AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
