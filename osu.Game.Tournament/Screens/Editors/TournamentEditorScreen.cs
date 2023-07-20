@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Editors
     {
         protected abstract BindableList<TModel> Storage { get; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         [CanBeNull]
         private IDialogOverlay dialogOverlay { get; set; }
 
