@@ -213,7 +213,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             int instantWinAmount = Match.Round.Value.BestOf.Value / 2;
 
             Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
-                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instantWinAmount || Match.Team2Score.Value > instantWinAmount);
+                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instantWinAmount
+                                                                                                                          || Match.Team2Score.Value > instantWinAmount);
         }
 
         protected override void LoadComplete()
@@ -265,8 +266,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnMouseDown(MouseDownEvent e) => e.Button == MouseButton.Left && editorInfo != null;
 
-        protected override bool OnDragStart(DragStartEvent e) => editorInfo != null;
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (Selected && editorInfo != null && e.Key == Key.Delete)
@@ -287,16 +286,35 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             return true;
         }
 
+        private Vector2 positionAtStartOfDrag;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (editorInfo != null)
+            {
+                positionAtStartOfDrag = Position;
+                return true;
+            }
+
+            return false;
+        }
+
         protected override void OnDrag(DragEvent e)
         {
             base.OnDrag(e);
 
             Selected = true;
-            this.MoveToOffset(e.Delta);
 
-            var pos = Position;
-            Match.Position.Value = new Point((int)pos.X, (int)pos.Y);
+            this.MoveTo(snapToGrid(positionAtStartOfDrag + (e.MousePosition - e.MouseDownPosition)));
+
+            Match.Position.Value = new Point((int)Position.X, (int)Position.Y);
         }
+
+        private Vector2 snapToGrid(Vector2 pos) =>
+            new Vector2(
+                (int)(pos.X / 10) * 10,
+                (int)(pos.Y / 10) * 10
+            );
 
         public void Remove()
         {
