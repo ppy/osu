@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private WarningBox rightClickMessage;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         [CanBeNull]
         private IDialogOverlay dialogOverlay { get; set; }
 
@@ -80,7 +80,11 @@ namespace osu.Game.Tournament.Screens.Editors
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
-                        dialogOverlay?.Push(new LadderResetTeamsDialog(MatchesContainer));
+                        dialogOverlay?.Push(new LadderResetTeamsDialog(() =>
+                        {
+                            foreach (var p in MatchesContainer)
+                                p.Match.Reset();
+                        }));
                     })
                 };
             }

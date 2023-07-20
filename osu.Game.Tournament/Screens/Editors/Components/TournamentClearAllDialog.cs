@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Screens.Editors.Components
     {
         public TournamentClearAllDialog(IList storage)
         {
-            HeaderText = @"Confirm clear all?";
+            HeaderText = @"Clear all?";
             Icon = FontAwesome.Solid.Trash;
             DangerousAction = storage.Clear;
         }
