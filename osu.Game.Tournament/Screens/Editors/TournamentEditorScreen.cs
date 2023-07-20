@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osuTK;
 
@@ -42,7 +41,7 @@ namespace osu.Game.Tournament.Screens.Editors
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -75,9 +74,10 @@ namespace osu.Game.Tournament.Screens.Editors
                             Text = "Add new",
                             Action = () => Storage.Add(new TModel())
                         },
-                        new DangerousSettingsButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
+                            BackgroundColour = colours.Pink3,
                             Text = "Clear all",
                             Action = Storage.Clear
                         },
