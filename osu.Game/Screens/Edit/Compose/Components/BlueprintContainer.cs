@@ -382,6 +382,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool selectedBlueprintAlreadySelectedOnMouseDown;
 
         /// <summary>
+        /// Sorts the supplied <paramref name="blueprints"/> by the order of preference when making a selection.
+        /// Blueprints at the start of the list will be prioritised over later items if the selection requested is ambiguous due to spatial overlap.
+        /// </summary>
+        protected virtual IEnumerable<SelectionBlueprint<T>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<T>> blueprints) => blueprints.Reverse();
+
+        /// <summary>
         /// Attempts to select any hovered blueprints.
         /// </summary>
         /// <param name="e">The input event that triggered this selection.</param>
@@ -390,15 +396,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
             // Priority is given to already-selected blueprints.
-            foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.Reverse().OrderByDescending(b => b.IsSelected))
+            foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.Where(b => b.IsSelected))
             {
-                if (!blueprint.IsHovered) continue;
+                if (runForBlueprint(blueprint))
+                    return true;
+            }
 
-                selectedBlueprintAlreadySelectedOnMouseDown = blueprint.State == SelectionState.Selected;
-                return clickSelectionHandled = SelectionHandler.MouseDownSelectionRequested(blueprint, e);
+            foreach (SelectionBlueprint<T> blueprint in ApplySelectionOrder(SelectionBlueprints.AliveChildren))
+            {
+                if (runForBlueprint(blueprint))
+                    return true;
             }
 
             return false;
+
+            bool runForBlueprint(SelectionBlueprint<T> blueprint)
+            {
+                if (!blueprint.IsHovered) return false;
+
+                selectedBlueprintAlreadySelectedOnMouseDown = blueprint.State == SelectionState.Selected;
+                clickSelectionHandled = SelectionHandler.MouseDownSelectionRequested(blueprint, e);
+                return true;
+            }
         }
 
         /// <summary>
@@ -432,13 +451,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 // The depth of blueprints is constantly changing (see above where selected blueprints are brought to the front).
                 // For this logic, we want a stable sort order so we can correctly cycle, thus using the blueprintMap instead.
-                IEnumerable<SelectionBlueprint<T>> cyclingSelectionBlueprints = blueprintMap.Values;
+                IEnumerable<SelectionBlueprint<T>> cyclingSelectionBlueprints = ApplySelectionOrder(blueprintMap.Values);
 
                 // If there's already a selection, let's start from the blueprint after the selection.
                 cyclingSelectionBlueprints = cyclingSelectionBlueprints.SkipWhile(b => !b.IsSelected).Skip(1);
 
                 // Add the blueprints from before the selection to the end of the enumerable to allow for cyclic selection.
-                cyclingSelectionBlueprints = cyclingSelectionBlueprints.Concat(blueprintMap.Values.TakeWhile(b => !b.IsSelected));
+                cyclingSelectionBlueprints = cyclingSelectionBlueprints.Concat(ApplySelectionOrder(blueprintMap.Values).TakeWhile(b => !b.IsSelected));
 
                 foreach (SelectionBlueprint<T> blueprint in cyclingSelectionBlueprints)
                 {

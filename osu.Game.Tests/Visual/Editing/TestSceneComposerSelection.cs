@@ -6,21 +6,21 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
@@ -215,6 +215,75 @@ namespace osu.Game.Tests.Visual.Editing
             moveMouseToObject(() => addedObjects[1]);
             AddStep("click second", () => InputManager.Click(MouseButton.Left));
             AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 2 && !EditorBeatmap.SelectedHitObjects.Contains(addedObjects[1]));
+        }
+
+        [Test]
+        public void TestNearestSelection()
+        {
+            var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek near first", () => EditorClock.Seek(100));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek near second", () => EditorClock.Seek(500));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek halfway", () => EditorClock.Seek(300));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+        }
+
+        [Test]
+        public void TestNearestSelectionWithEndTime()
+        {
+            var firstObject = new Slider
+            {
+                Position = new Vector2(256, 192),
+                StartTime = 0,
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(),
+                    new PathControlPoint(new Vector2(50, 0)),
+                })
+            };
+
+            var secondObject = new HitCircle
+            {
+                Position = new Vector2(256, 192),
+                StartTime = 600
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new HitObject[] { firstObject, secondObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek near first", () => EditorClock.Seek(100));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek near second", () => EditorClock.Seek(500));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek roughly halfway", () => EditorClock.Seek(350));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            // Slider gets priority due to end time.
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
         }
 
         [TestCase(false)]
