@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         private void toggleAllFreeMods()
         {
-            var availableMods = freeModSelectOverlay.AllAvailableAndValidMods.ToArray();
+            var availableMods = allAvailableAndValidMods.ToArray();
 
             Current.Value = Current.Value.Count == availableMods.Length
                 ? Array.Empty<Mod>()
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             int current = Current.Value.Count;
 
-            if (current == freeModSelectOverlay.AllAvailableAndValidMods.Count())
+            if (current == allAvailableAndValidMods.Count())
             {
                 count.Text = "all";
                 circle.FadeColour(colours.Yellow, 200, Easing.OutQuint);
@@ -124,5 +124,9 @@ namespace osu.Game.Screens.OnlinePlay
                 circle.FadeColour(colours.Gray4, 200, Easing.OutQuint);
             }
         }
+
+        private IEnumerable<Mod> allAvailableAndValidMods => freeModSelectOverlay.AllAvailableMods
+                                                                                 .Where(state => state.ValidForSelection.Value)
+                                                                                 .Select(state => state.Mod);
     }
 }

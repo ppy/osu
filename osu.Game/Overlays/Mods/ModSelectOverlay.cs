@@ -111,11 +111,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> globalAvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
-        public IEnumerable<Mod> AllAvailableAndValidMods => allAvailableMods
-                                                            .Select(s => s.Mod)
-                                                            .Where(m => isValidMod(m));
-
-        private IEnumerable<ModState> allAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
+        public IEnumerable<ModState> AllAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -386,7 +382,7 @@ namespace osu.Game.Overlays.Mods
 
         private void filterMods()
         {
-            foreach (var modState in allAvailableMods)
+            foreach (var modState in AllAvailableMods)
                 modState.ValidForSelection.Value = modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
@@ -411,7 +407,7 @@ namespace osu.Game.Overlays.Mods
             bool anyCustomisableModActive = false;
             bool anyModPendingConfiguration = false;
 
-            foreach (var modState in allAvailableMods)
+            foreach (var modState in AllAvailableMods)
             {
                 anyCustomisableModActive |= modState.Active.Value && modState.Mod.GetSettingsSourceProperties().Any();
                 anyModPendingConfiguration |= modState.PendingConfiguration;
@@ -468,7 +464,7 @@ namespace osu.Game.Overlays.Mods
 
             var newSelection = new List<Mod>();
 
-            foreach (var modState in allAvailableMods)
+            foreach (var modState in AllAvailableMods)
             {
                 var matchingSelectedMod = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == modState.Mod.GetType());
 
@@ -495,7 +491,7 @@ namespace osu.Game.Overlays.Mods
             if (externalSelectionUpdateInProgress)
                 return;
 
-            var candidateSelection = allAvailableMods.Where(modState => modState.Active.Value)
+            var candidateSelection = AllAvailableMods.Where(modState => modState.Active.Value)
                                                      .Select(modState => modState.Mod)
                                                      .ToArray();
 
