@@ -381,6 +381,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private bool selectedBlueprintAlreadySelectedOnMouseDown;
 
+        /// <summary>
+        /// Sorts the supplied <paramref name="blueprints"/> by the order of preference when making a selection.
+        /// Blueprints at the start of the list will be prioritised over later items if the selection requested is ambiguous due to spatial overlap.
+        /// </summary>
         protected virtual IEnumerable<SelectionBlueprint<T>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<T>> blueprints) => blueprints.Reverse();
 
         /// <summary>
