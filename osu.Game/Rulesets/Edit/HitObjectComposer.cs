@@ -472,7 +472,7 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 130;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
 
         public readonly Ruleset Ruleset;
 

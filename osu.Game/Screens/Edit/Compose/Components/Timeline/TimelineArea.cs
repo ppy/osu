@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Edit;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             OsuCheckbox controlPointsCheckbox;
             OsuCheckbox ticksCheckbox;
 
+            const float padding = 10;
+
             InternalChildren = new Drawable[]
             {
                 new GridContainer
@@ -51,7 +54,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         new Dimension(GridSizeMode.Absolute, 140),
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 35),
-                        new Dimension(GridSizeMode.Absolute, 110),
+                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT - padding * 2),
                     },
                     Content = new[]
                     {
@@ -71,7 +74,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding(10),
+                                        Padding = new MarginPadding(padding),
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
@@ -124,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Name = @"Zoom controls",
-                                Padding = new MarginPadding { Right = 10 },
+                                Padding = new MarginPadding { Right = padding },
                                 Children = new Drawable[]
                                 {
                                     new Box
