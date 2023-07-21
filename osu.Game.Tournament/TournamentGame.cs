@@ -11,7 +11,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -101,7 +100,7 @@ namespace osu.Game.Tournament
                         RelativeSizeAxes = Axes.Both,
                         Child = new TournamentSceneManager()
                     },
-                    new Container { RelativeSizeAxes = Axes.Both, Child = dialogOverlay }
+                    dialogOverlay
                 }, drawables =>
                 {
                     loadingSpinner.Hide();
