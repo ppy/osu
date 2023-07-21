@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -15,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osuTK;
 
@@ -27,23 +24,24 @@ namespace osu.Game.Tournament.Screens.Editors
     {
         protected abstract BindableList<TModel> Storage { get; }
 
-        private FillFlowContainer<TDrawable> flow;
+        private FillFlowContainer<TDrawable> flow = null!;
 
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
+        [Resolved]
+        private TournamentSceneManager? sceneManager { get; set; }
 
-        protected ControlPanel ControlPanel;
+        protected ControlPanel ControlPanel = null!;
 
-        private readonly TournamentScreen parentScreen;
-        private BackButton backButton;
+        private readonly TournamentScreen? parentScreen;
 
-        protected TournamentEditorScreen(TournamentScreen parentScreen = null)
+        private BackButton backButton = null!;
+
+        protected TournamentEditorScreen(TournamentScreen? parentScreen = null)
         {
             this.parentScreen = parentScreen;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -63,6 +61,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(20),
+                        Padding = new MarginPadding(20),
                     },
                 },
                 ControlPanel = new ControlPanel
@@ -75,9 +74,10 @@ namespace osu.Game.Tournament.Screens.Editors
                             Text = "Add new",
                             Action = () => Storage.Add(new TModel())
                         },
-                        new DangerousSettingsButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
+                            BackgroundColour = colours.Pink3,
                             Text = "Clear all",
                             Action = Storage.Clear
                         },
