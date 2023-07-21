@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Screens.Setup
             FlowContainer.Insert(-1, folderButton = new RoundedButton
             {
                 Text = "Open folder",
-                Width = 100
+                Width = BUTTON_SIZE
             });
 
             FlowContainer.Insert(-2, dropdown = new OsuDropdown<string>
