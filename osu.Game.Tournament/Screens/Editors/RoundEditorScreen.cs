@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private LadderInfo ladderInfo { get; set; } = null!;
 
-            [Resolved(canBeNull: true)]
+            [Resolved]
             private IDialogOverlay? dialogOverlay { get; set; }
 
             public RoundRow(TournamentRound round)
