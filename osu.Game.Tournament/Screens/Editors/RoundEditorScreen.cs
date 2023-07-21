@@ -104,13 +104,11 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
                         Text = "Delete Round",
-                        Action = () => dialogOverlay?.Push(
-                            new RoundEditorDeleteRoundDialog(
-                                Model.Name.Value, () =>
-                                {
-                                    Expire();
-                                    ladderInfo.Rounds.Remove(Model);
-                                }))
+                        Action = () => dialogOverlay?.Push(new DeleteRoundDialog(Model, () =>
+                        {
+                            Expire();
+                            ladderInfo.Rounds.Remove(Model);
+                        }))
                     }
                 };
 

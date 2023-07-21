@@ -162,7 +162,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         Text = "Delete Team",
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Action = () => dialogOverlay?.Push(new TeamEditorDeleteTeamDialog(Model.FullName.Value, Model.Acronym.Value, () =>
+                                        Action = () => dialogOverlay?.Push(new DeleteTeamDialog(Model, () =>
                                         {
                                             Expire();
                                             ladderInfo.Teams.Remove(Model);
