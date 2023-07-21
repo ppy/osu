@@ -62,12 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void load()
         {
             // Give a bit of breathing room around the playfield content.
-            PlayfieldContentContainer.Padding = new MarginPadding
-            {
-                Vertical = 10,
-                // Intentionally use the left toolbox size for both sides to vertically centre the playfield.
-                Horizontal = TOOLBOX_CONTRACTED_SIZE_LEFT + 10,
-            };
+            PlayfieldContentContainer.Padding = new MarginPadding(10);
 
             LayerBelowRuleset.AddRange(new Drawable[]
             {

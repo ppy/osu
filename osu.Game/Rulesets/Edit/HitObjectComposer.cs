@@ -117,13 +117,10 @@ namespace osu.Game.Rulesets.Edit
             {
                 PlayfieldContentContainer = new Container
                 {
-                    Name = "Content",
-                    Padding = new MarginPadding
-                    {
-                        Left = TOOLBOX_CONTRACTED_SIZE_LEFT,
-                        Right = TOOLBOX_CONTRACTED_SIZE_RIGHT,
-                    },
-                    RelativeSizeAxes = Axes.Both,
+                    Name = "Playfield content",
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         // layers below playfield
@@ -238,6 +235,14 @@ namespace osu.Game.Rulesets.Edit
                 if (!timing.NewValue)
                     setSelectTool();
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
+            PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
