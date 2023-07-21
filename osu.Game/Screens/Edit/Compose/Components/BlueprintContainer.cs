@@ -46,15 +46,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
-        /// <summary>
-        /// Whether to allow cyclic selection on clicking multiple times.
-        /// </summary>
-        /// <remarks>
-        /// Disabled by default as it does not work well with editors that support double-clicking or other advanced interactions.
-        /// Can probably be made to work with more thought.
-        /// </remarks>
-        protected virtual bool AllowCyclicSelection => false;
-
         protected BlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
@@ -167,6 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (ClickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != ClickedBlueprint)
                 return false;
 
+            doubleClickHandled = true;
             return true;
         }
 
@@ -177,6 +169,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 endClickSelection(e);
                 clickSelectionHandled = false;
+                doubleClickHandled = false;
                 isDraggingBlueprint = false;
                 wasDragStarted = false;
             });
@@ -377,6 +370,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool clickSelectionHandled;
 
         /// <summary>
+        /// Whether a blueprint was double-clicked since last mouse down.
+        /// </summary>
+        private bool doubleClickHandled;
+
+        /// <summary>
         /// Whether the selected blueprint(s) were already selected on mouse down. Generally used to perform selection cycling on mouse up in such a case.
         /// </summary>
         private bool selectedBlueprintAlreadySelectedOnMouseDown;
@@ -427,8 +425,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a click selection was active.</returns>
         private bool endClickSelection(MouseButtonEvent e)
         {
-            // If already handled a selection or drag, we don't want to perform a mouse up / click action.
-            if (clickSelectionHandled || isDraggingBlueprint) return true;
+            // If already handled a selection, double-click, or drag, we don't want to perform a mouse up / click action.
+            if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint) return true;
 
             if (e.Button != MouseButton.Left) return false;
 
@@ -444,7 +442,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
             }
 
-            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1 && AllowCyclicSelection)
+            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)
             {
                 // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
                 // cycle between other blueprints which are also under the cursor.

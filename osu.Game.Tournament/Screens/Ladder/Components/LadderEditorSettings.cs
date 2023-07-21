@@ -11,15 +11,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public partial class LadderEditorSettings : PlayerSettingsGroup
+    public partial class LadderEditorSettings : CompositeDrawable
     {
         private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
@@ -33,21 +35,26 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
 
-        public LadderEditorSettings()
-            : base("ladder")
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            InternalChild = new FillFlowContainer
             {
-                team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 1" },
-                team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 2" },
-                roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "Round" },
-                losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
-                dateTimeBox = new DateTextBox { LabelText = "Match Time" },
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new Drawable[]
+                {
+                    team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 1" },
+                    team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 2" },
+                    roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "Round" },
+                    losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
+                    dateTimeBox = new DateTextBox { LabelText = "Match Time" },
+                },
             };
 
             editorInfo.Selected.ValueChanged += selection =>
