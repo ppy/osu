@@ -63,7 +63,7 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private TournamentSceneManager? sceneManager { get; set; }
 
-            [Resolved(canBeNull: true)]
+            [Resolved]
             private IDialogOverlay? dialogOverlay { get; set; }
 
             [Resolved]

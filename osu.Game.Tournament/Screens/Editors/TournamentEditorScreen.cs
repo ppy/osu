@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Editors
     {
         protected abstract BindableList<TModel> Storage { get; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         private FillFlowContainer<TDrawable> flow = null!;
