@@ -293,9 +293,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         userPanelContainer.Child = new UserListPanel(user.ToAPIUser())
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Scale = new Vector2(1.7f),
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Scale = new Vector2(1f),
                         };
                     });
                 }
