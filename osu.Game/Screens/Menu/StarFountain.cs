@@ -68,8 +68,8 @@ namespace osu.Game.Screens.Menu
                     Duration = RNG.NextSingle(particle_duration_min, particle_duration_max),
                     StartAngle = getRandomVariance(4),
                     EndAngle = getRandomVariance(2),
-                    EndScale = 1.4f + getRandomVariance(0.4f),
-                    Velocity = new Vector2(getCurrentAngle(), -1200 + getRandomVariance(100)),
+                    EndScale = 2.2f + getRandomVariance(0.4f),
+                    Velocity = new Vector2(getCurrentAngle(), -1400 + getRandomVariance(100)),
                 };
             }
 
