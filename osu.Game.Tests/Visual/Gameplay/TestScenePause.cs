@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -16,6 +15,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
@@ -49,6 +49,44 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
+        }
+
+        [Test]
+        public void TestNoPauseViaExitAttemptIfGameplaySucks()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
+
+            AddStep("attempt exit", () => Player.Exit());
+            confirmPauseOverlayShown(false);
+            confirmExited();
+        }
+
+        [Test]
+        public void TestPauseViaExitAttempt()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+
+            AddUntilStep("hit an object", () =>
+            {
+                var next = GetNextAliveObject();
+
+                if (next != null)
+                {
+                    InputManager.MoveMouseTo(next.ScreenSpaceDrawQuad.Centre);
+                    InputManager.Click(MouseButton.Left);
+
+                    return next.Entry?.Result?.Type.IsHit() == true;
+                }
+
+                return false;
+            });
+
+            AddStep("attempt exit", () => Player.Exit());
+            confirmPauseOverlayShown(true);
+            confirmNotExited();
+            AddStep("attempt exit again", () => Player.Exit());
+            confirmExited();
         }
 
         [Test]
@@ -335,7 +373,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
-            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSound>().FirstOrDefault();
+            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().First().ChildrenOfType<SkinnableSound>().First();
 
             pauseAndConfirm();
             AddAssert("loop is playing", () => getLoop().IsPlaying);

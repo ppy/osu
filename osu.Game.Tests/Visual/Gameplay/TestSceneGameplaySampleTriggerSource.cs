@@ -120,11 +120,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForAliveObjectIndex(0);
             checkValidObjectIndex(0);
 
-            AddAssert("first object not hit", () => getNextAliveObject()?.Entry?.Result?.HasResult != true);
+            AddAssert("first object not hit", () => GetNextAliveObject()?.Entry?.Result?.HasResult != true);
 
             AddStep("hit first object", () =>
             {
-                var next = getNextAliveObject();
+                var next = GetNextAliveObject();
 
                 if (next != null)
                 {
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            AddAssert("first object hit", () => getNextAliveObject()?.Entry?.Result?.HasResult == true);
+            AddAssert("first object hit", () => GetNextAliveObject()?.Entry?.Result?.HasResult == true);
 
             // next object is too far away, so we still use the already hit object.
             checkValidObjectIndex(0);
@@ -199,16 +199,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void waitForAliveObjectIndex(int? index)
         {
             if (index == null)
-                AddUntilStep("wait for no alive objects", getNextAliveObject, () => Is.Null);
+                AddUntilStep("wait for no alive objects", GetNextAliveObject, () => Is.Null);
             else
-                AddUntilStep($"wait for next alive to be {index}", () => getNextAliveObject()?.HitObject, () => Is.EqualTo(beatmap.HitObjects[index.Value]));
+                AddUntilStep($"wait for next alive to be {index}", () => GetNextAliveObject()?.HitObject, () => Is.EqualTo(beatmap.HitObjects[index.Value]));
         }
 
         private void checkValidObjectIndex(int index) =>
             AddAssert($"check object at index {index} is correct", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[index]));
-
-        private DrawableHitObject? getNextAliveObject() =>
-            Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
 
         [Test]
         public void TestSampleTriggering()

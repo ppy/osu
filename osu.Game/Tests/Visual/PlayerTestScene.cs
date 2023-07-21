@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Tests.Visual
 {
@@ -105,6 +106,10 @@ namespace osu.Game.Tests.Visual
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);
         }
+
+        [CanBeNull]
+        protected DrawableHitObject GetNextAliveObject() =>
+            Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
 
         protected override void Dispose(bool isDisposing)
         {
