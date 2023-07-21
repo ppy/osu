@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                X = -15,
+                                X = -10,
                                 Current = Mode,
                             },
                         },
