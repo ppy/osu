@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             public override bool RemoveWhenNotAlive => false;
         }
 
-        // Most osu!taiko hitsounds are managed by the drum (see DrumSampleTriggerSource).
-        public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
+        // osu!taiko hitsounds are managed by the drum (see DrumSampleTriggerSource).
+        public sealed override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
     }
 
     public abstract partial class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject

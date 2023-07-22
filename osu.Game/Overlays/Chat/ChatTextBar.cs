@@ -73,14 +73,13 @@ namespace osu.Game.Overlays.Chat
                                 Width = chatting_text_width,
                                 Masking = true,
                                 Padding = new MarginPadding { Horizontal = padding },
-                                Child = chattingText = new OsuSpriteText
+                                Child = chattingText = new TruncatingSpriteText
                                 {
                                     MaxWidth = chatting_text_width - padding * 2,
                                     Font = OsuFont.Torus.With(size: 20),
                                     Colour = colourProvider.Background1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Truncate = true,
                                 },
                             },
                             searchIconContainer = new Container
@@ -157,7 +156,11 @@ namespace osu.Game.Overlays.Chat
                     chatTextBox.Current.UnbindFrom(change.OldValue.TextBoxMessage);
 
                 if (newChannel != null)
+                {
+                    // change length limit first before binding to avoid accidentally truncating pending message from new channel.
+                    chatTextBox.LengthLimit = newChannel.MessageLengthLimit;
                     chatTextBox.Current.BindTo(newChannel.TextBoxMessage);
+                }
             }, true);
         }
 

@@ -15,6 +15,7 @@ namespace osu.Game.Tournament.Screens.Setup
     {
         private OsuDropdown<string> dropdown;
         private OsuButton folderButton;
+        private OsuButton reloadTournamentsButton;
 
         [Resolved]
         private TournamentGameBase game { get; set; }
@@ -28,7 +29,13 @@ namespace osu.Game.Tournament.Screens.Setup
             dropdown.Items = storage.ListTournaments();
             dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
-            Action = () => game.AttemptExit();
+            reloadTournamentsButton.Action = () => dropdown.Items = storage.ListTournaments();
+
+            Action = () =>
+            {
+                game.RestartAppWhenExited();
+                game.AttemptExit();
+            };
             folderButton.Action = () => storage.PresentExternally();
 
             ButtonText = "Close osu!";
@@ -41,10 +48,16 @@ namespace osu.Game.Tournament.Screens.Setup
             FlowContainer.Insert(-1, folderButton = new RoundedButton
             {
                 Text = "Open folder",
-                Width = 100
+                Width = BUTTON_SIZE
             });
 
-            FlowContainer.Insert(-2, dropdown = new OsuDropdown<string>
+            FlowContainer.Insert(-2, reloadTournamentsButton = new RoundedButton
+            {
+                Text = "Refresh",
+                Width = BUTTON_SIZE
+            });
+
+            FlowContainer.Insert(-3, dropdown = new OsuDropdown<string>
             {
                 Width = 510
             });
