@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Setup
 
             FlowContainer.Insert(-2, reloadTournamentsButton = new RoundedButton
             {
-                Text = "Reload list",
+                Text = "Refresh",
                 Width = BUTTON_SIZE
             });
 
