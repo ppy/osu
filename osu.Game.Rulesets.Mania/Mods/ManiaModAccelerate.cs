@@ -44,19 +44,19 @@ namespace osu.Game.Rulesets.Mania.Mods
         };
 
         [SettingSource("Min Speed", "The speed when combo is 0", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
-        public BindableInt MinScoreSpeed { get; } = new BindableInt(8)
+        public BindableInt MinScoreSpeed { get; } = new BindableInt(18)
         {
             MinValue = 1,
             MaxValue = 39,
-            Value = 8,
+            Value = 18,
         };
 
         [SettingSource("Max Speed", "The Max speed will reach", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
-        public BindableInt MaxScoreSpeed { get; } = new BindableInt(40)
+        public BindableInt MaxScoreSpeed { get; } = new BindableInt(30)
         {
             MinValue = 2,
             MaxValue = 40,
-            Value = 40,
+            Value = 30,
         };
 
         public ManiaModAccelerate()
