@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -35,11 +36,9 @@ namespace osu.Game.Tournament.Screens.Editors
         [BackgroundDependencyLoader]
         private void load()
         {
-            Content.Add(new LadderEditorSettings
+            AddInternal(new ControlPanel
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Margin = new MarginPadding(5)
+                Child = new LadderEditorSettings(),
             });
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));

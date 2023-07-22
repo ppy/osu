@@ -75,6 +75,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 handleRoomLost();
         }
 
+        protected override bool IsConnected => base.IsConnected && client.IsConnected.Value;
+
         protected override Drawable CreateMainContent() => new Container
         {
             RelativeSizeAxes = Axes.Both,
@@ -250,13 +252,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // the room may not be left immediately after a disconnection due to async flow,
-            // so checking the IsConnected status is also required.
-            if (client.Room == null || !client.IsConnected.Value)
-            {
-                // room has not been created yet; exit immediately.
+            // room has not been created yet or we're offline; exit immediately.
+            if (client.Room == null || !IsConnected)
                 return base.OnExiting(e);
-            }
 
             if (!exitConfirmed && dialogOverlay != null)
             {
