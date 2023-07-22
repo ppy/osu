@@ -53,7 +53,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 isOverlapping |= Precision.DefinitelyBigger(endTimes[i], startTime, 1) && Precision.DefinitelyBigger(endTime, endTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
-                if (Precision.DefinitelyBigger(endTimes[i], endTime, 1))
+                if (Precision.DefinitelyBigger(endTimes[i], endTime, 1) &&
+                    Precision.DefinitelyBigger(startTime, startTimes[i], 1))
                     holdFactor = 1.25;
 
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - endTimes[i]));
