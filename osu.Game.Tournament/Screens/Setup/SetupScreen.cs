@@ -106,8 +106,8 @@ namespace osu.Game.Tournament.Screens.Setup
 
                         loginOverlay.State.Value = Visibility.Visible;
                     },
-                    Value = api?.LocalUser.Value.Username,
-                    Failing = api?.IsLoggedIn != true,
+                    Value = api.LocalUser.Value.Username,
+                    Failing = api.IsLoggedIn != true,
                     Description = "In order to access the API and display metadata, signing in is required."
                 },
                 new LabelledDropdown<RulesetInfo>

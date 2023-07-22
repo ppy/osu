@@ -38,7 +38,7 @@ namespace osu.Game.Tournament
         private Container screens;
         private TourneyVideo video;
 
-        public const float CONTROL_AREA_WIDTH = 160;
+        public const float CONTROL_AREA_WIDTH = 200;
 
         public const float STREAM_AREA_WIDTH = 1366;
 
@@ -252,14 +252,13 @@ namespace osu.Game.Tournament
 
                 if (shortcutKey != null)
                 {
-                    Add(new Container
+                    Add(new CircularContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Size = new Vector2(24),
                         Margin = new MarginPadding(5),
                         Masking = true,
-                        CornerRadius = 4,
                         Alpha = 0.5f,
                         Blending = BlendingParameters.Additive,
                         Children = new Drawable[]
