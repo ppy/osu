@@ -15,12 +15,12 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class DifficultySection : SetupSection
     {
-        protected LabelledSliderBar<float> CircleSizeSlider = null!;
-        protected LabelledSliderBar<float> HealthDrainSlider = null!;
-        protected LabelledSliderBar<float> ApproachRateSlider = null!;
-        protected LabelledSliderBar<float> OverallDifficultySlider = null!;
-        protected LabelledSliderBar<double> BaseVelocitySlider = null!;
-        protected LabelledSliderBar<double> TickRateSlider = null!;
+        protected LabelledSliderBar<float> CircleSizeSlider { get; private set; } = null!;
+        protected LabelledSliderBar<float> HealthDrainSlider { get; private set; } = null!;
+        protected LabelledSliderBar<float> ApproachRateSlider { get; private set; } = null!;
+        protected LabelledSliderBar<float> OverallDifficultySlider { get; private set; } = null!;
+        protected LabelledSliderBar<double> BaseVelocitySlider { get; private set; } = null!;
+        protected LabelledSliderBar<double> TickRateSlider { get; private set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
