@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
@@ -30,64 +31,34 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
+            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).OrderBy(x => x).ToList();
+            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).OrderBy(x => x).ToList();
+
             foreach (var breakPeriod in context.Beatmap.Breaks)
             {
                 if (breakPeriod.Duration < BreakPeriod.MIN_BREAK_DURATION)
                     yield return new IssueTemplateTooShort(this).Create(breakPeriod.StartTime);
 
-                var previousObject = getPreviousObject(breakPeriod.StartTime, context.Beatmap.HitObjects);
-                var nextObject = getNextObject(breakPeriod.EndTime, context.Beatmap.HitObjects);
+                int previousObjectEndTimeIndex = endTimes.BinarySearch(breakPeriod.StartTime);
+                if (previousObjectEndTimeIndex < 0) previousObjectEndTimeIndex = ~previousObjectEndTimeIndex - 1;
 
-                if (previousObject != null)
+                if (previousObjectEndTimeIndex >= 0)
                 {
-                    double gapBeforeBreak = breakPeriod.StartTime - previousObject.GetEndTime();
+                    double gapBeforeBreak = breakPeriod.StartTime - endTimes[previousObjectEndTimeIndex];
                     if (gapBeforeBreak < minimum_gap_before_break - leniency_threshold)
                         yield return new IssueTemplateEarlyStart(this).Create(breakPeriod.StartTime, minimum_gap_before_break - gapBeforeBreak);
                 }
 
-                if (nextObject != null)
+                int nextObjectStartTimeIndex = startTimes.BinarySearch(breakPeriod.EndTime);
+                if (nextObjectStartTimeIndex < 0) nextObjectStartTimeIndex = ~nextObjectStartTimeIndex;
+
+                if (nextObjectStartTimeIndex < startTimes.Count)
                 {
-                    double gapAfterBreak = nextObject.StartTime - breakPeriod.EndTime;
+                    double gapAfterBreak = startTimes[nextObjectStartTimeIndex] - breakPeriod.EndTime;
                     if (gapAfterBreak < min_end_threshold - leniency_threshold)
                         yield return new IssueTemplateLateEnd(this).Create(breakPeriod.StartTime, min_end_threshold - gapAfterBreak);
                 }
             }
-        }
-
-        private HitObject? getPreviousObject(double time, IReadOnlyList<HitObject> hitObjects)
-        {
-            int left = 0;
-            int right = hitObjects.Count - 1;
-
-            while (left <= right)
-            {
-                int mid = left + (right - left) / 2;
-
-                if (hitObjects[mid].GetEndTime() < time)
-                    left = mid + 1;
-                else
-                    right = mid - 1;
-            }
-
-            return right >= 0 ? hitObjects[right] : null;
-        }
-
-        private HitObject? getNextObject(double time, IReadOnlyList<HitObject> hitObjects)
-        {
-            int left = 0;
-            int right = hitObjects.Count - 1;
-
-            while (left <= right)
-            {
-                int mid = left + (right - left) / 2;
-
-                if (hitObjects[mid].StartTime <= time)
-                    left = mid + 1;
-                else
-                    right = mid - 1;
-            }
-
-            return left < hitObjects.Count ? hitObjects[left] : null;
         }
 
         public class IssueTemplateEarlyStart : IssueTemplate
