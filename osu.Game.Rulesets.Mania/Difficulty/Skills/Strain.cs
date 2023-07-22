@@ -50,7 +50,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             for (int i = 0; i < endTimes.Length; ++i)
             {
                 // The current note is overlapped if a previous note or end is overlapping the current note body
-                isOverlapping |= Precision.DefinitelyBigger(endTimes[i], startTime, 1) && Precision.DefinitelyBigger(endTime, endTimes[i], 1);
+                isOverlapping |= Precision.DefinitelyBigger(endTimes[i], startTime, 1) &&
+                                 Precision.DefinitelyBigger(endTime, endTimes[i], 1) &&
+                                 Precision.DefinitelyBigger(startTime, startTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
                 if (Precision.DefinitelyBigger(endTimes[i], endTime, 1) &&
