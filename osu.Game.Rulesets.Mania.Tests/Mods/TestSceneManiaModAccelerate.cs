@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             PassCondition = () =>
             {
                 var drawableRuleset = (DrawableManiaRuleset)Player.DrawableRuleset;
-                return drawableRuleset.ScrollSpeed.Value < DrawableManiaRuleset.MIN_TIME_RANGE;
+                return drawableRuleset.CustomSmoothTimeRange.Value < DrawableManiaRuleset.MIN_TIME_RANGE;
             }
         });
     }

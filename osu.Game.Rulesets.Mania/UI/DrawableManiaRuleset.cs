@@ -73,12 +73,12 @@ namespace osu.Game.Rulesets.Mania.UI
         private double configSmoothTimeRange;
 
         // Enable it only when need, it overrides configSmoothTimeRange
-        public BindableDouble ScrollSpeed = new BindableDouble
+        public BindableDouble CustomSmoothTimeRange = new BindableDouble
         {
             Disabled = true
         };
 
-        private double smoothTimeRange => ScrollSpeed.Disabled ? configSmoothTimeRange : ScrollSpeed.Value;
+        private double smoothTimeRange => CustomSmoothTimeRange.Disabled ? configSmoothTimeRange : CustomSmoothTimeRange.Value;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);

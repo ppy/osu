@@ -81,8 +81,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            drawableRuleset.ScrollSpeed.Disabled = false;
-            scrollTime.BindTo(drawableRuleset.ScrollSpeed);
+            drawableRuleset.CustomSmoothTimeRange.Disabled = false;
+            scrollTime.BindTo(drawableRuleset.CustomSmoothTimeRange);
             scrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScoreSpeed.Value);
             targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScoreSpeed.Value);
         }
