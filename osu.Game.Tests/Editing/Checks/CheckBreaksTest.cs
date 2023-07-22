@@ -89,6 +89,52 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestBreakAfterLastObjectStartsEarly()
+        {
+            var beatmap = new Beatmap<HitObject>
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 0 },
+                    new HitCircle { StartTime = 1200 }
+                },
+                Breaks = new List<BreakPeriod>
+                {
+                    new BreakPeriod(1398, 2300)
+                }
+            };
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckBreaks.IssueTemplateEarlyStart);
+        }
+
+        [Test]
+        public void TestBreakBeforeFirstObjectEndsLate()
+        {
+            var beatmap = new Beatmap<HitObject>
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1100 },
+                    new HitCircle { StartTime = 1500 }
+                },
+                Breaks = new List<BreakPeriod>
+                {
+                    new BreakPeriod(0, 652)
+                }
+            };
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckBreaks.IssueTemplateLateEnd);
+        }
+
+        [Test]
         public void TestBreakMultipleObjectsEarly()
         {
             var beatmap = new Beatmap<HitObject>
