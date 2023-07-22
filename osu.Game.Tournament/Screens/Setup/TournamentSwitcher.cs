@@ -29,7 +29,6 @@ namespace osu.Game.Tournament.Screens.Setup
             dropdown.Items = storage.ListTournaments();
             dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
-            reloadTournamentsButton.Enabled.Value = true;
             reloadTournamentsButton.Action = () => dropdown.Items = storage.ListTournaments();
 
             Action = () =>
