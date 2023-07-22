@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Edit.Setup;
 
@@ -14,6 +15,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         {
             CircleSizeSlider.Label = BeatmapsetsStrings.ShowStatsCsMania;
             CircleSizeSlider.Description = "The number of columns in the beatmap";
+            if (CircleSizeSlider.Current is BindableNumber<float> circleSizeFloat)
+                circleSizeFloat.Precision = 1;
         }
     }
 }
