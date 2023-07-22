@@ -232,6 +232,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
+        public override void Hide()
+        {
+            scheduledOperation?.Cancel();
+            base.Hide();
+        }
+
         private partial class ChromaArea : CompositeDrawable
         {
             [Resolved]

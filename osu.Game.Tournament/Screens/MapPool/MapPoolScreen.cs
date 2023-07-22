@@ -222,6 +222,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             }
         }
 
+        public override void Hide()
+        {
+            scheduledChange?.Cancel();
+            base.Hide();
+        }
+
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             base.CurrentMatchChanged(match);
