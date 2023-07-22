@@ -36,14 +36,21 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private readonly BindableDouble targetScrollTime = new BindableDouble();
 
-        [SettingSource("Max Speed combo", "The combo count at which point the spead reaches max.")]
+        [SettingSource("Base Combo", "The combo count to start changing speed.")]
+        public BindableInt BaseComboCount { get; } = new BindableInt
+        {
+            MinValue = 0,
+            MaxValue = 1999,
+        };
+
+        [SettingSource("Max Speed combo", "The combo count at which let the speed reaches max.")]
         public BindableInt MaxComboCount { get; } = new BindableInt(480)
         {
             MinValue = 1,
             MaxValue = 2000,
         };
 
-        [SettingSource("Min Speed", "The speed when combo is 0", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
+        [SettingSource("Min Speed", "The speed when combo is \"Base Combo\"", SettingControlType = typeof(SettingsSlider<int, ManiaScrollSlider>))]
         public BindableInt MinScoreSpeed { get; } = new BindableInt(18)
         {
             MinValue = 1,
@@ -59,6 +66,9 @@ namespace osu.Game.Rulesets.Mania.Mods
             Value = 30,
         };
 
+        private int comboRange => MaxComboCount.Value - BaseComboCount.Value;
+        private int speedRange => MaxScoreSpeed.Value - MinScoreSpeed.Value;
+
         public ManiaModAccelerate()
         {
             MinScoreSpeed.BindValueChanged(val =>
@@ -71,6 +81,22 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 if (val.NewValue <= MinScoreSpeed.Value)
                     MinScoreSpeed.Value = val.NewValue - MinScoreSpeed.Precision;
+            });
+
+            BaseComboCount.BindValueChanged(val =>
+            {
+                if (val.NewValue >= MaxComboCount.Value)
+                {
+                    MaxComboCount.Value = val.NewValue + MaxComboCount.Precision;
+                }
+            });
+
+            MaxComboCount.BindValueChanged(val =>
+            {
+                if (val.NewValue <= BaseComboCount.Value)
+                {
+                    BaseComboCount.Value = val.NewValue - BaseComboCount.Precision;
+                }
             });
         }
 
@@ -91,14 +117,20 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             scoreProcessor.Combo.BindValueChanged(s =>
             {
-                targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(s.NewValue >= MaxComboCount.Value
-                    ? MaxScoreSpeed.Value
-                    : targetScrollSpeed(s.NewValue));
+                targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(targetScrollSpeed(s.NewValue));
             });
         }
 
-        private int targetScrollSpeed(int combo) =>
-            (int)(MinScoreSpeed.Value + (MaxScoreSpeed.Value - MinScoreSpeed.Value) * (combo / (double)MaxComboCount.Value));
+        private int targetScrollSpeed(int combo)
+        {
+            if (combo <= BaseComboCount.Value)
+                return MinScoreSpeed.Value;
+
+            if (combo >= MaxComboCount.Value)
+                return MaxScoreSpeed.Value;
+
+            return (int)(MinScoreSpeed.Value + (double)speedRange * (combo - BaseComboCount.Value) / comboRange);
+        }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
