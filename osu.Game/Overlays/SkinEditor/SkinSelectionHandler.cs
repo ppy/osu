@@ -26,31 +26,11 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
-        public override bool HandleRotation(float angle)
+        public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler(ChangeHandler)
         {
-            if (SelectedBlueprints.Count == 1)
-            {
-                // for single items, rotate around the origin rather than the selection centre.
-                ((Drawable)SelectedBlueprints.First().Item).Rotation += angle;
-            }
-            else
-            {
-                var selectionQuad = getSelectionQuad();
-
-                foreach (var b in SelectedBlueprints)
-                {
-                    var drawableItem = (Drawable)b.Item;
-
-                    var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
-                    updateDrawablePosition(drawableItem, rotatedPosition);
-
-                    drawableItem.Rotation += angle;
-                }
-            }
-
-            // this isn't always the case but let's be lenient for now.
-            return true;
-        }
+            SelectedItems = { BindTarget = SelectedItems },
+            UpdatePosition = updateDrawablePosition
+        };
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
@@ -172,7 +152,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanRotate = true;
             SelectionBox.CanScaleX = true;
             SelectionBox.CanScaleY = true;
             SelectionBox.CanFlipX = true;
