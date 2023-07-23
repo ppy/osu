@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = HandleRotation,
+                RotationHandler = RotationHandler,
                 OnScale = HandleScale,
                 OnFlip = HandleFlip,
                 OnReverse = HandleReverse,
