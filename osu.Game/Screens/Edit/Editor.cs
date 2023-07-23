@@ -1016,7 +1016,7 @@ namespace osu.Game.Screens.Edit
                 new EditorMenuItem(EditorStrings.ExportLegacyFormat, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
             };
 
-            return new EditorMenuItem(EditorStrings.ExportPackage) { Items = exportItems };
+            return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
         }
 
         private void exportBeatmap()
