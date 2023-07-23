@@ -35,14 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
-        /// "Legacy format (.osz)"
+        /// "For editing (.olz)"
         /// </summary>
-        public static LocalisableString ExportLegacyFormat => new TranslatableString(getKey(@"export_legacy_format"), @"Legacy format (.osz)");
+        public static LocalisableString ExportForEditing => new TranslatableString(getKey(@"export_for_editing"), @"For editing (.olz)");
 
         /// <summary>
-        /// "New format (.olz)"
+        /// "For compatibility (.osz)"
         /// </summary>
-        public static LocalisableString ExportNewFormat => new TranslatableString(getKey(@"export_new_format"), @"New format (.olz)");
+        public static LocalisableString ExportForCompatibility => new TranslatableString(getKey(@"export_for_compatibility"), @"For compatibility (.osz)");
 
         /// <summary>
         /// "Create new difficulty"
