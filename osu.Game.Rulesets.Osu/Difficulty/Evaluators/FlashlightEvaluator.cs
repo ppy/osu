@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and whether the hidden mod is enabled.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden, double clockRate)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -98,7 +98,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuSlider.LazyTravelDistance / scalingFactor;
 
                 // Account for slow velocities being sightreadable, with smaller circle size being more difficult to navigate.
-                sliderBonus *= Math.Max(Math.Sqrt(clockRate * scalingFactor * osuSlider.Velocity) - Math.Sqrt(min_velocity), 0);
+                double apparentVelocity = scalingFactor * osuSlider.Distance / osuSlider.LazyTravelTime;
+                sliderBonus *= Math.Max(0, 1 - Math.Pow(2, -apparentVelocity + min_velocity));
 
                 // Nerf sliders with repeats, as less memorisation is required.
                 if (osuSlider.RepeatCount > 0)
