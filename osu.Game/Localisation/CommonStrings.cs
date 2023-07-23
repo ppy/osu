@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"Default");
 
         /// <summary>
+        /// "Export"
+        /// </summary>
+        public static LocalisableString Export => new TranslatableString(getKey(@"export"), @"Export");
+
+        /// <summary>
         /// "Width"
         /// </summary>
         public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"Width");
