@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -21,7 +22,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
     {
-        public Action<float> HandleRotate { get; set; }
+        [CanBeNull]
+        public SelectionRotationHandler RotationHandler { get; init; }
 
         public LocalisableString TooltipText { get; private set; }
 
@@ -63,10 +65,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            bool handle = base.OnDragStart(e);
-            if (handle)
-                cumulativeRotation.Value = 0;
-            return handle;
+            if (RotationHandler == null) return false;
+
+            RotationHandler.Begin();
+            return true;
         }
 
         protected override void OnDrag(DragEvent e)
@@ -99,7 +101,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            base.OnDragEnd(e);
+            RotationHandler?.Commit();
+            UpdateHoverState();
+
             cumulativeRotation.Value = null;
             rawCumulativeRotation = 0;
             TooltipText = default;
@@ -116,14 +120,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void applyRotation(bool shouldSnap)
         {
-            float oldRotation = cumulativeRotation.Value ?? 0;
-
             float newRotation = shouldSnap ? snap(rawCumulativeRotation, snap_step) : MathF.Round(rawCumulativeRotation);
             newRotation = (newRotation - 180) % 360 + 180;
 
             cumulativeRotation.Value = newRotation;
 
-            HandleRotate?.Invoke(newRotation - oldRotation);
+            RotationHandler?.Update(newRotation);
             TooltipText = shouldSnap ? EditorStrings.RotationSnapped(newRotation) : EditorStrings.RotationUnsnapped(newRotation);
         }
 

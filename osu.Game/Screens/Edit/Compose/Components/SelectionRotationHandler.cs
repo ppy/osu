@@ -16,11 +16,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         public Bindable<bool> CanRotate { get; private set; } = new BindableBool();
 
+        public void Rotate(float rotation, Vector2? origin = null)
+        {
+            Begin();
+            Update(rotation, origin);
+            Commit();
+        }
+
         public virtual void Begin()
         {
         }
 
-        public virtual void Update(float rotation, Vector2 origin)
+        public virtual void Update(float rotation, Vector2? origin = null)
         {
         }
 
