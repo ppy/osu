@@ -93,6 +93,11 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 scoreDiffText = new MatchScoreDiffCounter
                 {
                     Anchor = Anchor.TopCentre,
+                    Margin = new MarginPadding
+                    {
+                        Top = bar_height / 4,
+                        Horizontal = 8
+                    },
                     Alpha = 0
                 }
             };
@@ -168,14 +173,9 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private partial class MatchScoreDiffCounter : CommaSeparatedScoreCounter
         {
-            public MatchScoreDiffCounter()
-            {
-                Margin = new MarginPadding { Top = bar_height / 4, Horizontal = 10 };
-            }
-
             protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
-                s.Spacing = new Vector2(-1);
+                s.Spacing = new Vector2(-2);
                 s.Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: bar_height, fixedWidth: true);
             });
         }
