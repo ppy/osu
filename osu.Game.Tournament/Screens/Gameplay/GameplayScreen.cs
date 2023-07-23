@@ -234,15 +234,15 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public override void Hide()
         {
-            if (scheduledOperation != null)
-            {
-                scheduledOperation.Cancel();
-
-                if (State.Value == TourneyState.Ranking)
-                    contract();
-            }
+            scheduledOperation?.Cancel();
 
             base.Hide();
+        }
+
+        public override void Show()
+        {
+            stateChanged(new ValueChangedEvent<TourneyState>(TourneyState.Idle, State.Value));
+            base.Show();
         }
 
         private partial class ChromaArea : CompositeDrawable
