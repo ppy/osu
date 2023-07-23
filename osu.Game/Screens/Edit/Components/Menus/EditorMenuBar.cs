@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
@@ -200,7 +201,17 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 public DrawableSpacer(MenuItem item)
                     : base(item)
                 {
-                    Scale = new Vector2(1, 0.3f);
+                    Scale = new Vector2(1, 0.6f);
+
+                    AddInternal(new Box
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = BackgroundColourHover,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2f,
+                        Width = 0.8f,
+                    });
                 }
 
                 protected override bool OnHover(HoverEvent e) => true;
