@@ -127,13 +127,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
 
-            if (diff == 0)
-            {
-                scoreDiffText.Hide();
-                return;
-            }
-
-            scoreDiffText.Show();
+            scoreDiffText.Alpha = diff != 0 ? 1 : 0;
             scoreDiffText.Current.Value = -diff;
             scoreDiffText.Origin = score1.Value > score2.Value ? Anchor.TopLeft : Anchor.TopRight;
         }
