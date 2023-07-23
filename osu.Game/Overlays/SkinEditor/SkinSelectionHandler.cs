@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -40,7 +41,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     var drawableItem = (Drawable)b.Item;
 
-                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
+                    var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
                     updateDrawablePosition(drawableItem, rotatedPosition);
 
                     drawableItem.Rotation += angle;
@@ -137,7 +138,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -275,7 +276,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         /// <returns></returns>
         private Quad getSelectionQuad() =>
-            GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            GeometryUtils.GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
         private void applyFixedAnchors(Anchor anchor)
         {
