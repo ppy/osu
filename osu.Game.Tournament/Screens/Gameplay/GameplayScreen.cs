@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics.Contracts;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
