@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics.Contracts;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -159,6 +160,25 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TourneyState lastState;
         private MatchHeader header;
 
+        private void contract()
+        {
+            SongBar.Expanded = false;
+            scoreDisplay.FadeOut(100);
+            using (chat?.BeginDelayedSequence(500))
+                chat?.Expand();
+        }
+
+        private void expand()
+        {
+            chat?.Contract();
+
+            using (BeginDelayedSequence(300))
+            {
+                scoreDisplay.FadeIn(100);
+                SongBar.Expanded = true;
+            }
+        }
+
         private void stateChanged(ValueChangedEvent<TourneyState> state)
         {
             try
@@ -174,25 +194,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
 
                 scheduledOperation?.Cancel();
-
-                void expand()
-                {
-                    chat?.Contract();
-
-                    using (BeginDelayedSequence(300))
-                    {
-                        scoreDisplay.FadeIn(100);
-                        SongBar.Expanded = true;
-                    }
-                }
-
-                void contract()
-                {
-                    SongBar.Expanded = false;
-                    scoreDisplay.FadeOut(100);
-                    using (chat?.BeginDelayedSequence(500))
-                        chat?.Expand();
-                }
 
                 switch (state.NewValue)
                 {
@@ -234,7 +235,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public override void Hide()
         {
-            scheduledOperation?.Cancel();
+            if (scheduledOperation != null)
+            {
+                scheduledOperation.Cancel();
+
+                if (State.Value == TourneyState.Ranking)
+                    contract();
+            }
+
             base.Hide();
         }
 
