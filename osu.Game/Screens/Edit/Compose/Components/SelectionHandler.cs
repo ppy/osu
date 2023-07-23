@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         protected IEditorChangeHandler ChangeHandler { get; private set; }
 
+        protected SelectionRotationHandler RotationHandler { get; private set; }
+
         protected SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint<T>>();
@@ -66,6 +68,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            RotationHandler = CreateRotationHandler();
+
             InternalChild = SelectionBox = CreateSelectionBox();
 
             SelectedItems.CollectionChanged += (_, _) =>
@@ -131,6 +135,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="angle">The delta angle to apply to the selection.</param>
         /// <returns>Whether any items could be rotated.</returns>
         public virtual bool HandleRotation(float angle) => false;
+
+        /// <summary>
+        /// Creates the handler to use for rotation operations.
+        /// </summary>
+        public virtual SelectionRotationHandler CreateRotationHandler() => new SelectionRotationHandler();
 
         /// <summary>
         /// Handles the selected items being scaled.
