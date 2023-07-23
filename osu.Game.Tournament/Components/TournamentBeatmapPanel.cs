@@ -56,7 +56,7 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new UpdateableOnlineBeatmapSetCover
+                new TournamentUpdateableOnlineBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
@@ -179,6 +179,14 @@ namespace osu.Game.Tournament.Components
                 BorderThickness = 0;
                 Alpha = 1;
             }
+        }
+
+        private partial class TournamentUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        {
+            // Use DelayedLoadWrapper to avoid beatmap cover unload in map pool.
+            // see https://github.com/ppy/osu/discussions/24337
+            protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+                => new DelayedLoadWrapper(createContentFunc, timeBeforeLoad);
         }
     }
 }
