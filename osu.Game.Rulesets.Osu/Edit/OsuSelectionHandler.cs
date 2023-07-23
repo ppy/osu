@@ -29,11 +29,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private IDistanceSnapProvider? snapProvider { get; set; }
 
         /// <summary>
-        /// During a transform, the initial origin is stored so it can be used throughout the operation.
-        /// </summary>
-        private Vector2? referenceOrigin;
-
-        /// <summary>
         /// During a transform, the initial path types of a single selected slider are stored so they
         /// can be maintained throughout the operation.
         /// </summary>
@@ -54,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void OnOperationEnded()
         {
             base.OnOperationEnded();
-            referenceOrigin = null;
             referencePathTypes = null;
         }
 
@@ -170,28 +164,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
-        public override bool HandleRotation(float delta)
+        public override SelectionRotationHandler CreateRotationHandler() => new OsuSelectionRotationHandler(ChangeHandler)
         {
-            var hitObjects = selectedMovableObjects;
-
-            Quad quad = GeometryUtils.GetSurroundingQuad(hitObjects);
-
-            referenceOrigin ??= quad.Centre;
-
-            foreach (var h in hitObjects)
-            {
-                h.Position = GeometryUtils.RotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
-
-                if (h is IHasPath path)
-                {
-                    foreach (PathControlPoint cp in path.Path.ControlPoints)
-                        cp.Position = GeometryUtils.RotatePointAroundOrigin(cp.Position, Vector2.Zero, delta);
-                }
-            }
-
-            // this isn't always the case but let's be lenient for now.
-            return true;
-        }
+            SelectedItems = { BindTarget = SelectedItems }
+        };
 
         private void scaleSlider(Slider slider, Vector2 scale)
         {
