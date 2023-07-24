@@ -250,10 +250,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (editorInfo != null)
             {
                 globalSelection = editorInfo.Selected.GetBoundCopy();
-                globalSelection.BindValueChanged(s =>
-                {
-                    if (s.NewValue != Match) Selected = false;
-                });
+                globalSelection.BindValueChanged(s => Selected = s.NewValue == Match, true);
             }
         }
 

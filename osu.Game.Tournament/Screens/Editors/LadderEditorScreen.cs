@@ -78,8 +78,12 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        var pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
-                        LadderInfo.Matches.Add(new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
+                        Vector2 pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
+
+                        LadderInfo.Matches.Add(newMatch);
+
+                        editorInfo.Selected.Value = newMatch;
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
