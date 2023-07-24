@@ -62,22 +62,28 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 // ensure any ongoing edits are committed out to the *current* selection before changing to a new one.
                 GetContainingInputManager().TriggerFocusContention(null);
 
-                roundDropdown.Current = selection.NewValue?.Round;
-                losersCheckbox.Current = selection.NewValue?.Losers;
-                dateTimeBox.Current = selection.NewValue?.Date;
+                // Required to avoid cyclic failure in BindableWithCurrent (TriggerChange called during the Current_Set process).
+                // Arguable a framework issue but since we haven't hit it anywhere else a local workaround seems best.
+                roundDropdown.Current.ValueChanged -= roundDropdownChanged;
 
-                team1Dropdown.Current = selection.NewValue?.Team1;
-                team2Dropdown.Current = selection.NewValue?.Team2;
+                roundDropdown.Current = selection.NewValue.Round;
+                losersCheckbox.Current = selection.NewValue.Losers;
+                dateTimeBox.Current = selection.NewValue.Date;
+
+                team1Dropdown.Current = selection.NewValue.Team1;
+                team2Dropdown.Current = selection.NewValue.Team2;
+
+                roundDropdown.Current.ValueChanged += roundDropdownChanged;
             };
+        }
 
-            roundDropdown.Current.ValueChanged += round =>
+        private void roundDropdownChanged(ValueChangedEvent<TournamentRound> round)
+        {
+            if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
             {
-                if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
-                {
-                    editorInfo.Selected.Value.Date.Value = round.NewValue.StartDate.Value;
-                    editorInfo.Selected.TriggerChange();
-                }
-            };
+                editorInfo.Selected.Value.Date.Value = round.NewValue.StartDate.Value;
+                editorInfo.Selected.TriggerChange();
+            }
         }
 
         protected override void LoadComplete()
