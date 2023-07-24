@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -12,8 +13,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osu.Game.Users;
@@ -50,7 +51,7 @@ namespace osu.Game.Tournament.Screens.Editors
     public partial class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
-        private OsuTextBox? teamJsonTextBox;
+        private SettingsTextBox? teamJsonTextBox;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -62,10 +63,10 @@ namespace osu.Game.Tournament.Screens.Editors
                 Action = addAllCountries
             });
 
-            ControlPanel.Add(teamJsonTextBox = new OsuTextBox
+            ControlPanel.Add(teamJsonTextBox = new TournamentEditorJsonTextBox
             {
                 RelativeSizeAxes = Axes.X,
-                LengthLimit = 262144
+                LabelText = "Rounds to import JSON"
             });
             ControlPanel.Add(new TourneyButton
             {
@@ -77,7 +78,15 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private void importTeamsJson()
         {
-            var teams = JsonConvert.DeserializeObject<List<ImportedTeam>>(teamJsonTextBox?.Text ?? "[]");
+            var teams = JsonConvert.DeserializeObject<List<ImportedTeam>>(teamJsonTextBox?.Current.Value ?? "[]",
+                new JsonSerializerSettings
+                {
+                    Error = delegate(object? _, ErrorEventArgs args)
+                    {
+                        args.ErrorContext.Handled = true;
+                        teamJsonTextBox?.SetNoticeText("Unable to parse JSON, please check your input");
+                    }
+                });
 
             if (teams == null) return;
 

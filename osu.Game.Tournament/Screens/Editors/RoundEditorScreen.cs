@@ -1,7 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,7 +24,84 @@ namespace osu.Game.Tournament.Screens.Editors
 {
     public partial class RoundEditorScreen : TournamentEditorScreen<RoundEditorScreen.RoundRow, TournamentRound>
     {
+        public class ImportedBeatmap
+        {
+            [JsonProperty("beatmap_id")]
+            public int ID { get; set; }
+
+            [JsonProperty("mods")]
+            public string Mods { get; set; } = string.Empty;
+        }
+
+        public class ImportedRound
+        {
+            [JsonProperty("round_name")]
+            public string Name { get; set; } = string.Empty;
+
+            [JsonProperty("description")]
+            public string Description { get; set; } = string.Empty;
+
+            [JsonProperty("start_time")]
+            public string StartTime { get; set; } = string.Empty;
+
+            [JsonProperty("best_of")]
+            public int BestOf { get; set; }
+
+            [JsonProperty("beatmaps")]
+            public IEnumerable<ImportedBeatmap> Beatmaps { get; set; } = new List<ImportedBeatmap>();
+        }
+
         protected override BindableList<TournamentRound> Storage => LadderInfo.Rounds;
+        private SettingsTextBox? roundJsonTextBox;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            ControlPanel.Add(roundJsonTextBox = new TournamentEditorJsonTextBox
+            {
+                RelativeSizeAxes = Axes.X,
+                LabelText = "Teams to import JSON"
+            });
+            ControlPanel.Add(new TourneyButton
+            {
+                RelativeSizeAxes = Axes.X,
+                Text = "new shiny button",
+                Action = importRoundsJson
+            });
+        }
+
+        private void importRoundsJson()
+        {
+            var importedRounds = JsonConvert.DeserializeObject<List<ImportedRound>>(roundJsonTextBox?.Current.Value ?? "[]",
+                new JsonSerializerSettings
+                {
+                    Error = delegate(object? _, ErrorEventArgs args)
+                    {
+                        args.ErrorContext.Handled = true;
+                        roundJsonTextBox?.SetNoticeText("Unable to parse JSON, please check your input");
+                    }
+                });
+
+            if (importedRounds == null)
+            {
+                return;
+            }
+
+            roundJsonTextBox?.ClearNoticeText();
+
+            foreach (var round in importedRounds)
+            {
+                var newRound = new TournamentRound
+                {
+                    Name = { Value = round.Name },
+                    Description = { Value = round.Description },
+                    StartDate = { Value = round.StartTime.Length > 0 ? DateTime.Parse(round.StartTime, null, System.Globalization.DateTimeStyles.RoundtripKind) : DateTimeOffset.UtcNow },
+                    BestOf = { Value = round.BestOf }
+                };
+                newRound.Beatmaps.AddRange(round.Beatmaps.Select(beatmap => new RoundBeatmap { ID = beatmap.ID }));
+                Storage.Add(newRound);
+            }
+        }
 
         public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
