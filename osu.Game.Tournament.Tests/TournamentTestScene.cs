@@ -43,8 +43,6 @@ namespace osu.Game.Tournament.Tests
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
-
-            base.Content.Add(Content);
         }
 
         [SetUpSteps]
