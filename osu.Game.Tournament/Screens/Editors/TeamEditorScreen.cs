@@ -22,32 +22,6 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class ImportedTeam
-    {
-        [JsonProperty("acronym")]
-        public string Acronym { get; set; } = string.Empty;
-
-        [JsonProperty("name")]
-        public string Name { get; set; } = string.Empty;
-
-        [JsonProperty("flag")]
-        public string Flag { get; set; } = string.Empty;
-
-        [JsonProperty("seed")]
-        public string Seed { get; set; } = string.Empty;
-
-        [JsonProperty("last_year_placement")]
-        public int LastYearPlacement { get; set; }
-
-        [JsonProperty("players")]
-        public IEnumerable<int> Players { get; set; } = new List<int>();
-
-        public override string ToString()
-        {
-            return $"{(Name.Length > 0 ? Name : "<no name>")} ({(Acronym.Length > 0 ? Acronym : "<no acronym>")})";
-        }
-    }
-
     public partial class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
@@ -78,7 +52,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private void importTeamsJson()
         {
-            var teams = JsonConvert.DeserializeObject<List<ImportedTeam>>(teamJsonTextBox?.Current.Value ?? "[]",
+            var teams = JsonConvert.DeserializeObject<List<TournamentTeam>>(teamJsonTextBox?.Current.Value ?? "[]",
                 new JsonSerializerSettings
                 {
                     Error = delegate(object? _, ErrorEventArgs args)
@@ -90,22 +64,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
             if (teams == null) return;
 
-            foreach (var team in teams)
-            {
-                // todo: check if team we're about to import already exists and skip if we're about to create a duplicate?
-                var newTeam = new TournamentTeam
-                {
-                    FlagName = { Value = team.Flag },
-                    FullName = { Value = team.Name },
-                    Acronym = { Value = team.Acronym },
-                    Seed = { Value = team.Seed },
-                    LastYearPlacing = { Value = team.LastYearPlacement },
-                };
-
-                newTeam.Players.AddRange(team.Players.Select(player => new TournamentUser { OnlineID = player }));
-
-                Storage.Add(newTeam);
-            }
+            Storage.AddRange(teams);
         }
 
         protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model, this);

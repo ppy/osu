@@ -54,8 +54,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     }
                 });
 
-            if (importedRounds == null)
-                return;
+            if (importedRounds == null) return;
 
             roundJsonTextBox?.ClearNoticeText();
 
