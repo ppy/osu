@@ -21,6 +21,20 @@ namespace osu.Game.Tournament.Tests.Screens
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
 
         [Test]
+        public void TestWarmup()
+        {
+            createScreen();
+
+            checkScoreVisibility(false);
+
+            toggleWarmup();
+            checkScoreVisibility(true);
+
+            toggleWarmup();
+            checkScoreVisibility(false);
+        }
+
+        [Test]
         public void TestStartupState([Values] TourneyState state)
         {
             AddStep("set state", () => IPCInfo.State.Value = state);
@@ -33,20 +47,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("set null current", () => Ladder.CurrentMatch.Value = null);
             AddStep("set state", () => IPCInfo.State.Value = state);
             createScreen();
-        }
-
-        [Test]
-        public void TestWarmup()
-        {
-            createScreen();
-
-            checkScoreVisibility(false);
-
-            toggleWarmup();
-            checkScoreVisibility(true);
-
-            toggleWarmup();
-            checkScoreVisibility(false);
         }
 
         private void createScreen()
