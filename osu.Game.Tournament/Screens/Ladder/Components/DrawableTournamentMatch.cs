@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -43,8 +44,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             const float border_thickness = 4;
             const float spacing = 2;
-
-            Margin = new MarginPadding(border_thickness);
 
             InternalChildren = new Drawable[]
             {
@@ -333,8 +332,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private Vector2 snapToGrid(Vector2 pos) =>
             new Vector2(
-                (int)(pos.X / 10) * 10,
-                (int)(pos.Y / 10) * 10
+                (int)(pos.X / LadderEditorScreen.GRID_SPACING) * LadderEditorScreen.GRID_SPACING,
+                (int)(pos.Y / LadderEditorScreen.GRID_SPACING) * LadderEditorScreen.GRID_SPACING
             );
 
         public void Remove()
