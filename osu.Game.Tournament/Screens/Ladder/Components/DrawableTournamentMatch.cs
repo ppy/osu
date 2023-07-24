@@ -42,8 +42,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             AutoSizeAxes = Axes.Both;
 
-            const float border_thickness = 4;
+            const float border_thickness = 5;
             const float spacing = 2;
+
+            Margin = new MarginPadding(10);
 
             InternalChildren = new Drawable[]
             {
@@ -56,41 +58,45 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(-(border_thickness + spacing)),
+                    Padding = new MarginPadding(-10),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Children = new[]
+                    Child = selectionBox = new Container
                     {
-                        selectionBox = new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        Masking = true,
+                        BorderColour = Color4.YellowGreen,
+                        BorderThickness = border_thickness,
+                        Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
                             Alpha = 0,
-                            Masking = true,
-                            BorderColour = Color4.YellowGreen,
-                            BorderThickness = border_thickness,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                AlwaysPresent = true,
-                                Alpha = 0,
-                            }
-                        },
-                        CurrentMatchSelectionBox = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            BorderColour = Color4.White,
-                            BorderThickness = border_thickness,
-                            Masking = true,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                AlwaysPresent = true,
-                                Alpha = 0,
-                            }
-                        },
-                    }
+                        }
+                    },
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(-(spacing + border_thickness)),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Child = CurrentMatchSelectionBox = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        BorderColour = Color4.White,
+                        BorderThickness = border_thickness,
+                        Masking = true,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                        }
+                    },
+                }
             };
 
             boundReference(match.Team1).BindValueChanged(_ => updateTeams());
@@ -117,7 +123,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
                 Changed?.Invoke();
             }, true);
-
             updateTeams();
         }
 
