@@ -15,7 +15,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneGameplayScreen : TournamentTestScene
+    public partial class TestSceneGameplayScreen : TournamentScreenTestScene
     {
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
