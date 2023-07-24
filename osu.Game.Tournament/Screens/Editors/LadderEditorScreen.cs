@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder;
@@ -26,6 +27,8 @@ namespace osu.Game.Tournament.Screens.Editors
     [Cached]
     public partial class LadderEditorScreen : LadderScreen, IHasContextMenu
     {
+        public const float GRID_SPACING = 10;
+
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
@@ -42,6 +45,13 @@ namespace osu.Game.Tournament.Screens.Editors
             });
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
+
+            ScrollContent.Add(new RectangularPositionSnapGrid(Vector2.Zero)
+            {
+                Spacing = new Vector2(GRID_SPACING),
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MaxValue
+            });
 
             LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
