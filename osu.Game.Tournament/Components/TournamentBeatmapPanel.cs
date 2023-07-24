@@ -183,6 +183,9 @@ namespace osu.Game.Tournament.Components
 
         private partial class TournamentUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
+            // no need to wait for Load because beatmap cover information does not change.
+            protected override double LoadDelay => 0;
+
             // Use DelayedLoadWrapper to avoid beatmap cover unload in map pool.
             // see https://github.com/ppy/osu/discussions/24337
             protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
