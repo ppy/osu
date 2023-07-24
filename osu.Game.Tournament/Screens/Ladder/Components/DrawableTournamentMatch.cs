@@ -41,36 +41,57 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             AutoSizeAxes = Axes.Both;
 
-            Margin = new MarginPadding(5);
+            const float border_thickness = 4;
+            const float spacing = 2;
 
-            InternalChildren = new[]
+            Margin = new MarginPadding(border_thickness);
+
+            InternalChildren = new Drawable[]
             {
-                selectionBox = new Container
-                {
-                    Scale = new Vector2(1.1f),
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                    Colour = Color4.YellowGreen,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
-                CurrentMatchSelectionBox = new Container
-                {
-                    Scale = new Vector2(1.05f, 1.1f),
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                    Colour = Color4.White,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
                 Flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2)
-                }
+                    Spacing = new Vector2(spacing)
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(-(border_thickness + spacing)),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new[]
+                    {
+                        selectionBox = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Masking = true,
+                            BorderColour = Color4.YellowGreen,
+                            BorderThickness = border_thickness,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                AlwaysPresent = true,
+                                Alpha = 0,
+                            }
+                        },
+                        CurrentMatchSelectionBox = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            BorderColour = Color4.White,
+                            BorderThickness = border_thickness,
+                            Masking = true,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                AlwaysPresent = true,
+                                Alpha = 0,
+                            }
+                        },
+                    }
+                },
             };
 
             boundReference(match.Team1).BindValueChanged(_ => updateTeams());
