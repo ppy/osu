@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -121,5 +125,28 @@ namespace osu.Game.Tournament.Screens.Editors
         }
 
         protected abstract TDrawable CreateDrawable(TModel model);
+
+        public virtual bool ImportFromJson(string inputJson)
+        {
+            if (inputJson.StartsWith("{", StringComparison.Ordinal) && inputJson.EndsWith("}", StringComparison.Ordinal))
+            {
+                // input is not an array, wrap it in an array
+                inputJson = $"[{inputJson}]";
+            }
+
+            List<TModel>? rounds = JsonConvert.DeserializeObject<List<TModel>>(inputJson,
+                new JsonSerializerSettings
+                {
+                    Error = delegate(object? _, ErrorEventArgs args)
+                    {
+                        args.ErrorContext.Handled = true;
+                    }
+                });
+
+            if (rounds == null) return false;
+
+            Storage.AddRange(rounds);
+            return true;
+        }
     }
 }

@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,33 +29,23 @@ namespace osu.Game.Tournament.Screens.Editors
             ControlPanel.Add(roundJsonTextBox = new TournamentEditorJsonTextBox
             {
                 RelativeSizeAxes = Axes.X,
-                LabelText = "Teams to import JSON"
+                LabelText = "JSON of round(s) to import"
             });
             ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
-                Text = "Import teams from JSON",
-                Action = importRoundsJson
-            });
-        }
-
-        private void importRoundsJson()
-        {
-            var importedRounds = JsonConvert.DeserializeObject<List<TournamentRound>>(roundJsonTextBox?.Current.Value ?? "[]",
-                new JsonSerializerSettings
+                Text = "Import round(s)",
+                Action = () =>
                 {
-                    Error = delegate(object? _, ErrorEventArgs args)
+                    if (ImportFromJson(roundJsonTextBox.Current.Value))
                     {
-                        args.ErrorContext.Handled = true;
-                        roundJsonTextBox?.SetNoticeText("Unable to parse JSON, please check your input");
+                        roundJsonTextBox.ClearNoticeText();
+                        return;
                     }
-                });
 
-            if (importedRounds == null) return;
-
-            roundJsonTextBox?.ClearNoticeText();
-
-            Storage.AddRange(importedRounds);
+                    roundJsonTextBox.SetNoticeText("No rounds parsed, please double-check your input");
+                }
+            });
         }
 
         public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>

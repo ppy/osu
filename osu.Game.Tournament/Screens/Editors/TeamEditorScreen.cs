@@ -40,31 +40,23 @@ namespace osu.Game.Tournament.Screens.Editors
             ControlPanel.Add(teamJsonTextBox = new TournamentEditorJsonTextBox
             {
                 RelativeSizeAxes = Axes.X,
-                LabelText = "Rounds to import JSON"
+                LabelText = "JSON of team(s) to import"
             });
             ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
-                Text = "Import teams",
-                Action = importTeamsJson
-            });
-        }
-
-        private void importTeamsJson()
-        {
-            var teams = JsonConvert.DeserializeObject<List<TournamentTeam>>(teamJsonTextBox?.Current.Value ?? "[]",
-                new JsonSerializerSettings
+                Text = "Import team(s)",
+                Action = () =>
                 {
-                    Error = delegate(object? _, ErrorEventArgs args)
+                    if (ImportFromJson(teamJsonTextBox.Current.Value))
                     {
-                        args.ErrorContext.Handled = true;
-                        teamJsonTextBox?.SetNoticeText("Unable to parse JSON, please check your input");
+                        teamJsonTextBox.ClearNoticeText();
+                        return;
                     }
-                });
 
-            if (teams == null) return;
-
-            Storage.AddRange(teams);
+                    teamJsonTextBox.SetNoticeText("No rounds parsed, please double-check your input");
+                }
+            });
         }
 
         protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model, this);
