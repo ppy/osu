@@ -14,7 +14,7 @@ using osu.Game.Tournament.Screens.MapPool;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneMapPoolScreen : TournamentTestScene
+    public partial class TestSceneMapPoolScreen : TournamentScreenTestScene
     {
         private MapPoolScreen screen;
 

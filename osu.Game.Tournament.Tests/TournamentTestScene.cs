@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -20,16 +18,16 @@ namespace osu.Game.Tournament.Tests
 {
     public abstract partial class TournamentTestScene : OsuTestScene
     {
-        private TournamentMatch match;
-
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [Cached]
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
+
+        private TournamentMatch match = null!;
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
@@ -45,6 +43,8 @@ namespace osu.Game.Tournament.Tests
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+
+            base.Content.Add(Content);
         }
 
         [SetUpSteps]
@@ -167,7 +167,7 @@ namespace osu.Game.Tournament.Tests
 
         public partial class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSceneTestRunner.TestRunner runner = null!;
 
             protected override void LoadAsyncComplete()
             {

@@ -5,7 +5,7 @@ using osu.Game.Tournament.Screens.Editors;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneTeamEditorScreen : TournamentTestScene
+    public partial class TestSceneTeamEditorScreen : TournamentScreenTestScene
     {
         public TestSceneTeamEditorScreen()
         {
