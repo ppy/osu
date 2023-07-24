@@ -75,6 +75,13 @@ namespace osu.Game.Tournament
                     //Masking = true,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            Colour = new Color4(20, 20, 20, 255),
+                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 10,
+                        },
                         video = new TourneyVideo("main", true)
                         {
                             Loop = true,
