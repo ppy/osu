@@ -468,6 +468,13 @@ namespace osu.Game.Skinning
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
+            switch (componentName)
+            {
+                case "Menu/fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
             foreach (string name in getFallbackNames(componentName))
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)
