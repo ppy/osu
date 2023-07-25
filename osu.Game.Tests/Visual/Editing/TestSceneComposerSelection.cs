@@ -1,26 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
@@ -82,7 +80,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestNudgeSelection()
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -104,7 +102,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestRotateHotkeys()
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -136,7 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestGlobalFlipHotkeys()
         {
-            HitCircle addedObject = null;
+            HitCircle addedObject = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.Add(addedObject = new HitCircle { StartTime = 100 }));
 
@@ -217,11 +215,173 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 2 && !EditorBeatmap.SelectedHitObjects.Contains(addedObjects[1]));
         }
 
+        [Test]
+        public void TestNearestSelection()
+        {
+            var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek near first", () => EditorClock.Seek(100));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek near second", () => EditorClock.Seek(500));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek halfway", () => EditorClock.Seek(300));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+        }
+
+        [Test]
+        public void TestNearestSelectionWithEndTime()
+        {
+            var firstObject = new Slider
+            {
+                Position = new Vector2(256, 192),
+                StartTime = 0,
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(),
+                    new PathControlPoint(new Vector2(50, 0)),
+                })
+            };
+
+            var secondObject = new HitCircle
+            {
+                Position = new Vector2(256, 192),
+                StartTime = 600
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new HitObject[] { firstObject, secondObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek near first", () => EditorClock.Seek(100));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek near second", () => EditorClock.Seek(500));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddStep("seek roughly halfway", () => EditorClock.Seek(350));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            // Slider gets priority due to end time.
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+        }
+
+        [Test]
+        public void TestCyclicSelection()
+        {
+            var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 300 };
+            var thirdObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject, thirdObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
+
+            // cycle around
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+        }
+
+        [Test]
+        public void TestCyclicSelectionOutwards()
+        {
+            var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 300 };
+            var thirdObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject, thirdObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek near second", () => EditorClock.Seek(320));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            // cycle around
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+        }
+
+        [Test]
+        public void TestCyclicSelectionBackwards()
+        {
+            var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 200 };
+            var thirdObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 400 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject, thirdObject }));
+
+            moveMouseToObject(() => firstObject);
+
+            AddStep("seek to third", () => EditorClock.Seek(350));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondObject));
+
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("first selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(firstObject));
+
+            // cycle around
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
+        }
+
+        [Test]
+        public void TestDoubleClickToSeek()
+        {
+            var hitCircle = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { hitCircle }));
+
+            moveMouseToObject(() => hitCircle);
+
+            AddRepeatStep("double click", () => InputManager.Click(MouseButton.Left), 2);
+
+            AddUntilStep("seeked to circle", () => EditorClock.CurrentTime, () => Is.EqualTo(600));
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestMultiSelectFromDrag(bool alreadySelectedBeforeDrag)
         {
-            HitCircle[] addedObjects = null;
+            HitCircle[] addedObjects = null!;
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
@@ -320,7 +480,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestQuickDeleteRemovesSliderControlPoint()
         {
-            Slider slider = null;
+            Slider slider = null!;
 
             PathControlPoint[] points =
             {
