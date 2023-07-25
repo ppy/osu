@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             // If in a playing state, require visiting the pause menu before exiting.
-            if (Score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0) && !GameplayState.HasPassed && !GameplayState.HasFailed && !GameplayClockContainer.IsPaused.Value)
+            if (Score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0) && !GameplayState.HasPassed && !GameplayState.HasFailed && !GameplayClockContainer.IsPaused.Value && Configuration.AllowPause)
             {
                 Pause();
                 return true;
