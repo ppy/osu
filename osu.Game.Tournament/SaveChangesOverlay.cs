@@ -25,12 +25,11 @@ namespace osu.Game.Tournament
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new Container
+            InternalChild = new CircularContainer
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Position = new Vector2(5),
-                CornerRadius = 10,
+                Position = new Vector2(-5),
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -43,18 +42,10 @@ namespace osu.Game.Tournament
                     saveChangesButton = new TourneyButton
                     {
                         Text = "Save Changes",
+                        RelativeSizeAxes = Axes.None,
                         Width = 140,
                         Height = 50,
-                        Padding = new MarginPadding
-                        {
-                            Top = 10,
-                            Left = 10,
-                        },
-                        Margin = new MarginPadding
-                        {
-                            Right = 10,
-                            Bottom = 10,
-                        },
+                        Margin = new MarginPadding(10),
                         Action = saveChanges,
                         // Enabled = { Value = false },
                     },

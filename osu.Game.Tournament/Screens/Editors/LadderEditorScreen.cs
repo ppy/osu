@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,8 +15,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tournament.Components;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
@@ -26,10 +30,16 @@ namespace osu.Game.Tournament.Screens.Editors
     [Cached]
     public partial class LadderEditorScreen : LadderScreen, IHasContextMenu
     {
+        public const float GRID_SPACING = 10;
+
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
         private WarningBox rightClickMessage;
+
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         protected override bool DrawLoserPaths => true;
 
@@ -42,6 +52,13 @@ namespace osu.Game.Tournament.Screens.Editors
             });
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
+
+            ScrollContent.Add(new RectangularPositionSnapGrid(Vector2.Zero)
+            {
+                Spacing = new Vector2(GRID_SPACING),
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MaxValue
+            });
 
             LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
@@ -68,13 +85,20 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        var pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
-                        LadderInfo.Matches.Add(new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
+                        Vector2 pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
+
+                        LadderInfo.Matches.Add(newMatch);
+
+                        editorInfo.Selected.Value = newMatch;
                     }),
                     new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
                     {
-                        foreach (var p in MatchesContainer)
-                            p.Match.Reset();
+                        dialogOverlay?.Push(new LadderResetTeamsDialog(() =>
+                        {
+                            foreach (var p in MatchesContainer)
+                                p.Match.Reset();
+                        }));
                     })
                 };
             }
