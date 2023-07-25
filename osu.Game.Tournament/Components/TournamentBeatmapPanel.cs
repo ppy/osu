@@ -56,7 +56,7 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new TournamentUpdateableOnlineBeatmapSetCover
+                new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
@@ -181,13 +181,12 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        private partial class TournamentUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class NoUnloadBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
-            // no need to wait for Load because beatmap cover information does not change.
+            // As covers are displayed on stream, we want them to load as soon as possible.
             protected override double LoadDelay => 0;
 
-            // Use DelayedLoadWrapper to avoid beatmap cover unload in map pool.
-            // see https://github.com/ppy/osu/discussions/24337
+            // Use DelayedLoadWrapper to avoid content unloading when switching away to another screen.
             protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
                 => new DelayedLoadWrapper(createContentFunc, timeBeforeLoad);
         }
