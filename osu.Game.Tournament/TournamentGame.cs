@@ -42,11 +42,8 @@ namespace osu.Game.Tournament
 
         private LoadingSpinner loadingSpinner;
 
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
@@ -63,8 +60,6 @@ namespace osu.Game.Tournament
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(40),
             });
-
-            dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
 
             // in order to have the OS mouse cursor visible, relative mode needs to be disabled.
             // can potentially be removed when https://github.com/ppy/osu-framework/issues/4309 is resolved.
