@@ -70,6 +70,12 @@ namespace osu.Game.Screens
         bool? ApplyModTrackAdjustments { get; }
 
         /// <summary>
+        /// Whether control of the global track should be allowed via the music controller / now playing overlay.
+        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
+        /// </summary>
+        bool? AllowGlobalTrackControl { get; }
+
+        /// <summary>
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.
         /// </summary>
         /// <remarks>

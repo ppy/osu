@@ -41,6 +41,11 @@ namespace osu.Game.Overlays
         public bool UserPauseRequested { get; private set; }
 
         /// <summary>
+        /// Whether control of the global track should be allowed.
+        /// </summary>
+        public readonly BindableBool AllowTrackControl = new BindableBool(true);
+
+        /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
         /// Includes direction information for display purposes.
         /// </summary>
@@ -92,8 +97,10 @@ namespace osu.Game.Overlays
             seekDelegate?.Cancel();
             seekDelegate = Schedule(() =>
             {
-                if (!beatmap.Disabled)
-                    CurrentTrack.Seek(position);
+                if (beatmap.Disabled || !AllowTrackControl.Value)
+                    return;
+
+                CurrentTrack.Seek(position);
             });
         }
 
@@ -107,7 +114,7 @@ namespace osu.Game.Overlays
 
             if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                if (beatmap.Disabled)
+                if (beatmap.Disabled || !AllowTrackControl.Value)
                     return;
 
                 Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
@@ -132,6 +139,9 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool Play(bool restart = false, bool requestedByUser = false)
         {
+            if (requestedByUser && !AllowTrackControl.Value)
+                return false;
+
             if (requestedByUser)
                 UserPauseRequested = false;
 
@@ -153,6 +163,9 @@ namespace osu.Game.Overlays
         /// </param>
         public void Stop(bool requestedByUser = false)
         {
+            if (requestedByUser && !AllowTrackControl.Value)
+                return;
+
             UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.StopAsync();
@@ -164,6 +177,9 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
+            if (!AllowTrackControl.Value)
+                return false;
+
             if (CurrentTrack.IsRunning)
                 Stop(true);
             else
@@ -189,7 +205,7 @@ namespace osu.Game.Overlays
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
         private PreviousTrackResult prev()
         {
-            if (beatmap.Disabled)
+            if (beatmap.Disabled || !AllowTrackControl.Value)
                 return PreviousTrackResult.None;
 
             double currentTrackPosition = CurrentTrack.CurrentTime;
@@ -229,7 +245,7 @@ namespace osu.Game.Overlays
 
         private bool next()
         {
-            if (beatmap.Disabled)
+            if (beatmap.Disabled || !AllowTrackControl.Value)
                 return false;
 
             queuedDirection = TrackChangeDirection.Next;
@@ -352,7 +368,7 @@ namespace osu.Game.Overlays
 
         private void onTrackCompleted()
         {
-            if (!CurrentTrack.Looping && !beatmap.Disabled)
+            if (!CurrentTrack.Looping && !beatmap.Disabled && AllowTrackControl.Value)
                 NextTrack();
         }
 

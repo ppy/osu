@@ -87,6 +87,8 @@ namespace osu.Game.Screens
 
         public virtual bool? ApplyModTrackAdjustments => null;
 
+        public virtual bool? AllowGlobalTrackControl => null;
+
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
@@ -94,6 +96,8 @@ namespace osu.Game.Screens
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         private OsuScreenDependencies screenDependencies;
+
+        private bool? globalMusicControlStateAtSuspend;
 
         private bool? modTrackAdjustmentStateAtSuspend;
 
@@ -180,6 +184,8 @@ namespace osu.Game.Screens
             // in such a case there's no need to restore this value.
             if (modTrackAdjustmentStateAtSuspend != null)
                 musicController.ApplyModTrackAdjustments = modTrackAdjustmentStateAtSuspend.Value;
+            if (globalMusicControlStateAtSuspend != null)
+                musicController.AllowTrackControl.Value = globalMusicControlStateAtSuspend.Value;
 
             base.OnResuming(e);
         }
@@ -189,6 +195,7 @@ namespace osu.Game.Screens
             base.OnSuspending(e);
 
             modTrackAdjustmentStateAtSuspend = musicController.ApplyModTrackAdjustments;
+            globalMusicControlStateAtSuspend = musicController.AllowTrackControl.Value;
 
             onSuspendingLogo();
         }
@@ -199,6 +206,9 @@ namespace osu.Game.Screens
 
             if (ApplyModTrackAdjustments != null)
                 musicController.ApplyModTrackAdjustments = ApplyModTrackAdjustments.Value;
+
+            if (AllowGlobalTrackControl != null)
+                musicController.AllowTrackControl.Value = AllowGlobalTrackControl.Value;
 
             if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
