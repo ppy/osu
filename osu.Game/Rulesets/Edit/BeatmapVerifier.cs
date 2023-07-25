@@ -38,6 +38,9 @@ namespace osu.Game.Rulesets.Edit
 
             // Timing
             new CheckPreviewTime(),
+
+            // Events
+            new CheckBreaks()
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
