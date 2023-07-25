@@ -37,6 +37,28 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
+        public void TestHitWithBothKeysOnSameFrameDoesNotFallThroughToNextObject()
+        {
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(1000, TaikoAction.LeftCentre, TaikoAction.RightCentre),
+            }, CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = 1000,
+            }, new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = 1020
+            }));
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Great);
+            AssertResult<Hit>(1, HitResult.Miss);
+        }
+
+        [Test]
         public void TestHitRimHit()
         {
             const double hit_time = 1000;
