@@ -371,7 +371,7 @@ namespace osu.Game.Screens.Select
                     {
                         new InfoLabel(new BeatmapStatistic
                         {
-                            Name = $"Length (Breaks: {playableBeatmap.TotalBreakTime.ToFormattedDuration().ToString()})",
+                            Name = $"Length (Drain: {playableBeatmap.CalculateDrainLength().ToFormattedDuration().ToString()})",
                             CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
                             Content = working.BeatmapInfo.Length.ToFormattedDuration().ToString(),
                         }),
