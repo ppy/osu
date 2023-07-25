@@ -36,8 +36,10 @@ namespace osu.Game.Tournament
 
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
         private Drawable heightWarning;
-        private Bindable<Size> windowSize;
+
         private Bindable<WindowMode> windowMode;
+        private readonly BindableSize windowSize = new BindableSize();
+
         private LoadingSpinner loadingSpinner;
 
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
@@ -49,7 +51,10 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
         {
-            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
+            frameworkConfig.BindWith(FrameworkSetting.WindowedSize, windowSize);
+
+            windowSize.MinValue = new Size(TournamentSceneManager.REQUIRED_WIDTH, TournamentSceneManager.STREAM_AREA_HEIGHT);
+
             windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
             Add(loadingSpinner = new LoadingSpinner(true, true)
