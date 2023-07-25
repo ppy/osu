@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
-    public class CheckDrainTimeTest
+    public class CheckDrainLengthTest
     {
         private CheckDrainLength check = null!;
 
