@@ -356,20 +356,20 @@ namespace osu.Game.Overlays
                 NextTrack();
         }
 
-        private bool allowTrackAdjustments;
+        private bool applyModTrackAdjustments;
 
         /// <summary>
         /// Whether mod track adjustments are allowed to be applied.
         /// </summary>
-        public bool AllowTrackAdjustments
+        public bool ApplyModTrackAdjustments
         {
-            get => allowTrackAdjustments;
+            get => applyModTrackAdjustments;
             set
             {
-                if (allowTrackAdjustments == value)
+                if (applyModTrackAdjustments == value)
                     return;
 
-                allowTrackAdjustments = value;
+                applyModTrackAdjustments = value;
                 ResetTrackAdjustments();
             }
         }
@@ -377,7 +377,7 @@ namespace osu.Game.Overlays
         private AudioAdjustments modTrackAdjustments;
 
         /// <summary>
-        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
+        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="ApplyModTrackAdjustments"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
         /// Does not reset any adjustments applied directly to the beatmap track.
@@ -390,7 +390,7 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            if (allowTrackAdjustments)
+            if (applyModTrackAdjustments)
             {
                 CurrentTrack.BindAdjustments(modTrackAdjustments = new AudioAdjustments());
 

@@ -85,7 +85,7 @@ namespace osu.Game.Screens
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public virtual bool? AllowTrackAdjustments => null;
+        public virtual bool? ApplyModTrackAdjustments => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -95,7 +95,7 @@ namespace osu.Game.Screens
 
         private OsuScreenDependencies screenDependencies;
 
-        private bool? trackAdjustmentStateAtSuspend;
+        private bool? modTrackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -178,8 +178,8 @@ namespace osu.Game.Screens
 
             // it's feasible to resume to a screen if the target screen never loaded successfully.
             // in such a case there's no need to restore this value.
-            if (trackAdjustmentStateAtSuspend != null)
-                musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
+            if (modTrackAdjustmentStateAtSuspend != null)
+                musicController.ApplyModTrackAdjustments = modTrackAdjustmentStateAtSuspend.Value;
 
             base.OnResuming(e);
         }
@@ -188,7 +188,7 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(e);
 
-            trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
+            modTrackAdjustmentStateAtSuspend = musicController.ApplyModTrackAdjustments;
 
             onSuspendingLogo();
         }
@@ -197,8 +197,8 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            if (AllowTrackAdjustments != null)
-                musicController.AllowTrackAdjustments = AllowTrackAdjustments.Value;
+            if (ApplyModTrackAdjustments != null)
+                musicController.ApplyModTrackAdjustments = ApplyModTrackAdjustments.Value;
 
             if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
