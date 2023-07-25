@@ -139,7 +139,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             base.LoadComplete();
 
             State.BindTo(ipc.State);
-            State.BindValueChanged(stateChanged, true);
+            State.BindValueChanged(_ => updateState(), true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -150,10 +150,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 return;
 
             warmup.Value = match.NewValue.Team1Score.Value + match.NewValue.Team2Score.Value == 0;
-            scheduledOperation?.Cancel();
+            scheduledScreenChange?.Cancel();
         }
 
-        private ScheduledDelegate scheduledOperation;
+        private ScheduledDelegate scheduledScreenChange;
+        private ScheduledDelegate scheduledContract;
+
         private TournamentMatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
@@ -161,6 +163,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private void contract()
         {
+            scheduledContract?.Cancel();
+
             SongBar.Expanded = false;
             scoreDisplay.FadeOut(100);
             using (chat?.BeginDelayedSequence(500))
@@ -169,6 +173,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private void expand()
         {
+            scheduledContract?.Cancel();
+
             chat?.Contract();
 
             using (BeginDelayedSequence(300))
@@ -178,11 +184,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private void stateChanged(ValueChangedEvent<TourneyState> state)
+        private void updateState()
         {
             try
             {
-                if (state.NewValue == TourneyState.Ranking)
+                scheduledScreenChange?.Cancel();
+
+                if (State.Value == TourneyState.Ranking)
                 {
                     if (warmup.Value || CurrentMatch.Value == null) return;
 
@@ -192,9 +200,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         CurrentMatch.Value.Team2Score.Value++;
                 }
 
-                scheduledOperation?.Cancel();
-
-                switch (state.NewValue)
+                switch (State.Value)
                 {
                     case TourneyState.Idle:
                         contract();
@@ -208,40 +214,38 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             if (lastState == TourneyState.Ranking && !warmup.Value)
                             {
                                 if (CurrentMatch.Value?.Completed.Value == true)
-                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
+                                    scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
                                 else if (CurrentMatch.Value?.Completed.Value == false)
-                                    scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
+                                    scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
                             }
                         }
 
                         break;
 
                     case TourneyState.Ranking:
-                        scheduledOperation = Scheduler.AddDelayed(contract, 10000);
+                        scheduledContract = Scheduler.AddDelayed(contract, 10000);
                         break;
 
                     default:
-                        chat.Contract();
                         expand();
                         break;
                 }
             }
             finally
             {
-                lastState = state.NewValue;
+                lastState = State.Value;
             }
         }
 
         public override void Hide()
         {
-            scheduledOperation?.Cancel();
-
+            scheduledScreenChange?.Cancel();
             base.Hide();
         }
 
         public override void Show()
         {
-            stateChanged(new ValueChangedEvent<TourneyState>(TourneyState.Idle, State.Value));
+            updateState();
             base.Show();
         }
 

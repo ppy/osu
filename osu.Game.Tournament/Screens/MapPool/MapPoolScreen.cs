@@ -37,6 +37,8 @@ namespace osu.Game.Tournament.Screens.MapPool
         private OsuButton buttonRedPick;
         private OsuButton buttonBluePick;
 
+        private ScheduledDelegate scheduledScreenChange;
+
         [BackgroundDependencyLoader]
         private void load(MatchIPCInfo ipc)
         {
@@ -188,8 +190,6 @@ namespace osu.Game.Tournament.Screens.MapPool
             setNextMode();
         }
 
-        private ScheduledDelegate scheduledChange;
-
         private void addForBeatmap(int beatmapId)
         {
             if (CurrentMatch.Value == null)
@@ -216,15 +216,15 @@ namespace osu.Game.Tournament.Screens.MapPool
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
                 {
-                    scheduledChange?.Cancel();
-                    scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+                    scheduledScreenChange?.Cancel();
+                    scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
                 }
             }
         }
 
         public override void Hide()
         {
-            scheduledChange?.Cancel();
+            scheduledScreenChange?.Cancel();
             base.Hide();
         }
 
