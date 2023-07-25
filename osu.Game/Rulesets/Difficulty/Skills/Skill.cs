@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
     /// <summary>
-    /// Process the <see cref="DifficultyHitObject"/> in a map and produce a difficulty value.
+    /// Abstract class used for creating implementations of skills, which process a map's <see cref="DifficultyHitObject"/>s to produce an aggregate difficulty value.
     /// </summary>
     /// <remarks>
     /// This class should be considered a "processing" class and not persisted.
