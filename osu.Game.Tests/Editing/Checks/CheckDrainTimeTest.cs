@@ -16,12 +16,12 @@ namespace osu.Game.Tests.Editing.Checks
 {
     public class CheckDrainTimeTest
     {
-        private CheckDrainTime check = null!;
+        private CheckDrainLength check = null!;
 
         [SetUp]
         public void Setup()
         {
-            check = new CheckDrainTime();
+            check = new CheckDrainLength();
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckDrainTime.IssueTemplateTooShort);
+            Assert.That(issues.Single().Template is CheckDrainLength.IssueTemplateTooShort);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckDrainTime.IssueTemplateTooShort);
+            Assert.That(issues.Single().Template is CheckDrainLength.IssueTemplateTooShort);
         }
 
         [Test]
