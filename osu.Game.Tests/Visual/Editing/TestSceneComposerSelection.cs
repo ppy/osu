@@ -340,14 +340,14 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestCyclicSelectionBackwards()
         {
             var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
-            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 300 };
-            var thirdObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 600 };
+            var secondObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 200 };
+            var thirdObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 400 };
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[] { firstObject, secondObject, thirdObject }));
 
             moveMouseToObject(() => firstObject);
 
-            AddStep("seek to third", () => EditorClock.Seek(600));
+            AddStep("seek to third", () => EditorClock.Seek(350));
 
             AddStep("left click", () => InputManager.Click(MouseButton.Left));
             AddAssert("third selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(thirdObject));
