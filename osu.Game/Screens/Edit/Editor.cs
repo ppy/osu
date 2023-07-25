@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                X = -15,
+                                X = -10,
                                 Current = Mode,
                             },
                         },
@@ -997,21 +997,38 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-            new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-            new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
             new EditorMenuItemSpacer(),
             new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
             new EditorMenuItemSpacer(),
+            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+            createExportMenu(),
+            new EditorMenuItemSpacer(),
             new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
+
+        private EditorMenuItem createExportMenu()
+        {
+            var exportItems = new List<MenuItem>
+            {
+                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            };
+
+            return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
+        }
 
         private void exportBeatmap()
         {
             Save();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void exportLegacyBeatmap()
+        {
+            Save();
+            beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
         }
 
         /// <summary>
