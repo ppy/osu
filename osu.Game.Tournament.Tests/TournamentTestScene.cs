@@ -19,7 +19,8 @@ namespace osu.Game.Tournament.Tests
 {
     public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
-        protected DialogOverlay DialogOverlay = null!;
+        [Cached(typeof(IDialogOverlay))]
+        protected readonly DialogOverlay DialogOverlay = new DialogOverlay { Depth = float.MinValue };
 
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
@@ -47,9 +48,7 @@ namespace osu.Game.Tournament.Tests
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
 
-            Add(DialogOverlay = new DialogOverlay { Depth = -1 });
-
-            Dependencies.CacheAs<IDialogOverlay>(DialogOverlay);
+            Add(DialogOverlay);
         }
 
         [SetUpSteps]
