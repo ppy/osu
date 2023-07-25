@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Tests.Screens
             {
                 Team1 = { Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA") },
                 Team2 = { Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN") },
-                Round = { Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals") }
+                Round = { Value = Ladder.Rounds.First(g => g.Name.Value == "Quarterfinals") }
             };
 
             Add(new TeamIntroScreen

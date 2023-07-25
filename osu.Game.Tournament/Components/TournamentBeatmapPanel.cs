@@ -22,13 +22,13 @@ namespace osu.Game.Tournament.Components
     {
         public readonly TournamentBeatmap? Beatmap;
 
-        private readonly string mod;
+        private readonly string? mod;
 
         public const float HEIGHT = 50;
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
-        private Box flash = null!;
+        private Box? flash;
 
         public TournamentBeatmapPanel(TournamentBeatmap? beatmap, string mod = "")
         {
@@ -135,25 +135,29 @@ namespace osu.Game.Tournament.Components
                 match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
             if (match.NewValue != null)
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
-
-            Scheduler.AddOnce(updateState);
+            updateState();
         }
 
         private void picksBansOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-            => Scheduler.AddOnce(updateState);
+            => updateState();
 
         private BeatmapChoice? choice;
 
         private void updateState()
         {
-            var newChoice = currentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            if (currentMatch.Value == null)
+            {
+                return;
+            }
+
+            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             bool shouldFlash = newChoice != choice;
 
             if (newChoice != null)
             {
                 if (shouldFlash)
-                    flash.FadeOutFromOne(500).Loop(0, 10);
+                    flash?.FadeOutFromOne(500).Loop(0, 10);
 
                 BorderThickness = 6;
 
