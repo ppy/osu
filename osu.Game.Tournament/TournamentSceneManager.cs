@@ -38,11 +38,14 @@ namespace osu.Game.Tournament
         private Container screens;
         private TourneyVideo video;
 
-        public const float CONTROL_AREA_WIDTH = 200;
+        public const int CONTROL_AREA_WIDTH = 200;
 
-        public const float STREAM_AREA_WIDTH = 1366;
+        public const int STREAM_AREA_WIDTH = 1366;
+        public const int STREAM_AREA_HEIGHT = (int)(STREAM_AREA_WIDTH / ASPECT_RATIO);
 
-        public const double REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
+        public const float ASPECT_RATIO = 16 / 9f;
+
+        public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
@@ -65,13 +68,20 @@ namespace osu.Game.Tournament
                     RelativeSizeAxes = Axes.Y,
                     X = CONTROL_AREA_WIDTH,
                     FillMode = FillMode.Fit,
-                    FillAspectRatio = 16 / 9f,
+                    FillAspectRatio = ASPECT_RATIO,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Width = STREAM_AREA_WIDTH,
                     //Masking = true,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            Colour = new Color4(20, 20, 20, 255),
+                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 10,
+                        },
                         video = new TourneyVideo("main", true)
                         {
                             Loop = true,
@@ -252,14 +262,13 @@ namespace osu.Game.Tournament
 
                 if (shortcutKey != null)
                 {
-                    Add(new Container
+                    Add(new CircularContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Size = new Vector2(24),
                         Margin = new MarginPadding(5),
                         Masking = true,
-                        CornerRadius = 4,
                         Alpha = 0.5f,
                         Blending = BlendingParameters.Additive,
                         Children = new Drawable[]
