@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -48,6 +49,9 @@ namespace osu.Game
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
@@ -118,10 +122,27 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
+                // BeatmapProcessor is responsible for both online and local processing.
+                // In the case a user isn't logged in, it won't update LastOnlineUpdate and therefore re-queue,
+                // causing overhead from the non-online processing to redundantly run every startup.
+                //
+                // We may eventually consider making the Process call more specific (or avoid this in any number
+                // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
+                if (api.IsLoggedIn)
                 {
-                    Debug.Assert(b.BeatmapSet != null);
-                    beatmapSetIds.Add(b.BeatmapSet.ID);
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
+                    {
+                        Debug.Assert(b.BeatmapSet != null);
+                        beatmapSetIds.Add(b.BeatmapSet.ID);
+                    }
+                }
+                else
+                {
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0))
+                    {
+                        Debug.Assert(b.BeatmapSet != null);
+                        beatmapSetIds.Add(b.BeatmapSet.ID);
+                    }
                 }
             });
 

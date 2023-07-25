@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneLadderEditorScreen : TournamentTestScene
+    public partial class TestSceneLadderEditorScreen : TournamentScreenTestScene
     {
         private LadderEditorScreen ladderEditorScreen = null!;
         private OsuContextMenuContainer? osuContextMenuContainer;
