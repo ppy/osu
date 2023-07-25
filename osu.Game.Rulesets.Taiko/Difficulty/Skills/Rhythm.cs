@@ -49,6 +49,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
+        /// <remarks>
+        /// This skill is note-based and not time-based
+        /// </remarks>
         protected override double StrainAtTime(double time) => 0;
 
         protected override double StrainValueAt(DifficultyHitObject current)

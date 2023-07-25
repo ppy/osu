@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
     /// Container for storing the peak value for consecutive intervals of a time series
+    /// Used to store peak strain values for difficulty calculation
     /// </summary>
     public class SectionPeaks : IEnumerable<double>
     {

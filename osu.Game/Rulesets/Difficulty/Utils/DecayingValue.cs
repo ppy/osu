@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
-    /// Represents a value that exponentially decays over time
+    /// Represents a value that exponentially decays over time, e.g. strain.
     /// </summary>
     public class DecayingValue
     {
