@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool validActionPressed;
 
-        private bool pressHandledThisFrame;
+        private double? lastPressHandleTime;
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
@@ -76,7 +76,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             HitActions = null;
             HitAction = null;
-            validActionPressed = pressHandledThisFrame = false;
+            validActionPressed = false;
+            lastPressHandleTime = null;
         }
 
         private void updateActionsFromType()
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            if (pressHandledThisFrame)
+            if (lastPressHandleTime == Time.Current)
                 return true;
             if (Judged)
                 return false;
@@ -128,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
-            pressHandledThisFrame = true;
+            lastPressHandleTime = Time.Current;
             return result;
         }
 
@@ -137,15 +138,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (e.Action == HitAction)
                 HitAction = null;
             base.OnReleased(e);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // The input manager processes all input prior to us updating, so this is the perfect time
-            // for us to remove the extra press blocking, before input is handled in the next frame
-            pressHandledThisFrame = false;
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
