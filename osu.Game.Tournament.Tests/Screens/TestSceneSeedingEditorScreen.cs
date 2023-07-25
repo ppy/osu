@@ -12,7 +12,8 @@ namespace osu.Game.Tournament.Tests.Screens
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
 
-        public TestSceneSeedingEditorScreen()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var match = CreateSampleMatch();
 
