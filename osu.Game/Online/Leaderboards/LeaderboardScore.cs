@@ -425,7 +425,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
+                    items.Add(new OsuMenuItem(Localisation.CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 

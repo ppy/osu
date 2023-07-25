@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 10),
+                        Spacing = new Vector2(0, 5),
                         Child = Control = CreateControl(),
                     }
                 }
