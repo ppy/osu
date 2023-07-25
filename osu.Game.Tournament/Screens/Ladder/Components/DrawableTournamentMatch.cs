@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         }
 
         /// <summary>
-        /// Fired when somethign changed that requires a ladder redraw.
+        /// Fired when something changed that requires a ladder redraw.
         /// </summary>
         public Action Changed;
 
