@@ -487,7 +487,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case SelectionState.NotSelected:
-                        if (blueprint.IsAlive && blueprint.IsPresent && quad.Contains(blueprint.ScreenSpaceSelectionPoint))
+                        if (blueprint.IsSelectable && quad.Contains(blueprint.ScreenSpaceSelectionPoint))
                             blueprint.Select();
                         break;
                 }
