@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -25,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly bool editor;
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
-        protected readonly Drawable CurrentMatchSelectionBox;
+        private readonly Drawable currentMatchSelectionBox;
         private Bindable<TournamentMatch> globalSelection;
 
         [Resolved(CanBeNull = true)]
@@ -41,35 +42,60 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             AutoSizeAxes = Axes.Both;
 
-            Margin = new MarginPadding(5);
+            const float border_thickness = 5;
+            const float spacing = 2;
 
-            InternalChildren = new[]
+            Margin = new MarginPadding(10);
+
+            InternalChildren = new Drawable[]
             {
-                selectionBox = new Container
-                {
-                    Scale = new Vector2(1.1f),
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                    Colour = Color4.YellowGreen,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
-                CurrentMatchSelectionBox = new Container
-                {
-                    Scale = new Vector2(1.05f, 1.1f),
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                    Colour = Color4.White,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
                 Flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2)
+                    Spacing = new Vector2(spacing)
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(-10),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Child = selectionBox = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        Masking = true,
+                        BorderColour = Color4.YellowGreen,
+                        BorderThickness = border_thickness,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                        }
+                    },
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(-(spacing + border_thickness)),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Child = currentMatchSelectionBox = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        BorderColour = Color4.White,
+                        BorderThickness = border_thickness,
+                        Masking = true,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                        }
+                    },
                 }
             };
 
@@ -97,12 +123,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Position = new Vector2(pos.NewValue.X, pos.NewValue.Y);
                 Changed?.Invoke();
             }, true);
-
             updateTeams();
         }
 
         /// <summary>
-        /// Fired when somethign changed that requires a ladder redraw.
+        /// Fired when something changed that requires a ladder redraw.
         /// </summary>
         public Action Changed;
 
@@ -126,9 +151,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private void updateCurrentMatch()
         {
             if (Match.Current.Value)
-                CurrentMatchSelectionBox.Show();
+                currentMatchSelectionBox.Show();
             else
-                CurrentMatchSelectionBox.Hide();
+                currentMatchSelectionBox.Hide();
         }
 
         private bool selected;
@@ -225,10 +250,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (editorInfo != null)
             {
                 globalSelection = editorInfo.Selected.GetBoundCopy();
-                globalSelection.BindValueChanged(s =>
-                {
-                    if (s.NewValue != Match) Selected = false;
-                });
+                globalSelection.BindValueChanged(s => Selected = s.NewValue == Match, true);
             }
         }
 
@@ -312,8 +334,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private Vector2 snapToGrid(Vector2 pos) =>
             new Vector2(
-                (int)(pos.X / 10) * 10,
-                (int)(pos.Y / 10) * 10
+                (int)(pos.X / LadderEditorScreen.GRID_SPACING) * LadderEditorScreen.GRID_SPACING,
+                (int)(pos.Y / LadderEditorScreen.GRID_SPACING) * LadderEditorScreen.GRID_SPACING
             );
 
         public void Remove()
