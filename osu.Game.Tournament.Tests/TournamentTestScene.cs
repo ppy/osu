@@ -4,6 +4,7 @@
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -40,10 +41,10 @@ namespace osu.Game.Tournament.Tests
 
             match = CreateSampleMatch();
 
-            Ladder.Rounds.Add(match.Round.Value);
+            Ladder.Rounds.Add(match.Round.Value.AsNonNull());
             Ladder.Matches.Add(match);
-            Ladder.Teams.Add(match.Team1.Value);
-            Ladder.Teams.Add(match.Team2.Value);
+            Ladder.Teams.Add(match.Team1.Value.AsNonNull());
+            Ladder.Teams.Add(match.Team2.Value.AsNonNull());
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
@@ -152,7 +153,7 @@ namespace osu.Game.Tournament.Tests
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
             }
         };
 

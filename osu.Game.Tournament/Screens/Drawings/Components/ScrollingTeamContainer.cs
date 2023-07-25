@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -22,8 +21,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public partial class ScrollingTeamContainer : Container
     {
-        public event Action OnScrollStarted;
-        public event Action<TournamentTeam> OnSelected;
+        public event Action? OnScrollStarted;
+        public event Action<TournamentTeam>? OnSelected;
 
         private readonly List<TournamentTeam> availableTeams = new List<TournamentTeam>();
 
@@ -42,7 +41,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         private double lastTime;
 
-        private ScheduledDelegate delayedStateChangeDelegate;
+        private ScheduledDelegate? delayedStateChangeDelegate;
 
         public ScrollingTeamContainer()
         {
@@ -117,7 +116,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     if (!Children.Any())
                         break;
 
-                    ScrollingTeam closest = null;
+                    ScrollingTeam? closest = null;
 
                     foreach (var c in Children)
                     {
@@ -139,15 +138,14 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                     Trace.Assert(closest != null, "closest != null");
 
-                    // ReSharper disable once PossibleNullReferenceException
-                    offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
+                    offset += DrawWidth / 2f - (closest.AsNonNull().Position.X + closest.AsNonNull().DrawWidth / 2f);
 
-                    ScrollingTeam st = closest;
+                    ScrollingTeam st = closest.AsNonNull();
 
                     availableTeams.RemoveAll(at => at == st.Team);
 
                     st.Selected = true;
-                    OnSelected?.Invoke(st.Team);
+                    OnSelected?.Invoke(st.Team.AsNonNull());
 
                     delayedStateChangeDelegate = Scheduler.AddDelayed(() => setScrollState(ScrollState.Idle), 10000);
                     break;
@@ -174,7 +172,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             setScrollState(ScrollState.Idle);
         }
 
-        public void AddTeams(IEnumerable<TournamentTeam> teams)
+        public void AddTeams(IEnumerable<TournamentTeam>? teams)
         {
             if (teams == null)
                 return;
@@ -190,8 +188,11 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             setScrollState(ScrollState.Idle);
         }
 
-        public void RemoveTeam(TournamentTeam team)
+        public void RemoveTeam(TournamentTeam? team)
         {
+            if (team == null)
+                return;
+
             availableTeams.Remove(team);
 
             foreach (var c in Children)
@@ -311,6 +312,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         public partial class ScrollingTeam : DrawableTournamentTeam
         {
+            public new TournamentTeam Team => base.Team.AsNonNull();
+
             public const float WIDTH = 58;
             public const float HEIGHT = 44;
 
