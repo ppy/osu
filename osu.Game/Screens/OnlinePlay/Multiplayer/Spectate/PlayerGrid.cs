@@ -169,5 +169,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             foreach (var cell in facadeContainer)
                 cell.Size = cellSize;
         }
+
+        /// <summary>
+        /// A facade of the grid which is used as a dummy object to store the required position/size of cells.
+        /// </summary>
+        public partial class Facade : Drawable
+        {
+            public Facade()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+        }
     }
 }
