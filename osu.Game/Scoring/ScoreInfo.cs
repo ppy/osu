@@ -81,6 +81,15 @@ namespace osu.Game.Scoring
         /// </remarks>
         public long? LegacyTotalScore { get; set; }
 
+        /// <summary>
+        /// If an reprocess of total score failed to update this score to the latest version, this flag will become <c>true</c>.
+        /// Should be used to ensure we don't repeatedly attempt to update the same scores each startup even though we already know they will fail.
+        /// </summary>
+        /// <remarks>
+        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur(missing beatmap file on disk).
+        /// </remarks>
+        public bool TotalScoreUpgradeFailed { get; set; }
+
         public int MaxCombo { get; set; }
 
         public double Accuracy { get; set; }

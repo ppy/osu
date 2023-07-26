@@ -82,8 +82,9 @@ namespace osu.Game.Database
         /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
         /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
         /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
+        /// 33   2023-07-26    Add TotalScoreUpgradeFailed flag to ScoreInfo to track upgrade failures.
         /// </summary>
-        private const int schema_version = 32;
+        private const int schema_version = 33;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
