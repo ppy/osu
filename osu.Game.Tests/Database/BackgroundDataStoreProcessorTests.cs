@@ -8,6 +8,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual;
@@ -122,6 +125,32 @@ namespace osu.Game.Tests.Database
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating > 0);
                 });
             });
+        }
+
+        [Test]
+        public void TestScoreUpgradeFailed()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (but has no beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: new BeatmapInfo
+                    {
+                        BeatmapSet = new BeatmapSetInfo(),
+                        Ruleset = r.All<RulesetInfo>().First(),
+                    })
+                    {
+                        TotalScoreVersion = 30000002,
+                        IsLegacyScore = true,
+                    });
+                });
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreUpgradeFailed));
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
