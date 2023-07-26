@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -23,6 +24,7 @@ namespace osu.Desktop
     internal partial class DiscordRichPresence : Component
     {
         private const string client_id = "367827983903490050";
+        private const string default_image_key = "osu_logo_lazer";
 
         private DiscordRpcClient client = null!;
 
@@ -34,14 +36,18 @@ namespace osu.Desktop
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly Bindable<APIBeatmapSet?> beatmapSet = new Bindable<APIBeatmapSet?>();
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
         {
-            Assets = new Assets { LargeImageKey = "osu_logo_lazer", }
+            Assets = new Assets { LargeImageKey = default_image_key, }
         };
 
         [BackgroundDependencyLoader]
@@ -68,10 +74,16 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
+            activity.BindValueChanged(_ =>
+            {
+                fetchBeatmapSet();
+                updateStatus();
+            });
+
             ruleset.BindValueChanged(_ => updateStatus());
             status.BindValueChanged(_ => updateStatus());
-            activity.BindValueChanged(_ => updateStatus());
             privacyMode.BindValueChanged(_ => updateStatus());
+            beatmapSet.BindValueChanged(_ => updateStatus());
 
             client.Initialize();
         }
@@ -108,16 +120,28 @@ namespace osu.Desktop
                             Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{ruleset.Value.ShortName}/{beatmap.OnlineID}"
                         }
                     };
+
+                    if (beatmapSet.Value != null)
+                    {
+                        presence.Assets.LargeImageKey = beatmapSet.Value.Covers.List;
+                    }
+                    else
+                    {
+                        presence.Assets.LargeImageKey = default_image_key;
+                    }
                 }
                 else
                 {
                     presence.Buttons = null;
+                    presence.Assets.LargeImageKey = default_image_key;
                 }
             }
             else
             {
                 presence.State = "Idle";
                 presence.Details = string.Empty;
+                presence.Buttons = null;
+                presence.Assets.LargeImageKey = default_image_key;
             }
 
             // update user information
@@ -171,6 +195,34 @@ namespace osu.Desktop
             }
 
             return null;
+        }
+
+        private void fetchBeatmapSet()
+        {
+            if (!api.IsLoggedIn)
+                return;
+
+            if (activity.Value != null)
+            {
+                var beatmap = getBeatmap(activity.Value);
+                if (beatmap != null)
+                {
+                    var req = new GetBeatmapSetRequest(beatmap.OnlineID, BeatmapSetLookupType.BeatmapId);
+                    req.Success += res =>
+                    {
+                        beatmapSet.Value = res;
+                    };
+                    api.Queue(req);
+                }
+                else
+                {
+                    beatmapSet.Value = null;
+                }
+            }
+            else
+            {
+                beatmapSet.Value = null;
+            }
         }
 
         private string getDetails(UserActivity activity)
