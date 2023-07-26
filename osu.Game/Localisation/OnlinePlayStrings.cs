@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.OnlinePlay";
 
         /// <summary>
-        /// "This duration is only available for osu!supporters."
+        /// "Playlist durations longer than 2 weeks require an active osu!supporter tag."
         /// </summary>
-        public static LocalisableString SupporterOnlyDurationNotice => new TranslatableString(getKey(@"supporter_only_duration_notice"), @"This duration is only available for osu!supporters.");
+        public static LocalisableString SupporterOnlyDurationNotice => new TranslatableString(getKey(@"supporter_only_duration_notice"), @"Playlist durations longer than 2 weeks require an active osu!supporter tag.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

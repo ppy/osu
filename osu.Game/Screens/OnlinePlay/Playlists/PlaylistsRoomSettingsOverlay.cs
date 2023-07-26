@@ -371,7 +371,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0
                                              && hasValidDuration;
 
-            private bool hasValidDuration => DurationField.Current.Value < TimeSpan.FromDays(31) || localUser.Value.IsSupporter;
+            private bool hasValidDuration => DurationField.Current.Value <= TimeSpan.FromDays(14) || localUser.Value.IsSupporter;
 
             private void apply()
             {
