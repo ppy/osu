@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for button clickable", () => ((OsuScreen)Player.GetChildScreen())
                                                             .ChildrenOfType<ReplayDownloadButton>().FirstOrDefault()?
-                                                            .ChildrenOfType<OsuClickableContainer>()?.FirstOrDefault()?
+                                                            .ChildrenOfType<OsuClickableContainer>().FirstOrDefault()?
                                                             .Enabled.Value == true);
 
             AddAssert("no export files", () => !LocalStorage.GetFiles("exports").Any());
