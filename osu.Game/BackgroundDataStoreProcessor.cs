@@ -24,7 +24,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
-    public partial class BackgroundBeatmapProcessor : Component
+    /// <summary>
+    /// Performs background updating of data stores at startup.
+    /// </summary>
+    public partial class BackgroundDataStoreProcessor : Component
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
@@ -61,7 +64,8 @@ namespace osu.Game
 
             Task.Factory.StartNew(() =>
             {
-                Logger.Log("Beginning background beatmap processing..");
+                Logger.Log("Beginning background data store processing..");
+
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
@@ -74,7 +78,7 @@ namespace osu.Game
                     return;
                 }
 
-                Logger.Log("Finished background beatmap processing!");
+                Logger.Log("Finished background data store processing!");
             });
         }
 

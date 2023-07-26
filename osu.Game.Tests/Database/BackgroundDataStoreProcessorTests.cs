@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Database
 {
     [HeadlessTest]
-    public partial class BackgroundBeatmapProcessorTests : OsuTestScene, ILocalUserPlayInfo
+    public partial class BackgroundDataStoreProcessorTests : OsuTestScene, ILocalUserPlayInfo
     {
         public IBindable<bool> IsPlaying => isPlaying;
 
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Database
 
             AddStep("Run background processor", () =>
             {
-                Add(new TestBackgroundBeatmapProcessor());
+                Add(new TestBackgroundDataStoreProcessor());
             });
 
             AddUntilStep("wait for difficulties repopulated", () =>
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Database
 
             AddStep("Run background processor", () =>
             {
-                Add(new TestBackgroundBeatmapProcessor());
+                Add(new TestBackgroundDataStoreProcessor());
             });
 
             AddWaitStep("wait some", 500);
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Database
             });
         }
 
-        public partial class TestBackgroundBeatmapProcessor : BackgroundBeatmapProcessor
+        public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
         }
