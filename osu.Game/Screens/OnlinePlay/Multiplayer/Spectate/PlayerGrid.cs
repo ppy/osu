@@ -83,8 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var facade = new Facade();
             facadeContainer.Add(facade);
 
-            var cell = new Cell(index, content) { ToggleMaximisationState = toggleMaximisationState };
-            cell.SetFacade(facade);
+            var cell = new Cell(index, content, facade) { ToggleMaximisationState = toggleMaximisationState };
 
             cellContainer.Add(cell);
         }
@@ -99,30 +98,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void toggleMaximisationState(Cell target)
         {
-            bool anyMaximised = target.IsMaximised = !target.IsMaximised;
+            // in the case the target is the already maximised cell, no cell should be maximised.
+            bool hasMaximised = !target.IsMaximised;
 
             // Iterate through all cells to ensure only one is maximised at any time.
             foreach (var cell in cellContainer.ToList())
             {
-                if (cell != target)
-                    cell.IsMaximised = false;
-
-                if (cell.IsMaximised)
+                if (hasMaximised && cell == target)
                 {
                     // Transfer cell to the maximised facade.
-                    cell.SetFacade(MaximisedFacade);
+                    cell.SetFacade(MaximisedFacade, true);
                     cellContainer.ChangeChildDepth(cell, maximisedInstanceDepth -= 0.001f);
                 }
                 else
                 {
                     // Transfer cell back to its original facade.
-                    cell.SetFacade(facadeContainer[cell.FacadeIndex]);
+                    cell.SetFacade(facadeContainer[cell.FacadeIndex], false);
                 }
 
-                cell.FadeColour(anyMaximised && cell != target ? Color4.Gray : Color4.White, ANIMATION_DELAY, Easing.Out);
+                cell.FadeColour(hasMaximised && cell != target ? Color4.Gray : Color4.White, ANIMATION_DELAY, Easing.OutQuint);
             }
 
-            facadeContainer.ScaleTo(anyMaximised ? 0.95f : 1, ANIMATION_DELAY, Easing.OutQuint);
+            facadeContainer.ScaleTo(hasMaximised ? 0.95f : 1, ANIMATION_DELAY, Easing.OutQuint);
         }
 
         protected override void Update()
