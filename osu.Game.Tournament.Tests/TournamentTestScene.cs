@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
@@ -16,8 +17,11 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {
-    public abstract partial class TournamentTestScene : OsuTestScene
+    public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
+        [Cached(typeof(IDialogOverlay))]
+        protected readonly DialogOverlay DialogOverlay = new DialogOverlay { Depth = float.MinValue };
+
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
@@ -43,6 +47,8 @@ namespace osu.Game.Tournament.Tests
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+
+            Add(DialogOverlay);
         }
 
         [SetUpSteps]
