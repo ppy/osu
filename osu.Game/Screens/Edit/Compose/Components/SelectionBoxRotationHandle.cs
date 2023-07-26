@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -16,25 +13,24 @@ using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
-using Key = osuTK.Input.Key;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
     {
-        [CanBeNull]
-        public SelectionRotationHandler RotationHandler { get; init; }
+        public SelectionRotationHandler? RotationHandler { get; init; }
 
         public LocalisableString TooltipText { get; private set; }
 
-        private SpriteIcon icon;
+        private SpriteIcon icon = null!;
 
         private const float snap_step = 15;
 
         private readonly Bindable<float?> cumulativeRotation = new Bindable<float?>();
 
         [Resolved]
-        private SelectionBox selectionBox { get; set; }
+        private SelectionBox selectionBox { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
