@@ -68,6 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
+            CornerRadius = 5;
 
             AudioContainer audioContainer;
             InternalChildren = new Drawable[]
