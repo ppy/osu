@@ -31,6 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         // We are managing our own adjustments. For now, this happens inside the Player instances themselves.
         public override bool? AllowTrackAdjustments => false;
 
+        public override bool HideOverlaysOnEnter => true;
+
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
