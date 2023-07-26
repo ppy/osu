@@ -641,7 +641,7 @@ namespace osu.Game.Overlays.Mods
                     // If nothing is selected, it should exit the dialog (a bit weird, but this is the expectation from stable).
                     if (string.IsNullOrEmpty(SearchTerm))
                     {
-                        Hide();
+                        hideOverlay(true);
                         return true;
                     }
 
