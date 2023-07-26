@@ -317,7 +317,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 DurationField.Current.BindValueChanged(duration =>
                 {
-                    if (selectedAvailableDuration)
+                    if (hasValidDuration)
                         durationNoticeText.Hide();
                     else
                     {
@@ -369,9 +369,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0
-                                             && selectedAvailableDuration;
+                                             && hasValidDuration;
 
-            private bool selectedAvailableDuration => DurationField.Current.Value < TimeSpan.FromDays(31) || localUser.Value.IsSupporter;
+            private bool hasValidDuration => DurationField.Current.Value < TimeSpan.FromDays(31) || localUser.Value.IsSupporter;
 
             private void apply()
             {
