@@ -134,9 +134,11 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var user = new RoundBeatmap();
-                    round.Beatmaps.Add(user);
-                    flow.Add(new RoundBeatmapRow(round, user));
+                    var b = new RoundBeatmap();
+
+                    round.Beatmaps.Add(b);
+
+                    flow.Add(new RoundBeatmapRow(round, b));
                 }
 
                 public partial class RoundBeatmapRow : CompositeDrawable
