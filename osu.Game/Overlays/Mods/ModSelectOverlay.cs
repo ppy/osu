@@ -638,8 +638,12 @@ namespace osu.Game.Overlays.Mods
                 case GlobalAction.Select:
                 {
                     // Pressing select should select first filtered mod if a search is in progress.
+                    // If nothing is selected, it should exit the dialog (a bit weird, but this is the expectation from stable).
                     if (string.IsNullOrEmpty(SearchTerm))
+                    {
+                        Hide();
                         return true;
+                    }
 
                     ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
 
