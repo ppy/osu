@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -155,11 +156,18 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // If in a playing state, require visiting the pause menu before exiting.
-            if (Score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0) && !GameplayState.HasPassed && !GameplayState.HasFailed && !GameplayClockContainer.IsPaused.Value && Configuration.AllowPause)
+            // If an exit is requested and some objects have already been hit, show the pause screen as a method of
+            // confirming the exit operation.
+            if (PausingSupportedByCurrentState)
             {
-                Pause();
-                return true;
+                bool isValuableScore = Score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0);
+                bool hasConfirmed = PauseOverlay?.State.Value == Visibility.Visible;
+
+                if (isValuableScore && !hasConfirmed)
+                {
+                    Pause();
+                    return true;
+                }
             }
 
             bool exiting = base.OnExiting(e);

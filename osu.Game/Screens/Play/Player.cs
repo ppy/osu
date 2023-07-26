@@ -488,7 +488,7 @@ namespace osu.Game.Screens.Play
 
         private void updatePauseOnFocusLostState()
         {
-            if (!PauseOnFocusLost || !pausingSupportedByCurrentState || breakTracker.IsBreakTime.Value)
+            if (!PauseOnFocusLost || !PausingSupportedByCurrentState || breakTracker.IsBreakTime.Value)
                 return;
 
             if (gameActive.Value == false)
@@ -591,7 +591,7 @@ namespace osu.Game.Screens.Play
                 }
 
                 // even if this call has requested a dialog, there is a chance the current player mode doesn't support pausing.
-                if (pausingSupportedByCurrentState)
+                if (PausingSupportedByCurrentState)
                 {
                     // in the case a dialog needs to be shown, attempt to pause and show it.
                     // this may fail (see internal checks in Pause()) but the fail cases are temporary, so don't fall through to Exit().
@@ -956,7 +956,7 @@ namespace osu.Game.Screens.Play
         /// pausing to be attempted via <see cref="Pause"/>. If false, the game should generally exit if a user pause
         /// is attempted.
         /// </summary>
-        private bool pausingSupportedByCurrentState =>
+        protected bool PausingSupportedByCurrentState =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
             LoadedBeatmapSuccessfully && Configuration.AllowPause && ValidForResume
             // replays cannot be paused and exit immediately
@@ -974,7 +974,7 @@ namespace osu.Game.Screens.Play
 
         public bool Pause()
         {
-            if (!pausingSupportedByCurrentState) return false;
+            if (!PausingSupportedByCurrentState) return false;
 
             if (!IsResuming && PauseCooldownActive)
                 return false;
