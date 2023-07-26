@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private IBindable<bool> canRotate = new BindableBool();
+        private readonly IBindable<bool> canRotate = new BindableBool();
 
         private bool canScaleX;
 
@@ -152,8 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (RotationHandler != null)
                 canRotate.BindTo(RotationHandler.CanRotate);
 
-            canRotate.BindValueChanged(_ => recreate());
-            recreate();
+            canRotate.BindValueChanged(_ => recreate(), true);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
