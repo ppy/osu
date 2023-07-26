@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -40,7 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             public bool IsMaximised;
 
             private Facade facade;
-            private bool isTracking = true;
+
+            private bool isAnimating;
 
             public Cell(int facadeIndex, Drawable content)
             {
@@ -54,11 +56,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 base.Update();
 
-                if (isTracking)
-                {
-                    Position = getFinalPosition();
-                    Size = getFinalSize();
-                }
+                var targetPos = getFinalPosition();
+                var targetSize = getFinalSize();
+
+                double duration = isAnimating ? 60 : 0;
+
+                Position = new Vector2(
+                    (float)Interpolation.DampContinuously(Position.X, targetPos.X, duration, Time.Elapsed),
+                    (float)Interpolation.DampContinuously(Position.Y, targetPos.Y, duration, Time.Elapsed)
+                );
+
+                Size = new Vector2(
+                    (float)Interpolation.DampContinuously(Size.X, targetSize.X, duration, Time.Elapsed),
+                    (float)Interpolation.DampContinuously(Size.Y, targetSize.Y, duration, Time.Elapsed)
+                );
+
+                // If we don't track the animating state, the animation will also occur when resizing the window.
+                isAnimating &= !Precision.AlmostEquals(Position, targetPos, 0.01f);
             }
 
             /// <summary>
@@ -66,30 +80,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             /// </summary>
             public void SetFacade([NotNull] Facade newFacade)
             {
-                Facade lastFacade = facade;
                 facade = newFacade;
-
-                if (lastFacade == null || lastFacade == newFacade)
-                    return;
-
-                isTracking = false;
-
-                this.MoveTo(getFinalPosition(), 400, Easing.OutQuint).ResizeTo(getFinalSize(), 400, Easing.OutQuint)
-                    .Then()
-                    .OnComplete(_ =>
-                    {
-                        if (facade == newFacade)
-                            isTracking = true;
-                    });
+                isAnimating = true;
             }
 
-            private Vector2 getFinalPosition()
-            {
-                var topLeft = Parent.ToLocalSpace(facade.ToScreenSpace(Vector2.Zero));
-                return topLeft + facade.DrawSize / 2;
-            }
+            private Vector2 getFinalPosition() =>
+                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
 
-            private Vector2 getFinalSize() => facade.DrawSize;
+            private Vector2 getFinalSize() =>
+                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.BottomRight)
+                - Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.TopLeft);
 
             protected override bool OnClick(ClickEvent e)
             {
