@@ -128,6 +128,30 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestScoreUpgradeSuccess()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (but has no beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: r.All<BeatmapInfo>().First())
+                    {
+                        TotalScoreVersion = 30000002,
+                        LegacyTotalScore = 123456,
+                        IsLegacyScore = true,
+                    });
+                });
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreUpgradeFailed), () => Is.False);
+        }
+
+        [Test]
         public void TestScoreUpgradeFailed()
         {
             ScoreInfo scoreInfo = null!;
@@ -150,7 +174,8 @@ namespace osu.Game.Tests.Database
 
             AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
 
-            AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreUpgradeFailed));
+            AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreUpgradeFailed), () => Is.True);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
