@@ -267,7 +267,6 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = beatmapOffset;
-            bool skipFramesPresent = false;
             ReplayFrame currentFrame = null;
 
             // the negative time amount that must be "paid back" by positive frames before we start including frames again.
@@ -299,22 +298,20 @@ namespace osu.Game.Scoring.Legacy
                 lastTime += diff;
 
                 if (i < 2 && mouseX == 256 && mouseY == -500)
-                {
                     // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
                     // both frames use a position of (256, -500).
                     // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
-                    skipFramesPresent = true;
                     continue;
-                }
 
-                // if the skip frames inserted by stable are present, the third frame will have a large negative time
-                // roughly equal to SkipBoundary. We don't want this to count towards the deficit: doing so would cause
-                // the replay data before the skip to be, well, skipped.
-                // In other words, this frame, if present, is a different kind of negative frame. It sets the "offset"
-                // for the beginning of the replay. This is the only negative frame to be handled in such a way.
-                bool isNegativeBreakFrame = i == 2 && skipFramesPresent && diff < 0;
-
-                if (!isNegativeBreakFrame)
+                // negative frames are only counted towards the deficit after the very beginning of the replay.
+                // When the two skip frames are present (see directly above), the third frame will have a large
+                // negative time roughly equal to SkipBoundary. This shouldn't be counted towards the deficit, otherwise
+                // any replay data before the skip would be, well, skipped.
+                //
+                // On testing against stable it appears that stable ignores the negative time of *any* of the first
+                // three frames, regardless of if the skip frames are present. Hence the condition here.
+                // But this may be incorrect and need to be revisited later.
+                if (i > 2)
                 {
                     timeDeficit += diff;
                     timeDeficit = Math.Min(0, timeDeficit);
