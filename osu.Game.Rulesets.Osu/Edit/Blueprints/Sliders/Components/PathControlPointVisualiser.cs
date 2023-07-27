@@ -371,6 +371,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 curveTypeItems.Add(createMenuItemForPathType(PathType.PerfectCurve));
                 curveTypeItems.Add(createMenuItemForPathType(PathType.Bezier));
                 curveTypeItems.Add(createMenuItemForPathType(PathType.Catmull));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline));
 
                 var menuItems = new List<MenuItem>
                 {

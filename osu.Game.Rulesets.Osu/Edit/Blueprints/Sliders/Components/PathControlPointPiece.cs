@@ -270,6 +270,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case PathType.PerfectCurve:
                     return colours.PurpleDark;
 
+                case PathType.BSpline:
+                    return colours.GreenLight;
+
                 default:
                     return colours.Red;
             }

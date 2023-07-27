@@ -280,6 +280,9 @@ namespace osu.Game.Rulesets.Objects
 
                 case PathType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
+
+                case PathType.BSpline:
+                    return PathApproximator.ApproximateBSpline(subControlPoints, 2);
             }
 
             return PathApproximator.ApproximateBezier(subControlPoints);
