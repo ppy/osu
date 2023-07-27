@@ -36,12 +36,9 @@ namespace osu.Desktop
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; } = null!;
-
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
-        private readonly Bindable<APIBeatmapSet?> beatmapSet = new Bindable<APIBeatmapSet?>();
+        private readonly Bindable<IBeatmapSetOnlineInfo?> beatmapSetOnline = new Bindable<IBeatmapSetOnlineInfo?>();
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
@@ -83,7 +80,7 @@ namespace osu.Desktop
             ruleset.BindValueChanged(_ => updateStatus());
             status.BindValueChanged(_ => updateStatus());
             privacyMode.BindValueChanged(_ => updateStatus());
-            beatmapSet.BindValueChanged(_ => updateStatus());
+            beatmapSetOnline.BindValueChanged(_ => updateStatus());
 
             client.Initialize();
         }
@@ -121,14 +118,9 @@ namespace osu.Desktop
                         }
                     };
 
-                    if (beatmapSet.Value != null)
-                    {
-                        presence.Assets.LargeImageKey = beatmapSet.Value.Covers.List;
-                    }
-                    else
-                    {
-                        presence.Assets.LargeImageKey = default_image_key;
-                    }
+                    presence.Assets.LargeImageKey = default_image_key;
+                    if (beatmapSetOnline.Value != null && Encoding.UTF8.GetByteCount(beatmapSetOnline.Value.Covers.ListLowRes) <= 256) // Ensure the URL will fit and not throw.
+                        presence.Assets.LargeImageKey = beatmapSetOnline.Value.Covers.List;
                 }
                 else
                 {
@@ -199,29 +191,32 @@ namespace osu.Desktop
 
         private void fetchBeatmapSet()
         {
-            if (!api.IsLoggedIn)
-                return;
-
-            if (activity.Value != null)
+            IBeatmapInfo? beatmap = getBeatmap(activity.Value);
+            if (beatmap == null)
             {
-                var beatmap = getBeatmap(activity.Value);
-                if (beatmap != null)
+                beatmapSetOnline.Value = null;
+                return;
+            }
+
+            if (beatmap.BeatmapSet is IBeatmapSetOnlineInfo online)
+            {
+                beatmapSetOnline.Value = online;
+            }
+            else
+            {
+                if (api.IsLoggedIn)
                 {
                     var req = new GetBeatmapSetRequest(beatmap.OnlineID, BeatmapSetLookupType.BeatmapId);
                     req.Success += res =>
                     {
-                        beatmapSet.Value = res;
+                        beatmapSetOnline.Value = res;
                     };
                     api.Queue(req);
                 }
                 else
                 {
-                    beatmapSet.Value = null;
+                    beatmapSetOnline.Value = null;
                 }
-            }
-            else
-            {
-                beatmapSet.Value = null;
             }
         }
 
