@@ -17,6 +17,7 @@ using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -40,6 +41,9 @@ namespace osu.Game.Tournament
         private readonly BindableSize windowSize = new BindableSize();
 
         private LoadingSpinner loadingSpinner;
+
+        [Cached(typeof(IDialogOverlay))]
+        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
@@ -95,12 +99,12 @@ namespace osu.Game.Tournament
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new TournamentSceneManager()
-                    }
+                    },
+                    dialogOverlay
                 }, drawables =>
                 {
                     loadingSpinner.Hide();
                     loadingSpinner.Expire();
-
                     AddRange(drawables);
 
                     windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>

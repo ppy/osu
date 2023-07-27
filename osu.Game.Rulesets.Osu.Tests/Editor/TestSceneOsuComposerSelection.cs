@@ -26,6 +26,35 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
         [Test]
+        public void TestSelectAfterFadedOut()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100))
+                    }
+                }
+            };
+            AddStep("add slider", () => EditorBeatmap.Add(slider));
+
+            moveMouseToObject(() => slider);
+
+            AddStep("seek after end", () => EditorClock.Seek(750));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("slider not selected", () => EditorBeatmap.SelectedHitObjects.Count == 0);
+
+            AddStep("seek to visible", () => EditorClock.Seek(650));
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("slider selected", () => EditorBeatmap.SelectedHitObjects.Single() == slider);
+        }
+
+        [Test]
         public void TestContextMenuShownCorrectlyForSelectedSlider()
         {
             var slider = new Slider
