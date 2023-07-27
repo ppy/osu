@@ -163,11 +163,11 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (map != null)
             {
-                if (e.Button == MouseButton.Left && map.Beatmap.OnlineID > 0)
+                if (e.Button == MouseButton.Left && map.Beatmap?.OnlineID > 0)
                     addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineID);
+                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
 
                     if (existing != null)
                     {
