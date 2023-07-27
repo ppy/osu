@@ -19,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -245,7 +244,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false) ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -270,7 +271,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false) ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
