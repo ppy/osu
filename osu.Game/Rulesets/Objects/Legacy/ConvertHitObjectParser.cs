@@ -229,6 +229,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 case 'P':
                     return PathType.PerfectCurve;
+
+                case 'S':
+                    return PathType.BSpline;
             }
         }
 

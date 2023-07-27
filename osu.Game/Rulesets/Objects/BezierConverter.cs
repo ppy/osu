@@ -87,6 +87,11 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
+                    case PathType.BSpline:
+                        result.AddRange(from segment in ConvertBSplineToBezierAnchors(segmentVertices) from v in segment select v + position);
+
+                        break;
+
                     default:
                         foreach (Vector2 v in segmentVertices)
                         {
@@ -156,6 +161,17 @@ namespace osu.Game.Rulesets.Objects
                         for (int j = 0; j < circleResult.Length - 1; j++)
                         {
                             result.Add(new PathControlPoint(circleResult[j], j == 0 ? PathType.Bezier : null));
+                        }
+
+                        break;
+
+                    case PathType.BSpline:
+                        foreach (var segment in ConvertBSplineToBezierAnchors(segmentVertices))
+                        {
+                            for (int j = 0; j < segment.Length - 1; j++)
+                            {
+                                result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.Bezier : null));
+                            }
                         }
 
                         break;
@@ -240,6 +256,57 @@ namespace osu.Game.Rulesets.Objects
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Converts b-spline anchors to bezier anchors.
+        /// </summary>
+        /// <param name="controlPoints">The control point positions to convert.</param>
+        public static Vector2[][] ConvertBSplineToBezierAnchors(ReadOnlySpan<Vector2> controlPoints)
+        {
+            if (controlPoints.Length < 3) return new[] { controlPoints.ToArray() };
+
+            var bezier = new Vector2[controlPoints.Length - 1][];
+            var joinPoint = Vector2.Lerp(
+                Vector2.Lerp(controlPoints[0], controlPoints[1], 2f / 3f),
+                Vector2.Lerp(controlPoints[1], controlPoints[2], 1f / 3f),
+                0.5f
+            );
+
+            bezier[0] = new[]
+            {
+                controlPoints[0],
+                Vector2.Lerp(controlPoints[0], controlPoints[1], 2f / 3f),
+                joinPoint
+            };
+
+            for (int i = 1; i < controlPoints.Length - 2; i++)
+            {
+                var nextJoinPoint = Vector2.Lerp(
+                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 2f / 3f),
+                    Vector2.Lerp(controlPoints[i + 1], controlPoints[i + 2], 1f / 3f),
+                    0.5f
+                );
+
+                bezier[i] = new[]
+                {
+                    joinPoint,
+                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 1f / 3f),
+                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 2f / 3f),
+                    nextJoinPoint
+                };
+
+                joinPoint = nextJoinPoint;
+            }
+
+            bezier[^1] = new[]
+            {
+                joinPoint,
+                Vector2.Lerp(controlPoints[^2], controlPoints[^1], 1f / 3f),
+                controlPoints[^1],
+            };
+
+            return bezier;
         }
 
         /// <summary>

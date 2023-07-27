@@ -67,7 +67,12 @@ namespace osu.Game.Database
 
                 hitObject.StartTime = Math.Floor(hitObject.StartTime);
 
-                if (hitObject is not IHasPath hasPath || BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
+                if (hitObject is not IHasPath hasPath) continue;
+
+                int segmentCount = BezierConverter.CountSegments(hasPath.Path.ControlPoints);
+
+                if (segmentCount == 0 || (segmentCount == 1 && hasPath.Path.ControlPoints[0].Type != PathType.BSpline))
+                    continue;
 
                 var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 

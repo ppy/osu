@@ -474,6 +474,10 @@ namespace osu.Game.Beatmaps.Formats
                             case PathType.Linear:
                                 writer.Write("L|");
                                 break;
+
+                            case PathType.BSpline:
+                                writer.Write("S|");
+                                break;
                         }
 
                         lastType = point.Type;
