@@ -172,7 +172,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             string? filePath = null;
 
-            AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(), () => Is.Not.Null);
+            // Files starting with _ are temporary, created by CreateFileSafely call.
+            AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !f.StartsWith("_", StringComparison.Ordinal)), () => Is.Not.Null);
             AddAssert("filesize is non-zero", () =>
             {
                 using (var stream = LocalStorage.GetStream(filePath))
