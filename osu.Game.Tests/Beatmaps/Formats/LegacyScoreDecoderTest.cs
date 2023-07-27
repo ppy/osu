@@ -92,17 +92,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
         public void TestLegacyBeatmapReplayOffsetsDecode(int beatmapVersion, bool offsetApplied)
         {
-            const double first_frame_time = 48;
-            const double second_frame_time = 65;
+            const double first_frame_time = 31;
+            const double second_frame_time = 48;
+            const double third_frame_time = 65;
 
             var decoder = new TestLegacyScoreDecoder(beatmapVersion);
 
             using (var resourceStream = TestResources.OpenResource("Replays/mania-replay.osr"))
             {
                 var score = decoder.Parse(resourceStream);
+                int offset = offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
-                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
-                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
+                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + offset));
+                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + offset));
+                Assert.That(score.Replay.Frames[2].Time, Is.EqualTo(third_frame_time + offset));
             }
         }
 
