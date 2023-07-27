@@ -119,7 +119,7 @@ namespace osu.Desktop
                     };
 
                     presence.Assets.LargeImageKey = default_image_key;
-                    if (beatmapSetOnline.Value != null && Encoding.UTF8.GetByteCount(beatmapSetOnline.Value.Covers.ListLowRes) <= 256) // Ensure the URL will fit and not throw.
+                    if (beatmapSetOnline.Value != null && beatmapSetOnline.Value.Covers.List != null && Encoding.UTF8.GetByteCount(beatmapSetOnline.Value.Covers.List) <= 256) // Ensure the URL will fit and not throw.
                         presence.Assets.LargeImageKey = beatmapSetOnline.Value.Covers.List;
                 }
                 else
