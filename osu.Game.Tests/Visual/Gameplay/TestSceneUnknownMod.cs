@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             CreateModTest(new ModTestData
             {
-                Beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).Beatmap,
                 Mod = new UnknownMod("WNG"),
                 PassCondition = () => Player.IsLoaded && !Player.LoadedBeatmapSuccessfully
             });
