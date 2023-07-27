@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -323,7 +323,7 @@ namespace osu.Game.Scoring.Legacy
                 // still paying back the deficit from a negative frame. Skip this frame.
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames
-                if (timeDeficit < 0 || isNegativeBreakFrame)
+                if (timeDeficit < 0)
                     continue;
 
                 currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
