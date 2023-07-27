@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
-        public TournamentBeatmapPanel(TournamentBeatmap beatmap, string mod = "")
+        public TournamentBeatmapPanel(TournamentBeatmap? beatmap, string mod = "")
         {
             Beatmap = beatmap;
             this.mod = mod;
