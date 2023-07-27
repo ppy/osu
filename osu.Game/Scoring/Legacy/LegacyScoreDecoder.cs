@@ -321,8 +321,6 @@ namespace osu.Game.Scoring.Legacy
                 }
 
                 // still paying back the deficit from a negative frame. Skip this frame.
-                // Todo: At some point we probably want to rewind and play back the negative-time frames
-                // but for now we'll achieve equal playback to stable by skipping negative frames
                 if (timeDeficit < 0)
                     continue;
 
