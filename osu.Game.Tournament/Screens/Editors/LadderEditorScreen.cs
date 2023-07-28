@@ -76,6 +76,14 @@ namespace osu.Game.Tournament.Screens.Editors
             grid.Size = ScrollContent.Size + new Vector2(GRID_SPACING * 2);
         }
 
+        private Vector2 lastMatchesContainerMouseDownPosition;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            lastMatchesContainerMouseDownPosition = MatchesContainer.ToLocalSpace(e.ScreenSpaceMouseDownPosition);
+            return base.OnMouseDown(e);
+        }
+
         private void updateMessage()
         {
             rightClickMessage.Alpha = LadderInfo.Matches.Count > 0 ? 0 : 1;
@@ -97,7 +105,8 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        Vector2 pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        Vector2 pos = lastMatchesContainerMouseDownPosition;
+
                         TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
 
                         LadderInfo.Matches.Add(newMatch);
