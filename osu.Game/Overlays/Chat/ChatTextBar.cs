@@ -156,7 +156,11 @@ namespace osu.Game.Overlays.Chat
                     chatTextBox.Current.UnbindFrom(change.OldValue.TextBoxMessage);
 
                 if (newChannel != null)
+                {
+                    // change length limit first before binding to avoid accidentally truncating pending message from new channel.
+                    chatTextBox.LengthLimit = newChannel.MessageLengthLimit;
                     chatTextBox.Current.BindTo(newChannel.TextBoxMessage);
+                }
             }, true);
         }
 

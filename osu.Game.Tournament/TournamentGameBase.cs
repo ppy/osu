@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -20,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -94,7 +92,7 @@ namespace osu.Game.Tournament
             Task.Run(readBracket);
         }
 
-        private void readBracket()
+        private async Task readBracket()
         {
             try
             {
@@ -102,7 +100,7 @@ namespace osu.Game.Tournament
                 {
                     using (Stream stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Read, FileMode.Open))
                     using (var sr = new StreamReader(stream))
-                        ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
+                        ladder = JsonConvert.DeserializeObject<LadderInfo>(await sr.ReadToEndAsync().ConfigureAwait(false), new JsonPointConverter());
                 }
 
                 ladder ??= new LadderInfo();
@@ -166,8 +164,8 @@ namespace osu.Game.Tournament
                 }
 
                 addedInfo |= addPlayers();
-                addedInfo |= addRoundBeatmaps();
-                addedInfo |= addSeedingBeatmaps();
+                addedInfo |= await addRoundBeatmaps().ConfigureAwait(false);
+                addedInfo |= await addSeedingBeatmaps().ConfigureAwait(false);
 
                 if (addedInfo)
                     saveChanges();
@@ -233,11 +231,11 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing beatmap info based on beatmap IDs
         /// </summary>
-        private bool addRoundBeatmaps()
+        private async Task<bool> addRoundBeatmaps()
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
+                                                    .Where(b => (b.Beatmap == null || b.Beatmap?.OnlineID == 0) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -246,7 +244,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetResultSafely() ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -257,7 +257,7 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing beatmap info based on beatmap IDs
         /// </summary>
-        private bool addSeedingBeatmaps()
+        private async Task<bool> addSeedingBeatmaps()
         {
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
@@ -271,7 +271,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                b.Beatmap = new TournamentBeatmap(beatmapCache.GetBeatmapAsync(b.ID).GetResultSafely() ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }

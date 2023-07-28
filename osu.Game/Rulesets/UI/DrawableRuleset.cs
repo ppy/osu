@@ -335,11 +335,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+        public void Attach(InputCountController inputCountController) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(inputCountController);
 
-        public void Attach(ClicksPerSecondCalculator calculator) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
+        public void Attach(ClicksPerSecondController controller) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(controller);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.

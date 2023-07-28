@@ -9,6 +9,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class DrumRollTick : TaikoStrongableHitObject
     {
+        public readonly DrumRoll Parent;
+
         /// <summary>
         /// Whether this is the first (initial) tick of the slider.
         /// </summary>
@@ -24,6 +26,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// The time allowed to hit this tick.
         /// </summary>
         public double HitWindow => TickSpacing / 2;
+
+        public DrumRollTick(DrumRoll parent)
+        {
+            Parent = parent;
+        }
 
         public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 

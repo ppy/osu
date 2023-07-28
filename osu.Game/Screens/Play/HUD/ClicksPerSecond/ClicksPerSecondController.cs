@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCalculator : Component
+    public partial class ClicksPerSecondController : Component
     {
         private readonly List<double> timestamps = new List<double>();
 
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
         private IGameplayClock clock => frameStableClock ?? gameplayClock;
 
-        public ClicksPerSecondCalculator()
+        public ClicksPerSecondController()
         {
             RelativeSizeAxes = Axes.Both;
         }

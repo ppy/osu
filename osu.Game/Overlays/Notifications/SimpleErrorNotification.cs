@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Notifications
 {
     public partial class SimpleErrorNotification : SimpleNotification
     {
-        public override string PopInSampleName => "UI/error-notification-pop-in";
+        public override string PopInSampleName => "UI/notification-error";
 
         public SimpleErrorNotification()
         {

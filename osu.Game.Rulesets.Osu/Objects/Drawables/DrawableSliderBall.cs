@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -179,16 +180,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2? lastPosition;
 
-        private bool rewinding;
-
         public void UpdateProgress(double completionProgress)
         {
             Position = drawableSlider.HitObject.CurvePositionAt(completionProgress);
 
             var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
 
-            if (Clock.ElapsedFrameTime != 0)
-                rewinding = Clock.ElapsedFrameTime < 0;
+            bool rewinding = (Clock as IGameplayClock)?.IsRewinding == true;
 
             // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
             if (diff.LengthFast < 0.01f)

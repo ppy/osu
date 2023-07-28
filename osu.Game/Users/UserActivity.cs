@@ -111,7 +111,7 @@ namespace osu.Game.Users
 
             protected string Username => score.User.Username;
 
-            public BeatmapInfo BeatmapInfo => score.BeatmapInfo;
+            public BeatmapInfo? BeatmapInfo => score.BeatmapInfo;
 
             public WatchingReplay(ScoreInfo score)
             {

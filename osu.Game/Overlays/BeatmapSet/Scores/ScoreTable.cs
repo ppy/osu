@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 username,
 #pragma warning disable 618
-                new StatisticText(score.MaxCombo, score.BeatmapInfo.MaxCombo, @"0\x"),
+                new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
 #pragma warning restore 618
             };
 

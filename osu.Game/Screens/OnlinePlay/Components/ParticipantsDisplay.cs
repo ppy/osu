@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     RelativeSizeAxes = Axes.X;
 
                     scroll.RelativeSizeAxes = Axes.X;
-                    scroll.Height = ParticipantsList.TILE_SIZE + OsuScrollContainer.SCROLL_BAR_HEIGHT + OsuScrollContainer.SCROLL_BAR_PADDING * 2;
+                    scroll.Height = ParticipantsList.TILE_SIZE + OsuScrollContainer.SCROLL_BAR_WIDTH + OsuScrollContainer.SCROLL_BAR_PADDING * 2;
 
                     list.RelativeSizeAxes = Axes.Y;
                     list.AutoSizeAxes = Axes.X;

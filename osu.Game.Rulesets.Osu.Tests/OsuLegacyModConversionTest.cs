@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Tests.Beatmaps;
 
@@ -28,7 +29,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             new object[] { LegacyMods.SpunOut, new[] { typeof(OsuModSpunOut) } },
             new object[] { LegacyMods.Autopilot, new[] { typeof(OsuModAutopilot) } },
             new object[] { LegacyMods.Target, new[] { typeof(OsuModTargetPractice) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } },
+            new object[] { LegacyMods.ScoreV2, new[] { typeof(ModScoreV2) } },
         };
 
         [TestCaseSource(nameof(osu_mod_mapping))]

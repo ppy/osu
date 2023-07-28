@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         [TestCase(6.7115569159190587d, 206, "diffcalc-test")]
         [TestCase(1.4391311903612753d, 45, "zero-length-sliders")]
+        [TestCase(0.14102693012101306d, 1, "nan-slider")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 

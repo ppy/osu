@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
                 scrollbarBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                    Width = OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Alpha = 0.5f

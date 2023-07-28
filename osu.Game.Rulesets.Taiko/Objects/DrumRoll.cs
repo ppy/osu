@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                AddNested(new DrumRollTick
+                AddNested(new DrumRollTick(this)
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,

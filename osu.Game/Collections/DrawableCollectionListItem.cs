@@ -197,7 +197,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collection.PerformWrite(c => c.Realm.Remove(c));
+            private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
     }
 }

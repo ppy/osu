@@ -36,7 +36,6 @@ namespace osu.Game.Overlays.Settings
                 {
                     numberBox = new OutlinedNumberBox
                     {
-                        Margin = new MarginPadding { Top = 5 },
                         RelativeSizeAxes = Axes.X,
                         CommitOnFocusLost = true
                     }

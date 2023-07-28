@@ -141,7 +141,7 @@ namespace osu.Game.Scoring
         {
             Realm.Run(r =>
             {
-                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
+                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID)!.Scores.ToList();
                 Delete(beatmapScores, silent);
             });
         }
