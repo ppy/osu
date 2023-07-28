@@ -45,9 +45,9 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         /// <summary>
-        /// Whether the playfield should be centered vertically. Should be disabled for playfields which span the full horizontal width.
+        /// Whether the playfield should be centered horizontally. Should be disabled for playfields which span the full horizontal width.
         /// </summary>
-        protected virtual bool ApplyVerticalCentering => true;
+        protected virtual bool ApplyHorizontalCentering => true;
 
         protected IRulesetConfigManager Config { get; private set; }
 
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Edit
             base.Update();
 
             // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
-            if (ApplyVerticalCentering)
+            if (ApplyHorizontalCentering)
             {
                 PlayfieldContentContainer.Anchor = Anchor.Centre;
                 PlayfieldContentContainer.Origin = Anchor.Centre;
