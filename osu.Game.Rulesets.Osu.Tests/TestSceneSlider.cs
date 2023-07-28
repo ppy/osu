@@ -102,6 +102,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Catmull Slider 1 Repeat", () => SetContents(_ => testCatmull(1)));
             AddStep("Catmull Slider 2 Repeats", () => SetContents(_ => testCatmull(2)));
 
+            AddStep("B-Spline Slider", () => SetContents(_ => testBSpline()));
+            AddStep("B-Spline Slider 1 Repeat", () => SetContents(_ => testBSpline(1)));
+            AddStep("B-Spline Slider 2 Repeats", () => SetContents(_ => testBSpline(2)));
+
             AddStep("Big Single, Large StackOffset", () => SetContents(_ => testSimpleBigLargeStackOffset()));
             AddStep("Big 1 Repeat, Large StackOffset", () => SetContents(_ => testSimpleBigLargeStackOffset(1)));
 
@@ -331,6 +335,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testCatmull(int repeats = 0) => createCatmull(repeats);
 
+        private Drawable testBSpline(int repeats = 0) => createBSpline(repeats);
+
         private Drawable createCatmull(int repeats = 0)
         {
             var repeatSamples = new List<IList<HitSampleInfo>>();
@@ -353,6 +359,26 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             return createDrawable(slider, 3, 1);
+        }
+
+        private Drawable createBSpline(int repeats = 0)
+        {
+            var slider = new Slider
+            {
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
+                Path = new SliderPath(PathType.BSpline, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(max_length * 0.375f, max_length * 0.18f),
+                    new Vector2(max_length / 2, max_length / 4),
+                    new Vector2(max_length * 0.75f, -max_length / 2),
+                    new Vector2(max_length, 0)
+                }),
+                RepeatCount = repeats,
+            };
+
+            return createDrawable(slider, 2, 3);
         }
 
         private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
