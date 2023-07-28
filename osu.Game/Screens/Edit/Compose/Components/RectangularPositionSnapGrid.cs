@@ -55,11 +55,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 ClearInternal();
 
-                if (DrawSize != Vector2.Zero)
-                {
+                if (DrawWidth > 0 && DrawHeight > 0)
                     createContent();
-                    gridCache.Validate();
-                }
+
+                gridCache.Validate();
             }
         }
 
