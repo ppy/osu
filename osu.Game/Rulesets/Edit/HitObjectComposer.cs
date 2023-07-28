@@ -124,8 +124,6 @@ namespace osu.Game.Rulesets.Edit
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         // layers below playfield
@@ -247,7 +245,22 @@ namespace osu.Game.Rulesets.Edit
             base.Update();
 
             // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
-            PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (ApplyVerticalCentering ? TOOLBOX_CONTRACTED_SIZE_RIGHT : TOOLBOX_CONTRACTED_SIZE_LEFT) * 2;
+            if (ApplyVerticalCentering)
+            {
+                PlayfieldContentContainer.Anchor = Anchor.Centre;
+                PlayfieldContentContainer.Origin = Anchor.Centre;
+
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
+                PlayfieldContentContainer.X = 0;
+            }
+            else
+            {
+                PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
+                PlayfieldContentContainer.Origin = Anchor.CentreLeft;
+
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
+                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+            }
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
