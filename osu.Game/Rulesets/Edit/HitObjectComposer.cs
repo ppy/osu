@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
+        /// <summary>
+        /// Whether the playfield should be centered horizontally. Should be disabled for playfields which span the full horizontal width.
+        /// </summary>
+        protected virtual bool ApplyHorizontalCentering => true;
+
         protected IRulesetConfigManager Config { get; private set; }
 
         // Provides `Playfield`
@@ -119,8 +124,6 @@ namespace osu.Game.Rulesets.Edit
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         // layers below playfield
@@ -241,8 +244,23 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
-            PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
+            if (ApplyHorizontalCentering)
+            {
+                PlayfieldContentContainer.Anchor = Anchor.Centre;
+                PlayfieldContentContainer.Origin = Anchor.Centre;
+
+                // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
+                PlayfieldContentContainer.X = 0;
+            }
+            else
+            {
+                PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
+                PlayfieldContentContainer.Origin = Anchor.CentreLeft;
+
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
+                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+            }
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
