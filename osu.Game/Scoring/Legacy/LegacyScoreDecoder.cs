@@ -267,6 +267,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = beatmapOffset;
+            bool negativeFrameEncounted = false;
             ReplayFrame currentFrame = null;
 
             // the negative time amount that must be "paid back" by positive frames before we start including frames again.
@@ -308,14 +309,18 @@ namespace osu.Game.Scoring.Legacy
                 // negative time roughly equal to SkipBoundary. This shouldn't be counted towards the deficit, otherwise
                 // any replay data before the skip would be, well, skipped.
                 //
-                // On testing against stable it appears that stable ignores the negative time of *any* of the first
-                // three frames, regardless of if the skip frames are present. Hence the condition here.
-                // But this may be incorrect and need to be revisited later.
-                if (i > 2)
+                // On testing against stable, it appears that stable ignores the negative time of only the first
+                // negative frame of the first three replay frames, regardless of if the skip frames are present.
+                // Hence the condition here.
+                // But there is a possibility this is incorrect and may need to be revisited later.
+                if (i > 2 || negativeFrameEncounted)
                 {
                     timeDeficit += diff;
                     timeDeficit = Math.Min(0, timeDeficit);
                 }
+
+                if (diff < 0)
+                    negativeFrameEncounted = true;
 
                 // still paying back the deficit from a negative frame. Skip this frame.
                 if (timeDeficit < 0)
