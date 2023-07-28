@@ -37,5 +37,41 @@ namespace osu.Game.Rulesets.Mania.Judgements
                     return base.HealthIncreaseFor(result);
             }
         }
+
+        public static int ToAccuracyWeight(HitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+
+                case HitResult.SmallTickHit:
+                    return 10;
+
+                case HitResult.LargeTickHit:
+                    return 30;
+
+                case HitResult.Meh:
+                    return 50;
+
+                case HitResult.Ok:
+                    return 100;
+
+                case HitResult.Good:
+                    return 200;
+
+                case HitResult.Great:
+                    return 300;
+
+                case HitResult.Perfect:
+                    return 300;
+
+                case HitResult.SmallBonus:
+                    return SMALL_BONUS_SCORE;
+
+                case HitResult.LargeBonus:
+                    return LARGE_BONUS_SCORE;
+            }
+        }
     }
 }

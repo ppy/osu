@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -33,6 +34,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override double GetComboScoreChange(JudgementResult result)
             => Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+
+        protected override int GetHitAccuracyValue(HitResult result) => ManiaJudgement.ToAccuracyWeight(result);
 
         private class JudgementOrderComparer : IComparer<HitObject>
         {
