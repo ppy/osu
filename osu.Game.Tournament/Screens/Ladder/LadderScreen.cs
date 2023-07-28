@@ -57,12 +57,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                     },
                     ScrollContent = new LadderDragContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
-                            MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
+                            MatchesContainer = new Container<DrawableTournamentMatch>
+                            {
+                                AutoSizeAxes = Axes.Both
+                            },
                         }
                     },
                 }
