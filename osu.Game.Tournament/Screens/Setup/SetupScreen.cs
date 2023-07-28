@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -57,14 +58,18 @@ namespace osu.Game.Tournament.Screens.Setup
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f),
                 },
-                fillFlow = new FillFlowContainer
+                new OsuScrollContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding(10),
-                    Spacing = new Vector2(10),
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Child = fillFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Spacing = new Vector2(10),
+                    },
+                },
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
