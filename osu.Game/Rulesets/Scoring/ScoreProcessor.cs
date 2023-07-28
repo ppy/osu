@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Scoring
         public long MaximumTotalScore { get; private set; }
 
         /// <summary>
-        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// The maximum sum of judgements at the current point in time.
         /// </summary>
         /// <remarks>
         /// Used to compute accuracy.
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Scoring
         private double currentMaximumBaseScore;
 
         /// <summary>
-        /// The sum of all accuracy-affecting judgements at the current point in time.
+        /// The sum of all judgements at the current point in time.
         /// </summary>
         /// <remarks>
         /// Used to compute accuracy.
@@ -118,9 +118,25 @@ namespace osu.Game.Rulesets.Scoring
         private double currentBaseScore;
 
         /// <summary>
+        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentMaximumAccuracyScore;
+
+        /// <summary>
+        /// The sum of all accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentAccuracyScore;
+
+        /// <summary>
         /// The maximum sum of all accuracy-affecting judgements in the beatmap.
         /// </summary>
-        private double maximumBaseScore;
+        private double maximumAccuracyScore;
 
         /// <summary>
         /// The count of all accuracy-affecting judgements in the beatmap.
@@ -222,8 +238,10 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Type.AffectsAccuracy())
             {
-                currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
-                currentBaseScore += Judgement.ToNumericResult(result.Type);
+                currentMaximumAccuracyScore += GetHitAccuracyValue(result.Judgement.MaxResult);
+                currentAccuracyScore += GetHitAccuracyValue(result.Type);
+                currentMaximumBaseScore += GetHitScoreValue(result.Judgement.MaxResult);
+                currentBaseScore += GetHitScoreValue(result.Type);
                 currentAccuracyJudgementCount++;
             }
 
@@ -245,6 +263,20 @@ namespace osu.Game.Rulesets.Scoring
                 updateScore();
             }
         }
+
+        /// <summary>
+        /// Retrieve the accuracy value of a <see cref="HitResult"/> in this <see cref="ScoreProcessor"/> context.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to judge the accuracy from.</param>
+        /// <returns>The <see cref="HitResult"/> accuracy value</returns>
+        protected virtual int GetHitAccuracyValue(HitResult result) => Judgement.ToNumericResult(result);
+
+        /// <summary>
+        /// Retrieve the score value of a <see cref="HitResult"/> in this <see cref="ScoreProcessor"/> context.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to judge the score from.</param>
+        /// <returns>The <see cref="JudgementResult"/> accuracy value</returns>
+        protected virtual int GetHitScoreValue(HitResult result) => Judgement.ToNumericResult(result);
 
         /// <summary>
         /// Creates the <see cref="HitEvent"/> that describes a <see cref="JudgementResult"/>.
@@ -272,8 +304,10 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Type.AffectsAccuracy())
             {
-                currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
-                currentBaseScore -= Judgement.ToNumericResult(result.Type);
+                currentMaximumAccuracyScore -= GetHitAccuracyValue(result.Judgement.MaxResult);
+                currentAccuracyScore -= GetHitAccuracyValue(result.Type);
+                currentMaximumBaseScore -= GetHitScoreValue(result.Judgement.MaxResult);
+                currentBaseScore -= GetHitScoreValue(result.Type);
                 currentAccuracyJudgementCount--;
             }
 
@@ -305,9 +339,9 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScore()
         {
-            Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
-            MinimumAccuracy.Value = maximumBaseScore > 0 ? currentBaseScore / maximumBaseScore : 0;
-            MaximumAccuracy.Value = maximumBaseScore > 0 ? (currentBaseScore + (maximumBaseScore - currentMaximumBaseScore)) / maximumBaseScore : 1;
+            Accuracy.Value = currentMaximumAccuracyScore > 0 ? currentAccuracyScore / currentMaximumAccuracyScore : 1;
+            MinimumAccuracy.Value = maximumAccuracyScore > 0 ? currentAccuracyScore / maximumAccuracyScore : 0;
+            MaximumAccuracy.Value = maximumAccuracyScore > 0 ? (currentAccuracyScore + (maximumAccuracyScore - currentMaximumAccuracyScore)) / maximumAccuracyScore : 1;
 
             double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
             double accuracyProcess = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
@@ -338,7 +372,7 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maximumBaseScore = currentBaseScore;
+                maximumAccuracyScore = currentAccuracyScore;
 
                 maximumComboPortion = currentComboPortion;
                 maximumAccuracyJudgementCount = currentAccuracyJudgementCount;
@@ -352,7 +386,9 @@ namespace osu.Game.Rulesets.Scoring
             scoreResultCounts.Clear();
 
             currentBaseScore = 0;
+            currentAccuracyScore = 0;
             currentMaximumBaseScore = 0;
+            currentMaximumAccuracyScore = 0;
             currentAccuracyJudgementCount = 0;
             currentComboPortion = 0;
             currentBonusPortion = 0;
