@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -103,10 +104,11 @@ namespace osu.Game.Screens.Play
 
         private readonly List<Drawable> hideTargets;
 
+        private readonly Drawable playfieldComponents;
+
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
             Drawable rulesetComponents;
-
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -122,6 +124,9 @@ namespace osu.Game.Screens.Play
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
                 rulesetComponents = drawableRuleset != null
                     ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
+                    : Empty(),
+                playfieldComponents = drawableRuleset != null
+                    ? new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
                 topRightElements = new FillFlowContainer
                 {
@@ -162,7 +167,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, playfieldComponents, topRightElements };
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -229,6 +234,11 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
+
+            Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
+
+            playfieldComponents.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+            playfieldComponents.Size = ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
 
             float? lowestTopScreenSpaceLeft = null;
             float? lowestTopScreenSpaceRight = null;
