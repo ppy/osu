@@ -107,6 +107,9 @@ namespace osu.Game.Screens.Ranking
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SaveReplay:
