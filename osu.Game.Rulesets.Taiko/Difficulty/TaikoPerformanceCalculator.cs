@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0 || estimatedUr == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(60 / estimatedUr.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = Math.Pow(70 / estimatedUr.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 110.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
