@@ -7,12 +7,13 @@ using osu.Game.Tournament.Screens.Editors;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneSeedingEditorScreen : TournamentTestScene
+    public partial class TestSceneSeedingEditorScreen : TournamentScreenTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
 
-        public TestSceneSeedingEditorScreen()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var match = CreateSampleMatch();
 

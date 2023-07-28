@@ -43,11 +43,6 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </remarks>
         private readonly Dictionary<HitObjectLifetimeEntry, HitObject> parentMap = new Dictionary<HitObjectLifetimeEntry, HitObject>();
 
-        /// <summary>
-        /// Stores the list of child entries for each hit object managed by this <see cref="HitObjectEntryManager"/>.
-        /// </summary>
-        private readonly Dictionary<HitObject, List<HitObjectLifetimeEntry>> childrenMap = new Dictionary<HitObject, List<HitObjectLifetimeEntry>>();
-
         public void Add(HitObjectLifetimeEntry entry, HitObject? parent)
         {
             HitObject hitObject = entry.HitObject;
@@ -57,22 +52,24 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
             // Add the entry.
             entryMap[hitObject] = entry;
-            childrenMap[hitObject] = new List<HitObjectLifetimeEntry>();
 
             // If the entry has a parent, set it and add the entry to the parent's children.
             if (parent != null)
             {
                 parentMap[entry] = parent;
-                if (childrenMap.TryGetValue(parent, out var parentChildEntries))
-                    parentChildEntries.Add(entry);
+                if (entryMap.TryGetValue(parent, out var parentEntry))
+                    parentEntry.NestedEntries.Add(entry);
             }
 
             hitObject.DefaultsApplied += onDefaultsApplied;
             OnEntryAdded?.Invoke(entry, parent);
         }
 
-        public void Remove(HitObjectLifetimeEntry entry)
+        public bool Remove(HitObjectLifetimeEntry entry)
         {
+            if (entry is SyntheticHitObjectEntry)
+                return false;
+
             HitObject hitObject = entry.HitObject;
 
             if (!entryMap.ContainsKey(hitObject))
@@ -81,18 +78,16 @@ namespace osu.Game.Rulesets.Objects.Pooling
             entryMap.Remove(hitObject);
 
             // If the entry has a parent, unset it and remove the entry from the parents' children.
-            if (parentMap.Remove(entry, out var parent) && childrenMap.TryGetValue(parent, out var parentChildEntries))
-                parentChildEntries.Remove(entry);
+            if (parentMap.Remove(entry, out var parent) && entryMap.TryGetValue(parent, out var parentEntry))
+                parentEntry.NestedEntries.Remove(entry);
 
             // Remove all the entries' children.
-            if (childrenMap.Remove(hitObject, out var childEntries))
-            {
-                foreach (var childEntry in childEntries)
-                    Remove(childEntry);
-            }
+            foreach (var childEntry in entry.NestedEntries)
+                Remove(childEntry);
 
             hitObject.DefaultsApplied -= onDefaultsApplied;
             OnEntryRemoved?.Invoke(entry, parent);
+            return true;
         }
 
         public bool TryGet(HitObject hitObject, [MaybeNullWhen(false)] out HitObjectLifetimeEntry entry)
@@ -105,16 +100,16 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         private void onDefaultsApplied(HitObject hitObject)
         {
-            if (!childrenMap.Remove(hitObject, out var childEntries))
+            if (!entryMap.TryGetValue(hitObject, out var entry))
                 return;
 
-            // Remove all the entries' children. At this point the parents' (this entries') children list has been removed from the map, so this does not cause upwards traversal.
-            foreach (var entry in childEntries)
-                Remove(entry);
+            // Replace the entire list rather than clearing to prevent circular traversal later.
+            var previousEntries = entry.NestedEntries;
+            entry.NestedEntries = new List<HitObjectLifetimeEntry>();
 
-            // The removed children list needs to be added back to the map for the entry to potentially receive children.
-            childEntries.Clear();
-            childrenMap[hitObject] = childEntries;
+            // Remove all the entries' children. At this point the parents' (this entries') children list has been reconstructed, so this does not cause upwards traversal.
+            foreach (var nested in previousEntries)
+                Remove(nested);
         }
     }
 }

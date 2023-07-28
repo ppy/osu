@@ -59,7 +59,7 @@ namespace osu.Game.Collections
             Current.BindValueChanged(selectionChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             var selectedItem = SelectedItem?.Value?.Collection;
 
@@ -188,7 +188,7 @@ namespace osu.Game.Collections
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                    X = -OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Scale = new Vector2(0.65f),
                     Action = addOrRemove,
                 });
