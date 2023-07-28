@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        Vector2 pos = lastMatchesContainerMouseDownPosition;
+                        Vector2 pos = MatchesContainer.Count == 0 ? Vector2.Zero : lastMatchesContainerMouseDownPosition;
 
                         TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
 
