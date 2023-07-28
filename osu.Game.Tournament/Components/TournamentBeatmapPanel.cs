@@ -136,11 +136,11 @@ namespace osu.Game.Tournament.Components
             if (match.NewValue != null)
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
 
-            updateState();
+            Scheduler.AddOnce(updateState);
         }
 
         private void picksBansOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-            => updateState();
+            => Scheduler.AddOnce(updateState);
 
         private BeatmapChoice? choice;
 
