@@ -37,6 +37,8 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private WarningBox rightClickMessage;
 
+        private RectangularPositionSnapGrid grid;
+
         [Resolved(canBeNull: true)]
         [CanBeNull]
         private IDialogOverlay dialogOverlay { get; set; }
@@ -53,15 +55,33 @@ namespace osu.Game.Tournament.Screens.Editors
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
 
-            ScrollContent.Add(new RectangularPositionSnapGrid(Vector2.Zero)
+            ScrollContent.Add(grid = new RectangularPositionSnapGrid(Vector2.Zero)
             {
                 Spacing = new Vector2(GRID_SPACING),
-                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                BypassAutoSizeAxes = Axes.Both,
                 Depth = float.MaxValue
             });
 
             LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Expand grid with the content to allow going beyond the bounds of the screen.
+            grid.Size = ScrollContent.Size + new Vector2(GRID_SPACING * 2);
+        }
+
+        private Vector2 lastMatchesContainerMouseDownPosition;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            lastMatchesContainerMouseDownPosition = MatchesContainer.ToLocalSpace(e.ScreenSpaceMouseDownPosition);
+            return base.OnMouseDown(e);
         }
 
         private void updateMessage()
@@ -85,7 +105,8 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        Vector2 pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        Vector2 pos = MatchesContainer.Count == 0 ? Vector2.Zero : lastMatchesContainerMouseDownPosition;
+
                         TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
 
                         LadderInfo.Matches.Add(newMatch);
