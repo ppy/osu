@@ -22,6 +22,7 @@ using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
@@ -1170,6 +1171,7 @@ namespace osu.Game.Screens.Play
                 // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
+                score.ScoreInfo.Files.AddRange(s.Files.Detach());
             });
 
             return Task.CompletedTask;
