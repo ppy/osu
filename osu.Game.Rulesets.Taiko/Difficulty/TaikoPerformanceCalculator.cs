@@ -115,9 +115,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         }
 
         /// <summary>
-        /// Estimates the player's tap deviation based on the OD, number of objects, and number of 300s, 100s, and misses,
-        /// assuming the player's mean hit error is 0. The estimation is consistent in that two SS scores on the same map with the same settings
-        /// will always return the same deviation. See: https://www.desmos.com/calculator/x3mvtir093
+        /// Calculates the tap deviation for a player using the OD, object count, and scores of 300s, 100s, and misses, with an assumed mean hit error of 0.
+        /// Consistency is ensured as identical SS scores on the same map and settings yield the same deviation.
         /// </summary>
         private double? computeEstimatedUr(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
@@ -127,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double h300 = attributes.GreatHitWindow;
             double h100 = attributes.OkHitWindow;
 
-            // Returns the likelihood of a deviation resulting in the score's hit judgements. The peak of the curve is the most likely deviation.
+            // Determines the probability of a deviation leading to the score's hit evaluations. The curve's apex represents the most probable deviation.
             double likelihoodGradient(double d)
             {
                 if (d <= 0)
@@ -157,18 +156,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double logPcHit(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
 
-        // There's a numerical approximation to increase how far you can calculate ln(erfc(x)).
+        // Utilises a numerical approximation to extend the computation range of ln(erfc(x)).
         private double logErfcApprox(double x) => x <= 5
             ? Math.Log(SpecialFunctions.Erfc(x))
             : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/kdbxwxgf01
 
-        // Log rules make subtraction of the non-log value non-trivial, this method simply subtracts the base value of 2 logs.
+        // Subtracts the base value of two logs, circumventing log rules that typically complicate subtraction of non-logarithmic values.
         private double logDiff(double firstLog, double secondLog)
         {
             double maxVal = Math.Max(firstLog, secondLog);
 
-            // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity.
-            // Shouldn't ever happen, but good for redundancy purposes.
+            // To avoid a NaN result, a check is performed to prevent subtraction of two negative infinity values.
             if (double.IsNegativeInfinity(maxVal))
             {
                 return maxVal;
