@@ -70,7 +70,9 @@ namespace osu.Game.Screens.Play
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
+        [CanBeNull]
         private readonly DrawableRuleset drawableRuleset;
+
         private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Drawable playfieldComponents;
 
-        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
             Drawable rulesetComponents;
             this.drawableRuleset = drawableRuleset;
@@ -235,10 +237,13 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
+            if (drawableRuleset != null)
+            {
+                Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
 
-            playfieldComponents.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
-            playfieldComponents.Size = ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+                playfieldComponents.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+                playfieldComponents.Size = ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+            }
 
             float? lowestTopScreenSpaceLeft = null;
             float? lowestTopScreenSpaceRight = null;
