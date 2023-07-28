@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
+            yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
+            OkHitWindow = values[ATTRIB_ID_OK_HIT_WINDOW];
         }
     }
 }
