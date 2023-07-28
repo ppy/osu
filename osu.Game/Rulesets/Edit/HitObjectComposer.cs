@@ -244,12 +244,12 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
             if (ApplyHorizontalCentering)
             {
                 PlayfieldContentContainer.Anchor = Anchor.Centre;
                 PlayfieldContentContainer.Origin = Anchor.Centre;
 
+                // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
                 PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
                 PlayfieldContentContainer.X = 0;
             }
