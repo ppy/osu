@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private OsuButton warmupButton = null!;
         private MatchIPCInfo ipc = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
         [Resolved]

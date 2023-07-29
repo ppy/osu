@@ -28,10 +28,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly Drawable currentMatchSelectionBox;
         private Bindable<TournamentMatch>? globalSelection;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private LadderEditorInfo? editorInfo { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private LadderInfo? ladderInfo { get; set; }
 
         public DrawableTournamentMatch(TournamentMatch match, bool editor = false)

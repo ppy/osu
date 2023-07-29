@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly Func<bool>? isWinner;
         private LadderEditorScreen ladderEditor = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private LadderInfo? ladderInfo { get; set; }
 
         private void setCurrent()
@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             ladderInfo.CurrentMatch.Value.Current.Value = true;
         }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private LadderEditorInfo? editorInfo { get; set; }
 
         public DrawableMatchTeam(TournamentTeam? team, TournamentMatch match, bool losers)

@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Screens.MapPool
     {
         private FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
         private TeamColour pickColour;
