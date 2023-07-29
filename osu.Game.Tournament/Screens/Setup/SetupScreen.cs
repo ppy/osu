@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
         private Bindable<Size> windowSize = null!;

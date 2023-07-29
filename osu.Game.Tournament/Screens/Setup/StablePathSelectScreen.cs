@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Screens.Setup
 {
     public partial class StablePathSelectScreen : TournamentScreen
     {
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
         [Resolved]

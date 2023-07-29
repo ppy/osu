@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private RectangularPositionSnapGrid grid = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         protected override bool DrawLoserPaths => true;
