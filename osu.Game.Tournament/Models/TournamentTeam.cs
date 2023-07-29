@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Models
             {
                 int[] ranks = Players.Select(p => p.Rank)
                                      .Where(i => i.HasValue)
-                                     .Select(i => i.AsNonNull().Value)
+                                     .Cast<int>()
                                      .ToArray();
 
                 if (ranks.Length == 0)
