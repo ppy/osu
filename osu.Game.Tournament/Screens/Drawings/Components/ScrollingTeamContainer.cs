@@ -188,11 +188,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             setScrollState(ScrollState.Idle);
         }
 
-        public void RemoveTeam(TournamentTeam? team)
+        public void RemoveTeam(TournamentTeam team)
         {
-            if (team == null)
-                return;
-
             availableTeams.Remove(team);
 
             foreach (var c in Children)
