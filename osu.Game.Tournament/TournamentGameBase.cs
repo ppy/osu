@@ -30,7 +30,7 @@ namespace osu.Game.Tournament
     public partial class TournamentGameBase : OsuGameBase
     {
         public const string BRACKET_FILENAME = @"bracket.json";
-        private LadderInfo ladder = null!;
+        private LadderInfo ladder = new LadderInfo();
         private TournamentStorage storage = null!;
         private DependencyContainer dependencies = null!;
         private FileBasedIPC ipc = null!;
@@ -77,8 +77,6 @@ namespace osu.Game.Tournament
             dependencies.CacheAs(new StableInfo(storage));
 
             beatmapCache = dependencies.Get<BeatmapLookupCache>();
-
-            ladder = new LadderInfo();
         }
 
         protected override void LoadComplete()
