@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Mods include autoplay", () => Game.SelectedMods.Value.Any(m => m is ModAutoplay));
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
-            AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            AddUntilStep("returned to main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
             AddAssert("did perform", () => actionPerformed);
 
             AddAssert("Mods don't include autoplay", () => !Game.SelectedMods.Value.Any(m => m is ModAutoplay));
