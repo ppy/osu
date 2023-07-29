@@ -136,11 +136,11 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                             closest = stc;
                     }
 
-                    Trace.Assert(closest != null, "closest != null");
+                    Debug.Assert(closest != null, "closest != null");
 
-                    offset += DrawWidth / 2f - (closest.AsNonNull().Position.X + closest.AsNonNull().DrawWidth / 2f);
+                    offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
-                    ScrollingTeam st = closest.AsNonNull();
+                    ScrollingTeam st = closest;
 
                     availableTeams.RemoveAll(at => at == st.Team);
 
