@@ -21,21 +21,30 @@ namespace osu.Game.Screens.Play.Break
 
         public Bindable<T> Current = new Bindable<T>();
 
-        private readonly OsuSpriteText text;
-        private readonly OsuSpriteText valueText;
+        private readonly LocalisableString name;
+
+        private OsuSpriteText valueText = null!;
 
         public BreakInfoLine(LocalisableString name)
         {
+            this.name = name;
+
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Children = new Drawable[]
             {
-                text = new OsuSpriteText
+                new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Text = name,
                     Font = OsuFont.GetFont(size: 17),
-                    Margin = new MarginPadding { Right = margin }
+                    Margin = new MarginPadding { Right = margin },
+                    Colour = colours.Yellow,
                 },
                 valueText = new OsuSpriteText
                 {
@@ -43,11 +52,17 @@ namespace osu.Game.Screens.Play.Break
                     Origin = Anchor.CentreLeft,
                     Text = @"-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                    Margin = new MarginPadding { Left = margin }
+                    Margin = new MarginPadding { Left = margin },
+                    Colour = colours.YellowLight,
                 }
             };
+        }
 
-            Current.ValueChanged += text => valueText.Text = Format(text.NewValue);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(text => valueText.Text = Format(text.NewValue), true);
         }
 
         protected virtual LocalisableString Format(T count)
@@ -56,13 +71,6 @@ namespace osu.Game.Screens.Play.Break
                 return countEnum.GetDescription();
 
             return count.ToString() ?? string.Empty;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            text.Colour = colours.Yellow;
-            valueText.Colour = colours.YellowLight;
         }
     }
 
