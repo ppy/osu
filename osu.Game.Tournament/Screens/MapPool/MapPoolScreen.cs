@@ -252,9 +252,6 @@ namespace osu.Game.Tournament.Screens.MapPool
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
-                    if (b.Beatmap == null)
-                        continue;
-
                     if (currentFlow == null || (LadderInfo.SplitMapPoolByMods.Value && currentMods != b.Mods))
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
