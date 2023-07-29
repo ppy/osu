@@ -14,14 +14,14 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that applies user-configured visual settings to its contents.
     /// </summary>
-    public abstract class UserDimContainer : Container
+    public abstract partial class UserDimContainer : Container
     {
         /// <summary>
         /// Amount of lightening to apply to current dim level during break times.
         /// </summary>
         public const float BREAK_LIGHTEN_AMOUNT = 0.3f;
 
-        protected const double BACKGROUND_FADE_DURATION = 800;
+        public const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
         /// Whether or not user-configured settings relating to brightness of elements should be ignored

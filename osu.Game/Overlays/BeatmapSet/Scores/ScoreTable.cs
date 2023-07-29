@@ -28,7 +28,7 @@ using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTable : TableContainer
+    public partial class ScoreTable : TableContainer
     {
         private const float horizontal_inset = 20;
         private const float row_height = 22;
@@ -95,8 +95,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersScore, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
                 new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
-                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
-                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(minSize: 125)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(minSize: 70, maxSize: 120))
             };
 
             // All statistics across all scores, unordered.
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 var displayName = ruleset.GetDisplayNameForHitResult(result);
 
-                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(minSize: 35, maxSize: 60)));
                 statisticResultTypes.Add((result, displayName));
             }
 
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 username,
 #pragma warning disable 618
-                new StatisticText(score.MaxCombo, score.BeatmapInfo.MaxCombo, @"0\x"),
+                new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
 #pragma warning restore 618
             };
 
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
-        private class HeaderText : OsuSpriteText
+        private partial class HeaderText : OsuSpriteText
         {
             public HeaderText(LocalisableString text)
             {
@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private class StatisticText : OsuSpriteText, IHasTooltip
+        private partial class StatisticText : OsuSpriteText, IHasTooltip
         {
             private readonly double? count;
             private readonly double? maxCount;

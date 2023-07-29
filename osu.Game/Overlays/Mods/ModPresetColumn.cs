@@ -18,7 +18,7 @@ using Realms;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetColumn : ModSelectColumn
+    public partial class ModPresetColumn : ModSelectColumn
     {
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Mods
         private Task? latestLoadTask;
         internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true;
 
-        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet changes, Exception error)
+        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet? changes)
         {
             cancellationTokenSource?.Cancel();
 

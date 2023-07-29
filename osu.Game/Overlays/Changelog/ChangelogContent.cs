@@ -8,7 +8,7 @@ using System;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogContent : FillFlowContainer
+    public partial class ChangelogContent : FillFlowContainer
     {
         public Action<APIChangelogBuild>? BuildSelected;
 

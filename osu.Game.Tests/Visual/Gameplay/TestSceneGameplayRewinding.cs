@@ -7,8 +7,8 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Utils;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Objects;
@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplayRewinding : OsuPlayerTestScene
+    public partial class TestSceneGameplayRewinding : OsuPlayerTestScene
     {
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -31,11 +31,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Select(kc => kc.CountPresses).Sum() == 15);
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.InputCountController.Triggers.Select(kc => kc.ActivationCount.Value).Sum() == 15);
             AddStep("clear results", () => Player.Results.Clear());
             addSeekStep(0);
             AddAssert("none judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => !h.Judged));
-            AddUntilStep("key counters reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+            AddUntilStep("key counters reset", () => Player.HUDOverlay.InputCountController.Triggers.All(kc => kc.ActivationCount.Value == 0));
             AddAssert("no results triggered", () => Player.Results.Count == 0);
         }
 

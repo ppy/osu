@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -10,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
@@ -18,18 +17,21 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {
-    public abstract class TournamentTestScene : OsuTestScene
+    public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
-        private TournamentMatch match;
+        [Cached(typeof(IDialogOverlay))]
+        protected readonly DialogOverlay DialogOverlay = new DialogOverlay { Depth = float.MinValue };
 
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [Cached]
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
+
+        private TournamentMatch match = null!;
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
@@ -45,6 +47,8 @@ namespace osu.Game.Tournament.Tests
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+
+            Add(DialogOverlay);
         }
 
         [SetUpSteps]
@@ -165,9 +169,9 @@ namespace osu.Game.Tournament.Tests
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
 
-        public class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
+        public partial class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSceneTestRunner.TestRunner runner = null!;
 
             protected override void LoadAsyncComplete()
             {

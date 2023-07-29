@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroTriangles : IntroScreen
+    public partial class IntroTriangles : IntroScreen
     {
         protected override string BeatmapHash => "a1556d0801b3a6b175dda32ef546f0ec812b400499f575c44fccbe9c67f9b1e5";
 
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Menu
             intro.Expire();
         }
 
-        private class TrianglesIntroSequence : CompositeDrawable
+        private partial class TrianglesIntroSequence : CompositeDrawable
         {
             private readonly OsuLogo logo;
             private readonly Action showBackgroundAction;
@@ -224,8 +224,8 @@ namespace osu.Game.Screens.Menu
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
                         rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
-                        welcomeText.FadeOut();
-                        triangles.FadeOut();
+                        welcomeText.FadeOut().Expire();
+                        triangles.FadeOut().Expire();
                     }
 
                     using (BeginDelayedSequence(rulesets_2))
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class GameWideFlash : Box
+            private partial class GameWideFlash : Box
             {
                 private const double flash_length = 1000;
 
@@ -287,7 +287,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class LazerLogo : CompositeDrawable
+            private partial class LazerLogo : CompositeDrawable
             {
                 private LogoAnimation highlight, background;
 
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Menu
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(TextureStore textures)
+                private void load(LargeTextureStore textures)
                 {
                     InternalChildren = new Drawable[]
                     {
@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class RulesetFlow : FillFlowContainer
+            private partial class RulesetFlow : FillFlowContainer
             {
                 [BackgroundDependencyLoader]
                 private void load(RulesetStore rulesets)
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            private class GlitchingTriangles : CompositeDrawable
+            private partial class GlitchingTriangles : CompositeDrawable
             {
                 public GlitchingTriangles()
                 {
@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Menu
                 /// <summary>
                 /// Represents a sprite that is drawn in a triangle shape, instead of a rectangle shape.
                 /// </summary>
-                public class OutlineTriangle : BufferedContainer
+                public partial class OutlineTriangle : BufferedContainer
                 {
                     public OutlineTriangle(bool outlineOnly, float size)
                         : base(cachedFrameBuffer: true)

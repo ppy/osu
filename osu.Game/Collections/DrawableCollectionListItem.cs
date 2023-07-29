@@ -23,7 +23,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
+    public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
     {
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
@@ -44,7 +44,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The main content of the <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        private class ItemContent : CircularContainer
+        private partial class ItemContent : CircularContainer
         {
             private readonly Live<BeatmapCollection> collection;
 
@@ -86,6 +86,7 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
+                                CommitOnFocusLost = true,
                                 PlaceholderText = collection.IsManaged ? string.Empty : "Create a new collection"
                             },
                         }
@@ -113,7 +114,7 @@ namespace osu.Game.Collections
             }
         }
 
-        private class ItemTextBox : OsuTextBox
+        private partial class ItemTextBox : OsuTextBox
         {
             protected override float LeftRightPadding => item_height / 2;
 
@@ -125,7 +126,7 @@ namespace osu.Game.Collections
             }
         }
 
-        public class DeleteButton : CompositeDrawable
+        public partial class DeleteButton : CompositeDrawable
         {
             public Func<Vector2, bool> IsTextBoxHovered = null!;
 
@@ -196,7 +197,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collection.PerformWrite(c => c.Realm.Remove(c));
+            private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
     }
 }

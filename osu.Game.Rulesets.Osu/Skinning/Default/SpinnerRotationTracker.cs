@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -17,11 +16,21 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerRotationTracker : CircularContainer
+    public partial class SpinnerRotationTracker : CircularContainer
     {
         public override bool IsPresent => true; // handle input when hidden
 
         private readonly DrawableSpinner drawableSpinner;
+
+        private Vector2 mousePosition;
+
+        private float lastAngle;
+        private float currentRotation;
+
+        private bool rotationTransferred;
+
+        [Resolved(canBeNull: true)]
+        private IGameplayClock? gameplayClock { get; set; }
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
@@ -51,16 +60,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             return base.OnMouseMove(e);
         }
 
-        private Vector2 mousePosition;
-
-        private float lastAngle;
-        private float currentRotation;
-
-        private bool rotationTransferred;
-
-        [Resolved(canBeNull: true)]
-        private IGameplayClock gameplayClock { get; set; }
-
         protected override void Update()
         {
             base.Update();
@@ -73,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             lastAngle = thisAngle;
 
-            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation / 2 - Rotation) > 5f;
+            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
 
-            Rotation = (float)Interpolation.Damp(Rotation, currentRotation / 2, 0.99, Math.Abs(Time.Elapsed));
+            Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
         /// <summary>
@@ -126,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.HitObjectApplied -= resetState;
         }
     }

@@ -9,8 +9,10 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
+    public partial class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
     {
+        protected override bool ApplyHorizontalCentering => false;
+
         public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
         {

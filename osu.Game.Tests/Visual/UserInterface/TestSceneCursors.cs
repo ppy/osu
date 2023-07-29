@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -20,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneCursors : OsuManualInputManagerTestScene
+    public partial class TestSceneCursors : OsuManualInputManagerTestScene
     {
         private readonly GlobalCursorDisplay globalCursorDisplay;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
@@ -239,7 +237,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private bool checkAtMouse(CursorContainer cursorContainer)
             => Precision.AlmostEquals(InputManager.CurrentState.Mouse.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
-        private class CustomCursorBox : Container, IProvideCursor
+        private partial class CustomCursorBox : Container, IProvideCursor
         {
             public bool SmoothTransition;
 
@@ -290,11 +288,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestCursorContainer : CursorContainer
+        private partial class TestCursorContainer : CursorContainer
         {
             protected override Drawable CreateCursor() => new TestCursor();
 
-            private class TestCursor : CircularContainer
+            private partial class TestCursor : CircularContainer
             {
                 public TestCursor()
                 {

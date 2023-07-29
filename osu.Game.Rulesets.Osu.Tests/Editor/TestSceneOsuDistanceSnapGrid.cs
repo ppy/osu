@@ -27,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private const float beat_length = 100;
 
@@ -185,7 +185,18 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("Ensure cursor is on a grid line", () =>
             {
-                return grid.ChildrenOfType<CircularProgress>().Any(p => Precision.AlmostEquals(p.ScreenSpaceDrawQuad.TopRight.X, grid.ToScreenSpace(cursor.LastSnappedPosition).X));
+                return grid.ChildrenOfType<CircularProgress>().Any(ring =>
+                {
+                    // the grid rings are actually slightly _larger_ than the snapping radii.
+                    // this is done such that the snapping radius falls right in the middle of each grid ring thickness-wise,
+                    // but it does however complicate the following calculations slightly.
+
+                    // we want to calculate the coordinates of the rightmost point on the grid line, which is in the exact middle of the ring thickness-wise.
+                    // for the X component, we take the entire width of the ring, minus one half of the inner radius (since we want the middle of the line on the right side).
+                    // for the Y component, we just take 0.5f.
+                    var rightMiddleOfGridLine = ring.ToScreenSpace(ring.DrawSize * new Vector2(1 - ring.InnerRadius / 2, 0.5f));
+                    return Precision.AlmostEquals(rightMiddleOfGridLine.X, grid.ToScreenSpace(cursor.LastSnappedPosition).X);
+                });
             });
         }
 
@@ -217,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             return Precision.AlmostEquals(expectedDistance, Vector2.Distance(snappedPosition, grid_position));
         });
 
-        private class SnappingCursorContainer : CompositeDrawable
+        private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;
 

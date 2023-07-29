@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,11 +23,12 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
+using osu.Game.Overlays.Comments.Buttons;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCommentActions : OsuManualInputManagerTestScene
+    public partial class TestSceneCommentActions : OsuManualInputManagerTestScene
     {
         private Container<Drawable> content = null!;
         protected override Container<Drawable> Content => content;
@@ -77,14 +80,14 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
                 var ourComment = comments.SingleOrDefault(x => x.Comment.Id == 1);
-                return ourComment != null && ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "Delete");
+                return ourComment != null && ourComment.ChildrenOfType<OsuSpriteText>().Any(x => x.Text == "delete");
             });
 
             AddAssert("Second doesn't", () =>
             {
                 var comments = this.ChildrenOfType<DrawableComment>();
                 var ourComment = comments.Single(x => x.Comment.Id == 2);
-                return ourComment.ChildrenOfType<OsuSpriteText>().All(x => x.Text != "Delete");
+                return ourComment.ChildrenOfType<OsuSpriteText>().All(x => x.Text != "delete");
             });
         }
 
@@ -102,7 +105,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("It has delete button", () =>
             {
-                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Delete");
+                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "delete");
                 InputManager.MoveMouseTo(btn);
             });
             AddStep("Click delete button", () =>
@@ -175,7 +178,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("It has delete button", () =>
             {
-                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Delete");
+                var btn = ourComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "delete");
                 InputManager.MoveMouseTo(btn);
             });
             AddStep("Click delete button", () =>
@@ -189,7 +192,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (request is not CommentDeleteRequest req)
                         return false;
 
-                    req.TriggerFailure(new Exception());
+                    req.TriggerFailure(new InvalidOperationException());
                     delete = true;
                     return false;
                 };
@@ -245,7 +248,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Click the button", () =>
             {
-                var btn = targetComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "Report");
+                var btn = targetComment.ChildrenOfType<OsuSpriteText>().Single(x => x.Text == "report");
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
@@ -259,7 +262,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
             AddStep("Set report data", () =>
             {
-                var field = this.ChildrenOfType<OsuTextBox>().Single();
+                var field = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
                 field.Current.Value = report_text;
                 var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
                 reason.Current.Value = CommentReportReason.Other;
@@ -276,6 +279,93 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);
+        }
+
+        [Test]
+        public void TestReply()
+        {
+            addTestComments();
+            DrawableComment? targetComment = null;
+            AddUntilStep("Comment exists", () =>
+            {
+                var comments = this.ChildrenOfType<DrawableComment>();
+                targetComment = comments.SingleOrDefault(x => x.Comment.Id == 2);
+                return targetComment != null;
+            });
+            AddStep("Setup request handling", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest = r =>
+                {
+                    if (!(r is CommentPostRequest req))
+                        return false;
+
+                    if (req.ParentCommentId != 2)
+                        throw new ArgumentException("Wrong parent ID in request!");
+
+                    if (req.CommentableId != 123 || req.Commentable != CommentableType.Beatmapset)
+                        throw new ArgumentException("Wrong commentable data in request!");
+
+                    Task.Run(() =>
+                    {
+                        requestLock.Wait(10000);
+                        req.TriggerSuccess(new CommentBundle
+                        {
+                            Comments = new List<Comment>
+                            {
+                                new Comment
+                                {
+                                    Id = 98,
+                                    Message = req.Message,
+                                    LegacyName = "FirstUser",
+                                    CreatedAt = DateTimeOffset.Now,
+                                    VotesCount = 98,
+                                    ParentId = req.ParentCommentId,
+                                }
+                            }
+                        });
+                    });
+
+                    return true;
+                };
+            });
+            AddStep("Click reply button", () =>
+            {
+                var btn = targetComment.ChildrenOfType<LinkFlowContainer>().Skip(1).First();
+                var texts = btn.ChildrenOfType<SpriteText>();
+                InputManager.MoveMouseTo(texts.Skip(1).First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("There is 0 replies", () =>
+            {
+                var replLabel = targetComment.ChildrenOfType<ShowRepliesButton>().First().ChildrenOfType<SpriteText>().First();
+                return replLabel.Text.ToString().Contains('0') && targetComment!.Comment.RepliesCount == 0;
+            });
+            AddStep("Focus field", () =>
+            {
+                InputManager.MoveMouseTo(targetComment.ChildrenOfType<TextBox>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Enter text", () =>
+            {
+                targetComment.ChildrenOfType<TextBox>().First().Current.Value = "random reply";
+            });
+            AddStep("Submit", () =>
+            {
+                InputManager.Key(Key.Enter);
+            });
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("There is 1 reply", () =>
+            {
+                var replLabel = targetComment.ChildrenOfType<ShowRepliesButton>().First().ChildrenOfType<SpriteText>().First();
+                return replLabel.Text.ToString().Contains('1') && targetComment!.Comment.RepliesCount == 1;
+            });
+            AddUntilStep("Submitted comment shown", () =>
+            {
+                var r = targetComment.ChildrenOfType<DrawableComment>().Skip(1).FirstOrDefault();
+                return r != null && r.Comment.Message == "random reply";
+            });
         }
 
         private void addTestComments()

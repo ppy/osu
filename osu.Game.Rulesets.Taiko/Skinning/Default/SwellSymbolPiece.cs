@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class SwellCirclePiece : CirclePiece
+    public partial class SwellCirclePiece : CirclePiece
     {
         public SwellCirclePiece()
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// The symbol used for swell pieces.
         /// </summary>
-        public class SwellSymbolPiece : Container
+        public partial class SwellSymbolPiece : Container
         {
             public SwellSymbolPiece()
             {

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,7 +29,8 @@ namespace osu.Game.Database
         /// This will post notifications tracking progress.
         /// </remarks>
         /// <param name="tasks">The import tasks from which the files should be imported.</param>
-        Task Import(params ImportTask[] tasks);
+        /// <param name="parameters">Parameters to further configure the import process.</param>
+        Task Import(ImportTask[] tasks, ImportParameters parameters = default);
 
         /// <summary>
         /// An array of accepted file extensions (in the standard format of ".abc").

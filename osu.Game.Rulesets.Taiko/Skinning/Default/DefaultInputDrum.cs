@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class DefaultInputDrum : AspectContainer
+    public partial class DefaultInputDrum : AspectContainer
     {
         public DefaultInputDrum()
         {
@@ -65,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class TaikoHalfDrum : Container, IKeyBindingHandler<TaikoAction>
+        private partial class TaikoHalfDrum : Container, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.
@@ -135,8 +134,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
-                Drawable target = null;
-                Drawable back = null;
+                Drawable? target = null;
+                Drawable? back = null;
 
                 if (e.Action == CentreAction)
                 {
@@ -149,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     back = rim;
                 }
 
-                if (target != null)
+                if (target != null && back != null)
                 {
                     const float scale_amount = 0.05f;
                     const float alpha_amount = 0.5f;

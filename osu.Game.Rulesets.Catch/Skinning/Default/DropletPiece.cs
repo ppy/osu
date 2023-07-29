@@ -1,15 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DropletPiece : CatchHitObjectPiece
+    public partial class DropletPiece : CatchHitObjectPiece
     {
         protected override Drawable HyperBorderPiece { get; }
 

@@ -17,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Utility
 {
     [Cached]
-    public class LatencyArea : CompositeDrawable, IProvideCursor
+    public partial class LatencyArea : CompositeDrawable, IProvideCursor
     {
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;

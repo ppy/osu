@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneBrokenRulesetHandling : OsuTestScene
+    public partial class TestSceneBrokenRulesetHandling : OsuTestScene
     {
         [Resolved]
         private OsuGameBase gameBase { get; set; } = null!;
@@ -73,7 +73,5 @@ namespace osu.Game.Tests.Rulesets
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
             public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
         }
-
-#nullable enable
     }
 }

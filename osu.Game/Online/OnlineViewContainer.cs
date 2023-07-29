@@ -17,7 +17,7 @@ namespace osu.Game.Online
     /// A <see cref="Container"/> for displaying online content which require a local user to be logged in.
     /// Shows its children only when the local user is logged in and supports displaying a placeholder if not.
     /// </summary>
-    public class OnlineViewContainer : Container
+    public partial class OnlineViewContainer : Container
     {
         protected LoadingSpinner LoadingSpinner { get; private set; }
 

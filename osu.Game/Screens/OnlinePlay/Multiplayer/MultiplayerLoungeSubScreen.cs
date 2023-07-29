@@ -23,7 +23,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerLoungeSubScreen : LoungeSubScreen
+    public partial class MultiplayerLoungeSubScreen : LoungeSubScreen
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // To work around this, temporarily remove the room and trigger an immediate listing poll.
             if (e.Last is MultiplayerMatchSubScreen match)
             {
-                RoomManager.RemoveRoom(match.Room);
+                RoomManager?.RemoveRoom(match.Room);
                 ListingPollingComponent.PollImmediately();
             }
         }
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.OpenNewRoom(room);
         }
 
-        private class MultiplayerListingPollingComponent : ListingPollingComponent
+        private partial class MultiplayerListingPollingComponent : ListingPollingComponent
         {
             [Resolved]
             private MultiplayerClient client { get; set; }

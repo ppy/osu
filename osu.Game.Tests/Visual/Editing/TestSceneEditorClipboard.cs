@@ -6,7 +6,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -21,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorClipboard : EditorTestScene
+    public partial class TestSceneEditorClipboard : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -95,10 +94,6 @@ namespace osu.Game.Tests.Visual.Editing
                 var path = slider.Path;
                 return path.ControlPoints.Count == 2 && path.ControlPoints.SequenceEqual(addedObject.Path.ControlPoints);
             });
-
-            // see `HitObject.control_point_leniency`.
-            AddAssert("sample control point has correct time", () => Precision.AlmostEquals(slider.SampleControlPoint.Time, slider.GetEndTime(), 1));
-            AddAssert("difficulty control point has correct time", () => slider.DifficultyControlPoint.Time == slider.StartTime);
         }
 
         [Test]

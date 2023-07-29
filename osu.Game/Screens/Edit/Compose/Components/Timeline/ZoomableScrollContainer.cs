@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class ZoomableScrollContainer : OsuScrollContainer
+    public partial class ZoomableScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The time to zoom into/out of a point.
@@ -41,8 +39,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private bool isZoomSetUp;
 
-        [Resolved(canBeNull: true)]
-        private IFrameBasedClock editorClock { get; set; }
+        [Resolved]
+        private IFrameBasedClock? editorClock { get; set; }
 
         private readonly LayoutValue zoomedContentWidthCache = new LayoutValue(Invalidation.DrawSize);
 
@@ -99,9 +97,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             minZoom = minimum;
             maxZoom = maximum;
-            CurrentZoom = zoomTarget = initial;
-            isZoomSetUp = true;
 
+            CurrentZoom = zoomTarget = initial;
+            zoomedContentWidthCache.Invalidate();
+
+            isZoomSetUp = true;
             zoomedContent.Show();
         }
 

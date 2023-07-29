@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class AccountCreationOverlay : OsuFocusedOverlayContainer
+    public partial class AccountCreationOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_time = 400;
 
@@ -90,7 +90,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
             this.FadeIn(transition_time, Easing.OutQuint);
 
             if (welcomeScreen.GetChildScreen() != null)

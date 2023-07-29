@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
     {
         private Container content;
         protected override Container<Drawable> Content => content;
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Editing
             }));
         }
 
-        private class SnappingCursorContainer : CompositeDrawable
+        private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;
 

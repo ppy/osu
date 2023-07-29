@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
     ///  - Exposes track length.
     ///  - Allows changing the source to a new track (for cases like editor track updating).
     /// </summary>
-    public class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public partial class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         private readonly bool applyOffsets;
 
@@ -63,6 +63,8 @@ namespace osu.Game.Beatmaps
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        public bool IsRewinding { get; private set; }
 
         public bool IsCoupled
         {
@@ -133,6 +135,9 @@ namespace osu.Game.Beatmaps
             }
             else
                 finalClockSource.ProcessFrame();
+
+            if (Clock.ElapsedFrameTime != 0)
+                IsRewinding = Clock.ElapsedFrameTime < 0;
         }
 
         public double TotalAppliedOffset

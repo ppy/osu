@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A visualiser that reacts to music coming from beatmaps.
     /// </summary>
-    public class LogoVisualisation : Drawable
+    public partial class LogoVisualisation : Drawable
     {
         /// <summary>
         /// The number of bars to jump each update iteration.
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Menu
         private void load(IRenderer renderer, ShaderManager shaders)
         {
             texture = renderer.WhitePixel;
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
         }
 
         private readonly float[] temporalAmplitudes = new float[ChannelAmplitudes.AMPLITUDES_SIZE];
@@ -102,8 +102,7 @@ namespace osu.Game.Screens.Menu
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
-            if (beatSyncProvider.Clock != null)
-                addAmplitudesFromSource(beatSyncProvider);
+            addAmplitudesFromSource(beatSyncProvider);
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);
@@ -147,7 +146,7 @@ namespace osu.Game.Screens.Menu
 
         private void addAmplitudesFromSource(IHasAmplitudes source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
 

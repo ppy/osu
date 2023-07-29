@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonArea : Container, IStateful<Visibility>
+    public partial class ButtonArea : Container, IStateful<Visibility>
     {
         public FlowContainerWithOrigin Flow;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Menu
 
         public event Action<Visibility> StateChanged;
 
-        private class ButtonAreaBackground : Box, IStateful<ButtonAreaBackgroundState>
+        private partial class ButtonAreaBackground : Box, IStateful<ButtonAreaBackgroundState>
         {
             private ButtonAreaBackgroundState state;
 

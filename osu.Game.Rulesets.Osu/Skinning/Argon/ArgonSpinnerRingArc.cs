@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSpinnerRingArc : CompositeDrawable
+    public partial class ArgonSpinnerRingArc : CompositeDrawable
     {
         private const float arc_fill = 0.31f;
         private const float arc_fill_complete = 0.50f;

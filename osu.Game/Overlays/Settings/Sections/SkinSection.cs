@@ -13,18 +13,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
-using osu.Game.Skinning.Editor;
 using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class SkinSection : SettingsSection
+    public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
 
@@ -93,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections
             });
         }
 
-        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
         {
             // This can only mean that realm is recycling, else we would see the protected skins.
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
@@ -105,6 +104,7 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownItems.Clear();
 
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
 
@@ -123,23 +123,20 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
+        private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
             protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
-            private class SkinDropdownControl : DropdownControl
+            private partial class SkinDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 
-        public class ExportSkinButton : SettingsButton
+        public partial class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
-
-            [Resolved]
-            private Storage storage { get; set; }
 
             private Bindable<Skin> currentSkin;
 
@@ -162,7 +159,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage).Export(s));
+                    skins.ExportCurrentSkin();
                 }
                 catch (Exception e)
                 {
@@ -171,7 +168,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class DeleteSkinButton : DangerousSettingsButton
+        public partial class DeleteSkinButton : DangerousSettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }

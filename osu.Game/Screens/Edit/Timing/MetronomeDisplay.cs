@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -26,26 +23,25 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class MetronomeDisplay : BeatSyncedContainer
+    public partial class MetronomeDisplay : BeatSyncedContainer
     {
-        private Container swing;
+        private Container swing = null!;
 
-        private OsuSpriteText bpmText;
+        private OsuSpriteText bpmText = null!;
 
-        private Drawable weight;
-        private Drawable stick;
+        private Drawable weight = null!;
+        private Drawable stick = null!;
 
-        private IAdjustableClock metronomeClock;
+        private IAdjustableClock metronomeClock = null!;
 
-        private Sample sampleTick;
-        private Sample sampleTickDownbeat;
-        private Sample sampleLatch;
+        private Sample? sampleTick;
+        private Sample? sampleTickDownbeat;
+        private Sample? sampleLatch;
 
-        [CanBeNull]
-        private ScheduledDelegate tickPlaybackDelegate;
+        private ScheduledDelegate? tickPlaybackDelegate;
 
         [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; }
+        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
         public bool EnableClicking { get; set; } = true;
 
@@ -225,13 +221,13 @@ namespace osu.Game.Screens.Edit.Timing
 
         private double beatLength;
 
-        private TimingControlPoint timingPoint;
+        private TimingControlPoint timingPoint = null!;
 
         private bool isSwinging;
 
         private readonly BindableInt interpolatedBpm = new BindableInt();
 
-        private ScheduledDelegate latchDelegate;
+        private ScheduledDelegate? latchDelegate;
 
         protected override void LoadComplete()
         {
@@ -244,7 +240,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            if (BeatSyncSource.ControlPoints == null || BeatSyncSource.Clock == null)
+            if (BeatSyncSource.ControlPoints == null)
                 return;
 
             metronomeClock.Rate = IsBeatSyncedWithTrack ? BeatSyncSource.Clock.Rate : 1;
@@ -263,7 +259,7 @@ namespace osu.Game.Screens.Edit.Timing
                 this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
             }
 
-            if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
+            if (!BeatSyncSource.Clock.IsRunning && isSwinging)
             {
                 swing.ClearTransforms(true);
 

@@ -3,13 +3,11 @@
 
 using System;
 using JetBrains.Annotations;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Difficulty;
 using Realms;
 
 namespace osu.Game.Rulesets
 {
-    [ExcludeFromDynamicCompile]
     [MapTo("Ruleset")]
     public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
     {
@@ -53,21 +51,21 @@ namespace osu.Game.Rulesets
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo r && Equals(r);
 
-        public int CompareTo(RulesetInfo other)
+        public int CompareTo(RulesetInfo? other)
         {
-            if (OnlineID >= 0 && other.OnlineID >= 0)
+            if (OnlineID >= 0 && other?.OnlineID >= 0)
                 return OnlineID.CompareTo(other.OnlineID);
 
             // Official rulesets are always given precedence for the time being.
             if (OnlineID >= 0)
                 return -1;
-            if (other.OnlineID >= 0)
+            if (other?.OnlineID >= 0)
                 return 1;
 
-            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+            return string.Compare(ShortName, other?.ShortName, StringComparison.Ordinal);
         }
 
-        public int CompareTo(IRulesetInfo other)
+        public int CompareTo(IRulesetInfo? other)
         {
             if (!(other is RulesetInfo ruleset))
                 throw new ArgumentException($@"Object is not of type {nameof(RulesetInfo)}.", nameof(other));

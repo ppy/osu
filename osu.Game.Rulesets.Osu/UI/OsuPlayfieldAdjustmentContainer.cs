@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class OsuPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
         private readonly ScalingContainer content;
@@ -48,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// A <see cref="Container"/> which scales its content relative to a target width.
         /// </summary>
-        private class ScalingContainer : Container
+        private partial class ScalingContainer : Container
         {
             internal bool PlayfieldShift { get; set; }
 

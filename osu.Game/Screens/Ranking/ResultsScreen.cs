@@ -29,7 +29,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public abstract class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
@@ -96,11 +96,11 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    statisticsPanel = new StatisticsPanel
+                                    statisticsPanel = CreateStatisticsPanel().With(panel =>
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Score = { BindTarget = SelectedScore }
-                                    },
+                                        panel.RelativeSizeAxes = Axes.Both;
+                                        panel.Score.BindTarget = SelectedScore;
+                                    }),
                                     ScorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Ranking
 
             if (allowWatchingReplay)
             {
-                buttons.Add(new ReplayDownloadButton(null)
+                buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
                     Score = { BindTarget = SelectedScore },
                     Width = 300
@@ -231,6 +231,11 @@ namespace osu.Game.Screens.Ranking
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
+        /// <summary>
+        /// Creates the <see cref="StatisticsPanel"/> to be used to display extended information about scores.
+        /// </summary>
+        protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
+
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
             foreach (var s in scores)
@@ -300,7 +305,7 @@ namespace osu.Game.Screens.Ranking
                 float origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
                 expandedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
+                             .MoveToX(StatisticsPanel.SIDE_PADDING, 400, Easing.OutElasticQuarter);
 
                 // Hide contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -308,7 +313,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.1f), 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.4f), 400, Easing.OutQuint));
 
                 detachedPanel = expandedPanel;
             }
@@ -324,7 +329,7 @@ namespace osu.Game.Screens.Ranking
                 float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveToX(0, 150, Easing.OutQuint);
+                             .MoveToX(0, 250, Easing.OutElasticQuarter);
 
                 // Show contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -332,7 +337,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 250, Easing.OutQuint));
 
                 detachedPanel = null;
             }
@@ -357,7 +362,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected class VerticalScrollContainer : OsuScrollContainer
+        protected partial class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 

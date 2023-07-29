@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -14,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestScenePlayfieldCoveringContainer : OsuTestScene
+    public partial class TestScenePlayfieldCoveringContainer : OsuTestScene
     {
         private readonly ScrollingTestContainer scrollingContainer;
         private readonly PlayfieldCoveringWrapper cover;

@@ -1,44 +1,18 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using Humanizer;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     /// <summary>
     /// A pill that displays the playlist item count.
     /// </summary>
-    public class PlaylistCountPill : OnlinePlayComposite
+    public partial class PlaylistCountPill : OnlinePlayPill
     {
-        private OsuTextFlowContainer count;
-
-        public PlaylistCountPill()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InternalChild = new PillContainer
-            {
-                Child = count = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
-            };
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -55,10 +29,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 ? Playlist.Count(i => !i.Expired)
                 : PlaylistItemStats.Value.CountActive;
 
-            count.Clear();
-            count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
-            count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
+            TextFlow.Clear();
+            TextFlow.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            TextFlow.AddText(" ");
+            TextFlow.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
         }
     }
 }

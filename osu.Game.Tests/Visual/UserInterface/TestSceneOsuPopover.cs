@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -18,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuPopover : OsuGridTestScene
+    public partial class TestSceneOsuPopover : OsuGridTestScene
     {
         public TestSceneOsuPopover()
             : base(1, 2)
@@ -33,7 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Text = @"No OverlayColourProvider",
                         Font = OsuFont.Default.With(size: 40)
                     },
-                    new TriangleButtonWithPopover()
+                    new RoundedButtonWithPopover()
                 }
             };
 
@@ -50,15 +48,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Text = @"With OverlayColourProvider (orange)",
                             Font = OsuFont.Default.With(size: 40)
                         },
-                        new TriangleButtonWithPopover()
+                        new RoundedButtonWithPopover()
                     }
                 }
             };
         }
 
-        private class TriangleButtonWithPopover : TriangleButton, IHasPopover
+        private partial class RoundedButtonWithPopover : RoundedButton, IHasPopover
         {
-            public TriangleButtonWithPopover()
+            public RoundedButtonWithPopover()
             {
                 Width = 100;
                 Height = 30;
@@ -91,7 +89,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class ColourProvidingContainer : Container
+        private partial class ColourProvidingContainer : Container
         {
             [Cached]
             private OverlayColourProvider provider { get; }

@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class SongBar : CompositeDrawable
+    public partial class SongBar : CompositeDrawable
     {
         private TournamentBeatmap beatmap;
 
@@ -188,7 +188,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.##}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.00}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
@@ -242,7 +242,7 @@ namespace osu.Game.Tournament.Components
             };
         }
 
-        public class DiffPiece : TextFlowContainer
+        public partial class DiffPiece : TextFlowContainer
         {
             public DiffPiece(params (string heading, string content)[] tuples)
             {

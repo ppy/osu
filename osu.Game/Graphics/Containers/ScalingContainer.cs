@@ -15,13 +15,14 @@ using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// Handles user-defined scaling, allowing application at multiple levels defined by <see cref="ScalingMode"/>.
     /// </summary>
-    public class ScalingContainer : Container
+    public partial class ScalingContainer : Container
     {
         internal const float TRANSITION_DURATION = 500;
 
@@ -45,6 +46,8 @@ namespace osu.Game.Graphics.Containers
         private readonly Container sizableContainer;
 
         private BackgroundScreenStack backgroundStack;
+
+        private Bindable<float> scalingMenuBackgroundDim;
 
         private RectangleF? customRect;
         private bool customRectIsRelativePosition;
@@ -82,7 +85,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public partial class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
@@ -138,6 +141,9 @@ namespace osu.Game.Graphics.Containers
 
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
+            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+            scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
         }
 
         protected override void LoadComplete()
@@ -148,7 +154,9 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.FinishTransforms();
         }
 
-        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
+        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays)
+                                                  && (sizeX.Value != 1 || sizeY.Value != 1)
+                                                  && scalingMenuBackgroundDim.Value < 1;
 
         private void updateSize()
         {
@@ -161,8 +169,8 @@ namespace osu.Game.Graphics.Containers
                     {
                         AddInternal(backgroundStack = new BackgroundScreenStack
                         {
-                            Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
+                            Colour = Color4.Black,
                             Depth = float.MaxValue
                         });
 
@@ -170,6 +178,7 @@ namespace osu.Game.Graphics.Containers
                     }
 
                     backgroundStack.FadeIn(TRANSITION_DURATION);
+                    backgroundStack.FadeColour(OsuColour.Gray(1.0f - scalingMenuBackgroundDim.Value), TRANSITION_DURATION, Easing.OutQuint);
                 }
                 else
                     backgroundStack?.FadeOut(TRANSITION_DURATION);
@@ -211,7 +220,7 @@ namespace osu.Game.Graphics.Containers
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
-        private class ScalingBackgroundScreen : BackgroundScreenDefault
+        private partial class ScalingBackgroundScreen : BackgroundScreenDefault
         {
             protected override bool AllowStoryboardBackground => false;
 
@@ -221,7 +230,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private class SizeableAlwaysInputContainer : Container
+        private partial class SizeableAlwaysInputContainer : Container
         {
             [Resolved]
             private GameHost host { get; set; }

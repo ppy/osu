@@ -30,8 +30,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
+    public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
+        /// <summary>
+        /// How much padding around the selection area is added.
+        /// </summary>
+        public const float INFLATE_SIZE = 5;
+
         /// <summary>
         /// The currently selected blueprints.
         /// Should be used when operations are dealing directly with the visible blueprints.
@@ -155,13 +160,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat)
                 return false;
 
+            bool handled;
+
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    return HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    return HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
             }
 
             return false;
@@ -192,9 +207,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Selection Handling
 
         /// <summary>
-        /// Bind an action to deselect all selected blueprints.
+        /// Deselect all selected items.
         /// </summary>
-        internal Action DeselectAll { private get; set; }
+        protected void DeselectAll() => SelectedItems.Clear();
 
         /// <summary>
         /// Handle a blueprint becoming selected.
@@ -298,7 +313,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (blueprint.IsSelected)
                 return false;
 
-            DeselectAll?.Invoke();
+            DeselectAll();
             blueprint.Select();
             return true;
         }
@@ -306,6 +321,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected void DeleteSelected()
         {
             DeleteItems(SelectedItems.ToArray());
+            DeselectAll();
         }
 
         #endregion
@@ -346,7 +362,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             for (int i = 1; i < selectedBlueprints.Count; i++)
                 selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            selectionRect = selectionRect.Inflate(5f);
+            selectionRect = selectionRect.Inflate(INFLATE_SIZE);
 
             SelectionBox.Position = selectionRect.Location;
             SelectionBox.Size = selectionRect.Size;

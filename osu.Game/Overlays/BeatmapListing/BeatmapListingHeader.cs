@@ -3,16 +3,21 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingHeader : OverlayHeader
+    public partial class BeatmapListingHeader : OverlayHeader
     {
+        public BeatmapListingFilterControl FilterControl { get; private set; }
+
         protected override OverlayTitle CreateTitle() => new BeatmapListingTitle();
 
-        private class BeatmapListingTitle : OverlayTitle
+        protected override Drawable CreateContent() => FilterControl = new BeatmapListingFilterControl();
+
+        private partial class BeatmapListingTitle : OverlayTitle
         {
             public BeatmapListingTitle()
             {

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -49,6 +50,9 @@ namespace osu.Game.Online
             this.api = api;
             this.versionHash = versionHash;
             this.preferMessagePack = preferMessagePack;
+
+            // Automatically start these connections.
+            Start();
         }
 
         protected override Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
@@ -56,17 +60,21 @@ namespace osu.Game.Online
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
                 {
-                    // Use HttpClient.DefaultProxy once on net6 everywhere.
-                    // The credential setter can also be removed at this point.
-                    options.Proxy = WebRequest.DefaultWebProxy;
-                    if (options.Proxy != null)
-                        options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                    // Configuring proxies is not supported on iOS, see https://github.com/xamarin/xamarin-macios/issues/14632.
+                    if (RuntimeInfo.OS != RuntimeInfo.Platform.iOS)
+                    {
+                        // Use HttpClient.DefaultProxy once on net6 everywhere.
+                        // The credential setter can also be removed at this point.
+                        options.Proxy = WebRequest.DefaultWebProxy;
+                        if (options.Proxy != null)
+                            options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                    }
 
                     options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT && preferMessagePack)
+            if (RuntimeFeature.IsDynamicCodeCompiled && preferMessagePack)
             {
                 builder.AddMessagePackProtocol(options =>
                 {

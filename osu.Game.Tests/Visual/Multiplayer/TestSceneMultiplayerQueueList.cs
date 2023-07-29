@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerQueueList : MultiplayerTestScene
+    public partial class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add playlist item", () =>
             {
-                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
+                MultiplayerPlaylistItem item = TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
 
                 MultiplayerClient.AddUserPlaylistItem(userId(), item).WaitSafely();
 

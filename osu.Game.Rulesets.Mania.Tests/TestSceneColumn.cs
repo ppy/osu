@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -24,7 +22,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneColumn : ManiaInputTestScene
+    public partial class TestSceneColumn : ManiaInputTestScene
     {
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();

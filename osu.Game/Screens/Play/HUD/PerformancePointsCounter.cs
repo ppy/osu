@@ -35,7 +35,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class PerformancePointsCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class PerformancePointsCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play.HUD
             loadCancellationSource?.Cancel();
         }
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;
 
-            protected override Texture GetBackground() => throw new NotImplementedException();
+            public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 

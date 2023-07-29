@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -21,7 +18,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sound consisting of one or more samples to be played.
     /// </summary>
-    public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -39,13 +36,12 @@ namespace osu.Game.Skinning
         /// <summary>
         /// All raw <see cref="DrawableSamples"/>s contained in this <see cref="SkinnableSound"/>.
         /// </summary>
-        [NotNull, ItemNotNull]
         protected IEnumerable<DrawableSample> DrawableSamples => samplesContainer.Select(c => c.Sample).Where(s => s != null);
 
         private readonly AudioContainer<PoolableSkinnableSample> samplesContainer;
 
-        [Resolved(CanBeNull = true)]
-        private IPooledSampleProvider samplePool { get; set; }
+        [Resolved]
+        private IPooledSampleProvider? samplePool { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="SkinnableSound"/>.
@@ -59,7 +55,7 @@ namespace osu.Game.Skinning
         /// Creates a new <see cref="SkinnableSound"/> with some initial samples.
         /// </summary>
         /// <param name="samples">The initial samples.</param>
-        public SkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
+        public SkinnableSound(IEnumerable<ISampleInfo> samples)
             : this()
         {
             this.samples = samples.ToArray();
@@ -69,7 +65,7 @@ namespace osu.Game.Skinning
         /// Creates a new <see cref="SkinnableSound"/> with an initial sample.
         /// </summary>
         /// <param name="sample">The initial sample.</param>
-        public SkinnableSound([NotNull] ISampleInfo sample)
+        public SkinnableSound(ISampleInfo sample)
             : this(new[] { sample })
         {
         }
@@ -84,8 +80,6 @@ namespace osu.Game.Skinning
             get => samples;
             set
             {
-                value ??= Array.Empty<ISampleInfo>();
-
                 if (samples == value)
                     return;
 
@@ -95,6 +89,8 @@ namespace osu.Game.Skinning
                     updateSamples();
             }
         }
+
+        public void ClearSamples() => Samples = Array.Empty<ISampleInfo>();
 
         private bool looping;
 
@@ -119,6 +115,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
+            FlushPendingSkinChanges();
+
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)

@@ -1,14 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,34 +20,32 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
+    public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
 
-        private Action<BeatmapSetInfo> restoreHiddenRequested;
-        private Action<int> viewDetails;
-
-        [Resolved(CanBeNull = true)]
-        private IDialogOverlay dialogOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
+        private Action<int>? viewDetails;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
 
-        [CanBeNull]
-        private Container<DrawableCarouselItem> beatmapContainer;
+        private Container<DrawableCarouselItem>? beatmapContainer;
 
-        private BeatmapSetInfo beatmapSet;
+        private BeatmapSetInfo beatmapSet = null!;
 
-        [CanBeNull]
-        private Task beatmapsLoadTask;
+        private Task? beatmapsLoadTask;
 
         [Resolved]
-        private BeatmapManager manager { get; set; }
+        private BeatmapManager manager { get; set; } = null!;
 
         protected override void FreeAfterUse()
         {
@@ -61,8 +56,8 @@ namespace osu.Game.Screens.Select.Carousel
             ClearTransforms();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay beatmapOverlay)
+        [BackgroundDependencyLoader]
+        private void load(BeatmapSetOverlay? beatmapOverlay)
         {
             restoreHiddenRequested = s =>
             {
@@ -78,10 +73,11 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Update();
 
+            Debug.Assert(Item != null);
+
             // position updates should not occur if the item is filtered away.
             // this avoids panels flying across the screen only to be eventually off-screen or faded out.
-            if (!Item.Visible)
-                return;
+            if (!Item.Visible) return;
 
             float targetY = Item.CarouselYPosition;
 
@@ -112,14 +108,15 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
+                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, 300)
+                }, 200)
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 50)
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -129,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
             mainFlow.DelayedLoadComplete += fadeContentIn;
         }
 
-        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
+        private void fadeContentIn(Drawable d) => d.FadeInFromZero(150);
 
         protected override void Deselected()
         {
@@ -151,6 +148,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateBeatmapDifficulties()
         {
+            Debug.Assert(Item != null);
+
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
             var visibleBeatmaps = carouselBeatmapSet.Items.Where(c => c.Visible).ToArray();
@@ -171,7 +170,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()!)
                 };
 
                 beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
@@ -196,10 +195,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
-            bool isSelected = Item.State.Value == CarouselItemState.Selected;
+            bool isSelected = Item?.State.Value == CarouselItemState.Selected;
 
             foreach (var panel in beatmapContainer.Children)
             {
+                Debug.Assert(panel.Item != null);
+
                 if (isSelected)
                 {
                     panel.MoveToY(yPos, 800, Easing.OutQuint);
@@ -218,7 +219,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item.State.Value == CarouselItemState.NotSelected)
+                if (Item?.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)

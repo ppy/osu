@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
@@ -19,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderScreen : TournamentScreen
+    public partial class LadderScreen : TournamentScreen
     {
         protected Container<DrawableTournamentMatch> MatchesContainer;
         private Container<Path> paths;
@@ -40,6 +41,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             InternalChild = Content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     new TourneyVideo("ladder")
@@ -55,12 +57,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                     },
                     ScrollContent = new LadderDragContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
-                            MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
+                            MatchesContainer = new Container<DrawableTournamentMatch>
+                            {
+                                AutoSizeAxes = Axes.Both
+                            },
                         }
                     },
                 }
@@ -81,11 +86,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (var p in args.NewItems.Cast<TournamentMatch>())
                             addMatch(p);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (var p in args.OldItems.Cast<TournamentMatch>())
                         {
                             foreach (var d in MatchesContainer.Where(d => d.Match == p))
@@ -153,7 +162,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topMatch = MatchesContainer.Where(p => !p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => !p.Match.Losers.Value && p.Match.Round.Value == round).MinBy(p => p.Y);
 
                 if (topMatch == null) continue;
 
@@ -167,7 +176,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var round in LadderInfo.Rounds)
             {
-                var topMatch = MatchesContainer.Where(p => p.Match.Losers.Value && p.Match.Round.Value == round).OrderBy(p => p.Y).FirstOrDefault();
+                var topMatch = MatchesContainer.Where(p => p.Match.Losers.Value && p.Match.Round.Value == round).MinBy(p => p.Y);
 
                 if (topMatch == null) continue;
 

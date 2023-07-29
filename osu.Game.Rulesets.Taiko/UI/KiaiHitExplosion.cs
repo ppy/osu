@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class KiaiHitExplosion : Container
+    public partial class KiaiHitExplosion : Container
     {
         public override bool RemoveWhenNotAlive => true;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             JudgedObject = judgedObject;
             this.hitType = hitType;
 
-            Anchor = Anchor.CentreLeft;
+            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
         }
     }
 }

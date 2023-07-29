@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
@@ -14,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the control points.
     /// </summary>
-    public class ControlPointPart : TimelinePart<GroupVisualisation>
+    public partial class ControlPointPart : TimelinePart<GroupVisualisation>
     {
         private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
@@ -33,6 +32,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                         break;
 
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (var group in args.NewItems.OfType<ControlPointGroup>())
                         {
                             // as an optimisation, don't add a visualisation if there are already groups with the same types in close proximity.
@@ -47,6 +48,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (var group in args.OldItems.OfType<ControlPointGroup>())
                         {
                             var matching = Children.SingleOrDefault(gv => ReferenceEquals(gv.Group, group));

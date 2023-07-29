@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// Represents a simple statistic item (one that only needs textual display).
     /// Richer visualisations should be done with <see cref="StatisticItem"/>s.
     /// </summary>
-    public abstract class SimpleStatisticItem : Container
+    public abstract partial class SimpleStatisticItem : Container
     {
         /// <summary>
         /// The text to display as the statistic's value.
@@ -44,13 +44,13 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Text = Name,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(size: 14)
+                    Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE)
                 },
                 value = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                 }
             });
         }
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Strongly-typed generic specialisation for <see cref="SimpleStatisticItem"/>.
     /// </summary>
-    public class SimpleStatisticItem<TValue> : SimpleStatisticItem
+    public partial class SimpleStatisticItem<TValue> : SimpleStatisticItem
     {
         private TValue value;
 

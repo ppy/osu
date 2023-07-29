@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
             samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
         }
 
-        public Drawable? GetDrawableComponent(ISkinComponent component) => null;
+        public Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => null;
 
         public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => textures.Get(componentName, wrapModeS, wrapModeT);
 

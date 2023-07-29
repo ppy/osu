@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer
     {
         public LocalisableString Text
         {

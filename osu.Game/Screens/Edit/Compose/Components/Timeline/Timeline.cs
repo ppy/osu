@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -22,7 +23,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached]
-    public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         private const float timeline_height = 72;
         private const float timeline_expanded_height = 94;
@@ -34,8 +35,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
-
-        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
         private EditorClock editorClock { get; set; }
@@ -92,6 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private double trackLengthForZoom;
 
+        private readonly IBindable<Track> track = new Bindable<Track>();
+
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
@@ -139,11 +140,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
 
-            Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-            }, true);
+            track.BindTo(editorClock.Track);
+            track.BindValueChanged(_ => waveform.Waveform = beatmap.Value.Waveform, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
@@ -196,9 +194,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
 
-                float initialZoom = (float)(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom));
                 float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
                 float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
+
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
 
                 SetupZoom(initialZoom, minimumZoom, maximumZoom);
 

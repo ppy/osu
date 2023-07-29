@@ -17,7 +17,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {
-    public class SoloPlayer : SubmittingPlayer
+    public partial class SoloPlayer : SubmittingPlayer
     {
         public SoloPlayer()
             : this(null)
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
         {
             IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo;
 
-            Debug.Assert(beatmap.OnlineID > 0);
+            Debug.Assert(beatmap!.OnlineID > 0);
 
             return new SubmitSoloScoreRequest(score.ScoreInfo, token, beatmap.OnlineID);
         }

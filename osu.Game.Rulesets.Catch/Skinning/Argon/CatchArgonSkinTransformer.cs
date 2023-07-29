@@ -13,11 +13,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case CatchSkinComponent catchComponent:
+                case CatchSkinComponentLookup catchComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (catchComponent.Component)
                     {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }

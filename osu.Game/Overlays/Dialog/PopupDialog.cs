@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public abstract class PopupDialog : VisibilityContainer
+    public abstract partial class PopupDialog : VisibilityContainer
     {
         public const float ENTER_DURATION = 500;
         public const float EXIT_DURATION = 200;
@@ -198,6 +196,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding(5),
                                 },
                             },
                         },
@@ -226,7 +225,12 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first button of the provided type.
         /// </summary>
-        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
+        public void PerformAction<T>() where T : PopupDialogButton
+        {
+            // Buttons are regularly added in BDL or LoadComplete, so let's schedule to ensure
+            // they are ready to be pressed.
+            Scheduler.AddOnce(() => Buttons.OfType<T>().FirstOrDefault()?.TriggerClick());
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

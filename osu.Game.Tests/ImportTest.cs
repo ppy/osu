@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Threading;
@@ -15,7 +13,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
-    public abstract class ImportTest
+    public abstract partial class ImportTest
     {
         protected virtual TestOsuGameBase LoadOsuIntoHost(GameHost host, bool withBeatmap = false)
         {
@@ -45,7 +43,7 @@ namespace osu.Game.Tests
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
-        public class TestOsuGameBase : OsuGameBase
+        public partial class TestOsuGameBase : OsuGameBase
         {
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 

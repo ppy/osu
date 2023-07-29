@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
-    public class ScrollingHitObjectContainer : HitObjectContainer
+    public partial class ScrollingHitObjectContainer : HitObjectContainer
     {
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
@@ -232,8 +232,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             double computedStartTime = computeDisplayStartTime(entry);
 
             // always load the hitobject before its first judgement offset
-            double judgementOffset = entry.HitObject.HitWindows?.WindowFor(Scoring.HitResult.Miss) ?? 0;
-            entry.LifetimeStart = Math.Min(entry.HitObject.StartTime - judgementOffset, computedStartTime);
+            entry.LifetimeStart = Math.Min(entry.HitObject.StartTime - entry.HitObject.MaximumJudgementOffset, computedStartTime);
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject, double? parentHitObjectStartTime = null)

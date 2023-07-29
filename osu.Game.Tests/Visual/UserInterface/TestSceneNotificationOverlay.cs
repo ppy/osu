@@ -21,7 +21,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
     {
         private NotificationOverlay notificationOverlay = null!;
 
@@ -51,6 +51,32 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"unread count: {count.NewValue}"; };
         });
+
+        [Test]
+        public void TestBasicFlow()
+        {
+            setState(Visibility.Visible);
+            AddStep(@"simple #1", sendHelloNotification);
+            AddStep(@"simple #2", sendAmazingNotification);
+            AddStep(@"progress #1", sendUploadProgress);
+            AddStep(@"progress #2", sendDownloadProgress);
+
+            checkProgressingCount(2);
+
+            setState(Visibility.Hidden);
+
+            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
+
+            waitForCompletion();
+
+            AddStep(@"progress #3", sendUploadProgress);
+
+            checkProgressingCount(1);
+
+            checkDisplayedCount(33);
+
+            waitForCompletion();
+        }
 
         [Test]
         public void TestForwardWithFlingRight()
@@ -412,32 +438,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBasicFlow()
-        {
-            setState(Visibility.Visible);
-            AddStep(@"simple #1", sendHelloNotification);
-            AddStep(@"simple #2", sendAmazingNotification);
-            AddStep(@"progress #1", sendUploadProgress);
-            AddStep(@"progress #2", sendDownloadProgress);
-
-            checkProgressingCount(2);
-
-            setState(Visibility.Hidden);
-
-            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
-
-            waitForCompletion();
-
-            AddStep(@"progress #3", sendUploadProgress);
-
-            checkProgressingCount(1);
-
-            checkDisplayedCount(33);
-
-            waitForCompletion();
-        }
-
-        [Test]
         public void TestImportantWhileClosed()
         {
             AddStep(@"simple #1", sendHelloNotification);
@@ -617,12 +617,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay.Post(new SimpleNotification { Text = @"Spam incoming!!" });
         }
 
-        private class BackgroundNotification : SimpleNotification
+        private partial class BackgroundNotification : SimpleNotification
         {
             public override bool IsImportant => false;
         }
 
-        private class BackgroundProgressNotification : ProgressNotification
+        private partial class BackgroundProgressNotification : ProgressNotification
         {
             public override bool IsImportant => false;
         }

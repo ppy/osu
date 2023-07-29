@@ -16,5 +16,7 @@ namespace osu.Game.Online.API.Requests
 
         [JsonProperty]
         public List<Message> Messages;
+
+        // TODO: Handle Silences here (will need to add to includes[] in the request).
     }
 }

@@ -31,7 +31,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : OnlineOverlay<BeatmapListingHeader>
+    public partial class BeatmapListingOverlay : OnlineOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -41,12 +41,10 @@ namespace osu.Game.Overlays
 
         private IBindable<APIUser> apiUser;
 
-        private Drawable currentContent;
         private Container panelTarget;
         private FillFlowContainer<BeatmapCard> foundContent;
-        private NotFoundDrawable notFoundContent;
-        private SupporterRequiredDrawable supporterRequiredContent;
-        private BeatmapListingFilterControl filterControl;
+
+        private BeatmapListingFilterControl filterControl => Header.FilterControl;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -63,12 +61,6 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    filterControl = new BeatmapListingFilterControl
-                    {
-                        TypingStarted = onTypingStarted,
-                        SearchStarted = onSearchStarted,
-                        SearchFinished = onSearchFinished,
-                    },
                     new Container
                     {
                         AutoSizeAxes = Axes.Y,
@@ -86,16 +78,15 @@ namespace osu.Game.Overlays
                                 RelativeSizeAxes = Axes.X,
                                 Masking = true,
                                 Padding = new MarginPadding { Horizontal = 20 },
-                                Children = new Drawable[]
-                                {
-                                    notFoundContent = new NotFoundDrawable(),
-                                    supporterRequiredContent = new SupporterRequiredDrawable(),
-                                }
                             }
                         },
                     },
                 }
             };
+
+            filterControl.TypingStarted = onTypingStarted;
+            filterControl.SearchStarted = onSearchStarted;
+            filterControl.SearchFinished = onSearchFinished;
         }
 
         protected override void LoadComplete()
@@ -107,7 +98,7 @@ namespace osu.Game.Overlays
             apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
-                    addContentToResultsArea(Drawable.Empty());
+                    replaceResultsAreaContent(Drawable.Empty());
             }));
         }
 
@@ -116,6 +107,18 @@ namespace osu.Game.Overlays
             filterControl.Search(query);
             Show();
             ScrollFlow.ScrollToStart();
+        }
+
+        public void ShowWithGenreFilter(SearchGenre genre)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterGenre(genre);
+        }
+
+        public void ShowWithLanguageFilter(SearchLanguage language)
+        {
+            ShowWithSearch(string.Empty);
+            filterControl.FilterLanguage(language);
         }
 
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
@@ -155,8 +158,8 @@ namespace osu.Game.Overlays
 
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
-                supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
-                addContentToResultsArea(supporterRequiredContent);
+                var supporterOnly = new SupporterRequiredDrawable(searchResult.SupporterOnlyFiltersUsed);
+                replaceResultsAreaContent(supporterOnly);
                 return;
             }
 
@@ -167,13 +170,13 @@ namespace osu.Game.Overlays
                 //No matches case
                 if (!newCards.Any())
                 {
-                    addContentToResultsArea(notFoundContent);
+                    replaceResultsAreaContent(new NotFoundDrawable());
                     return;
                 }
 
                 var content = createCardContainerFor(newCards);
 
-                panelLoadTask = LoadComponentAsync(foundContent = content, addContentToResultsArea, (cancellationToken = new CancellationTokenSource()).Token);
+                panelLoadTask = LoadComponentAsync(foundContent = content, replaceResultsAreaContent, (cancellationToken = new CancellationTokenSource()).Token);
             }
             else
             {
@@ -221,35 +224,15 @@ namespace osu.Game.Overlays
             return content;
         }
 
-        private void addContentToResultsArea(Drawable content)
+        private void replaceResultsAreaContent(Drawable content)
         {
             Loading.Hide();
             lastFetchDisplayedTime = Time.Current;
 
-            if (content == currentContent)
-                return;
-
-            var lastContent = currentContent;
-
-            if (lastContent != null)
-            {
-                lastContent.FadeOut();
-                if (!isPlaceholderContent(lastContent))
-                    lastContent.Expire();
-            }
-
-            if (!content.IsAlive)
-                panelTarget.Add(content);
+            panelTarget.Child = content;
 
             content.FadeInFromZero();
-            currentContent = content;
         }
-
-        /// <summary>
-        /// Whether <paramref name="drawable"/> is a static placeholder reused multiple times by this overlay.
-        /// </summary>
-        private bool isPlaceholderContent(Drawable drawable)
-            => drawable == notFoundContent || drawable == supporterRequiredContent;
 
         private void onCardSizeChanged()
         {
@@ -276,7 +259,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        public class NotFoundDrawable : CompositeDrawable
+        public partial class NotFoundDrawable : CompositeDrawable
         {
             public NotFoundDrawable()
             {
@@ -287,7 +270,7 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 AddInternal(new FillFlowContainer
                 {
@@ -320,19 +303,23 @@ namespace osu.Game.Overlays
 
         // TODO: localisation requires Text/LinkFlowContainer support for localising strings with links inside
         // (https://github.com/ppy/osu-framework/issues/4530)
-        public class SupporterRequiredDrawable : CompositeDrawable
+        public partial class SupporterRequiredDrawable : CompositeDrawable
         {
             private LinkFlowContainer supporterRequiredText;
 
-            public SupporterRequiredDrawable()
+            private readonly List<LocalisableString> filtersUsed;
+
+            public SupporterRequiredDrawable(List<LocalisableString> filtersUsed)
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 225;
                 Alpha = 0;
+
+                this.filtersUsed = filtersUsed;
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 AddInternal(new FillFlowContainer
                 {
@@ -360,14 +347,9 @@ namespace osu.Game.Overlays
                         },
                     }
                 });
-            }
-
-            public void UpdateText(List<LocalisableString> filters)
-            {
-                supporterRequiredText.Clear();
 
                 supporterRequiredText.AddText(
-                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString(),
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filtersUsed), "").ToString(),
                     t =>
                     {
                         t.Font = OsuFont.GetFont(size: 16);

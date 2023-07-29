@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
+    public abstract partial class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
         /// <summary>
         /// The number of items displayed per page.
@@ -35,20 +33,20 @@ namespace osu.Game.Overlays.Profile.Sections
         protected virtual int InitialItemsCount => 5;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         protected PaginationParameters? CurrentPage { get; private set; }
 
-        protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
+        protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; } = null!;
 
-        private APIRequest<List<TModel>> retrievalRequest;
-        private CancellationTokenSource loadCancellation;
+        private APIRequest<List<TModel>>? retrievalRequest;
+        private CancellationTokenSource? loadCancellation;
 
-        private ShowMoreButton moreButton;
-        private OsuSpriteText missing;
+        private ShowMoreButton moreButton = null!;
+        private OsuSpriteText missing = null!;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<APIUser> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+        protected PaginatedProfileSubsection(Bindable<UserProfileData?> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
             : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
@@ -94,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<APIUser> e)
+        private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -102,26 +100,29 @@ namespace osu.Game.Overlays.Profile.Sections
             CurrentPage = null;
             ItemsContainer.Clear();
 
-            if (e.NewValue != null)
+            if (e.NewValue?.User != null)
             {
                 showMore();
-                SetCount(GetCount(e.NewValue));
+                SetCount(GetCount(e.NewValue.User));
             }
         }
 
         private void showMore()
         {
+            if (User.Value == null)
+                return;
+
             loadCancellation = new CancellationTokenSource();
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(CurrentPage.Value);
-            retrievalRequest.Success += UpdateItems;
+            retrievalRequest = CreateRequest(User.Value, CurrentPage.Value);
+            retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
         }
 
-        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
+        protected virtual void UpdateItems(List<TModel> items, CancellationTokenSource cancellationTokenSource) => Schedule(() =>
         {
             OnItemsReceived(items);
 
@@ -136,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 return;
             }
 
-            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null).Cast<Drawable>(), drawables =>
             {
                 missing.Hide();
 
@@ -144,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.IsLoading = false;
 
                 ItemsContainer.AddRange(drawables);
-            }, loadCancellation.Token);
+            }, cancellationTokenSource.Token);
         });
 
         protected virtual int GetCount(APIUser user) => 0;
@@ -153,9 +154,9 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(PaginationParameters pagination);
+        protected abstract APIRequest<List<TModel>> CreateRequest(UserProfileData user, PaginationParameters pagination);
 
-        protected abstract Drawable CreateDrawableItem(TModel model);
+        protected abstract Drawable? CreateDrawableItem(TModel model);
 
         protected override void Dispose(bool isDisposing)
         {

@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
+    public partial class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
     {
         private readonly SkinnableDrawable skinnableExplosion;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
-            InternalChild = skinnableExplosion = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.HitExplosion), _ => new DefaultHitExplosion())
+            InternalChild = skinnableExplosion = new SkinnableDrawable(new CatchSkinComponentLookup(CatchSkinComponents.HitExplosion), _ => new DefaultHitExplosion())
             {
                 CentreComponent = false,
                 Anchor = Anchor.BottomCentre,

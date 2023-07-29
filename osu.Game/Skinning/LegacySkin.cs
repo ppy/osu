@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -104,7 +106,7 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
                 case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
+                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
@@ -136,6 +138,10 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
 
                 case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
@@ -183,6 +189,16 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
+
+                    if (existing.NoteBodyStyle != null)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(existing.NoteBodyStyle.Value));
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.Stretch));
+
+                    return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.RepeatBottom));
 
                 case LegacyManiaSkinConfigurationLookups.NoteImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
@@ -276,7 +292,7 @@ namespace osu.Game.Skinning
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         private IBindable<string>? getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
-            => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
+            => source.ImageLookups.TryGetValue(lookup, out string? image) ? new Bindable<string>(image) : null;
 
         private IBindable<TValue>? legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
             where TValue : notnull
@@ -297,7 +313,7 @@ namespace osu.Game.Skinning
         {
             try
             {
-                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString() ?? string.Empty, out string? val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
                     // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).
@@ -321,18 +337,22 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(component) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;
 
-            switch (component)
+            switch (lookup)
             {
-                case SkinnableTargetComponent target:
-                    switch (target.Target)
+                case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
+
+                    switch (containerLookup.Target)
                     {
-                        case SkinnableTarget.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
@@ -348,17 +368,27 @@ namespace osu.Game.Skinning
                                 {
                                     songProgress.Anchor = Anchor.TopRight;
                                     songProgress.Origin = Anchor.CentreRight;
-                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+
+                                    if (keyCounter != null)
+                                    {
+                                        const float padding = 10;
+
+                                        keyCounter.Anchor = Anchor.BottomRight;
+                                        keyCounter.Origin = Anchor.BottomRight;
+                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
+                                    }
                                 }
                             })
                             {
@@ -367,24 +397,24 @@ namespace osu.Game.Skinning
                                     new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
-                                    new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
+                                    new DefaultKeyCounterDisplay()
                                 }
                             };
-
-                            return skinnableTargetWrapper;
                     }
 
                     return null;
 
-                case GameplaySkinComponent<HitResult> resultComponent:
-                    // TODO: this should be inside the judgement pieces.
-                    Func<Drawable?> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
-                    if (createDrawable() != null)
+                    if (getJudgementAnimation(resultComponent.Component) != null)
                     {
+                        // TODO: this should be inside the judgement pieces.
+                        Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
+
                         var particle = getParticleTexture(resultComponent.Component);
 
                         if (particle != null)
@@ -394,9 +424,6 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
-
-                case SkinnableSprite.SpriteComponent sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
             }
 
             return null;
@@ -441,6 +468,13 @@ namespace osu.Game.Skinning
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
+            switch (componentName)
+            {
+                case "Menu/fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
             foreach (string name in getFallbackNames(componentName))
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)

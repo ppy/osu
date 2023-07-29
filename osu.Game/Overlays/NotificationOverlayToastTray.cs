@@ -22,11 +22,16 @@ namespace osu.Game.Overlays
     /// <summary>
     /// A tray which attaches to the left of <see cref="NotificationOverlay"/> to show temporary toasts.
     /// </summary>
-    public class NotificationOverlayToastTray : CompositeDrawable
+    public partial class NotificationOverlayToastTray : CompositeDrawable
     {
         public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => toastFlow.ReceivePositionalInputAt(screenSpacePos);
+
+        /// <summary>
+        /// All notifications currently being displayed by the toast tray.
+        /// </summary>
+        public IEnumerable<Notification> Notifications => toastFlow;
 
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 

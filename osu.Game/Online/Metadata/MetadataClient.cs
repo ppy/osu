@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Online.Metadata
 {
-    public abstract class MetadataClient : Component, IMetadataClient, IMetadataServer
+    public abstract partial class MetadataClient : Component, IMetadataClient, IMetadataServer
     {
         public abstract Task BeatmapSetsUpdated(BeatmapUpdates updates);
 

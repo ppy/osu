@@ -1,18 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetTabButton : TabItem<RulesetInfo>
+    public partial class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
         private readonly RulesetButton ruleset;
 
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = $"play some {rInstance.Description}";
+            ruleset.TooltipSub = ToolbarStrings.PlaySomeRuleset(rInstance.Description);
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 
@@ -37,7 +36,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void OnDeactivated() => ruleset.Active = false;
 
-        private class RulesetButton : ToolbarButton
+        private partial class RulesetButton : ToolbarButton
         {
             public bool Active
             {

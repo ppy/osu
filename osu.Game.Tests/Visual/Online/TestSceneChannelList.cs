@@ -20,7 +20,7 @@ using osu.Game.Overlays.Chat.Listing;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChannelList : OsuTestScene
+    public partial class TestSceneChannelList : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);

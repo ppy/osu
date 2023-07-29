@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class DefaultKiaiHitExplosion : CircularContainer
+    public partial class DefaultKiaiHitExplosion : CircularContainer
     {
         public override bool RemoveWhenNotAlive => true;
 

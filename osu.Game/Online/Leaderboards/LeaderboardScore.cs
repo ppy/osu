@@ -17,8 +17,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -37,7 +35,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public partial class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -66,17 +64,17 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private SongSelect songSelect { get; set; }
-
-        [Resolved]
-        private Storage storage { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
@@ -90,7 +88,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
 
@@ -310,7 +308,7 @@ namespace osu.Game.Online.Leaderboards
             base.OnHoverLost(e);
         }
 
-        private class ScoreComponentLabel : Container, IHasTooltip
+        private partial class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
             private readonly FillFlowContainer content;
@@ -372,7 +370,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class RankLabel : Container, IHasTooltip
+        private partial class RankLabel : Container, IHasTooltip
         {
             public RankLabel(int? rank)
             {
@@ -391,7 +389,7 @@ namespace osu.Game.Online.Leaderboards
             public LocalisableString TooltipText { get; }
         }
 
-        private class DateLabel : DrawableDate
+        private partial class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
                 : base(date)
@@ -427,7 +425,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
+                    items.Add(new OsuMenuItem(Localisation.CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 

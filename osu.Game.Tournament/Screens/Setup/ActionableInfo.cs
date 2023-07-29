@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,9 +11,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ActionableInfo : LabelledDrawable<Drawable>
+    internal partial class ActionableInfo : LabelledDrawable<Drawable>
     {
-        protected OsuButton Button;
+        public const float BUTTON_SIZE = 120;
+
+        public Action? Action;
+
+        protected FillFlowContainer FlowContainer = null!;
+
+        protected OsuButton Button = null!;
+
+        private TournamentSpriteText valueText = null!;
 
         public ActionableInfo()
             : base(true)
@@ -37,11 +43,6 @@ namespace osu.Game.Tournament.Screens.Setup
             set => valueText.Colour = value ? Color4.Red : Color4.White;
         }
 
-        public Action Action;
-
-        private TournamentSpriteText valueText;
-        protected FillFlowContainer FlowContainer;
-
         protected override Drawable CreateComponent() => new Container
         {
             AutoSizeAxes = Axes.Y,
@@ -61,9 +62,9 @@ namespace osu.Game.Tournament.Screens.Setup
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        Button = new TriangleButton
+                        Button = new RoundedButton
                         {
-                            Size = new Vector2(100, 40),
+                            Size = new Vector2(BUTTON_SIZE, 40),
                             Action = () => Action?.Invoke()
                         }
                     }

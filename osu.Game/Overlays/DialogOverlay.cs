@@ -16,7 +16,7 @@ using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
-    public class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
+    public partial class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
     {
         private readonly Container dialogContainer;
 
@@ -99,7 +99,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 

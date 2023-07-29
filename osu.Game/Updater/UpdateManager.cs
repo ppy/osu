@@ -17,7 +17,7 @@ namespace osu.Game.Updater
     /// <summary>
     /// An update manager which only shows notifications after an update completes.
     /// </summary>
-    public class UpdateManager : CompositeDrawable
+    public partial class UpdateManager : CompositeDrawable
     {
         /// <summary>
         /// Whether this UpdateManager should be or is capable of checking for updates.
@@ -85,7 +85,7 @@ namespace osu.Game.Updater
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
 
-        private class UpdateCompleteNotification : SimpleNotification
+        private partial class UpdateCompleteNotification : SimpleNotification
         {
             private readonly string version;
 
@@ -110,7 +110,7 @@ namespace osu.Game.Updater
             }
         }
 
-        public class UpdateApplicationCompleteNotification : ProgressCompletionNotification
+        public partial class UpdateApplicationCompleteNotification : ProgressCompletionNotification
         {
             public UpdateApplicationCompleteNotification()
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Updater
             }
         }
 
-        public class UpdateProgressNotification : ProgressNotification
+        public partial class UpdateProgressNotification : ProgressNotification
         {
             protected override Notification CreateCompletionNotification() => new UpdateApplicationCompleteNotification
             {
@@ -134,7 +134,7 @@ namespace osu.Game.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
+                        Icon = FontAwesome.Solid.Download,
                         Size = new Vector2(34),
                         Colour = OsuColour.Gray(0.2f),
                         Depth = float.MaxValue,

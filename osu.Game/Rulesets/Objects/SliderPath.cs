@@ -1,11 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -41,6 +40,7 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
+        private readonly List<int> segmentEnds = new List<int>();
         private readonly Cached pathCache = new Cached();
 
         private double calculatedLength;
@@ -57,12 +57,16 @@ namespace osu.Game.Rulesets.Objects
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (var c in args.NewItems.Cast<PathControlPoint>())
                             c.Changed += invalidate;
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (var c in args.OldItems.Cast<PathControlPoint>())
                             c.Changed -= invalidate;
                         break;
@@ -191,6 +195,16 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
+        /// <summary>
+        /// Returns the progress values at which segments of the path end.
+        /// </summary>
+        public IEnumerable<double> GetSegmentEnds()
+        {
+            ensureValid();
+
+            return segmentEnds.Select(i => cumulativeLength[i] / calculatedLength);
+        }
+
         private void invalidate()
         {
             pathCache.Invalidate();
@@ -211,6 +225,7 @@ namespace osu.Game.Rulesets.Objects
         private void calculatePath()
         {
             calculatedPath.Clear();
+            segmentEnds.Clear();
 
             if (ControlPoints.Count == 0)
                 return;
@@ -235,6 +250,9 @@ namespace osu.Game.Rulesets.Objects
                     if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                         calculatedPath.Add(t);
                 }
+
+                // Remember the index of the segment end
+                segmentEnds.Add(calculatedPath.Count - 1);
 
                 // Start the new segment at the current vertex
                 start = i;
@@ -301,6 +319,10 @@ namespace osu.Game.Rulesets.Objects
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
+
+                        // Shorten the last segment to the expected distance
+                        if (segmentEnds.Count > 0)
+                            segmentEnds[^1]--;
                     }
                 }
 

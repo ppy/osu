@@ -6,21 +6,27 @@
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets
 {
-    public abstract class RulesetSelector : TabControl<RulesetInfo>
+    public abstract partial class RulesetSelector : TabControl<RulesetInfo>
     {
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }
 
         protected override Dropdown<RulesetInfo> CreateDropdown() => null;
 
+        protected virtual bool LegacyOnly => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             foreach (var ruleset in Rulesets.AvailableRulesets)
             {
+                if (!ruleset.IsLegacyRuleset() && LegacyOnly)
+                    continue;
+
                 try
                 {
                     AddItem(ruleset);

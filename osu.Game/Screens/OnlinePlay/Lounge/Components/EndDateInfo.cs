@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -11,7 +9,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class EndDateInfo : OnlinePlayComposite
+    public partial class EndDateInfo : OnlinePlayComposite
     {
         public EndDateInfo()
         {
@@ -30,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             };
         }
 
-        private class EndDatePart : DrawableDate
+        private partial class EndDatePart : DrawableDate
         {
             public readonly IBindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 

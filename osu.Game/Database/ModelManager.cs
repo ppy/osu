@@ -18,6 +18,11 @@ namespace osu.Game.Database
     public class ModelManager<TModel> : IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public virtual bool PauseImports { get; set; }
+
         protected RealmAccess Realm { get; }
 
         private readonly RealmFileStore realmFileStore;
@@ -29,13 +34,13 @@ namespace osu.Game.Database
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
-            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm));
+            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm!));
 
         public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents) =>
-            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm));
+            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm!));
 
         public void AddFile(TModel item, Stream contents, string filename) =>
-            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm));
+            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm!));
 
         private void performFileOperation(TModel item, Action<TModel> operation)
         {
@@ -173,13 +178,14 @@ namespace osu.Game.Database
             // (ie. if an async import finished very recently).
             return Realm.Write(realm =>
             {
-                if (!item.IsManaged)
-                    item = realm.Find<TModel>(item.ID);
+                TModel? processableItem = item;
+                if (!processableItem.IsManaged)
+                    processableItem = realm.Find<TModel>(item.ID);
 
-                if (item?.DeletePending != false)
+                if (processableItem?.DeletePending != false)
                     return false;
 
-                item.DeletePending = true;
+                processableItem.DeletePending = true;
                 return true;
             });
         }
@@ -190,13 +196,14 @@ namespace osu.Game.Database
             // (ie. if an async import finished very recently).
             Realm.Write(realm =>
             {
-                if (!item.IsManaged)
-                    item = realm.Find<TModel>(item.ID);
+                TModel? processableItem = item;
+                if (!processableItem.IsManaged)
+                    processableItem = realm.Find<TModel>(item.ID);
 
-                if (item?.DeletePending != true)
+                if (processableItem?.DeletePending != true)
                     return;
 
-                item.DeletePending = false;
+                processableItem.DeletePending = false;
             });
         }
 

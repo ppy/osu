@@ -12,6 +12,7 @@ using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -93,9 +94,11 @@ namespace osu.Game.Tests.Resources
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
+                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
                 Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
+
+            Logger.Log($"🛠️ Generating beatmap set \"{metadata}\" for test consumption.");
 
             var beatmapSet = new BeatmapSetInfo
             {
@@ -173,9 +176,10 @@ namespace osu.Game.Tests.Resources
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             },
             BeatmapInfo = beatmap,
+            BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
-            TotalScore = 2845370,
+            TotalScore = 284537,
             Accuracy = 0.95,
             MaxCombo = 999,
             Position = 1,

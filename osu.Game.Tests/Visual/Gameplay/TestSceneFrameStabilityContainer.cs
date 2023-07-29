@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFrameStabilityContainer : OsuTestScene
+    public partial class TestSceneFrameStabilityContainer : OsuTestScene
     {
         private readonly ManualClock manualClock;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void checkRate(double rate) =>
             AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate, () => Is.EqualTo(rate));
 
-        public class ClockConsumingChild : CompositeDrawable
+        public partial class ClockConsumingChild : CompositeDrawable
         {
             private readonly OsuSpriteText text;
             private readonly OsuSpriteText text2;

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,7 +17,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorBlueprintContainer : BlueprintContainer<HitObject>
+    public partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
     {
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -128,6 +129,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             EditorClock?.SeekSmoothlyTo(ClickedBlueprint.Item.StartTime);
             return true;
         }
+
+        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
+            base.ApplySelectionOrder(blueprints)
+                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 

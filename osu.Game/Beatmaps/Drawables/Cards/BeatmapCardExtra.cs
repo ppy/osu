@@ -17,7 +17,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardExtra : BeatmapCard
+    public partial class BeatmapCardExtra : BeatmapCard
     {
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
@@ -106,12 +106,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             {
                                                 new Drawable[]
                                                 {
-                                                    new OsuSpriteText
+                                                    new TruncatingSpriteText
                                                     {
                                                         Text = new RomanisableString(BeatmapSet.TitleUnicode, BeatmapSet.Title),
                                                         Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
                                                     },
                                                     titleBadgeArea = new FillFlowContainer
                                                     {
@@ -140,21 +139,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             {
                                                 new[]
                                                 {
-                                                    new OsuSpriteText
+                                                    new TruncatingSpriteText
                                                     {
                                                         Text = createArtistText(),
                                                         Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
                                                     },
                                                     Empty()
                                                 },
                                             }
                                         },
-                                        new OsuSpriteText
+                                        new TruncatingSpriteText
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Truncate = true,
                                             Text = BeatmapSet.Source,
                                             Shadow = false,
                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),

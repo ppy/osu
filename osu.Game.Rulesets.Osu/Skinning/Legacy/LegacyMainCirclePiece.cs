@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -18,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable
+    public partial class LegacyMainCirclePiece : CompositeDrawable
     {
         public override bool RemoveCompletedTransforms => false;
 
@@ -29,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly bool hasNumber;
 
-        protected Drawable CircleSprite = null!;
-        protected Drawable OverlaySprite = null!;
+        protected LegacyKiaiFlashingDrawable CircleSprite = null!;
+        protected LegacyKiaiFlashingDrawable OverlaySprite = null!;
 
         protected Container OverlayLayer { get; private set; } = null!;
 
@@ -65,7 +66,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the conditional above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
-
             InternalChildren = new[]
             {
                 CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (hasNumber)
             {
-                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponentLookup(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -114,7 +114,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
+            accentColour.BindValueChanged(colour =>
+            {
+                Color4 objectColour = colour.NewValue;
+                int add = Math.Max(25, 300 - (int)(objectColour.R * 255) - (int)(objectColour.G * 255) - (int)(objectColour.B * 255));
+
+                var kiaiTintColour = new Color4(
+                    (byte)Math.Min((byte)(objectColour.R * 255) + add, 255),
+                    (byte)Math.Min((byte)(objectColour.G * 255) + add, 255),
+                    (byte)Math.Min((byte)(objectColour.B * 255) + add, 255),
+                    255);
+
+                CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue);
+                OverlaySprite.KiaiGlowColour = CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
+            }, true);
+
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 

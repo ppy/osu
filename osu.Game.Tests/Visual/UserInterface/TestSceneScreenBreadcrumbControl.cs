@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,13 +9,14 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneScreenBreadcrumbControl : OsuTestScene
+    public partial class TestSceneScreenBreadcrumbControl : OsuTestScene
     {
         private readonly ScreenBreadcrumbControl breadcrumbs;
         private readonly OsuScreenStack screenStack;
@@ -79,7 +78,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void pushNext() => AddStep(@"push next screen", () => ((TestScreen)screenStack.CurrentScreen).PushNext());
         private void waitForCurrent() => AddUntilStep("current screen", () => screenStack.CurrentScreen.IsCurrentScreen());
 
-        private abstract class TestScreen : OsuScreen
+        private abstract partial class TestScreen : OsuScreen
         {
             protected abstract string NextTitle { get; }
             protected abstract TestScreen CreateNextScreen();
@@ -109,7 +108,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Origin = Anchor.TopCentre,
                             Text = Title,
                         },
-                        new TriangleButton
+                        new RoundedButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -122,14 +121,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestScreenOne : TestScreen
+        private partial class TestScreenOne : TestScreen
         {
             public override string Title => @"Screen One";
             protected override string NextTitle => @"Two";
             protected override TestScreen CreateNextScreen() => new TestScreenTwo();
         }
 
-        private class TestScreenTwo : TestScreen
+        private partial class TestScreenTwo : TestScreen
         {
             public override string Title => @"Screen Two";
             protected override string NextTitle => @"One";

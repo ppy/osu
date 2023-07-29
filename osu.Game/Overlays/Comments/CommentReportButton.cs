@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -18,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentReportButton : CompositeDrawable, IHasPopover
+    public partial class CommentReportButton : CompositeDrawable, IHasPopover
     {
         private readonly Comment comment;
 
@@ -53,8 +54,13 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            link.AddLink(UsersStrings.ReportButtonText, this.ShowPopover);
+            link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
         }
+
+        public Popover GetPopover() => new ReportCommentPopover(comment)
+        {
+            Action = report
+        };
 
         private void report(CommentReportReason reason, string comments)
         {
@@ -82,10 +88,5 @@ namespace osu.Game.Overlays.Comments
 
             api.Queue(request);
         }
-
-        public Popover GetPopover() => new ReportCommentPopover(comment)
-        {
-            Action = report
-        };
     }
 }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
@@ -16,7 +14,7 @@ using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneCommentRepliesButton : OsuTestScene
+    public partial class TestSceneCommentRepliesButton : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -54,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Icon facing downwards", () => button.Icon.Scale.Y == 1);
         }
 
-        private class TestButton : CommentRepliesButton
+        private partial class TestButton : CommentRepliesButton
         {
             public SpriteIcon Icon => this.ChildrenOfType<SpriteIcon>().First();
 

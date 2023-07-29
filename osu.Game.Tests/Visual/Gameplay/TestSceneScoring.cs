@@ -17,18 +17,19 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneScoring : OsuTestScene
+    public partial class TestSceneScoring : OsuTestScene
     {
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
@@ -124,8 +125,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", Color4.YellowGreen, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Standardised } });
-            runForProcessor("lazer-classic", Color4.MediumPurple, new ScoreProcessor(new OsuRuleset()) { Mode = { Value = ScoringMode.Classic } });
+            runForProcessor("lazer-standardised", Color4.YellowGreen, new OsuScoreProcessor(), ScoringMode.Standardised);
+            runForProcessor("lazer-classic", Color4.MediumPurple, new OsuScoreProcessor(), ScoringMode.Classic);
 
             runScoreV1();
             runScoreV2();
@@ -218,7 +219,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 });
         }
 
-        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor)
+        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -232,10 +233,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
                 () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
-                () => (int)processor.TotalScore.Value);
+                () => processor.GetDisplayScore(mode));
         }
 
-        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyNonPerfect, Action applyMiss, Func<int> getTotalScore)
+        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyNonPerfect, Action applyMiss, Func<long> getTotalScore)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -279,7 +280,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
     }
 
-    public class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
+    public partial class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
         public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
@@ -439,7 +440,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public IEnumerable<LineGraph> TooltipContent => Content.OfType<LineGraph>();
 
-        public class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
+        public partial class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
         {
             private readonly GraphContainer graphContainer;
 

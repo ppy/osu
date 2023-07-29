@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
+    public partial class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
     {
         private Color4 accentColour;
 
@@ -60,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                 tabDropdownHeader.AccentColour = accentColour;
         }
 
-        private class OsuTabDropdownMenu : OsuDropdownMenu
+        private partial class OsuTabDropdownMenu : OsuDropdownMenu
         {
             public OsuTabDropdownMenu()
             {
@@ -73,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item);
 
-            private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
+            private partial class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
             {
                 public DrawableOsuTabDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -83,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
+        protected partial class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
         {
             private Color4 accentColour;
 

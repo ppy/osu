@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class HomePanel : Container
+    public partial class HomePanel : Container
     {
         protected override Container<Drawable> Content => content;
 

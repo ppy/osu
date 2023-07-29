@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
+    public partial class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -57,6 +57,20 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertLength(200);
+            assertControlPointCount(2);
+            assertControlPointType(0, PathType.Linear);
+        }
+
+        [Test]
+        public void TestPlaceWithMouseMovementOutsidePlayfield()
+        {
+            addMovementStep(new Vector2(200));
+            addClickStep(MouseButton.Left);
+
+            AddStep("move mouse out of screen", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + Vector2.One));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
             assertControlPointCount(2);
             assertControlPointType(0, PathType.Linear);
         }

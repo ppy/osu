@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneParticleSpewer : OsuTestScene
+    public partial class TestSceneParticleSpewer : OsuTestScene
     {
         private TestParticleSpewer spewer;
 
@@ -69,13 +69,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 spewer.Clock = new FramedClock(testClock);
             });
             AddStep("start spewer", () => spewer.Active.Value = true);
-            AddAssert("spawned first particle", () => spewer.TotalCreatedParticles == 1);
+            AddAssert("spawned first particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(1));
 
             AddStep("move clock forward", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * 3);
-            AddAssert("spawned second particle", () => spewer.TotalCreatedParticles == 2);
+            AddAssert("spawned second particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(2));
 
             AddStep("move clock backwards", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * -1);
-            AddAssert("spawned third particle", () => spewer.TotalCreatedParticles == 3);
+            AddAssert("spawned third particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(3));
         }
 
         private TestParticleSpewer createSpewer() =>
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Size = new Vector2(0.5f),
             };
 
-        private class TestParticleSpewer : ParticleSpewer
+        private partial class TestParticleSpewer : ParticleSpewer
         {
             public const int MAX_DURATION = 1500;
             private const int rate = 250;

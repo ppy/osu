@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     /// <summary>
     /// Displays contents in a "pill".
     /// </summary>
-    public class PillContainer : Container
+    public partial class PillContainer : Container
     {
         private const float padding = 8;
 

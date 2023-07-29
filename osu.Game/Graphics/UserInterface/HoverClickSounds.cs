@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// Adds hover and click sounds to a drawable.
     /// Does not draw anything.
     /// </summary>
-    public class HoverClickSounds : HoverSounds
+    public partial class HoverClickSounds : HoverSounds
     {
         public Bindable<bool> Enabled = new Bindable<bool>(true);
 
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
+            if (buttons.Contains(e.Button))
             {
                 var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
 
@@ -56,6 +56,14 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             return base.OnClick(e);
+        }
+
+        public override void PlayHoverSample()
+        {
+            if (!Enabled.Value)
+                return;
+
+            base.PlayHoverSample();
         }
 
         [BackgroundDependencyLoader]

@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
         public const double ANIM_DURATION = 150;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Origin = Anchor.Centre;
 
-            AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
+            AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,

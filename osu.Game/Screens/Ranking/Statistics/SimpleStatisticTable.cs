@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 {
     /// <summary>
     /// Represents a table with simple statistics (ones that only need textual display).
-    /// Richer visualisations should be done with <see cref="StatisticRow"/>s and <see cref="StatisticItem"/>s.
+    /// Richer visualisations should be done with <see cref="StatisticItem"/>s.
     /// </summary>
-    public class SimpleStatisticTable : CompositeDrawable
+    public partial class SimpleStatisticTable : CompositeDrawable
     {
         private readonly SimpleStatisticItem[] items;
         private readonly int columnCount;
@@ -98,12 +98,11 @@ namespace osu.Game.Screens.Ranking.Statistics
             Direction = FillDirection.Vertical
         };
 
-        private class Spacer : CompositeDrawable
+        public partial class Spacer : CompositeDrawable
         {
             public Spacer()
             {
                 RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Vertical = 4 };
 
                 InternalChild = new CircularContainer
                 {

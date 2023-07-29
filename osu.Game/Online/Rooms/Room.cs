@@ -16,7 +16,7 @@ using osu.Game.Online.Rooms.RoomStatuses;
 namespace osu.Game.Online.Rooms
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class Room
+    public partial class Room : IDependencyInjectionCandidate
     {
         [Cached]
         [JsonProperty("id")]

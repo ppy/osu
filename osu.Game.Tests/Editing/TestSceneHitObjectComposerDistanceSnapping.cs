@@ -14,13 +14,14 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing
 {
     [HeadlessTest]
-    public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
+    public partial class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
         private TestHitObjectComposer composer = null!;
 
@@ -74,12 +75,9 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSpeedMultiplierDoesNotChangeDistanceSnap(float multiplier)
         {
-            assertSnapDistance(100, new HitObject
+            assertSnapDistance(100, new Slider
             {
-                DifficultyControlPoint = new DifficultyControlPoint
-                {
-                    SliderVelocity = multiplier
-                }
+                SliderVelocity = multiplier
             }, false);
         }
 
@@ -87,12 +85,9 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSpeedMultiplierDoesChangeDistanceSnap(float multiplier)
         {
-            assertSnapDistance(100 * multiplier, new HitObject
+            assertSnapDistance(100 * multiplier, new Slider
             {
-                DifficultyControlPoint = new DifficultyControlPoint
-                {
-                    SliderVelocity = multiplier
-                }
+                SliderVelocity = multiplier
             }, true);
         }
 
@@ -114,12 +109,9 @@ namespace osu.Game.Tests.Editing
             const float base_distance = 100;
             const float slider_velocity = 1.2f;
 
-            var referenceObject = new HitObject
+            var referenceObject = new Slider
             {
-                DifficultyControlPoint = new DifficultyControlPoint
-                {
-                    SliderVelocity = slider_velocity
-                }
+                SliderVelocity = slider_velocity
             };
 
             assertSnapDistance(base_distance * slider_velocity, referenceObject, true);
@@ -251,7 +243,7 @@ namespace osu.Game.Tests.Editing
         private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
             => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
-        private class TestHitObjectComposer : OsuHitObjectComposer
+        private partial class TestHitObjectComposer : OsuHitObjectComposer
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
 

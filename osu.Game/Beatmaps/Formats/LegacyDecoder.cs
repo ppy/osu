@@ -130,18 +130,22 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
-            string[] split = line.Split(separator, 2);
+            string[] split = line.Split(separator, 2, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
 
             return new KeyValuePair<string, string>
             (
-                split[0].Trim(),
-                split.Length > 1 ? split[1].Trim() : string.Empty
+                split[0],
+                split.Length > 1 ? split[1] : string.Empty
             );
         }
 
-        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
+        protected string CleanFilename(string path) => path
+                                                       // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
+                                                       .Replace(@"\\", @"\")
+                                                       .Trim('"')
+                                                       .ToStandardisedPath();
 
         public enum Section
         {
@@ -222,12 +226,16 @@ namespace osu.Game.Beatmaps.Formats
 
             public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(hitSampleInfo);
+                if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
+                {
+                    return legacy.With(
+                        newCustomSampleBank: legacy.CustomSampleBank > 0 ? legacy.CustomSampleBank : CustomSampleBank,
+                        newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume,
+                        newBank: legacy.BankSpecified ? legacy.Bank : SampleBank
+                    );
+                }
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
-                    return legacy.With(newCustomSampleBank: CustomSampleBank);
-
-                return baseInfo;
+                return base.ApplyTo(hitSampleInfo);
             }
 
             public override bool IsRedundant(ControlPoint? existing)
