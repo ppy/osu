@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play.Break
 
         private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            string newText = prefix + Format(e.NewValue);
+            LocalisableString newText = LocalisableString.Interpolate($"{prefix}{Format(e.NewValue)}");
 
             if (valueText.Text == newText)
                 return;
