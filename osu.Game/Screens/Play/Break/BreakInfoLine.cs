@@ -47,17 +47,7 @@ namespace osu.Game.Screens.Play.Break
                 }
             };
 
-            Current.ValueChanged += currentValueChanged;
-        }
-
-        private void currentValueChanged(ValueChangedEvent<T> e)
-        {
-            LocalisableString newText = Format(e.NewValue);
-
-            if (valueText.Text == newText)
-                return;
-
-            valueText.Text = newText;
+            Current.ValueChanged += text => valueText.Text = Format(text.NewValue);
         }
 
         protected virtual LocalisableString Format(T count)
