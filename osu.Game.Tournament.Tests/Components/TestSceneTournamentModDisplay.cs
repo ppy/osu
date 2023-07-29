@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap beatmap)
         {
-            var ruleset = rulesets.GetRuleset(Ladder.Ruleset.Value.OnlineID);
+            var ruleset = rulesets.GetRuleset(Ladder.Ruleset.Value?.OnlineID ?? -1);
 
             if (ruleset == null)
                 return;
