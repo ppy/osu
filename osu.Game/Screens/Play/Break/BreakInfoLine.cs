@@ -24,12 +24,8 @@ namespace osu.Game.Screens.Play.Break
         private readonly OsuSpriteText text;
         private readonly OsuSpriteText valueText;
 
-        private readonly string prefix;
-
-        public BreakInfoLine(LocalisableString name, string prefix = @"")
+        public BreakInfoLine(LocalisableString name)
         {
-            this.prefix = prefix;
-
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
@@ -45,7 +41,7 @@ namespace osu.Game.Screens.Play.Break
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
-                    Text = prefix + @"-",
+                    Text = @"-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                     Margin = new MarginPadding { Left = margin }
                 }
@@ -56,7 +52,7 @@ namespace osu.Game.Screens.Play.Break
 
         private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            LocalisableString newText = LocalisableString.Interpolate($"{prefix}{Format(e.NewValue)}");
+            LocalisableString newText = Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
@@ -82,8 +78,8 @@ namespace osu.Game.Screens.Play.Break
 
     public partial class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
-            : base(name, prefix)
+        public PercentageBreakInfoLine(LocalisableString name)
+            : base(name)
         {
         }
 
