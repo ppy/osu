@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Components
     {
         public readonly TournamentBeatmap? Beatmap;
 
-        private readonly string? mod;
+        private readonly string mod;
 
         public const float HEIGHT = 50;
 
