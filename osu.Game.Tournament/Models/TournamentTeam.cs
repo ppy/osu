@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Tournament.Models
 {
