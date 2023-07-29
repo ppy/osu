@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
         private Storage storage = null!;
 
-        public ITeamList? TeamList;
+        public ITeamList TeamList = null!;
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)
@@ -48,7 +48,8 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             RelativeSizeAxes = Axes.Both;
 
-            TeamList ??= new StorageBackedTeamList(storage);
+            if (TeamList.IsNull())
+                TeamList = new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
@@ -223,7 +224,7 @@ namespace osu.Game.Tournament.Screens.Drawings
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (TournamentTeam t in TeamList.AsNonNull().Teams)
+            foreach (TournamentTeam t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName.Value))
                     continue;
