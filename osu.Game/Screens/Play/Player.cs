@@ -71,8 +71,6 @@ namespace osu.Game.Screens.Play
         // We are managing our own adjustments (see OnEntering/OnExiting).
         public override bool? ApplyModTrackAdjustments => false;
 
-        public override bool? AllowGlobalTrackControl => false;
-
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
