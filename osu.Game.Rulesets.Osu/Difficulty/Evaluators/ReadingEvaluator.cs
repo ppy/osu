@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 80) / 15);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -48,10 +48,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (hidden)
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = 800 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 1000 / pastObjectDifficultyInfluence;
 
-                hiddenDifficulty += Math.Pow(7 * timeSpentInvisible / timeDifficultyFactor, 1) +
-                                    2 * currVelocity;
+                double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 3, 1, 10);
+
+                hiddenDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor, 1) +
+                                    visibleObjectFactor * 4 * currVelocity;
             }
 
             double difficulty = hiddenDifficulty + noteDensityDifficulty;
@@ -75,6 +77,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 yield return hitObject;
             }
+        }
+
+        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
+        {
+            List<OsuDifficultyHitObject> objects = new List<OsuDifficultyHitObject>();
+
+            for (int i = 0; i < current.Count; i++)
+            {
+                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Next(i);
+
+                if (hitObject.IsNull() ||
+                    (hitObject.StartTime - current.StartTime) > reading_window_size ||
+                    current.StartTime < hitObject.StartTime - hitObject.Preempt)
+                    break;
+
+                objects.Add(hitObject);
+            }
+
+            return objects;
         }
 
         private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
