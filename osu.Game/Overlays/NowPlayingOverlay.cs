@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -39,33 +38,33 @@ namespace osu.Game.Overlays
         private const float bottom_black_area_height = 55;
         private const float margin = 10;
 
-        private Drawable background;
-        private ProgressBar progressBar;
+        private Drawable background = null!;
+        private ProgressBar progressBar = null!;
 
-        private IconButton prevButton;
-        private IconButton playButton;
-        private IconButton nextButton;
-        private IconButton playlistButton;
+        private IconButton prevButton = null!;
+        private IconButton playButton = null!;
+        private IconButton nextButton = null!;
+        private IconButton playlistButton = null!;
 
-        private SpriteText title, artist;
+        private SpriteText title = null!, artist = null!;
 
-        private PlaylistOverlay playlist;
+        private PlaylistOverlay? playlist;
 
-        private Container dragContainer;
-        private Container playerContainer;
-        private Container playlistContainer;
+        private Container dragContainer = null!;
+        private Container playerContainer = null!;
+        private Container playlistContainer = null!;
 
         protected override string PopInSampleName => "UI/now-playing-pop-in";
         protected override string PopOutSampleName => "UI/now-playing-pop-out";
 
         [Resolved]
-        private MusicController musicController { get; set; }
+        private MusicController musicController { get; set; } = null!;
 
         [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; }
+        private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public NowPlayingOverlay()
         {
@@ -285,7 +284,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private Action pendingBeatmapSwitch;
+        private Action? pendingBeatmapSwitch;
 
         private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
@@ -338,7 +337,7 @@ namespace osu.Game.Overlays
         {
             base.Dispose(isDisposing);
 
-            if (musicController != null)
+            if (musicController.IsNotNull())
                 musicController.TrackChanged -= trackChanged;
         }
 
@@ -371,7 +370,7 @@ namespace osu.Game.Overlays
             private readonly Sprite sprite;
             private readonly WorkingBeatmap beatmap;
 
-            public Background(WorkingBeatmap beatmap = null)
+            public Background(WorkingBeatmap beatmap)
                 : base(cachedFrameBuffer: true)
             {
                 this.beatmap = beatmap;
@@ -401,7 +400,7 @@ namespace osu.Game.Overlays
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textures)
             {
-                sprite.Texture = beatmap?.GetBackground() ?? textures.Get(@"Backgrounds/bg4");
+                sprite.Texture = beatmap.GetBackground() ?? textures.Get(@"Backgrounds/bg4");
             }
         }
 
