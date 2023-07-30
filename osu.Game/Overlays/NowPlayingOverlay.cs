@@ -67,7 +67,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private Bindable<bool> allowTrackControl;
+        private Bindable<bool> allowTrackControl = null!;
 
         public NowPlayingOverlay()
         {
