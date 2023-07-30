@@ -37,6 +37,8 @@ namespace osu.Game.Tournament.Screens.MapPool
         private OsuButton buttonRedPick;
         private OsuButton buttonBluePick;
 
+        private ScheduledDelegate scheduledScreenChange;
+
         [BackgroundDependencyLoader]
         private void load(MatchIPCInfo ipc)
         {
@@ -163,11 +165,11 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (map != null)
             {
-                if (e.Button == MouseButton.Left && map.Beatmap.OnlineID > 0)
+                if (e.Button == MouseButton.Left && map.Beatmap?.OnlineID > 0)
                     addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineID);
+                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
 
                     if (existing != null)
                     {
@@ -188,14 +190,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             setNextMode();
         }
 
-        private ScheduledDelegate scheduledChange;
-
         private void addForBeatmap(int beatmapId)
         {
             if (CurrentMatch.Value == null)
                 return;
 
-            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.Beatmap.OnlineID != beatmapId))
+            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.Beatmap?.OnlineID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
@@ -216,10 +216,16 @@ namespace osu.Game.Tournament.Screens.MapPool
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
                 {
-                    scheduledChange?.Cancel();
-                    scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+                    scheduledScreenChange?.Cancel();
+                    scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
                 }
             }
+        }
+
+        public override void Hide()
+        {
+            scheduledScreenChange?.Cancel();
+            base.Hide();
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)

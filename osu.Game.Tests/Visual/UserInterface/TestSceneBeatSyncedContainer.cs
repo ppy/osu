@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
@@ -283,8 +282,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (ReferenceEquals(timingPoints[^1], current))
                 {
-                    Debug.Assert(BeatSyncSource.Clock != null);
-
                     return (int)Math.Ceiling((BeatSyncSource.Clock.CurrentTime - current.Time) / current.BeatLength);
                 }
 
@@ -294,8 +291,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override void Update()
             {
                 base.Update();
-
-                Debug.Assert(BeatSyncSource.Clock != null);
 
                 timeUntilNextBeat.Value = TimeUntilNextBeat;
                 timeSinceLastBeat.Value = TimeSinceLastBeat;

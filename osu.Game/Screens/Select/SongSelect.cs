@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        public override bool? AllowTrackAdjustments => true;
+        public override bool? ApplyModTrackAdjustments => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
