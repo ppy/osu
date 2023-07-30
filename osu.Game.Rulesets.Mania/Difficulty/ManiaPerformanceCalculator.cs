@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
         private const double tail_multiplier = 1.5; // Lazer LN tails have 1.5x the hit window of a Note or an LN head.
+        private const double tail_deviation_multiplier = 1.8; // Empirical testing shows that players get ~1.8x the deviation on tails.
 
         private int countPerfect;
         private int countGreat;
@@ -104,14 +105,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double logNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
             double logHoldCount = Math.Log(attributes.HoldNoteCount);
 
+            double noteHeadPortion = (double)(attributes.NoteCount + attributes.HoldNoteCount) / (attributes.NoteCount + attributes.HoldNoteCount * 2);
+            double tailPortion = (double)attributes.HoldNoteCount / (attributes.NoteCount + attributes.HoldNoteCount * 2);
+
             double likelihoodGradient(double d)
             {
                 if (d <= 0)
                     return 0;
 
-                JudgementProbs pNotes = pNote(d);
+                // Since tails have a higher deviation, find the deviation values for notes/heads and tails that average out to the final deviation value.
+                double dNote = d / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
+                double dTail = dNote * tail_deviation_multiplier;
+
+                JudgementProbs pNotes = pNote(dNote);
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
-                JudgementProbs pHolds = isLegacyScore ? pHold(d) : pNote(d, tail_multiplier);
+                JudgementProbs pHolds = isLegacyScore ? pHold(dNote, dTail) : pNote(dTail, tail_multiplier);
 
                 return -totalProb(pNotes, pHolds, logNoteCount, logHoldCount);
             }
@@ -213,31 +221,31 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         // Probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
-        private JudgementProbs pHold(double d)
+        private JudgementProbs pHold(double dHead, double dTail)
         {
             JudgementProbs probabilities = new JudgementProbs();
 
             // Since we're using complementary probabilities for precision, multiplying the head and tail probabilities takes the form P(A∩B)' = P(A'∪B') = P(A') + P(B') - P(A'∩B').
             double combinedProb(double p1, double p2) => logDiff(logSum(p1, p2), p1 + p2);
 
-            double logPcMaxHead = logPcNote(hitWindows[0] * 1.2, d);
-            double logPcMaxTail = logPcHoldTail(hitWindows[0] * 2.4, d);
+            double logPcMaxHead = logPcNote(hitWindows[0] * 1.2, dHead);
+            double logPcMaxTail = logPcHoldTail(hitWindows[0] * 2.4, dTail);
             probabilities.PMax = logDiff(0, combinedProb(logPcMaxHead, logPcMaxTail));
 
-            double logPc300Head = logPcNote(hitWindows[1] * 1.1, d);
-            double logPc300Tail = logPcHoldTail(hitWindows[1] * 2.2, d);
+            double logPc300Head = logPcNote(hitWindows[1] * 1.1, dHead);
+            double logPc300Tail = logPcHoldTail(hitWindows[1] * 2.2, dTail);
             probabilities.P300 = logDiff(combinedProb(logPcMaxHead, logPcMaxTail), combinedProb(logPc300Head, logPc300Tail));
 
-            double logPc200Head = logPcNote(hitWindows[2], d);
-            double logPc200Tail = logPcHoldTail(hitWindows[2] * 2, d);
+            double logPc200Head = logPcNote(hitWindows[2], dHead);
+            double logPc200Tail = logPcHoldTail(hitWindows[2] * 2, dTail);
             probabilities.P200 = logDiff(combinedProb(logPc300Head, logPc300Tail), combinedProb(logPc200Head, logPc200Tail));
 
-            double logPc100Head = logPcNote(hitWindows[3], d);
-            double logPc100Tail = logPcHoldTail(hitWindows[3] * 2, d);
+            double logPc100Head = logPcNote(hitWindows[3], dHead);
+            double logPc100Tail = logPcHoldTail(hitWindows[3] * 2, dTail);
             probabilities.P100 = logDiff(combinedProb(logPc200Head, logPc200Tail), combinedProb(logPc100Head, logPc100Tail));
 
-            double logPc50Head = logPcNote(hitWindows[4], d);
-            double logPc50Tail = logPcHoldTail(hitWindows[4] * 2, d);
+            double logPc50Head = logPcNote(hitWindows[4], dHead);
+            double logPc50Tail = logPcHoldTail(hitWindows[4] * 2, dTail);
             probabilities.P50 = logDiff(combinedProb(logPc100Head, logPc100Tail), combinedProb(logPc50Head, logPc50Tail));
 
             probabilities.P0 = combinedProb(logPc50Head, logPc50Tail);
@@ -292,8 +300,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/kdbxwxgf01
 
         private double logProbTail(double x) => x <= 7
-            ? Math.Log(1 - Math.Pow(2 * Normal.CDF(0, 1, x) - 1, 2))
-            : Math.Log(2) - Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/lgwyhx0fxo
+            ? Math.Log(1 - (2 * Normal.CDF(0, 1, x) - 1))
+            : -Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/lgwyhx0fxo
 
         private double logSum(double firstLog, double secondLog)
         {
