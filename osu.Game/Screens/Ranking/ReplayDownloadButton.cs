@@ -117,11 +117,17 @@ namespace osu.Game.Screens.Ranking
                     return true;
 
                 case GlobalAction.ExportReplay:
-                    State.BindValueChanged(exportWhenReady, true);
-
-                    // start the import via button
-                    if (State.Value != DownloadState.LocallyAvailable)
+                    if (State.Value == DownloadState.LocallyAvailable)
+                    {
+                        State.BindValueChanged(exportWhenReady, true);
+                    }
+                    else
+                    {
+                        // A download needs to be performed before we can export this replay.
                         button.TriggerClick();
+                        if (button.Enabled.Value)
+                            State.BindValueChanged(exportWhenReady, true);
+                    }
 
                     return true;
             }
