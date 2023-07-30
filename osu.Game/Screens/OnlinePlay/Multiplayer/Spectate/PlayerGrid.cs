@@ -98,8 +98,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void toggleMaximisationState(Cell target)
         {
-            // in the case the target is the already maximised cell, no cell should be maximised.
-            bool hasMaximised = !target.IsMaximised;
+            // in the case the target is the already maximised cell (or there is only one cell), no cell should be maximised.
+            bool hasMaximised = !target.IsMaximised && cellContainer.Count > 1;
 
             // Iterate through all cells to ensure only one is maximised at any time.
             foreach (var cell in cellContainer.ToList())
