@@ -65,12 +65,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             AlwaysPresent = true;
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(RotationHandler = CreateRotationHandler());
+            return dependencies;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             AddRangeInternal(new Drawable[]
             {
-                RotationHandler = CreateRotationHandler(),
+                RotationHandler,
                 SelectionBox = CreateSelectionBox(),
             });
 
@@ -86,7 +93,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                RotationHandler = RotationHandler,
                 OnScale = HandleScale,
                 OnFlip = HandleFlip,
                 OnReverse = HandleReverse,

@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class SelectionBoxRotationHandle : SelectionBoxDragHandle, IHasTooltip
     {
-        public SelectionRotationHandler? RotationHandler { get; init; }
-
         public LocalisableString TooltipText { get; private set; }
 
         private SpriteIcon icon = null!;
@@ -31,6 +29,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         private SelectionBox selectionBox { get; set; } = null!;
+
+        [Resolved]
+        private SelectionRotationHandler? rotationHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -61,9 +62,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (RotationHandler == null) return false;
+            if (rotationHandler == null) return false;
 
-            RotationHandler.Begin();
+            rotationHandler.Begin();
             return true;
         }
 
@@ -97,7 +98,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            RotationHandler?.Commit();
+            rotationHandler?.Commit();
             UpdateHoverState();
 
             cumulativeRotation.Value = null;
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             cumulativeRotation.Value = newRotation;
 
-            RotationHandler?.Update(newRotation);
+            rotationHandler?.Update(newRotation);
             TooltipText = shouldSnap ? EditorStrings.RotationSnapped(newRotation) : EditorStrings.RotationUnsnapped(newRotation);
         }
 

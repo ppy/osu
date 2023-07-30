@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -21,6 +22,14 @@ namespace osu.Game.Tests.Visual.Editing
     {
         private Container selectionArea;
         private SelectionBox selectionBox;
+
+        [Cached(typeof(SelectionRotationHandler))]
+        private TestSelectionRotationHandler rotationHandler;
+
+        public TestSceneComposeSelectBox()
+        {
+            rotationHandler = new TestSelectionRotationHandler(() => selectionArea);
+        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -41,7 +50,6 @@ namespace osu.Game.Tests.Visual.Editing
                         CanFlipX = true,
                         CanFlipY = true,
 
-                        RotationHandler = new TestSelectionRotationHandler(() => selectionArea),
                         OnScale = handleScale
                     }
                 }
