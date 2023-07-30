@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -293,21 +292,10 @@ namespace osu.Game.Overlays
             // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
             pendingBeatmapSwitch = delegate
             {
-                // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
-                Task.Run(() =>
-                {
-                    if (beatmap?.Beatmap == null) // this is not needed if a placeholder exists
-                    {
-                        title.Text = @"Nothing to play";
-                        artist.Text = @"Nothing to play";
-                    }
-                    else
-                    {
-                        BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-                        artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
-                    }
-                });
+                BeatmapMetadata metadata = beatmap.Metadata;
+
+                title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                 {
