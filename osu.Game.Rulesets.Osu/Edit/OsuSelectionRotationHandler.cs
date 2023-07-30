@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,17 +17,25 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionRotationHandler : SelectionRotationHandler
+    public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
-        private readonly IEditorChangeHandler? changeHandler;
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
-        public BindableList<HitObject> SelectedItems { get; } = new BindableList<HitObject>();
+        private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
-        public OsuSelectionRotationHandler(IEditorChangeHandler? changeHandler)
+        [BackgroundDependencyLoader]
+        private void load(EditorBeatmap editorBeatmap)
         {
-            this.changeHandler = changeHandler;
+            selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
+        }
 
-            SelectedItems.CollectionChanged += (_, __) => updateState();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedItems.CollectionChanged += (_, __) => updateState();
+            updateState();
         }
 
         private void updateState()
@@ -92,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             defaultOrigin = null;
         }
 
-        private IEnumerable<OsuHitObject> selectedMovableObjects => SelectedItems.Cast<OsuHitObject>()
+        private IEnumerable<OsuHitObject> selectedMovableObjects => selectedItems.Cast<OsuHitObject>()
                                                                                  .Where(h => h is not Spinner);
     }
 }

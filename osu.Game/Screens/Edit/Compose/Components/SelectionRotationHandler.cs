@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -9,7 +10,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// Base handler for editor rotation operations.
     /// </summary>
-    public class SelectionRotationHandler
+    public partial class SelectionRotationHandler : Component
     {
         /// <summary>
         /// Whether the rotation can currently be performed.

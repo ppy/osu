@@ -26,9 +26,8 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
-        public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler(ChangeHandler)
+        public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler
         {
-            SelectedItems = { BindTarget = SelectedItems },
             UpdatePosition = updateDrawablePosition
         };
 

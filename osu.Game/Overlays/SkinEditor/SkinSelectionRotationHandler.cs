@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit;
@@ -15,23 +16,32 @@ using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
 {
-    public class SkinSelectionRotationHandler : SelectionRotationHandler
+    public partial class SkinSelectionRotationHandler : SelectionRotationHandler
     {
-        private readonly IEditorChangeHandler? changeHandler;
-
-        public BindableList<ISerialisableDrawable> SelectedItems { get; } = new BindableList<ISerialisableDrawable>();
         public Action<Drawable, Vector2> UpdatePosition { get; init; } = null!;
 
-        public SkinSelectionRotationHandler(IEditorChangeHandler? changeHandler)
-        {
-            this.changeHandler = changeHandler;
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
-            SelectedItems.CollectionChanged += (_, __) => updateState();
+        private BindableList<ISerialisableDrawable> selectedItems { get; } = new BindableList<ISerialisableDrawable>();
+
+        [BackgroundDependencyLoader]
+        private void load(SkinEditor skinEditor)
+        {
+            selectedItems.BindTo(skinEditor.SelectedComponents);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedItems.CollectionChanged += (_, __) => updateState();
+            updateState();
         }
 
         private void updateState()
         {
-            CanRotate.Value = SelectedItems.Count > 0;
+            CanRotate.Value = selectedItems.Count > 0;
         }
 
         private Drawable[]? objectsInRotation;
@@ -47,7 +57,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.BeginChange();
 
-            objectsInRotation = SelectedItems.Cast<Drawable>().ToArray();
+            objectsInRotation = selectedItems.Cast<Drawable>().ToArray();
             originalRotations = objectsInRotation.ToDictionary(d => d, d => d.Rotation);
             originalPositions = objectsInRotation.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
             defaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())).Centre;
