@@ -23,7 +23,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private const float button_padding = 5;
 
-        public SelectionRotationHandler? RotationHandler { get; init; }
+        [Resolved]
+        private SelectionRotationHandler? rotationHandler { get; set; }
+
         public Func<Vector2, Anchor, bool>? OnScale;
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
@@ -149,8 +151,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (RotationHandler != null)
-                canRotate.BindTo(RotationHandler.CanRotate);
+            if (rotationHandler != null)
+                canRotate.BindTo(rotationHandler.CanRotate);
 
             canRotate.BindValueChanged(_ => recreate(), true);
         }
@@ -252,8 +254,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addRotationComponents()
         {
-            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => RotationHandler?.Rotate(-90));
-            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => RotationHandler?.Rotate(90));
+            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => rotationHandler?.Rotate(-90));
+            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => rotationHandler?.Rotate(90));
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
@@ -323,7 +325,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                RotationHandler = RotationHandler
             };
 
             handle.OperationStarted += operationStarted;
