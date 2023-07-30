@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -286,8 +287,14 @@ namespace osu.Game.Overlays
 
         private Action? pendingBeatmapSwitch;
 
+        private CancellationTokenSource? backgroundLoadCancellation;
+
+        private WorkingBeatmap? currentBeatmap;
+
         private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
+            currentBeatmap = beatmap;
+
             // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
             pendingBeatmapSwitch = delegate
             {
@@ -296,8 +303,16 @@ namespace osu.Game.Overlays
                 title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
                 artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
+                backgroundLoadCancellation?.Cancel();
+
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                 {
+                    if (beatmap != currentBeatmap)
+                    {
+                        newBackground.Dispose();
+                        return;
+                    }
+
                     switch (direction)
                     {
                         case TrackChangeDirection.Next:
@@ -317,7 +332,7 @@ namespace osu.Game.Overlays
                     background = newBackground;
 
                     playerContainer.Add(newBackground);
-                });
+                }, (backgroundLoadCancellation = new CancellationTokenSource()).Token);
             };
         }
 
