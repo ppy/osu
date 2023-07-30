@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
         public bool UserPauseRequested { get; private set; }
 
         /// <summary>
-        /// Whether control of the global track should be allowed.
+        /// Whether user control of the global track should be allowed.
         /// </summary>
         public readonly BindableBool AllowTrackControl = new BindableBool(true);
 
