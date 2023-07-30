@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
             return true;
         }
 
-        private class TestSelectionRotationHandler : SelectionRotationHandler
+        private partial class TestSelectionRotationHandler : SelectionRotationHandler
         {
             private readonly Func<Container> getTargetContainer;
 

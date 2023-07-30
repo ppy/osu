@@ -68,9 +68,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            RotationHandler = CreateRotationHandler();
-
-            InternalChild = SelectionBox = CreateSelectionBox();
+            AddRangeInternal(new Drawable[]
+            {
+                RotationHandler = CreateRotationHandler(),
+                SelectionBox = CreateSelectionBox(),
+            });
 
             SelectedItems.CollectionChanged += (_, _) =>
             {
