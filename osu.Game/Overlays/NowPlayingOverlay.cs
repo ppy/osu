@@ -68,6 +68,8 @@ namespace osu.Game.Overlays
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private Bindable<bool> allowTrackControl;
+
         public NowPlayingOverlay()
         {
             Width = 400;
@@ -220,8 +222,10 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            beatmap.BindDisabledChanged(_ => Scheduler.AddOnce(beatmapDisabledChanged));
-            beatmapDisabledChanged();
+            beatmap.BindDisabledChanged(_ => Scheduler.AddOnce(updateEnabledStates));
+
+            allowTrackControl = musicController.AllowTrackControl.GetBoundCopy();
+            allowTrackControl.BindValueChanged(_ => Scheduler.AddOnce(updateEnabledStates), true);
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
@@ -334,16 +338,18 @@ namespace osu.Game.Overlays
             };
         }
 
-        private void beatmapDisabledChanged()
+        private void updateEnabledStates()
         {
-            bool disabled = beatmap.Disabled;
+            bool beatmapDisabled = beatmap.Disabled;
+            bool trackControlDisabled = !musicController.AllowTrackControl.Value;
 
-            if (disabled)
+            if (beatmapDisabled || trackControlDisabled)
                 playlist?.Hide();
 
-            prevButton.Enabled.Value = !disabled;
-            nextButton.Enabled.Value = !disabled;
-            playlistButton.Enabled.Value = !disabled;
+            prevButton.Enabled.Value = !beatmapDisabled && !trackControlDisabled;
+            nextButton.Enabled.Value = !beatmapDisabled && !trackControlDisabled;
+            playlistButton.Enabled.Value = !beatmapDisabled && !trackControlDisabled;
+            playButton.Enabled.Value = !trackControlDisabled;
         }
 
         protected override void Dispose(bool isDisposing)
