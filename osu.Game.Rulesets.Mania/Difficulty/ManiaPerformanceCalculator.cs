@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return null;
 
             // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
-            double logNoteCount = isLegacyScore ? Math.Log(attributes.NoteCount) : Math.Log(attributes.NoteCount + attributes.HoldNoteCount);
+            double logNoteCount = Math.Log(isLegacyScore ? attributes.NoteCount : attributes.NoteCount + attributes.HoldNoteCount);
             double logHoldCount = Math.Log(attributes.HoldNoteCount);
 
             double noteHeadPortion = (double)(attributes.NoteCount + attributes.HoldNoteCount) / (attributes.NoteCount + attributes.HoldNoteCount * 2);
