@@ -17,12 +17,42 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep
+        {
+            get => slider.KeyboardStep;
+            set => slider.KeyboardStep = value;
+        }
+
+        public Bindable<T> Current
+        {
+            get => slider.Current;
+            set => slider.Current = value;
+        }
+
+        private bool instantaneous;
+
+        /// <summary>
+        /// Whether changes to the slider should instantaneously transfer to the text box (and vice versa).
+        /// If <see langword="false"/>, the transfer will happen on text box commit (explicit, or implicit via focus loss), or on slider drag end.
+        /// </summary>
+        public bool Instantaneous
+        {
+            get => instantaneous;
+            set
+            {
+                instantaneous = value;
+                slider.TransferValueOnCommit = !instantaneous;
+            }
+        }
+
         private readonly SettingsSlider<T> slider;
+        private readonly LabelledTextBox textBox;
 
         public SliderWithTextBoxInput(LocalisableString labelText)
         {
-            LabelledTextBox textBox;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -49,55 +79,65 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 },
             };
 
-            textBox.OnCommit += (t, isNew) =>
-            {
-                try
-                {
-                    switch (slider.Current)
-                    {
-                        case Bindable<int> bindableInt:
-                            bindableInt.Value = int.Parse(t.Text);
-                            break;
+            textBox.OnCommit += textCommitted;
+            textBox.Current.BindValueChanged(textChanged);
 
-                        case Bindable<double> bindableDouble:
-                            bindableDouble.Value = double.Parse(t.Text);
-                            break;
-
-                        default:
-                            slider.Current.Parse(t.Text);
-                            break;
-                    }
-                }
-                catch
-                {
-                    // TriggerChange below will restore the previous text value on failure.
-                }
-
-                // This is run regardless of parsing success as the parsed number may not actually trigger a change
-                // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
-                Current.TriggerChange();
-            };
-
-            Current.BindValueChanged(_ =>
-            {
-                decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
-                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
-            }, true);
+            Current.BindValueChanged(updateTextBoxFromSlider, true);
         }
 
-        /// <summary>
-        /// A custom step value for each key press which actuates a change on this control.
-        /// </summary>
-        public float KeyboardStep
+        private bool updatingFromTextBox;
+
+        private void textChanged(ValueChangedEvent<string> change)
         {
-            get => slider.KeyboardStep;
-            set => slider.KeyboardStep = value;
+            if (!instantaneous) return;
+
+            tryUpdateSliderFromTextBox();
         }
 
-        public Bindable<T> Current
+        private void textCommitted(TextBox t, bool isNew)
         {
-            get => slider.Current;
-            set => slider.Current = value;
+            tryUpdateSliderFromTextBox();
+
+            // If the attempted update above failed, restore text box to match the slider.
+            Current.TriggerChange();
+        }
+
+        private void tryUpdateSliderFromTextBox()
+        {
+            updatingFromTextBox = true;
+
+            try
+            {
+                switch (slider.Current)
+                {
+                    case Bindable<int> bindableInt:
+                        bindableInt.Value = int.Parse(textBox.Current.Value);
+                        break;
+
+                    case Bindable<double> bindableDouble:
+                        bindableDouble.Value = double.Parse(textBox.Current.Value);
+                        break;
+
+                    default:
+                        slider.Current.Parse(textBox.Current.Value);
+                        break;
+                }
+            }
+            catch
+            {
+                // ignore parsing failures.
+                // sane state will eventually be restored by a commit (either explicit, or implicit via focus loss).
+            }
+
+            updatingFromTextBox = false;
+        }
+
+        private void updateTextBoxFromSlider(ValueChangedEvent<T> _)
+        {
+            if (updatingFromTextBox) return;
+
+            decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
+            textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
         }
     }
 }

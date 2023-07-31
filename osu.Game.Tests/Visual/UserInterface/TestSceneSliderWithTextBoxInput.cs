@@ -40,6 +40,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestNonInstantaneousMode()
         {
+            AddStep("set instantaneous to false", () => sliderWithTextBoxInput.Instantaneous = false);
+
             AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
             AddStep("change text", () => textBox.Text = "3");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.Zero);
@@ -63,6 +65,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestInstantaneousMode()
         {
+            AddStep("set instantaneous to true", () => sliderWithTextBoxInput.Instantaneous = true);
+
             AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
             AddStep("change text", () => textBox.Text = "3");
             AddAssert("slider moved", () => slider.Current.Value, () => Is.EqualTo(3));
