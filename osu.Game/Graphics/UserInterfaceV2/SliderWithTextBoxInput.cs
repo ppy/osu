@@ -8,12 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Utils;
 using osuTK;
 
-namespace osu.Game.Screens.Edit.Timing
+namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
