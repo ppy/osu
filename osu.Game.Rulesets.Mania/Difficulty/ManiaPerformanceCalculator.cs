@@ -223,32 +223,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         // Probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
         private JudgementProbs pHold(double dHead, double dTail)
         {
-            JudgementProbs probabilities = new JudgementProbs();
-
-            // Since we're using complementary probabilities for precision, multiplying the head and tail probabilities takes the form P(A∩B)' = P(A'∪B') = P(A') + P(B') - P(A'∩B').
-            double combinedProb(double p1, double p2) => logDiff(logSum(p1, p2), p1 + p2);
-
-            double logPcMaxHead = logPcNote(hitWindows[0] * 1.2, dHead);
-            double logPcMaxTail = logPcHoldTail(hitWindows[0] * 2.4, dTail);
-            probabilities.PMax = logDiff(0, combinedProb(logPcMaxHead, logPcMaxTail));
-
-            double logPc300Head = logPcNote(hitWindows[1] * 1.1, dHead);
-            double logPc300Tail = logPcHoldTail(hitWindows[1] * 2.2, dTail);
-            probabilities.P300 = logDiff(combinedProb(logPcMaxHead, logPcMaxTail), combinedProb(logPc300Head, logPc300Tail));
-
-            double logPc200Head = logPcNote(hitWindows[2], dHead);
-            double logPc200Tail = logPcHoldTail(hitWindows[2] * 2, dTail);
-            probabilities.P200 = logDiff(combinedProb(logPc300Head, logPc300Tail), combinedProb(logPc200Head, logPc200Tail));
-
-            double logPc100Head = logPcNote(hitWindows[3], dHead);
-            double logPc100Tail = logPcHoldTail(hitWindows[3] * 2, dTail);
-            probabilities.P100 = logDiff(combinedProb(logPc200Head, logPc200Tail), combinedProb(logPc100Head, logPc100Tail));
-
-            double logPc50Head = logPcNote(hitWindows[4], dHead);
-            double logPc50Tail = logPcHoldTail(hitWindows[4] * 2, dTail);
-            probabilities.P50 = logDiff(combinedProb(logPc100Head, logPc100Tail), combinedProb(logPc50Head, logPc50Tail));
-
-            probabilities.P0 = combinedProb(logPc50Head, logPc50Tail);
+            JudgementProbs probabilities = new JudgementProbs
+            {
+                PMax = logDiff(0, logPcHold(hitWindows[0] * 1.2, dHead, dTail)),
+                P300 = logDiff(logPcHold(hitWindows[0] * 1.2, dHead, dTail), logPcHold(hitWindows[1] * 1.1, dHead, dTail)),
+                P200 = logDiff(logPcHold(hitWindows[1] * 1.1, dHead, dTail), logPcHold(hitWindows[2], dHead, dTail)),
+                P100 = logDiff(logPcHold(hitWindows[2], dHead, dTail), logPcHold(hitWindows[3], dHead, dTail)),
+                P50 = logDiff(logPcHold(hitWindows[3], dHead, dTail), logPcHold(hitWindows[4], dHead, dTail)),
+                P0 = logPcHold(hitWindows[4], dHead, dTail)
+            };
 
             return probabilities;
         }
@@ -279,29 +262,40 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         }
 
         /// <summary>
-        /// The log complementary probability of hitting within a hit window with a certain deviation.
+        /// The log complementary probability of getting a certain judgement with a certain deviation.
         /// </summary>
         /// <returns>
         /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
         /// </returns>
-        private double logPcNote(double x, double deviation) => logErfc(x / (deviation * Math.Sqrt(2)));
+        private double logPcNote(double window, double deviation) => logErfc(window / (deviation * Math.Sqrt(2)));
 
         /// <summary>
-        /// The log complementary probability of hitting within a hit window with a certain deviation.
-        /// Exclusively for stable LN tails, as they give a result from 2 error values (total error on the head + the tail).
+        /// The log complementary probability of getting a certain judgement with a certain deviation.
+        /// Exclusively for stable LNs, as they give a result from 2 error values (total error on the head + the tail).
         /// </summary>
         /// <returns>
         /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
         /// </returns>
-        private double logPcHoldTail(double x, double deviation) => logProbTail(x / (deviation * Math.Sqrt(2)));
+        private double logPcHold(double window, double headDeviation, double tailDeviation)
+        {
+            double root2 = Math.Sqrt(2);
+
+            double logPcHead = logErfc(window / (headDeviation * root2));
+
+            // Calculate the expected value of the distance from 0 of the head hit, given it lands within the current window.
+            // We'll subtract this from the tail window to approximate the difficulty of landing both hits within 2x the current window.
+            double beta = window / headDeviation;
+            double z = Normal.CDF(0, 1, beta) - 0.5;
+            double expectedValue = headDeviation * (Normal.PDF(0, 1, 0) - Normal.PDF(0, 1, beta)) / z;
+
+            double logPcTail = logErfc((2 * window - expectedValue) / (tailDeviation * root2));
+
+            return logDiff(logSum(logPcHead, logPcTail), logPcHead + logPcTail);
+        }
 
         private double logErfc(double x) => x <= 5
             ? Math.Log(SpecialFunctions.Erfc(x))
             : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/kdbxwxgf01
-
-        private double logProbTail(double x) => x <= 7
-            ? Math.Log(1 - (2 * Normal.CDF(0, 1, x) - 1))
-            : -Math.Pow(x, 2) / 2 - Math.Log(x / Math.Sqrt(2) * Math.Sqrt(Math.PI)); // This is an approximation, https://www.desmos.com/calculator/lgwyhx0fxo
 
         private double logSum(double firstLog, double secondLog)
         {
