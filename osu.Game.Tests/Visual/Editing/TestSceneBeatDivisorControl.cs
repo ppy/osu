@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -23,8 +21,7 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public partial class TestSceneBeatDivisorControl : OsuManualInputManagerTestScene
     {
-        private BeatDivisorControl beatDivisorControl;
-        private BindableBeatDivisor bindableBeatDivisor;
+        private BeatDivisorControl beatDivisorControl = null!;
 
         private SliderBar<int> tickSliderBar => beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
         private Triangle tickMarkerHead => tickSliderBar.ChildrenOfType<Triangle>().Single();
@@ -32,13 +29,19 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        [Cached]
+        private readonly BindableBeatDivisor bindableBeatDivisor = new BindableBeatDivisor(16);
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            bindableBeatDivisor.ValidDivisors.SetDefault();
+            bindableBeatDivisor.SetDefault();
+
             Child = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = beatDivisorControl = new BeatDivisorControl(bindableBeatDivisor = new BindableBeatDivisor(16))
+                Child = beatDivisorControl = new BeatDivisorControl
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -51,9 +54,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddRepeatStep("move previous", () => bindableBeatDivisor.Previous(), 2);
+            AddRepeatStep("move previous", () => bindableBeatDivisor.SelectPrevious(), 2);
             AddAssert("divisor is 4", () => bindableBeatDivisor.Value == 4);
-            AddRepeatStep("move next", () => bindableBeatDivisor.Next(), 1);
+            AddRepeatStep("move next", () => bindableBeatDivisor.SelectNext(), 1);
             AddAssert("divisor is 12", () => bindableBeatDivisor.Value == 8);
         }
 
@@ -101,16 +104,22 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestBeatChevronNavigation()
         {
             switchBeatSnap(1);
+            assertBeatSnap(16);
+
+            switchBeatSnap(-4);
             assertBeatSnap(1);
 
             switchBeatSnap(3);
             assertBeatSnap(8);
 
-            switchBeatSnap(-1);
+            switchBeatSnap(3);
+            assertBeatSnap(16);
+
+            switchBeatSnap(-2);
             assertBeatSnap(4);
 
             switchBeatSnap(-3);
-            assertBeatSnap(16);
+            assertBeatSnap(1);
         }
 
         [Test]
@@ -163,9 +172,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Triplets);
+            assertBeatSnap(6);
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Common);
+            assertBeatSnap(4);
 
             switchPresets(-1);
             assertPreset(BeatDivisorType.Triplets);
@@ -181,6 +192,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             setDivisorViaInput(15);
             assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(15);
 
             switchBeatSnap(-1);
             assertBeatSnap(5);
@@ -190,12 +202,14 @@ namespace osu.Game.Tests.Visual.Editing
 
             setDivisorViaInput(5);
             assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(5);
 
             switchPresets(1);
             assertPreset(BeatDivisorType.Common);
 
             switchPresets(-1);
-            assertPreset(BeatDivisorType.Triplets);
+            assertPreset(BeatDivisorType.Custom, 15);
+            assertBeatSnap(15);
         }
 
         private void switchBeatSnap(int direction) => AddRepeatStep($"move snap {(direction > 0 ? "forward" : "backward")}", () =>
@@ -207,7 +221,7 @@ namespace osu.Game.Tests.Visual.Editing
         }, Math.Abs(direction));
 
         private void assertBeatSnap(int expected) => AddAssert($"beat snap is {expected}",
-            () => bindableBeatDivisor.Value == expected);
+            () => bindableBeatDivisor.Value, () => Is.EqualTo(expected));
 
         private void switchPresets(int direction) => AddRepeatStep($"move presets {(direction > 0 ? "forward" : "backward")}", () =>
         {
@@ -219,7 +233,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void assertPreset(BeatDivisorType type, int? maxDivisor = null)
         {
-            AddAssert($"preset is {type}", () => bindableBeatDivisor.ValidDivisors.Value.Type == type);
+            AddAssert($"preset is {type}", () => bindableBeatDivisor.ValidDivisors.Value.Type, () => Is.EqualTo(type));
 
             if (type == BeatDivisorType.Custom)
             {
@@ -237,7 +251,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
 
-            BeatDivisorControl.CustomDivisorPopover popover = null;
+            BeatDivisorControl.CustomDivisorPopover? popover = null;
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<BeatDivisorControl.CustomDivisorPopover>().SingleOrDefault()) != null && popover.IsLoaded);
             AddStep($"set divisor to {divisor}", () =>
             {

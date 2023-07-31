@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -18,7 +16,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
     public partial class ArgonHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
         private readonly TaikoSkinComponents component;
+
         private readonly Circle outer;
+        private readonly Circle inner;
 
         public ArgonHitExplosion(TaikoSkinComponents component)
         {
@@ -34,13 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(
-                        new Color4(255, 227, 236, 255),
-                        new Color4(255, 198, 211, 255)
-                    ),
                     Masking = true,
                 },
-                new Circle
+                inner = new Circle
                 {
                     Name = "Inner circle",
                     Anchor = Anchor.Centre,
@@ -48,12 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
                     Size = new Vector2(0.85f),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 132, 191, 255).Opacity(0.5f),
-                        Radius = 45,
-                    },
                     Masking = true,
                 },
             };
@@ -62,6 +52,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         public void Animate(DrawableHitObject drawableHitObject)
         {
             this.FadeOut();
+
+            bool isRim = (drawableHitObject.HitObject as Hit)?.Type == HitType.Rim;
+
+            outer.Colour = isRim ? ArgonInputDrum.RIM_HIT_GRADIENT : ArgonInputDrum.CENTRE_HIT_GRADIENT;
+            inner.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = (isRim ? ArgonInputDrum.RIM_HIT_GLOW : ArgonInputDrum.CENTRE_HIT_GLOW).Opacity(0.5f),
+                Radius = 45,
+            };
 
             switch (component)
             {

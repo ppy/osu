@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Play.HUD
                                                             }
                                                         }
                                                     },
-                                                    usernameText = new OsuSpriteText
+                                                    usernameText = new TruncatingSpriteText
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         Width = 0.6f,
@@ -244,7 +244,6 @@ namespace osu.Game.Screens.Play.HUD
                                                         Colour = Color4.White,
                                                         Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                                         Text = User?.Username ?? string.Empty,
-                                                        Truncate = true,
                                                         Shadow = false,
                                                     }
                                                 }

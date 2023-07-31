@@ -41,6 +41,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             InternalChild = Content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     new TourneyVideo("ladder")
@@ -56,12 +57,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                     },
                     ScrollContent = new LadderDragContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
-                            MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
+                            MatchesContainer = new Container<DrawableTournamentMatch>
+                            {
+                                AutoSizeAxes = Axes.Both
+                            },
                         }
                     },
                 }

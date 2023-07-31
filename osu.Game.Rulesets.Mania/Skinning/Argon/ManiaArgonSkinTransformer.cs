@@ -139,11 +139,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 case 3:
                     switch (columnIndex)
                     {
-                        case 0: return colour_pink;
+                        case 0: return colour_green;
 
-                        case 1: return colour_orange;
+                        case 1: return colour_special_column;
 
-                        case 2: return colour_yellow;
+                        case 2: return colour_cyan;
 
                         default: throw new ArgumentOutOfRangeException();
                     }
@@ -185,11 +185,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 1: return colour_orange;
 
-                        case 2: return colour_yellow;
+                        case 2: return colour_green;
 
                         case 3: return colour_cyan;
 
-                        case 4: return colour_purple;
+                        case 4: return colour_orange;
 
                         case 5: return colour_pink;
 
@@ -201,17 +201,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     {
                         case 0: return colour_pink;
 
-                        case 1: return colour_cyan;
+                        case 1: return colour_orange;
 
                         case 2: return colour_pink;
 
                         case 3: return colour_special_column;
 
-                        case 4: return colour_green;
+                        case 4: return colour_pink;
 
-                        case 5: return colour_cyan;
+                        case 5: return colour_orange;
 
-                        case 6: return colour_green;
+                        case 6: return colour_pink;
 
                         default: throw new ArgumentOutOfRangeException();
                     }
@@ -225,9 +225,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 2: return colour_orange;
 
-                        case 3: return colour_yellow;
+                        case 3: return colour_green;
 
-                        case 4: return colour_yellow;
+                        case 4: return colour_cyan;
 
                         case 5: return colour_orange;
 
@@ -273,9 +273,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 3: return colour_yellow;
 
-                        case 4: return colour_cyan;
+                        case 4: return colour_green;
 
-                        case 5: return colour_green;
+                        case 5: return colour_cyan;
 
                         case 6: return colour_yellow;
 

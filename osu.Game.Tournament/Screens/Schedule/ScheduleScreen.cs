@@ -177,7 +177,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value)
+                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value ?? string.Empty)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -217,8 +217,6 @@ namespace osu.Game.Tournament.Screens.Schedule
                 Flow.Direction = FillDirection.Horizontal;
 
                 Scale = new Vector2(0.8f);
-
-                CurrentMatchSelectionBox.Scale = new Vector2(1.02f, 1.15f);
 
                 bool conditional = match is ConditionalTournamentMatch;
 

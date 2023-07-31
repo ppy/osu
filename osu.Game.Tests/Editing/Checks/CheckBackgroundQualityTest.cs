@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
-            mock.SetupGet(w => w.Background).Returns(background);
+            mock.Setup(w => w.GetBackground()).Returns(background);
             mock.Setup(w => w.GetStream(It.IsAny<string>())).Returns(stream);
 
             return mock;

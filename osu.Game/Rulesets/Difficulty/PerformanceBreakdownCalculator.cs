@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown { Performance = performanceArray[0], PerfectPerformance = performanceArray[1] };
+            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
         }
 
         [ItemCanBeNull]
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Difficulty
                 ).ConfigureAwait(false);
 
                 // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
-                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(perfectPlay, difficulty.Value.Attributes);
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(perfectPlay, difficulty.Value.Attributes.AsNonNull());
             }, cancellationToken);
         }
 

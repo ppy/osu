@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public BindableBool ShowMaxJudgement { get; set; } = new BindableBool(true);
 
         [Resolved]
-        private JudgementTally tally { get; set; } = null!;
+        private JudgementCountController judgementCountController { get; set; } = null!;
 
         protected FillFlowContainer<JudgementCounter> CounterFlow = null!;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 AutoSizeAxes = Axes.Both
             };
 
-            foreach (var result in tally.Results)
+            foreach (var result in judgementCountController.Results)
                 CounterFlow.Add(createCounter(result));
         }
 
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
-        private JudgementCounter createCounter(JudgementTally.JudgementCount info) =>
+        private JudgementCounter createCounter(JudgementCountController.JudgementCount info) =>
             new JudgementCounter(info)
             {
                 State = { Value = Visibility.Hidden },

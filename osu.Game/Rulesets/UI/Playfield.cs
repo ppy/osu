@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
     [Cached(typeof(IPooledSampleProvider))]
+    [Cached]
     public abstract partial class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>

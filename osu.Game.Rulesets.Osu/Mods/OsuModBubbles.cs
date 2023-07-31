@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private PlayfieldAdjustmentContainer bubbleContainer = null!;
 
+        private DrawablePool<BubbleDrawable> bubblePool = null!;
+
         private readonly Bindable<int> currentCombo = new BindableInt();
 
         private float maxSize;
         private float bubbleSize;
         private double bubbleFade;
-
-        private readonly DrawablePool<BubbleDrawable> bubblePool = new DrawablePool<BubbleDrawable>(100);
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             bubbleContainer = drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
             drawableRuleset.Overlays.Add(bubbleContainer);
+            drawableRuleset.Overlays.Add(bubblePool = new DrawablePool<BubbleDrawable>(100));
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawableObject)

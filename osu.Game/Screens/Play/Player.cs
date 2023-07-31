@@ -11,8 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -24,6 +22,7 @@ using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
@@ -71,7 +70,7 @@ namespace osu.Game.Screens.Play
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
 
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
@@ -113,8 +112,6 @@ namespace osu.Game.Screens.Play
         public GameplayState GameplayState { get; private set; }
 
         private Ruleset ruleset;
-
-        private Sample sampleRestart;
 
         public BreakOverlay BreakOverlay;
 
@@ -195,7 +192,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
+        private void load(OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
         {
             var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
@@ -212,8 +209,6 @@ namespace osu.Game.Screens.Play
 
             if (playableBeatmap == null)
                 return;
-
-            sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -295,14 +290,17 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AllowRestart)
             {
-                rulesetSkinProvider.Add(new HotkeyRetryOverlay
+                rulesetSkinProvider.AddRange(new Drawable[]
                 {
-                    Action = () =>
+                    new HotkeyRetryOverlay
                     {
-                        if (!this.IsCurrentScreen()) return;
+                        Action = () =>
+                        {
+                            if (!this.IsCurrentScreen()) return;
 
-                        fadeOut(true);
-                        Restart(true);
+                            fadeOut(true);
+                            Restart(true);
+                        },
                     },
                 });
             }
@@ -378,9 +376,6 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
 
-            if (Configuration.AutomaticallySkipIntro)
-                skipIntroOverlay.SkipWhenReady();
-
             loadLeaderboard();
         }
 
@@ -432,13 +427,12 @@ namespace osu.Game.Screens.Play
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                             ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
-                        KeyCounter =
+                        InputCountController =
                         {
                             IsCounting =
                             {
                                 Value = false
                             },
-                            AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
@@ -478,7 +472,7 @@ namespace osu.Game.Screens.Play
         {
             updateGameplayState();
             updatePauseOnFocusLostState();
-            HUDOverlay.KeyCounter.IsCounting.Value = !isBreakTime.NewValue;
+            HUDOverlay.InputCountController.IsCounting.Value = !isBreakTime.NewValue;
         }
 
         private void updateGameplayState()
@@ -677,7 +671,6 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            sampleRestart?.Play();
             RestartRequested?.Invoke(quickRestart);
 
             PerformExit(false);
@@ -1087,6 +1080,9 @@ namespace osu.Game.Screens.Play
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
             GameplayClockContainer.Reset(startClock: true);
+
+            if (Configuration.AutomaticallySkipIntro)
+                skipIntroOverlay.SkipWhenReady();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -1175,6 +1171,7 @@ namespace osu.Game.Screens.Play
                 // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
+                score.ScoreInfo.Files.AddRange(s.Files.Detach());
             });
 
             return Task.CompletedTask;

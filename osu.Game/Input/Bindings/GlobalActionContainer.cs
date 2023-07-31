@@ -101,6 +101,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
+            // Framework automatically converts wheel up/down to left/right when shift is held.
+            // See https://github.com/ppy/osu-framework/blob/master/osu.Framework/Input/StateChanges/MouseScrollRelativeInput.cs#L37-L38.
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelRight }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -115,6 +119,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
             new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
+            new KeyBinding(InputKey.F1, GlobalAction.SaveReplay),
+            new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
         };
 
         public IEnumerable<KeyBinding> ReplayKeyBindings => new[]
@@ -123,6 +129,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
+            new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
         };
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
@@ -355,6 +362,21 @@ namespace osu.Game.Input.Bindings
         ToggleProfile,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCloneSelection))]
-        EditorCloneSelection
+        EditorCloneSelection,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCyclePreviousBeatSnapDivisor))]
+        EditorCyclePreviousBeatSnapDivisor,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleNextBeatSnapDivisor))]
+        EditorCycleNextBeatSnapDivisor,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SaveReplay))]
+        SaveReplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExportReplay))]
+        ExportReplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleReplaySettings))]
+        ToggleReplaySettings,
     }
 }

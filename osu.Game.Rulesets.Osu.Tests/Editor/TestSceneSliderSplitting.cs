@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
-                item?.Action?.Value();
+                item?.Action.Value?.Invoke();
             });
         }
     }

@@ -75,18 +75,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
+            tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both };
+
             AddRangeInternal(new Drawable[]
             {
                 shakeContainer = new ShakeContainer
                 {
                     ShakeDuration = 30,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
-                        tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
+                        // proxied here so that the tail is drawn under repeats/ticks - legacy skins rely on this
+                        tailContainer.CreateProxy(),
                         tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                         repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                        // actual tail container is placed here to ensure that tail hitobjects are processed after ticks/repeats.
+                        // this is required for the correct operation of Score V2.
+                        tailContainer,
                     }
                 },
                 // slider head is not included in shake as it handles hit detection, and handles its own shaking.

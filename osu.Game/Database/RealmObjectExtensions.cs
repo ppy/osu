@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -41,7 +43,7 @@ namespace osu.Game.Database
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
-                 d.Ruleset = d.Realm.Find<RulesetInfo>(s.Ruleset.ShortName);
+                 d.Ruleset = d.Realm!.Find<RulesetInfo>(s.Ruleset.ShortName)!;
                  copyChangesToRealm(s.Difficulty, d.Difficulty);
                  copyChangesToRealm(s.Metadata, d.Metadata);
              });
@@ -52,18 +54,32 @@ namespace osu.Game.Database
              {
                  foreach (var beatmap in s.Beatmaps)
                  {
-                     var existing = d.Beatmaps.FirstOrDefault(b => b.ID == beatmap.ID);
+                     // Importantly, search all of realm for the beatmap (not just the set's beatmaps).
+                     // It may have gotten detached, and if that's the case let's use this opportunity to fix
+                     // things up.
+                     var existingBeatmap = d.Realm!.Find<BeatmapInfo>(beatmap.ID);
 
-                     if (existing != null)
-                         copyChangesToRealm(beatmap, existing);
+                     if (existingBeatmap != null)
+                     {
+                         // As above, reattach if it happens to not be in the set's beatmaps.
+                         if (!d.Beatmaps.Contains(existingBeatmap))
+                         {
+                             Debug.Fail("Beatmaps should never become detached under normal circumstances. If this ever triggers, it should be investigated further.");
+                             Logger.Log("WARNING: One of the difficulties in a beatmap was detached from its set. Please save a copy of logs and report this to devs.", LoggingTarget.Database, LogLevel.Important);
+                             d.Beatmaps.Add(existingBeatmap);
+                         }
+
+                         copyChangesToRealm(beatmap, existingBeatmap);
+                     }
                      else
                      {
                          var newBeatmap = new BeatmapInfo
                          {
                              ID = beatmap.ID,
                              BeatmapSet = d,
-                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
+                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)!
                          };
+
                          d.Beatmaps.Add(newBeatmap);
                          copyChangesToRealm(beatmap, newBeatmap);
                      }
@@ -266,12 +282,10 @@ namespace osu.Game.Database
         /// <returns>
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
         /// To stop receiving notifications, call <see cref="M:System.IDisposable.Dispose" />.
-        ///
-        /// May be null in the case the provided collection is not managed.
         /// </returns>
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0})" />
         /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0})" />
-        public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
+        public static IDisposable QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
             if (!RealmAccess.CurrentThreadSubscriptionsAllowed)

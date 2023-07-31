@@ -30,11 +30,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ClearAll => new TranslatableString(getKey(@"clear_all"), @"Clear All");
 
         /// <summary>
-        /// "Cancel All"
-        /// </summary>
-        public static LocalisableString CancelAll => new TranslatableString(getKey(@"cancel_all"), @"Cancel All");
-
-        /// <summary>
         /// "Your battery level is low! Charge your device to prevent interruptions during gameplay."
         /// </summary>
         public static LocalisableString BatteryLow => new TranslatableString(getKey(@"battery_low"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");
@@ -62,6 +57,41 @@ Please try changing your audio device to a working setting.");
         /// "The score overlay is currently disabled. You can toggle this by pressing {0}."
         /// </summary>
         public static LocalisableString ScoreOverlayDisabled(LocalisableString arg0) => new TranslatableString(getKey(@"score_overlay_disabled"), @"The score overlay is currently disabled. You can toggle this by pressing {0}.", arg0);
+
+        /// <summary>
+        /// "The URL {0} has an unsupported or dangerous protocol and will not be opened."
+        /// </summary>
+        public static LocalisableString UnsupportedOrDangerousUrlProtocol(string url) => new TranslatableString(getKey(@"unsupported_or_dangerous_url_protocol"), @"The URL {0} has an unsupported or dangerous protocol and will not be opened.", url);
+
+        /// <summary>
+        /// "Subsequent messages have been logged. Click to view log files."
+        /// </summary>
+        public static LocalisableString SubsequentMessagesLogged => new TranslatableString(getKey(@"subsequent_messages_logged"), @"Subsequent messages have been logged. Click to view log files.");
+
+        /// <summary>
+        /// "Disabling tablet support due to error: &quot;{0}&quot;"
+        /// </summary>
+        public static LocalisableString TabletSupportDisabledDueToError(string message) => new TranslatableString(getKey(@"tablet_support_disabled_due_to_error"), @"Disabling tablet support due to error: ""{0}""", message);
+
+        /// <summary>
+        /// "Encountered tablet warning, your tablet may not function correctly. Click here for a list of all tablets supported."
+        /// </summary>
+        public static LocalisableString EncounteredTabletWarning => new TranslatableString(getKey(@"encountered_tablet_warning"), @"Encountered tablet warning, your tablet may not function correctly. Click here for a list of all tablets supported.");
+
+        /// <summary>
+        /// "This link type is not yet supported!"
+        /// </summary>
+        public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
+
+        /// <summary>
+        /// "You received a private message from '{0}'. Click to read it!"
+        /// </summary>
+        public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
+
+        /// <summary>
+        /// "Your name was mentioned in chat by '{0}'. Click to find out why!"
+        /// </summary>
+        public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

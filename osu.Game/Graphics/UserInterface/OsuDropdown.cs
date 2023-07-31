@@ -335,12 +335,11 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new Drawable[]
                         {
-                            Text = new OsuSpriteText
+                            Text = new TruncatingSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                             Icon = new SpriteIcon
                             {

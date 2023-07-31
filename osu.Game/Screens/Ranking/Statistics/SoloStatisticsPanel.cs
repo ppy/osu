@@ -23,32 +23,26 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
 
-        protected override ICollection<StatisticRow> CreateStatisticRows(ScoreInfo newScore, IBeatmap playableBeatmap)
+        protected override ICollection<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
         {
-            var rows = base.CreateStatisticRows(newScore, playableBeatmap);
+            var items = base.CreateStatisticItems(newScore, playableBeatmap);
 
             if (newScore.UserID > 1
                 && newScore.UserID == achievedScore.UserID
                 && newScore.OnlineID > 0
                 && newScore.OnlineID == achievedScore.OnlineID)
             {
-                rows = rows.Append(new StatisticRow
+                items = items.Append(new StatisticItem("Overall Ranking", () => new OverallRanking
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Overall Ranking", () => new OverallRanking
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Width = 0.5f,
-                            StatisticsUpdate = { BindTarget = StatisticsUpdate }
-                        })
-                    }
-                }).ToArray();
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f,
+                    StatisticsUpdate = { BindTarget = StatisticsUpdate }
+                })).ToArray();
             }
 
-            return rows;
+            return items;
         }
     }
 }
