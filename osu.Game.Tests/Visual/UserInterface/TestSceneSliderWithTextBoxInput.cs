@@ -59,5 +59,28 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("textbox changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
             AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
         }
+
+        [Test]
+        public void TestInstantaneousMode()
+        {
+            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("change text", () => textBox.Text = "3");
+            AddAssert("slider moved", () => slider.Current.Value, () => Is.EqualTo(3));
+            AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3));
+
+            AddStep("commit text", () => InputManager.Key(Key.Enter));
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(3));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3));
+
+            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(nub));
+            AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move mouse to minimum", () => InputManager.MoveMouseTo(sliderWithTextBoxInput.ScreenSpaceDrawQuad.BottomLeft));
+            AddAssert("textbox changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
+            AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("textbox not changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+        }
     }
 }
