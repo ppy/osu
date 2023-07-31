@@ -11,9 +11,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -35,6 +35,9 @@ namespace osu.Desktop
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -73,8 +76,8 @@ namespace osu.Desktop
 
             activity.BindValueChanged(_ =>
             {
-                fetchBeatmapSet();
                 updateStatus();
+                fetchBeatmapSet();
             });
 
             ruleset.BindValueChanged(_ => updateStatus());
@@ -119,7 +122,7 @@ namespace osu.Desktop
                     };
 
                     presence.Assets.LargeImageKey = default_image_key;
-                    if (beatmapSetOnline.Value != null && beatmapSetOnline.Value.Covers.List != null && Encoding.UTF8.GetByteCount(beatmapSetOnline.Value.Covers.List) <= 256) // Ensure the URL will fit and not throw.
+                    if (beatmapSetOnline.Value != null && Encoding.UTF8.GetByteCount(beatmapSetOnline.Value.Covers.List) <= 256) // Ensure the URL will fit and not throw.
                         presence.Assets.LargeImageKey = beatmapSetOnline.Value.Covers.List;
                 }
                 else
@@ -189,7 +192,7 @@ namespace osu.Desktop
             return null;
         }
 
-        private void fetchBeatmapSet()
+        private async void fetchBeatmapSet()
         {
             IBeatmapInfo? beatmap = getBeatmap(activity.Value);
             if (beatmap == null)
@@ -204,17 +207,21 @@ namespace osu.Desktop
             }
             else
             {
-                if (api.IsLoggedIn)
+                try
                 {
-                    var req = new GetBeatmapSetRequest(beatmap.OnlineID, BeatmapSetLookupType.BeatmapId);
-                    req.Success += res =>
+                    var beatmapOnline = await beatmapLookupCache.GetBeatmapAsync(beatmap.OnlineID);
+                    if (beatmapOnline != null && beatmapOnline.BeatmapSet != null)
                     {
-                        beatmapSetOnline.Value = res;
-                    };
-                    api.Queue(req);
+                        beatmapSetOnline.Value = beatmapOnline.BeatmapSet;
+                    }
+                    else
+                    {
+                        beatmapSetOnline.Value = null;
+                    }
                 }
-                else
+                catch(Exception)
                 {
+                    // ignoring exceptions as this is a "best attempt" feature.
                     beatmapSetOnline.Value = null;
                 }
             }
