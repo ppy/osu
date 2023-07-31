@@ -51,8 +51,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             textBox.OnCommit += (t, isNew) =>
             {
-                if (!isNew) return;
-
                 try
                 {
                     switch (slider.Current)
