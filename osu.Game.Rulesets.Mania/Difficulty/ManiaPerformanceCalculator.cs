@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
                 JudgementProbs pNotes = logPNote(dNote);
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
-                JudgementProbs pHolds = isLegacyScore ? pHold(dNote, dTail) : logPNote(dTail, tail_multiplier);
+                JudgementProbs pHolds = isLegacyScore ? legacyLogPHold(dNote, dTail) : logPNote(dTail, tail_multiplier);
 
                 return -totalProb(pNotes, pHolds, logNoteCount, logHoldCount);
             }
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             public double P0;
         }
 
-        // Log Judgement Probabilities given a deviation.
+        // Log Judgement Probabilities of a Note given a deviation.
         // The multiplier is for lazer LN tails, which are 1.5x as lenient.
         private JudgementProbs logPNote(double d, double multiplier = 1)
         {
@@ -223,8 +223,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return probabilities;
         }
 
-        // Probability of hitting a certain judgement on legacy LNs, which have different hit behaviour to Notes and lazer LNs.
-        private JudgementProbs pHold(double dHead, double dTail)
+        // Log Judgement Probabilities of a Legacy Hold given a deviation.
+        // This is only used for Legacy Holds, which has a different hit behaviour from Notes and lazer LNs.
+        private JudgementProbs legacyLogPHold(double dHead, double dTail)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
