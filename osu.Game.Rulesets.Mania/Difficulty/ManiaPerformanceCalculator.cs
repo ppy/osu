@@ -119,9 +119,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double dNote = d / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
                 double dTail = dNote * tail_deviation_multiplier;
 
-                JudgementProbs pNotes = pNote(dNote);
+                JudgementProbs pNotes = logPNote(dNote);
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
-                JudgementProbs pHolds = isLegacyScore ? pHold(dNote, dTail) : pNote(dTail, tail_multiplier);
+                JudgementProbs pHolds = isLegacyScore ? pHold(dNote, dTail) : logPNote(dTail, tail_multiplier);
 
                 return -totalProb(pNotes, pHolds, logNoteCount, logHoldCount);
             }
@@ -206,8 +206,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             public double P0;
         }
 
-        // Probability of hitting a certain judgement on Notes given a deviation. The multiplier is for lazer LN tails, which are 1.5x as lenient.
-        private JudgementProbs pNote(double d, double multiplier = 1)
+        // Log Judgement Probabilities given a deviation.
+        // The multiplier is for lazer LN tails, which are 1.5x as lenient.
+        private JudgementProbs logPNote(double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
