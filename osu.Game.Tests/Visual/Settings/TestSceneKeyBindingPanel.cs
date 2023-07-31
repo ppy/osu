@@ -195,16 +195,16 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
-                var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
+                var resetButton = settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First();
 
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
 
             AddAssert("binding cleared",
                 () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
@@ -225,7 +225,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.Settings
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
 
             AddAssert("binding cleared",
                 () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));

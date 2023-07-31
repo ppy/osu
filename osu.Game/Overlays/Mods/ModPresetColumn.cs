@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Mods
         private Task? latestLoadTask;
         internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true;
 
-        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet changes, Exception error)
+        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet? changes)
         {
             cancellationTokenSource?.Cancel();
 

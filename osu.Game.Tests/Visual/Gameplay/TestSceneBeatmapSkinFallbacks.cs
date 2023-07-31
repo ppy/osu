@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -77,7 +78,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
                     (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
                     (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
-                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>())
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>()),
+                    (typeof(InputCountController), actualComponentsContainer.Dependencies.Get<InputCountController>())
                 },
             };
 

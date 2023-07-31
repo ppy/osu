@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
         public RoundedSliderBar()
         {
             Height = Nub.HEIGHT;
-            RangePadding = Nub.EXPANDED_SIZE / 2;
+            RangePadding = Nub.DEFAULT_EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 new Container

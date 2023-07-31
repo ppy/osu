@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;
 
-            protected override Texture GetBackground() => throw new NotImplementedException();
+            public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 

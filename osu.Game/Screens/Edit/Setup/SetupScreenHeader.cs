@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             base.LoadComplete();
 
-            sections.SelectedSection.BindValueChanged(section => tabControl.Current.Value = section.NewValue);
+            sections.SelectedSection.BindValueChanged(section => tabControl.Current.Value = section.NewValue!);
             tabControl.Current.BindValueChanged(section =>
             {
                 if (section.NewValue != sections.SelectedSection.Value)

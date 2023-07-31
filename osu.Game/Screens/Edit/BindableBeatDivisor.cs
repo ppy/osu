@@ -59,16 +59,18 @@ namespace osu.Game.Screens.Edit
                 Value = 1;
         }
 
-        public void Next()
+        public void SelectNext()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) ?? presets[0];
+            if (presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) is int newValue)
+                Value = newValue;
         }
 
-        public void Previous()
+        public void SelectPrevious()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() ?? presets[^1];
+            if (presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() is int newValue)
+                Value = newValue;
         }
 
         protected override int DefaultPrecision => 1;
