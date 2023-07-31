@@ -60,6 +60,26 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("textbox changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
             AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("set text to invalid", () => textBox.Text = "garbage");
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("commit text", () => InputManager.Key(Key.Enter));
+            AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("set text to invalid", () => textBox.Text = "garbage");
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("lose focus", () => InputManager.ChangeFocus(null));
+            AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
         }
 
         [Test]
@@ -84,6 +104,26 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("textbox not changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("set text to invalid", () => textBox.Text = "garbage");
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("commit text", () => InputManager.Key(Key.Enter));
+            AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("set text to invalid", () => textBox.Text = "garbage");
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
+
+            AddStep("lose focus", () => InputManager.ChangeFocus(null));
+            AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
+            AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
         }
     }
