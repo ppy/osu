@@ -98,15 +98,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// </summary>
         private double? computeEstimatedUr(ManiaDifficultyAttributes attributes)
         {
-            if (totalSuccessfulJudgements == 0 || attributes.NoteCount + attributes.HoldNoteCount == 0)
+            int noteCount = attributes.NoteCount;
+            int holdNoteCount = attributes.HoldNoteCount;
+            if (totalSuccessfulJudgements == 0 || noteCount + holdNoteCount == 0)
                 return null;
 
             // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
-            double logNoteCount = Math.Log(isLegacyScore ? attributes.NoteCount : attributes.NoteCount + attributes.HoldNoteCount);
-            double logHoldCount = Math.Log(attributes.HoldNoteCount);
+            double logNoteCount = Math.Log(isLegacyScore ? noteCount : noteCount + holdNoteCount);
+            double logHoldCount = Math.Log(holdNoteCount);
 
-            double noteHeadPortion = (double)(attributes.NoteCount + attributes.HoldNoteCount) / (attributes.NoteCount + attributes.HoldNoteCount * 2);
-            double tailPortion = (double)attributes.HoldNoteCount / (attributes.NoteCount + attributes.HoldNoteCount * 2);
+            double noteHeadPortion = (double)(noteCount + holdNoteCount) / (noteCount + holdNoteCount * 2);
+            double tailPortion = (double)holdNoteCount / (noteCount + holdNoteCount * 2);
 
             double likelihoodGradient(double d)
             {
