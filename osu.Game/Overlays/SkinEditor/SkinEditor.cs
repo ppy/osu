@@ -356,7 +356,7 @@ namespace osu.Game.Overlays.SkinEditor
                     {
                         new SettingsDropdown<SkinComponentsContainerLookup?>
                         {
-                            Items = availableTargets.Select(t => t.Lookup),
+                            Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
                         }
                     }
