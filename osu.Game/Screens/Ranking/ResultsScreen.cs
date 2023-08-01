@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Ranking
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? AllowGlobalTrackControl => true;
+
         // Temporary for now to stop dual transitions. Should respect the current toolbar mode, but there's no way to do so currently.
         public override bool HideOverlaysOnEnter => true;
 
