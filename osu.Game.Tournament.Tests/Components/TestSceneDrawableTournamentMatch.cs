@@ -1,10 +1,11 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
@@ -12,60 +13,67 @@ namespace osu.Game.Tournament.Tests.Components
 {
     public partial class TestSceneDrawableTournamentMatch : TournamentTestScene
     {
-        public TestSceneDrawableTournamentMatch()
+        [Test]
+        public void TestBasic()
         {
-            Container<DrawableTournamentMatch> level1;
-            Container<DrawableTournamentMatch> level2;
+            Container<DrawableTournamentMatch> level1 = null!;
+            Container<DrawableTournamentMatch> level2 = null!;
 
-            var match1 = new TournamentMatch(
-                new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" }, },
-                new TournamentTeam { FlagName = { Value = "JP" }, FullName = { Value = "Japan" }, Acronym = { Value = "JPN" } })
+            TournamentMatch match1 = null!;
+            TournamentMatch match2 = null!;
+
+            AddStep("setup test", () =>
             {
-                Team1Score = { Value = 4 },
-                Team2Score = { Value = 1 },
-            };
-
-            var match2 = new TournamentMatch(
-                new TournamentTeam
+                match1 = new TournamentMatch(
+                    new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" }, },
+                    new TournamentTeam { FlagName = { Value = "JP" }, FullName = { Value = "Japan" }, Acronym = { Value = "JPN" } })
                 {
-                    FlagName = { Value = "RO" },
-                    FullName = { Value = "Romania" },
-                }
-            );
+                    Team1Score = { Value = 4 },
+                    Team2Score = { Value = 1 },
+                };
 
-            Child = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
+                match2 = new TournamentMatch(
+                    new TournamentTeam
+                    {
+                        FlagName = { Value = "RO" },
+                        FullName = { Value = "Romania" },
+                    }
+                );
+
+                Child = new FillFlowContainer
                 {
-                    level1 = new FillFlowContainer<DrawableTournamentMatch>
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new[]
+                        level1 = new FillFlowContainer<DrawableTournamentMatch>
                         {
-                            new DrawableTournamentMatch(match1),
-                            new DrawableTournamentMatch(match2),
-                            new DrawableTournamentMatch(new TournamentMatch()),
-                        }
-                    },
-                    level2 = new FillFlowContainer<DrawableTournamentMatch>
-                    {
-                        AutoSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding(20),
-                        Children = new[]
+                            AutoSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical,
+                            Children = new[]
+                            {
+                                new DrawableTournamentMatch(match1),
+                                new DrawableTournamentMatch(match2),
+                                new DrawableTournamentMatch(new TournamentMatch()),
+                            }
+                        },
+                        level2 = new FillFlowContainer<DrawableTournamentMatch>
                         {
-                            new DrawableTournamentMatch(new TournamentMatch()),
-                            new DrawableTournamentMatch(new TournamentMatch())
+                            AutoSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical,
+                            Margin = new MarginPadding(20),
+                            Children = new[]
+                            {
+                                new DrawableTournamentMatch(new TournamentMatch()),
+                                new DrawableTournamentMatch(new TournamentMatch())
+                            }
                         }
                     }
-                }
-            };
+                };
 
-            level1.Children[0].Match.Progression.Value = level2.Children[0].Match;
-            level1.Children[1].Match.Progression.Value = level2.Children[0].Match;
+                level1.Children[0].Match.Progression.Value = level2.Children[0].Match;
+                level1.Children[1].Match.Progression.Value = level2.Children[0].Match;
+            });
 
             AddRepeatStep("change scores", () => match1.Team2Score.Value++, 4);
             AddStep("add new team", () => match2.Team2.Value = new TournamentTeam { FlagName = { Value = "PT" }, FullName = { Value = "Portugal" } });
@@ -80,6 +88,9 @@ namespace osu.Game.Tournament.Tests.Components
             AddRepeatStep("change scores", () => level2.Children[0].Match.Team1Score.Value++, 5);
 
             AddRepeatStep("change scores", () => level2.Children[0].Match.Team2Score.Value++, 4);
+
+            AddStep("select as current", () => match1.Current.Value = true);
+            AddStep("select as editing", () => this.ChildrenOfType<DrawableTournamentMatch>().Last().Selected = true);
         }
     }
 }

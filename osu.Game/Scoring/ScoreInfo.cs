@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -16,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
@@ -25,7 +25,6 @@ namespace osu.Game.Scoring
     /// <summary>
     /// A realm model containing metadata for a single score.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
@@ -36,9 +35,16 @@ namespace osu.Game.Scoring
         /// The <see cref="BeatmapInfo"/> this score was made against.
         /// </summary>
         /// <remarks>
-        /// When setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
+        /// <para>
+        /// This property may be <see langword="null"/> if the score was set on a beatmap (or a version of the beatmap) that is not available locally
+        /// e.g. due to online updates, or local modifications to the beatmap.
+        /// The property will only link to a <see cref="BeatmapInfo"/> if its <see cref="Beatmaps.BeatmapInfo.Hash"/> matches <see cref="BeatmapHash"/>.
+        /// </para>
+        /// <para>
+        /// Due to the above, whenever setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
+        /// </para>
         /// </remarks>
-        public BeatmapInfo BeatmapInfo { get; set; } = null!;
+        public BeatmapInfo? BeatmapInfo { get; set; }
 
         /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
@@ -54,6 +60,26 @@ namespace osu.Game.Scoring
         public bool DeletePending { get; set; }
 
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The version of processing applied to calculate total score as stored in the database.
+        /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
+        /// the total score has not yet been updated to reflect the current scoring values.
+        ///
+        /// See <see cref="BackgroundBeatmapProcessor"/>'s conversion logic.
+        /// </summary>
+        /// <remarks>
+        /// This may not match the version stored in the replay files.
+        /// </remarks>
+        public int TotalScoreVersion { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
+
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        /// <remarks>
+        /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
+        /// </remarks>
+        public long? LegacyTotalScore { get; set; }
 
         public int MaxCombo { get; set; }
 
@@ -84,6 +110,7 @@ namespace osu.Game.Scoring
         {
             Ruleset = ruleset ?? new RulesetInfo();
             BeatmapInfo = beatmap ?? new BeatmapInfo();
+            BeatmapHash = BeatmapInfo.Hash;
             RealmUser = realmUser ?? new RealmUser();
             ID = Guid.NewGuid();
         }
@@ -130,13 +157,11 @@ namespace osu.Game.Scoring
         public int RankInt { get; set; }
 
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
+        IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
-
-        public Guid BeatmapInfoID => BeatmapInfo.ID;
 
         public int UserID => RealmUser.OnlineID;
 
@@ -183,8 +208,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [Ignored]
-        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+        public bool IsLegacyScore { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 

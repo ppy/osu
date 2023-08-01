@@ -12,7 +12,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -28,10 +27,9 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz", ".olz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
@@ -70,7 +68,7 @@ namespace osu.Game.Beatmaps
 
                 Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
 
-                original = realm.Find<BeatmapSetInfo>(original.ID);
+                original = realm!.Find<BeatmapSetInfo>(original.ID)!;
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
@@ -147,7 +145,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
+        protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
@@ -206,6 +204,14 @@ namespace osu.Game.Beatmaps
         protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
         {
             base.PostImport(model, realm, parameters);
+
+            // Scores are stored separately from beatmaps, and persist even when a beatmap is modified or deleted.
+            // Let's reattach any matching scores that exist in the database, based on hash.
+            foreach (BeatmapInfo beatmap in model.Beatmaps)
+            {
+                beatmap.UpdateLocalScores(realm);
+            }
+
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
         }
 

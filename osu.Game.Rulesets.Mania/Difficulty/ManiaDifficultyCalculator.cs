@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -33,9 +31,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override int Version => 20220902;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
+
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
             originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
@@ -52,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             int holdNoteCount = beatmap.HitObjects.Count(h => h is HoldNote);
             bool isConvert = beatmap.BeatmapInfo.Ruleset.OnlineID != 3;
 
-            return new ManiaDifficultyAttributes
+            ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
@@ -65,6 +67,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 HoldNoteCount = holdNoteCount,
                 IsConvert = isConvert
             };
+
+            if (ComputeLegacyScoringValues)
+            {
+                ManiaLegacyScoreSimulator sv1Simulator = new ManiaLegacyScoreSimulator();
+                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
+                attributes.LegacyComboScore = sv1Simulator.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
+            }
+
+            return attributes;
         }
 
         private static int maxComboForObject(HitObject hitObject)

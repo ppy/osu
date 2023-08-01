@@ -15,10 +15,10 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -35,6 +35,7 @@ namespace osu.Game.Tournament
         private TournamentStorage storage;
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
+        private BeatmapLookupCache beatmapCache;
 
         protected Task BracketLoadTask => bracketLoadTaskCompletionSource.Task;
 
@@ -75,6 +76,8 @@ namespace osu.Game.Tournament
             Textures.AddTextureSource(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
+
+            beatmapCache = dependencies.Get<BeatmapLookupCache>();
         }
 
         protected override void LoadComplete()
@@ -89,7 +92,7 @@ namespace osu.Game.Tournament
             Task.Run(readBracket);
         }
 
-        private void readBracket()
+        private async Task readBracket()
         {
             try
             {
@@ -97,7 +100,7 @@ namespace osu.Game.Tournament
                 {
                     using (Stream stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Read, FileMode.Open))
                     using (var sr = new StreamReader(stream))
-                        ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
+                        ladder = JsonConvert.DeserializeObject<LadderInfo>(await sr.ReadToEndAsync().ConfigureAwait(false), new JsonPointConverter());
                 }
 
                 ladder ??= new LadderInfo();
@@ -161,8 +164,8 @@ namespace osu.Game.Tournament
                 }
 
                 addedInfo |= addPlayers();
-                addedInfo |= addRoundBeatmaps();
-                addedInfo |= addSeedingBeatmaps();
+                addedInfo |= await addRoundBeatmaps().ConfigureAwait(false);
+                addedInfo |= await addSeedingBeatmaps().ConfigureAwait(false);
 
                 if (addedInfo)
                     saveChanges();
@@ -228,11 +231,11 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing beatmap info based on beatmap IDs
         /// </summary>
-        private bool addRoundBeatmaps()
+        private async Task<bool> addRoundBeatmaps()
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
+                                                    .Where(b => (b.Beatmap == null || b.Beatmap?.OnlineID == 0) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -241,9 +244,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
-                API.Perform(req);
-                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -254,7 +257,7 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing beatmap info based on beatmap IDs
         /// </summary>
-        private bool addSeedingBeatmaps()
+        private async Task<bool> addSeedingBeatmaps()
         {
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
@@ -268,9 +271,9 @@ namespace osu.Game.Tournament
             {
                 var b = beatmapsRequiringPopulation[i];
 
-                var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
-                API.Perform(req);
-                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
+                var populated = await beatmapCache.GetBeatmapAsync(b.ID).ConfigureAwait(false);
+                if (populated != null)
+                    b.Beatmap = new TournamentBeatmap(populated);
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }

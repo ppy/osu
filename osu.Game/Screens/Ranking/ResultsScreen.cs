@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Ranking
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? AllowGlobalTrackControl => true;
+
         // Temporary for now to stop dual transitions. Should respect the current toolbar mode, but there's no way to do so currently.
         public override bool HideOverlaysOnEnter => true;
 
@@ -160,7 +162,7 @@ namespace osu.Game.Screens.Ranking
 
             if (allowWatchingReplay)
             {
-                buttons.Add(new ReplayDownloadButton(null)
+                buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
                     Score = { BindTarget = SelectedScore },
                     Width = 300
@@ -305,7 +307,7 @@ namespace osu.Game.Screens.Ranking
                 float origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
                 expandedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
+                             .MoveToX(StatisticsPanel.SIDE_PADDING, 400, Easing.OutElasticQuarter);
 
                 // Hide contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -313,7 +315,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.1f), 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.4f), 400, Easing.OutQuint));
 
                 detachedPanel = expandedPanel;
             }
@@ -329,7 +331,7 @@ namespace osu.Game.Screens.Ranking
                 float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveToX(0, 150, Easing.OutQuint);
+                             .MoveToX(0, 250, Easing.OutElasticQuarter);
 
                 // Show contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -337,7 +339,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 250, Easing.OutQuint));
 
                 detachedPanel = null;
             }

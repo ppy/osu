@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -367,17 +368,27 @@ namespace osu.Game.Skinning
                                 {
                                     songProgress.Anchor = Anchor.TopRight;
                                     songProgress.Origin = Anchor.CentreRight;
-                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+
+                                    if (keyCounter != null)
+                                    {
+                                        const float padding = 10;
+
+                                        keyCounter.Anchor = Anchor.BottomRight;
+                                        keyCounter.Origin = Anchor.BottomRight;
+                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
+                                    }
                                 }
                             })
                             {
@@ -386,9 +397,10 @@ namespace osu.Game.Skinning
                                     new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
-                                    new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
+                                    new DefaultKeyCounterDisplay()
                                 }
                             };
                     }
@@ -456,6 +468,13 @@ namespace osu.Game.Skinning
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
+            switch (componentName)
+            {
+                case "Menu/fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
             foreach (string name in getFallbackNames(componentName))
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)

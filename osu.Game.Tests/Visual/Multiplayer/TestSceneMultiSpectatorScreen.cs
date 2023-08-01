@@ -65,6 +65,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("clear playing users", () => playingUsers.Clear());
         }
 
+        [TestCase(1)]
+        [TestCase(4)]
+        public void TestGeneral(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
         [Test]
         public void TestDelayedStart()
         {
@@ -86,18 +99,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddWaitStep("wait a bit", 10);
             AddStep("load player second_player_id", () => SpectatorClient.SendStartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
-        }
-
-        [Test]
-        public void TestGeneral()
-        {
-            int[] userIds = getPlayerIds(4);
-
-            start(userIds);
-            loadSpectateScreen();
-
-            sendFrames(userIds, 1000);
-            AddWaitStep("wait a bit", 20);
         }
 
         [Test]

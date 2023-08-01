@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
     <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
@@ -30,14 +30,14 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2022.809.0">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2023.712.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Realm" Version="10.20.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2023.418.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.417.0" />
+    <PackageReference Include="Realm" Version="11.1.2" />
+    <PackageReference Include="ppy.osu.Framework" Version="2023.801.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.719.0" />
     <PackageReference Include="Sentry" Version="3.28.1" />
     <PackageReference Include="SharpCompress" Version="0.32.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
