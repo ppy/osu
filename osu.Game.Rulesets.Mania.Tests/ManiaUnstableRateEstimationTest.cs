@@ -13,6 +13,7 @@ using osu.Game.Tests.Beatmaps;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using JetBrains.Annotations;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -50,19 +51,10 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void Test3(int[] judgements)
             => TestSingleNoteBound(judgements);
 
-        // Compares the true hit windows to the hit windows computed manually in perfcalc, within a margin of error of +-0.000001ms.
-        [TestCase(0.0d)]
-        [TestCase(2.5d)]
-        [TestCase(5.0d)]
-        [TestCase(7.5d)]
-        [TestCase(10.0d)]
-        public void Test4(double overallDifficulty)
-            => TestHitWindows(overallDifficulty);
-
-        protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, string name, params Mod[] mods)
+        // Evaluates the Unstable Rate estimation of a beatmap with the given judgements.
+        private double? computeUnstableRate(DifficultyAttributes attr, int[] judgementCounts,
+                                            [CanBeNull] string resourceName = null, params Mod[] mods)
         {
-            DifficultyAttributes attributes = new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, getBeatmap(name)).Calculate(mods);
-
             var judgements = new Dictionary<HitResult, int>
             {
                 { HitResult.Perfect, judgementCounts[0] },
@@ -73,36 +65,33 @@ namespace osu.Game.Rulesets.Mania.Tests
                 { HitResult.Miss, judgementCounts[5] }
             };
 
-            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo(getBeatmap(name).BeatmapInfo)
-            {
-                Mods = mods,
-                Statistics = judgements
-            }, attributes);
+            var beatmapInfo = resourceName == null ? null : getBeatmap(resourceName).BeatmapInfo;
+            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(
+                new ScoreInfo(beatmapInfo)
+                {
+                    Mods = mods,
+                    Statistics = judgements
+                }, attr
+            );
 
+            return perfAttributes.EstimatedUr;
+        }
+
+        protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, string name, params Mod[] mods)
+        {
+            DifficultyAttributes attributes = new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, getBeatmap(name)).Calculate(mods);
+
+            double? estimatedUr = computeUnstableRate(attributes, judgementCounts, name, mods);
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
-            Assert.That(perfAttributes.EstimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
+            Assert.That(estimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
         }
 
         protected void TestNullUnstableRate(bool expectedNullStatus, int[] judgementCounts)
         {
             DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 10 };
 
-            var judgements = new Dictionary<HitResult, int>
-            {
-                { HitResult.Perfect, judgementCounts[0] },
-                { HitResult.Great, judgementCounts[1] },
-                { HitResult.Good, judgementCounts[2] },
-                { HitResult.Ok, judgementCounts[3] },
-                { HitResult.Meh, judgementCounts[4] },
-                { HitResult.Miss, judgementCounts[5] }
-            };
-
-            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo
-            {
-                Statistics = judgements
-            }, attributes);
-
-            bool isNull = perfAttributes.EstimatedUr == null;
+            double? estimatedUr = computeUnstableRate(attributes, judgementCounts);
+            bool isNull = estimatedUr == null;
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
             Assert.That(isNull, Is.EqualTo(expectedNullStatus), "The estimated mania UR was/wasn't null.");
@@ -112,23 +101,8 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 0 };
 
-            var judgements = new Dictionary<HitResult, int>
-            {
-                { HitResult.Perfect, judgementCounts[0] },
-                { HitResult.Great, judgementCounts[1] },
-                { HitResult.Good, judgementCounts[2] },
-                { HitResult.Ok, judgementCounts[3] },
-                { HitResult.Meh, judgementCounts[4] },
-                { HitResult.Miss, judgementCounts[5] }
-            };
-
-            ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(new ScoreInfo
-            {
-                Statistics = judgements
-            }, attributes);
-
-            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
-            Assert.That(perfAttributes.EstimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
+            double? estimatedUr = computeUnstableRate(attributes, judgementCounts);
+            Assert.That(estimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
         }
 
         protected void TestHitWindows(double overallDifficulty)
