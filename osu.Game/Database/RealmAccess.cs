@@ -82,8 +82,9 @@ namespace osu.Game.Database
         /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
         /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
         /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
+        /// 32   2023-08-01    Added a new keybind that toggles the in-game leaderboard on and off
         /// </summary>
-        private const int schema_version = 32;
+        private const int schema_version = 33;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -771,6 +772,7 @@ namespace osu.Game.Database
                     break;
 
                 case 8:
+                {
                     // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
                     // New defaults will be populated by the key store afterwards.
                     var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
@@ -784,6 +786,7 @@ namespace osu.Game.Database
                         migration.NewRealm.Remove(decreaseSpeedBinding);
 
                     break;
+                }
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
@@ -838,6 +841,7 @@ namespace osu.Game.Database
                     break;
 
                 case 11:
+                {
                     string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
 
                     if (!migration.OldRealm.Schema.TryFindObjectSchema(keyBindingClassName, out _))
@@ -864,6 +868,7 @@ namespace osu.Game.Database
                     }
 
                     break;
+                }
 
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
@@ -1009,6 +1014,14 @@ namespace osu.Game.Database
                             score.LegacyTotalScore = score.TotalScore = totalScore;
                         });
                     }
+
+                    break;
+                }
+
+                case 33:
+                {
+                    var oldKeyBinds = migration.NewRealm.All<RealmKeyBinding>();
+                    var newKeyBinds = migration.NewRealm.All<RealmKeyBinding>();
 
                     break;
                 }
