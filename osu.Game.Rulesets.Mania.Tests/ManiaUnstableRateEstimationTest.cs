@@ -4,19 +4,12 @@
 #nullable disable
 
 using NUnit.Framework;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Scoring;
-using osu.Game.Tests.Beatmaps;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using JetBrains.Annotations;
-using osu.Framework.Extensions.ObjectExtensions;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.IO;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -29,15 +22,15 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         // Test that both SS scores and near 0% scores are handled properly, within a margin of +-0.001 UR
-        [TestCase(42.978515625d, new[] { 11847, 0, 0, 0, 0, 0 }, "ur-estimation-test")]
-        [TestCase(9523485.0d, new[] { 0, 0, 0, 0, 1, 11846 }, "ur-estimation-test")]
-        public void Test1(double expectedEstimatedUnstableRate, int[] judgements, string name)
-            => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name);
+        [TestCase(42.978515625d, new[] { 11847, 0, 0, 0, 0, 0 })]
+        [TestCase(9523485.0d, new[] { 0, 0, 0, 0, 1, 11846 })]
+        public void Test1(double expectedEstimatedUnstableRate, int[] judgements)
+            => TestUnstableRate(expectedEstimatedUnstableRate, judgements);
 
         // General test to make sure UR estimation isn't changed by anything, inclusive of rate changing, within a margin of +-0.001 UR.
-        [TestCase(309.990234375d, new[] { 5336, 3886, 1661, 445, 226, 293 }, "ur-estimation-test")]
-        public void Test1ClockRateAdjusted(double expectedEstimatedUnstableRate, int[] judgements, string name)
-            => TestUnstableRate(expectedEstimatedUnstableRate, judgements, name, new ManiaModDoubleTime());
+        [TestCase(309.990234375d, new[] { 5336, 3886, 1661, 445, 226, 293 })]
+        public void Test1ClockRateAdjusted(double expectedEstimatedUnstableRate, int[] judgements)
+            => TestUnstableRate(expectedEstimatedUnstableRate, judgements, new ManiaModDoubleTime());
 
         // Ensure the UR estimation only returns null when it is supposed to.
         [TestCase(false, new[] { 1, 0, 0, 0, 0, 0 })]
@@ -52,8 +45,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             => TestSingleNoteBound(judgements);
 
         // Evaluates the Unstable Rate estimation of a beatmap with the given judgements.
-        private double? computeUnstableRate(DifficultyAttributes attr, int[] judgementCounts,
-                                            [CanBeNull] string resourceName = null, params Mod[] mods)
+        private double? computeUnstableRate(DifficultyAttributes attr, int[] judgementCounts, params Mod[] mods)
         {
             var judgements = new Dictionary<HitResult, int>
             {
@@ -65,9 +57,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 { HitResult.Miss, judgementCounts[5] }
             };
 
-            var beatmapInfo = resourceName == null ? null : getBeatmap(resourceName).BeatmapInfo;
             ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(
-                new ScoreInfo(beatmapInfo)
+                new ScoreInfo
                 {
                     Mods = mods,
                     Statistics = judgements
@@ -77,11 +68,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             return perfAttributes.EstimatedUr;
         }
 
-        protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, string name, params Mod[] mods)
+        protected void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, params Mod[] mods)
         {
-            DifficultyAttributes attributes = new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, getBeatmap(name)).Calculate(mods);
+            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = judgementCounts.Sum(), OverallDifficulty = 7 };
 
-            double? estimatedUr = computeUnstableRate(attributes, judgementCounts, name, mods);
+            double? estimatedUr = computeUnstableRate(attributes, judgementCounts, mods);
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
             Assert.That(estimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
         }
@@ -105,6 +96,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             Assert.That(estimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
         }
 
+        // TODO: @Natelytle Is this used for anything?
         protected void TestHitWindows(double overallDifficulty)
         {
             DifficultyAttributes attributes = new ManiaDifficultyAttributes { OverallDifficulty = overallDifficulty };
@@ -125,31 +117,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
             Assert.That(perfAttributes.HitWindows, Is.EqualTo(trueHitWindows).Within(0.000001), "The true mania hit windows are different to the ones calculated in ManiaPerformanceCalculator.");
-        }
-
-        private WorkingBeatmap getBeatmap(string name)
-        {
-            using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
-            using (var stream = new LineBufferedReader(resStream))
-            {
-                var decoder = Decoder.GetDecoder<Beatmap>(stream);
-
-                ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
-
-                return new TestWorkingBeatmap(decoder.Decode(stream))
-                {
-                    BeatmapInfo =
-                    {
-                        Ruleset = new ManiaRuleset().RulesetInfo
-                    }
-                };
-            }
-        }
-
-        private Stream openResource(string name)
-        {
-            string localPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).AsNonNull();
-            return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
     }
 }
