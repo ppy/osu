@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 ? GetLegacyHitWindows(score.Mods, maniaAttributes.IsConvert, maniaAttributes.OverallDifficulty)
                 : GetLazerHitWindows(score.Mods, maniaAttributes.OverallDifficulty);
 
-            estimatedUr = computeEstimatedUr(maniaAttributes);
+            estimatedUr = computeEstimatedUr(maniaAttributes.NoteCount, maniaAttributes.HoldNoteCount);
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -100,10 +100,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Returns the estimated tapping deviation of the score, assuming the average hit location is in the center of the hit window.
         /// </summary>
-        private double? computeEstimatedUr(ManiaDifficultyAttributes attributes)
+        private double? computeEstimatedUr(int noteCount, int holdNoteCount)
         {
-            int noteCount = attributes.NoteCount;
-            int holdNoteCount = attributes.HoldNoteCount;
             if (totalSuccessfulJudgements == 0 || noteCount + holdNoteCount == 0)
                 return null;
 
