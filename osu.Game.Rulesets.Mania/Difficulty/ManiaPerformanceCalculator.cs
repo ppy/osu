@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && !Precision.DefinitelyBigger(totalJudgements, maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount);
-            hitWindows = isLegacyScore ? getLegacyHitWindows(score, maniaAttributes) : getLazerHitWindows(score, maniaAttributes);
+            hitWindows = isLegacyScore ? GetLegacyHitWindows(score, maniaAttributes) : GetLazerHitWindows(score, maniaAttributes);
             estimatedUr = computeEstimatedUr(maniaAttributes);
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return deviation * 10;
         }
 
-        private double[] getLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        public static double[] GetLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             double[] legacyHitWindows = new double[5];
 
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return legacyHitWindows;
         }
 
-        private double[] getLazerHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        public static double[] GetLazerHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
         {
             double[] lazerHitWindows = new double[5];
 
