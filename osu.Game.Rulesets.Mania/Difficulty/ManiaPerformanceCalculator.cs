@@ -53,7 +53,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && !Precision.DefinitelyBigger(totalJudgements, maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount);
-            hitWindows = isLegacyScore ? GetLegacyHitWindows(score, maniaAttributes) : GetLazerHitWindows(score, maniaAttributes);
+
+            hitWindows = isLegacyScore
+                ? GetLegacyHitWindows(score.Mods, maniaAttributes.IsConvert, maniaAttributes.OverallDifficulty)
+                : GetLazerHitWindows(score.Mods, maniaAttributes.OverallDifficulty);
+
             estimatedUr = computeEstimatedUr(maniaAttributes);
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
@@ -132,20 +136,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return deviation * 10;
         }
 
-        public static double[] GetLegacyHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        public static double[] GetLegacyHitWindows(Mod[] mods, bool isConvert, double overallDifficulty)
         {
             double[] legacyHitWindows = new double[5];
 
-            double overallDifficulty = attributes.OverallDifficulty;
             double greatWindowLeniency = 0;
             double goodWindowLeniency = 0;
 
             // When converting beatmaps to osu!mania in stable, the resulting hit window sizes are dependent on whether the beatmap's OD is above or below 4.
-            if (attributes.IsConvert)
+            if (isConvert)
             {
                 overallDifficulty = 10;
 
-                if (attributes.OverallDifficulty <= 4)
+                if (overallDifficulty <= 4)
                 {
                     greatWindowLeniency = 13;
                     goodWindowLeniency = 10;
@@ -154,9 +157,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double windowMultiplier = 1;
 
-            if (score.Mods.Any(m => m is ModHardRock))
+            if (mods.Any(m => m is ModHardRock))
                 windowMultiplier *= 1 / 1.4;
-            else if (score.Mods.Any(m => m is ModEasy))
+            else if (mods.Any(m => m is ModEasy))
                 windowMultiplier *= 1.4;
 
             legacyHitWindows[0] = Math.Floor(16 * windowMultiplier);
@@ -168,30 +171,30 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return legacyHitWindows;
         }
 
-        public static double[] GetLazerHitWindows(ScoreInfo score, ManiaDifficultyAttributes attributes)
+        public static double[] GetLazerHitWindows(Mod[] mods, double overallDifficulty)
         {
             double[] lazerHitWindows = new double[5];
 
             // Create a new track of arbitrary length, and apply the total rate change of every mod to the track (i.e. DT = 1.01-2x, HT = 0.5-0.99x)
             var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
 
             double windowMultiplier = 1 / clockRate;
 
-            if (score.Mods.Any(m => m is ModHardRock))
+            if (mods.Any(m => m is ModHardRock))
                 windowMultiplier *= 1 / 1.4;
-            else if (score.Mods.Any(m => m is ModEasy))
+            else if (mods.Any(m => m is ModEasy))
                 windowMultiplier *= 1.4;
 
-            if (attributes.OverallDifficulty < 5)
-                lazerHitWindows[0] = (22.4 - 0.6 * attributes.OverallDifficulty) * windowMultiplier;
+            if (overallDifficulty < 5)
+                lazerHitWindows[0] = (22.4 - 0.6 * overallDifficulty) * windowMultiplier;
             else
-                lazerHitWindows[0] = (24.9 - 1.1 * attributes.OverallDifficulty) * windowMultiplier;
-            lazerHitWindows[1] = (64 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            lazerHitWindows[2] = (97 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            lazerHitWindows[3] = (127 - 3 * attributes.OverallDifficulty) * windowMultiplier;
-            lazerHitWindows[4] = (151 - 3 * attributes.OverallDifficulty) * windowMultiplier;
+                lazerHitWindows[0] = (24.9 - 1.1 * overallDifficulty) * windowMultiplier;
+            lazerHitWindows[1] = (64 - 3 * overallDifficulty) * windowMultiplier;
+            lazerHitWindows[2] = (97 - 3 * overallDifficulty) * windowMultiplier;
+            lazerHitWindows[3] = (127 - 3 * overallDifficulty) * windowMultiplier;
+            lazerHitWindows[4] = (151 - 3 * overallDifficulty) * windowMultiplier;
 
             return lazerHitWindows;
         }
