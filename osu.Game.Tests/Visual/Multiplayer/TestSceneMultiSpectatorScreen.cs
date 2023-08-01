@@ -67,6 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         [TestCase(1)]
         [TestCase(4)]
+        [TestCase(9)]
         public void TestGeneral(int count)
         {
             int[] userIds = getPlayerIds(count);
