@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Play
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? AllowGlobalTrackControl => false;
+
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
