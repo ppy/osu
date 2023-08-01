@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected StatisticsPanel StatisticsPanel;
+        protected StatisticsPanel StatisticsPanel { get; private set; }
 
         private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
