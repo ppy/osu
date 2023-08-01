@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play.HUD
         private Drawable score1Bar;
         private Drawable score2Bar;
 
+        private MatchScoreDiffCounter scoreDiffText;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -98,6 +100,16 @@ namespace osu.Game.Screens.Play.HUD
                         },
                     }
                 },
+                scoreDiffText = new MatchScoreDiffCounter
+                {
+                    Anchor = Anchor.TopCentre,
+                    Margin = new MarginPadding
+                    {
+                        Top = bar_height / 4,
+                        Horizontal = 8
+                    },
+                    Alpha = 0
+                }
             };
         }
 
@@ -139,6 +151,10 @@ namespace osu.Game.Screens.Play.HUD
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
+
+            scoreDiffText.Alpha = diff != 0 ? 1 : 0;
+            scoreDiffText.Current.Value = -diff;
+            scoreDiffText.Origin = Team1Score.Value > Team2Score.Value ? Anchor.TopLeft : Anchor.TopRight;
         }
 
         protected override void UpdateAfterChildren()
@@ -173,6 +189,15 @@ namespace osu.Game.Screens.Play.HUD
                 => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: font_size, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: font_size * 0.8f, fixedWidth: true);
+        }
+
+        private partial class MatchScoreDiffCounter : CommaSeparatedScoreCounter
+        {
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
+            {
+                s.Spacing = new Vector2(-2);
+                s.Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: bar_height, fixedWidth: true);
+            });
         }
     }
 }
