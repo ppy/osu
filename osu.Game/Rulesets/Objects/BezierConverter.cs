@@ -34,9 +34,17 @@ namespace osu.Game.Rulesets.Objects
             new CircleBezierPreset(3.1385246920140215,
                 new[] { new Vector2d(1, 0), new Vector2d(1, 0.87084764f), new Vector2d(0.002304826f, 1.5033062f), new Vector2d(-0.9973236f, 0.8739115f), new Vector2d(-0.9999953f, 0.0030679568f) }),
             new CircleBezierPreset(5.69720464620727,
-                new[] { new Vector2d(1, 0), new Vector2d(1, 1.4137783f), new Vector2d(-1.4305235f, 2.0779421f), new Vector2d(-2.3410065f, -0.94017583f), new Vector2d(0.05132711f, -1.7309346f), new Vector2d(0.8331702f, -0.5530167f) }),
+                new[]
+                {
+                    new Vector2d(1, 0), new Vector2d(1, 1.4137783f), new Vector2d(-1.4305235f, 2.0779421f), new Vector2d(-2.3410065f, -0.94017583f), new Vector2d(0.05132711f, -1.7309346f),
+                    new Vector2d(0.8331702f, -0.5530167f)
+                }),
             new CircleBezierPreset(2 * Math.PI,
-                new[] { new Vector2d(1, 0), new Vector2d(1, 1.2447058f), new Vector2d(-0.8526471f, 2.118367f), new Vector2d(-2.6211002f, 7.854936e-06f), new Vector2d(-0.8526448f, -2.118357f), new Vector2d(1, -1.2447058f), new Vector2d(1, 0) })
+                new[]
+                {
+                    new Vector2d(1, 0), new Vector2d(1, 1.2447058f), new Vector2d(-0.8526471f, 2.118367f), new Vector2d(-2.6211002f, 7.854936e-06f), new Vector2d(-0.8526448f, -2.118357f),
+                    new Vector2d(1, -1.2447058f), new Vector2d(1, 0)
+                })
         };
 
         /// <summary>
@@ -262,51 +270,41 @@ namespace osu.Game.Rulesets.Objects
         /// Converts b-spline anchors to bezier anchors.
         /// </summary>
         /// <param name="controlPoints">The control point positions to convert.</param>
-        public static Vector2[][] ConvertBSplineToBezierAnchors(ReadOnlySpan<Vector2> controlPoints)
+        /// <param name="p">The polynomial order of the b-spline curve</param>
+        public static Vector2[][] ConvertBSplineToBezierAnchors(ReadOnlySpan<Vector2> controlPoints, int p = 3)
         {
-            if (controlPoints.Length < 3) return new[] { controlPoints.ToArray() };
+            var points = controlPoints.ToArray();
+            int n = points.Length - 1;
 
-            var bezier = new Vector2[controlPoints.Length - 1][];
-            var joinPoint = Vector2.Lerp(
-                Vector2.Lerp(controlPoints[0], controlPoints[1], 2f / 3f),
-                Vector2.Lerp(controlPoints[1], controlPoints[2], 1f / 3f),
-                0.5f
-            );
+            if (p <= 0 || p >= n) return new[] { points };
 
-            bezier[0] = new[]
+            Vector2[][] result = new Vector2[n - p + 1][];
+
+            // Subdivide B-spline into bezier control points at knots.
+            for (int i = 0; i < n - p; i++)
             {
-                controlPoints[0],
-                Vector2.Lerp(controlPoints[0], controlPoints[1], 2f / 3f),
-                joinPoint
-            };
+                var subBezier = new Vector2[p + 1];
+                subBezier[0] = points[i];
 
-            for (int i = 1; i < controlPoints.Length - 2; i++)
-            {
-                var nextJoinPoint = Vector2.Lerp(
-                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 2f / 3f),
-                    Vector2.Lerp(controlPoints[i + 1], controlPoints[i + 2], 1f / 3f),
-                    0.5f
-                );
-
-                bezier[i] = new[]
+                // Destructively insert the knot p-1 times via Boehm's algorithm.
+                for (int j = 0; j < p - 1; j++)
                 {
-                    joinPoint,
-                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 1f / 3f),
-                    Vector2.Lerp(controlPoints[i], controlPoints[i + 1], 2f / 3f),
-                    nextJoinPoint
-                };
+                    subBezier[j + 1] = points[i + 1];
 
-                joinPoint = nextJoinPoint;
+                    for (int k = 1; k < p - j; k++)
+                    {
+                        int l = Math.Min(k, n - p - i);
+                        points[i + k] = (l * points[i + k] + points[i + k + 1]) / (l + 1);
+                    }
+                }
+
+                subBezier[p] = points[i + 1];
+                result[i] = subBezier;
             }
 
-            bezier[^1] = new[]
-            {
-                joinPoint,
-                Vector2.Lerp(controlPoints[^2], controlPoints[^1], 1f / 3f),
-                controlPoints[^1],
-            };
+            result[^1] = points[(n - p)..];
 
-            return bezier;
+            return result;
         }
 
         /// <summary>
