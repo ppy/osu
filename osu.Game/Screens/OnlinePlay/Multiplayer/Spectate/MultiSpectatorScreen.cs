@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 if (instance.Score == null)
                     continue;
 
-                minFrameTimes.Add(instance.Score.Replay.Frames.Min(f => f.Time));
+                minFrameTimes.Add(instance.Score.Replay.Frames.MinBy(f => f.Time)?.Time ?? 0);
             }
 
             // Remove any outliers (only need to worry about removing those lower than the mean since we will take a Min() after).
