@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     /// <summary>
-    /// This test suite tests <see cref="ManiaPerformanceCalculator.computeEstimatedUr"/>.
+    /// This test suite tests ManiaPerformanceCalculator.computeEstimatedUr
     /// <remarks>
     /// This suite focuses on the objective aspects of the calculation, not the accuracy of the calculation.
     /// </remarks>
