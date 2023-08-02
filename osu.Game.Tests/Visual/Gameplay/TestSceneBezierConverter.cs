@@ -118,6 +118,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(PathType.Bezier)]
         [TestCase(PathType.Catmull)]
         [TestCase(PathType.PerfectCurve)]
+        [TestCase(PathType.BSpline)]
         public void TestSingleSegment(PathType type)
             => AddStep("create path", () => path.ControlPoints.AddRange(createSegment(type, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
 
@@ -125,6 +126,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(PathType.Bezier)]
         [TestCase(PathType.Catmull)]
         [TestCase(PathType.PerfectCurve)]
+        [TestCase(PathType.BSpline)]
         public void TestMultipleSegment(PathType type)
         {
             AddStep("create path", () =>
