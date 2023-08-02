@@ -160,6 +160,13 @@ namespace osu.Game.Screens.Play
 
             Seek(StartTime);
 
+            // This is a workaround for the fact that DecoupleableInterpolatingFramedClock doesn't seek the source
+            // if the source is not IsRunning. (see https://github.com/ppy/osu-framework/blob/2102638056dfcf85d21b4d85266d53b5dd018767/osu.Framework/Timing/DecoupleableInterpolatingFramedClock.cs#L209-L210)
+            //
+            // This breaks in multiplayer spectator.
+            // I hope to remove this once we knock some sense into clocks in general.
+            (SourceClock as IAdjustableClock)?.Seek(StartTime);
+
             if (!wasPaused || startClock)
                 Start();
         }
