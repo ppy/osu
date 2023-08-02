@@ -174,16 +174,17 @@ namespace osu.Game.Screens.Import
 
             if (beatmapSetInfo == null) return;
 
-            if (scoreStream == null) return;
+            if (scoreStream == null || !scoreStream.CanRead) return;
 
             if (sender.Any(b => b.OnlineID == beatmapSetInfo.OnlineID))
             {
                 var progressNotification = new ImportProgressNotification();
                 var importTask = new ImportTask(scoreStream, "score.osr");
-
                 scoreManager.Import(progressNotification, new[] { importTask })
                             .ContinueWith(s =>
                             {
+                                scoreStream.Dispose();
+
                                 s.GetResultSafely<IEnumerable<Live<ScoreInfo>>>().FirstOrDefault()?.PerformRead(score =>
                                 {
                                     Guid scoreid = score.ID;
@@ -205,6 +206,7 @@ namespace osu.Game.Screens.Import
             base.Dispose(isDisposing);
 
             realmSubscription?.Dispose();
+            scoreStream?.Dispose();
         }
     }
 }
