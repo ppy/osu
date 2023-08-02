@@ -16,54 +16,111 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
+    /// <summary>
+    /// This test suite tests <see cref="ManiaPerformanceCalculator.computeEstimatedUr"/>.
+    /// <remarks>
+    /// This suite focuses on the objective aspects of the calculation, not the accuracy of the calculation.
+    /// </remarks>
+    /// </summary>
     public class ManiaUnstableRateEstimationTest
     {
+        public enum SpeedMod
+        {
+            DoubleTime,
+            NormalTime,
+            HalfTime
+        }
+
         public static IEnumerable<TestCaseData> TestCaseSourceData()
         {
-            yield return new TestCaseData(286.7138671875d, new[] { 5336, 3886, 1661, 445, 226, 293 }, new[] { new ManiaModDoubleTime() });
-            // Test that both SS scores and near 0% scores are handled properly, within a margin of +-0.001 UR
-            yield return new TestCaseData(42.01171875d, new[] { 11847, 0, 0, 0, 0, 0 }, null);
-            yield return new TestCaseData(8171805.0d, new[] { 0, 0, 0, 0, 1, 11846 }, null);
+            yield return new TestCaseData(691.640625d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.DoubleTime);
+            yield return new TestCaseData(1037.4609375d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.NormalTime);
+            yield return new TestCaseData(1383.28125d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.HalfTime);
         }
 
-        // General test to make sure UR estimation isn't changed by anything, inclusive of rate changing, within a margin of +-0.001 UR.
+        /// <summary>
+        /// A catch-all hardcoded regression test, inclusive of rate changing.
+        /// </summary>
         [TestCaseSource(nameof(TestCaseSourceData))]
-        public void TestUnstableRate(double expectedEstimatedUnstableRate, int[] judgementCounts, params Mod[] mods)
+        public void RegressionTest(double expectedUr, int[] judgementCounts, SpeedMod speedMod)
         {
-            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = judgementCounts.Sum(), OverallDifficulty = 7 };
-
-            double? estimatedUr = computeUnstableRate(attributes, judgementCounts, mods);
+            double? estimatedUr = computeUnstableRate(judgementCounts, speedMod: speedMod);
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
-            Assert.That(estimatedUr, Is.EqualTo(expectedEstimatedUnstableRate).Within(0.001), "The estimated mania UR differed from the expected value.");
+            Assert.That(
+                estimatedUr, Is.EqualTo(expectedUr).Within(0.001),
+                $"The estimated mania UR {estimatedUr} differed from the expected value {expectedUr}."
+            );
         }
 
-        // Ensure the UR estimation only returns null when it is supposed to.
+        /// <summary>
+        /// Test anomalous judgement counts where NULLs can occur.
+        /// </summary>
         [TestCase(false, new[] { 1, 0, 0, 0, 0, 0 })]
         [TestCase(true, new[] { 0, 0, 0, 0, 0, 1 })]
         [TestCase(true, new[] { 0, 0, 0, 0, 0, 0 })]
-        public void TestNullUnstableRate(bool expectedNullStatus, int[] judgementCounts)
+        public void TestNull(bool expectedIsNull, int[] judgementCounts)
         {
-            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 10 };
-
-            double? estimatedUr = computeUnstableRate(attributes, judgementCounts);
+            double? estimatedUr = computeUnstableRate(judgementCounts);
             bool isNull = estimatedUr == null;
 
-            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) and advanced math functions (Erf, FindMinimum) may result in slight differences.
-            Assert.That(isNull, Is.EqualTo(expectedNullStatus), "The estimated mania UR was/wasn't null.");
+            Assert.That(isNull, Is.EqualTo(expectedIsNull), $"Estimated mania UR {estimatedUr} was/wasn't null.");
         }
 
-        // Ensure the estimated deviation doesn't reach too high of a value in a single note situation, as a sanity check.
-        [TestCase(new[] { 0, 0, 0, 0, 1, 0 })]
-        public void TestSingleNoteBound(int[] judgementCounts)
+        /// <summary>
+        /// Ensure that the worst case scenarios don't result in unbounded URs.
+        /// <remarks>Given Int.MaxValue judgements, it can result in
+        /// <see cref="MathNet.Numerics.Optimization.MaximumIterationsException"/>.
+        /// However, we'll only test realistic scenarios.</remarks>
+        /// </summary>
+        [Test, Combinatorial]
+        public void TestEdge(
+            [Values(100_000, 1, 0)] int judgeMax,
+            [Values(100_000, 1, 0)] int judge50,
+            [Values(100_000, 1, 0)] int judge0,
+            [Values(SpeedMod.DoubleTime, SpeedMod.HalfTime, SpeedMod.NormalTime)]
+            SpeedMod speedMod,
+            [Values(true, false)] bool isHoldsLegacy,
+            [Values(true, false)] bool isAllHolds,
+            [Values(10, 5, 0)] double od
+        )
         {
-            DifficultyAttributes attributes = new ManiaDifficultyAttributes { NoteCount = 1, OverallDifficulty = 0 };
+            // This is tested in TestNull.
+            if (judgeMax + judge50 == 0) Assert.Ignore();
 
-            double? estimatedUr = computeUnstableRate(attributes, judgementCounts);
-            Assert.That(estimatedUr, Is.AtMost(10000.0), "The estimated mania UR returned too high for a single note.");
+            int noteCount = isAllHolds ? 0 : judgeMax + judge50 + judge0;
+            int holdCount = isAllHolds ? judgeMax + judge50 + judge0 : 0;
+
+            double? estimatedUr = computeUnstableRate(
+                new[] { judgeMax, 0, 0, 0, judge50, judge0 },
+                noteCount,
+                holdCount,
+                od,
+                speedMod,
+                isHoldsLegacy
+            );
+            Assert.That(
+                estimatedUr, Is.AtMost(1_000_000_000),
+                $"The estimated mania UR {estimatedUr} returned too high for a single note."
+            );
         }
 
-        // Evaluates the Unstable Rate estimation of a beatmap with the given judgements.
-        private double? computeUnstableRate(DifficultyAttributes attr, IReadOnlyList<int> judgementCounts, params Mod[] mods)
+        /// <summary>
+        /// Evaluates the Unstable Rate
+        /// </summary>
+        /// <param name="judgementCounts">Size-6 Int List of Judgements, starting from MAX</param>
+        /// <param name="noteCount">Number of notes</param>
+        /// <param name="holdCount">Number of holds</param>
+        /// <param name="od">Overall Difficulty</param>
+        /// <param name="speedMod">Speed Mod, <see cref="SpeedMod"/></param>
+        /// <param name="isHoldsLegacy">Whether to append ClassicMod to simulate Legacy Holds</param>
+        /// <returns></returns>
+        private double? computeUnstableRate(
+            IReadOnlyList<int> judgementCounts,
+            int? noteCount = null,
+            int holdCount = 0,
+            double od = 5,
+            SpeedMod speedMod = SpeedMod.NormalTime,
+            bool isHoldsLegacy = false)
         {
             var judgements = new Dictionary<HitResult, int>
             {
@@ -74,20 +131,49 @@ namespace osu.Game.Rulesets.Mania.Tests
                 { HitResult.Meh, judgementCounts[4] },
                 { HitResult.Miss, judgementCounts[5] }
             };
+            noteCount ??= judgements.Sum(kvp => kvp.Value);
+
+            var mods = new Mod[] { };
+
+            if (isHoldsLegacy) mods = mods.Append(new ManiaModClassic()).ToArray();
+
+            switch (speedMod)
+            {
+                case SpeedMod.DoubleTime:
+                    mods = mods.Append(new ManiaModDoubleTime()).ToArray();
+                    break;
+
+                case SpeedMod.HalfTime:
+                    mods = mods.Append(new ManiaModHalfTime()).ToArray();
+                    break;
+            }
 
             ManiaPerformanceAttributes perfAttributes = new ManiaPerformanceCalculator().Calculate(
                 new ScoreInfo
                 {
                     Mods = mods,
                     Statistics = judgements
-                }, attr
+                },
+                new ManiaDifficultyAttributes
+                {
+                    NoteCount = (int)noteCount,
+                    HoldNoteCount = holdCount,
+                    OverallDifficulty = od,
+                    Mods = mods
+                }
             );
 
             return perfAttributes.EstimatedUr;
         }
 
-        // TODO: @Natelytle Is this used for anything?
-        protected void TestHitWindows(double overallDifficulty)
+        /// <summary>
+        /// This ensures that external changes of hitwindows don't break the ur calculator.
+        /// This includes all ODs.
+        /// </summary>
+        [Test]
+        public void RegressionTestHitWindows(
+            [Range(0, 10, 0.5)] double overallDifficulty
+        )
         {
             DifficultyAttributes attributes = new ManiaDifficultyAttributes { OverallDifficulty = overallDifficulty };
 
