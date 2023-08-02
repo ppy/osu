@@ -9,6 +9,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -19,6 +20,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens;
+using osu.Game.Screens.Import;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -26,6 +29,8 @@ namespace osu.Game.Scoring
     public class ScoreImporter : RealmArchiveModelImporter<ScoreInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
+
+        public IPerformFromScreenRunner? Performer { get; set; }
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
@@ -54,10 +59,26 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
+                    onMissingBeatmap(e);
                     Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
                     return null;
                 }
             }
+        }
+
+        private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e)
+        {
+            var req = new GetBeatmapRequest(new BeatmapInfo
+            {
+                MD5Hash = e.Hash
+            });
+
+            req.Success += res =>
+            {
+                Performer?.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, e.ScoreStream)));
+            };
+
+            api.Queue(req);
         }
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
