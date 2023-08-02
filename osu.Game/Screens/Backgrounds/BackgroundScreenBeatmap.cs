@@ -36,6 +36,9 @@ namespace osu.Game.Screens.Backgrounds
         /// </remarks>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>(true);
 
+        /// <summary>
+        /// Whether or not the storyboard loaded should completely hide the background behind it.
+        /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
@@ -60,12 +63,11 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
 
+            dimmable.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
-
-            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         [BackgroundDependencyLoader]
@@ -144,6 +146,8 @@ namespace osu.Game.Screens.Backgrounds
             /// </remarks>
             public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+            public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
             public Background Background
             {
                 get => background;
@@ -187,6 +191,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
+                StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
 
             protected override bool ShowDimContent
