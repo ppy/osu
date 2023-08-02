@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Import
         public ReplayMissingBeatmapScreen(APIBeatmap beatmap, MemoryStream? scoreStream = null)
         {
             this.beatmap = beatmap;
+            beatmapSetInfo = beatmap.BeatmapSet;
+
             this.scoreStream = scoreStream;
         }
 
@@ -145,19 +147,30 @@ namespace osu.Game.Screens.Import
         {
             base.LoadComplete();
 
-            var onlineBeatmapRequest = new GetBeatmapSetRequest(beatmap.OnlineBeatmapSetID);
-
-            onlineBeatmapRequest.Success += res =>
+            if (beatmapSetInfo == null)
             {
-                beatmapSetInfo = res;
-                beatmapPanelContainer.Child = new BeatmapCardNormal(res, allowExpansion: false);
-                checkForAutomaticDownload(res);
-            };
+                var onlineBeatmapRequest = new GetBeatmapSetRequest(beatmap.OnlineBeatmapSetID);
 
-            api.Queue(onlineBeatmapRequest);
+                onlineBeatmapRequest.Success += res =>
+                {
+                    beatmapSetInfo = res;
+                    updateStatus();
+                };
+                api.Queue(onlineBeatmapRequest);
+            }
 
+            updateStatus();
             realmSubscription = realm.RegisterForNotifications(
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+        }
+
+        private void updateStatus()
+        {
+            if (beatmapSetInfo == null) return;
+
+            beatmapPanelContainer.Clear();
+            beatmapPanelContainer.Child = new BeatmapCardNormal(beatmapSetInfo, allowExpansion: false);
+            checkForAutomaticDownload(beatmapSetInfo);
         }
 
         private void checkForAutomaticDownload(APIBeatmapSet beatmap)
