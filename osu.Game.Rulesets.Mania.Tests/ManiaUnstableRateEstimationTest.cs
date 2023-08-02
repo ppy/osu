@@ -74,13 +74,13 @@ namespace osu.Game.Rulesets.Mania.Tests
         /// </summary>
         [Test, Combinatorial]
         public void TestEdge(
-            [Values(100_000, 1, 0)] int judgeMax,
+            [Values(100_000, 1, 0)] int judgeMax, // We're only interested in the edge judgements.
             [Values(100_000, 1, 0)] int judge50,
             [Values(100_000, 1, 0)] int judge0,
             [Values(SpeedMod.DoubleTime, SpeedMod.HalfTime, SpeedMod.NormalTime)]
             SpeedMod speedMod,
             [Values(true, false)] bool isHoldsLegacy,
-            [Values(true, false)] bool isAllHolds,
+            [Values(true, false)] bool isAllHolds, // This will determine if we use all holds or all notes.
             [Values(10, 5, 0)] double od
         )
         {
@@ -113,7 +113,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         /// <param name="od">Overall Difficulty</param>
         /// <param name="speedMod">Speed Mod, <see cref="SpeedMod"/></param>
         /// <param name="isHoldsLegacy">Whether to append ClassicMod to simulate Legacy Holds</param>
-        /// <returns></returns>
         private double? computeUnstableRate(
             IReadOnlyList<int> judgementCounts,
             int? noteCount = null,
@@ -167,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         /// <summary>
-        /// This ensures that external changes of hitwindows don't break the ur calculator.
+        /// This ensures that external changes of hit windows don't break the ur calculator.
         /// This includes all ODs.
         /// </summary>
         [Test]
