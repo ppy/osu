@@ -105,6 +105,33 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         /// <summary>
+        /// This tests if the UR gets smaller, given more judgements on MAX.
+        /// This follows the logic that:
+        ///   - More MAX judgements implies stronger evidence of smaller UR, as the probability of hitting more MAX is lower.
+        /// <remarks>
+        /// It's not necessary, nor logical to test other behaviors.
+        /// </remarks>
+        /// </summary>
+        [Test]
+        public void TestMoreMaxJudgementsSmallerUr(
+            [Values(1, 10, 1000)] int count,
+            [Values(1, 10, 1000)] int step
+        )
+        {
+            int[] judgementCountsLess = { count, 0, 0, 0, 0, 0 };
+            int[] judgementCountsMore = { count + step, 0, 0, 0, 0, 0 };
+            double? estimatedUrLessJudgements = computeUnstableRate(judgementCountsLess);
+            double? estimatedUrMoreJudgements = computeUnstableRate(judgementCountsMore);
+
+            // Assert that More Judgements results in a smaller UR.
+            Assert.That(
+                estimatedUrMoreJudgements, Is.LessThan(estimatedUrLessJudgements),
+                $"UR {estimatedUrMoreJudgements} with More Judgements {string.Join(",", judgementCountsMore)} >= "
+                + $"UR {estimatedUrLessJudgements} than Less Judgements {string.Join(",", judgementCountsLess)} "
+            );
+        }
+
+        /// <summary>
         /// Evaluates the Unstable Rate
         /// </summary>
         /// <param name="judgementCounts">Size-6 Int List of Judgements, starting from MAX</param>
