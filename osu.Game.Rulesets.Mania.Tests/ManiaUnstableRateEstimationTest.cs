@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         public static IEnumerable<TestCaseData> TestCaseSourceData()
         {
-            yield return new TestCaseData(309.990234375d, new[] { 5336, 3886, 1661, 445, 226, 293 }, new[] { new ManiaModDoubleTime() });
+            yield return new TestCaseData(286.7138671875d, new[] { 5336, 3886, 1661, 445, 226, 293 }, new[] { new ManiaModDoubleTime() });
             // Test that both SS scores and near 0% scores are handled properly, within a margin of +-0.001 UR
-            yield return new TestCaseData(42.978515625d, new[] { 11847, 0, 0, 0, 0, 0 }, null);
-            yield return new TestCaseData(9523485.0d, new[] { 0, 0, 0, 0, 1, 11846 }, null);
+            yield return new TestCaseData(42.01171875d, new[] { 11847, 0, 0, 0, 0, 0 }, null);
+            yield return new TestCaseData(8171805.0d, new[] { 0, 0, 0, 0, 1, 11846 }, null);
         }
 
         // General test to make sure UR estimation isn't changed by anything, inclusive of rate changing, within a margin of +-0.001 UR.
