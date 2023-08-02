@@ -29,11 +29,6 @@ namespace osu.Game.Graphics.Containers
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
 
         /// <summary>
-        /// Whether or not the storyboard loaded should completely hide the background behind it.
-        /// </summary>
-        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
-
-        /// <summary>
         /// Whether player is in break time.
         /// Must be bound to <see cref="BreakTracker.IsBreakTime"/> to allow for dim adjustments in gameplay.
         /// </summary>
@@ -83,7 +78,6 @@ namespace osu.Game.Graphics.Containers
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
-            StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
         }
 
