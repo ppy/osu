@@ -24,8 +24,11 @@ namespace osu.Game.Graphics.Containers
         public const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
-        /// Whether or not user-configured settings relating to brightness of elements should be ignored
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored.
         /// </summary>
+        /// <remarks>
+        /// For best or worst, this also bypasses storyboard disable. Not sure this is correct but leaving it as to not break anything.
+        /// </remarks>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace osu.Game.Graphics.Containers
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimWhenUserSettingsIgnored.Value, 0);
+        protected virtual float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimWhenUserSettingsIgnored.Value, 0);
 
         protected override Container<Drawable> Content => dimContent;
 

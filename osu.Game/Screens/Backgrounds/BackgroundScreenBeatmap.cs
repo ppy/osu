@@ -194,9 +194,16 @@ namespace osu.Game.Screens.Backgrounds
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
 
-            protected override bool ShowDimContent
-                // The background needs to be hidden in the case of it being replaced by the storyboard
-                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
+            protected override float DimLevel
+            {
+                get
+                {
+                    if ((IgnoreUserSettings.Value || ShowStoryboard.Value) && StoryboardReplacesBackground.Value)
+                        return 1;
+
+                    return base.DimLevel;
+                }
+            }
 
             protected override void UpdateVisuals()
             {
