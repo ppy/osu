@@ -98,7 +98,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double totalSuccessfulJudgements => countPerfect + countOk + countGreat + countGood + countMeh;
 
         /// <summary>
-        /// Returns the estimated tapping deviation of the score, assuming the average hit location is in the center of the hit window.
+        /// Returns the estimated unstable rate of the score, assuming the average hit location is in the center of the hit window.
+        /// <exception cref="MathNet.Numerics.Optimization.MaximumIterationsException">
+        /// Thrown when the optimization algorithm fails to converge.
+        /// This happens only on extreme cases. We tested up to 100 Million misses, the algorithm converges with default settings.
+        /// </exception>
+        /// <returns>
+        /// Returns Estimated UR, or null if the score is a miss-only score.
+        /// </returns>
         /// </summary>
         private double? computeEstimatedUr(int noteCount, int holdNoteCount)
         {
