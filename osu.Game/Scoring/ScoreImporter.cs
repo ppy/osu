@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
@@ -59,19 +60,24 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    onMissingBeatmap(e);
+                    onMissingBeatmap(e, archive, name);
                     Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
                     return null;
                 }
             }
         }
 
-        private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e)
+        private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive, string name)
         {
             if (Performer == null)
-            {
-                e.ScoreStream?.Dispose();
                 return;
+
+            var stream = new MemoryStream();
+
+            // stream will close after exception throw, so fetch the stream again.
+            using (var scoreStream = archive.GetStream(name))
+            {
+                scoreStream.CopyTo(stream);
             }
 
             var req = new GetBeatmapRequest(new BeatmapInfo
@@ -81,10 +87,10 @@ namespace osu.Game.Scoring
 
             req.Success += res =>
             {
-                Performer.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, e.ScoreStream)));
+                Performer.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, stream)));
             };
 
-            req.Failure += _ => e.ScoreStream?.Dispose();
+            req.Failure += _ => stream.Dispose();
 
             api.Queue(req);
         }
