@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -62,7 +61,7 @@ namespace osu.Game.Scoring.Legacy
                 workingBeatmap = GetBeatmap(beatmapHash);
 
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException(beatmapHash, stream);
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -350,19 +349,9 @@ namespace osu.Game.Scoring.Legacy
         {
             public string Hash { get; }
 
-            [CanBeNull]
-            public MemoryStream ScoreStream { get; }
-
-            public BeatmapNotFoundException(string hash, [CanBeNull] Stream scoreStream)
+            public BeatmapNotFoundException(string hash)
             {
                 Hash = hash;
-
-                if (scoreStream != null)
-                {
-                    ScoreStream = new MemoryStream();
-                    scoreStream.Position = 0;
-                    scoreStream.CopyTo(ScoreStream);
-                }
             }
         }
     }
