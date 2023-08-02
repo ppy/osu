@@ -56,13 +56,8 @@ namespace osu.Game.Screens.Play.Break
                     Colour = colours.YellowLight,
                 }
             };
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Current.BindValueChanged(text => valueText.Text = Format(text.NewValue), true);
+            Current.BindValueChanged(text => valueText.Text = Format(text.NewValue));
         }
 
         protected virtual LocalisableString Format(T count)
