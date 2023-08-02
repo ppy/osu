@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMiss;
         private double? estimatedUr;
         private bool isLegacyScore;
-        private double[] hitWindows;
+        private double[] hitWindows = null!;
 
         public ManiaPerformanceCalculator()
             : base(new ManiaRuleset())
@@ -83,7 +83,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (estimatedUr == null)
                 return 0;
 
-            difficultyValue *= Math.Max(1 - Math.Pow(estimatedUr.Value / 500, 1.9), 0); // UR to multiplier curve, see https://www.desmos.com/calculator/w3zgyzqalm
+            double noteHeadPortion = (double)(attributes.NoteCount + attributes.HoldNoteCount) / (attributes.NoteCount + attributes.HoldNoteCount * 2);
+            double tailPortion = (double)attributes.HoldNoteCount / (attributes.NoteCount + attributes.HoldNoteCount * 2);
+
+            // We increased the deviation of tails for estimation accuracy, but for difficulty scaling we actually
+            // only care about the deviation on notes and heads, as that's the "accuracy skill" of the player.
+            // Increasing the tail multiplier will decrease this value.
+            double noteHeadUr = estimatedUr.Value / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
+
+            difficultyValue *= Math.Max(1 - Math.Pow(noteHeadUr / 500, 1.9), 0);
 
             return difficultyValue;
         }
