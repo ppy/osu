@@ -214,7 +214,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 minFrameTimes.Add(instance.Score.Replay.Frames.Min(f => f.Time));
             }
 
-            // Remove any outliers (only need to worry about removing those lower than the mean since we will take a Min() after.
+            // Remove any outliers (only need to worry about removing those lower than the mean since we will take a Min() after).
             double mean = minFrameTimes.Average();
             minFrameTimes.RemoveAll(t => mean - t > 1000);
 
