@@ -68,6 +68,12 @@ namespace osu.Game.Scoring
 
         private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e)
         {
+            if (Performer == null)
+            {
+                e.ScoreStream?.Dispose();
+                return;
+            }
+
             var req = new GetBeatmapRequest(new BeatmapInfo
             {
                 MD5Hash = e.Hash
@@ -75,7 +81,7 @@ namespace osu.Game.Scoring
 
             req.Success += res =>
             {
-                Performer?.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, e.ScoreStream)));
+                Performer.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, e.ScoreStream)));
             };
 
             req.Failure += _ => e.ScoreStream?.Dispose();
