@@ -78,6 +78,8 @@ namespace osu.Game.Scoring
                 Performer?.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, e.ScoreStream)));
             };
 
+            req.Failure += _ => e.ScoreStream?.Dispose();
+
             api.Queue(req);
         }
 
