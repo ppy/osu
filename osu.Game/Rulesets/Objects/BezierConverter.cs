@@ -34,17 +34,9 @@ namespace osu.Game.Rulesets.Objects
             new CircleBezierPreset(3.1385246920140215,
                 new[] { new Vector2d(1, 0), new Vector2d(1, 0.87084764f), new Vector2d(0.002304826f, 1.5033062f), new Vector2d(-0.9973236f, 0.8739115f), new Vector2d(-0.9999953f, 0.0030679568f) }),
             new CircleBezierPreset(5.69720464620727,
-                new[]
-                {
-                    new Vector2d(1, 0), new Vector2d(1, 1.4137783f), new Vector2d(-1.4305235f, 2.0779421f), new Vector2d(-2.3410065f, -0.94017583f), new Vector2d(0.05132711f, -1.7309346f),
-                    new Vector2d(0.8331702f, -0.5530167f)
-                }),
+                new[] { new Vector2d(1, 0), new Vector2d(1, 1.4137783f), new Vector2d(-1.4305235f, 2.0779421f), new Vector2d(-2.3410065f, -0.94017583f), new Vector2d(0.05132711f, -1.7309346f), new Vector2d(0.8331702f, -0.5530167f) }),
             new CircleBezierPreset(2 * Math.PI,
-                new[]
-                {
-                    new Vector2d(1, 0), new Vector2d(1, 1.2447058f), new Vector2d(-0.8526471f, 2.118367f), new Vector2d(-2.6211002f, 7.854936e-06f), new Vector2d(-0.8526448f, -2.118357f),
-                    new Vector2d(1, -1.2447058f), new Vector2d(1, 0)
-                })
+                new[] { new Vector2d(1, 0), new Vector2d(1, 1.2447058f), new Vector2d(-0.8526471f, 2.118367f), new Vector2d(-2.6211002f, 7.854936e-06f), new Vector2d(-0.8526448f, -2.118357f), new Vector2d(1, -1.2447058f), new Vector2d(1, 0) })
         };
 
         /// <summary>
