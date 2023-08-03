@@ -29,7 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         // We are managing our own adjustments. For now, this happens inside the Player instances themselves.
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
+
+        public override bool HideOverlaysOnEnter => true;
 
         /// <summary>
         /// Whether all spectating players have finished loading.
@@ -212,7 +214,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
-            => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
+        {
+            var playerArea = instances.Single(i => i.UserId == userId);
+
+            // The multiplayer spectator flow requires the client to return to a higher level screen
+            // (ie. StartGameplay should only be called once per player).
+            //
+            // Meanwhile, the solo spectator flow supports multiple `StartGameplay` calls.
+            // To ensure we don't crash out in an edge case where this is called more than once in multiplayer,
+            // guard against re-entry for the same player.
+            if (playerArea.Score != null)
+                return;
+
+            playerArea.LoadScore(spectatorGameplayState.Score);
+        }
 
         protected override void QuitGameplay(int userId)
         {
