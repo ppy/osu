@@ -242,7 +242,9 @@ namespace osu.Game.Screens.Play
                 Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
 
                 playfieldComponents.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
-                playfieldComponents.Size = ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+                playfieldComponents.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                playfieldComponents.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                playfieldComponents.Rotation = drawableRuleset.Playfield.Rotation;
             }
 
             float? lowestTopScreenSpaceLeft = null;
