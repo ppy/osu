@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     return colours.PurpleDark;
 
                 case PathType.BSpline:
-                    return colours.GreenLight;
+                    return colours.BlueDarker;
 
                 default:
                     return colours.Red;
