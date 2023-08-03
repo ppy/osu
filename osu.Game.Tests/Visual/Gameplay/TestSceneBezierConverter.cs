@@ -182,6 +182,27 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [TestCase(PathType.Linear)]
+        [TestCase(PathType.Bezier)]
+        [TestCase(PathType.Catmull)]
+        [TestCase(PathType.PerfectCurve)]
+        [TestCase(PathType.BSpline)]
+        public void TestLongSegment(PathType type)
+        {
+            AddStep("create path", () =>
+            {
+                path.ControlPoints.AddRange(createSegment(type,
+                        Enumerable.Range(0, 10).Select(i =>
+                            new Vector2(
+                                (i >> 1) * 100,
+                                (i + 1) % 4 < 2 ? 0 : 100
+                            )
+                        ).ToArray()
+                    )
+                );
+            });
+        }
+
         private List<PathControlPoint> createSegment(PathType type, params Vector2[] controlPoints)
         {
             var points = controlPoints.Select(p => new PathControlPoint { Position = p }).ToList();
