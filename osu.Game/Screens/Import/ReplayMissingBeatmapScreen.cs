@@ -196,8 +196,6 @@ namespace osu.Game.Screens.Import
                 scoreManager.Import(progressNotification, new[] { importTask })
                             .ContinueWith(s =>
                             {
-                                scoreStream.Dispose();
-
                                 s.GetResultSafely<IEnumerable<Live<ScoreInfo>>>().FirstOrDefault()?.PerformRead(score =>
                                 {
                                     Guid scoreid = score.ID;
@@ -219,7 +217,6 @@ namespace osu.Game.Screens.Import
             base.Dispose(isDisposing);
 
             realmSubscription?.Dispose();
-            scoreStream?.Dispose();
         }
     }
 }
