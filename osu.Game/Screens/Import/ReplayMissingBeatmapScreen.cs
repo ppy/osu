@@ -56,12 +56,12 @@ namespace osu.Game.Screens.Import
         private ReplayDownloadButton replayDownloadButton = null!;
         private SettingsCheckbox automaticDownload = null!;
 
-        private readonly MemoryStream? scoreStream;
+        private readonly MemoryStream scoreStream;
         private readonly APIBeatmap beatmap;
 
         private APIBeatmapSet? beatmapSetInfo;
 
-        public ReplayMissingBeatmapScreen(APIBeatmap beatmap, MemoryStream? scoreStream = null)
+        public ReplayMissingBeatmapScreen(APIBeatmap beatmap, MemoryStream scoreStream)
         {
             this.beatmap = beatmap;
             beatmapSetInfo = beatmap.BeatmapSet;
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Import
 
             if (beatmapSetInfo == null) return;
 
-            if (scoreStream == null || !scoreStream.CanRead) return;
+            if (!scoreStream.CanRead) return;
 
             if (sender.Any(b => b.OnlineID == beatmapSetInfo.OnlineID))
             {
