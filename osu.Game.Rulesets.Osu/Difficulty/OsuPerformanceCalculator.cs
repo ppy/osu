@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMiss;
 
         private double effectiveMissCount;
-        private double deviation;
+        private double? deviation;
         private double speedDeviation;
 
         public OsuPerformanceCalculator()
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             int hitCircleCount = attributes.HitCircleCount;
 
-            if (score.Mods.Any(h => h is OsuModRelax) || totalSuccessfulHits == 0 || hitCircleCount == 0)
+            if (score.Mods.Any(h => h is OsuModRelax) || deviation == null)
                 return 0.0;
 
             double liveLengthBonus = Math.Min(1.15, Math.Pow(hitCircleCount / 1000.0, 0.3)); // Should eventually be removed.
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double scaling = Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(hitCircleCount, threshold))) / 6;
 
             // Accuracy pp formula that's roughly the same as live.
-            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * deviation);
+            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * (double)deviation);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
+            if (!score.Mods.Any(h => h is OsuModFlashlight) || deviation == null)
                 return 0.0;
 
             double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
             // Scale the flashlight value with deviation
-            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
+            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * (double)deviation));
 
             return flashlightValue;
         }
@@ -261,44 +261,72 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// will always return the same deviation. Sliders are treated as circles with a 50 hit window. Misses are ignored because they are usually due to misaiming,
         /// and 50s are grouped with 100s since they are usually due to misreading. Inaccuracies are capped to the number of circles in the map.
         /// </summary>
-        private double calculateDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double? calculateDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
-                return double.PositiveInfinity;
+                return null;
 
             // Create a new track to properly calculate the hit windows of 50s.
-            var track = new TrackVirtual(10000);
+            var track = new TrackVirtual(1);
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             double clockRate = track.Rate;
 
             double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
+            double hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
 
-            int greatCountOnCircles = attributes.HitCircleCount - countOk - countMeh - countMiss;
+            int circleCount = attributes.HitCircleCount;
+            int missCountCircles = Math.Min(countMiss, circleCount);
+            int mehCountCircles = Math.Min(countMeh, circleCount - missCountCircles);
+            int okCountCircles = Math.Min(countOk, circleCount - missCountCircles - mehCountCircles);
+            int greatCountCircles = Math.Max(0, circleCount - missCountCircles - mehCountCircles - okCountCircles);
 
-            // The probability that a player hits a circle is unknown, but we can estimate it to be
-            // the number of greats on circles divided by the number of circles, and then add one
-            // to the number of circles as a bias correction / bayesian prior.
-            double greatProbabilityCircle = Math.Max(0, greatCountOnCircles / (attributes.HitCircleCount + 1.0));
-            double greatProbabilitySlider;
+            // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
+            // compute the deviation on circles.
 
-            if (greatCountOnCircles < 0)
+            if (greatCountCircles > 0)
             {
-                int nonCircleMisses = -greatCountOnCircles;
-                greatProbabilitySlider = Math.Max(0, (attributes.SliderCount - nonCircleMisses) / (attributes.SliderCount + 1.0));
+                // The probability that a player hits a circle is unknown, but we can estimate it to be
+                // the number of greats on circles divided by the number of circles, and then add one
+                // to the number of circles as a bias correction.
+
+                double greatProbabilityCircle = greatCountCircles / (circleCount - missCountCircles - mehCountCircles + 1.0);
+
+                // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
+                // Begin with the normal distribution first.
+
+                double deviationOnCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilityCircle));
+                deviationOnCircles *= Math.Sqrt(1 - Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviationOnCircles, 2))
+                    / (deviationOnCircles * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviationOnCircles))));
+
+                // Then compute the variance for 50s.
+                double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
+
+                // Find the total deviation.
+                deviationOnCircles = Math.Sqrt(((greatCountCircles + okCountCircles) * Math.Pow(deviationOnCircles, 2) + mehCountCircles * mehVariance) / (greatCountCircles + okCountCircles + mehCountCircles));
+
+                return deviationOnCircles;
             }
-            else
+
+            // If there are more non-300s than there are circles, compute the deviation on sliders instead.
+            // Here, all that matters is whether or not the slider was missed, since it is impossible
+            // to get a 100 or 50 on a slider by mis-tapping it.
+
+            int sliderCount = attributes.SliderCount;
+            int missCountSliders = Math.Min(sliderCount, countMiss - missCountCircles);
+            int greatCountSliders = sliderCount - missCountSliders;
+
+            // We only get here if nothing was hit. In this case, there is no estimate for deviation.
+            // Note that this is never negative, so checking if this is only equal to 0 makes sense.
+            if (greatCountSliders == 0)
             {
-                greatProbabilitySlider = attributes.SliderCount / (attributes.SliderCount + 1.0);
+                return null;
             }
 
-            if (greatProbabilityCircle == 0 && greatProbabilitySlider == 0)
-                return double.PositiveInfinity;
-
-            double deviationOnCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilityCircle));
+            double greatProbabilitySlider = greatCountSliders / (sliderCount + 1.0);
             double deviationOnSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilitySlider));
 
-            return Math.Min(deviationOnCircles, deviationOnSliders);
+            return deviationOnSliders;
         }
 
         /// <summary>
