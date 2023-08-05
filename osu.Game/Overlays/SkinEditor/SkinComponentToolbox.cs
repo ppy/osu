@@ -13,6 +13,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Skinning;
 using osuTK;
@@ -23,14 +24,22 @@ namespace osu.Game.Overlays.SkinEditor
     {
         public Action<Type>? RequestPlacement;
 
-        private readonly SkinComponentsContainer? target;
+        private readonly SkinComponentsContainer target;
+
+        private readonly RulesetInfo? ruleset;
 
         private FillFlowContainer fill = null!;
 
-        public SkinComponentToolbox(SkinComponentsContainer? target = null)
-            : base(target?.Lookup.Ruleset == null ? SkinEditorStrings.Components : LocalisableString.Interpolate($"{SkinEditorStrings.Components} ({target.Lookup.Ruleset.Name})"))
+        /// <summary>
+        /// Create a new component toolbox for the specified taget.
+        /// </summary>
+        /// <param name="target">The target. This is mainly used as a dependency source to find candidate components.</param>
+        /// <param name="ruleset">A ruleset to filter components by. If null, only components which are not ruleset-specific will be included.</param>
+        public SkinComponentToolbox(SkinComponentsContainer target, RulesetInfo? ruleset)
+            : base(ruleset == null ? SkinEditorStrings.Components : LocalisableString.Interpolate($"{SkinEditorStrings.Components} ({ruleset.Name})"))
         {
             this.target = target;
+            this.ruleset = ruleset;
         }
 
         [BackgroundDependencyLoader]
@@ -51,7 +60,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             fill.Clear();
 
-            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables(target?.Lookup.Ruleset);
+            var skinnableTypes = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset);
             foreach (var type in skinnableTypes)
                 attemptAddComponent(type);
         }
