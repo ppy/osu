@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Tests.Beatmaps;
 
@@ -29,8 +28,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             new object[] { LegacyMods.Autoplay, new[] { typeof(OsuModAutoplay) } },
             new object[] { LegacyMods.SpunOut, new[] { typeof(OsuModSpunOut) } },
             new object[] { LegacyMods.Autopilot, new[] { typeof(OsuModAutopilot) } },
-            new object[] { LegacyMods.Target, new[] { typeof(OsuModTarget) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } }
+            new object[] { LegacyMods.Target, new[] { typeof(OsuModTargetPractice) } },
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } },
+            new object[] { LegacyMods.ScoreV2, new[] { typeof(ModScoreV2) } },
         };
 
         [TestCaseSource(nameof(osu_mod_mapping))]

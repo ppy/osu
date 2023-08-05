@@ -18,7 +18,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class SpectatorPlayer : Player
+    public abstract partial class SpectatorPlayer : Player
     {
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; }

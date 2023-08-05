@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,7 +21,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// A pill that displays the star rating of a beatmap.
     /// </summary>
-    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
+    public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
         private readonly bool animated;
         private readonly Box background;
@@ -47,10 +45,10 @@ namespace osu.Game.Beatmaps.Drawables
         public IBindable<double> DisplayedStars => displayedStars;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private OverlayColourProvider colourProvider { get; set; }
+        [Resolved]
+        private OverlayColourProvider? colourProvider { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.

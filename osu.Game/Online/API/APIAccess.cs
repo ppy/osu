@@ -18,14 +18,18 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Notifications;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : Component, IAPIProvider
     {
+        private readonly OsuGameBase game;
         private readonly OsuConfigManager config;
 
         private readonly string versionHash;
@@ -50,6 +54,8 @@ namespace osu.Game.Online.API
         public IBindableList<APIUser> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
 
+        public Language Language => game.CurrentLanguage.Value;
+
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
         private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
@@ -62,8 +68,9 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
+        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
+            this.game = game;
             this.config = config;
             this.versionHash = versionHash;
 
@@ -257,7 +264,11 @@ namespace osu.Game.Online.API
 
             var friendsReq = new GetFriendsRequest();
             friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res => friends.AddRange(res);
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
 
             if (!handleRequest(friendsReq))
             {
@@ -299,6 +310,9 @@ namespace osu.Game.Online.API
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
             new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
+        public NotificationsClientConnector GetNotificationsConnector() =>
+            new WebSocketNotificationsClientConnector(this);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -320,12 +334,35 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken(@"form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
-                    // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    e.Rethrow();
+                    try
+                    {
+                        // attempt to parse a non-form error message
+                        var response = JObject.Parse(req.GetResponseString().AsNonNull());
+
+                        string redirect = (string)response.SelectToken(@"url", true);
+                        string message = (string)response.SelectToken(@"error", false);
+
+                        if (!string.IsNullOrEmpty(redirect))
+                        {
+                            return new RegistrationRequest.RegistrationRequestErrors
+                            {
+                                Redirect = redirect,
+                                Message = message,
+                            };
+                        }
+
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
+                    catch
+                    {
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
                 }
             }
 
@@ -414,7 +451,7 @@ namespace osu.Game.Online.API
             failureCount++;
             log.Add($@"API failure count is now {failureCount}");
 
-            if (failureCount >= 3 && State.Value == APIState.Online)
+            if (failureCount >= 3)
             {
                 state.Value = APIState.Failing;
                 flushQueue();

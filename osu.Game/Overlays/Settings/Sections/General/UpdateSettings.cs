@@ -19,7 +19,7 @@ using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class UpdateSettings : SettingsSubsection
+    public partial class UpdateSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = $"You are running the latest release ({game.Version})",
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }
@@ -70,6 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.OpenOsuFolder,
+                    Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
 

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTournamentHeaderText : CompositeDrawable
+    public partial class DrawableTournamentHeaderText : CompositeDrawable
     {
         public DrawableTournamentHeaderText(bool center = true)
         {
@@ -25,7 +23,7 @@ namespace osu.Game.Tournament.Components
             RelativeSizeAxes = Axes.X;
         }
 
-        private class TextSprite : Sprite
+        private partial class TextSprite : Sprite
         {
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)

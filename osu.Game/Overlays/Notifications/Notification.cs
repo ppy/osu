@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container
+    public abstract partial class Notification : Container
     {
         /// <summary>
         /// Notification was closed, either by user or otherwise.
@@ -50,7 +50,8 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public virtual bool DisplayOnTop => true;
 
-        public virtual string PopInSampleName => "UI/notification-pop-in";
+        public virtual string PopInSampleName => "UI/notification-default";
+        public virtual string PopOutSampleName => "UI/overlay-pop-out";
 
         protected NotificationLight Light;
 
@@ -269,7 +270,7 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        private class DragContainer : Container
+        private partial class DragContainer : Container
         {
             private Vector2 velocity;
             private Vector2 lastPosition;
@@ -381,7 +382,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        internal class CloseButton : OsuClickableContainer
+        internal partial class CloseButton : OsuClickableContainer
         {
             private SpriteIcon icon = null!;
             private Box background = null!;
@@ -436,7 +437,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public class NotificationLight : Container
+        public partial class NotificationLight : Container
         {
             private bool pulsate;
             private Container pulsateLayer = null!;

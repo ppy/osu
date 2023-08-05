@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// A type of <see cref="DrawableRuleset{TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
     /// <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IKeyBindingHandler<GlobalAction>
+    public abstract partial class DrawableScrollingRuleset<TObject> : DrawableRuleset<TObject>, IDrawableScrollingRuleset, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         /// <summary>
@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         };
 
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
+
+        ScrollVisualisationMethod IDrawableScrollingRuleset.VisualisationMethod => VisualisationMethod;
 
         /// <summary>
         /// Whether the player can change <see cref="TimeRange"/>.
@@ -112,7 +114,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
+            double lastObjectTime = Beatmap.HitObjects.Any() ? Beatmap.GetLastObjectTime() : double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)
@@ -158,9 +160,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Trim unwanted sequences of timing changes
             timingChanges = timingChanges
                             // Collapse sections after the last hit object
-                            .Where(s => s.StartTime <= lastObjectTime)
+                            .Where(s => s.Time <= lastObjectTime)
                             // Collapse sections with the same start time
-                            .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
+                            .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time);
 
             ControlPoints.AddRange(timingChanges);
 

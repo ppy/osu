@@ -18,10 +18,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
+    public partial class TestScenePathControlPointVisualiser : OsuManualInputManagerTestScene
     {
         private Slider slider;
-        private PathControlPointVisualiser visualiser;
+        private PathControlPointVisualiser<Slider> visualiser;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPathType(3, null);
         }
 
-        private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser(slider, allowSelection)
+        private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser<Slider>(slider, allowSelection)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 MenuItem item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == "Curve type")?.Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
-                item?.Action?.Value();
+                item?.Action.Value?.Invoke();
             });
         }
     }

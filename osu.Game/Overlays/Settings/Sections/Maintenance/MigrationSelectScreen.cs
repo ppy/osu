@@ -12,11 +12,12 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MigrationSelectScreen : DirectorySelectScreen
+    public partial class MigrationSelectScreen : DirectorySelectScreen
     {
         [Resolved]
         private Storage storage { get; set; }
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override LocalisableString HeaderText => "Please select a new location";
+        public override LocalisableString HeaderText => MaintenanceSettingsStrings.SelectNewLocation;
 
         protected override void OnSelection(DirectoryInfo directory)
         {
@@ -46,14 +47,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 var directoryInfos = target.GetDirectories();
                 var fileInfos = target.GetFiles();
 
-                if (directoryInfos.Length > 0 || fileInfos.Length > 0)
+                if (directoryInfos.Length > 0 || fileInfos.Length > 0 || target.Parent == null)
                 {
                     // Quick test for whether there's already an osu! install at the target path.
                     if (fileInfos.Any(f => f.Name == OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
-                        dialogOverlay.Push(new ConfirmDialog("The target directory already seems to have an osu! install. Use that data instead?", () =>
+                        dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.TargetDirectoryAlreadyInstalledOsu, () =>
                             {
-                                dialogOverlay.Push(new ConfirmDialog("To complete this operation, osu! will close. Please open it again to use the new data location.", () =>
+                                dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.RestartAndReOpenRequiredForCompletion, () =>
                                 {
                                     (storage as OsuStorage)?.ChangeDataPath(target.FullName);
                                     game.Exit();
@@ -64,7 +65,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         return;
                     }
 
-                    target = target.CreateSubdirectory("osu-lazer");
+                    // Not using CreateSubDirectory as it throws unexpectedly when attempting to create a directory when already at the root of a disk.
+                    // See https://cs.github.com/dotnet/runtime/blob/f1bdd5a6182f43f3928b389b03f7bc26f826c8bc/src/libraries/System.Private.CoreLib/src/System/IO/DirectoryInfo.cs#L88-L94
+                    target = Directory.CreateDirectory(Path.Combine(target.FullName, @"osu-lazer"));
                 }
             }
             catch (Exception e)

@@ -29,7 +29,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneHitObjectComposer : EditorClockTestScene
     {
         private OsuHitObjectComposer hitObjectComposer;
         private EditorBeatmapContainer editorBeatmapContainer;
@@ -108,14 +108,18 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
 
+            ExpandingToolboxContainer toolboxContainer = null!;
+
+            AddStep("move mouse to toolbox", () => InputManager.MoveMouseTo(toolboxContainer = hitObjectComposer.ChildrenOfType<ExpandingToolboxContainer>().First()));
+            AddUntilStep("toolbox is expanded", () => toolboxContainer.Expanded.Value);
+            AddUntilStep("wait for toolbox to expand", () => toolboxContainer.LatestTransformEndTime, () => Is.EqualTo(Time.Current));
+
             AddStep("move mouse to overlapping toggle button", () =>
             {
                 var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
-                var button = hitObjectComposer
-                             .ChildrenOfType<ExpandingToolboxContainer>().First()
-                             .ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
+                var button = toolboxContainer.ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(getOverlapPoint(b)));
 
-                InputManager.MoveMouseTo(button);
+                InputManager.MoveMouseTo(getOverlapPoint(button));
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
@@ -123,6 +127,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("attempt place circle", () => InputManager.Click(MouseButton.Left));
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+
+            Vector2 getOverlapPoint(DrawableTernaryButton ternaryButton)
+            {
+                var quad = ternaryButton.ScreenSpaceDrawQuad;
+                return quad.TopLeft + new Vector2(quad.Width * 9 / 10, quad.Height / 2);
+            }
         }
 
         [Test]
@@ -148,10 +158,6 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
-
-            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
         }
 
         [Test]
@@ -165,13 +171,14 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
 
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
-            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
+
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
-        public class EditorBeatmapContainer : Container
+        public partial class EditorBeatmapContainer : Container
         {
             private readonly IWorkingBeatmap working;
 

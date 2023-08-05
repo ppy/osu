@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// Manages the synchronisation between one or more <see cref="SpectatorPlayerClock"/>s in relation to a master clock.
     /// </summary>
-    public class SpectatorSyncManager : Component
+    public partial class SpectatorSyncManager : Component
     {
         /// <summary>
         /// The offset from the master clock to which player clocks should remain within to be considered in-sync.
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             masterState = newState;
-            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {masterState}");
+            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock became {masterState}");
 
             switch (masterState)
             {

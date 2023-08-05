@@ -15,7 +15,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -33,7 +32,6 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles general operations related to global beatmap management.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
@@ -42,7 +40,21 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+        private readonly BeatmapExporter beatmapExporter;
+
+        private readonly LegacyBeatmapExporter legacyBeatmapExporter;
+
+        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
+
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                beatmapImporter.PauseImports = value;
+            }
+        }
 
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
@@ -62,10 +74,20 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
+            beatmapImporter.ProcessBeatmap = (beatmapSet, scope) => ProcessBeatmap?.Invoke(beatmapSet, scope);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
+
+            beatmapExporter = new BeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
+
+            legacyBeatmapExporter = new LegacyBeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -126,14 +148,12 @@ namespace osu.Game.Beatmaps
         /// <param name="rulesetInfo">The ruleset with which the new difficulty should be created.</param>
         public virtual WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
         {
-            var playableBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(rulesetInfo);
-
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone())
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceWorkingBeatmap.Metadata.DeepClone())
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
-            foreach (var timingPoint in playableBeatmap.ControlPointInfo.TimingPoints)
+            foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
@@ -178,7 +198,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, transferCollections: false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -195,7 +215,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
@@ -214,7 +234,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = false;
                     transaction.Commit();
@@ -272,73 +292,16 @@ namespace osu.Game.Beatmaps
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
         /// <summary>
-        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// Saves an existing <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
+        /// <remarks>
+        /// This method will also update any user beatmap collection hash references to the new post-saved hash.
+        /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
-        {
-            var setInfo = beatmapInfo.BeatmapSet;
-            Debug.Assert(setInfo != null);
-
-            // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
-            // This should hopefully be temporary, assuming said clone is eventually removed.
-
-            // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
-            // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
-            // CopyTo() will undo such adjustments, while CopyFrom() will not.
-            beatmapContent.Difficulty.CopyTo(beatmapInfo.Difficulty);
-
-            // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
-            beatmapContent.BeatmapInfo = beatmapInfo;
-
-            using (var stream = new MemoryStream())
-            {
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
-                var existingFileInfo = beatmapInfo.Path != null ? setInfo.GetFile(beatmapInfo.Path) : null;
-                string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
-
-                // ensure that two difficulties from the set don't point at the same beatmap file.
-                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
-                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
-
-                if (existingFileInfo != null)
-                    DeleteFile(setInfo, existingFileInfo);
-
-                beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
-                beatmapInfo.Hash = stream.ComputeSHA2Hash();
-
-                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-
-                AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
-
-                updateHashAndMarkDirty(setInfo);
-
-                Realm.Write(r =>
-                {
-                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
-
-                    setInfo.CopyChangesToRealm(liveBeatmapSet);
-
-                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
-                });
-            }
-
-            Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
-            {
-                var metadata = beatmapInfo.Metadata;
-                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
-            }
-        }
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
+            save(beatmapInfo, beatmapContent, beatmapSkin, transferCollections: true);
 
         public void DeleteAllVideos()
         {
@@ -374,7 +337,7 @@ namespace osu.Game.Beatmaps
             Realm.Write(r =>
             {
                 if (!beatmapInfo.IsManaged)
-                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
                 Debug.Assert(beatmapInfo.File != null);
@@ -383,6 +346,8 @@ namespace osu.Game.Beatmaps
 
                 DeleteFile(setInfo, beatmapInfo.File);
                 setInfo.Beatmaps.Remove(beatmapInfo);
+                r.Remove(beatmapInfo.Metadata);
+                r.Remove(beatmapInfo);
 
                 updateHashAndMarkDirty(setInfo);
                 workingBeatmapCache.Invalidate(setInfo);
@@ -417,7 +382,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -442,25 +407,105 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
+        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
             setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
             setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
+        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, bool transferCollections)
+        {
+            var setInfo = beatmapInfo.BeatmapSet;
+            Debug.Assert(setInfo != null);
+
+            // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
+            // This should hopefully be temporary, assuming said clone is eventually removed.
+
+            // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
+            // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
+            // CopyTo() will undo such adjustments, while CopyFrom() will not.
+            beatmapContent.Difficulty.CopyTo(beatmapInfo.Difficulty);
+
+            // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
+            beatmapContent.BeatmapInfo = beatmapInfo;
+
+            // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
+            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
+            // which influences the beatmap checksums.
+            beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
+            beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+            beatmapInfo.ResetOnlineInfo();
+
+            Realm.Write(r =>
+            {
+                using var stream = new MemoryStream();
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
+                var existingFileInfo = beatmapInfo.Path != null ? setInfo.GetFile(beatmapInfo.Path) : null;
+                string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
+
+                // ensure that two difficulties from the set don't point at the same beatmap file.
+                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
+
+                if (existingFileInfo != null)
+                    DeleteFile(setInfo, existingFileInfo);
+
+                string oldMd5Hash = beatmapInfo.MD5Hash;
+
+                beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+                beatmapInfo.Hash = stream.ComputeSHA2Hash();
+
+                AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
+
+                updateHashAndMarkDirty(setInfo);
+
+                var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
+
+                setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                if (transferCollections)
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+
+                liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
+                              .UpdateLocalScores(r);
+
+                // do not look up metadata.
+                // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
+                ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
+            });
+
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+            static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
+            {
+                var metadata = beatmapInfo.Metadata;
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
+            }
+        }
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => beatmapImporter.Import(tasks);
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default) => beatmapImporter.Import(tasks, parameters);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            beatmapImporter.Import(notification, tasks, parameters);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, parameters, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, default, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
@@ -522,4 +567,11 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
     }
+
+    /// <summary>
+    /// Delegate type for beatmap processing callbacks.
+    /// </summary>
+    /// <param name="beatmapSet">The beatmap set to be processed.</param>
+    /// <param name="lookupScope">The scope to use when looking up metadata.</param>
+    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope);
 }

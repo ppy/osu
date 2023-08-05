@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Rendering.Dummy;
@@ -21,8 +18,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckBackgroundQualityTest
     {
-        private CheckBackgroundQuality check;
-        private IBeatmap beatmap;
+        private CheckBackgroundQuality check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -48,7 +45,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = string.Empty;
-            var context = getContext(null, new MemoryStream(Array.Empty<byte>()));
+            var context = getContext(null!, new MemoryStream(Array.Empty<byte>()));
 
             Assert.That(check.Run(context), Is.Empty);
         }
@@ -118,7 +115,7 @@ namespace osu.Game.Tests.Editing.Checks
             stream.Verify(x => x.Close(), Times.Once());
         }
 
-        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] Stream stream = null)
+        private BeatmapVerifierContext getContext(Texture background, Stream? stream = null)
         {
             return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, stream).Object);
         }
@@ -128,13 +125,13 @@ namespace osu.Game.Tests.Editing.Checks
         /// </summary>
         /// <param name="background">The texture of the background.</param>
         /// <param name="stream">The stream representing the background file.</param>
-        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, [CanBeNull] Stream stream = null)
+        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, Stream? stream = null)
         {
             stream ??= new MemoryStream(new byte[1024 * 1024]);
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
-            mock.SetupGet(w => w.Background).Returns(background);
+            mock.Setup(w => w.GetBackground()).Returns(background);
             mock.Setup(w => w.GetStream(It.IsAny<string>())).Returns(stream);
 
             return mock;

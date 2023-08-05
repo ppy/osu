@@ -28,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TapButton : CircularContainer, IKeyBindingHandler<GlobalAction>
+    internal partial class TapButton : CircularContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SIZE = 140;
 
@@ -37,10 +37,10 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private Bindable<ControlPointGroup>? selectedGroup { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IBeatSyncProvider? beatSyncSource { get; set; }
 
         private Circle hoverLayer = null!;
@@ -295,6 +295,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void handleTap()
         {
+            if (selectedGroup?.Value == null)
+                return;
+
             tapTimings.Add(Clock.CurrentTime);
 
             if (tapTimings.Count > initial_taps_to_ignore + max_taps_to_consider)
@@ -307,7 +310,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             double averageBeatLength = (tapTimings.Last() - tapTimings.Skip(initial_taps_to_ignore).First()) / (tapTimings.Count - initial_taps_to_ignore - 1);
-            double clockRate = beatSyncSource?.Clock?.Rate ?? 1;
+            double clockRate = beatSyncSource?.Clock.Rate ?? 1;
 
             double bpm = Math.Round(60000 / averageBeatLength / clockRate);
 
@@ -340,7 +343,7 @@ namespace osu.Game.Screens.Edit.Timing
             IsHandlingTapping.Value = false;
         }
 
-        private class Light : CompositeDrawable
+        private partial class Light : CompositeDrawable
         {
             public Drawable Glow { get; private set; } = null!;
 

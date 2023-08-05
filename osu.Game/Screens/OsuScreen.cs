@@ -21,7 +21,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
+    public abstract partial class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
@@ -40,10 +40,9 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        /// <summary>
-        /// Whether all overlays should be hidden when this screen is entered or resumed.
-        /// </summary>
         public virtual bool HideOverlaysOnEnter => false;
+
+        public virtual bool HideMenuCursorOnNonMouseInput => false;
 
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
@@ -86,7 +85,9 @@ namespace osu.Game.Screens
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public virtual bool? AllowTrackAdjustments => null;
+        public virtual bool? ApplyModTrackAdjustments => null;
+
+        public virtual bool? AllowGlobalTrackControl => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -96,7 +97,9 @@ namespace osu.Game.Screens
 
         private OsuScreenDependencies screenDependencies;
 
-        private bool? trackAdjustmentStateAtSuspend;
+        private bool? globalMusicControlStateAtSuspend;
+
+        private bool? modTrackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -179,8 +182,10 @@ namespace osu.Game.Screens
 
             // it's feasible to resume to a screen if the target screen never loaded successfully.
             // in such a case there's no need to restore this value.
-            if (trackAdjustmentStateAtSuspend != null)
-                musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
+            if (modTrackAdjustmentStateAtSuspend != null)
+                musicController.ApplyModTrackAdjustments = modTrackAdjustmentStateAtSuspend.Value;
+            if (globalMusicControlStateAtSuspend != null)
+                musicController.AllowTrackControl.Value = globalMusicControlStateAtSuspend.Value;
 
             base.OnResuming(e);
         }
@@ -189,7 +194,8 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(e);
 
-            trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
+            modTrackAdjustmentStateAtSuspend = musicController.ApplyModTrackAdjustments;
+            globalMusicControlStateAtSuspend = musicController.AllowTrackControl.Value;
 
             onSuspendingLogo();
         }
@@ -198,8 +204,11 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            if (AllowTrackAdjustments != null)
-                musicController.AllowTrackAdjustments = AllowTrackAdjustments.Value;
+            if (ApplyModTrackAdjustments != null)
+                musicController.ApplyModTrackAdjustments = ApplyModTrackAdjustments.Value;
+
+            if (AllowGlobalTrackControl != null)
+                musicController.AllowTrackControl.Value = AllowGlobalTrackControl.Value;
 
             if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
@@ -234,7 +243,13 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual void LogoArriving(OsuLogo logo, bool resuming)
         {
-            ApplyLogoArrivingDefaults(logo);
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+            logo.Anchor = Anchor.TopLeft;
+            logo.Origin = Anchor.Centre;
+            logo.RelativePositionAxes = Axes.Both;
+            logo.Triangles = true;
+            logo.Ripple = true;
         }
 
         private void applyArrivingDefaults(bool isResuming)
@@ -243,22 +258,6 @@ namespace osu.Game.Screens
             {
                 if (this.IsCurrentScreen()) LogoArriving(logo, isResuming);
             }, true);
-        }
-
-        /// <summary>
-        /// Applies default animations to an arriving logo.
-        /// Todo: This should not exist.
-        /// </summary>
-        /// <param name="logo">The logo to apply animations to.</param>
-        public static void ApplyLogoArrivingDefaults(OsuLogo logo)
-        {
-            logo.Action = null;
-            logo.FadeOut(300, Easing.OutQuint);
-            logo.Anchor = Anchor.TopLeft;
-            logo.Origin = Anchor.Centre;
-            logo.RelativePositionAxes = Axes.Both;
-            logo.Triangles = true;
-            logo.Ripple = true;
         }
 
         private void onExitingLogo()

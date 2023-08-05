@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneBarLine : ManiaSkinnableTestScene
+    public partial class TestSceneBarLine : ManiaSkinnableTestScene
     {
         [Test]
         public void TestMinor()
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         {
             var stageDefinitions = new List<StageDefinition>
             {
-                new StageDefinition { Columns = 4 },
+                new StageDefinition(4),
             };
 
             SetContents(_ => new ManiaPlayfield(stageDefinitions).With(s =>

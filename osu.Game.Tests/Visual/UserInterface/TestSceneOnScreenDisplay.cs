@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -14,7 +12,7 @@ using osu.Game.Overlays.OSD;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneOnScreenDisplay : OsuTestScene
+    public partial class TestSceneOnScreenDisplay : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -95,7 +93,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Setting4
         }
 
-        private class EmptyToast : Toast
+        private partial class EmptyToast : Toast
         {
             public EmptyToast()
                 : base("", "", "")
@@ -103,7 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class LengthyToast : Toast
+        private partial class LengthyToast : Toast
         {
             public LengthyToast()
                 : base("Toast with a very very very long text", "A very very very very very very long text also", "A very very very very very long shortcut")
@@ -111,7 +109,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestOnScreenDisplay : OnScreenDisplay
+        private partial class TestOnScreenDisplay : OnScreenDisplay
         {
             protected override void DisplayTemporarily(Drawable toDisplay) => toDisplay.FadeIn().ResizeHeightTo(110);
         }

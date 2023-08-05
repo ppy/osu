@@ -20,7 +20,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
+    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
         /// <summary>
         /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
@@ -86,6 +86,8 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private EditorClock editorClock { get; set; }
 
+        public BindableInt PreviewTime { get; }
+
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
@@ -107,6 +109,14 @@ namespace osu.Game.Screens.Edit
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+
+            PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
+            PreviewTime.BindValueChanged(s =>
+            {
+                BeginChange();
+                BeatmapInfo.Metadata.PreviewTime = s.NewValue;
+                EndChange();
+            });
         }
 
         /// <summary>
@@ -304,7 +314,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="index">The index of the <see cref="HitObject"/> to remove.</param>
         public void RemoveAt(int index)
         {
-            var hitObject = (HitObject)mutableHitObjects[index];
+            HitObject hitObject = (HitObject)mutableHitObjects[index]!;
 
             mutableHitObjects.RemoveAt(index);
 
@@ -351,6 +361,8 @@ namespace osu.Game.Screens.Edit
 
             var updates = batchPendingUpdates.ToArray();
             batchPendingUpdates.Clear();
+
+            foreach (var h in deletes) SelectedHitObjects.Remove(h);
 
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);

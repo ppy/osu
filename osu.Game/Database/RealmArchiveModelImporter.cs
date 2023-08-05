@@ -56,6 +56,11 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
+        /// <summary>
+        /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
+        /// </summary>
+        public bool PauseImports { get; set; }
+
         public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
@@ -81,16 +86,16 @@ namespace osu.Game.Database
 
         public Task Import(params string[] paths) => Import(paths.Select(p => new ImportTask(p)).ToArray());
 
-        public Task Import(params ImportTask[] tasks)
+        public Task Import(ImportTask[] tasks, ImportParameters parameters = default)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, tasks);
+            return Import(notification, tasks, parameters);
         }
 
-        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default)
         {
             if (tasks.Length == 0)
             {
@@ -106,7 +111,7 @@ namespace osu.Game.Database
 
             var imported = new List<Live<TModel>>();
 
-            bool isBatchImport = tasks.Length >= minimum_items_considered_batch_import;
+            parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
             await Task.WhenAll(tasks.Select(async task =>
             {
@@ -115,7 +120,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
+                    var model = await Import(task, parameters, notification.CancellationToken).ConfigureAwait(false);
 
                     lock (imported)
                     {
@@ -149,9 +154,12 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().GetDisplayString()}!"
-                    : $"Imported {imported.Count} {HumanisedModelName}s!";
+                if (tasks.Length > imported.Count)
+                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                else if (imported.Count > 1)
+                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                else
+                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -176,16 +184,16 @@ namespace osu.Game.Database
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
         /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
-        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<Live<TModel>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, parameters, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -193,8 +201,8 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(task.Path) && ShouldDeleteArchive(task.Path))
-                    File.Delete(task.Path);
+                if (import != null && ShouldDeleteArchive(task.Path))
+                    task.DeleteFile();
             }
             catch (Exception e)
             {
@@ -211,9 +219,9 @@ namespace osu.Game.Database
         /// This method also handled queueing the import task on a relevant import thread pool.
         /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
-        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, ImportParameters parameters = default, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -236,10 +244,10 @@ namespace osu.Game.Database
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, parameters, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
-                batchImport ? import_scheduler_batch : import_scheduler);
+                parameters.Batch ? import_scheduler_batch : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -249,15 +257,15 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            pauseIfNecessary(cancellationToken);
 
             TModel? existing;
 
-            if (batchImport && archive != null)
+            if (parameters.Batch && archive != null)
             {
                 // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);
@@ -294,15 +302,38 @@ namespace osu.Game.Database
                 // Log output here will be missing a valid hash in non-batch imports.
                 LogForModel(item, $@"Beginning import from {archive?.Name ?? "unknown"}...");
 
+                List<RealmNamedFileUsage> files = new List<RealmNamedFileUsage>();
+
+                if (archive != null)
+                {
+                    // Import files to the disk store.
+                    // We intentionally delay adding to realm to avoid blocking on a write during disk operations.
+                    foreach (var filenames in getShortenedFilenames(archive))
+                    {
+                        using (Stream s = archive.GetStream(filenames.original))
+                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks), filenames.shortened));
+                    }
+                }
+
+                using (var transaction = realm.BeginWrite())
+                {
+                    // Add all files to realm in one go.
+                    // This is done ahead of the main transaction to ensure we can correctly cleanup the files, even if the import fails.
+                    foreach (var file in files)
+                    {
+                        if (!file.File.IsManaged)
+                            realm.Add(file.File, true);
+                    }
+
+                    transaction.Commit();
+                }
+
+                item.Files.AddRange(files);
+                item.Hash = ComputeHash(item);
+
                 // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
                 using (var transaction = realm.BeginWrite())
                 {
-                    if (archive != null)
-                        // TODO: look into rollback of file additions (or delayed commit).
-                        item.Files.AddRange(createFileInfos(archive, Files, realm));
-
-                    item.Hash = ComputeHash(item);
-
                     // TODO: we may want to run this outside of the transaction.
                     Populate(item, archive, realm, cancellationToken);
 
@@ -335,7 +366,7 @@ namespace osu.Game.Database
                     // import to store
                     realm.Add(item);
 
-                    PostImport(item, realm, batchImport);
+                    PostImport(item, realm, parameters);
 
                     transaction.Commit();
                 }
@@ -425,16 +456,6 @@ namespace osu.Game.Database
         {
             var fileInfos = new List<RealmNamedFileUsage>();
 
-            // import files to manager
-            foreach (var filenames in getShortenedFilenames(reader))
-            {
-                using (Stream s = reader.GetStream(filenames.original))
-                {
-                    var item = new RealmNamedFileUsage(files.Add(s, realm), filenames.shortened);
-                    fileInfos.Add(item);
-                }
-            }
-
             return fileInfos;
         }
 
@@ -480,8 +501,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
-        /// <param name="batchImport">Whether the import was part of a batch.</param>
-        protected virtual void PostImport(TModel model, Realm realm, bool batchImport)
+        /// <param name="parameters">Parameters to further configure the import process.</param>
+        protected virtual void PostImport(TModel model, Realm realm, ImportParameters parameters)
         {
         }
 
@@ -537,6 +558,23 @@ namespace osu.Game.Database
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        private void pauseIfNecessary(CancellationToken cancellationToken)
+        {
+            if (!PauseImports)
+                return;
+
+            Logger.Log($@"{GetType().Name} is being paused.");
+
+            while (PauseImports)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Thread.Sleep(500);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Logger.Log($@"{GetType().Name} is being resumed.");
+        }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)
         {

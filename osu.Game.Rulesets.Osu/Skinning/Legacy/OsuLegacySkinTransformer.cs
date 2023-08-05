@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle.Value;
+
         private readonly Lazy<bool> hasHitCircle;
 
         /// <summary>
@@ -28,17 +28,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is OsuSkinComponent osuComponent)
+            if (lookup is OsuSkinComponentLookup osuComponent)
             {
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation(component.LookupName, true, true, true, startAtCurrentTime: false);
+                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false);
 
                     case OsuSkinComponents.SliderScorePoint:
-                        return this.GetAnimation(component.LookupName, false, false);
+                        return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
@@ -100,9 +100,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
+                    case OsuSkinComponents.CursorRipple:
+                        if (GetTexture("cursor-ripple") != null)
+                        {
+                            var ripple = this.GetAnimation("cursor-ripple", false, false);
+
+                            // In stable this element was scaled down to 50% and opacity 20%, but this makes the elements WAY too big and inflexible.
+                            // If anyone complains about these not being applied, this can be uncommented.
+                            //
+                            // But if no one complains I'd rather fix this in lazer. Wiki documentation doesn't mention size,
+                            // so we might be okay.
+                            //
+                            // if (ripple != null)
+                            // {
+                            //     ripple.Scale = new Vector2(0.5f);
+                            //     ripple.Alpha = 0.2f;
+                            // }
+
+                            return ripple;
+                        }
+
+                        return null;
+
                     case OsuSkinComponents.CursorParticles:
                         if (GetTexture("star2") != null)
                             return new LegacyCursorParticles();
+
+                        return null;
+
+                    case OsuSkinComponents.CursorSmoke:
+                        if (GetTexture("cursor-smoke") != null)
+                            return new LegacySmokeSegment();
 
                         return null;
 
@@ -130,14 +158,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyApproachCircle();
 
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// <summary>
     /// A solid "notch" of the <see cref="AccuracyCircle"/> that appears at the ends of the rank circles to add separation.
     /// </summary>
-    public class RankNotch : CompositeDrawable
+    public partial class RankNotch : CompositeDrawable
     {
         private readonly float position;
 
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     Height = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Width = 1f,
+                    Width = (float)AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 360f,
                     Colour = OsuColour.Gray(0.3f),
                     EdgeSmoothness = new Vector2(1f)
                 }

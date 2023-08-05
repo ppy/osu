@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Pippidon.UI
 {
     [Cached]
-    public class PippidonPlayfield : Playfield
+    public partial class PippidonPlayfield : Playfield
     {
         protected override GameplayCursorContainer CreateCursor() => new PippidonCursorContainer();
 

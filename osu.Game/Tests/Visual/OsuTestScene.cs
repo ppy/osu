@@ -36,8 +36,7 @@ using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
-    [ExcludeFromDynamicCompile]
-    public abstract class OsuTestScene : TestScene
+    public abstract partial class OsuTestScene : TestScene
     {
         [Cached]
         protected Bindable<WorkingBeatmap> Beatmap { get; } = new Bindable<WorkingBeatmap>();
@@ -503,7 +502,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
+        public partial class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
         {
             private TestSceneTestRunner.TestRunner runner;
 

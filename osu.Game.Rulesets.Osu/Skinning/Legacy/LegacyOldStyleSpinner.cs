@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,11 +19,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.
     /// </summary>
-    public class LegacyOldStyleSpinner : LegacySpinner
+    public partial class LegacyOldStyleSpinner : LegacySpinner
     {
-        private Sprite disc;
-        private Sprite metreSprite;
-        private Container metre;
+        private Sprite disc = null!;
+        private Sprite metreSprite = null!;
+        private Container metre = null!;
 
         private bool spinnerBlink;
 

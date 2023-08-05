@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -10,7 +8,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsSidebar : ExpandingButtonContainer
+    public partial class SettingsSidebar : ExpandingButtonContainer
     {
         public const float DEFAULT_WIDTH = 70;
         public const int EXPANDED_WIDTH = 200;

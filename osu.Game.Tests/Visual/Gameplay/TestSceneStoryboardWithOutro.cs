@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
@@ -26,12 +27,13 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneStoryboardWithOutro : PlayerTestScene
+    public partial class TestSceneStoryboardWithOutro : PlayerTestScene
     {
         protected override bool HasCustomSteps => true;
 
         protected new OutroPlayer Player => (OutroPlayer)base.Player;
 
+        private double currentBeatmapDuration;
         private double currentStoryboardDuration;
 
         private bool showResults = true;
@@ -45,7 +47,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("enable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set dim level to 0", () => LocalConfig.SetValue<double>(OsuSetting.DimLevel, 0));
             AddStep("reset fail conditions", () => currentFailConditions = (_, _) => false);
-            AddStep("set storyboard duration to 2s", () => currentStoryboardDuration = 2000);
+            AddStep("set beatmap duration to 0s", () => currentBeatmapDuration = 0);
+            AddStep("set storyboard duration to 8s", () => currentStoryboardDuration = 8000);
             AddStep("set ShowResults = true", () => showResults = true);
         }
 
@@ -105,6 +108,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestSaveFailedReplayWithStoryboardEndedDoesNotProgress()
+        {
+            CreateTest(() =>
+            {
+                AddStep("fail on first judgement", () => currentFailConditions = (_, _) => true);
+                AddStep("set storyboard duration to 0s", () => currentStoryboardDuration = 0);
+            });
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+
+            AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
+            AddUntilStep("wait for button clickable", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().Enabled.Value);
+            AddStep("click save button", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().TriggerClick());
+
+            // Test a regression where importing the fail replay would cause progression to results screen in a failed state.
+            AddWaitStep("wait some", 10);
+            AddAssert("player is still current screen", () => Player.IsCurrentScreen());
+        }
+
+        [Test]
         public void TestShowResultsFalse()
         {
             CreateTest(() =>
@@ -151,6 +174,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("player exited", () => Stack.CurrentScreen == null);
         }
 
+        [Test]
+        public void TestPerformExitAfterOutro()
+        {
+            CreateTest(() =>
+            {
+                AddStep("set beatmap duration to 4s", () => currentBeatmapDuration = 4000);
+                AddStep("set storyboard duration to 1s", () => currentStoryboardDuration = 1000);
+            });
+
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
+            AddStep("exit via pause", () => Player.ExitViaPause());
+            AddAssert("player paused", () => !Player.IsResuming);
+
+            AddStep("resume player", () => Player.Resume());
+            AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddUntilStep("wait for score shown", () => Player.IsScoreShown);
+        }
+
         protected override bool AllowFail => true;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
@@ -160,7 +201,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap();
-            beatmap.HitObjects.Add(new HitCircle());
+            beatmap.HitObjects.Add(new HitCircle { StartTime = currentBeatmapDuration });
             return beatmap;
         }
 
@@ -178,7 +219,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             return storyboard;
         }
 
-        protected class OutroPlayer : TestPlayer
+        protected partial class OutroPlayer : TestPlayer
         {
             public void ExitViaPause() => PerformExit(true);
 
@@ -189,7 +230,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private event Func<HealthProcessor, JudgementResult, bool> failConditions;
 
             public OutroPlayer(Func<HealthProcessor, JudgementResult, bool> failConditions, bool showResults = true)
-                : base(false, showResults)
+                : base(showResults: showResults)
             {
                 this.failConditions = failConditions;
             }

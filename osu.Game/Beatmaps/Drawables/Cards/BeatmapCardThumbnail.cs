@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,13 +9,13 @@ using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
+using osu.Framework.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardThumbnail : Container
+    public partial class BeatmapCardThumbnail : Container
     {
         public BindableBool Dimmed { get; } = new BindableBool();
 
@@ -30,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly UpdateableOnlineBeatmapSetCover cover;
         private readonly Container foreground;
         private readonly PlayButton playButton;
-        private readonly SmoothCircularProgress progress;
+        private readonly CircularProgress progress;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -53,7 +51,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        progress = new SmoothCircularProgress
+                        progress = new CircularProgress
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -11,7 +9,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class HUDSettings : SettingsSubsection
+    public partial class HUDSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.HUDHeader;
 
@@ -27,10 +25,9 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    ClassicDefault = false,
-                    LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
-                    Keywords = new[] { "hp", "bar" }
+                    LabelText = GameplaySettingsStrings.ShowReplaySettingsOverlay,
+                    Current = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay),
+                    Keywords = new[] { "hide" },
                 },
                 new SettingsCheckbox
                 {
@@ -42,6 +39,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
+                },
+                new SettingsCheckbox
+                {
+                    ClassicDefault = false,
+                    LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                    Keywords = new[] { "hp", "bar" }
                 },
             };
         }

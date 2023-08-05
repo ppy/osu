@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -15,7 +17,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorBlueprintContainer : BlueprintContainer<HitObject>
+    public partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
     {
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -26,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected readonly HitObjectComposer Composer;
 
         private HitObjectUsageEventBuffer usageEventBuffer;
+
+        protected InputManager InputManager { get; private set; }
 
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
@@ -41,6 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            InputManager = GetContainingInputManager();
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
@@ -65,8 +71,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
             => blueprints.OrderBy(b => b.Item.StartTime);
-
-        protected override bool AllowDeselectionDuringDrag => !EditorClock.IsRunning;
 
         protected override bool ApplySnapResult(SelectionBlueprint<HitObject>[] blueprints, SnapResult result)
         {
@@ -126,6 +130,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
+            base.ApplySelectionOrder(blueprints)
+                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
+
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new EditorSelectionHandler();
@@ -133,8 +141,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();
-
-            base.SelectAll();
+            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)

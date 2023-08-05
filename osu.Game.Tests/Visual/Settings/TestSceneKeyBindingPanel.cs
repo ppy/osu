@@ -17,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneKeyBindingPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneKeyBindingPanel : OsuManualInputManagerTestScene
     {
         private readonly KeyBindingPanel panel;
 
@@ -38,6 +38,43 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("wait for load", () => panel.ChildrenOfType<GlobalKeyBindingsSection>().Any());
             AddStep("Scroll to top", () => panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollToTop());
             AddWaitStep("wait for scroll", 5);
+        }
+
+        [Test]
+        public void TestBindingTwoNonModifiers()
+        {
+            AddStep("press j", () => InputManager.PressKey(Key.J));
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press k", () => InputManager.Key(Key.K));
+            AddStep("release j", () => InputManager.ReleaseKey(Key.J));
+            checkBinding("Increase volume", "K");
+        }
+
+        [Test]
+        public void TestBindingSingleKey()
+        {
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press k", () => InputManager.Key(Key.K));
+            checkBinding("Increase volume", "K");
+        }
+
+        [Test]
+        public void TestBindingSingleModifier()
+        {
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+            checkBinding("Increase volume", "LShift");
+        }
+
+        [Test]
+        public void TestBindingSingleKeyWithModifier()
+        {
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("press k", () => InputManager.Key(Key.K));
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+            checkBinding("Increase volume", "LShift-K");
         }
 
         [Test]
@@ -158,18 +195,19 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
-                var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
+                var resetButton = settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First();
 
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared",
+                () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
@@ -187,7 +225,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
@@ -196,9 +234,10 @@ namespace osu.Game.Tests.Visual.Settings
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared",
+                () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
@@ -256,8 +295,8 @@ namespace osu.Game.Tests.Visual.Settings
                 var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
                 var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
-                return firstButton.Text.Text == keyName;
-            });
+                return firstButton.Text.Text.ToString();
+            }, () => Is.EqualTo(keyName));
         }
 
         private void scrollToAndStartBinding(string name)

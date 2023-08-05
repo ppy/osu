@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSplitting : EditorTestScene
+    public partial class TestSceneSliderSplitting : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
         private Slider? slider;
-        private PathControlPointVisualiser? visualiser;
+        private PathControlPointVisualiser<Slider>? visualiser;
 
         private const double split_gap = 100;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);
@@ -181,16 +181,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (slider is null) return;
 
-                slider.SampleControlPoint.SampleBank = "soft";
-                slider.SampleControlPoint.SampleVolume = 70;
-                sample = new HitSampleInfo("hitwhistle");
-                slider.Samples.Add(sample);
+                sample = new HitSampleInfo("hitwhistle", HitSampleInfo.BANK_SOFT, volume: 70);
+                slider.Samples.Add(sample.With());
             });
 
             AddStep("select added slider", () =>
             {
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser<Slider>>().First();
             });
 
             moveMouseToControlPoint(2);
@@ -207,9 +205,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("sliders have hitsounds", hasHitsounds);
 
             bool hasHitsounds() => sample is not null &&
-                                   EditorBeatmap.HitObjects.All(o => o.SampleControlPoint.SampleBank == "soft" &&
-                                                                     o.SampleControlPoint.SampleVolume == 70 &&
-                                                                     o.Samples.Contains(sample));
+                                   EditorBeatmap.HitObjects.All(o => o.Samples.Contains(sample));
         }
 
         private bool sliderCreatedFor(Slider s, double startTime, double endTime, params (Vector2 pos, PathType? pathType)[] expectedControlPoints)
@@ -248,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
-                item?.Action?.Value();
+                item?.Action.Value?.Invoke();
             });
         }
     }

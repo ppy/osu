@@ -20,7 +20,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsResultsScreen : ResultsScreen
+    public partial class PlaylistsResultsScreen : ResultsScreen
     {
         private readonly long roomId;
         private readonly PlaylistItem playlistItem;
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null) => Schedule(() =>
         {
-            var scoreInfos = scoreManager.OrderByTotalScore(scores.Select(s => s.CreateScoreInfo(rulesets, playlistItem, Beatmap.Value.BeatmapInfo))).ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
             // Select a score if we don't already have one selected.
             // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
@@ -235,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        private class PanelListLoadingSpinner : LoadingSpinner
+        private partial class PanelListLoadingSpinner : LoadingSpinner
         {
             private readonly ScorePanelList list;
 

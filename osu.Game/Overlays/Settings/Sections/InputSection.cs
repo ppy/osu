@@ -1,10 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -16,13 +12,11 @@ using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class InputSection : SettingsSection
+    public partial class InputSection : SettingsSection
     {
         private readonly KeyBindingPanel keyConfig;
 
         public override LocalisableString Header => InputSettingsStrings.InputSectionHeader;
-
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -51,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public class HandlerSection : SettingsSubsection
+        public partial class HandlerSection : SettingsSubsection
         {
             private readonly InputHandler handler;
 

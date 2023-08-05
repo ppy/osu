@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -21,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen
+    public partial class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 
@@ -57,14 +58,18 @@ namespace osu.Game.Tournament.Screens.Setup
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f),
                 },
-                fillFlow = new FillFlowContainer
+                new OsuScrollContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding(10),
-                    Spacing = new Vector2(10),
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Child = fillFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Spacing = new Vector2(10),
+                    },
+                },
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
@@ -106,14 +111,14 @@ namespace osu.Game.Tournament.Screens.Setup
 
                         loginOverlay.State.Value = Visibility.Visible;
                     },
-                    Value = api?.LocalUser.Value.Username,
-                    Failing = api?.IsLoggedIn != true,
+                    Value = api.LocalUser.Value.Username,
+                    Failing = api.IsLoggedIn != true,
                     Description = "In order to access the API and display metadata, signing in is required."
                 },
                 new LabelledDropdown<RulesetInfo>
                 {
                     Label = "Ruleset",
-                    Description = "Decides what stats are displayed and which ranks are retrieved for players.",
+                    Description = "Decides what stats are displayed and which ranks are retrieved for players. This requires a restart to reload data for an existing bracket.",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

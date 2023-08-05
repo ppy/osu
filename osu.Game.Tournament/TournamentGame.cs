@@ -17,13 +17,14 @@ using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament
 {
     [Cached]
-    public class TournamentGame : TournamentGameBase
+    public partial class TournamentGame : TournamentGameBase
     {
         public static ColourInfo GetTeamColour(TeamColour teamColour) => teamColour == TeamColour.Red ? COLOUR_RED : COLOUR_BLUE;
 
@@ -35,14 +36,22 @@ namespace osu.Game.Tournament
 
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
         private Drawable heightWarning;
-        private Bindable<Size> windowSize;
+
         private Bindable<WindowMode> windowMode;
+        private readonly BindableSize windowSize = new BindableSize();
+
         private LoadingSpinner loadingSpinner;
+
+        [Cached(typeof(IDialogOverlay))]
+        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
         {
-            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
+            frameworkConfig.BindWith(FrameworkSetting.WindowedSize, windowSize);
+
+            windowSize.MinValue = new Size(TournamentSceneManager.REQUIRED_WIDTH, TournamentSceneManager.STREAM_AREA_HEIGHT);
+
             windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
             Add(loadingSpinner = new LoadingSpinner(true, true)
@@ -90,12 +99,12 @@ namespace osu.Game.Tournament
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new TournamentSceneManager()
-                    }
+                    },
+                    dialogOverlay
                 }, drawables =>
                 {
                     loadingSpinner.Hide();
                     loadingSpinner.Expire();
-
                     AddRange(drawables);
 
                     windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>

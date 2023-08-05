@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class ConstantScrollAlgorithm : IScrollAlgorithm
@@ -20,7 +18,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             return -PositionAt(startTime, endTime, timeRange, scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
             => (float)((time - currentTime) / timeRange * scrollLength);
 
         public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)

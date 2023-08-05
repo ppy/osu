@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Spectate
     /// <summary>
     /// A <see cref="OsuScreen"/> which spectates one or more users.
     /// </summary>
-    public abstract class SpectatorScreen : OsuScreen
+    public abstract partial class SpectatorScreen : OsuScreen
     {
         protected IReadOnlyList<int> Users => users;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Spectate
             }));
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes, Exception ___)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes)
         {
             if (changes?.InsertedIndices == null) return;
 

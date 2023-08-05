@@ -4,8 +4,10 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
@@ -45,9 +47,21 @@ namespace osu.Game.Scoring.Legacy
 
                 int version = sr.ReadInt32();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
+                // TotalScoreVersion gets initialised to LATEST_VERSION.
+                // In the case where the incoming score has either an osu!stable or old lazer version, we need
+                // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
+                //
+                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+
+                string beatmapHash = sr.ReadString();
+
+                workingBeatmap = GetBeatmap(beatmapHash);
+
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -91,31 +105,26 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.OnlineID = sr.ReadInt32();
 
+                byte[] compressedScoreInfo = null;
+
+                if (version >= 30000001)
+                    compressedScoreInfo = sr.ReadByteArray();
+
                 if (compressedReplay?.Length > 0)
+                    readCompressedData(compressedReplay, reader => readLegacyReplay(score.Replay, reader));
+
+                if (compressedScoreInfo?.Length > 0)
                 {
-                    using (var replayInStream = new MemoryStream(compressedReplay))
+                    readCompressedData(compressedScoreInfo, reader =>
                     {
-                        byte[] properties = new byte[5];
-                        if (replayInStream.Read(properties, 0, 5) != 5)
-                            throw new IOException("input .lzma is too short");
+                        LegacyReplaySoloScoreInfo readScore = JsonConvert.DeserializeObject<LegacyReplaySoloScoreInfo>(reader.ReadToEnd());
 
-                        long outSize = 0;
+                        Debug.Assert(readScore != null);
 
-                        for (int i = 0; i < 8; i++)
-                        {
-                            int v = replayInStream.ReadByte();
-                            if (v < 0)
-                                throw new IOException("Can't Read 1");
-
-                            outSize |= (long)(byte)v << (8 * i);
-                        }
-
-                        long compressedSize = replayInStream.Length - replayInStream.Position;
-
-                        using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
-                        using (var reader = new StreamReader(lzma))
-                            readLegacyReplay(score.Replay, reader);
-                    }
+                        score.ScoreInfo.Statistics = readScore.Statistics;
+                        score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
+                        score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
+                    });
                 }
             }
 
@@ -124,8 +133,36 @@ namespace osu.Game.Scoring.Legacy
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;
+            score.ScoreInfo.BeatmapHash = workingBeatmap.BeatmapInfo.Hash;
 
             return score;
+        }
+
+        private void readCompressedData(byte[] data, Action<StreamReader> readFunc)
+        {
+            using (var replayInStream = new MemoryStream(data))
+            {
+                byte[] properties = new byte[5];
+                if (replayInStream.Read(properties, 0, 5) != 5)
+                    throw new IOException("input .lzma is too short");
+
+                long outSize = 0;
+
+                for (int i = 0; i < 8; i++)
+                {
+                    int v = replayInStream.ReadByte();
+                    if (v < 0)
+                        throw new IOException("Can't Read 1");
+
+                    outSize |= (long)(byte)v << (8 * i);
+                }
+
+                long compressedSize = replayInStream.Length - replayInStream.Position;
+
+                using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
+                using (var reader = new StreamReader(lzma))
+                    readFunc(reader);
+            }
         }
 
         /// <summary>
@@ -310,9 +347,11 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+            public string Hash { get; }
+
+            public BeatmapNotFoundException(string hash)
             {
+                Hash = hash;
             }
         }
     }

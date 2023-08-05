@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -16,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     [HeadlessTest]
-    public class TestSceneAutoGeneration : OsuTestScene
+    public partial class TestSceneAutoGeneration : OsuTestScene
     {
         /// <summary>
         /// The number of frames which are generated at the start of a replay regardless of hitobject content.
@@ -30,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | - |
             // |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(1));
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
 
             var generated = new ManiaAutoGenerator(beatmap).Generate();
@@ -51,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | * |
             // |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(1));
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
 
             var generated = new ManiaAutoGenerator(beatmap).Generate();
@@ -70,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | - | - |
             // |   |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 2 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(2));
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
             beatmap.HitObjects.Add(new Note { StartTime = 1000, Column = 1 });
 
@@ -92,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | * | * |
             // |   |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 2 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(2));
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000, Column = 1 });
 
@@ -115,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | - |   |
             // |   |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 2 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(2));
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
             beatmap.HitObjects.Add(new Note { StartTime = 2000, Column = 1 });
 
@@ -142,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | * |   |
             // |   |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 2 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(2));
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
             beatmap.HitObjects.Add(new HoldNote { StartTime = 2000, Duration = 2000, Column = 1 });
 
@@ -169,7 +167,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             // | * |   |
             // |   |   |
 
-            var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 2 });
+            var beatmap = new ManiaBeatmap(new StageDefinition(2));
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
             beatmap.HitObjects.Add(new Note { StartTime = 3000, Column = 1 });
 

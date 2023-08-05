@@ -16,22 +16,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyStageBackground : CompositeDrawable
+    public partial class LegacyStageBackground : CompositeDrawable
     {
-        private readonly StageDefinition stageDefinition;
-
         private Drawable leftSprite;
         private Drawable rightSprite;
         private ColumnFlow<Drawable> columnBackgrounds;
 
-        public LegacyStageBackground(StageDefinition stageDefinition)
+        public LegacyStageBackground()
         {
-            this.stageDefinition = stageDefinition;
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, StageDefinition stageDefinition)
         {
             string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
                                ?? "mania-stage-left";
@@ -80,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 rightSprite.Scale = new Vector2(1, DrawHeight / rightSprite.Height);
         }
 
-        private class ColumnBackground : CompositeDrawable
+        private partial class ColumnBackground : CompositeDrawable
         {
             private readonly int columnIndex;
             private readonly bool isLastColumn;

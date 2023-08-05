@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneContextMenu : OsuTestScene
+    public partial class TestSceneContextMenu : OsuTestScene
     {
         private const int start_time = 0;
         private const int duration = 1000;
@@ -113,12 +111,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class MyContextMenuContainer : Container, IHasContextMenu
+        private partial class MyContextMenuContainer : Container, IHasContextMenu
         {
             public MenuItem[] ContextMenuItems => makeMenu();
         }
 
-        private class AnotherContextMenuContainer : Container, IHasContextMenu
+        private partial class AnotherContextMenuContainer : Container, IHasContextMenu
         {
             public MenuItem[] ContextMenuItems
             {

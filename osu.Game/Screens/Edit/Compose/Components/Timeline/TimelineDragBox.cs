@@ -1,33 +1,24 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineDragBox : DragBox
+    public partial class TimelineDragBox : DragBox
     {
-        // the following values hold the start and end X positions of the drag box in the timeline's local space,
-        // but with zoom unapplied in order to be able to compensate for positional changes
-        // while the timeline is being zoomed in/out.
-        private float? selectionStart;
-        private float selectionEnd;
+        public double MinTime { get; private set; }
+
+        public double MaxTime { get; private set; }
+
+        private double? startTime;
 
         [Resolved]
-        private Timeline timeline { get; set; }
-
-        public TimelineDragBox(Action<RectangleF> performSelect)
-            : base(performSelect)
-        {
-        }
+        private Timeline timeline { get; set; } = null!;
 
         protected override Drawable CreateBox() => new Box
         {
@@ -35,47 +26,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Alpha = 0.3f
         };
 
-        public override bool HandleDrag(MouseButtonEvent e)
+        public override void HandleDrag(MouseButtonEvent e)
         {
-            // The dragbox should only be active if the mouseDownPosition.Y is within this drawable's bounds.
-            float localY = ToLocalSpace(e.ScreenSpaceMouseDownPosition).Y;
-            if (DrawRectangle.Top > localY || DrawRectangle.Bottom < localY)
-                return false;
+            startTime ??= timeline.TimeAtPosition(e.MouseDownPosition.X);
+            double endTime = timeline.TimeAtPosition(e.MousePosition.X);
 
-            selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
+            MinTime = Math.Min(startTime.Value, endTime);
+            MaxTime = Math.Max(startTime.Value, endTime);
 
-            // only calculate end when a transition is not in progress to avoid bouncing.
-            if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
-                selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
-
-            updateDragBoxPosition();
-            return true;
-        }
-
-        private void updateDragBoxPosition()
-        {
-            if (selectionStart == null)
-                return;
-
-            float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
-            float rescaledEnd = selectionEnd * timeline.CurrentZoom;
-
-            Box.X = Math.Min(rescaledStart, rescaledEnd);
-            Box.Width = Math.Abs(rescaledStart - rescaledEnd);
-
-            var boxScreenRect = Box.ScreenSpaceDrawQuad.AABBFloat;
-
-            // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
-            boxScreenRect.Y -= boxScreenRect.Height;
-            boxScreenRect.Height *= 2;
-
-            PerformSelection?.Invoke(boxScreenRect);
+            Box.X = timeline.PositionAtTime(MinTime);
+            Box.Width = timeline.PositionAtTime(MaxTime) - Box.X;
         }
 
         public override void Hide()
         {
             base.Hide();
-            selectionStart = null;
+            startTime = null;
         }
     }
 }

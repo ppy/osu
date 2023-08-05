@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using osuTK.Graphics;
 
@@ -22,11 +21,5 @@ namespace osu.Game.Beatmaps.Formats
         /// if empty, <see cref="ComboColours"/> will fall back to default combo colours.
         /// </summary>
         List<Color4> CustomComboColours { get; }
-
-        /// <summary>
-        /// Adds combo colours to the list.
-        /// </summary>
-        [Obsolete("Use CustomComboColours directly.")] // can be removed 20220215
-        void AddComboColours(params Color4[] colours);
     }
 }

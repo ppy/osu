@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dialog
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Dialog
     /// <summary>
     /// A dialog which confirms a user action.
     /// </summary>
-    public class ConfirmDialog : PopupDialog
+    public partial class ConfirmDialog : PopupDialog
     {
         /// <summary>
         /// Construct a new confirmation dialog.
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Dialog
         /// <param name="message">The description of the action to be displayed to the user.</param>
         /// <param name="onConfirm">An action to perform on confirmation.</param>
         /// <param name="onCancel">An optional action to perform on cancel.</param>
-        public ConfirmDialog(string message, Action onConfirm, Action onCancel = null)
+        public ConfirmDialog(LocalisableString message, Action onConfirm, Action onCancel = null)
         {
             HeaderText = message;
             BodyText = "Last chance to turn back";

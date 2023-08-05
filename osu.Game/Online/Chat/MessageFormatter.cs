@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Chat
 {
@@ -71,7 +72,7 @@ namespace osu.Game.Online.Chat
             {
                 int index = m.Index - captureOffset;
 
-                string? displayText = string.Format(display,
+                string displayText = string.Format(display,
                     m.Groups[0],
                     m.Groups["text"].Value,
                     m.Groups["url"].Value).Trim();
@@ -109,7 +110,7 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 int index = m.Index;
-                string? linkText = m.Groups["link"].Value;
+                string linkText = m.Groups["link"].Value;
                 int indexLength = linkText.Length;
 
                 var details = GetLinkDetails(linkText);
@@ -125,7 +126,7 @@ namespace osu.Game.Online.Chat
 
         public static LinkDetails GetLinkDetails(string url)
         {
-            string[]? args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
@@ -172,7 +173,7 @@ namespace osu.Game.Online.Chat
 
                             case "u":
                             case "users":
-                                return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
+                                return getUserLink(mainArg);
 
                             case "wiki":
                                 return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
@@ -230,8 +231,7 @@ namespace osu.Game.Online.Chat
                             break;
 
                         case "u":
-                            linkType = LinkAction.OpenUserProfile;
-                            break;
+                            return getUserLink(args[2]);
 
                         default:
                             return new LinkDetails(LinkAction.External, url);
@@ -244,6 +244,14 @@ namespace osu.Game.Online.Chat
             }
 
             return new LinkDetails(LinkAction.External, url);
+        }
+
+        private static LinkDetails getUserLink(string argument)
+        {
+            if (int.TryParse(argument, out int userId))
+                return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
+
+            return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
@@ -271,11 +279,8 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
-            string empty = "";
-            while (space-- > 0)
-                empty += "\0";
-
-            handleMatches(emoji_regex, empty, "{0}", result, startIndex);
+            // see: https://github.com/ppy/osu/pull/24190
+            result.Text = Regex.Replace(result.Text, emoji_regex.ToString(), "[emoji]");
 
             return result;
         }
@@ -341,6 +346,8 @@ namespace osu.Game.Online.Chat
         OpenWiki,
         Custom,
         OpenChangelog,
+        FilterBeatmapSetGenre,
+        FilterBeatmapSetLanguage,
     }
 
     public class Link : IComparable<Link>
@@ -362,6 +369,6 @@ namespace osu.Game.Online.Chat
 
         public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
 
-        public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
+        public int CompareTo(Link? otherLink) => Index > otherLink?.Index ? 1 : -1;
     }
 }

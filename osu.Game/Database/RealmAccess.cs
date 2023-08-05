@@ -15,19 +15,24 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
 using Realms;
 using Realms.Exceptions;
@@ -70,8 +75,15 @@ namespace osu.Game.Database
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
+        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
+        /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
+        /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
+        /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
+        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
+        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
+        /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
         /// </summary>
-        private const int schema_version = 25;
+        private const int schema_version = 32;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -178,43 +190,9 @@ namespace osu.Game.Database
                 applyFilenameSchemaSuffix(ref Filename);
 #endif
 
-            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
-
-            // Attempt to recover a newer database version if available.
-            if (storage.Exists(newerVersionFilename))
-            {
-                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
-                attemptRecoverFromFile(newerVersionFilename);
-            }
-
-            try
-            {
-                // This method triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
-                cleanupPendingDeletions();
-            }
-            catch (Exception e)
-            {
-                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
-                // This is the best way we can detect a schema version downgrade.
-                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
-                {
-                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
-
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
-                    if (!storage.Exists(newerVersionFilename))
-                        createBackup(newerVersionFilename);
-
-                    storage.Delete(Filename);
-                }
-                else
-                {
-                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
-                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
-                    storage.Delete(Filename);
-                }
-
-                cleanupPendingDeletions();
-            }
+            // `prepareFirstRealmAccess()` triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
+            using (var realm = prepareFirstRealmAccess())
+                cleanupPendingDeletions(realm);
         }
 
         /// <summary>
@@ -311,49 +289,93 @@ namespace osu.Game.Database
             Logger.Log(@"Recovery complete!", LoggingTarget.Database);
         }
 
-        private void cleanupPendingDeletions()
+        private Realm prepareFirstRealmAccess()
         {
-            using (var realm = getRealmInstance())
-            using (var transaction = realm.BeginWrite())
+            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
+
+            // Attempt to recover a newer database version if available.
+            if (storage.Exists(newerVersionFilename))
             {
-                var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
-
-                foreach (var score in pendingDeleteScores)
-                    realm.Remove(score);
-
-                var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
-
-                foreach (var beatmapSet in pendingDeleteSets)
-                {
-                    foreach (var beatmap in beatmapSet.Beatmaps)
-                    {
-                        // Cascade delete related scores, else they will have a null beatmap against the model's spec.
-                        foreach (var score in beatmap.Scores)
-                            realm.Remove(score);
-
-                        realm.Remove(beatmap.Metadata);
-                        realm.Remove(beatmap);
-                    }
-
-                    realm.Remove(beatmapSet);
-                }
-
-                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeleteSkins)
-                    realm.Remove(s);
-
-                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
-
-                foreach (var s in pendingDeletePresets)
-                    realm.Remove(s);
-
-                transaction.Commit();
+                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
+                attemptRecoverFromFile(newerVersionFilename);
             }
 
-            // clean up files after dropping any pending deletions.
-            // in the future we may want to only do this when the game is idle, rather than on every startup.
-            new RealmFileStore(this, storage).Cleanup();
+            try
+            {
+                return getRealmInstance();
+            }
+            catch (Exception e)
+            {
+                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
+                // This is the best way we can detect a schema version downgrade.
+                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
+                {
+                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
+
+                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    if (!storage.Exists(newerVersionFilename))
+                        createBackup(newerVersionFilename);
+                }
+                else
+                {
+                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                }
+
+                storage.Delete(Filename);
+                return getRealmInstance();
+            }
+        }
+
+        private void cleanupPendingDeletions(Realm realm)
+        {
+            try
+            {
+                using (var transaction = realm.BeginWrite())
+                {
+                    var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
+
+                    foreach (var score in pendingDeleteScores)
+                        realm.Remove(score);
+
+                    var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
+
+                    foreach (var beatmapSet in pendingDeleteSets)
+                    {
+                        foreach (var beatmap in beatmapSet.Beatmaps)
+                        {
+                            // Cascade delete related scores, else they will have a null beatmap against the model's spec.
+                            foreach (var score in beatmap.Scores)
+                                realm.Remove(score);
+
+                            realm.Remove(beatmap.Metadata);
+                            realm.Remove(beatmap);
+                        }
+
+                        realm.Remove(beatmapSet);
+                    }
+
+                    var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeleteSkins)
+                        realm.Remove(s);
+
+                    var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                    foreach (var s in pendingDeletePresets)
+                        realm.Remove(s);
+
+                    transaction.Commit();
+                }
+
+                // clean up files after dropping any pending deletions.
+                // in the future we may want to only do this when the game is idle, rather than on every startup.
+                new RealmFileStore(this, storage).Cleanup();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to clean up unused files. This is not critical but please report if it happens regularly.");
+            }
         }
 
         /// <summary>
@@ -481,7 +503,7 @@ namespace osu.Game.Database
                 // server, which we don't use. May want to report upstream or revisit in the future.
                 using (var realm = getRealmInstance())
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
+                    await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
                 pendingAsyncWrites.Signal();
             });
@@ -516,7 +538,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -558,7 +580,7 @@ namespace osu.Game.Database
 
                 return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
 
-                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                void onPropertyChanged(object? sender, PropertyChangedEventArgs args)
                 {
                     if (args.PropertyName == propertyName)
                         onChanged(propLookupCompiled(model));
@@ -708,6 +730,13 @@ namespace osu.Game.Database
 
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
+            Logger.Log($"Running realm migration to version {targetVersion}...");
+            Stopwatch stopwatch = new Stopwatch();
+
+            var files = new RealmFileStore(this, storage);
+
+            stopwatch.Start();
+
             switch (targetVersion)
             {
                 case 7:
@@ -731,10 +760,10 @@ namespace osu.Game.Database
 
                         for (int i = 0; i < itemCount; i++)
                         {
-                            dynamic? oldItem = oldItems.ElementAt(i);
-                            dynamic? newItem = newItems.ElementAt(i);
+                            dynamic oldItem = oldItems.ElementAt(i);
+                            dynamic newItem = newItems.ElementAt(i);
 
-                            long? nullableOnlineID = oldItem?.OnlineID;
+                            long? nullableOnlineID = oldItem.OnlineID;
                             newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                         }
                     }
@@ -771,7 +800,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        dynamic oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
@@ -794,7 +823,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newSettings.Count; i++)
                     {
-                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        dynamic oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
@@ -819,7 +848,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newKeyBindings.Count; i++)
                     {
-                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        dynamic oldItem = oldKeyBindings.ElementAt(i);
                         var newItem = newKeyBindings.ElementAt(i);
 
                         if (oldItem.RulesetID == null)
@@ -857,17 +886,7 @@ namespace osu.Game.Database
 
                     if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
                     {
-                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
-                        {
-                            if (task.Exception != null)
-                            {
-                                // can be removed 20221027 (just for initial safety).
-                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
-                                return;
-                            }
-
-                            storage.Move("collection.db", "collection.db.migrated");
-                        });
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(_ => storage.Move("collection.db", "collection.db.migrated"));
                     }
 
                     break;
@@ -876,7 +895,126 @@ namespace osu.Game.Database
                     // Remove the default skins so they can be added back by SkinManager with updated naming.
                     migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
+
+                case 26:
+                {
+                    // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
+
+                    break;
+                }
+
+                case 28:
+                {
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                    {
+                        score.PopulateFromReplay(files, sr =>
+                        {
+                            sr.ReadByte(); // Ruleset.
+                            int version = sr.ReadInt32();
+                            if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                score.IsLegacyScore = true;
+                        });
+                    }
+
+                    break;
+                }
+
+                case 29:
+                case 30:
+                {
+                    var scores = migration.NewRealm
+                                          .All<ScoreInfo>()
+                                          .Where(s => !s.IsLegacyScore);
+
+                    foreach (var score in scores)
+                    {
+                        try
+                        {
+                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
+                            {
+                                try
+                                {
+                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                    score.TotalScore = calculatedNew;
+                                }
+                                catch
+                                {
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+
+                    break;
+                }
+
+                case 31:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
+                        {
+                            // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
+                            score.TotalScoreVersion = 30000002;
+
+                            // Transfer known legacy scores to a permanent storage field for preservation.
+                            score.LegacyTotalScore = score.TotalScore;
+                        }
+                        else
+                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    }
+
+                    break;
+                }
+
+                case 32:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (!score.IsLegacyScore || !score.Ruleset.IsLegacyRuleset())
+                            continue;
+
+                        score.PopulateFromReplay(files, sr =>
+                        {
+                            sr.ReadByte(); // Ruleset.
+                            sr.ReadInt32(); // Version.
+                            sr.ReadString(); // Beatmap hash.
+                            sr.ReadString(); // Username.
+                            sr.ReadString(); // MD5Hash.
+                            sr.ReadUInt16(); // Count300.
+                            sr.ReadUInt16(); // Count100.
+                            sr.ReadUInt16(); // Count50.
+                            sr.ReadUInt16(); // CountGeki.
+                            sr.ReadUInt16(); // CountKatu.
+                            sr.ReadUInt16(); // CountMiss.
+
+                            // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
+                            int totalScore = sr.ReadInt32();
+
+                            sr.ReadUInt16(); // Max combo.
+                            sr.ReadBoolean(); // Perfect.
+
+                            var legacyMods = (LegacyMods)sr.ReadInt32();
+
+                            if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                                return;
+
+                            score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
+                            score.LegacyTotalScore = score.TotalScore = totalScore;
+                        });
+                    }
+
+                    break;
+                }
             }
+
+            Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId)
@@ -909,7 +1047,7 @@ namespace osu.Game.Database
 
             int attempts = 10;
 
-            while (attempts-- > 0)
+            while (true)
             {
                 try
                 {
@@ -927,6 +1065,9 @@ namespace osu.Game.Database
                 }
                 catch (IOException)
                 {
+                    if (attempts-- <= 0)
+                        throw;
+
                     // file may be locked during use.
                     Thread.Sleep(500);
                 }

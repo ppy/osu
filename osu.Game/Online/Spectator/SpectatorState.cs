@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
-using osu.Game.Scoring;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Online.Spectator
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Online.Spectator
         public SpectatedUserState State { get; set; }
 
         [Key(4)]
-        public ScoringValues MaximumScoringValues { get; set; }
+        public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
 
         public bool Equals(SpectatorState other)
         {

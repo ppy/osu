@@ -14,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuScrollContainer : OsuScrollContainer<Drawable>
+    public partial class OsuScrollContainer : OsuScrollContainer<Drawable>
     {
         public OsuScrollContainer()
         {
@@ -26,9 +26,9 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
+    public partial class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
     {
-        public const float SCROLL_BAR_HEIGHT = 10;
+        public const float SCROLL_BAR_WIDTH = 10;
         public const float SCROLL_BAR_PADDING = 3;
 
         /// <summary>
@@ -131,13 +131,15 @@ namespace osu.Game.Graphics.Containers
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
-        protected class OsuScrollbar : ScrollbarContainer
+        protected partial class OsuScrollbar : ScrollbarContainer
         {
             private Color4 hoverColour;
             private Color4 defaultColour;
             private Color4 highlightColour;
 
             private readonly Box box;
+
+            protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
 
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
@@ -147,7 +149,7 @@ namespace osu.Game.Graphics.Containers
                 CornerRadius = 5;
 
                 // needs to be set initially for the ResizeTo to respect minimum size
-                Size = new Vector2(SCROLL_BAR_HEIGHT);
+                Size = new Vector2(SCROLL_BAR_WIDTH);
 
                 const float margin = 3;
 
@@ -173,11 +175,10 @@ namespace osu.Game.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
+                this.ResizeTo(new Vector2(SCROLL_BAR_WIDTH)
                 {
                     [(int)ScrollDirection] = val
-                };
-                this.ResizeTo(size, duration, easing);
+                }, duration, easing);
             }
 
             protected override bool OnHover(HoverEvent e)

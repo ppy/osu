@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
@@ -10,7 +8,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public class TestSceneDisclaimer : ScreenTestScene
+    public partial class TestSceneDisclaimer : ScreenTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

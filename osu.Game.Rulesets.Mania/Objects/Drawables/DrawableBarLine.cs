@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// Visualises a <see cref="BarLine"/>. Although this derives DrawableManiaHitObject,
     /// this does not handle input/sound like a normal hit object.
     /// </summary>
-    public class DrawableBarLine : DrawableManiaHitObject<BarLine>
+    public partial class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
         public DrawableBarLine(BarLine barLine)
             : base(barLine)
@@ -52,10 +52,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     X = line_offset,
                 });
             }
-        }
-
-        protected override void UpdateInitialTransforms()
-        {
         }
 
         protected override void UpdateStartTimeStateTransforms() => this.FadeOut(150);

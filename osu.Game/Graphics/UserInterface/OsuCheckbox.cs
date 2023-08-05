@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox
+    public partial class OsuCheckbox : Checkbox
     {
         /// <summary>
         /// Whether to play sounds when the state changes as a result of user interaction.
@@ -26,28 +26,28 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                if (labelText != null)
-                    labelText.Text = value;
+                if (LabelTextFlowContainer != null)
+                    LabelTextFlowContainer.Text = value;
             }
         }
 
         public MarginPadding LabelPadding
         {
-            get => labelText?.Padding ?? new MarginPadding();
+            get => LabelTextFlowContainer?.Padding ?? new MarginPadding();
             set
             {
-                if (labelText != null)
-                    labelText.Padding = value;
+                if (LabelTextFlowContainer != null)
+                    LabelTextFlowContainer.Padding = value;
             }
         }
 
         protected readonly Nub Nub;
 
-        private readonly OsuTextFlowContainer labelText;
+        protected readonly OsuTextFlowContainer LabelTextFlowContainer;
         private Sample sampleChecked;
         private Sample sampleUnchecked;
 
-        public OsuCheckbox(bool nubOnRight = true)
+        public OsuCheckbox(bool nubOnRight = true, float nubSize = Nub.DEFAULT_EXPANDED_SIZE)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -56,12 +56,12 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelText = new OsuTextFlowContainer(ApplyLabelParameters)
+                LabelTextFlowContainer = new OsuTextFlowContainer(ApplyLabelParameters)
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                 },
-                Nub = new Nub(),
+                Nub = new Nub(nubSize),
                 new HoverSounds()
             };
 
@@ -70,19 +70,19 @@ namespace osu.Game.Graphics.UserInterface
                 Nub.Anchor = Anchor.CentreRight;
                 Nub.Origin = Anchor.CentreRight;
                 Nub.Margin = new MarginPadding { Right = nub_padding };
-                labelText.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
                 Nub.Anchor = Anchor.CentreLeft;
                 Nub.Origin = Anchor.CentreLeft;
                 Nub.Margin = new MarginPadding { Left = nub_padding };
-                labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
             }
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
+            Current.DisabledChanged += disabled => LabelTextFlowContainer.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
         /// <summary>

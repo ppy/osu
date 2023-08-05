@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
+using osu.Game.IO.Serialization;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -24,7 +25,14 @@ namespace osu.Game.Scoring.Legacy
         /// Database version in stable-compatible YYYYMMDD format.
         /// Should be incremented if any changes are made to the format/usage.
         /// </summary>
-        public const int LATEST_VERSION = FIRST_LAZER_VERSION;
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
+        /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm. Legacy scores on this version are candidate to Score V1 -> V2 conversion.</description></item>
+        /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
+        /// </list>
+        /// </remarks>
+        public const int LATEST_VERSION = 30000003;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -52,13 +60,13 @@ namespace osu.Game.Scoring.Legacy
                 throw new ArgumentException(@"Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
-        public void Encode(Stream stream)
+        public void Encode(Stream stream, bool leaveOpen = false)
         {
-            using (SerializationWriter sw = new SerializationWriter(stream))
+            using (SerializationWriter sw = new SerializationWriter(stream, leaveOpen))
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(LATEST_VERSION);
-                sw.Write(score.ScoreInfo.BeatmapInfo.MD5Hash);
+                sw.Write(score.ScoreInfo.BeatmapInfo!.MD5Hash);
                 sw.Write(score.ScoreInfo.User.Username);
                 sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));
@@ -77,6 +85,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.WriteByteArray(createReplayData());
                 sw.Write((long)0);
                 writeModSpecificData(score.ScoreInfo, sw);
+                sw.WriteByteArray(createScoreInfoData());
             }
         }
 
@@ -84,9 +93,13 @@ namespace osu.Game.Scoring.Legacy
         {
         }
 
-        private byte[] createReplayData()
+        private byte[] createReplayData() => compress(replayStringContent);
+
+        private byte[] createScoreInfoData() => compress(LegacyReplaySoloScoreInfo.FromScore(score.ScoreInfo).Serialize());
+
+        private byte[] compress(string data)
         {
-            byte[] content = new ASCIIEncoding().GetBytes(replayStringContent);
+            byte[] content = new ASCIIEncoding().GetBytes(data);
 
             using (var outStream = new MemoryStream())
             {
@@ -114,10 +127,10 @@ namespace osu.Game.Scoring.Legacy
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
                 double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
+                int lastTime = 0;
+
                 if (score.Replay != null)
                 {
-                    int lastTime = 0;
-
                     foreach (var f in score.Replay.Frames)
                     {
                         var legacyFrame = getLegacyFrame(f);

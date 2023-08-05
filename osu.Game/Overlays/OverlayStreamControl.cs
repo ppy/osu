@@ -12,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamControl<T> : TabControl<T>
+    public abstract partial class OverlayStreamControl<T> : TabControl<T>
     {
         protected OverlayStreamControl()
         {

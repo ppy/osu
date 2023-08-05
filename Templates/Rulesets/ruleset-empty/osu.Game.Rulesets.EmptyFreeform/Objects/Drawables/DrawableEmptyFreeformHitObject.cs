@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.EmptyFreeform.Objects.Drawables
 {
-    public class DrawableEmptyFreeformHitObject : DrawableHitObject<EmptyFreeformHitObject>
+    public partial class DrawableEmptyFreeformHitObject : DrawableHitObject<EmptyFreeformHitObject>
     {
         public DrawableEmptyFreeformHitObject(EmptyFreeformHitObject hitObject)
             : base(hitObject)

@@ -14,7 +14,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
+        public override bool IsProvidingLegacyResources => base.IsProvidingLegacyResources || hasHitCircle || hasBarLeft;
+
         private readonly Lazy<bool> hasExplosion;
+
+        private bool hasHitCircle => GetTexture("taikohitcircle") != null;
+        private bool hasBarLeft => GetTexture("taiko-bar-left") != null;
 
         public TaikoLegacySkinTransformer(ISkin skin)
             : base(skin)
@@ -22,16 +27,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (component is GameplaySkinComponent<HitResult>)
+            if (lookup is GameplaySkinComponentLookup<HitResult>)
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
                     return Drawable.Empty().With(d => d.Expire());
             }
 
-            if (component is TaikoSkinComponent taikoComponent)
+            if (lookup is TaikoSkinComponentLookup taikoComponent)
             {
                 switch (taikoComponent.Component)
                 {
@@ -42,14 +47,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         return null;
 
                     case TaikoSkinComponents.InputDrum:
-                        if (GetTexture("taiko-bar-left") != null)
+                        if (hasBarLeft)
                             return new LegacyInputDrum();
 
                         return null;
 
+                    case TaikoSkinComponents.DrumSamplePlayer:
+                        return null;
+
                     case TaikoSkinComponents.CentreHit:
                     case TaikoSkinComponents.RimHit:
-                        if (GetTexture("taikohitcircle") != null)
+                        if (hasHitCircle)
                             return new LegacyHit(taikoComponent.Component);
 
                         return null;
@@ -124,12 +132,18 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
 
+                    case TaikoSkinComponents.KiaiGlow:
+                        if (GetTexture("taiko-glow") != null)
+                            return new LegacyKiaiGlow();
+
+                        return null;
+
                     default:
-                        throw new UnsupportedSkinComponentException(component);
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         private string getHitName(TaikoSkinComponents component)

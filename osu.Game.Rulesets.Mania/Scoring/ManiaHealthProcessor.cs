@@ -1,18 +1,16 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    public class ManiaHealthProcessor : DrainingHealthProcessor
+    public partial class ManiaHealthProcessor : DrainingHealthProcessor
     {
         /// <inheritdoc/>
-        public ManiaHealthProcessor(double drainStartTime, double drainLenience = 0)
-            : base(drainStartTime, drainLenience)
+        public ManiaHealthProcessor(double drainStartTime)
+            : base(drainStartTime, 1.0)
         {
         }
 

@@ -1,37 +1,26 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Markdig;
-using Markdig.Extensions.AutoLinks;
-using Markdig.Extensions.EmphasisExtras;
 using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Containers.Markdown.Footnotes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownContainer : MarkdownContainer
+    [Cached]
+    public partial class OsuMarkdownContainer : MarkdownContainer
     {
-        /// <summary>
-        /// Allows this markdown container to parse and link footnotes.
-        /// </summary>
-        /// <seealso cref="FootnoteExtension"/>
-        protected virtual bool Footnotes => false;
-
-        /// <summary>
-        /// Allows this markdown container to make URL text clickable.
-        /// </summary>
-        /// <seealso cref="AutoLinkExtension"/>
-        protected virtual bool Autolinks => false;
-
         public OsuMarkdownContainer()
         {
             LineSpacing = 21;
@@ -46,6 +35,13 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case ListItemBlock listItemBlock:
+                    // `ListBlock.Parent` is annotated as null-returning in xmldoc.
+                    // Unfortunately code analysis sees that the type doesn't have NRT enabled and complains.
+                    // This is fixed upstream in 0.24.0 (https://github.com/xoofx/markdig/commit/6684c8257cbbcba2d34457020876be289d3cd8b9),
+                    // but markdig is a transitive dependency from framework, wherein we are locked to 0.23.0
+                    // (https://github.com/ppy/osu-framework/blob/9746d7d06f48910c05a24687a25f435f30d12f8b/osu.Framework/osu.Framework.csproj#L52C1-L54)
+                    // Therefore...
+                    // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
                     bool isOrdered = ((ListBlock)listItemBlock.Parent)?.IsOrdered == true;
 
                     OsuMarkdownListItem childContainer = CreateListItem(listItemBlock, level, isOrdered);
@@ -92,22 +88,17 @@ namespace osu.Game.Graphics.Containers.Markdown
             return new OsuMarkdownUnorderedListItem(level);
         }
 
-        // reference: https://github.com/ppy/osu-web/blob/05488a96b25b5a09f2d97c54c06dd2bae59d1dc8/app/Libraries/Markdown/OsuMarkdown.php#L301
-        protected override MarkdownPipeline CreateBuilder()
-        {
-            var pipeline = new MarkdownPipelineBuilder()
-                           .UseAutoIdentifiers()
-                           .UsePipeTables()
-                           .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
-                           .UseYamlFrontMatter();
+        protected override MarkdownFootnoteGroup CreateFootnoteGroup(FootnoteGroup footnoteGroup) => base.CreateFootnoteGroup(footnoteGroup).With(g => g.Spacing = new Vector2(5));
 
-            if (Footnotes)
-                pipeline = pipeline.UseFootnotes();
+        protected override MarkdownFootnote CreateFootnote(Footnote footnote) => new OsuMarkdownFootnote(footnote);
 
-            if (Autolinks)
-                pipeline = pipeline.UseAutoLinks();
+        protected sealed override MarkdownPipeline CreateBuilder()
+            => Options.BuildPipeline();
 
-            return pipeline.Build();
-        }
+        /// <summary>
+        /// Creates a <see cref="OsuMarkdownContainerOptions"/> instance which is used to determine
+        /// which CommonMark/Markdig extensions should be enabled for this <see cref="OsuMarkdownContainer"/>.
+        /// </summary>
+        protected virtual OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions();
     }
 }

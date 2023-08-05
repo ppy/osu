@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 25;
@@ -54,14 +54,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override void PopIn()
         {
-            base.PopIn();
             Settings.MoveToY(0, TRANSITION_DURATION, Easing.OutQuint);
             Settings.FadeIn(TRANSITION_DURATION / 2);
         }
 
         protected override void PopOut()
         {
-            base.PopOut();
             Settings.MoveToY(-1, TRANSITION_DURATION, Easing.InSine);
             Settings.Delay(TRANSITION_DURATION / 2).FadeOut(TRANSITION_DURATION / 2);
         }
@@ -101,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         /// use expanded overhanging content (like an <see cref="OsuDropdown{T}"/>'s dropdown),
         /// then the overhanging content will be correctly Z-ordered.
         /// </remarks>
-        protected class SectionContainer : ReverseChildIDFillFlowContainer<Section>
+        protected partial class SectionContainer : ReverseChildIDFillFlowContainer<Section>
         {
             public SectionContainer()
             {
@@ -113,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             }
         }
 
-        protected class Section : Container
+        protected partial class Section : Container
         {
             private readonly Container content;
 

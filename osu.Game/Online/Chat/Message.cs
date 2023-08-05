@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -30,6 +31,19 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"sender")]
         public APIUser Sender;
 
+        [JsonProperty(@"sender_id")]
+        public int SenderId
+        {
+            get => Sender?.Id ?? 0;
+            set => Sender = new APIUser { Id = value };
+        }
+
+        /// <summary>
+        /// A unique identifier for this message. Sent to and from osu!web to use for deduplication.
+        /// </summary>
+        [JsonProperty(@"uuid")]
+        public string Uuid { get; set; } = string.Empty;
+
         [JsonConstructor]
         public Message()
         {
@@ -46,19 +60,28 @@ namespace osu.Game.Online.Chat
         /// <remarks>The <see cref="Link"/>s' <see cref="Link.Index"/> and <see cref="Link.Length"/>s are according to <see cref="DisplayContent"/></remarks>
         public List<Link> Links;
 
+        private static long constructionOrderStatic;
+        private readonly long constructionOrder;
+
         public Message(long? id)
         {
             Id = id;
+
+            constructionOrder = Interlocked.Increment(ref constructionOrderStatic);
         }
 
         public int CompareTo(Message other)
         {
-            if (!Id.HasValue)
-                return other.Id.HasValue ? 1 : Timestamp.CompareTo(other.Timestamp);
-            if (!other.Id.HasValue)
-                return -1;
+            if (Id.HasValue && other.Id.HasValue)
+                return Id.Value.CompareTo(other.Id.Value);
 
-            return Id.Value.CompareTo(other.Id.Value);
+            int timestampComparison = Timestamp.CompareTo(other.Timestamp);
+
+            if (timestampComparison != 0)
+                return timestampComparison;
+
+            // Timestamp might not be accurate enough to make a stable sorting decision.
+            return constructionOrder.CompareTo(other.constructionOrder);
         }
 
         public virtual bool Equals(Message other)
@@ -72,6 +95,6 @@ namespace osu.Game.Online.Chat
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
 
-        public override string ToString() => $"[{ChannelId}] ({Id}) {Sender}: {Content}";
+        public override string ToString() => $"({(Id?.ToString() ?? "null")}) {Timestamp} {Sender}: {Content}";
     }
 }

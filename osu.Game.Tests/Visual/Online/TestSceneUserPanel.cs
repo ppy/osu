@@ -9,15 +9,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserPanel : OsuTestScene
+    public partial class TestSceneUserPanel : OsuTestScene
     {
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
         private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
@@ -107,14 +111,16 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set online status", () => status.Value = new UserStatusOnline());
 
             AddStep("idle", () => activity.Value = null);
-            AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
+            AddStep("watching replay", () => activity.Value = new UserActivity.WatchingReplay(createScore(@"nats")));
+            AddStep("spectating user", () => activity.Value = new UserActivity.SpectatingUser(createScore(@"mrekk")));
             AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
             AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
             AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
             AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
-            AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
-            AddStep("modding", () => activity.Value = new UserActivity.Modding());
+            AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(new BeatmapInfo()));
+            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(new BeatmapInfo()));
+            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(new BeatmapInfo(), new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -130,9 +136,17 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
         }
 
-        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
 
-        private class TestUserListPanel : UserListPanel
+        private ScoreInfo createScore(string name) => new ScoreInfo(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+        {
+            User = new APIUser
+            {
+                Username = name,
+            }
+        };
+
+        private partial class TestUserListPanel : UserListPanel
         {
             public TestUserListPanel(APIUser user)
                 : base(user)

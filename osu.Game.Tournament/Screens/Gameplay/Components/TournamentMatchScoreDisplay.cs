@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     // TODO: Update to derive from osu-side class?
-    public class TournamentMatchScoreDisplay : CompositeDrawable
+    public partial class TournamentMatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
 
@@ -27,6 +27,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private readonly MatchScoreCounter score1Text;
         private readonly MatchScoreCounter score2Text;
+
+        private readonly MatchScoreDiffCounter scoreDiffText;
 
         private readonly Drawable score1Bar;
         private readonly Drawable score2Bar;
@@ -88,6 +90,16 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
+                scoreDiffText = new MatchScoreDiffCounter
+                {
+                    Anchor = Anchor.TopCentre,
+                    Margin = new MarginPadding
+                    {
+                        Top = bar_height / 4,
+                        Horizontal = 8
+                    },
+                    Alpha = 0
+                }
             };
         }
 
@@ -119,6 +131,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
+
+            scoreDiffText.Alpha = diff != 0 ? 1 : 0;
+            scoreDiffText.Current.Value = -diff;
+            scoreDiffText.Origin = score1.Value > score2.Value ? Anchor.TopLeft : Anchor.TopRight;
         }
 
         protected override void UpdateAfterChildren()
@@ -128,7 +144,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        private class MatchScoreCounter : CommaSeparatedScoreCounter
+        private partial class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 
@@ -153,6 +169,15 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40, fixedWidth: true);
+        }
+
+        private partial class MatchScoreDiffCounter : CommaSeparatedScoreCounter
+        {
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
+            {
+                s.Spacing = new Vector2(-2);
+                s.Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: bar_height, fixedWidth: true);
+            });
         }
     }
 }

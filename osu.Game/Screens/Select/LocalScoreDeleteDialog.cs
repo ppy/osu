@@ -4,13 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
-using System.Diagnostics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
-    public class LocalScoreDeleteDialog : DeleteConfirmationDialog
+    public partial class LocalScoreDeleteDialog : DangerousActionDialog
     {
         private readonly ScoreInfo score;
 
@@ -20,15 +18,12 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager, ScoreManager scoreManager)
+        private void load(ScoreManager scoreManager)
         {
-            BeatmapInfo? beatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
-            Debug.Assert(beatmapInfo != null);
-
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
 
             Icon = FontAwesome.Regular.TrashAlt;
-            DeleteAction = () => scoreManager.Delete(score);
+            DangerousAction = () => scoreManager.Delete(score);
         }
     }
 }

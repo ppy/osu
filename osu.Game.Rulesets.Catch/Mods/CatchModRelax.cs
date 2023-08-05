@@ -15,32 +15,36 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
+    public partial class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
         public override LocalisableString Description => @"Use the mouse to control the catcher.";
 
-        private DrawableRuleset<CatchHitObject> drawableRuleset = null!;
+        private DrawableCatchRuleset drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            this.drawableRuleset = drawableRuleset;
+            this.drawableRuleset = (DrawableCatchRuleset)drawableRuleset;
         }
 
         public void ApplyToPlayer(Player player)
         {
             if (!drawableRuleset.HasReplayLoaded.Value)
-                drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
+            {
+                var catchPlayfield = (CatchPlayfield)drawableRuleset.Playfield;
+                catchPlayfield.CatcherArea.Add(new MouseInputHelper(catchPlayfield.CatcherArea));
+            }
         }
 
-        private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
+        private partial class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
             private readonly CatcherArea catcherArea;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            public MouseInputHelper(CatchPlayfield playfield)
+            public MouseInputHelper(CatcherArea catcherArea)
             {
-                catcherArea = playfield.CatcherArea;
+                this.catcherArea = catcherArea;
+
                 RelativeSizeAxes = Axes.Both;
             }
 

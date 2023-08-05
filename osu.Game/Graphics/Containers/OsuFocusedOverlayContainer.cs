@@ -18,14 +18,12 @@ using osu.Game.Overlays;
 namespace osu.Game.Graphics.Containers
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private Sample samplePopIn;
         private Sample samplePopOut;
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
-
-        protected override bool BlockScrollInput => false;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -90,6 +88,15 @@ namespace osu.Game.Graphics.Containers
             base.OnMouseUp(e);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // allow for controlling volume when alt is held.
+            // mostly for compatibility with osu-stable.
+            if (e.AltPressed) return false;
+
+            return true;
+        }
+
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -145,7 +152,6 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopOut()
         {
-            base.PopOut();
             previewTrackManager.StopAnyPlaying(this);
         }
 

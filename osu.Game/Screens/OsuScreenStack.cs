@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +8,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
-    public class OsuScreenStack : ScreenStack
+    public partial class OsuScreenStack : ScreenStack
     {
         [Cached]
         private BackgroundScreenStack backgroundScreenStack;
@@ -54,12 +52,12 @@ namespace osu.Game.Screens
             ScreenChanged(prev, next);
         }
 
-        protected virtual void ScreenChanged(IScreen prev, IScreen next)
+        protected virtual void ScreenChanged(IScreen prev, IScreen? next)
         {
             setParallax(next);
         }
 
-        private void setParallax(IScreen next) =>
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * (((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f);
+        private void setParallax(IScreen? next) =>
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((next as IOsuScreen)?.BackgroundParallaxAmount ?? 1.0f);
     }
 }

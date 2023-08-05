@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -14,7 +12,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFooterButtonMods : OsuTestScene
+    public partial class TestSceneFooterButtonMods : OsuTestScene
     {
         private readonly TestFooterButtonMods footerButtonMods;
 
@@ -81,7 +79,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
-        private class TestFooterButtonMods : FooterButtonMods
+        private partial class TestFooterButtonMods : FooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
         }

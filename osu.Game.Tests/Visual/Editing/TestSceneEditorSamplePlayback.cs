@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSamplePlayback : EditorTestScene
+    public partial class TestSceneEditorSamplePlayback : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 

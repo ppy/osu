@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
@@ -65,6 +65,34 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("clear playing users", () => playingUsers.Clear());
         }
 
+        [TestCase(1)]
+        [TestCase(4)]
+        [TestCase(9)]
+        public void TestGeneral(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestMultipleStartRequests()
+        {
+            int[] userIds = getPlayerIds(2);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+
+            start(userIds);
+        }
+
         [Test]
         public void TestDelayedStart()
         {
@@ -89,18 +117,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestGeneral()
-        {
-            int[] userIds = getPlayerIds(4);
-
-            start(userIds);
-            loadSpectateScreen();
-
-            sendFrames(userIds, 1000);
-            AddWaitStep("wait a bit", 20);
-        }
-
-        [Test]
         public void TestSpectatorPlayerInteractiveElementsHidden()
         {
             HUDVisibilityMode originalConfigValue = default;
@@ -121,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
-                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
+                p.ChildrenOfType<ArgonSongProgressBar>().SingleOrDefault()?.Interactive == false));
 
             AddStep("restore config hud visibility", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }

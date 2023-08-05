@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +10,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneResumeOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneResumeOverlay : OsuManualInputManagerTestScene
     {
         public TestSceneResumeOverlay()
         {
@@ -48,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("dismissed", () => resumeFired && resume.State.Value == Visibility.Hidden);
         }
 
-        private class ManualOsuInputManager : OsuInputManager
+        private partial class ManualOsuInputManager : OsuInputManager
         {
             public ManualOsuInputManager(RulesetInfo ruleset)
                 : base(ruleset)

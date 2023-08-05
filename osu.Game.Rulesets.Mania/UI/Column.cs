@@ -3,30 +3,31 @@
 
 #nullable disable
 
-using osuTK.Graphics;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.UI;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public partial class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -39,43 +40,72 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
-        internal readonly Container TopLevelContainer;
-        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+
+        internal readonly Container BackgroundContainer = new Container { RelativeSizeAxes = Axes.Both };
+
+        internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
+
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private readonly GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource;
 
-        public Column(int index)
+        /// <summary>
+        /// Whether this is a special (ie. scratch) column.
+        /// </summary>
+        public readonly bool IsSpecial;
+
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
+
+        public Column(int index, bool isSpecial)
         {
             Index = index;
+            IsSpecial = isSpecial;
 
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
-            {
-                RelativeSizeAxes = Axes.Both
-            };
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+        }
 
-            InternalChildren = new[]
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            SkinnableDrawable keyArea;
+
+            skin.SourceChanged += onSourceChanged;
+            onSourceChanged();
+
+            InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
-                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
-                background.CreateProxy(),
-                HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                HitObjectArea,
+                keyArea = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
-                background,
-                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
+                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
+                // (see `Stage.columnBackgrounds`).
+                BackgroundContainer,
+                TopLevelContainer,
                 new ColumnTouchInputArea(this)
             };
 
-            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
 
+            background.ApplyGameWideClock(host);
+            keyArea.ApplyGameWideClock(host);
+
+            BackgroundContainer.Add(background);
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
             RegisterPool<Note, DrawableNote>(10, 50);
@@ -85,18 +115,27 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
         }
 
+        private void onSourceChanged()
+        {
+            AccentColour.Value = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, Index)?.Value ?? Color4.Black;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             NewResult += OnNewResult;
         }
 
-        public ColumnType ColumnType { get; set; }
+        protected override void Dispose(bool isDisposing)
+        {
+            // must happen before children are disposed in base call to prevent illegal accesses to the hit explosion pool.
+            NewResult -= OnNewResult;
 
-        public bool IsSpecial => ColumnType == ColumnType.Special;
+            base.Dispose(isDisposing);
 
-        public Color4 AccentColour { get; set; }
+            if (skin != null)
+                skin.SourceChanged -= onSourceChanged;
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -111,7 +150,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-            maniaObject.AccentColour.Value = AccentColour;
+            maniaObject.AccentColour.BindTo(AccentColour);
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
@@ -143,7 +182,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public class ColumnTouchInputArea : Drawable
+        public partial class ColumnTouchInputArea : Drawable
         {
             private readonly Column column;
 
@@ -162,18 +201,6 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override void LoadComplete()
             {
                 keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-                base.OnMouseUp(e);
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)

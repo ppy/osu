@@ -10,11 +10,9 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class CollectionsSettings : SettingsSubsection
+    public partial class CollectionsSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Collections";
-
-        private SettingsButton importCollectionsButton = null!;
+        protected override LocalisableString Header => CommonStrings.Collections;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -23,21 +21,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private INotificationOverlay? notificationOverlay { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
+        private void load(IDialogOverlay? dialogOverlay)
         {
-            if (legacyImportManager?.SupportsImportFromStable == true)
-            {
-                Add(importCollectionsButton = new SettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.ImportCollectionsFromStable,
-                    Action = () =>
-                    {
-                        importCollectionsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(_ => Schedule(() => importCollectionsButton.Enabled.Value = true));
-                    }
-                });
-            }
-
             Add(new DangerousSettingsButton
             {
                 Text = MaintenanceSettingsStrings.DeleteAllCollections,
@@ -51,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private void deleteAllCollections()
         {
             realm.Write(r => r.RemoveAll<BeatmapCollection>());
-            notificationOverlay?.Post(new ProgressCompletionNotification { Text = "Deleted all collections!" });
+            notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.DeletedAllCollections });
         }
     }
 }

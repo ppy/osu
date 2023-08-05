@@ -24,6 +24,13 @@ namespace osu.Game.Rulesets.Difficulty
     public abstract class DifficultyCalculator
     {
         /// <summary>
+        /// Whether legacy scoring values (ScoreV1) should be computed to populate the difficulty attributes
+        /// <see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>,
+        /// and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>.
+        /// </summary>
+        public bool ComputeLegacyScoringValues;
+
+        /// <summary>
         /// The beatmap for which difficulty will be calculated.
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
@@ -137,7 +144,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
-                Mod classicMod = rulesetInstance.CreateAllMods().SingleOrDefault(m => m is ModClassic);
+                Mod classicMod = rulesetInstance.CreateMod<ModClassic>();
 
                 var finalCombination = ModUtils.FlattenMod(combination);
                 if (classicMod != null)

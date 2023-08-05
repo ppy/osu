@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// <summary>
     /// A historically-ordered list of <see cref="DrawableRoomPlaylistItem"/>s.
     /// </summary>
-    public class MultiplayerHistoryList : DrawableRoomPlaylist
+    public partial class MultiplayerHistoryList : DrawableRoomPlaylist
     {
         public MultiplayerHistoryList()
         {
@@ -27,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             Spacing = new Vector2(0, 2)
         };
 
-        private class HistoryFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        private partial class HistoryFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderByDescending(item => item.Model.PlayedAt);
         }

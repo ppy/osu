@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerQueueList : MultiplayerTestScene
+    public partial class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
@@ -97,14 +97,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestCurrentItemDoesNotHaveDeleteButton()
+        public void TestSingleItemDoesNotHaveDeleteButton()
+        {
+            AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+
+            assertDeleteButtonVisibility(0, false);
+        }
+
+        [Test]
+        public void TestCurrentItemHasDeleteButtonIfNotSingle()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
             AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
-            assertDeleteButtonVisibility(0, false);
+            assertDeleteButtonVisibility(0, true);
             assertDeleteButtonVisibility(1, true);
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
@@ -121,7 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add playlist item", () =>
             {
-                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
+                MultiplayerPlaylistItem item = TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
 
                 MultiplayerClient.AddUserPlaylistItem(userId(), item).WaitSafely();
 

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSettingsArea : CompositeDrawable
+    public partial class ModSettingsArea : CompositeDrawable
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -32,7 +30,7 @@ namespace osu.Game.Overlays.Mods
         private readonly FillFlowContainer modSettingsFlow;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ModSettingsArea()
         {
@@ -110,7 +108,7 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
 
-        private class ModSettingsColumn : CompositeDrawable
+        private partial class ModSettingsColumn : CompositeDrawable
         {
             public ModSettingsColumn(Mod mod, IEnumerable<Drawable> settingsControls)
             {

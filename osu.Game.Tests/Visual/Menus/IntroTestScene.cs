@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public abstract class IntroTestScene : OsuTestScene
+    public abstract partial class IntroTestScene : OsuTestScene
     {
         [Cached]
         private OsuLogo logo;

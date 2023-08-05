@@ -11,11 +11,13 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public abstract class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
+    public abstract partial class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public readonly IBindable<Vector2> PositionBindable = new Bindable<Vector2>();
         public readonly IBindable<int> StackHeightBindable = new Bindable<int>();
@@ -62,6 +64,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.UnbindFrom(HitObject.PositionBindable);
             StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
+        }
+
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            // Dim should only be applied at a top level, as it will be implicitly applied to nested objects.
+            if (ParentHitObject == null)
+            {
+                // Of note, no one noticed this was missing for years, but it definitely feels like it should still exist.
+                // For now this is applied across all skins, and matches stable.
+                // For simplicity, dim colour is applied to the DrawableHitObject itself.
+                // We may need to make a nested container setup if this even causes a usage conflict (ie. with a mod).
+                this.FadeColour(new Color4(195, 195, 195, 255));
+                using (BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
+                    this.FadeColour(Color4.White, 100);
+            }
         }
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;

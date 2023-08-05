@@ -12,12 +12,14 @@ using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual.Spectator
 {
-    public class TestSpectatorClient : SpectatorClient
+    public partial class TestSpectatorClient : SpectatorClient
     {
         /// <summary>
         /// Maximum number of frames sent per bundle via <see cref="SendFramesFromUser"/>.
@@ -43,6 +45,9 @@ namespace osu.Game.Tests.Visual.Spectator
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         public TestSpectatorClient()
         {
@@ -119,14 +124,14 @@ namespace osu.Game.Tests.Visual.Spectator
                 if (frames.Count == 0)
                     return;
 
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, frames.ToArray());
+                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
                 ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
                 frames.Clear();
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);

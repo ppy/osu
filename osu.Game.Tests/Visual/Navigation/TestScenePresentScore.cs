@@ -9,8 +9,10 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -22,7 +24,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestScenePresentScore : OsuGameTestScene
+    public partial class TestScenePresentScore : OsuGameTestScene
     {
         private BeatmapSetInfo beatmap;
 
@@ -90,6 +92,31 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
+        }
+
+        [Test]
+        public void TestFromSongSelectWithFilter([Values] ScorePresentType type)
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            AddStep("filter to nothing", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).FilterControl.CurrentTextSearch.Value = "fdsajkl;fgewq");
+            AddUntilStep("wait for no results", () => Beatmap.IsDefault);
+
+            var firstImport = importScore(1, new CatchRuleset().RulesetInfo);
+            presentAndConfirm(firstImport, type);
+        }
+
+        [Test]
+        public void TestFromSongSelectWithConvertRulesetChange([Values] ScorePresentType type)
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            AddStep("set convert to false", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            var firstImport = importScore(1, new CatchRuleset().RulesetInfo);
+            presentAndConfirm(firstImport, type);
         }
 
         [Test]

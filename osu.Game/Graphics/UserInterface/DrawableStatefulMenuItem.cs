@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DrawableStatefulMenuItem : DrawableOsuMenuItem
+    public partial class DrawableStatefulMenuItem : DrawableOsuMenuItem
     {
         protected new StatefulMenuItem Item => (StatefulMenuItem)base.Item;
 
@@ -21,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
-        private class ToggleTextContainer : TextContainer
+        private partial class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
             private readonly Bindable<object> state;

@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
@@ -34,7 +33,6 @@ using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
-    [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
         public RulesetInfo RulesetInfo { get; }
@@ -85,10 +83,12 @@ namespace osu.Game.Rulesets
         /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
         /// use <see cref="AllMods"/> instead.
         /// </remarks>
-        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues<ModType>()
                                                        // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                        .SelectMany(GetModsFor)
                                                        // Filter out all null mods
+                                                       // This is to handle old rulesets which were doing mods bad. Can be removed at some point we are sure nulls will not appear here.
+                                                       // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                                                        .Where(mod => mod != null)
                                                        // Resolve MultiMods as their .Mods property
                                                        .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
@@ -191,6 +191,10 @@ namespace osu.Game.Rulesets
 
                     case ModAutoplay:
                         value |= LegacyMods.Autoplay;
+                        break;
+
+                    case ModScoreV2:
+                        value |= LegacyMods.ScoreV2;
                         break;
                 }
             }
@@ -321,8 +325,8 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
         /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
-        /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
-        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
+        /// <returns>The <see cref="StatisticItem"/>s to display.</returns>
+        public virtual StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticItem>();
 
         /// <summary>
         /// Get all valid <see cref="HitResult"/>s for this ruleset.
@@ -380,5 +384,10 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
+
+        /// <summary>
+        /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
+        /// </summary>
+        public virtual DifficultySection? CreateEditorDifficultySection() => null;
     }
 }

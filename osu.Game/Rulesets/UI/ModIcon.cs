@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public class ModIcon : Container, IHasTooltip
+    public partial class ModIcon : Container, IHasTooltip
     {
         public readonly BindableBool Selected = new BindableBool();
 
