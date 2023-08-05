@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -202,6 +203,9 @@ namespace osu.Game.Screens.Menu
                 dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
 
+        [CanBeNull]
+        private Drawable proxiedLogo;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -211,7 +215,7 @@ namespace osu.Game.Screens.Menu
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
-            logo.ProxyToContainer(logoTarget);
+            proxiedLogo = logo.ProxyToContainer(logoTarget);
 
             if (resuming)
             {
@@ -250,10 +254,25 @@ namespace osu.Game.Screens.Menu
             var seq = logo.FadeOut(300, Easing.InSine)
                           .ScaleTo(0.2f, 300, Easing.InSine);
 
-            logo.ReturnProxy();
+            if (proxiedLogo != null)
+            {
+                logo.ReturnProxy();
+                proxiedLogo = null;
+            }
 
             seq.OnComplete(_ => Buttons.SetOsuLogo(null));
             seq.OnAbort(_ => Buttons.SetOsuLogo(null));
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+
+            if (proxiedLogo != null)
+            {
+                logo.ReturnProxy();
+                proxiedLogo = null;
+            }
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
