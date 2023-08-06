@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             scoreProcessor.Combo.BindValueChanged(s =>
             {
                 targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(targetScrollSpeed(s.NewValue));
-            });
+            }, true);
         }
 
         private int targetScrollSpeed(int combo)

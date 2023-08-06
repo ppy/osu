@@ -17,12 +17,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             Mod = new ManiaModAccelerate
             {
-                MaxComboCount = { Value = 2 }
+                MaxComboCount = { Value = 2 },
+                MaxScrollSpeed = { Value = 35 }
             },
             PassCondition = () =>
             {
                 var drawableRuleset = (DrawableManiaRuleset)Player.DrawableRuleset;
-                return drawableRuleset.CustomSmoothTimeRange.Value < DrawableManiaRuleset.MIN_TIME_RANGE;
+
+                // CustomSmoothTimeRange cannot reach targetScrollTime because interpolates handle, so check this faster then speed 34.
+                return !drawableRuleset.CustomSmoothTimeRange.Disabled && drawableRuleset.CustomSmoothTimeRange.Value <= DrawableManiaRuleset.ComputeScrollTime(34);
             }
         });
     }
