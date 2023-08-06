@@ -170,6 +170,39 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("time is correct", () => getEditor().ChildrenOfType<EditorClock>().First().CurrentTime, () => Is.EqualTo(1234));
         }
 
+        [Test]
+        public void TestAttemptGlobalMusicOperationFromEditor()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import test beatmap", () => Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely());
+            AddStep("retrieve beatmap", () => beatmapSet = Game.BeatmapManager.QueryBeatmapSet(set => !set.Protected).AsNonNull().Value.Detach());
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapSet));
+            AddUntilStep("wait for song select",
+                () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
+                      && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
+                      && songSelect.IsLoaded);
+
+            AddUntilStep("wait for music playing", () => Game.MusicController.IsPlaying);
+            AddStep("user request stop", () => Game.MusicController.Stop(requestedByUser: true));
+            AddUntilStep("wait for music stopped", () => !Game.MusicController.IsPlaying);
+
+            AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+
+            AddUntilStep("music still stopped", () => !Game.MusicController.IsPlaying);
+            AddStep("user request play", () => Game.MusicController.Play(requestedByUser: true));
+            AddUntilStep("music still stopped", () => !Game.MusicController.IsPlaying);
+
+            AddStep("exit to song select", () => Game.PerformFromScreen(_ => { }, typeof(PlaySongSelect).Yield()));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+
+            AddUntilStep("wait for music playing", () => Game.MusicController.IsPlaying);
+            AddStep("user request stop", () => Game.MusicController.Stop(requestedByUser: true));
+            AddUntilStep("wait for music stopped", () => !Game.MusicController.IsPlaying);
+        }
+
         private EditorBeatmap getEditorBeatmap() => getEditor().ChildrenOfType<EditorBeatmap>().Single();
 
         private Editor getEditor() => (Editor)Game.ScreenStack.CurrentScreen;

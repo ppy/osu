@@ -34,10 +34,13 @@ namespace osu.Game.Rulesets.Edit
             new CheckUnsnappedObjects(),
             new CheckConcurrentObjects(),
             new CheckZeroLengthObjects(),
-            new CheckDrainTime(),
+            new CheckDrainLength(),
 
             // Timing
             new CheckPreviewTime(),
+
+            // Events
+            new CheckBreaks()
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
