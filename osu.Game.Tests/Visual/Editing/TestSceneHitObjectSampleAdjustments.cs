@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using System.Collections.Generic;
@@ -13,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -24,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneHitObjectSamplePointAdjustments : EditorTestScene
+    public partial class TestSceneHitObjectSampleAdjustments : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -42,7 +41,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE - new Vector2(100, 0)) / 2,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 80)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: 80)
                     }
                 });
 
@@ -52,10 +51,30 @@ namespace osu.Game.Tests.Visual.Editing
                     Position = (OsuPlayfield.BASE_SIZE + new Vector2(100, 0)) / 2,
                     Samples = new List<HitSampleInfo>
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "soft", volume: 60)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT, volume: 60)
                     }
                 });
             });
+        }
+
+        [Test]
+        public void TestAddSampleAddition()
+        {
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            AddStep("add clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+
+            AddStep("remove clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
         }
 
         [Test]
@@ -69,7 +88,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSingleSelection()
         {
             clickSamplePiece(0);
-            samplePopoverHasSingleBank("normal");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
             samplePopoverHasSingleVolume(80);
 
             dismissPopover();
@@ -79,14 +98,29 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.First()));
 
             clickSamplePiece(1);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
             samplePopoverHasSingleVolume(60);
 
             setVolumeViaPopover(90);
             hitObjectHasSampleVolume(1, 90);
 
-            setBankViaPopover("drum");
-            hitObjectHasSampleBank(1, "drum");
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestUndo()
+        {
+            clickSamplePiece(1);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
+            samplePopoverHasSingleVolume(60);
+
+            setVolumeViaPopover(90);
+            hitObjectHasSampleVolume(1, 90);
+            dismissPopover();
+
+            AddStep("undo", () => Editor.Undo());
+            hitObjectHasSampleVolume(1, 60);
         }
 
         [Test]
@@ -135,7 +169,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestMultipleSelectionWithSameSampleBank()
+        public void TestPopoverMultipleSelectionWithSameSampleBank()
         {
             AddStep("unify sample bank", () =>
             {
@@ -143,33 +177,33 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     for (int i = 0; i < h.Samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newBank: "soft");
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
                     }
                 }
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
             clickSamplePiece(0);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
             dismissPopover();
 
             clickSamplePiece(1);
-            samplePopoverHasSingleBank("soft");
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
             setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, "soft");
-            hitObjectHasSampleBank(1, "soft");
-            samplePopoverHasSingleBank("soft");
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
-            setBankViaPopover("drum");
-            hitObjectHasSampleBank(0, "drum");
-            hitObjectHasSampleBank(1, "drum");
-            samplePopoverHasSingleBank("drum");
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
-        public void TestMultipleSelectionWithDifferentSampleBank()
+        public void TestPopoverMultipleSelectionWithDifferentSampleBank()
         {
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
             clickSamplePiece(0);
@@ -181,14 +215,109 @@ namespace osu.Game.Tests.Visual.Editing
             samplePopoverHasIndeterminateBank();
 
             setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, "normal");
-            hitObjectHasSampleBank(1, "soft");
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             samplePopoverHasIndeterminateBank();
 
-            setBankViaPopover("normal");
-            hitObjectHasSampleBank(0, "normal");
-            hitObjectHasSampleBank(1, "normal");
-            samplePopoverHasSingleBank("normal");
+            setBankViaPopover(HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+        }
+
+        [Test]
+        public void TestHotkeysMultipleSelectionWithSameSampleBank()
+        {
+            AddStep("unify sample bank", () =>
+            {
+                foreach (var h in EditorBeatmap.HitObjects)
+                {
+                    for (int i = 0; i < h.Samples.Count; i++)
+                    {
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
+                    }
+                }
+            });
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+
+            AddStep("Press normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+
+            AddStep("Press auto bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            // Should be a noop.
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestHotkeysDuringPlacement()
+        {
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move between two objects", () => EditorClock.Seek(250));
+
+            AddStep("Press normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_DRUM);
+
+            AddStep("Press auto bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            AddStep("Move after second object", () => EditorClock.Seek(750));
+            checkPlacementSample(HitSampleInfo.BANK_SOFT);
+
+            AddStep("Move to first object", () => EditorClock.Seek(0));
+            checkPlacementSample(HitSampleInfo.BANK_NORMAL);
+
+            void checkPlacementSample(string expected) => AddAssert($"Placement sample is {expected}", () => EditorBeatmap.PlacementObject.Value.Samples.First().Bank, () => Is.EqualTo(expected));
         }
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
@@ -229,7 +358,7 @@ namespace osu.Game.Tests.Visual.Editing
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
 
-            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox?.PlaceholderText.ToString());
+            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
         });
 
         private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>
@@ -269,6 +398,12 @@ namespace osu.Game.Tests.Visual.Editing
             // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
             InputManager.ChangeFocus(textBox);
             InputManager.Key(Key.Enter);
+        });
+
+        private void hitObjectHasSamples(int objectIndex, params string[] samples) => AddAssert($"{objectIndex.ToOrdinalWords()} has samples {string.Join(',', samples)}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Select(s => s.Name).SequenceEqual(samples);
         });
 
         private void hitObjectHasSampleBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has bank {bank}", () =>

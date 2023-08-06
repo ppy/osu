@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using Humanizer;
@@ -90,6 +88,20 @@ namespace osu.Game.Tests.Visual.Editing
 
             setVelocityViaPopover(5);
             hitObjectHasVelocity(1, 5);
+        }
+
+        [Test]
+        public void TestUndo()
+        {
+            clickDifficultyPiece(1);
+            velocityPopoverHasSingleValue(2);
+
+            setVelocityViaPopover(5);
+            hitObjectHasVelocity(1, 5);
+            dismissPopover();
+
+            AddStep("undo", () => Editor.Undo());
+            hitObjectHasVelocity(1, 2);
         }
 
         [Test]

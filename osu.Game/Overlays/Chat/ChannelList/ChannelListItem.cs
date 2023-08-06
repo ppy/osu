@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             new Drawable?[]
                             {
                                 createIcon(),
-                                text = new OsuSpriteText
+                                text = new TruncatingSpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -94,7 +94,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     Colour = colourProvider.Light3,
                                     Margin = new MarginPadding { Bottom = 2 },
                                     RelativeSizeAxes = Axes.X,
-                                    Truncate = true,
                                 },
                                 createMentionPill(),
                                 close = createCloseButton(),

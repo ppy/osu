@@ -1,43 +1,37 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
 {
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
-        private const float padding = 10;
+        public const float PADDING = 10;
 
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+        private Container timelineContainer = null!;
 
-        private Container timelineContainer;
+        private Container mainContent = null!;
+
+        private LoadingSpinner spinner = null!;
 
         protected EditorScreenWithTimeline(EditorScreenMode type)
             : base(type)
         {
         }
 
-        private Container mainContent;
-
-        private LoadingSpinner spinner;
-
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider, [CanBeNull] BindableBeatDivisor beatDivisor)
+        private void load(OverlayColourProvider colourProvider)
         {
-            if (beatDivisor != null)
-                this.beatDivisor.BindTo(beatDivisor);
-
+            // Grid with only two rows.
+            // First is the timeline area, which should be allowed to expand as required.
+            // Second is the main editor content, including the playfield and side toolbars (but not the bottom).
             Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -67,7 +61,7 @@ namespace osu.Game.Screens.Edit
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = padding, Top = padding },
+                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
                                     Child = new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -80,9 +74,7 @@ namespace osu.Game.Screens.Edit
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
-                                                    Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                             },
                                         },
                                         RowDimensions = new[]

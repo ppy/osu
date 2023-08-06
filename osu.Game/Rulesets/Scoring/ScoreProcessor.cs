@@ -4,11 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
+using MessagePack;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
@@ -22,6 +21,8 @@ namespace osu.Game.Rulesets.Scoring
 {
     public partial class ScoreProcessor : JudgementProcessor
     {
+        public const double MAX_SCORE = 1000000;
+
         private const double accuracy_cutoff_x = 1;
         private const double accuracy_cutoff_s = 0.95;
         private const double accuracy_cutoff_a = 0.9;
@@ -29,7 +30,13 @@ namespace osu.Game.Rulesets.Scoring
         private const double accuracy_cutoff_c = 0.7;
         private const double accuracy_cutoff_d = 0;
 
-        private const double max_score = 1000000;
+        /// <summary>
+        /// Whether <see cref="HitEvents"/> should be populated during application of results.
+        /// </summary>
+        /// <remarks>
+        /// Should only be disabled for special cases.
+        /// When disabled, <see cref="JudgementProcessor.RevertResult"/> cannot be used.</remarks>
+        internal bool TrackHitEvents = true;
 
         /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
@@ -79,38 +86,71 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt HighestCombo = new BindableInt();
 
         /// <summary>
-        /// The <see cref="ScoringMode"/> used to calculate scores.
-        /// </summary>
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
-
-        /// <summary>
         /// The <see cref="HitEvent"/>s collected during gameplay thus far.
         /// Intended for use with various statistics displays.
         /// </summary>
         public IReadOnlyList<HitEvent> HitEvents => hitEvents;
 
         /// <summary>
-        /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
-        /// </summary>
-        protected virtual double DefaultAccuracyPortion => 0.3;
-
-        /// <summary>
-        /// The default portion of <see cref="max_score"/> awarded for achieving a high combo. Default to 70%.
-        /// </summary>
-        protected virtual double DefaultComboPortion => 0.7;
-
-        /// <summary>
-        /// An arbitrary multiplier to scale scores in the <see cref="ScoringMode.Classic"/> scoring mode.
-        /// </summary>
-        protected virtual double ClassicScoreMultiplier => 36;
-
-        /// <summary>
         /// The ruleset this score processor is valid for.
         /// </summary>
         public readonly Ruleset Ruleset;
 
-        private readonly double accuracyPortion;
-        private readonly double comboPortion;
+        /// <summary>
+        /// The maximum achievable total score.
+        /// </summary>
+        public long MaximumTotalScore { get; private set; }
+
+        /// <summary>
+        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentMaximumBaseScore;
+
+        /// <summary>
+        /// The sum of all accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        private double currentBaseScore;
+
+        /// <summary>
+        /// The maximum sum of all accuracy-affecting judgements in the beatmap.
+        /// </summary>
+        private double maximumBaseScore;
+
+        /// <summary>
+        /// The count of all accuracy-affecting judgements in the beatmap.
+        /// </summary>
+        private int maximumAccuracyJudgementCount;
+
+        /// <summary>
+        /// The count of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        private int currentAccuracyJudgementCount;
+
+        /// <summary>
+        /// The maximum combo score in the beatmap.
+        /// </summary>
+        private double maximumComboPortion;
+
+        /// <summary>
+        /// The combo score at the current point in time.
+        /// </summary>
+        private double currentComboPortion;
+
+        /// <summary>
+        /// The bonus score at the current point in time.
+        /// </summary>
+        private double currentBonusPortion;
+
+        /// <summary>
+        /// The total score multiplier.
+        /// </summary>
+        private double scoreMultiplier = 1;
 
         public Dictionary<HitResult, int> MaximumStatistics
         {
@@ -123,27 +163,6 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        private ScoringValues maximumScoringValues;
-
-        /// <summary>
-        /// Scoring values for the current play assuming all perfect hits.
-        /// </summary>
-        /// <remarks>
-        /// This is only used to determine the accuracy with respect to the current point in time for an ongoing play session.
-        /// </remarks>
-        private ScoringValues currentMaximumScoringValues;
-
-        /// <summary>
-        /// Scoring values for the current play.
-        /// </summary>
-        private ScoringValues currentScoringValues;
-
-        /// <summary>
-        /// The maximum <see cref="HitResult"/> of a basic (non-tick and non-bonus) hitobject.
-        /// Only populated via <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoreInfo)"/> or <see cref="ResetFromReplayFrame"/>.
-        /// </summary>
-        private HitResult? maxBasicResult;
-
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
@@ -152,17 +171,9 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
-        private double scoreMultiplier = 1;
-
         public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
-
-            accuracyPortion = DefaultAccuracyPortion;
-            comboPortion = DefaultComboPortion;
-
-            if (!Precision.AlmostEquals(1.0, accuracyPortion + comboPortion))
-                throw new InvalidOperationException($"{nameof(DefaultAccuracyPortion)} + {nameof(DefaultComboPortion)} must equal 1.");
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
@@ -172,7 +183,6 @@ namespace osu.Game.Rulesets.Scoring
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
-            Mode.ValueChanged += _ => updateScore();
             Mods.ValueChanged += mods =>
             {
                 scoreMultiplier = 1;
@@ -200,10 +210,6 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
-            // Always update the maximum scoring values.
-            applyResult(result.Judgement.MaxResult, ref currentMaximumScoringValues);
-            currentMaximumScoringValues.MaxCombo += result.Judgement.MaxResult.IncreasesCombo() ? 1 : 0;
-
             if (!result.Type.IsScorable())
                 return;
 
@@ -212,27 +218,32 @@ namespace osu.Game.Rulesets.Scoring
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
 
-            applyResult(result.Type, ref currentScoringValues);
-            currentScoringValues.MaxCombo = HighestCombo.Value;
+            result.ComboAfterJudgement = Combo.Value;
 
-            hitEvents.Add(CreateHitEvent(result));
-            lastHitObject = result.HitObject;
+            if (result.Type.AffectsAccuracy())
+            {
+                currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentBaseScore += Judgement.ToNumericResult(result.Type);
+                currentAccuracyJudgementCount++;
+            }
 
-            updateScore();
-        }
-
-        private static void applyResult(HitResult result, ref ScoringValues scoringValues)
-        {
-            if (!result.IsScorable())
-                return;
-
-            if (result.IsBonus())
-                scoringValues.BonusScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+            if (result.Type.IsBonus())
+                currentBonusPortion += GetBonusScoreChange(result);
             else
-                scoringValues.BaseScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+                currentComboPortion += GetComboScoreChange(result);
 
-            if (result.IsBasic())
-                scoringValues.CountBasicHitObjects++;
+            ApplyScoreChange(result);
+
+            if (!IsSimulating)
+            {
+                if (TrackHitEvents)
+                {
+                    hitEvents.Add(CreateHitEvent(result));
+                    lastHitObject = result.HitObject;
+                }
+
+                updateScore();
+            }
         }
 
         /// <summary>
@@ -245,6 +256,9 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {
+            if (!TrackHitEvents)
+                throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
+
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
 
@@ -253,15 +267,22 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
-            // Always update the maximum scoring values.
-            revertResult(result.Judgement.MaxResult, ref currentMaximumScoringValues);
-            currentMaximumScoringValues.MaxCombo -= result.Judgement.MaxResult.IncreasesCombo() ? 1 : 0;
-
             if (!result.Type.IsScorable())
                 return;
 
-            revertResult(result.Type, ref currentScoringValues);
-            currentScoringValues.MaxCombo = HighestCombo.Value;
+            if (result.Type.AffectsAccuracy())
+            {
+                currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentBaseScore -= Judgement.ToNumericResult(result.Type);
+                currentAccuracyJudgementCount--;
+            }
+
+            if (result.Type.IsBonus())
+                currentBonusPortion -= GetBonusScoreChange(result);
+            else
+                currentComboPortion -= GetComboScoreChange(result);
+
+            RemoveScoreChange(result);
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
@@ -270,110 +291,35 @@ namespace osu.Game.Rulesets.Scoring
             updateScore();
         }
 
-        private static void revertResult(HitResult result, ref ScoringValues scoringValues)
+        protected virtual double GetBonusScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type);
+
+        protected virtual double GetComboScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type) * (1 + result.ComboAfterJudgement / 10d);
+
+        protected virtual void ApplyScoreChange(JudgementResult result)
         {
-            if (!result.IsScorable())
-                return;
+        }
 
-            if (result.IsBonus())
-                scoringValues.BonusScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
-            else
-                scoringValues.BaseScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
-
-            if (result.IsBasic())
-                scoringValues.CountBasicHitObjects--;
+        protected virtual void RemoveScoreChange(JudgementResult result)
+        {
         }
 
         private void updateScore()
         {
-            Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
-            MinimumAccuracy.Value = maximumScoringValues.BaseScore > 0 ? (double)currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 0;
-            MaximumAccuracy.Value = maximumScoringValues.BaseScore > 0
-                ? (double)(currentScoringValues.BaseScore + (maximumScoringValues.BaseScore - currentMaximumScoringValues.BaseScore)) / maximumScoringValues.BaseScore
-                : 1;
-            TotalScore.Value = computeScore(Mode.Value, currentScoringValues, maximumScoringValues);
+            Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
+            MinimumAccuracy.Value = maximumBaseScore > 0 ? currentBaseScore / maximumBaseScore : 0;
+            MaximumAccuracy.Value = maximumBaseScore > 0 ? (currentBaseScore + (maximumBaseScore - currentMaximumBaseScore)) / maximumBaseScore : 1;
+
+            double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
+            double accuracyProcess = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
+
+            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
         }
 
-        /// <summary>
-        /// Computes the accuracy of a given <see cref="ScoreInfo"/>.
-        /// </summary>
-        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <returns>The score's accuracy.</returns>
-        [Pure]
-        public double ComputeAccuracy(ScoreInfo scoreInfo)
+        protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
-
-            // We only extract scoring values from the score's statistics. This is because accuracy is always relative to the point of pass or fail rather than relative to the whole beatmap.
-            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
-
-            return maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
-        }
-
-        /// <summary>
-        /// Computes the total score of a given <see cref="ScoreInfo"/>.
-        /// </summary>
-        /// <remarks>
-        /// Does not require <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
-        /// </remarks>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        [Pure]
-        public long ComputeScore(ScoringMode mode, ScoreInfo scoreInfo)
-        {
-            if (!Ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{Ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
-
-            extractScoringValues(scoreInfo, out var current, out var maximum);
-
-            return computeScore(mode, current, maximum);
-        }
-
-        /// <summary>
-        /// Computes the total score from scoring values.
-        /// </summary>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="current">The current scoring values.</param>
-        /// <param name="maximum">The maximum scoring values.</param>
-        /// <returns>The total score computed from the given scoring values.</returns>
-        [Pure]
-        private long computeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
-        {
-            double accuracyRatio = maximum.BaseScore > 0 ? (double)current.BaseScore / maximum.BaseScore : 1;
-            double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
-        }
-
-        /// <summary>
-        /// Computes the total score from individual scoring components.
-        /// </summary>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
-        /// <param name="comboRatio">The portion of the max combo achieved by the player.</param>
-        /// <param name="bonusScore">The total bonus score.</param>
-        /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
-        /// <returns>The total score computed from the given scoring component ratios.</returns>
-        [Pure]
-        public long ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, long bonusScore, int totalBasicHitObjects)
-        {
-            double accuracyScore = accuracyPortion * accuracyRatio;
-            double comboScore = comboPortion * comboRatio;
-            double rawScore = (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
-
-            switch (mode)
-            {
-                default:
-                case ScoringMode.Standardised:
-                    return (long)Math.Round(rawScore);
-
-                case ScoringMode.Classic:
-                    // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
-                    // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-                    double scaledRawScore = rawScore / max_score;
-                    return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier);
-            }
+            return 700000 * comboProgress +
+                   300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress +
+                   bonusPortion;
         }
 
         /// <summary>
@@ -382,6 +328,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
         protected override void Reset(bool storeResults)
         {
+            // Run one last time to store max values.
+            updateScore();
+
             base.Reset(storeResults);
 
             hitEvents.Clear();
@@ -389,16 +338,24 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maximumScoringValues = currentScoringValues;
+                maximumBaseScore = currentBaseScore;
+
+                maximumComboPortion = currentComboPortion;
+                maximumAccuracyJudgementCount = currentAccuracyJudgementCount;
 
                 maximumResultCounts.Clear();
                 maximumResultCounts.AddRange(scoreResultCounts);
+
+                MaximumTotalScore = TotalScore.Value;
             }
 
             scoreResultCounts.Clear();
 
-            currentScoringValues = default;
-            currentMaximumScoringValues = default;
+            currentBaseScore = 0;
+            currentMaximumBaseScore = 0;
+            currentAccuracyJudgementCount = 0;
+            currentComboPortion = 0;
+            currentBonusPortion = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -428,7 +385,7 @@ namespace osu.Game.Rulesets.Scoring
                 score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
-            score.TotalScore = ComputeScore(ScoringMode.Standardised, score);
+            score.TotalScore = TotalScore.Value;
         }
 
         /// <summary>
@@ -452,126 +409,36 @@ namespace osu.Game.Rulesets.Scoring
             if (frame.Header == null)
                 return;
 
-            extractScoringValues(frame.Header.Statistics, out var current, out var maximum);
-            currentScoringValues.BaseScore = current.BaseScore;
-            currentScoringValues.MaxCombo = frame.Header.MaxCombo;
-            currentMaximumScoringValues.BaseScore = maximum.BaseScore;
-            currentMaximumScoringValues.MaxCombo = maximum.MaxCombo;
-
             Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
+            TotalScore.Value = frame.Header.TotalScore;
 
             scoreResultCounts.Clear();
             scoreResultCounts.AddRange(frame.Header.Statistics);
+
+            SetScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
 
             updateScore();
 
             OnResetFromReplayFrame?.Invoke();
         }
 
-        #region ScoringValue extraction
-
-        /// <summary>
-        /// Applies a best-effort extraction of hit statistics into <see cref="ScoringValues"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
-        /// <list type="bullet">
-        ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
-        /// </list>
-        /// Consumers are expected to more accurately fill in the above values through external means.
-        /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
-        /// <see cref="computeScore(osu.Game.Rulesets.Scoring.ScoringMode,ScoringValues,ScoringValues)"/>.
-        /// </para>
-        /// </remarks>
-        /// <param name="scoreInfo">The score to extract scoring values from.</param>
-        /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
-        /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        [Pure]
-        private void extractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
+        public ScoreProcessorStatistics GetScoreProcessorStatistics() => new ScoreProcessorStatistics
         {
-            extractScoringValues(scoreInfo.Statistics, out current, out maximum);
-            current.MaxCombo = scoreInfo.MaxCombo;
+            MaximumBaseScore = currentMaximumBaseScore,
+            BaseScore = currentBaseScore,
+            AccuracyJudgementCount = currentAccuracyJudgementCount,
+            ComboPortion = currentComboPortion,
+            BonusPortion = currentBonusPortion
+        };
 
-            if (scoreInfo.MaximumStatistics.Count > 0)
-                extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
-        }
-
-        /// <summary>
-        /// Applies a best-effort extraction of hit statistics into <see cref="ScoringValues"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
-        /// <list type="bullet">
-        ///     <item>The current <see cref="ScoringValues.MaxCombo"/> will always be 0.</item>
-        ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
-        /// </list>
-        /// Consumers are expected to more accurately fill in the above values (especially the current <see cref="ScoringValues.MaxCombo"/>) via external means (e.g. <see cref="ScoreInfo"/>).
-        /// </remarks>
-        /// <param name="statistics">The hit statistics to extract scoring values from.</param>
-        /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
-        /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        [Pure]
-        private void extractScoringValues(IReadOnlyDictionary<HitResult, int> statistics, out ScoringValues current, out ScoringValues maximum)
+        public void SetScoreProcessorStatistics(ScoreProcessorStatistics statistics)
         {
-            current = default;
-            maximum = default;
-
-            foreach ((HitResult result, int count) in statistics)
-            {
-                if (!result.IsScorable())
-                    continue;
-
-                if (result.IsBonus())
-                    current.BonusScore += count * Judgement.ToNumericResult(result);
-
-                if (result.AffectsAccuracy())
-                {
-                    // The maximum result of this judgement if it wasn't a miss.
-                    // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).
-                    HitResult maxResult;
-
-                    switch (result)
-                    {
-                        case HitResult.LargeTickHit:
-                        case HitResult.LargeTickMiss:
-                            maxResult = HitResult.LargeTickHit;
-                            break;
-
-                        case HitResult.SmallTickHit:
-                        case HitResult.SmallTickMiss:
-                            maxResult = HitResult.SmallTickHit;
-                            break;
-
-                        default:
-                            maxResult = maxBasicResult ??= Ruleset.GetHitResults().MaxBy(kvp => Judgement.ToNumericResult(kvp.result)).result;
-                            break;
-                    }
-
-                    current.BaseScore += count * Judgement.ToNumericResult(result);
-                    maximum.BaseScore += count * Judgement.ToNumericResult(maxResult);
-                }
-
-                if (result.AffectsCombo())
-                    maximum.MaxCombo += count;
-
-                if (result.IsBasic())
-                {
-                    current.CountBasicHitObjects += count;
-                    maximum.CountBasicHitObjects += count;
-                }
-            }
-        }
-
-        #endregion
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            hitEvents.Clear();
+            currentMaximumBaseScore = statistics.MaximumBaseScore;
+            currentBaseScore = statistics.BaseScore;
+            currentAccuracyJudgementCount = statistics.AccuracyJudgementCount;
+            currentComboPortion = statistics.ComboPortion;
+            currentBonusPortion = statistics.BonusPortion;
         }
 
         #region Static helper methods
@@ -630,30 +497,10 @@ namespace osu.Game.Rulesets.Scoring
 
         #endregion
 
-        /// <summary>
-        /// Stores the required scoring data that fulfils the minimum requirements for a <see cref="ScoreProcessor"/> to calculate score.
-        /// </summary>
-        private struct ScoringValues
+        protected override void Dispose(bool isDisposing)
         {
-            /// <summary>
-            /// The sum of all "basic" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBasic"/> and <see cref="Judgement.ToNumericResult"/>.
-            /// </summary>
-            public long BaseScore;
-
-            /// <summary>
-            /// The sum of all "bonus" <see cref="HitObject"/> scoring values. See: <see cref="HitResultExtensions.IsBonus"/> and <see cref="Judgement.ToNumericResult"/>.
-            /// </summary>
-            public long BonusScore;
-
-            /// <summary>
-            /// The highest achieved combo.
-            /// </summary>
-            public int MaxCombo;
-
-            /// <summary>
-            /// The count of "basic" <see cref="HitObject"/>s. See: <see cref="HitResultExtensions.IsBasic"/>.
-            /// </summary>
-            public int CountBasicHitObjects;
+            base.Dispose(isDisposing);
+            hitEvents.Clear();
         }
     }
 
@@ -664,5 +511,47 @@ namespace osu.Game.Rulesets.Scoring
 
         [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ClassicScoreDisplay))]
         Classic
+    }
+
+    [Serializable]
+    [MessagePackObject]
+    public class ScoreProcessorStatistics
+    {
+        /// <summary>
+        /// The sum of all accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// See: <see cref="HitResultExtensions.IsBasic"/> and <see cref="Judgement.ToNumericResult"/>.
+        /// </remarks>
+        [Key(0)]
+        public double BaseScore { get; set; }
+
+        /// <summary>
+        /// The maximum sum of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        /// <remarks>
+        /// Used to compute accuracy.
+        /// </remarks>
+        [Key(1)]
+        public double MaximumBaseScore { get; set; }
+
+        /// <summary>
+        /// The count of accuracy-affecting judgements at the current point in time.
+        /// </summary>
+        [Key(2)]
+        public int AccuracyJudgementCount { get; set; }
+
+        /// <summary>
+        /// The combo score at the current point in time.
+        /// </summary>
+        [Key(3)]
+        public double ComboPortion { get; set; }
+
+        /// <summary>
+        /// The bonus score at the current point in time.
+        /// </summary>
+        [Key(4)]
+        public double BonusPortion { get; set; }
     }
 }

@@ -435,5 +435,46 @@ namespace osu.Game.Screens.Menu
             logoBounceContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
             base.OnDragEnd(e);
         }
+
+        private Container defaultProxyTarget;
+        private Container currentProxyTarget;
+        private Drawable proxy;
+
+        public Drawable ProxyToContainer(Container c)
+        {
+            if (currentProxyTarget != null)
+                throw new InvalidOperationException("Previous proxy usage was not returned");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget = c;
+
+            defaultProxyTarget.Remove(proxy, false);
+            currentProxyTarget.Add(proxy);
+            return proxy;
+        }
+
+        public void ReturnProxy()
+        {
+            if (currentProxyTarget == null)
+                throw new InvalidOperationException("No usage to return");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget.Remove(proxy, false);
+            currentProxyTarget = null;
+
+            defaultProxyTarget.Add(proxy);
+        }
+
+        public void SetupDefaultContainer(Container container)
+        {
+            defaultProxyTarget = container;
+
+            defaultProxyTarget.Add(this);
+            defaultProxyTarget.Add(proxy = CreateProxy());
+        }
     }
 }
