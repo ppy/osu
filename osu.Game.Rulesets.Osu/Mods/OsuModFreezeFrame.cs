@@ -44,21 +44,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             IsDisabled.BindValueChanged(s =>
             {
-                if (s.NewValue)
-                {
-                    foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
-                    {
-                        applyFadeInAdjustment(obj);
-                    }
-                }
-                else
-                {
-                    calculateComboTime();
-                }
-            }, true);
-
-            void calculateComboTime()
-            {
                 double lastNewComboTime = 0;
 
                 foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
@@ -67,17 +52,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     applyFadeInAdjustment(obj, lastNewComboTime);
                 }
-            }
+            }, true);
 
-            void applyFadeInAdjustment(OsuHitObject osuObject, double? lastNewComboTime = null)
+            void applyFadeInAdjustment(OsuHitObject osuObject, double lastNewComboTime)
             {
-                if (lastNewComboTime != null)
+                if (!IsDisabled.Value)
                 {
-                    osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime.Value;
+                    osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
                 }
                 else
                 {
-                    osuObject.TimePreempt = 600;
+                    osuObject.TimePreempt -= osuObject.StartTime - lastNewComboTime;
                 }
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
