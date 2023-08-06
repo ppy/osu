@@ -37,8 +37,12 @@ namespace osu.Game.Rulesets.Mods
         {
             SpeedChange.BindValueChanged(val =>
             {
-                freqAdjust.Value = SpeedChange.Default;
                 tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+            }, true);
+
+            IsDisabled.BindValueChanged(val =>
+            {
+                freqAdjust.Value = val.NewValue ? 1.0 : SpeedChange.Default;
             }, true);
         }
 
