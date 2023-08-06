@@ -3,33 +3,26 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 
 namespace osu.Game.Input.Bindings
 {
-    public partial class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput, IKeyBindingHandler<GlobalAction>
     {
-        private readonly Drawable? handler;
-
-        private InputManager? parentInputManager;
+        private readonly IKeyBindingHandler<GlobalAction>? handler;
 
         public GlobalActionContainer(OsuGameBase? game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
-            if (game is IKeyBindingHandler<GlobalAction>)
-                handler = game;
+            if (game is IKeyBindingHandler<GlobalAction> h)
+                handler = h;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            parentInputManager = GetContainingInputManager();
-        }
+        protected override bool Prioritised => true;
 
         // IMPORTANT: Take care when changing order of the items in the enumerable.
         // It is used to decide the order of precedence, with the earlier items having higher precedence.
@@ -161,20 +154,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
-        protected override IEnumerable<Drawable> KeyBindingInputQueue
-        {
-            get
-            {
-                // To ensure the global actions are handled with priority, this GlobalActionContainer is actually placed after game content.
-                // It does not contain children as expected, so we need to forward the NonPositionalInputQueue from the parent input manager to correctly
-                // allow the whole game to handle these actions.
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e) => handler?.OnPressed(e) == true;
 
-                // An eventual solution to this hack is to create localised action containers for individual components like SongSelect, but this will take some rearranging.
-                var inputQueue = parentInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
-
-                return handler != null ? inputQueue.Prepend(handler) : inputQueue;
-            }
-        }
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => handler?.OnReleased(e);
     }
 
     public enum GlobalAction
