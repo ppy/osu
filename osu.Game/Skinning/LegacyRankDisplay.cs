@@ -40,6 +40,6 @@ namespace osu.Game.Skinning
             scoreProcessor.Rank.BindValueChanged(v => rank.Texture = getTexture(skin, v.NewValue.ToString()));
         }
 
-        private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"ranking-{name}");
+        private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"ranking-{name}-small");
     }
 }
