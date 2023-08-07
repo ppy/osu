@@ -35,11 +35,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// </summary>
         public int HoldNoteCount { get; set; }
 
-        /// <summary>
-        /// Conversion status from standard.
-        /// </summary>
-        public bool IsConvert { get; set; }
-
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())

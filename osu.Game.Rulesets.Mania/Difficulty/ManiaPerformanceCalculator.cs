@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double? estimatedUr;
         private bool isLegacyScore;
         private double[] hitWindows = null!;
+        private bool isConvert;
 
         public ManiaPerformanceCalculator()
             : base(new ManiaRuleset())
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
             var maniaAttributes = (ManiaDifficultyAttributes)attributes;
+
+            isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 3;
 
             countPerfect = score.Statistics.GetValueOrDefault(HitResult.Perfect);
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
@@ -145,7 +148,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double goodWindowLeniency = 0;
 
             // When converting beatmaps to osu!mania in stable, the resulting hit window sizes are dependent on whether the beatmap's OD is above or below 4.
-            if (attributes.IsConvert)
+            if (isConvert)
             {
                 overallDifficulty = 10;
 
