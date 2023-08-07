@@ -3,19 +3,22 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 using osuTK;
 
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class DefaultRankDisplay : GameplayRankDisplay
+    public partial class DefaultRankDisplay : Container, ISerialisableDrawable
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
+        public bool UsesFixedAnchor { get; set; }
 
-        private UpdateableRank rank;
+        private readonly UpdateableRank rank;
 
         public DefaultRankDisplay()
         {
