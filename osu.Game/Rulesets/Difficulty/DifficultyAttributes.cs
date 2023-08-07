@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_LEGACY_ACCURACY_SCORE = 23;
         protected const int ATTRIB_ID_LEGACY_COMBO_SCORE = 25;
         protected const int ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO = 27;
+        protected const int ATTRIB_ID_NOTE_COUNT = 33;
+        protected const int ATTRIB_ID_HOLD_NOTE_COUNT = 35;
 
         /// <summary>
         /// The mods which were applied to the beatmap.

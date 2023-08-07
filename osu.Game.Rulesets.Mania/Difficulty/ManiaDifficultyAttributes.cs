@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
+            yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
+            yield return (ATTRIB_ID_NOTE_COUNT, NoteCount);
+            yield return (ATTRIB_ID_HOLD_NOTE_COUNT, HoldNoteCount);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -50,6 +53,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
+            OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
+            NoteCount = (int)values[ATTRIB_ID_NOTE_COUNT];
+            HoldNoteCount = (int)values[ATTRIB_ID_HOLD_NOTE_COUNT];
         }
     }
 }
