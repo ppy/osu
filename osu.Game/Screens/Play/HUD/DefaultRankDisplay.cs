@@ -9,13 +9,13 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
-
 namespace osu.Game.Screens.Play.HUD
 {
     public partial class DefaultRankDisplay : Container, ISerialisableDrawable
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
+
         public bool UsesFixedAnchor { get; set; }
 
         private readonly UpdateableRank rank;
@@ -24,11 +24,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             Size = new Vector2(70, 35);
 
-            InternalChildren = new Drawable[] {
-                rank = new UpdateableRank(Scoring.ScoreRank.X) {
+            InternalChildren = new Drawable[]
+            {
+                rank = new UpdateableRank(Scoring.ScoreRank.X)
+                {
                     RelativeSizeAxes = Axes.Both
                 },
-        };
+            };
         }
 
         protected override void LoadComplete()

@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Skinning
@@ -34,7 +33,6 @@ namespace osu.Game.Skinning
 
         protected override void LoadComplete()
         {
-
             var skin = source.FindProvider(s => getTexture(s, "A") != null);
 
             rank.Texture = getTexture(skin, scoreProcessor.Rank.Value.ToString());
