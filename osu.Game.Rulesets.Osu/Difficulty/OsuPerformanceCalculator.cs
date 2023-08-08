@@ -209,6 +209,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
+            accuracyValue *= Math.Pow(0.97, Math.Max(0, effectiveMissCount - 1)); // Penalize accuracy pp after the first miss.
+
             return accuracyValue;
         }
 
