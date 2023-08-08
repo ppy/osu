@@ -29,6 +29,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Updater;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets
@@ -56,6 +57,11 @@ namespace osu.Game.Rulesets
         /// See https://github.com/ppy/osu/wiki/Breaking-Changes for full details on required ongoing changes.
         /// </remarks>
         public virtual string RulesetAPIVersionSupported => string.Empty;
+
+        /// <summary>
+        /// Returns an update manager that checks GitHub for any new updates for the ruleset.
+        /// </summary>
+        public virtual SimpleUpdateManager? CreateRulesetUpdateManager() => null;
 
         /// <summary>
         /// A queryable source containing all available mods.
