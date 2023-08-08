@@ -95,7 +95,7 @@ namespace osu.Desktop
             string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
 
             if (!string.IsNullOrEmpty(packageManaged))
-                return new NoActionUpdateManager();
+                return new NoActionGameUpdateManager();
 
             switch (RuntimeInfo.OS)
             {
@@ -105,7 +105,7 @@ namespace osu.Desktop
                     return new SquirrelUpdateManager();
 
                 default:
-                    return new SimpleUpdateManager();
+                    return new SimpleGameUpdateManager();
             }
         }
 
