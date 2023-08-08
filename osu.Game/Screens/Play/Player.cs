@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
 
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
@@ -1048,8 +1048,6 @@ namespace osu.Game.Screens.Play
             ShowingOverlayComponents.BindTo(HUDOverlay.ShowHud);
 
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
-
-            DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
