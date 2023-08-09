@@ -79,11 +79,11 @@ namespace osu.Game.Tournament.Tests.NonVisual
         public partial class TestTournament : TournamentGameBase
         {
             private readonly bool resetRuleset;
-            private readonly Action runOnLoadComplete;
+            private readonly Action? runOnLoadComplete;
 
             public new Task BracketLoadTask => base.BracketLoadTask;
 
-            public TestTournament(bool resetRuleset = false, [InstantHandle] Action runOnLoadComplete = null)
+            public TestTournament(bool resetRuleset = false, [InstantHandle] Action? runOnLoadComplete = null)
             {
                 this.resetRuleset = resetRuleset;
                 this.runOnLoadComplete = runOnLoadComplete;

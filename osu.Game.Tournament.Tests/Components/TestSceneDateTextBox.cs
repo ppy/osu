@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Tests.Components
 {
     public partial class TestSceneDateTextBox : OsuManualInputManagerTestScene
     {
-        private DateTextBox textBox;
+        private DateTextBox textBox = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
