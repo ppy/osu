@@ -29,7 +29,7 @@ namespace osu.Game.Tournament.Components
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public TournamentBeatmap Beatmap
+        public TournamentBeatmap? Beatmap
         {
             set
             {
