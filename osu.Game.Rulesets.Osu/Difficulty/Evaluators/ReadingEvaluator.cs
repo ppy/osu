@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            double noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3);
+            double noteDensityDifficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 3)), 2.3);
 
             double hiddenDifficulty = 0;
 
@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
                 double timeDifficultyFactor = 1000 / pastObjectDifficultyInfluence;
 
-                double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 3, 1, 10);
+                double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
                 hiddenDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor, 1) +
-                                    visibleObjectFactor * 4 * currVelocity;
+                                    (8 + visibleObjectFactor) * currVelocity;
             }
 
             double difficulty = hiddenDifficulty + noteDensityDifficulty;
