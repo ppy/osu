@@ -17,12 +17,12 @@ namespace osu.Game.Tournament.Tests.Components
     public partial class TestSceneTournamentModDisplay : TournamentTestScene
     {
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
-        private FillFlowContainer<TournamentBeatmapPanel> fillFlow;
+        private FillFlowContainer<TournamentBeatmapPanel> fillFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load()
