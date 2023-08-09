@@ -14,7 +14,6 @@ using Squirrel;
 using Squirrel.SimpleSplat;
 using LogLevel = Squirrel.SimpleSplat.LogLevel;
 using UpdateManager = osu.Game.Updater.UpdateManager;
-using GameVersionUpdater = osu.Game.Updater.GameVersionUpdater;
 
 namespace osu.Desktop.Updater
 {
@@ -45,9 +44,6 @@ namespace osu.Desktop.Updater
         private void load(INotificationOverlay notifications)
         {
             notificationOverlay = notifications;
-
-            // This will ensure that the version gets stored to the config as expected
-            AddInternal(new GameVersionUpdater());
 
             SquirrelLocator.CurrentMutable.Register(() => squirrelLogger, typeof(ILogger));
         }

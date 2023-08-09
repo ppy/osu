@@ -730,7 +730,7 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
-        protected virtual UpdateManager CreateUpdateManager() => new GameUpdateManager();
+        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
         protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
 
