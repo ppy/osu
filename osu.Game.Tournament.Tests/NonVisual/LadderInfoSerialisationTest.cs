@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using NUnit.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.NonVisual
@@ -36,8 +35,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 PlayersPerTeam = { Value = 4 },
                 Teams =
                 {
-                    match.Team1.Value.AsNonNull(),
-                    match.Team2.Value.AsNonNull(),
+                    match.Team1.Value!,
+                    match.Team2.Value!,
                 },
                 Rounds =
                 {

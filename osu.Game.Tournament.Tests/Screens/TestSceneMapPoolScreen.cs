@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Tournament.Components;
@@ -31,7 +30,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load few maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 8; i++)
                     addBeatmap();
@@ -51,7 +50,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load just enough maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 18; i++)
                     addBeatmap();
@@ -71,7 +70,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load many maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 19; i++)
                     addBeatmap();
@@ -91,7 +90,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load many maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 11; i++)
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
@@ -117,7 +116,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load many maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 12; i++)
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
@@ -137,7 +136,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("load many maps", () =>
             {
-                Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Clear();
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
 
                 for (int i = 0; i < 12; i++)
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
@@ -154,7 +153,7 @@ namespace osu.Game.Tournament.Tests.Screens
 
         private void addBeatmap(string mods = "NM")
         {
-            Ladder.CurrentMatch.Value.AsNonNull().Round.Value.AsNonNull().Beatmaps.Add(new RoundBeatmap
+            Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Add(new RoundBeatmap
             {
                 Beatmap = CreateSampleBeatmap(),
                 Mods = mods
