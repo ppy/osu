@@ -991,6 +991,9 @@ namespace osu.Game
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
+            // This shows a notification to the user if the version number changes
+            loadComponentSingleFile(new OsuPostUpdateNotifier(), Add, false);
+
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
