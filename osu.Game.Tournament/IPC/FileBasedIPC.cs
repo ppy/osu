@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
@@ -181,7 +180,7 @@ namespace osu.Game.Tournament.IPC
         /// <returns>Whether an IPC directory was successfully auto-detected.</returns>
         public bool AutoDetectIPCLocation() => SetIPCLocation(findStablePath());
 
-        private static bool ipcFileExistsInDirectory([NotNullWhen(true)] string? p) => p != null && File.Exists(Path.Combine(p, "ipc.txt"));
+        private static bool ipcFileExistsInDirectory(string? p) => p != null && File.Exists(Path.Combine(p, "ipc.txt"));
 
         private string? findStablePath()
         {
@@ -202,7 +201,7 @@ namespace osu.Game.Tournament.IPC
                 string? stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
 
                 if (ipcFileExistsInDirectory(stableInstallPath))
-                    return stableInstallPath;
+                    return stableInstallPath!;
             }
             catch
             {
