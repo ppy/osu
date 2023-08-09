@@ -121,13 +121,13 @@ namespace osu.Game.Tournament.Screens.MapPool
             splitMapPoolByMods.BindValueChanged(_ => updateDisplay());
         }
 
-        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
             if (CurrentMatch.Value == null || CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
                 return;
 
             // if bans have already been placed, beatmap changes result in a selection being made autoamtically
-            if (beatmap.NewValue.OnlineID > 0)
+            if (beatmap.NewValue?.OnlineID > 0)
                 addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
