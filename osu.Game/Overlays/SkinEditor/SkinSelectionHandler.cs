@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyOrigins(Anchor origin)
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -246,7 +246,7 @@ namespace osu.Game.Overlays.SkinEditor
                 ApplyClosestAnchor(drawable);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyFixedAnchors(Anchor anchor)
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -268,12 +268,12 @@ namespace osu.Game.Overlays.SkinEditor
                 applyAnchor(drawable, anchor);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         private void applyClosestAnchors()
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -281,7 +281,7 @@ namespace osu.Game.Overlays.SkinEditor
                 ApplyClosestAnchor((Drawable)item);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         private static Anchor getClosestAnchor(Drawable drawable)

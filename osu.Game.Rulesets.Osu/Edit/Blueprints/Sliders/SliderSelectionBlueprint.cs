@@ -49,9 +49,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
         public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
@@ -173,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case MouseButton.Left:
                     if (e.ControlPressed && IsSelected)
                     {
-                        changeHandler?.BeginChange();
+                        editorBeatmap?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
                         ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
@@ -204,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (placementControlPoint != null)
             {
                 placementControlPoint = null;
-                changeHandler?.EndChange();
+                editorBeatmap?.EndChange();
             }
         }
 
@@ -354,7 +351,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
             double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
 
-            changeHandler?.BeginChange();
+            editorBeatmap.BeginChange();
 
             int i = 0;
             double time = HitObject.StartTime;
@@ -385,7 +382,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.Remove(HitObject);
 
-            changeHandler?.EndChange();
+            editorBeatmap.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]

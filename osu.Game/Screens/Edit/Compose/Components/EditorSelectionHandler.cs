@@ -39,6 +39,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.CollectionChanged += (_, _) => Scheduler.AddOnce(UpdateTernaryStates);
         }
 
+        protected override void BeginChange()
+        {
+            // If the editor beatmap has a change handler then this will automatically call BeginChange() on it.
+            EditorBeatmap.BeginChange();
+        }
+
+        protected override void EndChange()
+        {
+            // If the editor beatmap has a change handler then this will automatically call EndChange() on it.
+            EditorBeatmap.EndChange();
+        }
+
         protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);
 
         #region Selection State

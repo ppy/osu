@@ -45,9 +45,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
-        protected override void OnOperationEnded()
+        protected override void EndChange()
         {
-            base.OnOperationEnded();
+            base.EndChange();
             referencePathTypes = null;
         }
 

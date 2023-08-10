@@ -23,13 +23,10 @@ namespace osu.Game.Screens.Edit.Timing
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; } = null!;
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
-
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -102,19 +99,19 @@ namespace osu.Game.Screens.Edit.Timing
             if (SelectedGroup.Value == null || time == SelectedGroup.Value.Time)
                 return;
 
-            changeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
             var currentGroupItems = SelectedGroup.Value.ControlPoints.ToArray();
 
-            Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
+            EditorBeatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
 
             foreach (var cp in currentGroupItems)
-                Beatmap.ControlPointInfo.Add(time, cp);
+                EditorBeatmap.ControlPointInfo.Add(time, cp);
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
-            SelectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(time, true);
+            SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(time, true);
 
-            changeHandler?.EndChange();
+            EditorBeatmap.EndChange();
         }
     }
 }

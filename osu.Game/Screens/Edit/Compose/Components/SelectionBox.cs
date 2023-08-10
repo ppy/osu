@@ -30,7 +30,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
 
+        /// <summary>
+        /// Fired when a drag operation begins from the selection box.
+        /// </summary>
         public Action? OperationStarted;
+
+        /// <summary>
+        /// Fired when a drag operation ends from the selection box.
+        /// </summary>
         public Action? OperationEnded;
 
         private SelectionBoxButton? reverseButton;

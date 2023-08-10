@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         protected readonly HitObjectComposer Composer;
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SelectedItems.BindTo(Beatmap.SelectedHitObjects);
+            SelectedItems.BindTo(EditorBeatmap.SelectedHitObjects);
         }
 
         protected override void LoadComplete()
@@ -48,8 +48,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             InputManager = GetContainingInputManager();
 
-            Beatmap.HitObjectAdded += AddBlueprintFor;
-            Beatmap.HitObjectRemoved += RemoveBlueprintFor;
+            EditorBeatmap.HitObjectAdded += AddBlueprintFor;
+            EditorBeatmap.HitObjectRemoved += RemoveBlueprintFor;
 
             if (Composer != null)
             {
@@ -61,6 +61,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 usageEventBuffer.HitObjectUsageFinished += RemoveBlueprintFor;
                 usageEventBuffer.HitObjectUsageTransferred += TransferBlueprintFor;
             }
+        }
+
+        protected override void BeginChange()
+        {
+            // If the editor beatmap has a change handler then this will automatically call BeginChange() on it.
+            EditorBeatmap.BeginChange();
+        }
+
+        protected override void EndChange()
+        {
+            // If the editor beatmap has a change handler then this will automatically call EndChange() on it.
+            EditorBeatmap.EndChange();
         }
 
         protected override void Update()
@@ -84,10 +96,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if (offset != 0)
                 {
-                    Beatmap.PerformOnSelection(obj =>
+                    EditorBeatmap.PerformOnSelection(obj =>
                     {
                         obj.StartTime += offset;
-                        Beatmap.Update(obj);
+                        EditorBeatmap.Update(obj);
                     });
                 }
             }
@@ -118,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)
-                Beatmap.Update(blueprint.Item);
+                EditorBeatmap.Update(blueprint.Item);
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
@@ -141,7 +153,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();
-            SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
+            SelectedItems.AddRange(EditorBeatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
@@ -162,10 +174,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Dispose(isDisposing);
 
-            if (Beatmap != null)
+            if (EditorBeatmap != null)
             {
-                Beatmap.HitObjectAdded -= AddBlueprintFor;
-                Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
+                EditorBeatmap.HitObjectAdded -= AddBlueprintFor;
+                EditorBeatmap.HitObjectRemoved -= RemoveBlueprintFor;
             }
 
             usageEventBuffer?.Dispose();

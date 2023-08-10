@@ -19,14 +19,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private EditorBeatmap editorBeatmap = null!;
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap editorBeatmap)
         {
+            this.editorBeatmap = editorBeatmap;
             selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInRotation != null)
                 throw new InvalidOperationException($"Cannot {nameof(Begin)} a rotate operation while another is in progress!");
 
-            changeHandler?.BeginChange();
+            editorBeatmap.BeginChange();
 
             objectsInRotation = selectedMovableObjects.ToArray();
             defaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation).Centre;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInRotation == null)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
-            changeHandler?.EndChange();
+            editorBeatmap.EndChange();
 
             objectsInRotation = null;
             originalPositions = null;

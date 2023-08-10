@@ -95,6 +95,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
+        protected virtual void BeginChange()
+        {
+            changeHandler?.BeginChange();
+        }
+
+        protected virtual void EndChange()
+        {
+            changeHandler?.EndChange();
+        }
+
         protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
@@ -190,7 +200,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
-                changeHandler?.BeginChange();
+                BeginChange();
                 return true;
             }
 
@@ -213,7 +223,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (isDraggingBlueprint)
             {
                 DragOperationCompleted();
-                changeHandler?.EndChange();
+                EndChange();
             }
 
             DragBox.Hide();
