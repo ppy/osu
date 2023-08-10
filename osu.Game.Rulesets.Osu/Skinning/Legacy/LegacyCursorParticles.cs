@@ -108,15 +108,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (relaxing != relaxHitSpewer.Active.Value) relaxHitSpewer.Active.Value = relaxing;
 
-            if (relaxing && relaxingKeyPressed())
+            if (relaxingKeyPressed() && !kiaiSpewer.Active.Value)
             {
-                if (kiaiSpewer.Active.Value) relaxHitSpewer.SpawnKiaiParticles = false;
-                else
-                {
-                    relaxHitSpewer.Direction = SpewDirection.None;
-                    relaxHitSpewer.Colour = starBreakAdditive;
-                    relaxHitSpewer.SpawnKiaiParticles = true;
-                }
+                relaxHitSpewer.Direction = SpewDirection.None;
+                relaxHitSpewer.Colour = starBreakAdditive;
+                relaxHitSpewer.SpawnKiaiParticles = true;
+            }
+            else
+            {
+                relaxHitSpewer.SpawnKiaiParticles = false;
             }
         }
 
