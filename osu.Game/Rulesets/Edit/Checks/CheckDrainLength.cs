@@ -7,10 +7,11 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckDrainTime : ICheck
+    public class CheckDrainLength : ICheck
     {
         private const int min_drain_threshold = 30 * 1000;
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Compose, "Too short drain time");
+
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Compose, "Drain length is too short");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double drainTime = context.Beatmap.CalculatePlayableLength() - context.Beatmap.TotalBreakTime;
+            double drainTime = context.Beatmap.CalculateDrainLength();
 
             if (drainTime < min_drain_threshold)
                 yield return new IssueTemplateTooShort(this).Create((int)(drainTime / 1000));

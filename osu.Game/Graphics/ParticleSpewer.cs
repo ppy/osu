@@ -1,9 +1,10 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -19,11 +20,11 @@ namespace osu.Game.Graphics
 {
     public abstract partial class ParticleSpewer : Sprite
     {
-        protected readonly FallingParticle[] Particles;
-        protected int CurrentIndex;
-        protected double LastParticleAdded;
+        private readonly FallingParticle[] particles;
+        private int currentIndex;
+        private double? lastParticleAdded;
 
-        private readonly double cooldown;
+        private readonly double timeBetweenSpawns;
         private readonly double maxDuration;
 
         /// <summary>
@@ -36,16 +37,16 @@ namespace osu.Game.Graphics
         protected virtual bool CanSpawnParticles => true;
         protected virtual float ParticleGravity => 0;
 
-        private bool hasActiveParticles => Active.Value || (LastParticleAdded + maxDuration) > Time.Current;
+        private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxDuration) > Time.Current;
 
         protected ParticleSpewer(Texture texture, int perSecond, double maxDuration)
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
 
-            Particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
+            particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
 
-            cooldown = 1000f / perSecond;
+            timeBetweenSpawns = 1000f / perSecond;
             this.maxDuration = maxDuration;
         }
 
@@ -53,18 +54,58 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - LastParticleAdded) > cooldown)
+            Invalidate(Invalidation.DrawNode);
+
+            if (!Active.Value || !CanSpawnParticles)
             {
-                var newParticle = CreateParticle();
-                newParticle.StartTime = (float)Time.Current;
-
-                Particles[CurrentIndex] = newParticle;
-
-                CurrentIndex = (CurrentIndex + 1) % Particles.Length;
-                LastParticleAdded = Time.Current;
+                lastParticleAdded = null;
+                return;
             }
 
-            Invalidate(Invalidation.DrawNode);
+            // Always want to spawn the first particle in an activation immediately.
+            if (lastParticleAdded == null)
+            {
+                lastParticleAdded = Time.Current;
+                spawnParticle();
+                return;
+            }
+
+            double timeElapsed = Time.Current - lastParticleAdded.Value;
+
+            // Avoid spawning too many particles if a long amount of time has passed.
+            if (Math.Abs(timeElapsed) > maxDuration)
+            {
+                lastParticleAdded = Time.Current;
+                spawnParticle();
+                return;
+            }
+
+            Debug.Assert(lastParticleAdded != null);
+
+            for (int i = 0; i < timeElapsed / timeBetweenSpawns; i++)
+            {
+                lastParticleAdded += timeBetweenSpawns;
+                spawnParticle();
+            }
+        }
+
+        private void spawnParticle()
+        {
+            Debug.Assert(lastParticleAdded != null);
+
+            var newParticle = CreateParticle();
+
+            newParticle.StartTime = (float)lastParticleAdded.Value;
+
+            particles[currentIndex] = newParticle;
+
+            currentIndex = (currentIndex + 1) % particles.Length;
+        }
+
+        protected void SpawnParticle()
+        {
+            lastParticleAdded = Time.Current;
+            spawnParticle();
         }
 
         /// <summary>
@@ -74,7 +115,7 @@ namespace osu.Game.Graphics
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
-        # region DrawNode
+        #region DrawNode
 
         private class ParticleSpewerDrawNode : SpriteDrawNode
         {
@@ -92,7 +133,7 @@ namespace osu.Game.Graphics
             public ParticleSpewerDrawNode(ParticleSpewer source)
                 : base(source)
             {
-                particles = new FallingParticle[Source.Particles.Length];
+                particles = new FallingParticle[Source.particles.Length];
                 maxDuration = (float)Source.maxDuration;
             }
 
@@ -100,7 +141,7 @@ namespace osu.Game.Graphics
             {
                 base.ApplyState();
 
-                Source.Particles.CopyTo(particles, 0);
+                Source.particles.CopyTo(particles, 0);
 
                 currentTime = (float)Source.Time.Current;
                 gravity = Source.ParticleGravity;

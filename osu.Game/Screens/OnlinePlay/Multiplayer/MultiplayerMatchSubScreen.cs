@@ -17,7 +17,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -50,9 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
@@ -78,6 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!client.IsConnected.Value)
                 handleRoomLost();
         }
+
+        protected override bool IsConnected => base.IsConnected && client.IsConnected.Value;
 
         protected override Drawable CreateMainContent() => new Container
         {
@@ -254,13 +252,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // the room may not be left immediately after a disconnection due to async flow,
-            // so checking the MultiplayerClient / IAPIAccess statuses is also required.
-            if (client.Room == null || !client.IsConnected.Value || api.State.Value != APIState.Online)
-            {
-                // room has not been created yet or we're offline; exit immediately.
+            // room has not been created yet or we're offline; exit immediately.
+            if (client.Room == null || !IsConnected)
                 return base.OnExiting(e);
-            }
 
             if (!exitConfirmed && dialogOverlay != null)
             {
@@ -271,7 +265,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
                     {
                         exitConfirmed = true;
-                        this.Exit();
+                        if (this.IsCurrentScreen())
+                            this.Exit();
                     }));
                 }
 
@@ -376,9 +371,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
-                return;
-
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
             // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
@@ -394,6 +386,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
             // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
             if (client.LocalUser?.State == MultiplayerUserState.Spectating && (SelectedItem.Value == null || Beatmap.IsDefault))
+                return;
+
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
             StartPlay();

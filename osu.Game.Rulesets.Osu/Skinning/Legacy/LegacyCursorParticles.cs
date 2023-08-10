@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private LegacyCursorParticleSpewer kiaiSpewer = null!;
         private LegacyRelaxCursorParticleSpewer relaxHitSpewer = null!;
 
+        private bool relaxing;
+
         [Resolved(canBeNull: true)]
         private Player? player { get; set; }
 
@@ -41,11 +44,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private GameplayState? gameplayState { get; set; }
 
+        private ColourInfo starBreakAdditive = new Color4(255, 182, 193, 255);
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
             var texture = skin.GetTexture("star2");
-            var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
+            starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
 
             if (texture != null)
             {
@@ -80,7 +85,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (player != null)
                 ((IBindable<bool>)breakSpewer.Active).BindTo(player.IsBreakTime);
+
+            relaxing = isRelaxing();
+
+            if (relaxing)
+                kiaiSpewer.Active.BindValueChanged(_ => { });
         }
+
+        private bool isRelaxing() => player != null && player.Mods.Value.OfType<OsuModRelax>().Any();
 
         protected override void Update()
         {
@@ -92,10 +104,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (gameplayState.Beatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
                 kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
-            kiaiSpewer.Active.Value = kiaiHitObject != null || relaxingKeyPressed();
+            kiaiSpewer.Active.Value = kiaiHitObject != null;
 
-            bool relaxing = isRelaxing();
             if (relaxing != relaxHitSpewer.Active.Value) relaxHitSpewer.Active.Value = relaxing;
+
+            if (relaxing && relaxingKeyPressed())
+            {
+                if (kiaiSpewer.Active.Value) relaxHitSpewer.SpawnKiaiParticles = false;
+                else
+                {
+                    relaxHitSpewer.Direction = SpewDirection.None;
+                    relaxHitSpewer.Colour = starBreakAdditive;
+                    relaxHitSpewer.SpawnKiaiParticles = true;
+                }
+            }
         }
 
         private bool doRelaxingSpew()
@@ -112,10 +134,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             if (gameplayState == null) return false;
 
-            return isRelaxing() && (leftPressed || rightPressed);
+            return relaxing && (leftPressed || rightPressed);
         }
-
-        private bool isRelaxing() => gameplayState != null && gameplayState.Mods.OfType<OsuModRelax>().Any();
 
         private bool isHit(DrawableHitObject h)
         {
@@ -184,23 +204,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             else
                 breakSpewer.Direction = SpewDirection.None;
 
-            if (pressed && action is OsuAction.LeftButton or OsuAction.RightButton && playfield != null && doRelaxingSpew())
+            if (pressed && action is OsuAction.LeftButton or OsuAction.RightButton && doRelaxingSpew())
+                spawnRelaxHitParticles();
+        }
+
+        private void spawnRelaxHitParticles()
+        {
+            if (playfield == null) return;
+
+            relaxHitSpewer.Direction = SpewDirection.RelaxHit;
+
+            var firstHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
+
+            switch (firstHitObject)
             {
-                var firstHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
+                case DrawableSlider slider:
+                    relaxHitSpewer.Colour = slider.HeadCircle.AccentColour.Value;
+                    break;
 
-                switch (firstHitObject)
-                {
-                    case DrawableSlider slider:
-                        relaxHitSpewer.Colour = slider.HeadCircle.AccentColour.Value;
-                        break;
-
-                    case DrawableHitCircle hitCircle:
-                        relaxHitSpewer.Colour = hitCircle.AccentColour.Value;
-                        break;
-                }
-
-                relaxHitSpewer.SpawnRelaxHitParticles();
+                case DrawableHitCircle hitCircle:
+                    relaxHitSpewer.Colour = hitCircle.AccentColour.Value;
+                    break;
             }
+
+            for (int i = 0; i < 6; i++)
+                relaxHitSpewer.SpawnNewParticles();
         }
 
         private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
@@ -324,29 +352,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private partial class LegacyRelaxCursorParticleSpewer : LegacyCursorParticleSpewer
         {
-            // Disable draw in Update()
-            protected override bool CanSpawnParticles => false;
+            // Disable spawn in Update()
+            protected override bool CanSpawnParticles => SpawnKiaiParticles;
 
             public LegacyRelaxCursorParticleSpewer(Texture? texture, int perSecond)
                 : base(texture, perSecond)
             {
+                SpawnKiaiParticles = false;
             }
 
-            public void SpawnRelaxHitParticles()
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    var newParticle = CreateParticle();
-                    newParticle.StartTime = (float)Time.Current;
+            public void SpawnNewParticles() => SpawnParticle();
 
-                    Particles[CurrentIndex] = newParticle;
-
-                    CurrentIndex = (CurrentIndex + 1) % Particles.Length;
-                    LastParticleAdded = Time.Current;
-                }
-
-                base.Update();
-            }
+            public bool SpawnKiaiParticles { get; set; }
         }
     }
 }
