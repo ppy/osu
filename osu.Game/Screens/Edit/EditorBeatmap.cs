@@ -337,6 +337,11 @@ namespace osu.Game.Screens.Edit
             hasTiming.Value = !ReferenceEquals(ControlPointInfo.TimingPointAt(editorClock.CurrentTime), TimingControlPoint.DEFAULT);
         }
 
+        /// <summary>
+        /// Force an update of the editor state. This is useful for when an operation requires the updated state mid-operation.
+        /// </summary>
+        public void ForceUpdateState() => UpdateState();
+
         protected override void UpdateState()
         {
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)

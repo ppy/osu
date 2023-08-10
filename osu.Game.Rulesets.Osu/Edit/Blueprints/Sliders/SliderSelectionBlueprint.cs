@@ -323,6 +323,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HitObject.StartTime += split_gap;
 
                 editorBeatmap.Add(newSlider);
+                editorBeatmap.ForceUpdateState();
 
                 HitObject.NewCombo = false;
                 HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
