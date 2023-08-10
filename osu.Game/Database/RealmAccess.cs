@@ -82,7 +82,7 @@ namespace osu.Game.Database
         /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
         /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
         /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
-        /// 32   2023-08-01    Added a new keybind that toggles the in-game leaderboard on and off
+        /// 33   2023-08-01    Reset default chat toggle keybind to avoid conflict with leaderboard toggle keybind.
         /// </summary>
         private const int schema_version = 33;
 
@@ -1020,12 +1020,11 @@ namespace osu.Game.Database
 
                 case 33:
                 {
-                    // Get all current keybinds, and find the toggle chat bind
-                    // (by default it would to overlap the new toggle leaderboard)
+                    // Clear default bindings for the chat focus toggle,
+                    // as they would conflict with the newly-added leaderboard toggle.
                     var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
                     var toggleChatBind = newKeyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleChatFocus);
 
-                    // If we have a bind for it, and that bind is still tab, remove it
                     if (toggleChatBind != default && toggleChatBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Tab }))
                         migration.NewRealm.Remove(toggleChatBind);
 
