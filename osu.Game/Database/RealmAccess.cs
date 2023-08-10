@@ -1021,11 +1021,11 @@ namespace osu.Game.Database
                 case 33:
                 {
                     // Get all current keybinds, and find the toggle chat bind
-                    // (by default it used to overlap the new toggle leaderboard)
+                    // (by default it would to overlap the new toggle leaderboard)
                     var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
                     var toggleChatBind = newKeyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleChatFocus);
 
-                    // If we have a bind for it, and that bind is tab, remove it
+                    // If we have a bind for it, and that bind is still tab, remove it
                     if (toggleChatBind != default && toggleChatBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Tab }))
                         migration.NewRealm.Remove(toggleChatBind);
 
