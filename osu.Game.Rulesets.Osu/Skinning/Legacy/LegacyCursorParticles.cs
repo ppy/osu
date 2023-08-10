@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         break;
                 }
 
-                relaxHitSpewer.CreateSixParticles();
+                relaxHitSpewer.SpawnRelaxHitParticles();
             }
         }
 
@@ -332,7 +332,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
             }
 
-            public void CreateSixParticles()
+            public void SpawnRelaxHitParticles()
             {
                 for (int i = 0; i < 6; i++)
                 {
