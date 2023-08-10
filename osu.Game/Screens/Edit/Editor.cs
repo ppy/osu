@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit
                 if (!canSave)
                     return false;
 
-                return lastSavedHash != changeHandler?.CurrentStateHash;
+                return lastSavedHash != editorBeatmap.CurrentStateHash;
             }
         }
 
@@ -148,9 +148,6 @@ namespace osu.Game.Screens.Edit
         private EditorBeatmap editorBeatmap;
 
         private BottomBar bottomBar;
-
-        [CanBeNull] // Should be non-null once it can support custom rulesets.
-        private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -250,12 +247,6 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
 
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
-
-            if (canSave)
-            {
-                changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
-                dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
-            }
 
             beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
@@ -367,8 +358,8 @@ namespace osu.Game.Screens.Edit
                     bottomBar = new BottomBar(),
                 }
             });
-            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            editorBeatmap.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            editorBeatmap.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             editorBackgroundDim.BindValueChanged(_ => dimBackground());
         }
@@ -846,9 +837,9 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => changeHandler?.RestoreState(-1);
+        protected void Undo() => editorBeatmap.RestoreState(-1);
 
-        protected void Redo() => changeHandler?.RestoreState(1);
+        protected void Redo() => editorBeatmap.RestoreState(1);
 
         protected void SetPreviewPointToCurrentTime()
         {
@@ -993,7 +984,7 @@ namespace osu.Game.Screens.Edit
 
         private void updateLastSavedHash()
         {
-            lastSavedHash = changeHandler?.CurrentStateHash;
+            lastSavedHash = editorBeatmap.CurrentStateHash;
         }
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
