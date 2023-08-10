@@ -146,7 +146,12 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            var newChoice = currentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            if (currentMatch.Value == null)
+            {
+                return;
+            }
+
+            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             bool shouldFlash = newChoice != choice;
 
