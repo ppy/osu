@@ -96,6 +96,8 @@ namespace osu.Game.Screens.Edit
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private readonly BeatmapEditorChangeHandler changeHandler;
 
+        public bool CanSave { get; }
+
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
@@ -122,7 +124,9 @@ namespace osu.Game.Screens.Edit
                 EndChange();
             });
 
-            if (BeatmapInfo.Ruleset.CreateInstance() is not ILegacyRuleset) return;
+            CanSave = BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
+
+            if (!CanSave) return;
 
             changeHandler = new BeatmapEditorChangeHandler(this);
 

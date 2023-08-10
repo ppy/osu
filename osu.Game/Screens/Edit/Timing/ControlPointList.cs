@@ -31,13 +31,10 @@ namespace osu.Game.Screens.Edit.Timing
         private EditorClock clock { get; set; } = null!;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; } = null!;
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
-
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -106,11 +103,11 @@ namespace osu.Game.Screens.Edit.Timing
                     : "+ Add at current time";
             }, true);
 
-            controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
+            controlPointGroups.BindTo(EditorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, _) =>
             {
                 table.ControlGroups = controlPointGroups;
-                changeHandler?.SaveState();
+                EditorBeatmap.SaveState();
             }, true);
 
             table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
@@ -162,9 +159,9 @@ namespace osu.Game.Screens.Edit.Timing
                 // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
 
                 // Find the next group which has the same type as the selected one.
-                var found = Beatmap.ControlPointInfo.Groups
-                                   .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
-                                   .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
+                var found = EditorBeatmap.ControlPointInfo.Groups
+                                         .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
+                                         .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
 
                 if (found != null)
                     selectedGroup.Value = found;
@@ -176,16 +173,16 @@ namespace osu.Game.Screens.Edit.Timing
             if (selectedGroup.Value == null)
                 return;
 
-            Beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
+            EditorBeatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
 
-            selectedGroup.Value = Beatmap.ControlPointInfo.Groups.FirstOrDefault(g => g.Time >= clock.CurrentTime);
+            selectedGroup.Value = EditorBeatmap.ControlPointInfo.Groups.FirstOrDefault(g => g.Time >= clock.CurrentTime);
         }
 
         private void addNew()
         {
-            bool isFirstControlPoint = !Beatmap.ControlPointInfo.TimingPoints.Any();
+            bool isFirstControlPoint = !EditorBeatmap.ControlPointInfo.TimingPoints.Any();
 
-            var group = Beatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
+            var group = EditorBeatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
 
             if (isFirstControlPoint)
                 group.Add(new TimingControlPoint());

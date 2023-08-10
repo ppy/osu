@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             void saveChanges()
             {
-                if (!isRebinding) ChangeHandler?.SaveState();
+                if (!isRebinding) EditorBeatmap.SaveState();
             }
         }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override TimingControlPoint CreatePoint()
         {
-            var reference = Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
+            var reference = EditorBeatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
 
             return new TimingControlPoint
             {
