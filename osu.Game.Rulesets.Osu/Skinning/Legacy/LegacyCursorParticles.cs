@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Play;
@@ -25,10 +26,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
-        public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value;
+        public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value || relaxHitSpewer.Active.Value;
 
         private LegacyCursorParticleSpewer breakSpewer = null!;
         private LegacyCursorParticleSpewer kiaiSpewer = null!;
+        private LegacyRelaxCursorParticleSpewer relaxHitSpewer = null!;
 
         [Resolved(canBeNull: true)]
         private Player? player { get; set; }
@@ -67,6 +69,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
                 },
+                relaxHitSpewer = new LegacyRelaxCursorParticleSpewer(texture, 60)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = starBreakAdditive,
+                    Direction = SpewDirection.RelaxHit,
+                }
             };
 
             if (player != null)
@@ -83,7 +92,43 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (gameplayState.Beatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
                 kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
-            kiaiSpewer.Active.Value = kiaiHitObject != null;
+            kiaiSpewer.Active.Value = kiaiHitObject != null || relaxingKeyPressed();
+
+            bool relaxing = isRelaxing();
+            if (relaxing != relaxHitSpewer.Active.Value) relaxHitSpewer.Active.Value = relaxing;
+        }
+
+        private bool doRelaxingSpew()
+        {
+            if (playfield == null || gameplayState == null) return false;
+
+            bool hitting = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isHit) != null;
+            bool slidingOrSpinning = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking) != null;
+
+            return hitting && relaxingKeyPressed() && !breakSpewer.Active.Value && !slidingOrSpinning;
+        }
+
+        private bool relaxingKeyPressed()
+        {
+            if (gameplayState == null) return false;
+
+            return isRelaxing() && (leftPressed || rightPressed);
+        }
+
+        private bool isRelaxing() => gameplayState != null && gameplayState.Mods.OfType<OsuModRelax>().Any();
+
+        private bool isHit(DrawableHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableSlider slider:
+                    return slider.HeadCircle.IsHit;
+
+                case DrawableHitCircle hitCircle:
+                    return hitCircle.IsHit;
+            }
+
+            return false;
         }
 
         private bool isTracking(DrawableHitObject h)
@@ -138,6 +183,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.Right;
             else
                 breakSpewer.Direction = SpewDirection.None;
+
+            if (pressed && action is OsuAction.LeftButton or OsuAction.RightButton && playfield != null && doRelaxingSpew())
+            {
+                var firstHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
+
+                switch (firstHitObject)
+                {
+                    case DrawableSlider slider:
+                        relaxHitSpewer.Colour = slider.HeadCircle.AccentColour.Value;
+                        break;
+
+                    case DrawableHitCircle hitCircle:
+                        relaxHitSpewer.Colour = hitCircle.AccentColour.Value;
+                        break;
+                }
+
+                relaxHitSpewer.CreateSixParticles();
+            }
         }
 
         private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
@@ -206,6 +269,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     EndAngle = RNG.NextSingle(-2f, 2f),
                     EndScale = RNG.NextSingle(2f),
                     Velocity = getVelocity(),
+                    Colour = Colour,
                 };
 
             private Vector2 getVelocity()
@@ -234,6 +298,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             RNG.NextSingle(-160f, 160f)
                         );
                         break;
+
+                    case SpewDirection.RelaxHit:
+                        velocity = new Vector2(
+                            RNG.NextSingle(-500f, 500f),
+                            RNG.NextSingle(-500f, 500f)
+                        );
+                        break;
                 }
 
                 velocity += cursorVelocity * 40;
@@ -248,6 +319,34 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Left,
             Right,
             Omni,
+            RelaxHit,
+        }
+
+        private partial class LegacyRelaxCursorParticleSpewer : LegacyCursorParticleSpewer
+        {
+            // Disable draw in Update()
+            protected override bool CanSpawnParticles => false;
+
+            public LegacyRelaxCursorParticleSpewer(Texture? texture, int perSecond)
+                : base(texture, perSecond)
+            {
+            }
+
+            public void CreateSixParticles()
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    var newParticle = CreateParticle();
+                    newParticle.StartTime = (float)Time.Current;
+
+                    Particles[CurrentIndex] = newParticle;
+
+                    CurrentIndex = (CurrentIndex + 1) % Particles.Length;
+                    LastParticleAdded = Time.Current;
+                }
+
+                base.Update();
+            }
         }
     }
 }
