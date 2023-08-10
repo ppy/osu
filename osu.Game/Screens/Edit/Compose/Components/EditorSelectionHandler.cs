@@ -47,6 +47,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void EndChange()
         {
+            foreach (var hitObject in SelectedItems)
+            {
+                EditorBeatmap.Update(hitObject);
+            }
+
             // If the editor beatmap has a change handler then this will automatically call EndChange() on it.
             EditorBeatmap.EndChange();
         }

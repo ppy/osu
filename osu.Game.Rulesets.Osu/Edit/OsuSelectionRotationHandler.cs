@@ -93,6 +93,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInRotation == null)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
+            // EditorSelectionHandler.EndChange() is not called in the rotation operation, so we need to call it here.
+            foreach (var hitObject in objectsInRotation)
+            {
+                editorBeatmap.Update(hitObject);
+            }
+
             editorBeatmap.EndChange();
 
             objectsInRotation = null;
