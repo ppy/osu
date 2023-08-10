@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 );
 
                 // If we don't track the animating state, the animation will also occur when resizing the window.
-                isAnimating &= !Precision.AlmostEquals(Position, targetPos, 0.01f);
+                isAnimating &= !Precision.AlmostEquals(Size, targetSize, 0.5f);
             }
 
             /// <summary>
