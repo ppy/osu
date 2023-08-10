@@ -7,6 +7,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
@@ -18,9 +19,9 @@ namespace osu.Game.Graphics
 {
     public abstract partial class ParticleSpewer : Sprite
     {
-        private readonly FallingParticle[] particles;
-        private int currentIndex;
-        private double lastParticleAdded;
+        protected readonly FallingParticle[] Particles;
+        protected int CurrentIndex;
+        protected double LastParticleAdded;
 
         private readonly double cooldown;
         private readonly double maxDuration;
@@ -35,14 +36,14 @@ namespace osu.Game.Graphics
         protected virtual bool CanSpawnParticles => true;
         protected virtual float ParticleGravity => 0;
 
-        private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxDuration) > Time.Current;
+        private bool hasActiveParticles => Active.Value || (LastParticleAdded + maxDuration) > Time.Current;
 
         protected ParticleSpewer(Texture texture, int perSecond, double maxDuration)
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
 
-            particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
+            Particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
 
             cooldown = 1000f / perSecond;
             this.maxDuration = maxDuration;
@@ -52,15 +53,15 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - lastParticleAdded) > cooldown)
+            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - LastParticleAdded) > cooldown)
             {
                 var newParticle = CreateParticle();
                 newParticle.StartTime = (float)Time.Current;
 
-                particles[currentIndex] = newParticle;
+                Particles[CurrentIndex] = newParticle;
 
-                currentIndex = (currentIndex + 1) % particles.Length;
-                lastParticleAdded = Time.Current;
+                CurrentIndex = (CurrentIndex + 1) % Particles.Length;
+                LastParticleAdded = Time.Current;
             }
 
             Invalidate(Invalidation.DrawNode);
@@ -91,7 +92,7 @@ namespace osu.Game.Graphics
             public ParticleSpewerDrawNode(ParticleSpewer source)
                 : base(source)
             {
-                particles = new FallingParticle[Source.particles.Length];
+                particles = new FallingParticle[Source.Particles.Length];
                 maxDuration = (float)Source.maxDuration;
             }
 
@@ -99,7 +100,7 @@ namespace osu.Game.Graphics
             {
                 base.ApplyState();
 
-                Source.particles.CopyTo(particles, 0);
+                Source.Particles.CopyTo(particles, 0);
 
                 currentTime = (float)Source.Time.Current;
                 gravity = Source.ParticleGravity;
@@ -136,7 +137,7 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                    renderer.DrawQuad(Texture, quad, p.Colour.MultiplyAlpha(alpha),
                         inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                         textureCoords: TextureCoords);
                 }
@@ -184,6 +185,7 @@ namespace osu.Game.Graphics
             public float StartAngle;
             public float EndAngle;
             public float EndScale;
+            public ColourInfo Colour;
 
             public float AlphaAtTime(float timeSinceStart) => 1 - progressAtTime(timeSinceStart);
 
