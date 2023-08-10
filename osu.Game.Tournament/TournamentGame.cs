@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -35,12 +33,12 @@ namespace osu.Game.Tournament
         public static readonly Color4 ELEMENT_FOREGROUND_COLOUR = Color4Extensions.FromHex("#000");
 
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
-        private Drawable heightWarning;
+        private Drawable heightWarning = null!;
 
-        private Bindable<WindowMode> windowMode;
+        private Bindable<WindowMode> windowMode = null!;
         private readonly BindableSize windowSize = new BindableSize();
 
-        private LoadingSpinner loadingSpinner;
+        private LoadingSpinner loadingSpinner = null!;
 
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
