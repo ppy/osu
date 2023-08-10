@@ -7,11 +7,14 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
@@ -159,6 +162,48 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("slider tracking stopped", () => !slider.Tracking.Value);
             AddAssert("particle spawning stopped", () => !cursorParticles.Active);
+        }
+
+        [Test]
+        public void TestLegacyRelaxParticles()
+        {
+            LegacyCursorParticles cursorParticles = null;
+
+            createLegacyTest(true, () =>
+                new Beatmap
+                {
+                    HitObjects =
+                    {
+                        new HitCircle
+                        {
+                            StartTime = 1000,
+                            Position = OsuPlayfield.BASE_SIZE / 2,
+                        }
+                    }
+                }
+            );
+
+            AddUntilStep("fetch cursor particles", () =>
+            {
+                cursorParticles = this.ChildrenOfType<LegacyCursorParticles>().SingleOrDefault();
+                return cursorParticles != null;
+            });
+
+            AddAssert("particles are not being spawned", () => !cursorParticles.Active);
+
+            AddStep("exit player", () => Player.Exit());
+            AddStep("enable relax", () => LoadPlayer(new Mod[] { new OsuModRelax() }));
+            AddUntilStep("wait for player load", () => Player.IsLoaded && Player.Alpha == 1);
+
+            AddStep("clear cursor particles", () => cursorParticles = null);
+
+            AddUntilStep("fetch cursor particles", () =>
+            {
+                cursorParticles = this.ChildrenOfType<LegacyCursorParticles>().SingleOrDefault();
+                return cursorParticles != null;
+            });
+
+            AddAssert("particles are beings pawned", () => cursorParticles.Active);
         }
 
         private void createLegacyTest(bool autoplay, Func<IBeatmap> beatmap) => CreateTest(() =>
