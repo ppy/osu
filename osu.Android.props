@@ -12,6 +12,11 @@
   <ItemGroup>
     <PackageReference Include="ppy.osu.Framework.Android" Version="2023.801.0" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- On release configurations, we use AOT compiler for optimal performance, along with Mono Interpreter as a fallback for libraries such as AutoMapper. -->
+    <EnableLLVM>true</EnableLLVM>
+    <AotAssemblies>true</AotAssemblies>
+  </PropertyGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.
          Since Realm objects are not declared directly in Android projects, simply disable Fody. -->
