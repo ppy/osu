@@ -51,6 +51,11 @@ namespace osu.Game.Rulesets.UI
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is updated.
+        /// </summary>
+        public event Action<HitObject> HitObjectUpdated;
+
         public HitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
@@ -108,6 +113,7 @@ namespace osu.Game.Rulesets.UI
             drawable.OnNewResult += onNewResult;
 
             bindStartTime(drawable);
+            bindUpdated(drawable);
             AddInternal(drawable);
         }
 
@@ -116,7 +122,7 @@ namespace osu.Game.Rulesets.UI
             drawable.OnNewResult -= onNewResult;
 
             unbindStartTime(drawable);
-
+            unbindUpdated(drawable);
             RemoveInternal(drawable, false);
         }
 
@@ -176,6 +182,27 @@ namespace osu.Game.Rulesets.UI
             startTimeMap.Clear();
         }
 
+        private void bindUpdated(DrawableHitObject hitObject)
+        {
+            hitObject.DefaultsApplied += onDefaultsApplied;
+        }
+
+        private void unbindUpdated(DrawableHitObject hitObject)
+        {
+            hitObject.DefaultsApplied += onDefaultsApplied;
+        }
+
+        private void unbindAllUpdated()
+        {
+            foreach (var h in AliveObjects)
+                unbindUpdated(h);
+        }
+
+        private void onDefaultsApplied(DrawableHitObject obj)
+        {
+            HitObjectUpdated?.Invoke(obj.HitObject);
+        }
+
         protected override int Compare(Drawable x, Drawable y)
         {
             if (!(x is DrawableHitObject xObj) || !(y is DrawableHitObject yObj))
@@ -192,6 +219,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
             unbindAllStartTimes();
+            unbindAllUpdated();
         }
     }
 }
