@@ -84,12 +84,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestFocusOnTabKeyWhenExpanded()
+        public void TestFocusOnEnterKeyWhenExpanded()
         {
             setLocalUserPlaying(true);
 
             assertChatFocused(false);
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
         }
 
@@ -99,19 +99,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             setLocalUserPlaying(true);
 
             assertChatFocused(false);
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
             AddStep("press escape", () => InputManager.Key(Key.Escape));
             assertChatFocused(false);
         }
 
         [Test]
-        public void TestFocusOnTabKeyWhenNotExpanded()
+        public void TestFocusOnEnterKeyWhenNotExpanded()
         {
             AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
 
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
             AddUntilStep("is visible", () => chatDisplay.IsPresent);
 
@@ -126,11 +126,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
 
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
             AddUntilStep("is visible", () => chatDisplay.IsPresent);
 
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(false);
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
         }
