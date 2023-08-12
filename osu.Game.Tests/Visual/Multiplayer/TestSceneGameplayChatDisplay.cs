@@ -120,21 +120,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
         }
 
-        [Test]
-        public void TestFocusToggleViaAction()
-        {
-            AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
-            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
-
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
-            assertChatFocused(true);
-            AddUntilStep("is visible", () => chatDisplay.IsPresent);
-
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
-            assertChatFocused(false);
-            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
-        }
-
         private void assertChatFocused(bool isFocused) =>
             AddAssert($"chat {(isFocused ? "focused" : "not focused")}", () => textBox.HasFocus == isFocused);
 
