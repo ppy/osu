@@ -29,9 +29,9 @@ namespace osu.Game.Database
 
         protected override Stream? GetFileContents(BeatmapSetInfo model, INamedFileUsage file)
         {
-            bool isBeatmap = model.Beatmaps.Any(o => o.Hash == file.File.Hash);
+            var beatmapInfo = model.Beatmaps.SingleOrDefault(o => o.Hash == file.File.Hash);
 
-            if (!isBeatmap)
+            if (beatmapInfo == null)
                 return base.GetFileContents(model, file);
 
             // Read the beatmap contents and skin
@@ -42,6 +42,9 @@ namespace osu.Game.Database
 
             using var contentStreamReader = new LineBufferedReader(contentStream);
             var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
+
+            var workingBeatmap = new FlatWorkingBeatmap(beatmapContent);
+            var playableBeatmap = workingBeatmap.GetPlayableBeatmap(beatmapInfo.Ruleset);
 
             using var skinStream = base.GetFileContents(model, file);
 
@@ -56,10 +59,10 @@ namespace osu.Game.Database
 
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to bezier curves
-            foreach (var controlPoint in beatmapContent.ControlPointInfo.AllControlPoints)
+            foreach (var controlPoint in playableBeatmap.ControlPointInfo.AllControlPoints)
                 controlPoint.Time = Math.Floor(controlPoint.Time);
 
-            foreach (var hitObject in beatmapContent.HitObjects)
+            foreach (var hitObject in playableBeatmap.HitObjects)
             {
                 // Truncate end time before truncating start time because end time is dependent on start time
                 if (hitObject is IHasDuration hasDuration && hitObject is not IHasPath)
@@ -86,7 +89,7 @@ namespace osu.Game.Database
             // Encode to legacy format
             var stream = new MemoryStream();
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
+                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
 
             stream.Seek(0, SeekOrigin.Begin);
 
