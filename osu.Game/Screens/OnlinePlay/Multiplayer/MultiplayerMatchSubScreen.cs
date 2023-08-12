@@ -371,9 +371,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
-                return;
-
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
             // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
@@ -389,6 +386,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
             // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
             if (client.LocalUser?.State == MultiplayerUserState.Spectating && (SelectedItem.Value == null || Beatmap.IsDefault))
+                return;
+
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
             StartPlay();

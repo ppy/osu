@@ -67,6 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         [TestCase(1)]
         [TestCase(4)]
+        [TestCase(9)]
         public void TestGeneral(int count)
         {
             int[] userIds = getPlayerIds(count);
@@ -76,6 +77,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             sendFrames(userIds, 1000);
             AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestMultipleStartRequests()
+        {
+            int[] userIds = getPlayerIds(2);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+
+            start(userIds);
         }
 
         [Test]

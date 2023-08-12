@@ -18,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -451,6 +452,51 @@ namespace osu.Game.Tests.Visual.Editing
                 // what we want to check is that both difficulties do not use the same file.
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
             });
+        }
+
+        [Test]
+        public void TestExitBlockedWhenSavingBeatmapWithSameNamedDifficulties()
+        {
+            Guid setId = Guid.Empty;
+            const string duplicate_difficulty_name = "duplicate";
+
+            AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != duplicate_difficulty_name;
+            });
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new Fruit
+                {
+                    StartTime = 0
+                },
+                new Fruit
+                {
+                    StartTime = 1000
+                }
+            }));
+
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddUntilStep("wait for has unsaved changes", () => Editor.HasUnsavedChanges);
+
+            AddStep("exit", () => Editor.Exit());
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+            AddStep("attempt to save", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddAssert("editor is still current", () => Editor.IsCurrentScreen());
         }
 
         [Test]
