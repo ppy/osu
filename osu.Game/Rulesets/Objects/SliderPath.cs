@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Objects
         {
             ensureValid();
 
-            return segmentEnds.Select(i => cumulativeLength[i] / calculatedLength);
+            return segmentEnds.Select(i => cumulativeLength[Math.Clamp(i, 0, cumulativeLength.Count - 1)] / calculatedLength);
         }
 
         private void invalidate()
