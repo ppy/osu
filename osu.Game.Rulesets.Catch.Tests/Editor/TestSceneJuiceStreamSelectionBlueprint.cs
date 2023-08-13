@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddMouseMoveStep(-100, 100);
             addVertexCheckStep(3, 1, times[0], positions[0]);
+            addDragEndStep();
         }
 
         [Test]
@@ -100,6 +101,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddMouseMoveStep(times[2] - 50, positions[2] - 50);
             addVertexCheckStep(4, 1, times[1] - 50, positions[1] - 50);
             addVertexCheckStep(4, 2, times[2] - 50, positions[2] - 50);
+            addDragEndStep();
         }
 
         [Test]
@@ -113,6 +115,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addDragStartStep(times[1], positions[1]);
             AddMouseMoveStep(times[1], 400);
             AddAssert("slider velocity changed", () => !hitObject.SliderVelocityBindable.IsDefault);
+            addDragEndStep();
         }
 
         [Test]
@@ -129,6 +132,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddStep("scroll playfield", () => manualClock.CurrentTime += 200);
             AddMouseMoveStep(times[1] + 200, positions[1] + 100);
             addVertexCheckStep(2, 1, times[1] + 200, positions[1] + 100);
+
+            addDragEndStep();
         }
 
         [Test]
