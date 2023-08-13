@@ -21,15 +21,14 @@ namespace osu.Game.Tests.Visual.Online
         {
             var beatmap = new APIBeatmap
             {
-                OnlineBeatmapSetID = 173612
+                OnlineBeatmapSetID = 173612,
+                BeatmapSet = new APIBeatmapSet
+                {
+                    OnlineID = 173612
+                }
             };
 
-            var beatmapset = new APIBeatmapSet
-            {
-                OnlineID = 173612,
-            };
-
-            setupBeatmapResponse(beatmap, beatmapset);
+            setupBeatmapResponse(beatmap);
 
             AddStep("import score", () =>
             {
@@ -62,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Replay missing screen not show", () => Game.ScreenStack.CurrentScreen.GetType() != typeof(ReplayMissingBeatmapScreen));
         }
 
-        private void setupBeatmapResponse(APIBeatmap b, APIBeatmapSet s)
+        private void setupBeatmapResponse(APIBeatmap b)
             => AddStep("setup response", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -70,12 +69,6 @@ namespace osu.Game.Tests.Visual.Online
                     if (request is GetBeatmapRequest getBeatmapRequest)
                     {
                         getBeatmapRequest.TriggerSuccess(b);
-                        return true;
-                    }
-
-                    if (request is GetBeatmapSetRequest getBeatmapSetRequest)
-                    {
-                        getBeatmapSetRequest.TriggerSuccess(s);
                         return true;
                     }
 

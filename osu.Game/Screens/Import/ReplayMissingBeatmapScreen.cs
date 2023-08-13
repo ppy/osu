@@ -18,7 +18,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -57,14 +56,12 @@ namespace osu.Game.Screens.Import
         private SettingsCheckbox automaticDownload = null!;
 
         private readonly MemoryStream scoreStream;
-        private readonly APIBeatmap beatmap;
 
-        private APIBeatmapSet? beatmapSetInfo;
+        private readonly APIBeatmapSet beatmapSetInfo;
 
         public ReplayMissingBeatmapScreen(APIBeatmap beatmap, MemoryStream scoreStream)
         {
-            this.beatmap = beatmap;
-            beatmapSetInfo = beatmap.BeatmapSet;
+            beatmapSetInfo = beatmap.BeatmapSet!;
 
             this.scoreStream = scoreStream;
         }
@@ -147,18 +144,6 @@ namespace osu.Game.Screens.Import
         {
             base.LoadComplete();
 
-            if (beatmapSetInfo == null)
-            {
-                var onlineBeatmapRequest = new GetBeatmapSetRequest(beatmap.OnlineBeatmapSetID);
-
-                onlineBeatmapRequest.Success += res =>
-                {
-                    beatmapSetInfo = res;
-                    updateStatus();
-                };
-                api.Queue(onlineBeatmapRequest);
-            }
-
             updateStatus();
             realmSubscription = realm.RegisterForNotifications(
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
@@ -184,8 +169,6 @@ namespace osu.Game.Screens.Import
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
             if (changes?.InsertedIndices == null) return;
-
-            if (beatmapSetInfo == null) return;
 
             if (!scoreStream.CanRead) return;
 
