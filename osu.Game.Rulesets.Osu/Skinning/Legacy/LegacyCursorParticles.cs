@@ -86,13 +86,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (player != null)
                 ((IBindable<bool>)breakSpewer.Active).BindTo(player.IsBreakTime);
 
-            relaxing = isRelaxing();
+            relaxHitSpewer.Active.Value = relaxing = isRelaxing();
 
-            if (relaxing)
-                kiaiSpewer.Active.BindValueChanged(_ => { });
+            bool isRelaxing() => player != null && (player.Mods.Value.OfType<OsuModRelax>().Any() ||
+                                                    player.Mods.Value.OfType<OsuModAutopilot>().Any());
         }
-
-        private bool isRelaxing() => player != null && player.Mods.Value.OfType<OsuModRelax>().Any();
 
         protected override void Update()
         {
@@ -104,38 +102,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (gameplayState.Beatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
                 kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
-            kiaiSpewer.Active.Value = kiaiHitObject != null;
-
-            if (relaxing != relaxHitSpewer.Active.Value) relaxHitSpewer.Active.Value = relaxing;
-
-            if (relaxingKeyPressed() && !kiaiSpewer.Active.Value)
-            {
-                relaxHitSpewer.Direction = SpewDirection.None;
-                relaxHitSpewer.Colour = starBreakAdditive;
-                relaxHitSpewer.SpawnKiaiParticles = true;
-            }
-            else
-            {
-                relaxHitSpewer.SpawnKiaiParticles = false;
-            }
+            kiaiSpewer.Active.Value = kiaiHitObject != null || relaxingKeyPressed();
         }
 
         private bool doRelaxingSpew()
         {
-            if (playfield == null || gameplayState == null) return false;
+            if (playfield == null) return false;
 
             bool hitting = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isHit) != null;
-            bool slidingOrSpinning = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking) != null;
 
-            return hitting && relaxingKeyPressed() && !breakSpewer.Active.Value && !slidingOrSpinning;
+            return hitting && relaxingKeyPressed() && !breakSpewer.Active.Value;
         }
 
-        private bool relaxingKeyPressed()
-        {
-            if (gameplayState == null) return false;
-
-            return relaxing && (leftPressed || rightPressed);
-        }
+        private bool relaxingKeyPressed() => relaxing && (leftPressed || rightPressed);
 
         private bool isHit(DrawableHitObject h)
         {
@@ -227,8 +206,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     break;
             }
 
-            for (int i = 0; i < 6; i++)
-                relaxHitSpewer.SpawnNewParticles();
+            relaxHitSpewer.SpawnRelaxingHitParticles();
         }
 
         private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
@@ -353,17 +331,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private partial class LegacyRelaxCursorParticleSpewer : LegacyCursorParticleSpewer
         {
             // Disable spawn in Update()
-            protected override bool CanSpawnParticles => SpawnKiaiParticles;
+            protected override bool CanSpawnParticles => false;
 
             public LegacyRelaxCursorParticleSpewer(Texture? texture, int perSecond)
                 : base(texture, perSecond)
             {
-                SpawnKiaiParticles = false;
             }
 
-            public void SpawnNewParticles() => SpawnParticle();
+            public void SpawnRelaxingHitParticles()
+            {
+                if (!base.CanSpawnParticles && !Active.Value) return;
 
-            public bool SpawnKiaiParticles { get; set; }
+                for (int i = 0; i < 6; i++)
+                    SpawnParticle();
+            }
         }
     }
 }
