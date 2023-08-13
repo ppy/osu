@@ -13,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Mods;
@@ -33,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private LegacyCursorParticleSpewer kiaiSpewer = null!;
         private LegacyRelaxCursorParticleSpewer relaxHitSpewer = null!;
 
-        private bool relaxing;
+        private readonly BindableBool relaxing = new BindableBool();
+        private Bindable<bool> spawnParticlesOnHit = null!;
 
         [Resolved(canBeNull: true)]
         private Player? player { get; set; }
@@ -47,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private ColourInfo starBreakAdditive = new Color4(255, 182, 193, 255);
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, OsuConfigManager osuConfig)
         {
             var texture = skin.GetTexture("star2");
             starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
@@ -86,10 +88,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (player != null)
                 ((IBindable<bool>)breakSpewer.Active).BindTo(player.IsBreakTime);
 
-            relaxHitSpewer.Active.Value = relaxing = isRelaxing();
+            relaxHitSpewer.Active.BindTo(relaxing);
 
-            bool isRelaxing() => player != null && (player.Mods.Value.OfType<OsuModRelax>().Any() ||
-                                                    player.Mods.Value.OfType<OsuModAutopilot>().Any());
+            spawnParticlesOnHit = osuConfig.GetBindable<bool>(OsuSetting.SpawnParticlesOnHit);
+            spawnParticlesOnHit.BindValueChanged(v => relaxing.Value = v.NewValue && player != null &&
+                                                                       (player.Mods.Value.OfType<OsuModRelax>().Any() ||
+                                                                        player.Mods.Value.OfType<OsuModAutopilot>().Any()), true);
         }
 
         protected override void Update()
@@ -114,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             return hitting && relaxingKeyPressed() && !breakSpewer.Active.Value;
         }
 
-        private bool relaxingKeyPressed() => relaxing && (leftPressed || rightPressed);
+        private bool relaxingKeyPressed() => relaxing.Value && (leftPressed || rightPressed);
 
         private bool isHit(DrawableHitObject h)
         {
@@ -340,7 +344,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             public void SpawnRelaxingHitParticles()
             {
-                if (!base.CanSpawnParticles && !Active.Value) return;
+                if (!base.CanSpawnParticles || !Active.Value) return;
 
                 for (int i = 0; i < 6; i++)
                     SpawnParticle();

@@ -139,6 +139,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
+        /// <summary>
+        /// "Spawn particles on hit"
+        /// </summary>
+        public static LocalisableString SpawnParticlesOnHit => new TranslatableString(getKey(@"spawn_particles_on_hit"), @"Spawn particles on hit");
+
+        /// <summary>
+        /// "Spawn particles on hit (requires Relax or Autopilot mod)"
+        /// </summary>
+        public static LocalisableString SpawnParticlesOnHitTooltip => new TranslatableString(getKey(@"spawn_particles_on_hit_tooltip"), @"Spawn particles on hit (requires Relax or Autopilot mod)");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
