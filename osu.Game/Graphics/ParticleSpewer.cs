@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -22,7 +21,8 @@ namespace osu.Game.Graphics
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
-        private double? lastParticleAdded;
+        private double lastParticleAdded;
+        private bool spawnImmediately;
 
         private readonly double timeBetweenSpawns;
         private readonly double maxDuration;
@@ -58,19 +58,20 @@ namespace osu.Game.Graphics
 
             if (!Active.Value || !CanSpawnParticles)
             {
-                lastParticleAdded = null;
+                spawnImmediately = true;
                 return;
             }
 
             // Always want to spawn the first particle in an activation immediately.
-            if (lastParticleAdded == null)
+            if (spawnImmediately)
             {
+                spawnImmediately = false;
                 lastParticleAdded = Time.Current;
                 spawnParticle();
                 return;
             }
 
-            double timeElapsed = Time.Current - lastParticleAdded.Value;
+            double timeElapsed = Time.Current - lastParticleAdded;
 
             // Avoid spawning too many particles if a long amount of time has passed.
             if (Math.Abs(timeElapsed) > maxDuration)
@@ -79,8 +80,6 @@ namespace osu.Game.Graphics
                 spawnParticle();
                 return;
             }
-
-            Debug.Assert(lastParticleAdded != null);
 
             for (int i = 0; i < timeElapsed / timeBetweenSpawns; i++)
             {
@@ -91,11 +90,9 @@ namespace osu.Game.Graphics
 
         private void spawnParticle()
         {
-            Debug.Assert(lastParticleAdded != null);
-
             var newParticle = CreateParticle();
 
-            newParticle.StartTime = (float)lastParticleAdded.Value;
+            newParticle.StartTime = (float)lastParticleAdded;
 
             particles[currentIndex] = newParticle;
 
