@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Objects
             double[] distinctSegmentEnds = segmentEnds.Distinct().ToArray();
 
             // Remove control points at the end which do not affect the visual slider path ("invisible" control points).
-            if (Math.Abs(segmentEnds[^1] - segmentEnds[^2]) < 1e-10 && distinctSegmentEnds.Length > 1)
+            if (segmentEnds.Length >= 2 && Math.Abs(segmentEnds[^1] - segmentEnds[^2]) < 1e-10 && distinctSegmentEnds.Length > 1)
             {
                 int numVisibleSegments = distinctSegmentEnds.Length - 2;
                 var nonInheritedControlPoints = controlPoints.Where(p => p.Type is not null).ToList();
