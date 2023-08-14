@@ -105,9 +105,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         /// <summary>
-        /// This tests if the UR gets smaller, given more judgements on MAX.
+        /// This tests if the UR gets smaller, given more MAX judgements.
         /// This follows the logic that:
-        ///   - More MAX judgements implies stronger evidence of smaller UR, as the probability of hitting more MAX is lower.
+        ///   - More MAX judgements implies stronger evidence of smaller UR, as the probability of hitting a MAX judgement is higher.
         /// <remarks>
         /// It's not necessary, nor logical to test other behaviors.
         /// </remarks>
