@@ -35,16 +35,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private static PathControlPoint[] createPathSegment(PathType type, params Vector2[] positions)
         {
-            return new[]
-            {
-                new PathControlPoint
-                {
-                    Type = type
-                },
-            }.Concat(positions.Select(p => new PathControlPoint
+            return positions.Select(p => new PathControlPoint
             {
                 Position = p
-            })).ToArray();
+            }).Prepend(new PathControlPoint
+            {
+                Type = type
+            }).ToArray();
         }
 
         [TestCase(0, 250)]
