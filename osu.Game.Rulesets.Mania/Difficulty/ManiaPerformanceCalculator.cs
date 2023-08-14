@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isLegacyScore = score.Mods.Any(m => m is ManiaModClassic) && !Precision.DefinitelyBigger(totalJudgements, maniaAttributes.NoteCount + maniaAttributes.HoldNoteCount);
 
             hitWindows = isLegacyScore
-                ? GetLegacyHitWindows(score.Mods, maniaAttributes.IsConvert, maniaAttributes.OverallDifficulty)
+                ? GetLegacyHitWindows(score.Mods, isConvert, maniaAttributes.OverallDifficulty)
                 : GetLazerHitWindows(score.Mods, maniaAttributes.OverallDifficulty);
 
             estimatedUr = computeEstimatedUr(maniaAttributes.NoteCount, maniaAttributes.HoldNoteCount);
