@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 Type = type
             }).ToArray();
         }
+
+        private Slider SelectedSlider => (Slider)EditorBeatmap.SelectedHitObjects[0];
 
         [TestCase(0, 250)]
         [TestCase(0, 200)]
@@ -87,13 +90,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("Slider was reversed correctly", () =>
-            {
-                var slider = (Slider)EditorBeatmap.SelectedHitObjects[0];
-                return Vector2.Distance(slider.Position, oldEndPos) < 1
-                       && Vector2.Distance(slider.EndPosition, oldStartPos) < 1
-                       && Math.Abs(slider.Path.Distance - oldDistance) < 1e-10;
-            });
+            AddAssert("Slider has correct length", () =>
+                Precision.AlmostEquals(SelectedSlider.Path.Distance, oldDistance));
+
+            AddAssert("Slider has correct start position", () =>
+                Vector2.Distance(SelectedSlider.Position, oldEndPos) < 1);
+
+            AddAssert("Slider has correct end position", () =>
+                Vector2.Distance(SelectedSlider.EndPosition, oldStartPos) < 1);
         }
     }
 }
