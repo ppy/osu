@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty
             // Temporarily allow these attributes to not exist so as to not block releases of server-side components while these attributes aren't populated/used yet.
             LegacyAccuracyScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_ACCURACY_SCORE);
             LegacyComboScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_COMBO_SCORE);
-            LegacyBonusScoreRatio = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO);
+            LegacyBonusScoreRatio = values.GetValueOrDefault(ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO);
         }
     }
 }
