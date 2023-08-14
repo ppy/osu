@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }).ToArray();
         }
 
-        private Slider SelectedSlider => (Slider)EditorBeatmap.SelectedHitObjects[0];
+        private Slider selectedSlider => (Slider)EditorBeatmap.SelectedHitObjects[0];
 
         [TestCase(0, 250)]
         [TestCase(0, 200)]
@@ -91,13 +90,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             AddAssert("Slider has correct length", () =>
-                Precision.AlmostEquals(SelectedSlider.Path.Distance, oldDistance));
+                Precision.AlmostEquals(selectedSlider.Path.Distance, oldDistance));
 
             AddAssert("Slider has correct start position", () =>
-                Vector2.Distance(SelectedSlider.Position, oldEndPos) < 1);
+                Vector2.Distance(selectedSlider.Position, oldEndPos) < 1);
 
             AddAssert("Slider has correct end position", () =>
-                Vector2.Distance(SelectedSlider.EndPosition, oldStartPos) < 1);
+                Vector2.Distance(selectedSlider.EndPosition, oldStartPos) < 1);
         }
     }
 }
