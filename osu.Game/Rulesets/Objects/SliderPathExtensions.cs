@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -71,18 +70,10 @@ namespace osu.Game.Rulesets.Objects
                 double lastSegmentStart = distinctSegmentEnds[^2];
                 double lastSegmentEnd = distinctSegmentEnds[^1];
 
-                var oldCircleArcPath = new List<Vector2>();
-                sliderPath.GetPathToProgress(oldCircleArcPath, lastSegmentStart / lastSegmentEnd, 1);
+                var circleArcPath = new List<Vector2>();
+                sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                var newCircleArcPoints = new[]
-                {
-                    oldCircleArcPath[0],
-                    oldCircleArcPath[oldCircleArcPath.Count / 2],
-                    oldCircleArcPath[^1]
-                };
-
-                var newCircleArcPath = PathApproximator.ApproximateCircularArc(newCircleArcPoints.AsSpan());
-                controlPoints[^2].Position = newCircleArcPath[newCircleArcPath.Count / 2];
+                controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
