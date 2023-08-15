@@ -320,20 +320,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 };
 
                 // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
-                HitObject.StartTime += split_gap;
-
-                editorBeatmap.Add(newSlider);
-                editorBeatmap.ForceUpdateState();
-
+                // We can't use newSlider.SpanDuration because it will only be calculated after EditorBeatmap updated the slider.
+                HitObject.StartTime += newSlider.Path.Distance / HitObject.Path.Distance * HitObject.Duration + split_gap;
+                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.Distance;
                 HitObject.NewCombo = false;
-                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
-                HitObject.StartTime += newSlider.SpanDuration;
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
                 {
                     HitObject.Path.ExpectedDistance.Value = null;
                 }
+
+                editorBeatmap.Add(newSlider);
             }
 
             // Once all required pieces have been split off, the original slider has the final split.
