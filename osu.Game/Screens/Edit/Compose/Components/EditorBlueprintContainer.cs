@@ -65,13 +65,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void BeginChange()
         {
-            // If the editor beatmap has a change handler then this will automatically call BeginChange() on it.
             EditorBeatmap.BeginChange();
         }
 
         protected override void EndChange()
         {
-            // If the editor beatmap has a change handler then this will automatically call EndChange() on it.
             EditorBeatmap.EndChange();
         }
 
