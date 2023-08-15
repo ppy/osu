@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Objects
             inheritedLinearPoints.ForEach(p => p.Type = PathType.Linear);
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
-            double[] distinctSegmentEnds = segmentEnds.Distinct().ToArray();
+            double[] distinctSegmentEnds = truncateEndingDuplicates(segmentEnds);
 
             // Remove control points at the end which do not affect the visual slider path ("invisible" control points).
             if (segmentEnds.Length >= 2 && Precision.AlmostEquals(segmentEnds[^1], segmentEnds[^2]) && distinctSegmentEnds.Length > 1)
@@ -81,6 +81,24 @@ namespace osu.Game.Rulesets.Objects
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
+        }
+
+        /// <summary>
+        /// Keeps removing the last element of the provided array until the last two elements are not equal.
+        /// </summary>
+        /// <param name="arr">The array to truncate.</param>
+        /// <returns>The truncated array.</returns>
+        private static double[] truncateEndingDuplicates(double[] arr)
+        {
+            if (arr.Length < 2)
+                return arr;
+
+            var result = arr.ToList();
+
+            while (Precision.AlmostEquals(result[^1], result[^2]))
+                result.RemoveAt(result.Count - 1);
+
+            return result.ToArray();
         }
 
         /// <summary>
