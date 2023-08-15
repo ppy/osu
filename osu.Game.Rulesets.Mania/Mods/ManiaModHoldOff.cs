@@ -46,19 +46,6 @@ namespace osu.Game.Rulesets.Mania.Mods
                     StartTime = h.StartTime,
                     Samples = h.GetNodeSamples(0)
                 });
-
-                // Don't add an end note if the duration is shorter than the threshold
-                double noteValue = GetNoteDurationInBeatLength(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
-
-                if (noteValue >= END_NOTE_ALLOW_THRESHOLD)
-                {
-                    newObjects.Add(new Note
-                    {
-                        Column = h.Column,
-                        StartTime = h.EndTime,
-                        Samples = h.GetNodeSamples((h.NodeSamples?.Count - 1) ?? 1)
-                    });
-                }
             }
 
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
