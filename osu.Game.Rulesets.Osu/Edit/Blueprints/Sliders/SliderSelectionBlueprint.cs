@@ -340,6 +340,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
+
+            editorBeatmap.Update(HitObject);
         }
 
         private void convertToStream()
