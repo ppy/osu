@@ -6,8 +6,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
@@ -16,6 +21,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -23,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public partial class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
+        private readonly Bindable<TernaryState> showSpeedChanges = new Bindable<TernaryState>();
+
         private DrawableManiaEditorRuleset drawableRuleset;
         private ManiaBeatSnapGrid beatSnapGrid;
         private InputManager inputManager;
@@ -36,6 +44,21 @@ namespace osu.Game.Rulesets.Mania.Edit
         private void load()
         {
             AddInternal(beatSnapGrid = new ManiaBeatSnapGrid());
+
+            LeftToolbox.Add(new EditorToolboxGroup("playfield")
+            {
+                Child = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
+                    Children = new[]
+                    {
+                        new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
+                    }
+                },
+            });
         }
 
         protected override void LoadComplete()
@@ -59,7 +82,10 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
-            drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
+            drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods)
+            {
+                ShowSpeedChanges = { BindTarget = showSpeedChanges }
+            };
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
             dependencies.CacheAs(drawableRuleset.ScrollingInfo);

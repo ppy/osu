@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
-
         protected override bool UserScrollSpeedAdjustment => false;
 
         private SkinnableDrawable scroller;
@@ -45,6 +43,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
+            VisualisationMethod = ScrollVisualisationMethod.Overlapping;
         }
 
         [BackgroundDependencyLoader]
