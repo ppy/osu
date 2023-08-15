@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Objects
 
             var result = arr.ToList();
 
-            while (Precision.AlmostEquals(result[^1], result[^2]))
+            while (Precision.AlmostEquals(result[^1], result[^2]) && result.Count > 1)
                 result.RemoveAt(result.Count - 1);
 
             return result.ToArray();
