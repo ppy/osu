@@ -33,5 +33,6 @@ namespace osu.Game.Rulesets.Mania
         HitExplosion,
         StageBackground,
         StageForeground,
+        BarLine
     }
 }
