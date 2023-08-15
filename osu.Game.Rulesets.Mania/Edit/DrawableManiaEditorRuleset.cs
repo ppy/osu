@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osuTK;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -19,6 +20,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         public DrawableManiaEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods)
             : base(ruleset, beatmap, mods)
         {
+            ScrollMethod = ScrollVisualisationMethod.Constant;
         }
 
         protected override Playfield CreatePlayfield() => new ManiaEditorPlayfield(Beatmap.Stages)
