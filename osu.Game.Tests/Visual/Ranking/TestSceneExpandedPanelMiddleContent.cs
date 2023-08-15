@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var author = new RealmUser { Username = "mapper_name" };
 
                 var score = TestResources.CreateTestScoreInfo(createTestBeatmap(author));
-                score.Mods = score.BeatmapInfo.Ruleset.CreateInstance().CreateAllMods().ToArray();
+                score.Mods = score.BeatmapInfo!.Ruleset.CreateInstance().CreateAllMods().ToArray();
 
                 showPanel(score);
             });

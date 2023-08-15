@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Database
             {
                 return Realm.Run(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating > 0);
                 });
             });
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Database
             {
                 Realm.Write(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     foreach (var b in beatmapSetInfo.Beatmaps)
                         b.StarRating = -1;
                 });
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Database
             {
                 return Realm.Run(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating > 0);
                 });
             });
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Database
             {
                 return Realm.Run(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating > 0);
                 });
             });
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Database
             {
                 Realm.Write(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     foreach (var b in beatmapSetInfo.Beatmaps)
                         b.StarRating = -1;
                 });
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Database
             {
                 return Realm.Run(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating == -1);
                 });
             });
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Database
             {
                 return Realm.Run(r =>
                 {
-                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID);
+                    var beatmapSetInfo = r.Find<BeatmapSetInfo>(importedSet.ID)!;
                     return beatmapSetInfo.Beatmaps.All(b => b.StarRating > 0);
                 });
             });

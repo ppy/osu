@@ -76,12 +76,12 @@ namespace osu.Game.Tests.Database
                     Available = true,
                 }));
 
-                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.True);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
                 var _ = new RealmRulesetStore(realm, storage);
 
-                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.False);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
             });
         }
 
@@ -101,18 +101,18 @@ namespace osu.Game.Tests.Database
                     Available = true,
                 }));
 
-                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.True);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
                 var _ = new RealmRulesetStore(realm, storage);
 
-                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.False);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
 
                 // Simulate the ruleset getting updated
                 LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
                 var __ = new RealmRulesetStore(realm, storage);
 
-                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.True);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
             });
         }
 

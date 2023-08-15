@@ -223,7 +223,7 @@ namespace osu.Game.Screens.Select
             subscriptionHiddenBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
-        private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception? error)
+        private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
             // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
             if (loadedTestBeatmaps)
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Select
                 removeBeatmapSet(sender[i].ID);
         }
 
-        private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception? error)
+        private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
             // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
             if (loadedTestBeatmaps)
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id).Detach());
+                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes, Exception? error)
+        private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
         {
             // we only care about actual changes in hidden status.
             if (changes == null)

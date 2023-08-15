@@ -30,11 +30,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ClearAll => new TranslatableString(getKey(@"clear_all"), @"Clear All");
 
         /// <summary>
-        /// "Cancel All"
-        /// </summary>
-        public static LocalisableString CancelAll => new TranslatableString(getKey(@"cancel_all"), @"Cancel All");
-
-        /// <summary>
         /// "Your battery level is low! Charge your device to prevent interruptions during gameplay."
         /// </summary>
         public static LocalisableString BatteryLow => new TranslatableString(getKey(@"battery_low"), @"Your battery level is low! Charge your device to prevent interruptions during gameplay.");

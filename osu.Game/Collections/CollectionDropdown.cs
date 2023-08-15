@@ -59,7 +59,7 @@ namespace osu.Game.Collections
             Current.BindValueChanged(selectionChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             var selectedItem = SelectedItem?.Value?.Collection;
 

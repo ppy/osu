@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Development;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Statistics;
 using Realms;
 
@@ -104,7 +105,7 @@ namespace osu.Game.Database
 
             PerformRead(t =>
             {
-                using (var transaction = t.Realm.BeginWrite())
+                using (var transaction = t.Realm!.BeginWrite())
                 {
                     perform(t);
                     transaction.Commit();
@@ -133,7 +134,7 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (dataIsFromUpdateThread && !data.Realm.IsClosed)
+            if (dataIsFromUpdateThread && !data.Realm.AsNonNull().IsClosed)
             {
                 RealmLiveStatistics.USAGE_UPDATE_IMMEDIATE.Value++;
                 return;
@@ -154,7 +155,7 @@ namespace osu.Game.Database
                 // To ensure that behaviour matches what we'd expect (the object *is* available), force
                 // a refresh to bring in any off-thread changes immediately.
                 realm.Refresh();
-                found = realm.Find<T>(ID);
+                found = realm.Find<T>(ID)!;
             }
 
             return found;

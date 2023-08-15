@@ -289,9 +289,9 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (host.Window is SDL2Window sdlWindow)
+            if (host.Window != null)
             {
-                sdlWindow.DragDrop += path =>
+                host.Window.DragDrop += path =>
                 {
                     // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
                     if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
@@ -950,9 +950,9 @@ namespace osu.Game
             if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
                 loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
 
-            loadComponentSingleFile(osuLogo, logo =>
+            loadComponentSingleFile(osuLogo, _ =>
             {
-                logoContainer.Add(logo);
+                osuLogo.SetupDefaultContainer(logoContainer);
 
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));

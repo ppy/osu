@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
             // TODO: The detection of rulesets is temporary until the leftover old skills have been reworked.
-            bool isConvert = score.BeatmapInfo.Ruleset.OnlineID != 1;
+            bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
 
             double multiplier = 1.13;
 

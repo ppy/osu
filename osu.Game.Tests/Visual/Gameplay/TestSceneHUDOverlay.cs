@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HUDOverlay hudOverlay = null!;
 
         [Cached(typeof(ScoreProcessor))]
-        private ScoreProcessor scoreProcessor => gameplayState.ScoreProcessor;
+        private ScoreProcessor scoreProcessor { get; set; }
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -46,6 +46,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
+
+        public TestSceneHUDOverlay()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [BackgroundDependencyLoader]
         private void load()

@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             return base.OnKeyDown(e);
         }
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
                 return false;
