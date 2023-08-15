@@ -140,6 +140,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
+            SetDefault(OsuSetting.SpawnParticlesOnHit, true);
+
             // Update
             SetDefault(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -384,6 +386,7 @@ namespace osu.Game.Configuration
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
-        ReplaySettingsOverlay
+        ReplaySettingsOverlay,
+        SpawnParticlesOnHit,
     }
 }

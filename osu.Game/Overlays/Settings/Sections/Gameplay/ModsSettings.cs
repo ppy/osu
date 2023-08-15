@@ -27,6 +27,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
                     Keywords = new[] { @"approach", @"circle", @"hidden" },
                 },
+                new SettingsCheckbox
+                {
+                    TooltipText = GameplaySettingsStrings.SpawnParticlesOnHitTooltip,
+                    LabelText = GameplaySettingsStrings.SpawnParticlesOnHit,
+                    Current = config.GetBindable<bool>(OsuSetting.SpawnParticlesOnHit),
+                    Keywords = new[] { @"particles", @"relax", @"autopilot" },
+                }
             };
         }
     }

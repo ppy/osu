@@ -4,10 +4,10 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
@@ -21,7 +21,8 @@ namespace osu.Game.Graphics
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
-        private double? lastParticleAdded;
+        private double lastParticleAdded;
+        private bool spawnImmediately;
 
         private readonly double timeBetweenSpawns;
         private readonly double maxDuration;
@@ -57,19 +58,20 @@ namespace osu.Game.Graphics
 
             if (!Active.Value || !CanSpawnParticles)
             {
-                lastParticleAdded = null;
+                spawnImmediately = true;
                 return;
             }
 
             // Always want to spawn the first particle in an activation immediately.
-            if (lastParticleAdded == null)
+            if (spawnImmediately)
             {
+                spawnImmediately = false;
                 lastParticleAdded = Time.Current;
                 spawnParticle();
                 return;
             }
 
-            double timeElapsed = Time.Current - lastParticleAdded.Value;
+            double timeElapsed = Time.Current - lastParticleAdded;
 
             // Avoid spawning too many particles if a long amount of time has passed.
             if (Math.Abs(timeElapsed) > maxDuration)
@@ -78,8 +80,6 @@ namespace osu.Game.Graphics
                 spawnParticle();
                 return;
             }
-
-            Debug.Assert(lastParticleAdded != null);
 
             for (int i = 0; i < timeElapsed / timeBetweenSpawns; i++)
             {
@@ -90,15 +90,19 @@ namespace osu.Game.Graphics
 
         private void spawnParticle()
         {
-            Debug.Assert(lastParticleAdded != null);
-
             var newParticle = CreateParticle();
 
-            newParticle.StartTime = (float)lastParticleAdded.Value;
+            newParticle.StartTime = (float)lastParticleAdded;
 
             particles[currentIndex] = newParticle;
 
             currentIndex = (currentIndex + 1) % particles.Length;
+        }
+
+        protected void SpawnParticle()
+        {
+            lastParticleAdded = Time.Current;
+            spawnParticle();
         }
 
         /// <summary>
@@ -171,7 +175,7 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                    renderer.DrawQuad(Texture, quad, p.Colour.MultiplyAlpha(alpha),
                         inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                         textureCoords: TextureCoords);
                 }
@@ -219,6 +223,7 @@ namespace osu.Game.Graphics
             public float StartAngle;
             public float EndAngle;
             public float EndScale;
+            public ColourInfo Colour;
 
             public float AlphaAtTime(float timeSinceStart) => 1 - progressAtTime(timeSinceStart);
 

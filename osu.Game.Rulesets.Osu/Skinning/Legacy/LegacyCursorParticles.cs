@@ -6,14 +6,17 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Play;
@@ -25,10 +28,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
-        public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value;
+        public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value || relaxHitSpewer.Active.Value;
 
         private LegacyCursorParticleSpewer breakSpewer = null!;
         private LegacyCursorParticleSpewer kiaiSpewer = null!;
+        private LegacyRelaxCursorParticleSpewer relaxHitSpewer = null!;
+
+        private readonly BindableBool relaxing = new BindableBool();
+        private Bindable<bool> spawnParticlesOnHit = null!;
 
         [Resolved(canBeNull: true)]
         private Player? player { get; set; }
@@ -39,11 +46,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private GameplayState? gameplayState { get; set; }
 
+        private ColourInfo starBreakAdditive = new Color4(255, 182, 193, 255);
+
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, OsuConfigManager osuConfig)
         {
             var texture = skin.GetTexture("star2");
-            var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
+            starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
 
             if (texture != null)
             {
@@ -67,10 +76,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
                 },
+                relaxHitSpewer = new LegacyRelaxCursorParticleSpewer(texture, 60)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = starBreakAdditive,
+                    Direction = SpewDirection.RelaxHit,
+                }
             };
 
             if (player != null)
                 ((IBindable<bool>)breakSpewer.Active).BindTo(player.IsBreakTime);
+
+            relaxHitSpewer.Active.BindTo(relaxing);
+
+            spawnParticlesOnHit = osuConfig.GetBindable<bool>(OsuSetting.SpawnParticlesOnHit);
+            spawnParticlesOnHit.BindValueChanged(v => relaxing.Value = v.NewValue && player != null &&
+                                                                       (player.Mods.Value.OfType<OsuModRelax>().Any() ||
+                                                                        player.Mods.Value.OfType<OsuModAutopilot>().Any()), true);
         }
 
         protected override void Update()
@@ -83,7 +106,32 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (gameplayState.Beatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
                 kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
-            kiaiSpewer.Active.Value = kiaiHitObject != null;
+            kiaiSpewer.Active.Value = kiaiHitObject != null || relaxingKeyPressed();
+        }
+
+        private bool doRelaxingSpew()
+        {
+            if (playfield == null) return false;
+
+            bool hitting = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isHit) != null;
+
+            return hitting && relaxingKeyPressed() && !breakSpewer.Active.Value;
+        }
+
+        private bool relaxingKeyPressed() => relaxing.Value && (leftPressed || rightPressed);
+
+        private bool isHit(DrawableHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableSlider slider:
+                    return slider.HeadCircle.IsHit;
+
+                case DrawableHitCircle hitCircle:
+                    return hitCircle.IsHit;
+            }
+
+            return false;
         }
 
         private bool isTracking(DrawableHitObject h)
@@ -138,6 +186,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.Right;
             else
                 breakSpewer.Direction = SpewDirection.None;
+
+            if (pressed && action is OsuAction.LeftButton or OsuAction.RightButton && doRelaxingSpew())
+                spawnRelaxHitParticles();
+        }
+
+        private void spawnRelaxHitParticles()
+        {
+            if (playfield == null) return;
+
+            relaxHitSpewer.Direction = SpewDirection.RelaxHit;
+
+            var firstHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
+
+            switch (firstHitObject)
+            {
+                case DrawableSlider slider:
+                    relaxHitSpewer.Colour = slider.HeadCircle.AccentColour.Value;
+                    break;
+
+                case DrawableHitCircle hitCircle:
+                    relaxHitSpewer.Colour = hitCircle.AccentColour.Value;
+                    break;
+            }
+
+            relaxHitSpewer.SpawnRelaxingHitParticles();
         }
 
         private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
@@ -206,6 +279,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     EndAngle = RNG.NextSingle(-2f, 2f),
                     EndScale = RNG.NextSingle(2f),
                     Velocity = getVelocity(),
+                    Colour = Colour,
                 };
 
             private Vector2 getVelocity()
@@ -234,6 +308,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             RNG.NextSingle(-160f, 160f)
                         );
                         break;
+
+                    case SpewDirection.RelaxHit:
+                        velocity = new Vector2(
+                            RNG.NextSingle(-500f, 500f),
+                            RNG.NextSingle(-500f, 500f)
+                        );
+                        break;
                 }
 
                 velocity += cursorVelocity * 40;
@@ -248,6 +329,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Left,
             Right,
             Omni,
+            RelaxHit,
+        }
+
+        private partial class LegacyRelaxCursorParticleSpewer : LegacyCursorParticleSpewer
+        {
+            // Disable spawn in Update()
+            protected override bool CanSpawnParticles => false;
+
+            public LegacyRelaxCursorParticleSpewer(Texture? texture, int perSecond)
+                : base(texture, perSecond)
+            {
+            }
+
+            public void SpawnRelaxingHitParticles()
+            {
+                if (!base.CanSpawnParticles || !Active.Value) return;
+
+                for (int i = 0; i < 6; i++)
+                    SpawnParticle();
+            }
         }
     }
 }
