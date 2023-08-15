@@ -41,9 +41,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
         protected BlueprintContainer()
@@ -95,15 +92,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        protected virtual void BeginChange()
-        {
-            changeHandler?.BeginChange();
-        }
+        protected virtual void BeginChange() { }
 
-        protected virtual void EndChange()
-        {
-            changeHandler?.EndChange();
-        }
+        protected virtual void EndChange() { }
 
         protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
 

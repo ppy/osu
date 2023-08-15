@@ -51,10 +51,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
         protected SelectionBox SelectionBox { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
-
         protected SelectionRotationHandler RotationHandler { get; private set; }
 
         protected SelectionHandler()
@@ -98,15 +94,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnReverse = HandleReverse,
             };
 
-        protected virtual void BeginChange()
-        {
-            ChangeHandler?.BeginChange();
-        }
+        protected virtual void BeginChange() { }
 
-        protected virtual void EndChange()
-        {
-            ChangeHandler?.EndChange();
-        }
+        protected virtual void EndChange() { }
 
         #region User Input Handling
 

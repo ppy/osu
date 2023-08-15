@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
@@ -25,6 +26,19 @@ namespace osu.Game.Overlays.SkinEditor
     {
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        protected override void BeginChange()
+        {
+            changeHandler?.BeginChange();
+        }
+
+        protected override void EndChange()
+        {
+            changeHandler?.EndChange();
+        }
 
         public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler
         {
