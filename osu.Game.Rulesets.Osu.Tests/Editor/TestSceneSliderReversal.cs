@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         [TestCase(0, 250)]
         [TestCase(0, 200)]
-        [TestCase(1, 80)]
         [TestCase(1, 120)]
+        [TestCase(1, 80)]
         public void TestSliderReversal(int pathIndex, double length)
         {
             var controlPoints = paths[pathIndex];
@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             Vector2 oldStartPos = default;
             Vector2 oldEndPos = default;
             double oldDistance = default;
+            var oldControlPointTypes = controlPoints.Select(p => p.Type);
 
             AddStep("Add slider", () =>
             {
@@ -97,6 +98,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("Slider has correct end position", () =>
                 Vector2.Distance(selectedSlider.EndPosition, oldStartPos) < 1);
+
+            AddAssert("Control points have correct types", () =>
+            {
+                var newControlPointTypes = selectedSlider.Path.ControlPoints.Select(p => p.Type).ToArray();
+
+                return oldControlPointTypes.Take(newControlPointTypes.Length).SequenceEqual(newControlPointTypes);
+            });
         }
     }
 }

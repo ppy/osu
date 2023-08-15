@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
@@ -30,12 +29,17 @@ namespace osu.Game.Rulesets.Objects
         public static void Reverse(this SliderPath sliderPath, out Vector2 positionalOffset)
         {
             var controlPoints = sliderPath.ControlPoints;
-            var originalControlPointTypes = controlPoints.Select(p => p.Type).ToArray();
 
-            controlPoints[0].Type ??= PathType.Linear;
+            var inheritedLinearPoints = controlPoints.Where(p => sliderPath.PointsInSegment(p)[0].Type == PathType.Linear && p.Type is null).ToList();
 
-            // Inherited points after a linear point should be treated as linear points.
-            controlPoints.Where(p => sliderPath.PointsInSegment(p)[0].Type == PathType.Linear).ForEach(p => p.Type = PathType.Linear);
+            if (controlPoints[0].Type == null)
+            {
+                inheritedLinearPoints.Add(controlPoints[0]);
+            }
+
+            // Inherited points after a linear point, as well as the first control point if it inherited,
+            // should be treated as linear points, so their types are temporarily changed to linear.
+            inheritedLinearPoints.ForEach(p => p.Type = PathType.Linear);
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
             double[] distinctSegmentEnds = segmentEnds.Distinct().ToArray();
@@ -62,10 +66,7 @@ namespace osu.Game.Rulesets.Objects
             }
 
             // Restore original control point types.
-            for (int i = 0; i < controlPoints.Count; i++)
-            {
-                controlPoints[i].Type = originalControlPointTypes[i];
-            }
+            inheritedLinearPoints.ForEach(p => p.Type = null);
 
             // Recalculate perfect curve at the end of the slider path.
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && distinctSegmentEnds.Length > 1)
