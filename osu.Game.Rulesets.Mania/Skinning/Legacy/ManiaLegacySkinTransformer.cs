@@ -119,6 +119,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
 
+                        case ManiaSkinComponents.BarLine:
+                            return null; // Not yet implemented.
+
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }
