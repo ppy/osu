@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -52,21 +51,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
-        public ScrollVisualisationMethod ScrollMethod
+        public new ScrollVisualisationMethod VisualisationMethod
         {
-            get => scrollMethod;
-            set
-            {
-                if (IsLoaded)
-                    throw new InvalidOperationException($"Can't alter {nameof(ScrollMethod)} after ruleset is already loaded");
-
-                scrollMethod = value;
-            }
+            get => base.VisualisationMethod;
+            set => base.VisualisationMethod = value;
         }
-
-        private ScrollVisualisationMethod scrollMethod = ScrollVisualisationMethod.Sequential;
-
-        protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();
