@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ManiaModInvert) };
 
-        public const double END_NOTE_ALLOW_THRESHOLD = 0.5;
-
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var maniaBeatmap = (ManiaBeatmap)beatmap;
@@ -49,12 +47,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
 
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
-        }
-
-        public static double GetNoteDurationInBeatLength(HoldNote holdNote, ManiaBeatmap beatmap)
-        {
-            double beatLength = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BeatLength;
-            return holdNote.Duration / beatLength;
         }
     }
 }
