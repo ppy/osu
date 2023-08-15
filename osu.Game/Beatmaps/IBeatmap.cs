@@ -111,6 +111,11 @@ namespace osu.Game.Beatmaps
         public static double CalculatePlayableLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects);
 
         /// <summary>
+        /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
+        /// </summary>
+        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
+
+        /// <summary>
         /// Find the timestamps in milliseconds of the start and end of the playable region.
         /// </summary>
         public static (double start, double end) CalculatePlayableBounds(this IBeatmap beatmap) => CalculatePlayableBounds(beatmap.HitObjects);

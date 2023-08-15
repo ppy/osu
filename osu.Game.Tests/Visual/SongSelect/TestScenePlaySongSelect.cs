@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Enter);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
         }
 
@@ -186,7 +186,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Down);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
         }
 
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Enter);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
         }
 
@@ -244,7 +244,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
         }
 
@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("update beatmap", () =>
             {
@@ -1011,7 +1011,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 });
             });
 
-            AddUntilStep("wait for results screen presented", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(getPresentBeatmap()));
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
@@ -1040,7 +1040,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect!.PresentScore(TestResources.CreateTestScoreInfo(getPresentBeatmap()));
             });
 
-            AddUntilStep("wait for results screen presented", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(getPresentBeatmap()));
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
@@ -1160,6 +1160,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (rulesets.IsNotNull())
                 rulesets.Dispose();
         }
+
+        private void waitForDismissed() => AddUntilStep("wait for not current", () => !songSelect.AsNonNull().IsCurrentScreen());
 
         private partial class TestSongSelect : PlaySongSelect
         {

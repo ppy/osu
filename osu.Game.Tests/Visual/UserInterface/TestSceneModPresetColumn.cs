@@ -9,8 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     var testPresets = createTestPresets();
                     foreach (var preset in testPresets)
-                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName);
+                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName)!;
 
                     realm.Add(testPresets);
                 });
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ManiaModNightcore(),
                     new ManiaModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("mania")
+                Ruleset = r.Find<RulesetInfo>("mania")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuModHidden(),
                     new OsuModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("osu")
+                Ruleset = r.Find<RulesetInfo>("osu")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -304,11 +304,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("preset is not changed", () => panel.Preset.Value.Name == presetName);
             AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
             AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
-            AddStep("attempt preset edit", () =>
-            {
-                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
-                InputManager.Click(MouseButton.Left);
-            });
+            AddStep("commit changes to textbox", () => InputManager.Key(Key.Enter));
+            AddStep("attempt preset edit via select binding", () => InputManager.Key(Key.Enter));
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
             AddAssert("preset is changed", () => panel.Preset.Value.Name != presetName);
         }

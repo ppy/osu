@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("uneven-repeat-slider")]
         [TestCase("old-stacking")]
         [TestCase("multi-segment-slider")]
+        [TestCase("nan-slider")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

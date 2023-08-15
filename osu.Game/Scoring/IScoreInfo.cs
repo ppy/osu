@@ -28,7 +28,7 @@ namespace osu.Game.Scoring
 
         double? PP { get; }
 
-        IBeatmapInfo Beatmap { get; }
+        IBeatmapInfo? Beatmap { get; }
 
         IRulesetInfo Ruleset { get; }
 

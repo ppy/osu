@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown { Performance = performanceArray[0], PerfectPerformance = performanceArray[1] };
+            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
         }
 
         [ItemCanBeNull]
