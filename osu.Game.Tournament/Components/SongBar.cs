@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,14 +22,14 @@ namespace osu.Game.Tournament.Components
 {
     public partial class SongBar : CompositeDrawable
     {
-        private TournamentBeatmap beatmap;
+        private TournamentBeatmap? beatmap;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public TournamentBeatmap Beatmap
+        public TournamentBeatmap? Beatmap
         {
             set
             {
@@ -55,7 +53,7 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        private FillFlowContainer flow;
+        private FillFlowContainer flow = null!;
 
         private bool expanded;
 

@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Drawing;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,13 +32,12 @@ namespace osu.Game.Tournament.Screens.Editors
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
-        private WarningBox rightClickMessage;
+        private WarningBox rightClickMessage = null!;
 
-        private RectangularPositionSnapGrid grid;
+        private RectangularPositionSnapGrid grid = null!;
 
-        [Resolved(canBeNull: true)]
-        [CanBeNull]
-        private IDialogOverlay dialogOverlay { get; set; }
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         protected override bool DrawLoserPaths => true;
 
@@ -94,36 +90,28 @@ namespace osu.Game.Tournament.Screens.Editors
             ScrollContent.Add(new JoinVisualiser(MatchesContainer, match, losers, UpdateLayout));
         }
 
-        public MenuItem[] ContextMenuItems
-        {
-            get
+        public MenuItem[] ContextMenuItems =>
+            new MenuItem[]
             {
-                if (editorInfo == null)
-                    return Array.Empty<MenuItem>();
-
-                return new MenuItem[]
+                new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                 {
-                    new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
+                    Vector2 pos = MatchesContainer.Count == 0 ? Vector2.Zero : lastMatchesContainerMouseDownPosition;
+
+                    TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
+
+                    LadderInfo.Matches.Add(newMatch);
+
+                    editorInfo.Selected.Value = newMatch;
+                }),
+                new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
+                {
+                    dialogOverlay?.Push(new LadderResetTeamsDialog(() =>
                     {
-                        Vector2 pos = MatchesContainer.Count == 0 ? Vector2.Zero : lastMatchesContainerMouseDownPosition;
-
-                        TournamentMatch newMatch = new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } };
-
-                        LadderInfo.Matches.Add(newMatch);
-
-                        editorInfo.Selected.Value = newMatch;
-                    }),
-                    new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
-                    {
-                        dialogOverlay?.Push(new LadderResetTeamsDialog(() =>
-                        {
-                            foreach (var p in MatchesContainer)
-                                p.Match.Reset();
-                        }));
-                    })
-                };
-            }
-        }
+                        foreach (var p in MatchesContainer)
+                            p.Match.Reset();
+                    }));
+                })
+            };
 
         public void Remove(TournamentMatch match)
         {
@@ -135,11 +123,11 @@ namespace osu.Game.Tournament.Screens.Editors
             private readonly Container<DrawableTournamentMatch> matchesContainer;
             public readonly TournamentMatch Source;
             private readonly bool losers;
-            private readonly Action complete;
+            private readonly Action? complete;
 
-            private ProgressionPath path;
+            private ProgressionPath? path;
 
-            public JoinVisualiser(Container<DrawableTournamentMatch> matchesContainer, TournamentMatch source, bool losers, Action complete)
+            public JoinVisualiser(Container<DrawableTournamentMatch> matchesContainer, TournamentMatch source, bool losers, Action? complete)
             {
                 this.matchesContainer = matchesContainer;
                 RelativeSizeAxes = Axes.Both;
@@ -153,7 +141,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     Source.Progression.Value = null;
             }
 
-            private DrawableTournamentMatch findTarget(InputState state)
+            private DrawableTournamentMatch? findTarget(InputState state)
             {
                 return matchesContainer.FirstOrDefault(d => d.ReceivePositionalInputAt(state.Mouse.Position));
             }

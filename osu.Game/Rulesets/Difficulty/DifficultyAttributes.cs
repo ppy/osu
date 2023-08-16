@@ -104,9 +104,11 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            LegacyAccuracyScore = (int)values[ATTRIB_ID_LEGACY_ACCURACY_SCORE];
-            LegacyComboScore = (int)values[ATTRIB_ID_LEGACY_COMBO_SCORE];
-            LegacyBonusScoreRatio = (int)values[ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO];
+
+            // Temporarily allow these attributes to not exist so as to not block releases of server-side components while these attributes aren't populated/used yet.
+            LegacyAccuracyScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_ACCURACY_SCORE);
+            LegacyComboScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_COMBO_SCORE);
+            LegacyBonusScoreRatio = values.GetValueOrDefault(ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO);
         }
     }
 }
