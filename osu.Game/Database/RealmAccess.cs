@@ -1022,10 +1022,10 @@ namespace osu.Game.Database
                 {
                     // Clear default bindings for the chat focus toggle,
                     // as they would conflict with the newly-added leaderboard toggle.
-                    var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
-                    var toggleChatBind = newKeyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleChatFocus);
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
 
-                    if (toggleChatBind != default && toggleChatBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Tab }))
+                    var toggleChatBind = keyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleChatFocus);
+                    if (toggleChatBind != null && toggleChatBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Tab }))
                         migration.NewRealm.Remove(toggleChatBind);
 
                     break;
