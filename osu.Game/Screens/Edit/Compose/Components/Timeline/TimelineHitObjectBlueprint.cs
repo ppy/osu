@@ -105,16 +105,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
-                sampleComponents = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
-                    X = Item is IHasRepeats ? 30 : 0,
+                    RelativePositionAxes = Axes.X,
                     AlternativeColor = Item is IHasRepeats
+                },
+                sampleComponents = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
@@ -262,6 +262,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Origin = Anchor.TopCentre
                 });
             }
+
+            samplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
