@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
             // - Gameplay doesn't start when it should (until a timeout occurs because nothing is happening for 10+ seconds)
             //
             // In addition, we use `CurrentTime` for this seek instead of `StartTime` as the above seek may have applied inherent
-            // offsets which need to be accounted for (ie. FramedBeatmapClock.TotalApliedOffset).
+            // offsets which need to be accounted for (ie. FramedBeatmapClock.TotalAppliedOffset).
             //
             // See https://github.com/ppy/osu/pull/24451/files/87fee001c786b29db34063ef3350e9a9f024d3ab#diff-28ca02979641e2d98a15fe5d5e806f56acf60ac100258a059fa72503b6cc54e8.
             (SourceClock as IAdjustableClock)?.Seek(CurrentTime);
