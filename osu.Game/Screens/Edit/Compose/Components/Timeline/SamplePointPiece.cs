@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
                 // on commit, ensure that the value is correct by sourcing it from the objects' samples again.
                 // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank();
+                bank.OnCommit += (_, _) => updateBankText();
 
                 updateAdditionBankText();
                 updateAdditionBankVisual();
@@ -261,6 +261,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
+            private void updateBankText()
+            {
+                bank.Current.Value = getCommonBank();
+            }
+
             private void updateBankPlaceholderText()
             {
                 string? commonBank = getCommonBank();
@@ -305,6 +310,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private readonly Dictionary<string, Bindable<TernaryState>> selectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
 
+            private readonly List<string> banks = new List<string>();
+
             private void createStateBindables()
             {
                 foreach (string sampleName in HitSampleInfo.AllAdditions)
@@ -330,6 +337,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     selectionSampleStates[sampleName] = bindable;
                 }
+
+                banks.AddRange(HitSampleInfo.AllBanks);
             }
 
             private void updateTernaryStates()
@@ -386,14 +395,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
+                if (e.ControlPressed || e.AltPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
                     return base.OnKeyDown(e);
 
-                var item = togglesCollection.ElementAtOrDefault(rightIndex);
+                if (e.ShiftPressed)
+                {
+                    string? bank = banks.ElementAtOrDefault(rightIndex);
+                    updateBank(bank);
+                    updateBankText();
+                    updateAdditionBank(bank);
+                    updateAdditionBankText();
+                }
+                else
+                {
+                    var item = togglesCollection.ElementAtOrDefault(rightIndex);
 
-                if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
+                    if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
 
-                button.Button.Toggle();
+                    button.Button.Toggle();
+                }
+
                 return true;
             }
 
