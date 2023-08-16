@@ -12,25 +12,26 @@ using osu.Game.Skinning;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A <see cref="WorkingBeatmap"/> which can be constructed directly from a .osu file, providing an implementation for
+    /// A <see cref="WorkingBeatmap"/> which can be constructed directly from an .osu file (via <see cref="FlatWorkingBeatmap(string, int?)"/>)
+    /// or an <see cref="IBeatmap"/> instance (via <see cref="FlatWorkingBeatmap(IBeatmap)"/>,
+    /// providing an implementation for
     /// <see cref="WorkingBeatmap.GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod})"/>.
     /// </summary>
-    public class FlatFileWorkingBeatmap : WorkingBeatmap
+    public class FlatWorkingBeatmap : WorkingBeatmap
     {
-        private readonly Beatmap beatmap;
+        private readonly IBeatmap beatmap;
 
-        public FlatFileWorkingBeatmap(string file, int? beatmapId = null)
-            : this(readFromFile(file), beatmapId)
+        public FlatWorkingBeatmap(string file, int? beatmapId = null)
+            : this(readFromFile(file))
         {
+            if (beatmapId.HasValue)
+                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
         }
 
-        private FlatFileWorkingBeatmap(Beatmap beatmap, int? beatmapId = null)
+        public FlatWorkingBeatmap(IBeatmap beatmap)
             : base(beatmap.BeatmapInfo, null)
         {
             this.beatmap = beatmap;
-
-            if (beatmapId.HasValue)
-                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
         }
 
         private static Beatmap readFromFile(string filename)
