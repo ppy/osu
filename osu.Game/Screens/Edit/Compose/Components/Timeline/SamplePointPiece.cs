@@ -394,10 +394,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 if (e.ShiftPressed)
                 {
-                    string? bank = banks.ElementAtOrDefault(rightIndex);
-                    updateBank(bank);
+                    string? newBank = banks.ElementAtOrDefault(rightIndex);
+                    updateBank(newBank);
                     updateBankText();
-                    updateAdditionBank(bank);
+                    updateAdditionBank(newBank);
                     updateAdditionBankText();
                 }
                 else
