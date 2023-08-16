@@ -200,12 +200,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 togglesCollection.AddRange(createTernaryButtons().Select(b => new DrawableTernaryButton(b) { RelativeSizeAxes = Axes.None, Size = new Vector2(40, 40) }));
             }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
-            }
-
             private string? getCommonBank() => allRelevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(allRelevantSamples.First()) : null;
             private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
             private int? getCommonVolume() => allRelevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(allRelevantSamples.First()) : null;
