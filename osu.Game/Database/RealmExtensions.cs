@@ -13,10 +13,13 @@ namespace osu.Game.Database
         /// If a match was not found, a <see cref="Realm.Refresh"/> is performed before trying a second time.
         /// This ensures that an instance is found even if the realm requested against was not in a consistent state.
         /// </summary>
-        /// <param name="realm"></param>
-        /// <param name="id"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="id">The ID of the entity to find in the realm.</param>
+        /// <typeparam name="T">The type of the entity to find in the realm.</typeparam>
+        /// <returns>
+        /// The retrieved entity of type <typeparamref name="T"/>.
+        /// Can be <see langword="null"/> if the entity is still not found by <paramref name="id"/> even after a refresh.
+        /// </returns>
         public static T? FindWithRefresh<T>(this Realm realm, Guid id) where T : IRealmObject
         {
             var found = realm.Find<T>(id);
@@ -24,7 +27,7 @@ namespace osu.Game.Database
             if (found == null)
             {
                 // It may be that we access this from the update thread before a refresh has taken place.
-                // To ensure that behaviour matches what we'd expect (the object *is* available), force
+                // To ensure that behaviour matches what we'd expect (the object generally *should be* available), force
                 // a refresh to bring in any off-thread changes immediately.
                 realm.Refresh();
                 found = realm.Find<T>(id);
