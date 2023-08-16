@@ -48,16 +48,13 @@ namespace osu.Game.Database
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                // Importantly, begin the realm write *before* re-fetching, else the update realm may not be in a consistent state
-                // (ie. if an async import finished very recently).
-                Realm.Realm.Write(realm =>
+                // We use RealmLive here as it handled re-retrieval and refreshing of realm if required.
+                new RealmLive<TModel>(item.ID, Realm).PerformWrite(i =>
                 {
-                    var managed = realm.Find<TModel>(item.ID);
-                    Debug.Assert(managed != null);
-                    operation(managed);
+                    operation(i);
 
                     item.Files.Clear();
-                    item.Files.AddRange(managed.Files.Detach());
+                    item.Files.AddRange(i.Files.Detach());
                 });
             }
             else
