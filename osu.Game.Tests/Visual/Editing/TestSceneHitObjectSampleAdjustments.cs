@@ -81,10 +81,10 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestPopoverHasFocus()
+        public void TestPopoverHasNoFocus()
         {
             clickSamplePiece(0);
-            samplePopoverHasFocus();
+            samplePopoverHasNoFocus();
         }
 
         [Test]
@@ -417,13 +417,13 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.Click(MouseButton.Left);
         });
 
-        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox focused", () =>
+        private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
-            return textbox?.HasFocus == true;
+            return textbox?.HasFocus == false;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
@@ -460,7 +460,6 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
-            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
