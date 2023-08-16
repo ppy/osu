@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
@@ -47,13 +48,16 @@ namespace osu.Game.Database
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                // We use RealmLive here as it handled re-retrieval and refreshing of realm if required.
-                new RealmLive<TModel>(item.ID, Realm).PerformWrite(i =>
+                // Importantly, begin the realm write *before* re-fetching, else the update realm may not be in a consistent state
+                // (ie. if an async import finished very recently).
+                Realm.Realm.Write(realm =>
                 {
-                    operation(i);
+                    var managed = realm.FindWithRefresh<TModel>(item.ID);
+                    Debug.Assert(managed != null);
+                    operation(managed);
 
                     item.Files.Clear();
-                    item.Files.AddRange(i.Files.Detach());
+                    item.Files.AddRange(managed.Files.Detach());
                 });
             }
             else

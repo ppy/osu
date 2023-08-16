@@ -9,6 +9,31 @@ namespace osu.Game.Database
     public static class RealmExtensions
     {
         /// <summary>
+        /// Performs a <see cref="Realm.Find{T}(System.Nullable{long})"/>.
+        /// If a match was not found, a <see cref="Realm.Refresh"/> is performed before trying a second time.
+        /// This ensures that an instance is found even if the realm requested against was not in a consistent state.
+        /// </summary>
+        /// <param name="realm"></param>
+        /// <param name="id"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T? FindWithRefresh<T>(this Realm realm, Guid id) where T : IRealmObject
+        {
+            var found = realm.Find<T>(id);
+
+            if (found == null)
+            {
+                // It may be that we access this from the update thread before a refresh has taken place.
+                // To ensure that behaviour matches what we'd expect (the object *is* available), force
+                // a refresh to bring in any off-thread changes immediately.
+                realm.Refresh();
+                found = realm.Find<T>(id);
+            }
+
+            return found;
+        }
+
+        /// <summary>
         /// Perform a write operation against the provided realm instance.
         /// </summary>
         /// <remarks>
