@@ -49,6 +49,18 @@ namespace osu.Game.Graphics
             this.maxDuration = maxDuration;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Active.BindValueChanged(active =>
+            {
+                // ensure that particles can be spawned immediately after the spewer becomes active.
+                if (active.NewValue)
+                    lastParticleAdded = null;
+            });
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -56,12 +68,8 @@ namespace osu.Game.Graphics
             Invalidate(Invalidation.DrawNode);
 
             if (!Active.Value || !CanSpawnParticles)
-            {
-                lastParticleAdded = null;
                 return;
-            }
 
-            // Always want to spawn the first particle in an activation immediately.
             if (lastParticleAdded == null)
             {
                 lastParticleAdded = Time.Current;
