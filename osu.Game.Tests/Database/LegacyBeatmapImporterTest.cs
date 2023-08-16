@@ -82,9 +82,10 @@ namespace osu.Game.Tests.Database
 
                     await new LegacyBeatmapImporter(new BeatmapImporter(storage, realm)).ImportFromStableAsync(stableStorage);
 
-                    var set = realm.Realm.All<BeatmapSetInfo>();
+                    var beatmapset = realm.Realm.All<BeatmapSetInfo>().First();
 
-                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), set.First().DateAdded);
+                    Assert.NotNull(beatmapset);
+                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), beatmapset.DateAdded);
                 }
             });
         }
