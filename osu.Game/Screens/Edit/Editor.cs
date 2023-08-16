@@ -199,6 +199,8 @@ namespace osu.Game.Screens.Edit
 
             if (loadableBeatmap is DummyWorkingBeatmap)
             {
+                Logger.Log("Editor was loaded without a valid beatmap; creating a new beatmap.");
+
                 isNewBeatmap = true;
 
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
