@@ -52,7 +52,7 @@ namespace osu.Game.Database
                 // (ie. if an async import finished very recently).
                 Realm.Realm.Write(realm =>
                 {
-                    var managed = realm.Find<TModel>(item.ID);
+                    var managed = realm.FindWithRefresh<TModel>(item.ID);
                     Debug.Assert(managed != null);
                     operation(managed);
 
