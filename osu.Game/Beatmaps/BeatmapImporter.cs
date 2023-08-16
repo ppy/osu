@@ -302,12 +302,48 @@ namespace osu.Game.Beatmaps
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
             }
 
+            var dateAdded = DateTimeOffset.UtcNow;
+
+            // Apply proper date added for a beatmapset when importing from stable.
+            // Stable tracks said date using the filesystem last modified date on the .osu file.
+            if (reader is LegacyDirectoryArchiveReader legacyReader)
+            {
+                dateAdded = determineDateAdded(legacyReader);
+            }
+
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
+                DateAdded = dateAdded
             };
+        }
+
+        /// <summary>
+        /// Used for beatmapsets in legacy (stable) storage.
+        /// Determine the date a given beatmapset has been added to the game.
+        /// The specific date is determined based on the oldest `.osu` file existing
+        /// in the beatmapset directory.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        private DateTimeOffset determineDateAdded(LegacyDirectoryArchiveReader reader)
+        {
+            var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+
+            var dateAdded = File.GetLastWriteTimeUtc(reader.GetPath(beatmaps.First()));
+
+            foreach (string beatmapName in beatmaps)
+            {
+                var currentDateAdded = File.GetLastWriteTimeUtc(reader.GetPath(beatmapName));
+
+                if (currentDateAdded < dateAdded)
+                {
+                    dateAdded = currentDateAdded;
+                }
+            }
+
+            return new DateTimeOffset(dateAdded);
         }
 
         /// <summary>
