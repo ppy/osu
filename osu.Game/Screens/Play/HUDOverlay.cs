@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
+        private Bindable<bool> configLeaderboardVisibility;
         private Bindable<bool> configSettingsOverlay;
 
         private readonly BindableBool replayLoaded = new BindableBool();
@@ -186,6 +187,7 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.Value = mods;
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
+            configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
             configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
@@ -397,6 +399,10 @@ namespace osu.Game.Screens.Play
                             break;
                     }
 
+                    return true;
+
+                case GlobalAction.ToggleInGameLeaderboard:
+                    configLeaderboardVisibility.Value = !configLeaderboardVisibility.Value;
                     return true;
             }
 
