@@ -30,7 +30,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
-        /// <param name="data">The realm data. Must be managed (see <see cref="IRealmObject.IsManaged"/>).</param>
+        /// <param name="data">The realm data. Must be managed (see <see cref="IRealmObjectBase.IsManaged"/>).</param>
         /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
         public RealmLive(T data, RealmAccess realm)
             : base(data.ID)
