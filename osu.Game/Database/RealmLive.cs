@@ -30,12 +30,30 @@ namespace osu.Game.Database
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
-        /// <param name="data">The realm data.</param>
+        /// <param name="data">The realm data. Must be managed (see <see cref="IRealmObject.IsManaged"/>).</param>
         /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
         public RealmLive(T data, RealmAccess realm)
             : base(data.ID)
         {
             this.data = data;
+            this.realm = realm;
+
+            dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
+        }
+
+        /// <summary>
+        /// Construct a new instance of live realm data from an ID.
+        /// </summary>
+        /// <param name="id">The ID of an already-persisting realm instance.</param>
+        /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
+        public RealmLive(Guid id, RealmAccess realm)
+            : base(id)
+        {
+            data = retrieveFromID(realm.Realm);
+
+            if (data.IsNull())
+                throw new ArgumentException("Realm instance for provided ID could not be found.", nameof(id));
+
             this.realm = realm;
 
             dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
