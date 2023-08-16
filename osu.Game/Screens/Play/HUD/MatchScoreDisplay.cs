@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,13 +22,13 @@ namespace osu.Game.Screens.Play.HUD
         public BindableLong Team1Score = new BindableLong();
         public BindableLong Team2Score = new BindableLong();
 
-        protected MatchScoreCounter Score1Text;
-        protected MatchScoreCounter Score2Text;
+        protected MatchScoreCounter Score1Text = null!;
+        protected MatchScoreCounter Score2Text = null!;
 
-        private Drawable score1Bar;
-        private Drawable score2Bar;
+        private Drawable score1Bar = null!;
+        private Drawable score2Bar = null!;
 
-        private MatchScoreDiffCounter scoreDiffText;
+        private MatchScoreDiffCounter scoreDiffText = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -166,7 +164,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected partial class MatchScoreCounter : CommaSeparatedScoreCounter
         {
-            private OsuSpriteText displayedSpriteText;
+            private OsuSpriteText displayedSpriteText = null!;
 
             public MatchScoreCounter()
             {
