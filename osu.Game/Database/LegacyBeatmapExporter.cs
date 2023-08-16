@@ -70,7 +70,13 @@ namespace osu.Game.Database
 
                 hitObject.StartTime = Math.Floor(hitObject.StartTime);
 
-                if (hitObject is not IHasPath hasPath || BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
+                if (hitObject is not IHasPath hasPath) continue;
+
+                // Make sure the last control point is inherit type
+                if (hasPath.Path.ControlPoints.Count > 1)
+                    hasPath.Path.ControlPoints[^1].Type = null;
+
+                if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
 
                 var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 
