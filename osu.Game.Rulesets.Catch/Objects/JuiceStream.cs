@@ -72,6 +72,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
+            this.PopulateNodeSamples();
+
             var dropletSamples = Samples.Select(s => s.With(@"slidertick")).ToList();
 
             int nodeIndex = 0;
