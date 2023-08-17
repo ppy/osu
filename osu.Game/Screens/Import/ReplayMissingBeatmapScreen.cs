@@ -35,9 +35,6 @@ namespace osu.Game.Screens.Import
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
