@@ -191,6 +191,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             protected override bool BlockNonPositionalInput => true;
 
+            protected override bool PlayPopInOutSamples => false;
+
             public PasswordEntryPopover(Room room)
             {
                 this.room = room;
