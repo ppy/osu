@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
 
             updateTextColour();
 
-            Item.Action.BindDisabledChanged(_ => updateState(), true);
+            Item.Action.BindDisabledChanged(_ => LoadComplete(), true);
         }
 
         private void updateTextColour()
