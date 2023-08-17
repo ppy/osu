@@ -147,8 +147,6 @@ namespace osu.Game.Screens.Import
 
         private void updateStatus()
         {
-            if (beatmapSetInfo == null) return;
-
             beatmapPanelContainer.Clear();
             beatmapPanelContainer.Child = new BeatmapCardNormal(beatmapSetInfo, allowExpansion: false);
             checkForAutomaticDownload(beatmapSetInfo);
