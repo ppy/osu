@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? sampleOff;
         private Sample? sampleOn;
 
+        protected virtual bool PlayClickSampleOnly => false;
+
         /// <summary>
         /// Whether this button is currently toggled to an active state.
         /// </summary>
@@ -67,6 +69,9 @@ namespace osu.Game.Graphics.UserInterface
         private void playSample()
         {
             sampleClick?.Play();
+
+            if (PlayClickSampleOnly)
+                return;
 
             if (Active.Value)
                 sampleOn?.Play();
