@@ -19,6 +19,7 @@ namespace osu.Game.Overlays
         protected override bool StartHidden => true;
 
         protected override string PopInSampleName => "UI/wave-pop-in";
+        protected override string PopOutSampleName => "UI/overlay-big-pop-out";
 
         public const float HORIZONTAL_PADDING = 50;
 
