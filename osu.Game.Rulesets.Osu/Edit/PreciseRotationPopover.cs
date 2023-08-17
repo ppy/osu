@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             new RadioButton("Selection centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
-                                () => new SpriteIcon { Icon = FontAwesome.Solid.ObjectGroup })
+                                () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     }
                 }
