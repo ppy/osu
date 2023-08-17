@@ -31,6 +31,8 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH;
+
         public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
