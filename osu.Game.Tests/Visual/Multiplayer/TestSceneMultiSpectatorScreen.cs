@@ -79,6 +79,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddWaitStep("wait a bit", 20);
         }
 
+        [TestCase(2)]
+        [TestCase(16)]
+        public void TestTeams(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds, teams: true);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
         [Test]
         public void TestMultipleStartRequests()
         {
@@ -450,16 +463,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
-        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null)
+        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null, bool teams = false)
         {
             AddStep("start play", () =>
             {
-                foreach (int id in userIds)
+                for (int i = 0; i < userIds.Length; i++)
                 {
+                    int id = userIds[i];
                     var user = new MultiplayerRoomUser(id)
                     {
                         User = new APIUser { Id = id },
                         Mods = mods ?? Array.Empty<APIMod>(),
+                        MatchState = teams ? new TeamVersusUserState { TeamID = i % 2 } : null,
                     };
 
                     OnlinePlayDependencies.MultiplayerClient.AddUser(user, true);
