@@ -85,7 +85,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = !tournamentClient }))
             {
                 if (!host.IsPrimaryInstance)
                 {
