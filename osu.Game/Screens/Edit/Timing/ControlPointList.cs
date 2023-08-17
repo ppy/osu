@@ -147,6 +147,10 @@ namespace osu.Game.Screens.Edit.Timing
                 trackedType = null;
             else
             {
+                // If the selected group has no control points, clear the tracked type.
+                // Otherwise the user will be unable to select a group with no control points.
+                if (selectedGroup.Value.ControlPoints.Count == 0)
+                    trackedType = null;
                 // If the selected group only has one control point, update the tracking type.
                 if (selectedGroup.Value.ControlPoints.Count == 1)
                     trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
