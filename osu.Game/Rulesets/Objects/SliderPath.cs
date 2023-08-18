@@ -40,10 +40,12 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
-        private readonly List<int> segmentEnds = new List<int>();
         private readonly Cached pathCache = new Cached();
 
         private double calculatedLength;
+
+        private readonly List<int> segmentEnds = new List<int>();
+        private double[] segmentEndDistances = Array.Empty<double>();
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
@@ -202,7 +204,7 @@ namespace osu.Game.Rulesets.Objects
         {
             ensureValid();
 
-            return segmentEnds.Select(i => cumulativeLength[i] / calculatedLength);
+            return segmentEndDistances.Select(d => d / Distance);
         }
 
         private void invalidate()
@@ -251,8 +253,9 @@ namespace osu.Game.Rulesets.Objects
                         calculatedPath.Add(t);
                 }
 
-                // Remember the index of the segment end
-                segmentEnds.Add(calculatedPath.Count - 1);
+                if (i > 0)
+                    // Remember the index of the segment end
+                    segmentEnds.Add(calculatedPath.Count - 1);
 
                 // Start the new segment at the current vertex
                 start = i;
@@ -298,6 +301,14 @@ namespace osu.Game.Rulesets.Objects
                 cumulativeLength.Add(calculatedLength);
             }
 
+            // Store the distances of the segment ends now, because after shortening the indices may be out of range
+            segmentEndDistances = new double[segmentEnds.Count];
+
+            for (int i = 0; i < segmentEnds.Count; i++)
+            {
+                segmentEndDistances[i] = cumulativeLength[segmentEnds[i]];
+            }
+
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
                 // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
@@ -319,10 +330,6 @@ namespace osu.Game.Rulesets.Objects
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
-
-                        // Shorten the last segment to the expected distance
-                        if (segmentEnds.Count > 0)
-                            segmentEnds[^1]--;
                     }
                 }
 
