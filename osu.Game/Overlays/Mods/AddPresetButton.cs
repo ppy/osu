@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class AddPresetButton : ShearedToggleButton, IHasPopover
     {
-        protected override bool PlayClickSampleOnly => true;
+        protected override bool PlayToggleSamples => false;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
