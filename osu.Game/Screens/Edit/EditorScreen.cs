@@ -44,14 +44,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "cut to clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformCut()
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanCut"/> themselves.
+        /// </remarks>
+        public virtual void Cut()
         {
-        }
-
-        public void Cut()
-        {
-            if (CanCut.Value)
-                PerformCut();
         }
 
         public BindableBool CanCopy { get; } = new BindableBool();
@@ -59,14 +56,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "copy to clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformCopy()
-        {
-        }
-
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanCopy"/> themselves.
+        /// </remarks>
         public virtual void Copy()
         {
-            if (CanCopy.Value)
-                PerformCopy();
         }
 
         public BindableBool CanPaste { get; } = new BindableBool();
@@ -74,14 +68,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "paste from clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformPaste()
-        {
-        }
-
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanPaste"/> themselves.
+        /// </remarks>
         public virtual void Paste()
         {
-            if (CanPaste.Value)
-                PerformPaste();
         }
 
         #endregion

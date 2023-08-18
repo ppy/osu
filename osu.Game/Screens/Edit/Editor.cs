@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
@@ -199,6 +199,8 @@ namespace osu.Game.Screens.Edit
 
             if (loadableBeatmap is DummyWorkingBeatmap)
             {
+                Logger.Log("Editor was loaded without a valid beatmap; creating a new beatmap.");
+
                 isNewBeatmap = true;
 
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
@@ -359,7 +361,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                X = -15,
+                                X = -10,
                                 Current = Mode,
                             },
                         },
@@ -425,7 +427,8 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
                 {
-                    Save();
+                    if (!Save()) return;
+
                     pushEditorPlayer();
                 }));
             }
@@ -764,7 +767,7 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            Save();
+            if (!Save()) return;
 
             ExitConfirmed = true;
             this.Exit();
@@ -997,21 +1000,40 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-            new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-            new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
             new EditorMenuItemSpacer(),
             new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
             new EditorMenuItemSpacer(),
+            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+            createExportMenu(),
+            new EditorMenuItemSpacer(),
             new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
 
+        private EditorMenuItem createExportMenu()
+        {
+            var exportItems = new List<MenuItem>
+            {
+                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, exportLegacyBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            };
+
+            return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
+        }
+
         private void exportBeatmap()
         {
-            Save();
+            if (!Save()) return;
+
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void exportLegacyBeatmap()
+        {
+            if (!Save()) return;
+
+            beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
         }
 
         /// <summary>
