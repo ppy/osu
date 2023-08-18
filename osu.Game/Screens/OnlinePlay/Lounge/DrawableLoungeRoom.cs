@@ -191,6 +191,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             protected override bool BlockNonPositionalInput => true;
 
+            // When a room is clicked, it already plays a click sound, which clashes pretty badly with the pop in sound.
+            // Dunno about this one. I'd probably remove the click sound from the panel in cases they are password protected and play these pop in / out sounds.
             protected override bool PlayPopInOutSamples => false;
 
             public PasswordEntryPopover(Room room)
