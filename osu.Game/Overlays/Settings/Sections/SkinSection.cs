@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -19,6 +20,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
+using osuTK;
 using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -26,6 +28,12 @@ namespace osu.Game.Overlays.Settings.Sections
     public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
+
+        private SkinSettingsDropdown[] modeSkinDropdowns;
+
+        private Bindable<bool> differentSkinPerMode = new BindableBool(false);
+
+        private FillFlowContainer modeSkins;
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -68,12 +76,54 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
+                new SettingsCheckbox
+                {
+                    LabelText = "Use different skin for each mode",
+                    Current = differentSkinPerMode,
+                },
+                modeSkins = new FillFlowContainer 
+                {
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0, 8),
+                    Direction = FillDirection.Vertical,
+                    Children = modeSkinDropdowns = new SkinSettingsDropdown[]
+                    {
+                        new SkinSettingsDropdown
+                        {
+                            LabelText = "osu!",
+                            Current = skins.CurrentSkinInfo,
+                            Keywords = new[] { @"skins" }
+                        },
+                        new SkinSettingsDropdown
+                        {
+                            LabelText = "osu!taiko",
+                            Current = skins.CurrentSkinInfo,
+                            Keywords = new[] { @"skins" }
+                        },
+                        new SkinSettingsDropdown
+                        {
+                            LabelText = "osu!catch",
+                            Current = skins.CurrentSkinInfo,
+                            Keywords = new[] { @"skins" }
+                        },
+                        new SkinSettingsDropdown
+                        {
+                            LabelText = "osu!mania",
+                            Current = skins.CurrentSkinInfo,
+                            Keywords = new[] { @"skins" }
+                        },
+                    },
+                },
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            differentSkinPerMode.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
@@ -90,6 +140,14 @@ namespace osu.Game.Overlays.Settings.Sections
                     skins.SelectRandomSkin();
                 }
             });
+        }
+
+        private void updateVisibility() 
+        {
+            modeSkins.Hide();
+
+            if (differentSkinPerMode.Value)
+                modeSkins.Show();
         }
 
         private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
@@ -114,6 +172,9 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
 
             Schedule(() => skinDropdown.Items = dropdownItems);
+
+            foreach (var dropdown in modeSkinDropdowns)
+                Schedule(() => dropdown.Items = dropdownItems);
         }
 
         protected override void Dispose(bool isDisposing)
