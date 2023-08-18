@@ -323,11 +323,11 @@ namespace osu.Game.Beatmaps
             {
                 var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 
-                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetPath(beatmaps.First()));
+                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps.First()));
 
                 foreach (string beatmapName in beatmaps)
                 {
-                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetPath(beatmapName));
+                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
 
                     if (currentDateAdded < dateAdded)
                         dateAdded = currentDateAdded;
