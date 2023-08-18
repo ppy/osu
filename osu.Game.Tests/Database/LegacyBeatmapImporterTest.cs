@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Platform;
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Database
                     var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
                     var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);
 
-                    System.IO.Compression.ZipFile.ExtractToDirectory(TestResources.GetQuickTestBeatmapForImport(), songsStorage.GetFullPath("renatus"));
+                    ZipFile.ExtractToDirectory(TestResources.GetQuickTestBeatmapForImport(), songsStorage.GetFullPath("renatus"));
 
                     string[] beatmaps = Directory.GetFiles(songsStorage.GetFullPath("renatus"), "*.osu", SearchOption.TopDirectoryOnly);
 
@@ -82,10 +83,10 @@ namespace osu.Game.Tests.Database
 
                     await new LegacyBeatmapImporter(new BeatmapImporter(storage, realm)).ImportFromStableAsync(stableStorage);
 
-                    var beatmapset = realm.Realm.All<BeatmapSetInfo>().First();
+                    var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
 
-                    Assert.NotNull(beatmapset);
-                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), beatmapset.DateAdded);
+                    Assert.NotNull(importedSet);
+                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), importedSet.DateAdded);
                 }
             });
         }
