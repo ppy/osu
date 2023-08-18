@@ -152,6 +152,8 @@ namespace osu.Game.Beatmaps
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet, realm));
 
+            beatmapSet.DateAdded = getDateAdded(archive);
+
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
                 b.BeatmapSet = beatmapSet;
@@ -302,47 +304,37 @@ namespace osu.Game.Beatmaps
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
             }
 
-            var dateAdded = DateTimeOffset.UtcNow;
-
-            // Apply proper date added for a beatmapset when importing from stable.
-            // Stable tracks said date using the filesystem last modified date on the .osu file.
-            if (reader is LegacyDirectoryArchiveReader legacyReader)
-            {
-                dateAdded = determineDateAdded(legacyReader);
-            }
-
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
-                DateAdded = dateAdded
             };
         }
 
         /// <summary>
-        /// Used for beatmapsets in legacy (stable) storage.
         /// Determine the date a given beatmapset has been added to the game.
-        /// The specific date is determined based on the oldest `.osu` file existing
-        /// in the beatmapset directory.
+        /// For legacy imports, we can use the oldest file write time for any `.osu` file in the directory.
+        /// For any other import types, use "now".
         /// </summary>
-        /// <param name="reader"></param>
-        /// <returns></returns>
-        private DateTimeOffset determineDateAdded(LegacyDirectoryArchiveReader reader)
+        private DateTimeOffset getDateAdded(ArchiveReader? reader)
         {
-            var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+            DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
 
-            var dateAdded = File.GetLastWriteTimeUtc(reader.GetPath(beatmaps.First()));
-
-            foreach (string beatmapName in beatmaps)
+            if (reader is LegacyDirectoryArchiveReader legacyReader)
             {
-                var currentDateAdded = File.GetLastWriteTimeUtc(reader.GetPath(beatmapName));
+                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 
-                if (currentDateAdded < dateAdded)
+                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetPath(beatmaps.First()));
+
+                foreach (string beatmapName in beatmaps)
                 {
-                    dateAdded = currentDateAdded;
+                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetPath(beatmapName));
+
+                    if (currentDateAdded < dateAdded)
+                        dateAdded = currentDateAdded;
                 }
             }
 
-            return new DateTimeOffset(dateAdded);
+            return dateAdded;
         }
 
         /// <summary>
