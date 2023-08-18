@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Objects
         {
             ensureValid();
 
-            return segmentEnds.Select(i => cumulativeLength[Math.Clamp(i, 0, cumulativeLength.Count - 1)] / calculatedLength);
+            return segmentEnds.Select(i => cumulativeLength[i] / Distance);
         }
 
         private void invalidate()
@@ -251,8 +251,9 @@ namespace osu.Game.Rulesets.Objects
                         calculatedPath.Add(t);
                 }
 
-                // Remember the index of the segment end
-                segmentEnds.Add(calculatedPath.Count - 1);
+                if (i > 0)
+                    // Remember the index of the segment end
+                    segmentEnds.Add(calculatedPath.Count - 1);
 
                 // Start the new segment at the current vertex
                 start = i;
@@ -314,15 +315,11 @@ namespace osu.Game.Rulesets.Objects
 
                 if (calculatedLength > expectedDistance)
                 {
-                    // The path will be shortened further, in which case we should trim any more unnecessary lengths and their associated path segments
+                    // The path will be shortened further, in which case we should trim any more unnecessary lengths
                     while (cumulativeLength.Count > 0 && cumulativeLength[^1] >= expectedDistance)
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
-
-                        // Shorten the last segment to the expected distance
-                        if (segmentEnds.Count > 0)
-                            segmentEnds[^1]--;
                     }
                 }
 
@@ -339,6 +336,12 @@ namespace osu.Game.Rulesets.Objects
 
                 calculatedPath[pathEndIndex] = calculatedPath[pathEndIndex - 1] + dir * (float)(expectedDistance - cumulativeLength[^1]);
                 cumulativeLength.Add(expectedDistance);
+
+                // Shorten the segments to the expected distance
+                for (int i = 0; i < segmentEnds.Count; i++)
+                {
+                    segmentEnds[i] = Math.Min(segmentEnds[i], cumulativeLength.Count - 1);
+                }
             }
         }
 

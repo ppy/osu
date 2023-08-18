@@ -45,9 +45,9 @@ namespace osu.Game.Rulesets.Objects
             double[] distinctSegmentEnds = truncateEndingDuplicates(segmentEnds);
 
             // Remove control points at the end which do not affect the visual slider path ("invisible" control points).
-            if (segmentEnds.Length >= 2 && Precision.AlmostEquals(segmentEnds[^1], segmentEnds[^2]) && distinctSegmentEnds.Length > 1)
+            if (segmentEnds.Length >= 2 && Precision.AlmostEquals(segmentEnds[^1], segmentEnds[^2]) && distinctSegmentEnds.Length > 0)
             {
-                int numVisibleSegments = distinctSegmentEnds.Length - 2;
+                int numVisibleSegments = distinctSegmentEnds.Length - 1;
                 var nonInheritedControlPoints = controlPoints.Where(p => p.Type is not null).ToList();
 
                 int lastVisibleControlPointIndex = controlPoints.IndexOf(nonInheritedControlPoints[numVisibleSegments]);
@@ -69,9 +69,9 @@ namespace osu.Game.Rulesets.Objects
             inheritedLinearPoints.ForEach(p => p.Type = null);
 
             // Recalculate perfect curve at the end of the slider path.
-            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && distinctSegmentEnds.Length > 1)
+            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && distinctSegmentEnds.Length > 0)
             {
-                double lastSegmentStart = distinctSegmentEnds[^2];
+                double lastSegmentStart = distinctSegmentEnds.Length > 1 ? distinctSegmentEnds[^2] : 0;
                 double lastSegmentEnd = distinctSegmentEnds[^1];
 
                 var circleArcPath = new List<Vector2>();
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Objects
 
             var result = arr.ToList();
 
-            while (Precision.AlmostEquals(result[^1], result[^2]) && result.Count > 1)
+            while (result.Count > 1 && Precision.AlmostEquals(result[^1], result[^2]))
                 result.RemoveAt(result.Count - 1);
 
             return result.ToArray();
