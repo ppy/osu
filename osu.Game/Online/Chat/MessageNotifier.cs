@@ -127,6 +127,8 @@ namespace osu.Game.Online.Chat
             if (!notifyOnPrivateMessage.Value || channel.Type != ChannelType.PM)
                 return false;
 
+            (host as DesktopGameHost)?.FlashWindow();
+
             notifications.Post(new PrivateMessageNotification(message, channel));
             return true;
         }
@@ -134,6 +136,8 @@ namespace osu.Game.Online.Chat
         private void checkForMentions(Channel channel, Message message)
         {
             if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
+
+            (host as DesktopGameHost)?.FlashWindow();
 
             notifications.Post(new MentionNotification(message, channel));
         }
