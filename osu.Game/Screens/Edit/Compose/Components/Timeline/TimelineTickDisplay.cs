@@ -19,16 +19,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
-        private EditorBeatmap beatmap { get; set; } = null!;
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
         private Bindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; } = null!;
-
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -45,9 +42,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             beatDivisor.BindValueChanged(_ => invalidateTicks());
 
-            if (changeHandler != null)
-                // currently this is the best way to handle any kind of timing changes.
-                changeHandler.OnStateChange += invalidateTicks;
+            // currently this is the best way to handle any kind of timing changes.
+            editorBeatmap.OnStateChange += invalidateTicks;
         }
 
         private void invalidateTicks()
@@ -103,10 +99,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             nextMinTick = null;
             nextMaxTick = null;
 
-            for (int i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
+            for (int i = 0; i < editorBeatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
-                var point = beatmap.ControlPointInfo.TimingPoints[i];
-                double until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
+                var point = editorBeatmap.ControlPointInfo.TimingPoints[i];
+                double until = i + 1 < editorBeatmap.ControlPointInfo.TimingPoints.Count ? editorBeatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
 
                 int beat = 0;
 
@@ -192,8 +188,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Dispose(isDisposing);
 
-            if (changeHandler != null)
-                changeHandler.OnStateChange -= invalidateTicks;
+            editorBeatmap.OnStateChange -= invalidateTicks;
         }
     }
 }

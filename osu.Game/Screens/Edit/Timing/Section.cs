@@ -27,13 +27,10 @@ namespace osu.Game.Screens.Edit.Timing
         private const float header_height = 50;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; } = null!;
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
-
-        [Resolved]
-        protected IEditorChangeHandler? ChangeHandler { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)

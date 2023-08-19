@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            placement = Beatmap.PlacementObject.GetBoundCopy();
+            placement = EditorBeatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
         }
 
@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             SelectedItems.RemoveAll(hitObject => !shouldBeSelected(hitObject));
 
-            foreach (var hitObject in Beatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected))
+            foreach (var hitObject in EditorBeatmap.HitObjects.Except(SelectedItems).Where(shouldBeSelected))
             {
                 Composer.Playfield.SetKeepAlive(hitObject, true);
                 SelectedItems.Add(hitObject);

@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
 
             [Resolved(canBeNull: true)]
-            private EditorBeatmap beatmap { get; set; } = null!;
+            private EditorBeatmap editorBeatmap { get; set; } = null!;
 
             public SampleEditPopover(HitObject hitObject)
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
-                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
+                var relevantObjects = (editorBeatmap.SelectedHitObjects.Contains(hitObject) ? editorBeatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
                 var relevantSamples = relevantObjects.Select(h => h.Samples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(newBank))
                     return;
 
-                beatmap.BeginChange();
+                editorBeatmap.BeginChange();
 
                 foreach (var h in objects)
                 {
@@ -161,10 +161,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         h.Samples[i] = h.Samples[i].With(newBank: newBank);
                     }
 
-                    beatmap.Update(h);
+                    editorBeatmap.Update(h);
                 }
 
-                beatmap.EndChange();
+                editorBeatmap.EndChange();
             }
 
             private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (newVolume == null)
                     return;
 
-                beatmap.BeginChange();
+                editorBeatmap.BeginChange();
 
                 foreach (var h in objects)
                 {
@@ -187,10 +187,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         h.Samples[i] = h.Samples[i].With(newVolume: newVolume.Value);
                     }
 
-                    beatmap.Update(h);
+                    editorBeatmap.Update(h);
                 }
 
-                beatmap.EndChange();
+                editorBeatmap.EndChange();
             }
         }
     }

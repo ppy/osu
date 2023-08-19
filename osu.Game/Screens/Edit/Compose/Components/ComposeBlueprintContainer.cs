@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            Beatmap.HitObjectAdded += hitObjectAdded;
+            EditorBeatmap.HitObjectAdded += hitObjectAdded;
 
             // updates to selected are handled for us by SelectionHandler.
             NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (nudgeMovementActive && !e.ControlPressed)
             {
-                Beatmap.EndChange();
+                EditorBeatmap.EndChange();
                 nudgeMovementActive = false;
             }
         }
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!nudgeMovementActive)
             {
                 nudgeMovementActive = true;
-                Beatmap.BeginChange();
+                EditorBeatmap.BeginChange();
             }
 
             var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
-            snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
+            snapResult.Time ??= EditorBeatmap.SnapTime(EditorClock.CurrentTime, null);
 
             CurrentPlacement.UpdateTimeAndPosition(snapResult);
         }
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             refreshTool();
 
             // on successful placement, the new combo button should be reset as this is the most common user interaction.
-            if (Beatmap.SelectedHitObjects.Count == 0)
+            if (EditorBeatmap.SelectedHitObjects.Count == 0)
                 NewCombo.Value = TernaryState.False;
         }
 

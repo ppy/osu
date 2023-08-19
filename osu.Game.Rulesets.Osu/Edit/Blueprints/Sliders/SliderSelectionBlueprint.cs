@@ -49,9 +49,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
         public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
@@ -173,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case MouseButton.Left:
                     if (e.ControlPressed && IsSelected)
                     {
-                        changeHandler?.BeginChange();
+                        editorBeatmap?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
                         ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
@@ -204,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (placementControlPoint != null)
             {
                 placementControlPoint = null;
-                changeHandler?.EndChange();
+                editorBeatmap?.EndChange();
             }
         }
 
@@ -323,19 +320,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 };
 
                 // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
-                HitObject.StartTime += split_gap;
-
-                editorBeatmap.Add(newSlider);
-
+                // We can't use newSlider.SpanDuration because it will only be calculated after EditorBeatmap updated the slider.
+                HitObject.StartTime += newSlider.Path.Distance / HitObject.Path.Distance * HitObject.Duration + split_gap;
+                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.Distance;
                 HitObject.NewCombo = false;
-                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
-                HitObject.StartTime += newSlider.SpanDuration;
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
                 {
                     HitObject.Path.ExpectedDistance.Value = null;
                 }
+
+                editorBeatmap.Add(newSlider);
             }
 
             // Once all required pieces have been split off, the original slider has the final split.
@@ -344,6 +340,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
+
+            editorBeatmap.Update(HitObject);
         }
 
         private void convertToStream()
@@ -354,7 +352,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
             double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
 
-            changeHandler?.BeginChange();
+            editorBeatmap.BeginChange();
 
             int i = 0;
             double time = HitObject.StartTime;
@@ -385,7 +383,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.Remove(HitObject);
 
-            changeHandler?.EndChange();
+            editorBeatmap.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]

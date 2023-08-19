@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         private Vector2 dragStartPosition;
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private EditorBeatmap? editorBeatmap { get; set; }
 
         public SelectionEditablePath(Func<float, double> positionToTime)
             : base(positionToTime)
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             for (int i = 0; i < VertexCount; i++)
                 VertexStates[i].VertexBeforeChange = Vertices[i];
 
-            changeHandler?.BeginChange();
+            editorBeatmap?.BeginChange();
             return true;
         }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            changeHandler?.EndChange();
+            editorBeatmap?.EndChange();
         }
 
         private int getMouseTargetVertex(Vector2 screenSpacePosition)

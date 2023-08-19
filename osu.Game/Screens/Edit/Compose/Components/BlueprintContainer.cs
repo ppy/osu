@@ -41,9 +41,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
         protected BlueprintContainer()
@@ -94,6 +91,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
         }
+
+        protected virtual void BeginChange() { }
+
+        protected virtual void EndChange() { }
 
         protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
 
@@ -190,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
-                changeHandler?.BeginChange();
+                BeginChange();
                 return true;
             }
 
@@ -213,7 +214,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (isDraggingBlueprint)
             {
                 DragOperationCompleted();
-                changeHandler?.EndChange();
+                EndChange();
             }
 
             DragBox.Hide();

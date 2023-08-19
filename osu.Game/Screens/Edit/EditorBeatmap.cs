@@ -14,13 +14,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
+    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider, IEditorChangeHandler
     {
         /// <summary>
         /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
@@ -92,6 +93,11 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
+        [CanBeNull] // Should be non-null once it can support custom rulesets.
+        private readonly BeatmapEditorChangeHandler changeHandler;
+
+        public bool CanSave { get; }
+
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
@@ -117,7 +123,37 @@ namespace osu.Game.Screens.Edit
                 BeatmapInfo.Metadata.PreviewTime = s.NewValue;
                 EndChange();
             });
+
+            CanSave = BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
+
+            if (!CanSave) return;
+
+            changeHandler = new BeatmapEditorChangeHandler(this);
+
+            CanUndo.BindTo(changeHandler.CanUndo);
+            CanRedo.BindTo(changeHandler.CanRedo);
+            changeHandler.OnStateChange += () => OnStateChange?.Invoke();
         }
+
+        #region change handler
+
+        public readonly Bindable<bool> CanUndo = new Bindable<bool>();
+        public readonly Bindable<bool> CanRedo = new Bindable<bool>();
+
+        public event Action OnStateChange;
+
+        /// <summary>
+        /// A SHA-2 hash representing the current visible editor state.
+        /// </summary>
+        public string CurrentStateHash => changeHandler?.CurrentStateHash;
+
+        /// <summary>
+        /// Restores an older or newer state.
+        /// </summary>
+        /// <param name="direction">The direction to restore in. If less than 0, an older state will be used. If greater than 0, a newer state will be used.</param>
+        public void RestoreState(int direction) => changeHandler?.RestoreState(direction);
+
+        #endregion
 
         /// <summary>
         /// Converts a <see cref="ControlPointInfo"/> such that the resultant <see cref="ControlPointInfo"/> is non-legacy.

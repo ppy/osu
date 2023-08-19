@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
@@ -25,6 +26,19 @@ namespace osu.Game.Overlays.SkinEditor
     {
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        protected override void BeginChange()
+        {
+            changeHandler?.BeginChange();
+        }
+
+        protected override void EndChange()
+        {
+            changeHandler?.EndChange();
+        }
 
         public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler
         {
@@ -229,7 +243,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyOrigins(Anchor origin)
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -246,7 +260,7 @@ namespace osu.Game.Overlays.SkinEditor
                 ApplyClosestAnchor(drawable);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         /// <summary>
@@ -258,7 +272,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void applyFixedAnchors(Anchor anchor)
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -268,12 +282,12 @@ namespace osu.Game.Overlays.SkinEditor
                 applyAnchor(drawable, anchor);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         private void applyClosestAnchors()
         {
-            OnOperationBegan();
+            BeginChange();
 
             foreach (var item in SelectedItems)
             {
@@ -281,7 +295,7 @@ namespace osu.Game.Overlays.SkinEditor
                 ApplyClosestAnchor((Drawable)item);
             }
 
-            OnOperationEnded();
+            EndChange();
         }
 
         private static Anchor getClosestAnchor(Drawable drawable)

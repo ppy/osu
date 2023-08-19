@@ -49,6 +49,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private EditorBeatmap editorBeatmap { get; set; }
+
         public PathControlPointVisualiser(T hitObject, bool allowSelection)
         {
             this.hitObject = hitObject;
@@ -95,9 +98,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (toRemove.Count == 0)
                 return false;
 
-            changeHandler?.BeginChange();
+            editorBeatmap?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
-            changeHandler?.EndChange();
+            editorBeatmap?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -114,9 +117,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (controlPointsToSplitAt.Count == 0)
                 return false;
 
-            changeHandler?.BeginChange();
+            editorBeatmap?.BeginChange();
             SplitControlPointsRequested?.Invoke(controlPointsToSplitAt);
-            changeHandler?.EndChange();
+            editorBeatmap?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -257,9 +260,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             piece.ControlPoint.Type = type;
         }
 
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
-
         #region Drag handling
 
         private Vector2[] dragStartPositions;
@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             Debug.Assert(draggedControlPointIndex >= 0);
 
-            changeHandler?.BeginChange();
+            editorBeatmap?.BeginChange();
         }
 
         private void dragInProgress(DragEvent e)
@@ -341,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 hitObject.Path.ControlPoints[i].Type = dragPathTypes[i];
         }
 
-        private void dragEnded() => changeHandler?.EndChange();
+        private void dragEnded() => editorBeatmap?.EndChange();
 
         #endregion
 

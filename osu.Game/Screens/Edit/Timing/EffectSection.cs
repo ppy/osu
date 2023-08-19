@@ -38,13 +38,13 @@ namespace osu.Game.Screens.Edit.Timing
             kiai.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
 
-            var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
+            var drawableRuleset = EditorBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(EditorBeatmap.PlayableBeatmap);
             if (drawableRuleset is not IDrawableScrollingRuleset scrollingRuleset || scrollingRuleset.VisualisationMethod == ScrollVisualisationMethod.Constant)
                 scrollSpeedSlider.Hide();
 
             void saveChanges()
             {
-                if (!isRebinding) ChangeHandler?.SaveState();
+                if (!isRebinding) EditorBeatmap.SaveState();
             }
         }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override EffectControlPoint CreatePoint()
         {
-            var reference = Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+            var reference = EditorBeatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
 
             return new EffectControlPoint
             {

@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osuTK;
@@ -25,6 +26,9 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor editor { get; set; } = null!;
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
         public SkinBlueprintContainer(ISerialisableDrawableContainer targetContainer)
         {
             this.targetContainer = targetContainer;
@@ -40,6 +44,16 @@ namespace osu.Game.Overlays.SkinEditor
             bindableList.BindCollectionChanged(componentsChanged, true);
 
             targetComponents.Add(bindableList);
+        }
+
+        protected override void BeginChange()
+        {
+            changeHandler?.BeginChange();
+        }
+
+        protected override void EndChange()
+        {
+            changeHandler?.EndChange();
         }
 
         private void componentsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>

@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private IndeterminateSliderWithTextBoxInput<double> sliderVelocitySlider;
 
             [Resolved(canBeNull: true)]
-            private EditorBeatmap beatmap { get; set; }
+            private EditorBeatmap editorBeatmap { get; set; }
 
             public DifficultyEditPopover(HitObject hitObject)
             {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
-                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
+                var relevantObjects = (editorBeatmap.SelectedHitObjects.Contains(hitObject) ? editorBeatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
                 // even if there are multiple objects selected, we can still display a value if they all have the same value.
                 var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocity).Distinct().Count() == 1
@@ -123,15 +123,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (val.NewValue == null)
                         return;
 
-                    beatmap.BeginChange();
+                    editorBeatmap.BeginChange();
 
                     foreach (var h in relevantObjects)
                     {
                         ((IHasSliderVelocity)h).SliderVelocity = val.NewValue.Value;
-                        beatmap.Update(h);
+                        editorBeatmap.Update(h);
                     }
 
-                    beatmap.EndChange();
+                    editorBeatmap.EndChange();
                 });
             }
 

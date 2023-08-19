@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; } = null!;
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public DrawableEditorRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -42,24 +42,21 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            beatmap.HitObjectAdded += addHitObject;
-            beatmap.HitObjectRemoved += removeHitObject;
+            editorBeatmap.HitObjectAdded += addHitObject;
+            editorBeatmap.HitObjectRemoved += removeHitObject;
 
-            if (changeHandler != null)
+            if (editorBeatmap.CanSave)
             {
                 // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
-                changeHandler.OnStateChange += () => Scheduler.AddOnce(regenerateAutoplay);
+                editorBeatmap.OnStateChange += () => Scheduler.AddOnce(regenerateAutoplay);
             }
             else
             {
-                beatmap.HitObjectUpdated += _ => Scheduler.AddOnce(regenerateAutoplay);
+                editorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(regenerateAutoplay);
             }
 
             Scheduler.AddOnce(regenerateAutoplay);
@@ -93,10 +90,10 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Dispose(isDisposing);
 
-            if (beatmap.IsNotNull())
+            if (editorBeatmap.IsNotNull())
             {
-                beatmap.HitObjectAdded -= addHitObject;
-                beatmap.HitObjectRemoved -= removeHitObject;
+                editorBeatmap.HitObjectAdded -= addHitObject;
+                editorBeatmap.HitObjectRemoved -= removeHitObject;
             }
         }
     }

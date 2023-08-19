@@ -51,10 +51,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
         protected SelectionBox SelectionBox { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
-
         protected SelectionRotationHandler RotationHandler { get; private set; }
 
         protected SelectionHandler()
@@ -90,29 +86,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SelectionBox CreateSelectionBox()
             => new SelectionBox
             {
-                OperationStarted = OnOperationBegan,
-                OperationEnded = OnOperationEnded,
+                OperationStarted = BeginChange,
+                OperationEnded = EndChange,
 
                 OnScale = HandleScale,
                 OnFlip = HandleFlip,
                 OnReverse = HandleReverse,
             };
 
-        /// <summary>
-        /// Fired when a drag operation ends from the selection box.
-        /// </summary>
-        protected virtual void OnOperationBegan()
-        {
-            ChangeHandler?.BeginChange();
-        }
+        protected virtual void BeginChange() { }
 
-        /// <summary>
-        /// Fired when a drag operation begins from the selection box.
-        /// </summary>
-        protected virtual void OnOperationEnded()
-        {
-            ChangeHandler?.EndChange();
-        }
+        protected virtual void EndChange() { }
 
         #region User Input Handling
 
@@ -181,16 +165,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    ChangeHandler?.BeginChange();
+                    BeginChange();
                     handled = HandleFlip(Direction.Horizontal, true);
-                    ChangeHandler?.EndChange();
+                    EndChange();
 
                     return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    ChangeHandler?.BeginChange();
+                    BeginChange();
                     handled = HandleFlip(Direction.Vertical, true);
-                    ChangeHandler?.EndChange();
+                    EndChange();
 
                     return handled;
             }
