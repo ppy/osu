@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -32,47 +31,32 @@ namespace osu.Game.Rulesets.Objects
 
             var inheritedLinearPoints = controlPoints.Where(p => sliderPath.PointsInSegment(p)[0].Type == PathType.Linear && p.Type is null).ToList();
 
-            if (controlPoints[0].Type == null)
-            {
-                inheritedLinearPoints.Add(controlPoints[0]);
-            }
-
             // Inherited points after a linear point, as well as the first control point if it inherited,
             // should be treated as linear points, so their types are temporarily changed to linear.
             inheritedLinearPoints.ForEach(p => p.Type = PathType.Linear);
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
-            double[] distinctSegmentEnds = truncateEndingDuplicates(segmentEnds);
 
-            // Remove control points at the end which do not affect the visual slider path ("invisible" control points).
-            if (segmentEnds.Length >= 2 && Precision.AlmostEquals(segmentEnds[^1], segmentEnds[^2]) && distinctSegmentEnds.Length > 0)
+            // Remove segments after the end of the slider.
+            for (int numSegmentsToRemove = segmentEnds.Count(se => se >= 1) - 1; numSegmentsToRemove > 0 && controlPoints.Count > 0;)
             {
-                int numVisibleSegments = distinctSegmentEnds.Length - 1;
-                var nonInheritedControlPoints = controlPoints.Where(p => p.Type is not null).ToList();
-
-                int lastVisibleControlPointIndex = controlPoints.IndexOf(nonInheritedControlPoints[numVisibleSegments]);
-
-                // Make sure to include all inherited control points directly after the last visible non-inherited control point.
-                while (lastVisibleControlPointIndex + 1 < controlPoints.Count)
+                if (controlPoints.Last().Type is not null)
                 {
-                    lastVisibleControlPointIndex++;
-
-                    if (controlPoints[lastVisibleControlPointIndex].Type is not null)
-                        break;
+                    numSegmentsToRemove--;
+                    segmentEnds = segmentEnds[..^1];
                 }
 
-                // Remove all control points after the first invisible non-inherited control point.
-                controlPoints.RemoveRange(lastVisibleControlPointIndex + 1, controlPoints.Count - lastVisibleControlPointIndex - 1);
+                controlPoints.RemoveAt(controlPoints.Count - 1);
             }
 
             // Restore original control point types.
             inheritedLinearPoints.ForEach(p => p.Type = null);
 
-            // Recalculate perfect curve at the end of the slider path.
-            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && distinctSegmentEnds.Length > 0)
+            // Recalculate middle perfect curve control points at the end of the slider path.
+            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && segmentEnds.Any())
             {
-                double lastSegmentStart = distinctSegmentEnds.Length > 1 ? distinctSegmentEnds[^2] : 0;
-                double lastSegmentEnd = distinctSegmentEnds[^1];
+                double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
+                double lastSegmentEnd = segmentEnds[^1];
 
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
@@ -81,24 +65,6 @@ namespace osu.Game.Rulesets.Objects
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
-        }
-
-        /// <summary>
-        /// Keeps removing the last element of the provided array until the last two elements are not equal.
-        /// </summary>
-        /// <param name="arr">The array to truncate.</param>
-        /// <returns>The truncated array.</returns>
-        private static double[] truncateEndingDuplicates(double[] arr)
-        {
-            if (arr.Length < 2)
-                return arr;
-
-            var result = arr.ToList();
-
-            while (result.Count > 1 && Precision.AlmostEquals(result[^1], result[^2]))
-                result.RemoveAt(result.Count - 1);
-
-            return result.ToArray();
         }
 
         /// <summary>
