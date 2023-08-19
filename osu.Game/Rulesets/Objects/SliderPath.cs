@@ -254,8 +254,10 @@ namespace osu.Game.Rulesets.Objects
                 }
 
                 if (i > 0)
+                {
                     // Remember the index of the segment end
                     segmentEnds.Add(calculatedPath.Count - 1);
+                }
 
                 // Start the new segment at the current vertex
                 start = i;
