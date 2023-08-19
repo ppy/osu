@@ -67,9 +67,9 @@ namespace osu.Game.Skinning
 
         private Skin trianglesSkin { get; }
 
-        public Bindable<bool> differentSkinPerRuleset = new BindableBool(false);
+        public Bindable<bool> DifferentSkinPerRuleset = new BindableBool(false);
 
-        public Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> rulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
+        public Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> RulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
 
         public override bool PauseImports
         {
@@ -90,14 +90,14 @@ namespace osu.Game.Skinning
             this.rulesetStore = rulesetStore;
             this.resources = resources;
 
-            foreach (var ruleset in rulesetStore.AvailableRulesets) 
+            foreach (var ruleset in rulesetStore.AvailableRulesets)
             {
                 Bindable<Live<SkinInfo>> rulesetSkin = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
-                rulesetSkin.ValueChanged += skin => 
+                rulesetSkin.ValueChanged += skin =>
                 {
-                    CombineSkins();
+                    mergeSkins();
                 };
-                rulesetSkins.Add(ruleset, rulesetSkin);
+                RulesetSkins.Add(ruleset, rulesetSkin);
             }
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
@@ -128,13 +128,15 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.ValueChanged += skin =>
             {
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
+                if (DifferentSkinPerRuleset.Value)
+                    mergeSkins();
             };
 
-            differentSkinPerRuleset.ValueChanged += newBool =>
+            DifferentSkinPerRuleset.ValueChanged += newBool =>
             {
                 CurrentSkin.Value = CurrentSkinInfo.Value.PerformRead(GetSkin);
                 if (newBool.NewValue)
-                    CombineSkins();
+                    mergeSkins();
             };
 
             CurrentSkin.Value = argonSkin;
@@ -152,9 +154,9 @@ namespace osu.Game.Skinning
             };
         }
 
-        private void CombineSkins()
+        private void mergeSkins()
         {
-            
+            ;
         }
 
         public void SelectRandomSkin()

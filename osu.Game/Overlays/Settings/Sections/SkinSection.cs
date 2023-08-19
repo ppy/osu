@@ -60,7 +60,8 @@ namespace osu.Game.Overlays.Settings.Sections
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
 
-            foreach (var (ruleset, skin) in skins.rulesetSkins) {
+            foreach (var (ruleset, skin) in skins.RulesetSkins)
+            {
                 rulesetSkinDropdowns.Add(
                     new SkinSettingsDropdown
                     {
@@ -88,10 +89,10 @@ namespace osu.Game.Overlays.Settings.Sections
                 new DeleteSkinButton(),
                 new SettingsCheckbox
                 {
-                    LabelText = SkinSettingsStrings.differentSkinPerRuleset,
-                    Current = skins.differentSkinPerRuleset,
+                    LabelText = SkinSettingsStrings.DifferentSkinPerRuleset,
+                    Current = skins.DifferentSkinPerRuleset,
                 },
-                rulesetSkins = new FillFlowContainer 
+                rulesetSkins = new FillFlowContainer
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
@@ -107,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             base.LoadComplete();
 
-            skins.differentSkinPerRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
+            skins.DifferentSkinPerRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
@@ -126,11 +127,11 @@ namespace osu.Game.Overlays.Settings.Sections
             });
         }
 
-        private void updateVisibility() 
+        private void updateVisibility()
         {
             rulesetSkins.Hide();
 
-            if (skins.differentSkinPerRuleset.Value)
+            if (skins.DifferentSkinPerRuleset.Value)
                 rulesetSkins.Show();
         }
 
