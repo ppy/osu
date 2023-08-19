@@ -24,6 +24,7 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Utils;
 
 namespace osu.Game.Skinning
@@ -48,6 +49,8 @@ namespace osu.Game.Skinning
 
         private readonly GameHost host;
 
+        private readonly RealmRulesetStore rulesetStore;
+
         private readonly IResourceStore<byte[]> resources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
@@ -64,6 +67,10 @@ namespace osu.Game.Skinning
 
         private Skin trianglesSkin { get; }
 
+        public Bindable<bool> differentSkinPerRuleset = new BindableBool(false);
+
+        public Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> rulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
+
         public override bool PauseImports
         {
             get => base.PauseImports;
@@ -74,13 +81,24 @@ namespace osu.Game.Skinning
             }
         }
 
-        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, RealmRulesetStore rulesetStore, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
         {
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
+            this.rulesetStore = rulesetStore;
             this.resources = resources;
+
+            foreach (var ruleset in rulesetStore.AvailableRulesets) 
+            {
+                Bindable<Live<SkinInfo>> rulesetSkin = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
+                rulesetSkin.ValueChanged += skin => 
+                {
+                    CombineSkins();
+                };
+                rulesetSkins.Add(ruleset, rulesetSkin);
+            }
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
@@ -112,6 +130,13 @@ namespace osu.Game.Skinning
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
             };
 
+            differentSkinPerRuleset.ValueChanged += newBool =>
+            {
+                CurrentSkin.Value = CurrentSkinInfo.Value.PerformRead(GetSkin);
+                if (newBool.NewValue)
+                    CombineSkins();
+            };
+
             CurrentSkin.Value = argonSkin;
             CurrentSkin.ValueChanged += skin =>
             {
@@ -125,6 +150,11 @@ namespace osu.Game.Skinning
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+        }
+
+        private void CombineSkins()
+        {
+            
         }
 
         public void SelectRandomSkin()

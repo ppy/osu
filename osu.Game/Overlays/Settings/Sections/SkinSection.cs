@@ -29,11 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private SkinSettingsDropdown skinDropdown;
 
-        private SkinSettingsDropdown[] modeSkinDropdowns;
+        private List<SkinSettingsDropdown> rulesetSkinDropdowns = new List<SkinSettingsDropdown>();
 
-        private Bindable<bool> differentSkinPerMode = new BindableBool(false);
-
-        private FillFlowContainer modeSkins;
+        private FillFlowContainer rulesetSkins;
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -61,6 +59,18 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
+
+            foreach (var (ruleset, skin) in skins.rulesetSkins) {
+                rulesetSkinDropdowns.Add(
+                    new SkinSettingsDropdown
+                    {
+                        LabelText = ruleset.Name,
+                        Current = skin,
+                        Keywords = new[] { @"skins" },
+                    }
+                );
+            }
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown
@@ -78,43 +88,17 @@ namespace osu.Game.Overlays.Settings.Sections
                 new DeleteSkinButton(),
                 new SettingsCheckbox
                 {
-                    LabelText = "Use different skin for each mode",
-                    Current = differentSkinPerMode,
+                    LabelText = SkinSettingsStrings.differentSkinPerRuleset,
+                    Current = skins.differentSkinPerRuleset,
                 },
-                modeSkins = new FillFlowContainer 
+                rulesetSkins = new FillFlowContainer 
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0, 8),
                     Direction = FillDirection.Vertical,
-                    Children = modeSkinDropdowns = new SkinSettingsDropdown[]
-                    {
-                        new SkinSettingsDropdown
-                        {
-                            LabelText = "osu!",
-                            Current = skins.CurrentSkinInfo,
-                            Keywords = new[] { @"skins" }
-                        },
-                        new SkinSettingsDropdown
-                        {
-                            LabelText = "osu!taiko",
-                            Current = skins.CurrentSkinInfo,
-                            Keywords = new[] { @"skins" }
-                        },
-                        new SkinSettingsDropdown
-                        {
-                            LabelText = "osu!catch",
-                            Current = skins.CurrentSkinInfo,
-                            Keywords = new[] { @"skins" }
-                        },
-                        new SkinSettingsDropdown
-                        {
-                            LabelText = "osu!mania",
-                            Current = skins.CurrentSkinInfo,
-                            Keywords = new[] { @"skins" }
-                        },
-                    },
+                    Children = rulesetSkinDropdowns,
                 },
             };
         }
@@ -123,7 +107,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             base.LoadComplete();
 
-            differentSkinPerMode.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
+            skins.differentSkinPerRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
@@ -144,10 +128,10 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateVisibility() 
         {
-            modeSkins.Hide();
+            rulesetSkins.Hide();
 
-            if (differentSkinPerMode.Value)
-                modeSkins.Show();
+            if (skins.differentSkinPerRuleset.Value)
+                rulesetSkins.Show();
         }
 
         private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
@@ -173,7 +157,10 @@ namespace osu.Game.Overlays.Settings.Sections
 
             Schedule(() => skinDropdown.Items = dropdownItems);
 
-            foreach (var dropdown in modeSkinDropdowns)
+            // random skin not supported for multiple rulesets, yet.
+            dropdownItems.Remove(random_skin_info);
+
+            foreach (var dropdown in rulesetSkinDropdowns)
                 Schedule(() => dropdown.Items = dropdownItems);
         }
 
