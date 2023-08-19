@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         Current = new BindableNumber<float>
                         {
-                            MinValue = -180,
-                            MaxValue = 180,
+                            MinValue = -360,
+                            MaxValue = 360,
                             Precision = 1
                         },
                         Instantaneous = true
