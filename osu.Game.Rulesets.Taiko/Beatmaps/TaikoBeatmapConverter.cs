@@ -139,7 +139,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            SliderVelocity = obj is IHasSliderVelocity velocityData ? velocityData.SliderVelocity : 1
                         };
                     }
 

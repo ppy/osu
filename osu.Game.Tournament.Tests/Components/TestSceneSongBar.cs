@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
@@ -17,11 +18,11 @@ namespace osu.Game.Tournament.Tests.Components
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
 
-        [Test]
-        public void TestSongBar()
-        {
-            SongBar songBar = null!;
+        private SongBar songBar = null!;
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
             AddStep("create bar", () => Child = songBar = new SongBar
             {
                 RelativeSizeAxes = Axes.X,
@@ -29,7 +30,11 @@ namespace osu.Game.Tournament.Tests.Components
                 Origin = Anchor.Centre
             });
             AddUntilStep("wait for loaded", () => songBar.IsLoaded);
+        }
 
+        [Test]
+        public void TestSongBar()
+        {
             AddStep("set beatmap", () =>
             {
                 var beatmap = CreateAPIBeatmap(Ruleset.Value);

@@ -810,10 +810,13 @@ namespace osu.Game.Screens.Play
             if (!canShowResults && !forceImport)
                 return Task.FromResult<ScoreInfo>(null);
 
+            // Clone score before beginning any async processing.
+            // - Must be run synchronously as the score may potentially be mutated in the background.
+            // - Must be cloned for the same reason.
+            Score scoreCopy = Score.DeepClone();
+
             return prepareScoreForDisplayTask = Task.Run(async () =>
             {
-                var scoreCopy = Score.DeepClone();
-
                 try
                 {
                     await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
