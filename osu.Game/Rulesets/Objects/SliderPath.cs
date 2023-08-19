@@ -198,8 +198,16 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Returns the progress values at which segments of the path end.
+        /// Returns the progress values at which (control point) segments of the path end.
+        /// Ranges from 0 (beginning of the path) to 1 (end of the path) to infinity (beyond the end of the path).
         /// </summary>
+        /// <example>In case <see cref="Distance"/> is less than <see cref="CalculatedDistance"/>,
+        /// the last segment ends after the end of the path, hence it returns a value greater than 1.
+        /// <para/>
+        /// In case <see cref="Distance"/> is greater than <see cref="CalculatedDistance"/>,
+        /// the last segment ends before the end of the path, hence it returns a value less than 1.</example>
+        /// <remarks><see cref="PositionAt"/> truncates the progression values to [0,1],
+        /// so you can't use this method to retrieve the positions of segment ends beyond the end of the path.</remarks>
         public IEnumerable<double> GetSegmentEnds()
         {
             ensureValid();
