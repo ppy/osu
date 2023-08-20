@@ -71,6 +71,9 @@ namespace osu.Game.Overlays.SkinEditor
                     scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
             }
 
+            // If scaling reverses the selection, don't scale.
+            if (adjustedRect.Width + scale.X < 0 || adjustedRect.Height + scale.Y < 0) return true;
+
             if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
             if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
 
@@ -79,8 +82,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
-                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
+                adjustedRect.Width / selectionRect.Width,
+                adjustedRect.Height / selectionRect.Height
             );
 
             foreach (var b in SelectedBlueprints)
