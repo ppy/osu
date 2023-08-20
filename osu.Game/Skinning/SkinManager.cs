@@ -49,13 +49,15 @@ namespace osu.Game.Skinning
 
         private readonly GameHost host;
 
-        private readonly RealmRulesetStore rulesetStore;
-
         private readonly IResourceStore<byte[]> resources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
         public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
+
+        public readonly Bindable<bool> DifferentSkinPerRuleset = new BindableBool(false);
+
+        public readonly Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> RulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
 
         private readonly SkinImporter skinImporter;
 
@@ -63,13 +65,11 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> userFiles;
 
+        private readonly Bindable<RulesetInfo> activeRuleset;
+
         private Skin argonSkin { get; }
 
         private Skin trianglesSkin { get; }
-
-        public Bindable<bool> DifferentSkinPerRuleset = new BindableBool(false);
-
-        public Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> RulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
 
         public override bool PauseImports
         {
@@ -81,21 +81,22 @@ namespace osu.Game.Skinning
             }
         }
 
-        public SkinManager(Storage storage, RealmAccess realm, GameHost host, RealmRulesetStore rulesetStore, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler, RulesetStore rulesetStore, Bindable<RulesetInfo> activeRuleset)
             : base(storage, realm)
         {
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
-            this.rulesetStore = rulesetStore;
             this.resources = resources;
+            this.activeRuleset = activeRuleset;
 
             foreach (var ruleset in rulesetStore.AvailableRulesets)
             {
                 Bindable<Live<SkinInfo>> rulesetSkin = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
                 rulesetSkin.ValueChanged += skin =>
                 {
-                    mergeSkins();
+                    if (activeRuleset.Value == ruleset)
+                        SetSkinFromRuleset(ruleset);
                 };
                 RulesetSkins.Add(ruleset, rulesetSkin);
             }
@@ -128,15 +129,17 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.ValueChanged += skin =>
             {
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
-                if (DifferentSkinPerRuleset.Value)
-                    mergeSkins();
             };
 
             DifferentSkinPerRuleset.ValueChanged += newBool =>
             {
-                CurrentSkin.Value = CurrentSkinInfo.Value.PerformRead(GetSkin);
                 if (newBool.NewValue)
-                    mergeSkins();
+                    SetSkinFromRuleset(activeRuleset.Value);
+            };
+
+            activeRuleset.ValueChanged += ruleset =>
+            {
+                SetSkinFromRuleset(ruleset.NewValue);
             };
 
             CurrentSkin.Value = argonSkin;
@@ -154,9 +157,13 @@ namespace osu.Game.Skinning
             };
         }
 
-        private void mergeSkins()
+        public void SetSkinFromRuleset(RulesetInfo ruleset)
         {
-            ;
+            if (!DifferentSkinPerRuleset.Value) return;
+
+            if (!RulesetSkins.ContainsKey(ruleset)) return;
+
+            CurrentSkinInfo.Value = RulesetSkins[ruleset].Value;
         }
 
         public void SelectRandomSkin()

@@ -158,9 +158,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
             Schedule(() => skinDropdown.Items = dropdownItems);
 
-            // random skin not supported for multiple rulesets, yet.
-            dropdownItems.Remove(random_skin_info);
-
             foreach (var dropdown in rulesetSkinDropdowns)
                 Schedule(() => dropdown.Items = dropdownItems);
         }
