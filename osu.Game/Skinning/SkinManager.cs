@@ -128,6 +128,9 @@ namespace osu.Game.Skinning
 
             CurrentSkinInfo.ValueChanged += skin =>
             {
+                if (DifferentSkinPerRuleset.Value && RulesetSkins.ContainsKey(activeRuleset.Value))
+                    RulesetSkins[activeRuleset.Value].Value = skin.NewValue;
+
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
             };
 
