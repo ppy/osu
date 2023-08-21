@@ -186,7 +186,7 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var score in r.All<ScoreInfo>().Where(s => !s.TotalScoreUpgradeFailed))
+                foreach (var score in r.All<ScoreInfo>().Where(s => !s.BackgroundReprocessingFailed))
                 {
                     if (score.BeatmapInfo != null
                         && score.Statistics.Sum(kvp => kvp.Value) > 0
@@ -225,7 +225,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
-                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.TotalScoreUpgradeFailed = true);
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                 }
             }
         }
@@ -235,7 +235,7 @@ namespace osu.Game
             Logger.Log("Querying for scores that need total score conversion...");
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => !s.TotalScoreUpgradeFailed && s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
                                                                              .AsEnumerable().Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
@@ -284,7 +284,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
-                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.TotalScoreUpgradeFailed = true);
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                     ++failedCount;
                 }
             }
