@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Database
         {
             ScoreInfo scoreInfo = null!;
 
-            AddStep("Add score which requires upgrade (but has no beatmap)", () =>
+            AddStep("Add score which requires upgrade (and has beatmap)", () =>
             {
                 Realm.Write(r =>
                 {
