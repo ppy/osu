@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             lastAngle = thisAngle;
 
-            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation / 2 - Rotation) > 5f;
+            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
 
-            Rotation = (float)Interpolation.Damp(Rotation, currentRotation / 2, 0.99, Math.Abs(Time.Elapsed));
+            Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
         /// <summary>

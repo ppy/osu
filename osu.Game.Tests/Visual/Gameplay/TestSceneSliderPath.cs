@@ -185,6 +185,37 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("shorten to -10 length", () => path.ExpectedDistance.Value = -10);
         }
 
+        [Test]
+        public void TestGetSegmentEnds()
+        {
+            var positions = new[]
+            {
+                Vector2.Zero,
+                new Vector2(100, 0),
+                new Vector2(100),
+                new Vector2(200, 100),
+            };
+            double[] distances = { 100d, 200d, 300d };
+
+            AddStep("create path", () => path.ControlPoints.AddRange(positions.Select(p => new PathControlPoint(p, PathType.Linear))));
+            AddAssert("segment ends are correct", () => path.GetSegmentEnds(), () => Is.EqualTo(distances.Select(d => d / 300)));
+            AddAssert("segment end positions recovered", () => path.GetSegmentEnds().Select(p => path.PositionAt(p)), () => Is.EqualTo(positions.Skip(1)));
+
+            AddStep("lengthen last segment", () => path.ExpectedDistance.Value = 400);
+            AddAssert("segment ends are correct", () => path.GetSegmentEnds(), () => Is.EqualTo(distances.Select(d => d / 400)));
+            AddAssert("segment end positions recovered", () => path.GetSegmentEnds().Select(p => path.PositionAt(p)), () => Is.EqualTo(positions.Skip(1)));
+
+            AddStep("shorten last segment", () => path.ExpectedDistance.Value = 150);
+            AddAssert("segment ends are correct", () => path.GetSegmentEnds(), () => Is.EqualTo(distances.Select(d => d / 150)));
+            // see remarks in `GetSegmentEnds()` xmldoc (`SliderPath.PositionAt()` clamps progress to [0,1]).
+            AddAssert("segment end positions not recovered", () => path.GetSegmentEnds().Select(p => path.PositionAt(p)), () => Is.EqualTo(new[]
+            {
+                positions[1],
+                new Vector2(100, 50),
+                new Vector2(100, 50),
+            }));
+        }
+
         private List<PathControlPoint> createSegment(PathType type, params Vector2[] controlPoints)
         {
             var points = controlPoints.Select(p => new PathControlPoint { Position = p }).ToList();
