@@ -14,6 +14,7 @@ namespace osu.Game.Tournament.Tests.Components
     public partial class TestSceneSongBar : TournamentTestScene
     {
         private SongBar songBar = null!;
+        private TournamentBeatmap ladderBeatmap = null!;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -22,9 +23,10 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("setup picks bans", () =>
             {
+                ladderBeatmap = CreateSampleBeatmap();
                 Ladder.CurrentMatch.Value!.PicksBans.Add(new BeatmapChoice
                 {
-                    BeatmapID = CreateSampleBeatmap().OnlineID,
+                    BeatmapID = ladderBeatmap.OnlineID,
                     Team = TeamColour.Red,
                     Type = ChoiceType.Pick,
                 });
@@ -52,7 +54,7 @@ namespace osu.Game.Tournament.Tests.Components
                 beatmap.StarRating = 4.56f;
                 beatmap.Length = 123456;
                 beatmap.BPM = 133;
-                beatmap.OnlineID = CreateSampleBeatmap().OnlineID;
+                beatmap.OnlineID = ladderBeatmap.OnlineID;
 
                 songBar.Beatmap = new TournamentBeatmap(beatmap);
             });
