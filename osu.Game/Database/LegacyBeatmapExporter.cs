@@ -72,7 +72,16 @@ namespace osu.Game.Database
 
                 if (hitObject is not IHasPath hasPath) continue;
 
-                // Make sure the last control point is inherit type
+                // stable's hit object parsing expects the entire slider to use only one type of curve,
+                // and happens to use the last non-empty curve type read for the entire slider.
+                // this clear of the last control point type handles an edge case
+                // wherein the last control point of an otherwise-single-segment slider path has a different type than previous,
+                // which would lead to sliders being mangled when exported back to stable.
+                // normally, that would be handled by the `BezierConverter.ConvertToModernBezier()` call below,
+                // which outputs a slider path containing only Bezier control points,
+                // but a non-inherited last control point is (rightly) not considered to be starting a new segment,
+                // therefore it would fail to clear the `CountSegments() <= 1` check.
+                // by clearing explicitly we both fix the issue and avoid unnecessary conversions to Bezier.
                 if (hasPath.Path.ControlPoints.Count > 1)
                     hasPath.Path.ControlPoints[^1].Type = null;
 
