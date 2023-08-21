@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,10 +17,10 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyStoryboardDecoder : LegacyDecoder<Storyboard>
     {
-        private StoryboardSprite storyboardSprite;
-        private CommandTimelineGroup timelineGroup;
+        private StoryboardSprite? storyboardSprite;
+        private CommandTimelineGroup? timelineGroup;
 
-        private Storyboard storyboard;
+        private Storyboard storyboard = null!;
 
         private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 #pragma warning disable 618
 
 using System;
@@ -36,11 +34,11 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         private const double control_point_leniency = 1;
 
-        internal static RulesetStore RulesetStore;
+        internal static RulesetStore? RulesetStore;
 
-        private Beatmap beatmap;
+        private Beatmap beatmap = null!;
 
-        private ConvertHitObjectParser parser;
+        private ConvertHitObjectParser? parser;
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
@@ -222,7 +220,7 @@ namespace osu.Game.Beatmaps.Formats
                 case @"Mode":
                     int rulesetID = Parsing.ParseInt(pair.Value);
 
-                    beatmap.BeatmapInfo.Ruleset = RulesetStore.GetRuleset(rulesetID) ?? throw new ArgumentException("Ruleset is not available locally.");
+                    beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(rulesetID) ?? throw new ArgumentException("Ruleset is not available locally.");
 
                     switch (rulesetID)
                     {
