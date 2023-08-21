@@ -330,7 +330,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             ClearNestedHitObjects();
 
             // Changes in state trigger defaults applied trigger state updates.
-            // When a new hitobject is applied, OnApply() automatically performs a state update anyway.
+            // When a new hitobject is applied, OnApply() automatically performs a state update.
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
             entry.RevertResult -= onRevertResult;
@@ -391,6 +391,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Apply(Entry);
 
             // Applied defaults indicate a change in hit object state.
+            // We need to update the judgement result time to the new end time
+            // and update state to ensure the hit object fades out at the correct time.
             if (Result is not null)
             {
                 Result.TimeOffset = 0;
