@@ -82,6 +82,12 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
+        // Apply a fixed rate change when accurately hitting notes, to counteract overcorrection stagnating or even slowing down an accurate but unstable human player.
+        private const double rate_change_on_hit = max_allowable_rate_change * 0.95;
+
+        // The threshold below which we'll reward the player's high accuracy with a speed up.
+        private const double rate_change_threshold = 0.05;
+
         private IAdjustableAudioComponent? track;
         private double targetRate = 1d;
 
@@ -258,8 +264,13 @@ namespace osu.Game.Rulesets.Mods
                 return rate_change_on_miss;
 
             double prevEndTime = precedingEndTimes[result.HitObject];
+            var rateChange = (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime);
+
+            if (Math.Abs(rateChange - 1.0) < rate_change_threshold) // Reward well-timed results with a speed up.
+                return rate_change_on_hit;
+
             return Math.Clamp(
-                (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime),
+                rateChange,
                 min_allowable_rate_change,
                 max_allowable_rate_change
             );
