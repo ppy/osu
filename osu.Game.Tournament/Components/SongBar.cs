@@ -234,7 +234,7 @@ namespace osu.Game.Tournament.Components
                         }
                     }
                 },
-                new UnmaskedTournamentBeatmapPanel(beatmap)
+                new TournamentBeatmapPanel(beatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,
@@ -275,20 +275,6 @@ namespace osu.Game.Tournament.Components
                     AddText(new TournamentSpriteText { Text = content }, s => cp(s, true));
                 }
             }
-        }
-    }
-
-    internal partial class UnmaskedTournamentBeatmapPanel : TournamentBeatmapPanel
-    {
-        public UnmaskedTournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
-            : base(beatmap, mod)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Masking = false;
         }
     }
 }
