@@ -86,7 +86,7 @@ namespace osu.Game.Scoring
         /// Should be used to ensure we don't repeatedly attempt to update the same scores each startup even though we already know they will fail.
         /// </summary>
         /// <remarks>
-        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur(missing beatmap file on disk).
+        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur (missing beatmap file on disk).
         /// </remarks>
         public bool TotalScoreUpgradeFailed { get; set; }
 
