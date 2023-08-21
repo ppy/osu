@@ -207,6 +207,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("shorten last segment", () => path.ExpectedDistance.Value = 150);
             AddAssert("segment ends are correct", () => path.GetSegmentEnds(), () => Is.EqualTo(distances.Select(d => d / 150)));
+            // see remarks in `GetSegmentEnds()` xmldoc (`SliderPath.PositionAt()` clamps progress to [0,1]).
             AddAssert("segment end positions not recovered", () => path.GetSegmentEnds().Select(p => path.PositionAt(p)), () => Is.EqualTo(new[]
             {
                 positions[1],
