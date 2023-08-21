@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
-        private readonly LinkedList<HitObjectLifetimeEntry> judgedEntries;
+        private readonly Stack<HitObjectLifetimeEntry> judgedEntries;
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -125,13 +125,12 @@ namespace osu.Game.Rulesets.UI
                 h.NewResult += onNewResult;
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
-                h.HitObjectUpdated += onHitObjectUpdated;
             }));
 
             entryManager.OnEntryAdded += onEntryAdded;
             entryManager.OnEntryRemoved += onEntryRemoved;
 
-            judgedEntries = new LinkedList<HitObjectLifetimeEntry>();
+            judgedEntries = new Stack<HitObjectLifetimeEntry>();
         }
 
         [BackgroundDependencyLoader]
@@ -271,16 +270,15 @@ namespace osu.Game.Rulesets.UI
             }
 
             // When rewinding, revert future judgements in the reverse order.
-            while (judgedEntries.Last is not null)
+            while (judgedEntries.Count > 0)
             {
-                var result = judgedEntries.Last.Value.Result;
+                var result = judgedEntries.Peek().Result;
                 Debug.Assert(result?.RawTime != null);
 
                 if (Time.Current >= result.RawTime.Value)
                     break;
 
-                revertResult(judgedEntries.Last.Value);
-                judgedEntries.RemoveLast();
+                revertResult(judgedEntries.Pop());
             }
         }
 
@@ -473,31 +471,10 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        private void onHitObjectUpdated(HitObject _)
-        {
-            // The time of judged entries may have changed, so we need to re-sort the list to preserve the invariant of monotone time.
-            // Insertion sort on linked-list is O(n) for nearly-sorted lists, which is the case here.
-            var current = judgedEntries.First;
-
-            while (current?.Next is not null)
-            {
-                var next = current.Next;
-
-                if (current.Value.Result?.RawTime > next.Value.Result?.RawTime)
-                {
-                    judgedEntries.Remove(next);
-                    judgedEntries.AddBefore(current, next);
-                    current = next.Previous;
-                }
-                else
-                    current = next;
-            }
-        }
-
         private void onNewResult(DrawableHitObject drawable, JudgementResult result)
         {
             Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null);
-            judgedEntries.AddLast(drawable.Entry.AsNonNull());
+            judgedEntries.Push(drawable.Entry.AsNonNull());
 
             NewResult?.Invoke(drawable, result);
         }
