@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 0.5;
+        public override double ScoreMultiplier => MinimumRate.Value;
 
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
@@ -39,7 +39,23 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
-            MaxValue = 2,
+            MaxValue = 4,
+            Precision = 0.01
+        };
+
+        [SettingSource("Minimum rate", "The minimum speed of the track")]
+        public BindableNumber<double> MinimumRate { get; } = new BindableDouble(0.5)
+        {
+            MinValue = 0.5,
+            MaxValue = 4,
+            Precision = 0.01
+        };
+
+        [SettingSource("Maximum rate", "The maximum speed of the track")]
+        public BindableNumber<double> MaximumRate { get; } = new BindableDouble(2)
+        {
+            MinValue = 0.5,
+            MaxValue = 4,
             Precision = 0.01
         };
 
@@ -50,17 +66,13 @@ namespace osu.Game.Rulesets.Mods
         /// The instantaneous rate of the track.
         /// Every frame this mod will attempt to smoothly adjust this to meet <see cref="targetRate"/>.
         /// </summary>
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1)
-        {
-            MinValue = min_allowable_rate,
-            MaxValue = max_allowable_rate,
-        };
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble(1);
 
-        // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.
+        // The two properties below denote the maximum allowable range of rates that `SpeedChange` can take.
         // The range is purposefully wider than the range of values that `InitialRate` allows
         // in order to give some leeway for change even when extreme initial rates are chosen.
-        private const double min_allowable_rate = 0.4d;
-        private const double max_allowable_rate = 2.5d;
+        private double MinAllowableRate => MinimumRate.Value - 0.4d;
+        private double MaxAllowableRate => MaximumRate.Value + 0.5d;
 
         // The two constants below denote the maximum allowable change in rate caused by a single hit
         // This prevents sudden jolts caused by a badly-timed hit.
@@ -103,7 +115,7 @@ namespace osu.Game.Rulesets.Mods
         /// </para>
         /// <para>
         /// With the above assumptions, the player is rushing / hitting early, which means that the track should speed up to match.
-        /// Therefore, the approximated target rate for this object would be equal to 500 / 480 * <see cref="InitialRate"/>.
+        /// Therefore, the approximated target rate for this object would be equal to 500 / 480 * <see cref="SpeedChange"/>.
         /// </para>
         /// </example>
         private readonly List<double> recentRates = Enumerable.Repeat(1d, recent_rate_count).ToList();
@@ -124,10 +136,23 @@ namespace osu.Game.Rulesets.Mods
 
         public ModAdaptiveSpeed()
         {
+            InitialRate.MinValue = MinimumRate.Value;
+            InitialRate.MaxValue = MaximumRate.Value;
+
             InitialRate.BindValueChanged(val =>
             {
                 SpeedChange.Value = val.NewValue;
                 targetRate = val.NewValue;
+            });
+            MinimumRate.BindValueChanged(val =>
+            {
+                InitialRate.MinValue = MinimumRate.Value = Math.Min(InitialRate.MaxValue, val.NewValue);
+                InitialRate.Value = Math.Max(InitialRate.Value, InitialRate.MinValue);
+            });
+            MaximumRate.BindValueChanged(val =>
+            {
+                InitialRate.MaxValue = MaximumRate.Value = Math.Max(InitialRate.MinValue, val.NewValue);
+                InitialRate.Value = Math.Min(InitialRate.Value, InitialRate.MaxValue);
             });
             AdjustPitch.BindValueChanged(adjustPitchChanged);
         }
@@ -164,7 +189,7 @@ namespace osu.Game.Rulesets.Mods
                 ratesForRewinding.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
 
-                recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
+                recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, MinAllowableRate, MaxAllowableRate));
 
                 updateTargetRate();
             };
