@@ -99,9 +99,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public void MissForcefully()
         {
-            // Not miss forcefully when Clock is on rewinding
+            // Not miss forcefully when clock is on rewinding
             if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return;
+
             ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
