@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Mods
                 return rate_change_on_miss;
 
             double prevEndTime = precedingEndTimes[result.HitObject];
-            var rateChange = (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime);
+            double rateChange = (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime);
 
             if (Math.Abs(rateChange - 1.0) < rate_change_threshold) // Reward well-timed results with a speed up.
                 return rate_change_on_hit;
