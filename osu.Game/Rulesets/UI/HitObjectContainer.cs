@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.UI
 
         private void unbindUpdated(DrawableHitObject hitObject)
         {
-            hitObject.DefaultsApplied -= onDefaultsApplied;
+            hitObject.DefaultsApplied += onDefaultsApplied;
         }
 
         private void unbindAllUpdated()
