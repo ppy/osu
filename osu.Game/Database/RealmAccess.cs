@@ -83,7 +83,7 @@ namespace osu.Game.Database
         /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
         /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
         /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
-        /// 35   2023-08-21    Add TotalScoreUpgradeFailed flag to ScoreInfo to track upgrade failures.
+        /// 34   2023-08-21    Add TotalScoreUpgradeFailed flag to ScoreInfo to track upgrade failures.
         /// </summary>
         private const int schema_version = 34;
 
