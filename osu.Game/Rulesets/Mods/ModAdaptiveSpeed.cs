@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Mods
         // The two properties below denote the maximum allowable range of rates that `SpeedChange` can take.
         // The range is purposefully wider than the range of values that `InitialRate` allows
         // in order to give some leeway for change even when extreme initial rates are chosen.
-        private double MinAllowableRate => MinimumRate.Value - 0.4d;
-        private double MaxAllowableRate => MaximumRate.Value + 0.5d;
+        private double minAllowableRate => MinimumRate.Value - 0.4d;
+        private double maxAllowableRate => MaximumRate.Value + 0.5d;
 
         // The two constants below denote the maximum allowable change in rate caused by a single hit
         // This prevents sudden jolts caused by a badly-timed hit.
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Mods
                 ratesForRewinding.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
 
-                recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, MinAllowableRate, MaxAllowableRate));
+                recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, minAllowableRate, maxAllowableRate));
 
                 updateTargetRate();
             };
