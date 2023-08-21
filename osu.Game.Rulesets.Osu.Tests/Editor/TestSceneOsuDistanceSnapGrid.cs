@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -70,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             base.Content.Children = new Drawable[]
             {
                 editorClock = new EditorClock(editorBeatmap),
-                snapProvider,
+                new PopoverContainer { Child = snapProvider },
                 Content
             };
         }
 
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+        protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
 
         [SetUp]
         public void Setup() => Schedule(() =>
