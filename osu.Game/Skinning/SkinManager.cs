@@ -59,6 +59,8 @@ namespace osu.Game.Skinning
 
         public readonly Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> RulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
 
+        public readonly Bindable<string> SerializedDict = new Bindable<string>("");
+
         private readonly SkinImporter skinImporter;
 
         private readonly LegacySkinExporter skinExporter;
@@ -97,6 +99,8 @@ namespace osu.Game.Skinning
                 {
                     if (activeRuleset.Value == ruleset)
                         SetSkinFromRuleset(ruleset);
+
+                    serializeDict();
                 };
                 RulesetSkins.Add(ruleset, rulesetSkin);
             }
@@ -385,5 +389,49 @@ namespace osu.Game.Skinning
 
             CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;
         }
+
+        private void serializeDict()
+        {
+            string result = "";
+            foreach (var (ruleset, skin) in RulesetSkins)
+                result += string.Format("[{0},{1}]:", ruleset.ShortName, skin.Value.ID.ToString());
+            SerializedDict.Value = result;
+        }
+
+        private void deserializeString(string serializedDict)
+        {
+            foreach (string rulesetSkin in serializedDict.Split(":"))
+            {
+                if (rulesetSkin.Length == 0 || !rulesetSkin.Contains(',')) continue;
+
+                int splitIndex = rulesetSkin.IndexOf(',');
+                string rulesetShortName = rulesetSkin.Substring(1, splitIndex - 1);
+                string guidString = rulesetSkin.Substring(splitIndex + 1, rulesetSkin.Length - splitIndex - 2);
+
+                Live<SkinInfo> skinInfo = null;
+
+                if (Guid.TryParse(guidString, out var guid))
+                    skinInfo = Query(s => s.ID == guid);
+
+                if (skinInfo == null)
+                {
+                    if (guid == SkinInfo.CLASSIC_SKIN)
+                        skinInfo = DefaultClassicSkin.SkinInfo;
+                }
+
+                // The Equals operator only uses the short name
+                RulesetInfo ruleset = new RulesetInfo(rulesetShortName, "", "", -1);
+
+                if (RulesetSkins.ContainsKey(ruleset))
+                    RulesetSkins[ruleset].Value = skinInfo ?? trianglesSkin.SkinInfo;
+            }
+        }
+
+        public void SetRulesetSkinsFromConfiguration(bool diffEachRuleset, string serializedDict)
+        {
+            DifferentSkinPerRuleset.Value = diffEachRuleset;
+            deserializeString(serializedDict);
+        }
+
     }
 }

@@ -36,6 +36,8 @@ namespace osu.Game.Configuration
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
+            SetDefault(OsuSetting.DifferentSkinPerRuleset, false);
+            SetDefault(OsuSetting.SerializedRulesetSkinsDict, "");
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -390,6 +392,8 @@ namespace osu.Game.Configuration
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
-        ReplaySettingsOverlay
+        ReplaySettingsOverlay,
+        DifferentSkinPerRuleset,
+        SerializedRulesetSkinsDict
     }
 }

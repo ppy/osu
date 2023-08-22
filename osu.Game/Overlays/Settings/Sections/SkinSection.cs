@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Settings.Sections
                     Children = rulesetSkinDropdowns,
                 },
             };
+
+            updateVisibility();
         }
 
         protected override void LoadComplete()
