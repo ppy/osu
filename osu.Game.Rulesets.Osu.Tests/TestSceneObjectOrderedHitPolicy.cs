@@ -11,17 +11,20 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -83,6 +86,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // note lock prevented the object from being hit, so the judgement offset should be very late.
             addJudgementOffsetAssert(hitObjects[0], referenceHitWindows.WindowFor(HitResult.Meh));
+            addClickActionAssert(0, ClickAction.Shake);
         }
 
         /// <summary>
@@ -119,6 +123,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // note lock prevented the object from being hit, so the judgement offset should be very late.
             addJudgementOffsetAssert(hitObjects[0], referenceHitWindows.WindowFor(HitResult.Meh));
+            addClickActionAssert(0, ClickAction.Shake);
         }
 
         /// <summary>
@@ -155,6 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // note lock prevented the object from being hit, so the judgement offset should be very late.
             addJudgementOffsetAssert(hitObjects[0], referenceHitWindows.WindowFor(HitResult.Meh));
+            addClickActionAssert(0, ClickAction.Shake);
         }
 
         /// <summary>
@@ -192,6 +198,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Meh);
             addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
             addJudgementOffsetAssert(hitObjects[0], -90); // time_second_circle - first_circle_time - 90
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
         }
 
         /// <summary>
@@ -229,6 +237,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Ok);
             addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
             addJudgementOffsetAssert(hitObjects[1], -100); // time_second_circle - first_circle_time
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
         }
 
         /// <summary>
@@ -271,6 +281,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Great);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
         }
 
         /// <summary>
@@ -314,6 +326,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[1], HitResult.Great);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
         }
 
         /// <summary>
@@ -353,6 +367,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
+            addClickActionAssert(0, ClickAction.Hit);
         }
 
         [Test]
@@ -391,6 +406,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Great);
+            addClickActionAssert(0, ClickAction.Shake);
+            addClickActionAssert(1, ClickAction.Hit);
+            addClickActionAssert(2, ClickAction.Hit);
         }
 
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
@@ -411,8 +429,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, () => Is.EqualTo(offset).Within(100));
         }
 
+        private void addClickActionAssert(int inputIndex, ClickAction action)
+            => AddAssert($"input #{inputIndex} resulted in {action}", () => testPolicy.ClickActions[inputIndex], () => Is.EqualTo(action));
+
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         private List<JudgementResult> judgementResults = null!;
+        private TestLegacyHitPolicy testPolicy = null!;
 
         private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames, [CallerMemberName] string testCaseName = "")
         {
@@ -513,6 +535,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
+            AddStep("Substitute hit policy", () => currentPlayer.ChildrenOfType<OsuPlayfield>().Single().HitPolicy = testPolicy = new TestLegacyHitPolicy());
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
@@ -538,6 +561,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                     ShowResults = false,
                 })
             {
+            }
+        }
+
+        private class TestLegacyHitPolicy : LegacyHitPolicy
+        {
+            public List<ClickAction> ClickActions { get; } = new List<ClickAction>();
+
+            public override ClickAction CheckHittable(DrawableHitObject hitObject, double time)
+            {
+                var action = base.CheckHittable(hitObject, time);
+                ClickActions.Add(action);
+                return action;
             }
         }
     }
