@@ -79,11 +79,14 @@ namespace osu.Game.Rulesets.Mods
         private const double min_allowable_rate_change = 0.9d;
         private const double max_allowable_rate_change = 1.11d;
 
+        // The rate multiplier used on hits and misses.
+        private const double rate_change_multiplier = 0.95;
+
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
-        private const double rate_change_on_miss = min_allowable_rate_change / 0.95;
+        private const double rate_change_on_miss = min_allowable_rate_change / rate_change_multiplier;
 
         // Apply a fixed rate change when accurately hitting notes, to counteract overcorrection stagnating or even slowing down an accurate but unstable human player.
-        private const double rate_change_on_hit = max_allowable_rate_change * 0.95;
+        private const double rate_change_on_hit = max_allowable_rate_change * rate_change_multiplier;
 
         // The threshold below which we'll reward the player's high accuracy with a speed up.
         private const double rate_change_threshold = 0.05;
