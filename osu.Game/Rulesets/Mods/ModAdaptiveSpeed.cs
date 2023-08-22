@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
         private const double max_allowable_rate_change = 1.11d;
 
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
-        private const double rate_change_on_miss = 0.95d;
+        private const double rate_change_on_miss = min_allowable_rate_change / 0.95;
 
         // Apply a fixed rate change when accurately hitting notes, to counteract overcorrection stagnating or even slowing down an accurate but unstable human player.
         private const double rate_change_on_hit = max_allowable_rate_change * 0.95;
