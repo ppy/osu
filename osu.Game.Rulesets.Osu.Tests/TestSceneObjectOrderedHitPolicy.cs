@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -380,7 +378,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => judgementResults.Single(r => r.HitObject == hitObject).Type, () => Is.EqualTo(result));
         }
 
-        private void addJudgementAssert(string name, Func<OsuHitObject> hitObject, HitResult result)
+        private void addJudgementAssert(string name, Func<OsuHitObject?> hitObject, HitResult result)
         {
             AddAssert($"{name} judgement is {result}",
                 () => judgementResults.Single(r => r.HitObject == hitObject()).Type == result);
@@ -392,8 +390,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => Precision.AlmostEquals(judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, offset, 100));
         }
 
-        private ScoreAccessibleReplayPlayer currentPlayer;
-        private List<JudgementResult> judgementResults;
+        private ScoreAccessibleReplayPlayer currentPlayer = null!;
+        private List<JudgementResult> judgementResults = null!;
 
         private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames)
         {
