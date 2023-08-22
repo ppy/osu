@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Compose
             new CheckOffscreenObjects(),
             new CheckTooShortSpinners(),
+            new CheckSpinnerRecoveryTime(),
 
             // Spread
             new CheckTimeDistanceEquality(),
