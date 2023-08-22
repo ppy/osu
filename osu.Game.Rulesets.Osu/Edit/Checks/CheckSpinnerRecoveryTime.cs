@@ -21,13 +21,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double? recommendedRecoveryTime_ = this.recommendedRecoveryTime(context.InterpretedDifficulty);
+            double? recommendedRecoveryTime = getRecommendedRecoveryTime(context.InterpretedDifficulty);
 
-            // If anything goes, we can skip this check
-            if (recommendedRecoveryTime_ is not double recommendedRecoveryTime)
-            {
+            if (!recommendedRecoveryTime.HasValue)
                 yield break;
-            }
 
             foreach (var (firstObject, secondObject) in context.Beatmap.HitObjects.Zip(context.Beatmap.HitObjects.Skip(1)))
             {
@@ -43,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 if (timeDifferenceInBeats < recommendedRecoveryTime)
                 {
                     yield return new IssueTemplateSpinnerRecoveryTooShort(this)
-                        .Create(spinner, timeDifferenceInBeats, recommendedRecoveryTime, context.InterpretedDifficulty);
+                        .Create(spinner, timeDifferenceInBeats, recommendedRecoveryTime.Value, context.InterpretedDifficulty);
                 }
             }
 
@@ -55,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         /// </summary>
         /// <param name="interpretedDifficulty">The difficulty to interpret the beatmap as</param>
         /// <returns>Number of beats if there is a guideline for it, null if anything goes</returns>
-        private double? recommendedRecoveryTime(DifficultyRating interpretedDifficulty)
+        private double? getRecommendedRecoveryTime(DifficultyRating interpretedDifficulty)
         {
             switch (interpretedDifficulty)
             {
