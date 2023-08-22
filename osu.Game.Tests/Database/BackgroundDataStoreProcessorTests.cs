@@ -8,6 +8,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual;
@@ -15,7 +18,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Database
 {
     [HeadlessTest]
-    public partial class BackgroundBeatmapProcessorTests : OsuTestScene, ILocalUserPlayInfo
+    public partial class BackgroundDataStoreProcessorTests : OsuTestScene, ILocalUserPlayInfo
     {
         public IBindable<bool> IsPlaying => isPlaying;
 
@@ -59,7 +62,7 @@ namespace osu.Game.Tests.Database
 
             AddStep("Run background processor", () =>
             {
-                Add(new TestBackgroundBeatmapProcessor());
+                Add(new TestBackgroundDataStoreProcessor());
             });
 
             AddUntilStep("wait for difficulties repopulated", () =>
@@ -98,7 +101,7 @@ namespace osu.Game.Tests.Database
 
             AddStep("Run background processor", () =>
             {
-                Add(new TestBackgroundBeatmapProcessor());
+                Add(new TestBackgroundDataStoreProcessor());
             });
 
             AddWaitStep("wait some", 500);
@@ -124,7 +127,58 @@ namespace osu.Game.Tests.Database
             });
         }
 
-        public partial class TestBackgroundBeatmapProcessor : BackgroundBeatmapProcessor
+        [Test]
+        public void TestScoreUpgradeSuccess()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (and has beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: r.All<BeatmapInfo>().First())
+                    {
+                        TotalScoreVersion = 30000002,
+                        LegacyTotalScore = 123456,
+                        IsLegacyScore = true,
+                    });
+                });
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
+        }
+
+        [Test]
+        public void TestScoreUpgradeFailed()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (but has no beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: new BeatmapInfo
+                    {
+                        BeatmapSet = new BeatmapSetInfo(),
+                        Ruleset = r.All<RulesetInfo>().First(),
+                    })
+                    {
+                        TotalScoreVersion = 30000002,
+                        IsLegacyScore = true,
+                    });
+                });
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
+        }
+
+        public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
         }

@@ -392,17 +392,18 @@ namespace osu.Game
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
-                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                Child = CreateScalingContainer().WithChild(globalBindings = new GlobalActionContainer(this)
                 {
-                    (GlobalCursorDisplay = new GlobalCursorDisplay
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    }),
-                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                    globalBindings = new GlobalActionContainer(this)
+                        (GlobalCursorDisplay = new GlobalCursorDisplay
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }),
+                    }
                 })
             });
 
