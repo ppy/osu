@@ -43,6 +43,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private AudioManager audio { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
@@ -175,6 +178,12 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             playDebouncedSample(notification.PopInSampleName);
+
+            if (notification.IsImportant)
+            {
+                game?.Window?.Flash();
+                notification.Closed += () => game?.Window?.CancelFlash();
+            }
 
             if (State.Value == Visibility.Hidden)
             {
