@@ -136,6 +136,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
+
+            RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }
 
         private ISkinSource currentSkin;
@@ -186,7 +188,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
 
-        public void Add(BarLine barLine) => base.Add(new DrawableBarLine(barLine));
+        public void Add(BarLine barLine) => base.Add(barLine);
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {

@@ -30,15 +30,15 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             get
             {
-                if (Stages.Count == 1)
-                    return Stages.First().ScreenSpaceDrawQuad;
+                RectangleF totalArea = RectangleF.Empty;
 
-                RectangleF area = RectangleF.Empty;
+                for (int i = 0; i < Stages.Count; ++i)
+                {
+                    var stageArea = Stages[i].ScreenSpaceDrawQuad.AABBFloat;
+                    totalArea = i == 0 ? stageArea : RectangleF.Union(totalArea, stageArea);
+                }
 
-                foreach (var stage in Stages)
-                    area = RectangleF.Union(area, stage.ScreenSpaceDrawQuad.AABBFloat);
-
-                return area;
+                return totalArea;
             }
         }
 
