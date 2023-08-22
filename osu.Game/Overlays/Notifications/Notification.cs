@@ -39,11 +39,6 @@ namespace osu.Game.Overlays.Notifications
         public virtual bool IsImportant => true;
 
         /// <summary>
-        /// Whether this notification should trigger a taskbar flash if the window is un-focused when posted.
-        /// </summary>
-        public bool FlashTaskbar { get; init; } = true;
-
-        /// <summary>
         /// Run on user activating the notification. Return true to close.
         /// </summary>
         public Func<bool>? Activated;

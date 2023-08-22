@@ -568,7 +568,6 @@ namespace osu.Game.Screens.Play
             public MutedNotification()
             {
                 Text = NotificationsStrings.GameVolumeTooLow;
-                FlashTaskbar = false;
             }
 
             [BackgroundDependencyLoader]
@@ -624,7 +623,6 @@ namespace osu.Game.Screens.Play
             public BatteryWarningNotification()
             {
                 Text = NotificationsStrings.BatteryLow;
-                FlashTaskbar = false;
             }
 
             [BackgroundDependencyLoader]
