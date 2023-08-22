@@ -344,6 +344,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
 
+        /// <summary>
+        /// "Toggle rotate control"
+        /// </summary>
+        public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
