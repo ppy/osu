@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private SkinSettingsDropdown skinDropdown;
 
-        private List<SkinSettingsDropdown> rulesetSkinDropdowns = new List<SkinSettingsDropdown>();
+        private readonly List<SkinSettingsDropdown> rulesetSkinDropdowns = new List<SkinSettingsDropdown>();
 
         private FillFlowContainer rulesetSkins;
 
@@ -59,7 +59,6 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
-
             foreach (var (ruleset, skin) in skins.RulesetSkins)
             {
                 rulesetSkinDropdowns.Add(

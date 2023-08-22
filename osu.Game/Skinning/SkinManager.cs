@@ -67,8 +67,6 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> userFiles;
 
-        private readonly Bindable<RulesetInfo> activeRuleset;
-
         private Skin argonSkin { get; }
 
         private Skin trianglesSkin { get; }
@@ -90,14 +88,13 @@ namespace osu.Game.Skinning
             this.scheduler = scheduler;
             this.host = host;
             this.resources = resources;
-            this.activeRuleset = activeRuleset;
 
             foreach (var ruleset in rulesetStore.AvailableRulesets)
             {
                 Bindable<Live<SkinInfo>> rulesetSkin = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
                 rulesetSkin.ValueChanged += skin =>
                 {
-                    if (activeRuleset.Value == ruleset)
+                    if (activeRuleset.Value.Equals(ruleset))
                         SetSkinFromRuleset(ruleset);
 
                     serializeDict();
@@ -394,7 +391,7 @@ namespace osu.Game.Skinning
         {
             string result = "";
             foreach (var (ruleset, skin) in RulesetSkins)
-                result += string.Format("[{0},{1}]:", ruleset.ShortName, skin.Value.ID.ToString());
+                result += $"[{ruleset.ShortName},{skin.Value.ID}]:";
             SerializedDict.Value = result;
         }
 
@@ -432,6 +429,5 @@ namespace osu.Game.Skinning
             DifferentSkinPerRuleset.Value = diffEachRuleset;
             deserializeString(serializedDict);
         }
-
     }
 }
