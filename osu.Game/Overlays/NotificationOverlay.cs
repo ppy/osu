@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
         private AudioManager audio { get; set; } = null!;
 
         [Resolved]
-        private OsuGame game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -181,8 +181,8 @@ namespace osu.Game.Overlays
 
             if (notification.FlashTaskbar)
             {
-                game.Window?.Flash(notification.IsImportant);
-                notification.Closed += () => game.Window?.CancelFlash();
+                game?.Window?.Flash(notification.IsImportant);
+                notification.Closed += () => game?.Window?.CancelFlash();
             }
 
             if (State.Value == Visibility.Hidden)
