@@ -179,9 +179,9 @@ namespace osu.Game.Overlays
 
             playDebouncedSample(notification.PopInSampleName);
 
-            if (notification.FlashTaskbar)
+            if (notification.IsImportant)
             {
-                game?.Window?.Flash(notification.IsImportant);
+                game?.Window?.Flash();
                 notification.Closed += () => game?.Window?.CancelFlash();
             }
 
