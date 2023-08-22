@@ -329,8 +329,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Entry.NestedEntries.RemoveAll(nestedEntry => nestedEntry is SyntheticHitObjectEntry);
             ClearNestedHitObjects();
 
-            // Changes in state trigger defaults applied trigger state updates.
-            // When a new hitobject is applied, OnApply() automatically performs a state update.
+            // Changes to `HitObject` properties trigger default application, which triggers `State` updates.
+            // When a new hitobject is applied, `OnApply()` automatically performs a state update.
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
             entry.RevertResult -= onRevertResult;
