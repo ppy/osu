@@ -411,6 +411,53 @@ namespace osu.Game.Rulesets.Osu.Tests
             addClickActionAssert(2, ClickAction.Hit);
         }
 
+        [Test]
+        public void TestOverlappingSliders()
+        {
+            const double time_first_slider = 1000;
+            const double time_second_slider = 1200;
+            Vector2 positionFirstSlider = new Vector2(100, 50);
+            Vector2 positionSecondSlider = new Vector2(100, 80);
+            var midpoint = (positionFirstSlider + positionSecondSlider) / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new Slider
+                {
+                    StartTime = time_first_slider,
+                    Position = positionFirstSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                },
+                new Slider
+                {
+                    StartTime = time_second_slider,
+                    Position = positionSecondSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_slider, Position = midpoint, Actions = { OsuAction.RightButton } },
+                new OsuReplayFrame { Time = time_first_slider + 25, Position = midpoint, Actions = { OsuAction.LeftButton, OsuAction.RightButton } },
+                new OsuReplayFrame { Time = time_first_slider + 50, Position = midpoint },
+                new OsuReplayFrame { Time = time_second_slider, Position = positionSecondSlider + new Vector2(0, 10), Actions = { OsuAction.LeftButton } },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Ok);
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
+        }
+
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
