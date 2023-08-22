@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
-        public ClickAction CheckHittable(DrawableHitObject hitObject, double time)
+        public virtual ClickAction CheckHittable(DrawableHitObject hitObject, double time)
         {
             var aliveObjects = HitObjectContainer.AliveObjects.ToList();
             int index = aliveObjects.IndexOf(hitObject);
