@@ -393,7 +393,6 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet?.BeatmapSet.ID == beatmapSet.ID)
                 previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
 
-            var newSet = createCarouselSet(beatmapSet);
             var removedSets = root.RemoveChild(beatmapSet.ID);
 
             foreach (var removedSet in removedSets)
@@ -405,13 +404,37 @@ namespace osu.Game.Screens.Select
                     expirePanelImmediately(removedDrawable);
             }
 
-            if (newSet != null)
+            if (beatmapsSplitOut)
             {
-                root.AddItem(newSet);
+                foreach (var beatmap in beatmapSet.Beatmaps)
+                {
+                    var newSet = createCarouselSet(new BeatmapSetInfo(new[] { beatmap })
+                    {
+                        ID = beatmapSet.ID
+                    });
 
-                // check if we can/need to maintain our current selection.
-                if (previouslySelectedID != null)
-                    select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
+                    if (newSet != null)
+                    {
+                        root.AddItem(newSet);
+
+                        // check if we can/need to maintain our current selection.
+                        if (previouslySelectedID != null)
+                            select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
+                    }
+                }
+            }
+            else
+            {
+                var newSet = createCarouselSet(beatmapSet);
+
+                if (newSet != null)
+                {
+                    root.AddItem(newSet);
+
+                    // check if we can/need to maintain our current selection.
+                    if (previouslySelectedID != null)
+                        select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
+                }
             }
 
             itemsCache.Invalidate();
