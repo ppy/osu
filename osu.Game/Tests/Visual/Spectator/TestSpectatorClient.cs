@@ -124,7 +124,12 @@ namespace osu.Game.Tests.Visual.Spectator
                 if (frames.Count == 0)
                     return;
 
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
+                var bundle = new FrameDataBundle(new ScoreInfo
+                {
+                    Combo = currentFrameIndex,
+                    TotalScore = (long)(currentFrameIndex * 123478 * RNG.NextDouble(0.99, 1.01)),
+                    Accuracy = RNG.NextDouble(0.98, 1),
+                }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
                 ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
                 frames.Clear();

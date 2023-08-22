@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private GameHost host { get; set; } = null!;
+        private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -444,7 +444,7 @@ namespace osu.Game.Overlays.Comments
 
         private void copyUrl()
         {
-            host.GetClipboard()?.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
+            clipboard.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
             onScreenDisplay?.Display(new CopyUrlToast());
         }
 

@@ -17,8 +17,8 @@ namespace osu.Game.Skinning
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
 
-            Scale = new Vector2(0.6f);
-            Margin = new MarginPadding(10);
+            Scale = new Vector2(0.6f * 0.96f);
+            Margin = new MarginPadding { Vertical = 9, Horizontal = 17 };
         }
 
         protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(LegacyFont.Score)

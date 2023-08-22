@@ -128,7 +128,7 @@ namespace osu.Game.Storyboards.Drawables
             //
             // In the case of storyboard animations, we want to synchronise with game time perfectly
             // so let's get a correct time based on gameplay clock and earliest transform.
-            PlaybackPosition = (beatSyncProvider.Clock?.CurrentTime ?? Clock.CurrentTime) - Animation.EarliestTransformTime;
+            PlaybackPosition = beatSyncProvider.Clock.CurrentTime - Animation.EarliestTransformTime;
         }
 
         private void skinSourceChanged()

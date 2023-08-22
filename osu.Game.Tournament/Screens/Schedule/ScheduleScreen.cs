@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -21,9 +19,9 @@ namespace osu.Game.Tournament.Screens.Schedule
 {
     public partial class ScheduleScreen : TournamentScreen
     {
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-        private Container mainContainer;
-        private LadderInfo ladder;
+        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
+        private Container mainContainer = null!;
+        private LadderInfo ladder = null!;
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder)
@@ -107,7 +105,7 @@ namespace osu.Game.Tournament.Screens.Schedule
             currentMatch.BindValueChanged(matchChanged, true);
         }
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
+        private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             var upcoming = ladder.Matches.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
             var conditionals = ladder
@@ -217,8 +215,6 @@ namespace osu.Game.Tournament.Screens.Schedule
                 Flow.Direction = FillDirection.Horizontal;
 
                 Scale = new Vector2(0.8f);
-
-                CurrentMatchSelectionBox.Scale = new Vector2(1.02f, 1.15f);
 
                 bool conditional = match is ConditionalTournamentMatch;
 

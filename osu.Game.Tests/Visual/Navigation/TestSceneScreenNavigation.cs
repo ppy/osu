@@ -723,6 +723,30 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestForceExitWithOperationInProgress()
+        {
+            AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            AddStep("start ongoing operation", () =>
+            {
+                Game.Notifications.Post(new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                });
+            });
+
+            AddStep("attempt exit", () =>
+            {
+                for (int i = 0; i < 2; ++i)
+                    Game.ScreenStack.CurrentScreen.Exit();
+            });
+            AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
         public void TestExitGameFromSongSelect()
         {
             PushAndConfirm(() => new TestPlaySongSelect());

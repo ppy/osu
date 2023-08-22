@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.Dialog
         {
             // Buttons are regularly added in BDL or LoadComplete, so let's schedule to ensure
             // they are ready to be pressed.
-            Schedule(() => Buttons.OfType<T>().First().TriggerClick());
+            Scheduler.AddOnce(() => Buttons.OfType<T>().FirstOrDefault()?.TriggerClick());
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

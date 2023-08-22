@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose
     public partial class ComposeScreen : EditorScreenWithTimeline, IGameplaySettings
     {
         [Resolved]
-        private GameHost host { get; set; }
+        private Clipboard hostClipboard { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; }
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
-            host.GetClipboard()?.SetText(getTimestamp());
+            hostClipboard.SetText(getTimestamp());
 
             if (CanCopy.Value)
                 clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();

@@ -124,7 +124,7 @@ namespace osu.Game.Beatmaps
         {
             base.Update();
 
-            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime)
+            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime - 100)
             {
                 // InterpolatingFramedClock won't interpolate backwards unless its source has an ElapsedFrameTime.
                 // See https://github.com/ppy/osu-framework/blob/ba1385330cc501f34937e08257e586c84e35d772/osu.Framework/Timing/InterpolatingFramedClock.cs#L91-L93

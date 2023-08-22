@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
@@ -120,18 +121,22 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         new OsuSpriteText
                                         {
                                             Text = "Overshoot",
+                                            Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.BottomCentre,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.BottomLeft,
+                                            Padding = new MarginPadding(2),
+                                            Rotation = -rotation,
                                             RelativePositionAxes = Axes.Both,
                                             Y = -(inner_portion + line_extension) / 2,
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = "Undershoot",
+                                            Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.TopCentre,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.TopRight,
+                                            Rotation = -rotation,
+                                            Padding = new MarginPadding(2),
                                             RelativePositionAxes = Axes.Both,
                                             Y = (inner_portion + line_extension) / 2,
                                         },
