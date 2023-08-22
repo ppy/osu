@@ -60,6 +60,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             var topLeft = new Vector2(minX, minY);
 
+            OriginPosition = new Vector2(PathRadius);
             Position = Parent.ToLocalSpace(topLeft);
             Vertices = points.Select(p => Parent.ToLocalSpace(p) - Parent.ToLocalSpace(topLeft)).ToList();
         }

@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -23,7 +24,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
-    public partial class BackgroundBeatmapProcessor : Component
+    /// <summary>
+    /// Performs background updating of data stores at startup.
+    /// </summary>
+    public partial class BackgroundDataStoreProcessor : Component
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
@@ -49,6 +53,9 @@ namespace osu.Game
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
@@ -57,7 +64,8 @@ namespace osu.Game
 
             Task.Factory.StartNew(() =>
             {
-                Logger.Log("Beginning background beatmap processing..");
+                Logger.Log("Beginning background data store processing..");
+
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
@@ -70,7 +78,7 @@ namespace osu.Game
                     return;
                 }
 
-                Logger.Log("Finished background beatmap processing!");
+                Logger.Log("Finished background data store processing!");
             });
         }
 
@@ -118,10 +126,27 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
+                // BeatmapProcessor is responsible for both online and local processing.
+                // In the case a user isn't logged in, it won't update LastOnlineUpdate and therefore re-queue,
+                // causing overhead from the non-online processing to redundantly run every startup.
+                //
+                // We may eventually consider making the Process call more specific (or avoid this in any number
+                // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
+                if (api.IsLoggedIn)
                 {
-                    Debug.Assert(b.BeatmapSet != null);
-                    beatmapSetIds.Add(b.BeatmapSet.ID);
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
+                    {
+                        Debug.Assert(b.BeatmapSet != null);
+                        beatmapSetIds.Add(b.BeatmapSet.ID);
+                    }
+                }
+                else
+                {
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0))
+                    {
+                        Debug.Assert(b.BeatmapSet != null);
+                        beatmapSetIds.Add(b.BeatmapSet.ID);
+                    }
                 }
             });
 
@@ -161,7 +186,7 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var score in r.All<ScoreInfo>())
+                foreach (var score in r.All<ScoreInfo>().Where(s => !s.BackgroundReprocessingFailed))
                 {
                     if (score.BeatmapInfo != null
                         && score.Statistics.Sum(kvp => kvp.Value) > 0
@@ -200,6 +225,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                 }
             }
         }
@@ -209,7 +235,7 @@ namespace osu.Game
             Logger.Log("Querying for scores that need total score conversion...");
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
                                                                              .AsEnumerable().Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
@@ -258,6 +284,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                     ++failedCount;
                 }
             }

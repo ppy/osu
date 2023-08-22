@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 10),
+                        Spacing = new Vector2(0, 5),
                         Child = Control = CreateControl(),
                     }
                 }
@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                defaultValueIndicatorContainer.Add(new RestoreDefaultValueButton<T>
+                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,

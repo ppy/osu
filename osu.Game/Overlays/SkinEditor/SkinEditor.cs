@@ -356,7 +356,7 @@ namespace osu.Game.Overlays.SkinEditor
                     {
                         new SettingsDropdown<SkinComponentsContainerLookup?>
                         {
-                            Items = availableTargets.Select(t => t.Lookup),
+                            Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
                         }
                     }
@@ -366,14 +366,14 @@ namespace osu.Game.Overlays.SkinEditor
             // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
             if (target.NewValue.Ruleset != null)
             {
-                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, target.NewValue.Ruleset)
                 {
                     RequestPlacement = requestPlacement
                 });
             }
 
             // Remove the ruleset from the lookup to get base components.
-            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, null)
             {
                 RequestPlacement = requestPlacement
             });

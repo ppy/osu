@@ -62,6 +62,20 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestPlaceWithMouseMovementOutsidePlayfield()
+        {
+            addMovementStep(new Vector2(200));
+            addClickStep(MouseButton.Left);
+
+            AddStep("move mouse out of screen", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + Vector2.One));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(2);
+            assertControlPointType(0, PathType.Linear);
+        }
+
+        [Test]
         public void TestPlaceNormalControlPoint()
         {
             addMovementStep(new Vector2(200));

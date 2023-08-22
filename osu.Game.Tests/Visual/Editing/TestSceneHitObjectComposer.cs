@@ -8,7 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -117,9 +117,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("move mouse to overlapping toggle button", () =>
             {
                 var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
-                var button = toolboxContainer.ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
+                var button = toolboxContainer.ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(getOverlapPoint(b)));
 
-                InputManager.MoveMouseTo(button);
+                InputManager.MoveMouseTo(getOverlapPoint(button));
             });
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
@@ -127,6 +127,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("attempt place circle", () => InputManager.Click(MouseButton.Left));
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+
+            Vector2 getOverlapPoint(DrawableTernaryButton ternaryButton)
+            {
+                var quad = ternaryButton.ScreenSpaceDrawQuad;
+                return quad.TopLeft + new Vector2(quad.Width * 9 / 10, quad.Height / 2);
+            }
         }
 
         [Test]
@@ -172,7 +178,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
-        public partial class EditorBeatmapContainer : Container
+        public partial class EditorBeatmapContainer : PopoverContainer
         {
             private readonly IWorkingBeatmap working;
 

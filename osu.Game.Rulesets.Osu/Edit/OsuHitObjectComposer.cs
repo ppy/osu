@@ -62,12 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void load()
         {
             // Give a bit of breathing room around the playfield content.
-            PlayfieldContentContainer.Padding = new MarginPadding
-            {
-                Vertical = 10,
-                Left = TOOLBOX_CONTRACTED_SIZE_LEFT + 10,
-                Right = TOOLBOX_CONTRACTED_SIZE_RIGHT + 10,
-            };
+            PlayfieldContentContainer.Padding = new MarginPadding(10);
 
             LayerBelowRuleset.AddRange(new Drawable[]
             {
@@ -90,6 +85,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
+
+            RightToolbox.Add(new TransformToolboxGroup
+            {
+                RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler
+            });
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
