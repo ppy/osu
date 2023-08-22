@@ -237,6 +237,12 @@ namespace osu.Game.Configuration
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
+                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
+                ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
                     name: GameplaySettingsStrings.HUDVisibilityMode,
