@@ -458,6 +458,26 @@ namespace osu.Game.Rulesets.Osu.Tests
             addClickActionAssert(1, ClickAction.Hit);
         }
 
+        [Test]
+        public void TestStacksDoNotShake()
+        {
+            const double time_stack_start = 1000;
+            Vector2 position = new Vector2(80);
+
+            var hitObjects = Enumerable.Range(0, 20).Select(i => new HitCircle
+            {
+                StartTime = time_stack_start + i * 100,
+                Position = position
+            }).Cast<OsuHitObject>().ToList();
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_stack_start - 450, Position = new Vector2(55), Actions = { OsuAction.LeftButton } },
+            });
+
+            addClickActionAssert(0, ClickAction.Ignore);
+        }
+
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
