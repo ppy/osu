@@ -131,6 +131,12 @@ namespace osu.Game.Screens.Select
         {
             originalBeatmapSetsDetached = beatmapSets.Detach();
 
+            if (selectedBeatmapSet != null && !originalBeatmapSetsDetached.Contains(selectedBeatmapSet.BeatmapSet))
+                selectedBeatmapSet = null;
+
+            var selectedSetBefore = selectedBeatmapSet;
+            var selectedBetmapBefore = selectedBeatmap;
+
             CarouselRoot newRoot = new CarouselRoot(this);
 
             if (beatmapsSplitOut)
@@ -148,13 +154,11 @@ namespace osu.Game.Screens.Select
             else
             {
                 var carouselBeatmapSets = originalBeatmapSetsDetached.Select(createCarouselSet).OfType<CarouselBeatmapSet>();
+
                 newRoot.AddItems(carouselBeatmapSets);
             }
 
             root = newRoot;
-
-            if (selectedBeatmapSet != null && !originalBeatmapSetsDetached.Contains(selectedBeatmapSet.BeatmapSet))
-                selectedBeatmapSet = null;
 
             Scroll.Clear(false);
             itemsCache.Invalidate();
@@ -164,6 +168,15 @@ namespace osu.Game.Screens.Select
 
             if (loadedTestBeatmaps)
                 signalBeatmapsLoaded();
+
+            // Restore selection
+            if (selectedBetmapBefore != null && selectedSetBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedSetBefore.BeatmapSet.ID, out var newSelectionCandidates))
+            {
+                CarouselBeatmap? found = newSelectionCandidates.SelectMany(s => s.Beatmaps).SingleOrDefault(b => b.BeatmapInfo.ID == selectedBetmapBefore.BeatmapInfo.ID);
+
+                if (found != null)
+                    found.State.Value = CarouselItemState.Selected;
+            }
         }
 
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
