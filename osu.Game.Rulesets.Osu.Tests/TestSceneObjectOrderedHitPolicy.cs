@@ -381,13 +381,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void addJudgementAssert(string name, Func<OsuHitObject?> hitObject, HitResult result)
         {
             AddAssert($"{name} judgement is {result}",
-                () => judgementResults.Single(r => r.HitObject == hitObject()).Type == result);
+                () => judgementResults.Single(r => r.HitObject == hitObject()).Type, () => Is.EqualTo(result));
         }
 
         private void addJudgementOffsetAssert(OsuHitObject hitObject, double offset)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judged at {offset}",
-                () => Precision.AlmostEquals(judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, offset, 100));
+                () => judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, () => Is.EqualTo(offset).Within(100));
         }
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
