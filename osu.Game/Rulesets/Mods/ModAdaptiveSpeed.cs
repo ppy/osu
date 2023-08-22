@@ -59,6 +59,14 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01
         };
 
+        [SettingSource("Rate multiplier", "How much hits and misses affect tempo")]
+        public BindableNumber<double> RateMultiplier { get; } = new BindableDouble(0.95)
+        {
+            MinValue = 0,
+            MaxValue = 2,
+            Precision = 0.01
+        };
+
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
@@ -79,14 +87,11 @@ namespace osu.Game.Rulesets.Mods
         private const double min_allowable_rate_change = 0.9d;
         private const double max_allowable_rate_change = 1.11d;
 
-        // The rate multiplier used on hits and misses.
-        private const double rate_change_multiplier = 0.95;
-
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
-        private const double rate_change_on_miss = min_allowable_rate_change / rate_change_multiplier;
+        private double rateChangeOnMiss => Math.Min(1.0, min_allowable_rate_change / RateMultiplier.Value);
 
         // Apply a fixed rate change when accurately hitting notes, to counteract overcorrection stagnating or even slowing down an accurate but unstable human player.
-        private const double rate_change_on_hit = max_allowable_rate_change * rate_change_multiplier;
+        private double rateChangeOnHit => Math.Max(1.0, max_allowable_rate_change * RateMultiplier.Value);
 
         // The threshold below which we'll reward the player's high accuracy with a speed up.
         private const double rate_change_threshold = 0.05;
@@ -264,13 +269,13 @@ namespace osu.Game.Rulesets.Mods
         private double getRelativeRateChange(JudgementResult result)
         {
             if (!result.IsHit)
-                return rate_change_on_miss;
+                return rateChangeOnMiss;
 
             double prevEndTime = precedingEndTimes[result.HitObject];
             double rateChange = (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime);
 
             if (Math.Abs(rateChange - 1.0) < rate_change_threshold) // Reward well-timed results with a speed up.
-                return rate_change_on_hit;
+                return rateChangeOnHit;
 
             return Math.Clamp(
                 rateChange,
