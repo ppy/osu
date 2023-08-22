@@ -137,8 +137,10 @@ namespace osu.Game.Screens.Select
             {
                 var carouselBeatmapSets = originalBeatmapSetsDetached.SelectMany(s => s.Beatmaps).Select(b =>
                 {
-                    var set = new BeatmapSetInfo(new[] { b });
-                    return createCarouselSet(set);
+                    return createCarouselSet(new BeatmapSetInfo(new[] { b })
+                    {
+                        ID = b.BeatmapSet!.ID,
+                    });
                 }).OfType<CarouselBeatmapSet>();
 
                 newRoot.AddItems(carouselBeatmapSets);
