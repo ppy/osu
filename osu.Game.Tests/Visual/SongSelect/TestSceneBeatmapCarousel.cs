@@ -39,6 +39,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapInfo currentSelection => carousel.SelectedBeatmapInfo;
 
         private const int set_count = 5;
+        private const int diff_count = 3;
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -502,6 +503,36 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestAddRemoveDifficultySort()
+        {
+            loadBeatmaps();
+
+            AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
+
+            checkVisibleItemCount(false, set_count * diff_count);
+
+            var firstAdded = TestResources.CreateTestBeatmapSetInfo(diff_count);
+            var secondAdded = TestResources.CreateTestBeatmapSetInfo(diff_count);
+
+            AddStep("Add new set", () => carousel.UpdateBeatmapSet(firstAdded));
+            AddStep("Add new set", () => carousel.UpdateBeatmapSet(secondAdded));
+
+            checkVisibleItemCount(false, (set_count + 2) * diff_count);
+
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(firstAdded));
+
+            checkVisibleItemCount(false, (set_count + 1) * diff_count);
+
+            setSelected(set_count + 1, 1);
+
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(secondAdded));
+
+            checkVisibleItemCount(false, (set_count) * diff_count);
+
+            waitForSelection(set_count);
+        }
+
+        [Test]
         public void TestSelectionEnteringFromEmptyRuleset()
         {
             var sets = new List<BeatmapSetInfo>();
@@ -662,7 +693,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 for (int i = 0; i < 3; i++)
                 {
-                    var set = TestResources.CreateTestBeatmapSetInfo(3);
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
 
                     // only need to set the first as they are a shared reference.
                     var beatmap = set.Beatmaps.First();
@@ -709,7 +740,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 for (int i = 0; i < 3; i++)
                 {
-                    var set = TestResources.CreateTestBeatmapSetInfo(3);
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
 
                     // only need to set the first as they are a shared reference.
                     var beatmap = set.Beatmaps.First();
@@ -768,7 +799,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 for (int i = 0; i < 3; i++)
                 {
-                    var set = TestResources.CreateTestBeatmapSetInfo(3);
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
                     set.Beatmaps[0].StarRating = 3 - i;
                     set.Beatmaps[2].StarRating = 6 + i;
                     sets.Add(set);
@@ -857,7 +888,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("create hidden set", () =>
             {
-                hidingSet = TestResources.CreateTestBeatmapSetInfo(3);
+                hidingSet = TestResources.CreateTestBeatmapSetInfo(diff_count);
                 hidingSet.Beatmaps[1].Hidden = true;
 
                 hiddenList.Clear();
@@ -904,7 +935,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
-                testMixed = TestResources.CreateTestBeatmapSetInfo(3);
+                testMixed = TestResources.CreateTestBeatmapSetInfo(diff_count);
 
                 for (int i = 0; i <= 2; i++)
                 {
@@ -926,7 +957,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             BeatmapSetInfo testSingle = null;
             AddStep("add single ruleset beatmapset", () =>
             {
-                testSingle = TestResources.CreateTestBeatmapSetInfo(3);
+                testSingle = TestResources.CreateTestBeatmapSetInfo(diff_count);
                 testSingle.Beatmaps.ForEach(b =>
                 {
                     b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
@@ -949,7 +980,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 manySets.Clear();
 
                 for (int i = 1; i <= 50; i++)
-                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(3));
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
             });
 
             loadBeatmaps(manySets);
@@ -1113,7 +1144,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     beatmapSets.Add(randomDifficulties
                         ? TestResources.CreateTestBeatmapSetInfo()
-                        : TestResources.CreateTestBeatmapSetInfo(3));
+                        : TestResources.CreateTestBeatmapSetInfo(diff_count));
                 }
             }
 
