@@ -71,8 +71,21 @@ namespace osu.Game.Rulesets.Mods
                 {
                     var bindable = (IBindable)property.GetValue(this)!;
 
+                    string valueText;
+
+                    switch (bindable)
+                    {
+                        case Bindable<bool> b:
+                            valueText = b.Value ? "on" : "off";
+                            break;
+
+                        default:
+                            valueText = bindable.ToString() ?? string.Empty;
+                            break;
+                    }
+
                     if (!bindable.IsDefault)
-                        tooltipTexts.Add($"{attr.Label}: {bindable}");
+                        tooltipTexts.Add($"{attr.Label}: {valueText}");
                 }
 
                 return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
