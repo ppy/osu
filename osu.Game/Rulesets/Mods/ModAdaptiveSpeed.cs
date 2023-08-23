@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => MinimumRate.Value;
+        public override double ScoreMultiplier => minAllowableRate;
 
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("Minimum rate", "The minimum speed of the track")]
-        public BindableNumber<double> MinimumRate { get; } = new BindableDouble(0.5)
+        public BindableNumber<double> MinimumRate { get; } = new BindableDouble(1)
         {
             MinValue = 0.5,
             MaxValue = 4,
