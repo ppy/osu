@@ -184,14 +184,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle - 200, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
+                new OsuReplayFrame { Time = time_first_circle - 190, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle - 90, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Meh);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
+            addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
+            addJudgementOffsetAssert(hitObjects[0], -90); // time_second_circle - first_circle_time - 90
         }
 
         /// <summary>
@@ -221,13 +221,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle - 200, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle - 190, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_first_circle, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Meh);
             addJudgementAssert(hitObjects[1], HitResult.Ok);
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
+            addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
             addJudgementOffsetAssert(hitObjects[1], -100); // time_second_circle - first_circle_time
         }
 
@@ -343,7 +343,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_spinner - 100, Position = positionCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_spinner - 90, Position = positionCircle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
