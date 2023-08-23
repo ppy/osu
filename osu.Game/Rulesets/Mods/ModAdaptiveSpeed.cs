@@ -188,7 +188,11 @@ namespace osu.Game.Rulesets.Mods
 
         public void Update(Playfield playfield)
         {
-            SpeedChange.Value = Interpolation.DampContinuously(SpeedChange.Value, targetRate, 50, playfield.Clock.ElapsedFrameTime);
+            // Use the absolute clock time so that we always move towards targetRate, not away from it (as is the case when rewinding).
+            // This prevents TrackBass from throwing an exception as the tempo approaches the lower bound (when AdjustPitch is set to false).
+            double elapsedTime = Math.Abs(playfield.Clock.ElapsedFrameTime);
+
+            SpeedChange.Value = Interpolation.DampContinuously(SpeedChange.Value, targetRate, 50, elapsedTime);
         }
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;
