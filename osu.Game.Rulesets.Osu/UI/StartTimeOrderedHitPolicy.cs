@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
-        public ClickAction CheckHittable(DrawableHitObject hitObject, double time)
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult _)
         {
             DrawableHitObject blockingObject = null;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!hitObjectCanBlockFutureHits(hitObject))
                 return;
 
-            if (CheckHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset) != ClickAction.Hit)
+            if (CheckHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset, hitObject.Result.Type) != ClickAction.Hit)
                 throw new InvalidOperationException($"A {hitObject} was hit before it became hittable!");
 
             // Miss all hitobjects prior to the hit one.

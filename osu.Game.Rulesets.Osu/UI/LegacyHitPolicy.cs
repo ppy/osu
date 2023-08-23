@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
-        public virtual ClickAction CheckHittable(DrawableHitObject hitObject, double time)
+        public virtual ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
         {
             var aliveObjects = HitObjectContainer.AliveObjects.ToList();
             int index = aliveObjects.IndexOf(hitObject);
@@ -37,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (previousHitObject.HitObject.StackHeight > 0 && !previousHitObject.AllJudged)
                     return ClickAction.Ignore;
             }
+
+            if (result == HitResult.None)
+                return ClickAction.Shake;
 
             foreach (DrawableHitObject testObject in aliveObjects)
             {

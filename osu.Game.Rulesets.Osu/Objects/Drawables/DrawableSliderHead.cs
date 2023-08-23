@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
-            CheckHittable = (d, t) => DrawableSlider.CheckHittable?.Invoke(d, t) ?? ClickAction.Hit;
+            CheckHittable = (d, t, r) => DrawableSlider.CheckHittable?.Invoke(d, t, r) ?? ClickAction.Hit;
         }
 
         protected override void Update()
