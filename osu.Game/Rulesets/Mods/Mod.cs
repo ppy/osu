@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mods
                     var bindable = (IBindable)property.GetValue(this)!;
 
                     if (!bindable.IsDefault)
-                        tooltipTexts.Add($"{attr.Label} {bindable}");
+                        tooltipTexts.Add($"{attr.Label}: {bindable}");
                 }
 
                 return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
