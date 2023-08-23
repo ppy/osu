@@ -1006,6 +1006,43 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCarouselRemembersSelectionDifficultySort()
+        {
+            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                manySets.Clear();
+
+                for (int i = 1; i <= 50; i++)
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
+            });
+
+            loadBeatmaps(manySets);
+
+            AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
+
+            advanceSelection(direction: 1, diff: false);
+
+            for (int i = 0; i < 5; i++)
+            {
+                AddStep("Toggle non-matching filter", () =>
+                {
+                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
+                });
+
+                AddStep("Restore no filter", () =>
+                {
+                    carousel.Filter(new FilterCriteria(), false);
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
+                });
+            }
+
+            // always returns to same selection as long as it's available.
+            AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
+        }
+
+        [Test]
         public void TestFilteringByUserStarDifficulty()
         {
             BeatmapSetInfo set = null;
