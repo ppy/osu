@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
 
-        public ClickAction CheckHittable(DrawableHitObject hitObject, double time) => ClickAction.Hit;
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result) => ClickAction.Hit;
 
         public void HandleHit(DrawableHitObject hitObject)
         {

@@ -155,15 +155,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             var result = ResultFor(timeOffset);
-            var clickAction = CheckHittable?.Invoke(this, Time.Current);
+            var clickAction = CheckHittable?.Invoke(this, Time.Current, result);
 
-            if (clickAction == ClickAction.Shake || (result == HitResult.None && clickAction != ClickAction.Ignore))
-            {
+            if (clickAction == ClickAction.Shake)
                 Shake();
-                return;
-            }
 
-            if (result == HitResult.None)
+            if (result == HitResult.None || clickAction != ClickAction.Hit)
                 return;
 
             ApplyResult(r =>

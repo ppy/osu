@@ -635,9 +635,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public List<ClickAction> ClickActions { get; } = new List<ClickAction>();
 
-            public override ClickAction CheckHittable(DrawableHitObject hitObject, double time)
+            public override ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
             {
-                var action = base.CheckHittable(hitObject, time);
+                var action = base.CheckHittable(hitObject, time, result);
                 ClickActions.Add(action);
                 return action;
             }

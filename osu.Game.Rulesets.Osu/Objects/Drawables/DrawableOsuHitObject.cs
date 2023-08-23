@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -37,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// and <see cref="ClickAction.Shake"/>, and this hit object will be shaken for return values of
         /// <see cref="ClickAction.Shake"/>.
         /// </summary>
-        public Func<DrawableHitObject, double, ClickAction> CheckHittable;
+        public Func<DrawableHitObject, double, HitResult, ClickAction> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
