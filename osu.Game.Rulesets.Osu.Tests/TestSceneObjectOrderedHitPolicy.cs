@@ -437,7 +437,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                     BeatmapInfo =
                     {
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                     },
                     ControlPointInfo = cpi
                 });
@@ -486,13 +487,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 AddStep("export score", () =>
                 {
-                    var scoreToEncode = score.DeepClone();
-                    scoreToEncode.Replay.Frames = scoreToEncode.Replay.Frames.Cast<OsuReplayFrame>()
-                                                               .Select(frame => new OsuReplayFrame(frame.Time + LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET, frame.Position, frame.Actions.ToArray()))
-                                                               .ToList<ReplayFrame>();
-
                     using var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osr"), FileMode.Create);
-                    var encoder = new LegacyScoreEncoder(scoreToEncode, playableBeatmap);
+                    var encoder = new LegacyScoreEncoder(score, playableBeatmap);
                     encoder.Encode(stream);
                 });
             }
