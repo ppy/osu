@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -478,6 +479,32 @@ namespace osu.Game.Rulesets.Osu.Tests
             addClickActionAssert(0, ClickAction.Ignore);
         }
 
+        [Test]
+        public void TestAutopilotReducesHittableRange()
+        {
+            const double time_circle = 1500;
+            Vector2 positionCircle = Vector2.Zero;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new HitCircle
+                {
+                    StartTime = time_circle,
+                    Position = positionCircle
+                },
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_circle - 250, Position = positionCircle, Actions = { OsuAction.LeftButton } }
+            }, new Mod[] { new OsuModAutopilot() });
+
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            // note lock prevented the object from being hit, so the judgement offset should be very late.
+            addJudgementOffsetAssert(hitObjects[0], referenceHitWindows.WindowFor(HitResult.Meh));
+            addClickActionAssert(0, ClickAction.Shake);
+        }
+
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
@@ -503,10 +530,19 @@ namespace osu.Game.Rulesets.Osu.Tests
         private List<JudgementResult> judgementResults = null!;
         private TestLegacyHitPolicy testPolicy = null!;
 
-        private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames, [CallerMemberName] string testCaseName = "")
+        private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames, IEnumerable<Mod>? extraMods = null, [CallerMemberName] string testCaseName = "")
         {
+            List<Mod> mods = null!;
             IBeatmap playableBeatmap = null!;
             Score score = null!;
+
+            AddStep("set up mods", () =>
+            {
+                mods = new List<Mod> { new OsuModClassic() };
+
+                if (extraMods != null)
+                    mods.AddRange(extraMods);
+            });
 
             AddStep("create beatmap", () =>
             {
@@ -550,7 +586,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                     ScoreInfo =
                     {
                         Ruleset = new OsuRuleset().RulesetInfo,
-                        BeatmapInfo = playableBeatmap.BeatmapInfo
+                        BeatmapInfo = playableBeatmap.BeatmapInfo,
+                        Mods = mods.ToArray()
                     }
                 };
             });
@@ -584,7 +621,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("load player", () =>
             {
-                SelectedMods.Value = new[] { new OsuModClassic() };
+                SelectedMods.Value = mods.ToArray();
 
                 var p = new ScoreAccessibleReplayPlayer(score);
 
