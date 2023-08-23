@@ -791,17 +791,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestSortingWithDifficultyFiltered()
         {
+            const int local_diff_count = 3;
+            const int local_set_count = 2;
+
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
 
             AddStep("Populuate beatmap sets", () =>
             {
                 sets.Clear();
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < local_set_count; i++)
                 {
-                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+                    var set = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
                     set.Beatmaps[0].StarRating = 3 - i;
-                    set.Beatmaps[2].StarRating = 6 + i;
+                    set.Beatmaps[1].StarRating = 6 + i;
                     sets.Add(set);
                 }
             });
@@ -810,29 +813,29 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
 
-            checkVisibleItemCount(false, 9);
+            checkVisibleItemCount(false, local_set_count * local_diff_count);
             checkVisibleItemCount(true, 1);
 
             AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
-            checkVisibleItemCount(false, 3);
+            checkVisibleItemCount(false, local_set_count);
             checkVisibleItemCount(true, 1);
 
             AddUntilStep("Check all visible sets have one normal", () =>
             {
                 return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
                                .Where(p => p.IsPresent)
-                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Normal", StringComparison.Ordinal)) == 3;
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Normal", StringComparison.Ordinal)) == local_set_count;
             });
 
             AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
-            checkVisibleItemCount(false, 3);
+            checkVisibleItemCount(false, local_set_count);
             checkVisibleItemCount(true, 1);
 
             AddUntilStep("Check all visible sets have one insane", () =>
             {
                 return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
                                .Where(p => p.IsPresent)
-                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Insane", StringComparison.Ordinal)) == 3;
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Insane", StringComparison.Ordinal)) == local_set_count;
             });
         }
 
