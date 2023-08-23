@@ -758,7 +758,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestSortingWithFiltered()
+        public void TestSortingWithDifficultyFiltered()
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
 
@@ -777,13 +777,32 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             loadBeatmaps(sets);
 
+            AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
+
+            checkVisibleItemCount(false, 9);
+            checkVisibleItemCount(true, 1);
+
             AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
-            AddAssert("Check first set at end", () => carousel.BeatmapSets.First().Equals(sets.Last()));
-            AddAssert("Check last set at start", () => carousel.BeatmapSets.Last().Equals(sets.First()));
+            checkVisibleItemCount(false, 3);
+            checkVisibleItemCount(true, 1);
+
+            AddUntilStep("Check all visible sets have one normal", () =>
+            {
+                return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
+                               .Where(p => p.IsPresent)
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Normal", StringComparison.Ordinal)) == 3;
+            });
 
             AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
-            AddAssert("Check first set at start", () => carousel.BeatmapSets.First().Equals(sets.First()));
-            AddAssert("Check last set at end", () => carousel.BeatmapSets.Last().Equals(sets.Last()));
+            checkVisibleItemCount(false, 3);
+            checkVisibleItemCount(true, 1);
+
+            AddUntilStep("Check all visible sets have one insane", () =>
+            {
+                return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
+                               .Where(p => p.IsPresent)
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Insane", StringComparison.Ordinal)) == 3;
+            });
         }
 
         [Test]
