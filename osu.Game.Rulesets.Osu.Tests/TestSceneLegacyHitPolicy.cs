@@ -639,7 +639,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddStep("Substitute hit policy", () => currentPlayer.ChildrenOfType<OsuPlayfield>().Single().HitPolicy = testPolicy = new TestLegacyHitPolicy());
+            AddStep("Substitute hit policy", () =>
+            {
+                var playfield = currentPlayer.ChildrenOfType<OsuPlayfield>().Single();
+                var currentPolicy = playfield.HitPolicy;
+                playfield.HitPolicy = testPolicy = new TestLegacyHitPolicy(currentPolicy);
+            });
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
@@ -670,11 +675,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestLegacyHitPolicy : LegacyHitPolicy
         {
+            private readonly IHitPolicy currentPolicy;
+
+            public TestLegacyHitPolicy(IHitPolicy currentPolicy)
+            {
+                this.currentPolicy = currentPolicy;
+            }
+
             public List<ClickAction> ClickActions { get; } = new List<ClickAction>();
 
             public override ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
             {
-                var action = base.CheckHittable(hitObject, time, result);
+                var action = currentPolicy.CheckHittable(hitObject, time, result);
                 ClickActions.Add(action);
                 return action;
             }

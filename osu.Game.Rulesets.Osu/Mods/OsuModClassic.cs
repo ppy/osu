@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -57,7 +58,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             var osuRuleset = (DrawableOsuRuleset)drawableRuleset;
 
             if (ClassicNoteLock.Value)
-                osuRuleset.Playfield.HitPolicy = new LegacyHitPolicy();
+            {
+                double hittableRange = OsuHitWindows.MISS_WINDOW - (drawableRuleset.Mods.OfType<OsuModAutopilot>().Any() ? 200 : 0);
+                osuRuleset.Playfield.HitPolicy = new LegacyHitPolicy(hittableRange);
+            }
 
             usingHiddenFading = drawableRuleset.Mods.OfType<OsuModHidden>().SingleOrDefault()?.OnlyFadeApproachCircles.Value == false;
         }

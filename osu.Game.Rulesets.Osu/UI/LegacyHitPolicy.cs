@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -22,6 +23,13 @@ namespace osu.Game.Rulesets.Osu.UI
     public class LegacyHitPolicy : IHitPolicy
     {
         public IHitObjectContainer HitObjectContainer { get; set; }
+
+        private readonly double hittableRange;
+
+        public LegacyHitPolicy(double hittableRange = OsuHitWindows.MISS_WINDOW)
+        {
+            this.hittableRange = hittableRange;
+        }
 
         public void HandleHit(DrawableHitObject hitObject)
         {
@@ -57,11 +65,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     return ClickAction.Shake;
             }
 
-            // stable has `const HitObjectManager.HITTABLE_RANGE = 400;`, which is only used for notelock code.
-            // probably not a coincidence that this is equivalent to lazer's OsuHitWindows.MISS_WINDOW.
-
-            // TODO stable compares to 200 when autopilot is enabled, instead of 400.
-            return Math.Abs(hitObject.HitObject.StartTime - time) < 400 ? ClickAction.Hit : ClickAction.Shake;
+            return Math.Abs(hitObject.HitObject.StartTime - time) < hittableRange ? ClickAction.Hit : ClickAction.Shake;
         }
     }
 }
