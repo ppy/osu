@@ -35,7 +35,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public partial class TestSceneObjectOrderedHitPolicy : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLegacyHitPolicy : RateAdjustedBeatmapTestScene
     {
         private readonly OsuHitWindows referenceHitWindows;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// </summary>
         private readonly string? exportLocation = null;
 
-        public TestSceneObjectOrderedHitPolicy()
+        public TestSceneLegacyHitPolicy()
         {
             referenceHitWindows = new OsuHitWindows();
             referenceHitWindows.SetDifficulty(0);
