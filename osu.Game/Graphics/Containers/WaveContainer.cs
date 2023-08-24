@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -32,6 +35,13 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool StartHidden => true;
 
+        private Sample? samplePopIn;
+        private Sample? samplePopOut;
+        protected virtual string PopInSampleName => "UI/wave-pop-in";
+        protected virtual string PopOutSampleName => "UI/overlay-big-pop-out";
+
+        private bool wasShown = false;
+
         public Color4 FirstWaveColour
         {
             get => firstWave.Colour;
@@ -54,6 +64,13 @@ namespace osu.Game.Graphics.Containers
         {
             get => fourthWave.Colour;
             set => fourthWave.Colour = value;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio)
+        {
+            samplePopIn = audio.Samples.Get(PopInSampleName);
+            samplePopOut = audio.Samples.Get(PopOutSampleName);
         }
 
         public WaveContainer()
@@ -110,6 +127,8 @@ namespace osu.Game.Graphics.Containers
                 w.Show();
 
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
+            samplePopIn?.Play();
+            wasShown = true;
         }
 
         protected override void PopOut()
@@ -118,6 +137,9 @@ namespace osu.Game.Graphics.Containers
                 w.Hide();
 
             contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
+
+            if (wasShown)
+                samplePopOut?.Play();
         }
 
         protected override void UpdateAfterChildren()
