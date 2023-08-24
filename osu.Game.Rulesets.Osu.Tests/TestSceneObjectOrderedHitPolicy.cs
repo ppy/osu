@@ -468,7 +468,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             if (exportLocation != null)
             {
-                AddStep("create beatmap", () =>
+                AddStep("export beatmap", () =>
                 {
                     var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null);
 
