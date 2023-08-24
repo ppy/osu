@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Select
                 selectedBeatmapSet = null;
 
             var selectedSetBefore = selectedBeatmapSet;
-            var selectedBetmapBefore = selectedBeatmap;
+            var selectedBeatmapBefore = selectedBeatmap;
 
             CarouselRoot newRoot = new CarouselRoot(this);
 
@@ -170,9 +170,9 @@ namespace osu.Game.Screens.Select
                 signalBeatmapsLoaded();
 
             // Restore selection
-            if (selectedBetmapBefore != null && selectedSetBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedSetBefore.BeatmapSet.ID, out var newSelectionCandidates))
+            if (selectedBeatmapBefore != null && selectedSetBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedSetBefore.BeatmapSet.ID, out var newSelectionCandidates))
             {
-                CarouselBeatmap? found = newSelectionCandidates.SelectMany(s => s.Beatmaps).SingleOrDefault(b => b.BeatmapInfo.ID == selectedBetmapBefore.BeatmapInfo.ID);
+                CarouselBeatmap? found = newSelectionCandidates.SelectMany(s => s.Beatmaps).SingleOrDefault(b => b.BeatmapInfo.ID == selectedBeatmapBefore.BeatmapInfo.ID);
 
                 if (found != null)
                     found.State.Value = CarouselItemState.Selected;
