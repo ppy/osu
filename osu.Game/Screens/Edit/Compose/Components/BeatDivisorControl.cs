@@ -262,6 +262,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private readonly OsuSpriteText divisorText;
 
             public DivisorDisplay()
+                : base(HoverSampleSet.Default)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
