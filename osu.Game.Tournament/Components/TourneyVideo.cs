@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -19,8 +17,8 @@ namespace osu.Game.Tournament.Components
     {
         private readonly string filename;
         private readonly bool drawFallbackGradient;
-        private Video video;
-        private ManualClock manualClock;
+        private Video? video;
+        private ManualClock? manualClock;
 
         public bool VideoAvailable => video != null;
 

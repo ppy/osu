@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz", ".olz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
@@ -145,12 +145,14 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
+        protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet, realm));
+
+            beatmapSet.DateAdded = getDateAdded(archive);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -305,9 +307,34 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
-                // Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
             };
+        }
+
+        /// <summary>
+        /// Determine the date a given beatmapset has been added to the game.
+        /// For legacy imports, we can use the oldest file write time for any `.osu` file in the directory.
+        /// For any other import types, use "now".
+        /// </summary>
+        private DateTimeOffset getDateAdded(ArchiveReader? reader)
+        {
+            DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
+
+            if (reader is LegacyDirectoryArchiveReader legacyReader)
+            {
+                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+
+                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps.First()));
+
+                foreach (string beatmapName in beatmaps)
+                {
+                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
+
+                    if (currentDateAdded < dateAdded)
+                        dateAdded = currentDateAdded;
+                }
+            }
+
+            return dateAdded;
         }
 
         /// <summary>
