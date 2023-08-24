@@ -28,7 +28,22 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => minAllowableRate;
+        public override double ScoreMultiplier
+        {
+            get
+            {
+                // Round to the nearest multiple of 0.1.
+                double value = (int)(minAllowableRate * 10) / 10.0;
+
+                // Offset back to 0.
+                value -= 1;
+
+                if (minAllowableRate > 1.0)
+                    value /= 5; // Each 0.1 multiple changes score multiplier by 0.02.
+
+                return 1 + value;
+            }
+        }
 
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
