@@ -40,7 +40,8 @@ namespace osu.Game.Graphics.Containers
         protected virtual string PopInSampleName => "UI/wave-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-big-pop-out";
 
-        private bool wasShown = false;
+        // required due to LoadAsyncComplete() in `VisibilityContainer` calling PopOut() during load - similar workaround to `OsuDropdownMenu`
+        private bool wasShown;
 
         public Color4 FirstWaveColour
         {
