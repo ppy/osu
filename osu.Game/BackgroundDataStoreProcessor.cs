@@ -24,7 +24,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
-    public partial class BackgroundBeatmapProcessor : Component
+    /// <summary>
+    /// Performs background updating of data stores at startup.
+    /// </summary>
+    public partial class BackgroundDataStoreProcessor : Component
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
@@ -61,7 +64,8 @@ namespace osu.Game
 
             Task.Factory.StartNew(() =>
             {
-                Logger.Log("Beginning background beatmap processing..");
+                Logger.Log("Beginning background data store processing..");
+
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
                 processScoresWithMissingStatistics();
@@ -74,7 +78,7 @@ namespace osu.Game
                     return;
                 }
 
-                Logger.Log("Finished background beatmap processing!");
+                Logger.Log("Finished background data store processing!");
             });
         }
 
@@ -182,7 +186,7 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var score in r.All<ScoreInfo>())
+                foreach (var score in r.All<ScoreInfo>().Where(s => !s.BackgroundReprocessingFailed))
                 {
                     if (score.BeatmapInfo != null
                         && score.Statistics.Sum(kvp => kvp.Value) > 0
@@ -221,6 +225,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                 }
             }
         }
@@ -230,7 +235,7 @@ namespace osu.Game
             Logger.Log("Querying for scores that need total score conversion...");
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
+                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null && s.TotalScoreVersion == 30000002)
                                                                              .AsEnumerable().Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
@@ -279,6 +284,7 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                     ++failedCount;
                 }
             }
