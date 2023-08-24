@@ -270,13 +270,11 @@ namespace osu.Game.Database
             switch (score.Ruleset.OnlineID)
             {
                 case 0:
-                    if(score.MaxCombo == 0 || score.Accuracy == 0)
+                    if (score.MaxCombo == 0 || score.Accuracy == 0)
                         return (long)Math.Round((
                             0
                             + 300000 * Math.Pow(score.Accuracy, 8)
                             + bonusProportion) * modMultiplier);
-
-                    double v3exp = 0.5; // Scorev3 combo exponent
 
                     // Assumption :
                     // - sliders and slider-ticks are uniformly spread arround the beatmap
@@ -287,12 +285,12 @@ namespace osu.Game.Database
                     // This is the ComboScore of v1/v3 were we remove all (map-)constant multipliers and accuracy multipliers (including hit results),
                     // based on the previous assumptions. For Scorev1, this is basically the sum of squared combos (because without sliders: object_count == combo).
                     double maxStrippedV1 = Math.Pow(maximumLegacyCombo, 2);
-                    double maxStrippedV3 = Math.Pow(maximumLegacyCombo, 1 + v3exp);
+                    double maxStrippedV3 = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
                     double strippedV1 = maxStrippedV1 * comboProportion / score.Accuracy;
 
                     double strippedV1FromMaxCombo = Math.Pow(score.MaxCombo, 2);
-                    double strippedV3FromMaxCombo = Math.Pow(score.MaxCombo, 1 + v3exp);
+                    double strippedV3FromMaxCombo = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
                     // Compute approximate lower estimate scorev3 for that play
                     // That is, a play were we made biggest amount of big combos (Repeat MaxCombo + 1 remaining big combo)
@@ -301,7 +299,7 @@ namespace osu.Game.Database
                     double strippedV1FromMaxComboRepeat = possibleMaxComboRepeat * strippedV1FromMaxCombo;
                     double remainingStrippedV1 = strippedV1 - strippedV1FromMaxComboRepeat;
                     double remainingCombo = Math.Sqrt(remainingStrippedV1);
-                    double remainingStrippedV3 = Math.Pow(remainingCombo, 1 + v3exp);
+                    double remainingStrippedV3 = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
                     double newLowerStrippedV3 = (possibleMaxComboRepeat * strippedV3FromMaxCombo) + remainingStrippedV3;
 
@@ -310,7 +308,7 @@ namespace osu.Game.Database
                     remainingStrippedV1 = strippedV1 - strippedV1FromMaxCombo;
                     double remainingComboObjects = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
                     double remainingAverageCombo = remainingComboObjects > 0 ? remainingStrippedV1 / remainingComboObjects : 0;
-                    remainingStrippedV3 = remainingComboObjects * Math.Pow(remainingAverageCombo, v3exp);
+                    remainingStrippedV3 = remainingComboObjects * Math.Pow(remainingAverageCombo, ScoreProcessor.COMBO_EXPONENT);
 
                     double newUpperStrippedV3 = strippedV3FromMaxCombo + remainingStrippedV3;
 
