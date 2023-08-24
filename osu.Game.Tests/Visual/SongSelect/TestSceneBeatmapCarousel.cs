@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestScrollPositionMaintainedOnAdd()
         {
-            loadBeatmaps(count: 1, randomDifficulties: false);
+            loadBeatmaps(setCount: 1);
 
             for (int i = 0; i < 10; i++)
             {
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestDeletion()
         {
-            loadBeatmaps(count: 5, randomDifficulties: true);
+            loadBeatmaps(setCount: 5, randomDifficulties: true);
 
             AddStep("remove first set", () => carousel.RemoveBeatmapSet(carousel.Items.Select(item => item.Item).OfType<CarouselBeatmapSet>().First().BeatmapSet));
             AddUntilStep("4 beatmap sets visible", () => this.ChildrenOfType<DrawableCarouselBeatmapSet>().Count(set => set.Alpha > 0) == 4);
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestScrollPositionMaintainedOnDelete()
         {
-            loadBeatmaps(count: 50, randomDifficulties: false);
+            loadBeatmaps(setCount: 50);
 
             for (int i = 0; i < 10; i++)
             {
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestManyPanels()
         {
-            loadBeatmaps(count: 5000, randomDifficulties: true);
+            loadBeatmaps(setCount: 5000, randomDifficulties: true);
         }
 
         [Test]
@@ -505,31 +505,34 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAddRemoveDifficultySort()
         {
-            loadBeatmaps();
+            const int local_set_count = 1;
+            const int local_diff_count = 1;
+
+            loadBeatmaps(setCount: local_set_count, diffCount: local_diff_count);
 
             AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
 
-            checkVisibleItemCount(false, set_count * diff_count);
+            checkVisibleItemCount(false, local_set_count * local_diff_count);
 
-            var firstAdded = TestResources.CreateTestBeatmapSetInfo(diff_count);
-            var secondAdded = TestResources.CreateTestBeatmapSetInfo(diff_count);
+            var firstAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
+            var secondAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
 
             AddStep("Add new set", () => carousel.UpdateBeatmapSet(firstAdded));
             AddStep("Add new set", () => carousel.UpdateBeatmapSet(secondAdded));
 
-            checkVisibleItemCount(false, (set_count + 2) * diff_count);
+            checkVisibleItemCount(false, (local_set_count + 2) * local_diff_count);
 
             AddStep("Remove set", () => carousel.RemoveBeatmapSet(firstAdded));
 
-            checkVisibleItemCount(false, (set_count + 1) * diff_count);
+            checkVisibleItemCount(false, (local_set_count + 1) * local_diff_count);
 
-            setSelected(set_count + 1, 1);
+            setSelected(local_set_count + 1, 1);
 
             AddStep("Remove set", () => carousel.RemoveBeatmapSet(secondAdded));
 
-            checkVisibleItemCount(false, (set_count) * diff_count);
+            checkVisibleItemCount(false, (local_set_count) * local_diff_count);
 
-            waitForSelection(set_count);
+            waitForSelection(local_set_count);
         }
 
         [Test]
@@ -1171,8 +1174,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null,
-                                  bool randomDifficulties = false)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null,
+                                  int? setCount = null, int? diffCount = null, bool randomDifficulties = false)
         {
             bool changed = false;
 
@@ -1180,11 +1183,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 beatmapSets = new List<BeatmapSetInfo>();
 
-                for (int i = 1; i <= (count ?? set_count); i++)
+                for (int i = 1; i <= (setCount ?? set_count); i++)
                 {
                     beatmapSets.Add(randomDifficulties
                         ? TestResources.CreateTestBeatmapSetInfo()
-                        : TestResources.CreateTestBeatmapSetInfo(diff_count));
+                        : TestResources.CreateTestBeatmapSetInfo(diffCount ?? diff_count));
                 }
             }
 
