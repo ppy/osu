@@ -328,5 +328,12 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+
+        public override double PreemptFromAr(float AR) => AR < 5 ? (1200.0 + 600.0 * (5 - AR) / 5) : (1200.0 - 750.0 * (AR - 5) / 5);
+        public override float ArFromPreempt(double preempt) => (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150)) + 5;
+        public override double HitwindowFromOd(float OD) => 80.0 - 6 * OD;
+        public override float OdFromHitwindow(double hitwindow300) => (float)(80.0 - hitwindow300) / 6;
+        public override float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
+        public override float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
     }
 }
