@@ -3,12 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -20,6 +25,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -29,6 +35,13 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneObjectOrderedHitPolicy : RateAdjustedBeatmapTestScene
     {
         private readonly OsuHitWindows referenceHitWindows;
+
+        /// <summary>
+        /// This is provided as a convenience for testing note lock behaviour against osu!stable.
+        /// Setting this field to a non-null path will cause beatmap files and replays used in all test cases
+        /// to be exported to disk so that they can be cross-checked against stable.
+        /// </summary>
+        private readonly string? exportLocation = null;
 
         public TestSceneObjectOrderedHitPolicy()
         {
@@ -171,14 +184,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle - 200, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
+                new OsuReplayFrame { Time = time_first_circle - 190, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle - 90, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Meh);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
+            addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
+            addJudgementOffsetAssert(hitObjects[0], -90); // time_second_circle - first_circle_time - 90
         }
 
         /// <summary>
@@ -208,13 +221,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle - 200, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle - 190, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_first_circle, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Meh);
             addJudgementAssert(hitObjects[1], HitResult.Ok);
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
+            addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
             addJudgementOffsetAssert(hitObjects[1], -100); // time_second_circle - first_circle_time
         }
 
@@ -330,7 +343,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_spinner - 100, Position = positionCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_spinner - 90, Position = positionCircle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
@@ -401,12 +414,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         private List<JudgementResult> judgementResults = null!;
 
-        private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames)
+        private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames, [CallerMemberName] string testCaseName = "")
         {
-            AddStep("load player", () =>
+            IBeatmap playableBeatmap = null!;
+            Score score = null!;
+
+            AddStep("create beatmap", () =>
             {
+                var cpi = new ControlPointInfo();
+                cpi.Add(0, new TimingControlPoint { BeatLength = 1000 });
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
+                    Metadata =
+                    {
+                        Title = testCaseName
+                    },
                     HitObjects = hitObjects,
                     Difficulty = new BeatmapDifficulty
                     {
@@ -415,13 +437,67 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                     BeatmapInfo =
                     {
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                     },
+                    ControlPointInfo = cpi
+                });
+                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
+            });
+
+            AddStep("create score", () =>
+            {
+                score = new Score
+                {
+                    Replay = new Replay
+                    {
+                        Frames = new List<ReplayFrame>
+                        {
+                            // required for correct playback in stable
+                            new OsuReplayFrame(0, new Vector2(256, -500)),
+                            new OsuReplayFrame(0, new Vector2(256, -500))
+                        }.Concat(frames).ToList()
+                    },
+                    ScoreInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = playableBeatmap.BeatmapInfo
+                    }
+                };
+            });
+
+            if (exportLocation != null)
+            {
+                AddStep("export beatmap", () =>
+                {
+                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+
+                    using (var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osu"), FileMode.Create))
+                    {
+                        var memoryStream = new MemoryStream();
+                        using (var writer = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
+                            beatmapEncoder.Encode(writer);
+
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        memoryStream.CopyTo(stream);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        playableBeatmap.BeatmapInfo.MD5Hash = memoryStream.ComputeMD5Hash();
+                    }
                 });
 
+                AddStep("export score", () =>
+                {
+                    using var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osr"), FileMode.Create);
+                    var encoder = new LegacyScoreEncoder(score, playableBeatmap);
+                    encoder.Encode(stream);
+                });
+            }
+
+            AddStep("load player", () =>
+            {
                 SelectedMods.Value = new[] { new OsuModClassic() };
 
-                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
+                var p = new ScoreAccessibleReplayPlayer(score);
 
                 p.OnLoadComplete += _ =>
                 {
