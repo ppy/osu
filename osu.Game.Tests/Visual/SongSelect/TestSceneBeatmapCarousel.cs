@@ -1016,7 +1016,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
 
-            AddStep("Populuate beatmap sets", () =>
+            AddStep("Populate beatmap sets", () =>
             {
                 manySets.Clear();
 
