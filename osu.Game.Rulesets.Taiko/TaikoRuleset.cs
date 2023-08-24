@@ -263,5 +263,8 @@ namespace osu.Game.Rulesets.Taiko
                 }), true)
             };
         }
+        public override double HitwindowFromOd(float OD) => 35.0 - 15.0 * (OD - 5) / 5;
+        public override float OdFromHitwindow(double hitwindow300) => (float)(5 * (35 - hitwindow300) / 15 + 5);
+        public override float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
     }
 }

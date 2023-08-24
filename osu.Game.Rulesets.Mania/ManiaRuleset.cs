@@ -427,6 +427,10 @@ namespace osu.Game.Rulesets.Mania
         public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
+
+        public override double HitwindowFromOd(float OD) => 64.0 - 3 * OD;
+        public override float OdFromHitwindow(double hitwindow300) => (float)(64.0 - hitwindow300) / 3;
+        public override float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
     }
 
     public enum PlayfieldType

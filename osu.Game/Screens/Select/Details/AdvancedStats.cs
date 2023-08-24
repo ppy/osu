@@ -133,12 +133,10 @@ namespace osu.Game.Screens.Select.Details
                 foreach (var mod in mods.Value.OfType<ModRateAdjust>())
                 {
                     double speedChange = (float)mod.SpeedChange.Value;
+                    Ruleset ruleset = gameRuleset.Value.CreateInstance();
 
-                    double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, 1800, 1200, 450) / speedChange;
-                    adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
-
-                    float hitwindow300 = (80.0f - 6 * adjustedDifficulty.OverallDifficulty) / (float)speedChange;
-                    adjustedDifficulty.OverallDifficulty = (80.0f - hitwindow300) / 6;
+                    adjustedDifficulty.ApproachRate = ruleset.ChangeArFromRate(adjustedDifficulty.ApproachRate, speedChange);
+                    adjustedDifficulty.OverallDifficulty = ruleset.ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, speedChange);
                 }
             }
 

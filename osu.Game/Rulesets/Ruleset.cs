@@ -389,5 +389,13 @@ namespace osu.Game.Rulesets
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
+
+        public virtual double PreemptFromAr(float AR) => 0;
+        public virtual float ArFromPreempt(double preempt) => 5;
+        public virtual double HitwindowFromOd(float OD) => 0;
+        public virtual float OdFromHitwindow(double hitwindow300) => 0;
+
+        public virtual float ChangeArFromRate(float AR, double rate) => AR;
+        public virtual float ChangeOdFromRate(float OD, double rate) => OD;
     }
 }
