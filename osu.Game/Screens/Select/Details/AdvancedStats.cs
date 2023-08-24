@@ -129,11 +129,11 @@ namespace osu.Game.Screens.Select.Details
             if (baseDifficulty != null && mods.Value.Any(m => m is ModRateAdjust))
             {
                 adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
+                Ruleset ruleset = gameRuleset.Value.CreateInstance();
 
                 foreach (var mod in mods.Value.OfType<ModRateAdjust>())
                 {
                     double speedChange = (float)mod.SpeedChange.Value;
-                    Ruleset ruleset = gameRuleset.Value.CreateInstance();
 
                     adjustedDifficulty.ApproachRate = ruleset.ChangeArFromRate(adjustedDifficulty.ApproachRate, speedChange);
                     adjustedDifficulty.OverallDifficulty = ruleset.ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, speedChange);
