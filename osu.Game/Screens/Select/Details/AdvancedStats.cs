@@ -126,6 +126,22 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
+            if (baseDifficulty != null && mods.Value.Any(m => m is ModRateAdjust))
+            {
+                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
+
+                foreach (var mod in mods.Value.OfType<ModRateAdjust>())
+                {
+                    double speedChange = (float)mod.SpeedChange.Value;
+
+                    double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, 1800, 1200, 450) / speedChange;
+                    adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
+
+                    float hitwindow300 = (80.0f - 6 * adjustedDifficulty.OverallDifficulty) / (float)speedChange;
+                    adjustedDifficulty.OverallDifficulty = (80.0f - hitwindow300) / 6;
+                }
+            }
+
             switch (BeatmapInfo?.Ruleset.OnlineID)
             {
                 case 3:
