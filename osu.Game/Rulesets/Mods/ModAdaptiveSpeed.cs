@@ -60,10 +60,10 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("Rate multiplier", "How much hits and misses affect tempo")]
-        public BindableNumber<double> RateMultiplier { get; } = new BindableDouble(0.95)
+        public BindableNumber<double> RateMultiplier { get; } = new BindableDouble(0.51)
         {
             MinValue = 0,
-            MaxValue = 2,
+            MaxValue = 8,
             Precision = 0.01
         };
 
@@ -88,10 +88,10 @@ namespace osu.Game.Rulesets.Mods
         private const double max_allowable_rate_change = 1.11d;
 
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
-        private double rateChangeOnMiss => Math.Min(1.0, min_allowable_rate_change / RateMultiplier.Value);
+        private double rateChangeOnMiss => Math.Pow(min_allowable_rate_change, RateMultiplier.Value);
 
         // Apply a fixed rate change when accurately hitting notes, to counteract overcorrection stagnating or even slowing down an accurate but unstable human player.
-        private double rateChangeOnHit => Math.Max(1.0, max_allowable_rate_change * RateMultiplier.Value);
+        private double rateChangeOnHit => Math.Pow(max_allowable_rate_change, RateMultiplier.Value);
 
         // The threshold below which we'll reward the player's high accuracy with a speed up.
         private const double rate_change_threshold = 0.05;
