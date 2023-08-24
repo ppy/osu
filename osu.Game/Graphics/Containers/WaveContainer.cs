@@ -37,8 +37,6 @@ namespace osu.Game.Graphics.Containers
 
         private Sample? samplePopIn;
         private Sample? samplePopOut;
-        protected virtual string PopInSampleName => "UI/wave-pop-in";
-        protected virtual string PopOutSampleName => "UI/overlay-big-pop-out";
 
         // required due to LoadAsyncComplete() in `VisibilityContainer` calling PopOut() during load - similar workaround to `OsuDropdownMenu`
         private bool wasShown;
@@ -70,8 +68,8 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            samplePopIn = audio.Samples.Get(PopInSampleName);
-            samplePopOut = audio.Samples.Get(PopOutSampleName);
+            samplePopIn = audio.Samples.Get("UI/wave-pop-in");
+            samplePopOut = audio.Samples.Get("UI/overlay-big-pop-out");
         }
 
         public WaveContainer()
