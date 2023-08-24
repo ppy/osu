@@ -55,6 +55,9 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestMinorDelayedHitsounds()
         {
+            // 1 ms of silence -> 1 ms of noise at 0.3 amplitude -> hitsound transient
+            // => The transient is delayed by 2 ms
+            // Waveform: https://github.com/ppy/osu/assets/39100084/d5b9edbe-0ba2-401d-94b0-6d57228bdbd3
             using (var resourceStream = TestResources.OpenResource("Samples/hitsound-minor-delay.wav"))
             {
                 var issues = check.Run(getContext(resourceStream)).ToList();
@@ -67,6 +70,9 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestDelayedHitsounds()
         {
+            // 3 ms of silence -> 3 ms of noise at 0.3 amplitude -> hitsound transient
+            // => The transient is delayed by 6 ms
+            // Waveform: https://github.com/ppy/osu/assets/39100084/2509ff35-d908-414b-b7b9-583681348772
             using var resourceStream = TestResources.OpenResource("Samples/hitsound-delay.wav");
 
             var issues = check.Run(getContext(resourceStream)).ToList();
@@ -78,6 +84,8 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestConsequentlyDelayedHitsounds()
         {
+            // The hitsound is delayed by 10 ms
+            // Waveform: https://github.com/ppy/osu/assets/39100084/3a7ede0d-8523-4b99-a222-3624cd208267
             using var resourceStream = TestResources.OpenResource("Samples/hitsound-consequent-delay.wav");
 
             var issues = check.Run(getContext(resourceStream)).ToList();
