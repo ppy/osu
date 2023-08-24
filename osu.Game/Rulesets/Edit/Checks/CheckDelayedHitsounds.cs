@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateConsequentDelay : IssueTemplate
         {
             public IssueTemplateConsequentDelay(ICheck check)
-                : base(check, IssueType.Error,
+                : base(check, IssueType.Problem,
                     "\"{0}\" has a {1:0.##} ms period of complete silence at the start.")
             {
             }
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
             }
 
-            public Issue Create(string filename, int pureDelay, int delay) => new Issue(this, filename, delay, pureDelay);
+            public Issue Create(string filename, int consequentDelay, int delay) => new Issue(this, filename, delay, consequentDelay);
         }
 
         public class IssuTemplateMinorDelay : IssueTemplate
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
             }
 
-            public Issue Create(string filename, int pureDelay, int delay) => new Issue(this, filename, delay, pureDelay);
+            public Issue Create(string filename, int consequentDelay, int delay) => new Issue(this, filename, delay, consequentDelay);
         }
     }
 }
