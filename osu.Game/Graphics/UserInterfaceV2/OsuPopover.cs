@@ -31,8 +31,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         // required due to LoadAsyncComplete() calling PopOut() during load - similar workaround to `OsuDropdownMenu`
         private bool wasOpened;
 
-        protected virtual bool PlayPopInOutSamples => true;
-
         public OsuPopover(bool withPadding = true)
         {
             Content.Padding = withPadding ? new MarginPadding(20) : new MarginPadding();
@@ -64,11 +62,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.ScaleTo(1, scale_duration, Easing.OutElasticHalf);
             this.FadeIn(fade_duration, Easing.OutQuint);
 
-            if (PlayPopInOutSamples)
-            {
-                samplePopIn?.Play();
-                wasOpened = true;
-            }
+            samplePopIn?.Play();
+            wasOpened = true;
         }
 
         protected override void PopOut()
@@ -76,7 +71,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.ScaleTo(0.7f, scale_duration, Easing.OutQuint);
             this.FadeOut(fade_duration, Easing.OutQuint);
 
-            if (wasOpened && PlayPopInOutSamples)
+            if (wasOpened)
                 samplePopOut?.Play();
         }
 
