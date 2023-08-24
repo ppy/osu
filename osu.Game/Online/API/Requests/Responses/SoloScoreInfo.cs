@@ -112,7 +112,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
-        [JsonProperty("has_replay")]
+        [JsonProperty("replay")]
         public bool HasReplay { get; set; }
 
         // These properties are calculated or not relevant to any external usage.
