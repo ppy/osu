@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             public IssueTemplateDelay(ICheck check)
                 : base(check, IssueType.Warning,
-                    "\"{0}\" has its transient delayed by ~{1:0.##} ms, preceded by {2:0.##} ms of complete silence.")
+                    "\"{0}\" has a transient delay of ~{1:0.##} ms, of which {2:0.##} ms is complete silence.")
             {
             }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             public IssuTemplateMinorDelay(ICheck check)
                 : base(check, IssueType.Negligible,
-                    "\"{0}\" has its transient delayed by ~{1:0.##} ms, preceded by {2:0.##} ms of complete silence.")
+                    "\"{0}\" has a transient delay of ~{1:0.##} ms, of which {2:0.##} ms is complete silence.")
             {
             }
 
