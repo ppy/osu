@@ -19,8 +19,8 @@ namespace osu.Game.Overlays
         protected override bool StartHidden => true;
 
         // `WaveContainer` plays PopIn/PopOut samples, so we disable the overlay-level one as to not double-up sample playback.
-        protected override string PopInSampleName => "";
-        protected override string PopOutSampleName => "";
+        protected override string PopInSampleName => string.Empty;
+        protected override string PopOutSampleName => string.Empty;
 
         public const float HORIZONTAL_PADDING = 50;
 
