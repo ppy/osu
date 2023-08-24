@@ -10,7 +10,7 @@ using osu.Game.Tournament.Screens.Drawings;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneDrawingsScreen : TournamentTestScene
+    public partial class TestSceneDrawingsScreen : TournamentScreenTestScene
     {
         [BackgroundDependencyLoader]
         private void load(Storage storage)

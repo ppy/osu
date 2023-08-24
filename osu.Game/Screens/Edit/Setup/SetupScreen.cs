@@ -26,16 +26,18 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
         {
+            var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
+
             var sectionsEnumerable = new List<SetupSection>
             {
                 new ResourcesSection(),
                 new MetadataSection(),
-                new DifficultySection(),
+                ruleset.CreateEditorDifficultySection() ?? new DifficultySection(),
                 new ColoursSection(),
                 new DesignSection(),
             };
 
-            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateEditorSetupSection();
+            var rulesetSpecificSection = ruleset.CreateEditorSetupSection();
             if (rulesetSpecificSection != null)
                 sectionsEnumerable.Add(rulesetSpecificSection);
 

@@ -352,29 +352,6 @@ namespace osu.Game.Screens.Select
                 if (working.Beatmap?.HitObjects.Any() != true)
                     return;
 
-                infoLabelContainer.Children = new Drawable[]
-                {
-                    new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "Length",
-                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = working.BeatmapInfo.Length.ToFormattedDuration().ToString(),
-                    }),
-                    bpmLabelContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(20, 0),
-                        Children = getRulesetInfoLabels()
-                    }
-                };
-            }
-
-            private InfoLabel[] getRulesetInfoLabels()
-            {
                 try
                 {
                     IBeatmap playableBeatmap;
@@ -390,14 +367,30 @@ namespace osu.Game.Screens.Select
                         playableBeatmap = working.GetPlayableBeatmap(working.BeatmapInfo.Ruleset, Array.Empty<Mod>());
                     }
 
-                    return playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)).ToArray();
+                    infoLabelContainer.Children = new Drawable[]
+                    {
+                        new InfoLabel(new BeatmapStatistic
+                        {
+                            Name = $"Length (Drain: {playableBeatmap.CalculateDrainLength().ToFormattedDuration().ToString()})",
+                            CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
+                            Content = working.BeatmapInfo.Length.ToFormattedDuration().ToString(),
+                        }),
+                        bpmLabelContainer = new Container
+                        {
+                            AutoSizeAxes = Axes.Both,
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Spacing = new Vector2(20, 0),
+                            Children = playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)).ToArray()
+                        }
+                    };
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e, "Could not load beatmap successfully!");
                 }
-
-                return Array.Empty<InfoLabel>();
             }
 
             private void refreshBPMLabel()

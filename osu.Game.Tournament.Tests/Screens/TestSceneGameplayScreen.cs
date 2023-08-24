@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -15,10 +13,24 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneGameplayScreen : TournamentTestScene
+    public partial class TestSceneGameplayScreen : TournamentScreenTestScene
     {
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
+
+        [Test]
+        public void TestWarmup()
+        {
+            createScreen();
+
+            checkScoreVisibility(false);
+
+            toggleWarmup();
+            checkScoreVisibility(true);
+
+            toggleWarmup();
+            checkScoreVisibility(false);
+        }
 
         [Test]
         public void TestStartupState([Values] TourneyState state)
@@ -33,20 +45,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("set null current", () => Ladder.CurrentMatch.Value = null);
             AddStep("set state", () => IPCInfo.State.Value = state);
             createScreen();
-        }
-
-        [Test]
-        public void TestWarmup()
-        {
-            createScreen();
-
-            checkScoreVisibility(false);
-
-            toggleWarmup();
-            checkScoreVisibility(true);
-
-            toggleWarmup();
-            checkScoreVisibility(false);
         }
 
         private void createScreen()

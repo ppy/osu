@@ -950,9 +950,9 @@ namespace osu.Game
             if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
                 loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
 
-            loadComponentSingleFile(osuLogo, logo =>
+            loadComponentSingleFile(osuLogo, _ =>
             {
-                logoContainer.Add(logo);
+                osuLogo.SetupDefaultContainer(logoContainer);
 
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
@@ -1025,7 +1025,7 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
+            loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());

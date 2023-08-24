@@ -22,6 +22,7 @@ using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
@@ -69,7 +70,7 @@ namespace osu.Game.Screens.Play
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
 
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
@@ -809,10 +810,13 @@ namespace osu.Game.Screens.Play
             if (!canShowResults && !forceImport)
                 return Task.FromResult<ScoreInfo>(null);
 
+            // Clone score before beginning any async processing.
+            // - Must be run synchronously as the score may potentially be mutated in the background.
+            // - Must be cloned for the same reason.
+            Score scoreCopy = Score.DeepClone();
+
             return prepareScoreForDisplayTask = Task.Run(async () =>
             {
-                var scoreCopy = Score.DeepClone();
-
                 try
                 {
                     await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
@@ -1048,8 +1052,6 @@ namespace osu.Game.Screens.Play
 
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
-            DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
-
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToPlayer>())
@@ -1170,6 +1172,7 @@ namespace osu.Game.Screens.Play
                 // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
+                score.ScoreInfo.Files.AddRange(s.Files.Detach());
             });
 
             return Task.CompletedTask;

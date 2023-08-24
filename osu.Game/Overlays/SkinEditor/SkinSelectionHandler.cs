@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -25,31 +26,10 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
-        public override bool HandleRotation(float angle)
+        public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler
         {
-            if (SelectedBlueprints.Count == 1)
-            {
-                // for single items, rotate around the origin rather than the selection centre.
-                ((Drawable)SelectedBlueprints.First().Item).Rotation += angle;
-            }
-            else
-            {
-                var selectionQuad = getSelectionQuad();
-
-                foreach (var b in SelectedBlueprints)
-                {
-                    var drawableItem = (Drawable)b.Item;
-
-                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
-                    updateDrawablePosition(drawableItem, rotatedPosition);
-
-                    drawableItem.Rotation += angle;
-                }
-            }
-
-            // this isn't always the case but let's be lenient for now.
-            return true;
-        }
+            UpdatePosition = updateDrawablePosition
+        };
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
@@ -137,7 +117,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -171,7 +151,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanRotate = true;
             SelectionBox.CanScaleX = true;
             SelectionBox.CanScaleY = true;
             SelectionBox.CanFlipX = true;
@@ -275,7 +254,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         /// <returns></returns>
         private Quad getSelectionQuad() =>
-            GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            GeometryUtils.GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
         private void applyFixedAnchors(Anchor anchor)
         {
