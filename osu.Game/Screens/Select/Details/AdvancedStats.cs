@@ -44,6 +44,9 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
+        private bool isArRateAdjusted { get; set; }
+        private bool isOdRateAdjusted { get; set; }
+
         private IBeatmapInfo beatmapInfo;
 
         public IBeatmapInfo BeatmapInfo
@@ -117,6 +120,8 @@ namespace osu.Game.Screens.Select.Details
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
+            isArRateAdjusted = false;
+            isOdRateAdjusted = false;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
@@ -135,8 +140,14 @@ namespace osu.Game.Screens.Select.Details
                 {
                     double speedChange = (float)mod.SpeedChange.Value;
 
-                    adjustedDifficulty.ApproachRate = ruleset.ChangeArFromRate(adjustedDifficulty.ApproachRate, speedChange);
-                    adjustedDifficulty.OverallDifficulty = ruleset.ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, speedChange);
+                    float ar = adjustedDifficulty.ApproachRate;
+                    float od = adjustedDifficulty.OverallDifficulty;
+
+                    adjustedDifficulty.ApproachRate = ruleset.ChangeArFromRate(ar, speedChange);
+                    adjustedDifficulty.OverallDifficulty = ruleset.ChangeOdFromRate(od, speedChange);
+
+                    if (adjustedDifficulty.ApproachRate != ar) isArRateAdjusted = true;
+                    if (adjustedDifficulty.OverallDifficulty != od) isOdRateAdjusted = true;
                 }
             }
 
@@ -146,18 +157,18 @@ namespace osu.Game.Screens.Select.Details
                     // Account for mania differences locally for now
                     // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
                     FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
-                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
+                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, null, false);
                     break;
 
                 default:
                     FirstValue.Title = BeatmapsetsStrings.ShowStatsCs;
-                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize, false);
                     break;
             }
 
-            HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
-            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
-            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
+            HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate, false);
+            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty, isOdRateAdjusted);
+            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate, isArRateAdjusted);
 
             updateStarDifficulty();
         }
@@ -191,7 +202,7 @@ namespace osu.Game.Screens.Select.Details
                 if (normalDifficulty == null || moddedDifficulty == null)
                     return;
 
-                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars, false);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
 
@@ -222,11 +233,11 @@ namespace osu.Game.Screens.Select.Details
                 set => name.Text = value;
             }
 
-            private (float baseValue, float? adjustedValue)? value;
+            private (float baseValue, float? adjustedValue, bool isRateAdjusted)? value;
 
-            public (float baseValue, float? adjustedValue) Value
+            public (float baseValue, float? adjustedValue, bool isRateAdjusted) Value
             {
-                get => value ?? (0, null);
+                get => value ?? (0, null, false);
                 set
                 {
                     if (value == this.value)
@@ -237,6 +248,7 @@ namespace osu.Game.Screens.Select.Details
                     bar.Length = value.baseValue / maxValue;
 
                     valueText.Text = (value.adjustedValue ?? value.baseValue).ToString(forceDecimalPlaces ? "0.00" : "0.##");
+                    if (value.isRateAdjusted) valueText.Text += "*";
                     ModBar.Length = (value.adjustedValue ?? 0) / maxValue;
 
                     if (Precision.AlmostEquals(value.baseValue, value.adjustedValue ?? value.baseValue, 0.05f))
