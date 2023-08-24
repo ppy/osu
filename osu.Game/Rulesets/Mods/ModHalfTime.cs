@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -24,6 +25,31 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 0.99,
             Precision = 0.01,
         };
+
+        private IAdjustableAudioComponent? track;
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public virtual BindableBool AdjustPitch { get; } = new BindableBool(false);
+
+        protected ModHalfTime()
+        {
+            AdjustPitch.BindValueChanged(adjustPitchChanged);
+        }
+
+        private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
+        {
+            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+        }
+
+        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
+
+        public override void ApplyToTrack(IAdjustableAudioComponent track)
+        {
+            this.track = track;
+            AdjustPitch.TriggerChange();
+        }
 
         public override double ScoreMultiplier
         {
