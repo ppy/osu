@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
 
-        // required due to LoadAsyncComplete() calling PopOut() during load - similar workaround to `OsuDropdownMenu`
+        // required due to LoadAsyncComplete() in `VisibilityContainer` calling PopOut() during load - similar workaround to `OsuDropdownMenu`
         private bool wasOpened;
 
         public OsuPopover(bool withPadding = true)
