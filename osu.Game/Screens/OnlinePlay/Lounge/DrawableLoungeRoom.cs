@@ -170,7 +170,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             if (Room.HasPassword.Value)
             {
-                sampleJoin?.Play();
                 this.ShowPopover();
                 return true;
             }
