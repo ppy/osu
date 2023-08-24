@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[0], HitResult.Meh);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
             addJudgementOffsetAssert(hitObjects[0], -190); // time_first_circle - 190
-            addJudgementOffsetAssert(hitObjects[0], -90); // time_second_circle - first_circle_time - 90
+            addJudgementOffsetAssert(hitObjects[1], -190); // time_second_circle - first_circle_time - 90
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
         }
@@ -520,7 +520,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void addJudgementOffsetAssert(OsuHitObject hitObject, double offset)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judged at {offset}",
-                () => judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, () => Is.EqualTo(offset).Within(100));
+                () => judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, () => Is.EqualTo(offset).Within(50));
         }
 
         private void addClickActionAssert(int inputIndex, ClickAction action)
