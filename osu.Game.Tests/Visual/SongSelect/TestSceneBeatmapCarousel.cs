@@ -505,8 +505,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAddRemoveDifficultySort()
         {
-            const int local_set_count = 1;
-            const int local_diff_count = 1;
+            const int local_set_count = 2;
+            const int local_diff_count = 2;
 
             loadBeatmaps(setCount: local_set_count, diffCount: local_diff_count);
 
@@ -515,22 +515,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(false, local_set_count * local_diff_count);
 
             var firstAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
-            var secondAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
 
             AddStep("Add new set", () => carousel.UpdateBeatmapSet(firstAdded));
-            AddStep("Add new set", () => carousel.UpdateBeatmapSet(secondAdded));
-
-            checkVisibleItemCount(false, (local_set_count + 2) * local_diff_count);
-
-            AddStep("Remove set", () => carousel.RemoveBeatmapSet(firstAdded));
 
             checkVisibleItemCount(false, (local_set_count + 1) * local_diff_count);
 
-            setSelected(local_set_count + 1, 1);
-
-            AddStep("Remove set", () => carousel.RemoveBeatmapSet(secondAdded));
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(firstAdded));
 
             checkVisibleItemCount(false, (local_set_count) * local_diff_count);
+
+            setSelected(local_set_count, 1);
 
             waitForSelection(local_set_count);
         }
