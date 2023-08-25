@@ -405,7 +405,7 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet?.BeatmapSet.ID == beatmapSet.ID)
                 previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
 
-            var removedSets = root.RemoveChild(beatmapSet.ID);
+            var removedSets = root.RemoveItemsByID(beatmapSet.ID);
 
             foreach (var removedSet in removedSets)
             {
@@ -1147,7 +1147,7 @@ namespace osu.Game.Screens.Select
                 base.AddItem(i);
             }
 
-            public IEnumerable<CarouselBeatmapSet> RemoveChild(Guid beatmapSetID)
+            public IEnumerable<CarouselBeatmapSet> RemoveItemsByID(Guid beatmapSetID)
             {
                 if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSets))
                 {
