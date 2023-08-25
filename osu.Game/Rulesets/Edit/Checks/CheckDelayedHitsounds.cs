@@ -32,7 +32,9 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateConsequentDelay(this),
             new IssueTemplateDelay(this),
-            new IssuTemplateMinorDelay(this)
+            new IssueTemplateDelayNoSilence(this),
+            new IssuTemplateMinorDelay(this),
+            new IssuTemplateMinorDelayNoSilence(this),
         };
 
         private float getAverageAmplitude(Waveform.Point point) => (point.AmplitudeLeft + point.AmplitudeRight) / 2;
@@ -93,9 +95,19 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (consequentDelay >= delay_threshold)
                         yield return new IssueTemplateConsequentDelay(this).Create(file.Filename, consequentDelay);
                     else if (consequentDelay + delay >= delay_threshold)
-                        yield return new IssueTemplateDelay(this).Create(file.Filename, consequentDelay, delay);
+                    {
+                        if (consequentDelay > 0)
+                            yield return new IssueTemplateDelay(this).Create(file.Filename, consequentDelay, delay);
+                        else
+                            yield return new IssueTemplateDelayNoSilence(this).Create(file.Filename, delay);
+                    }
                     else if (consequentDelay + delay >= delay_threshold_negligible)
-                        yield return new IssuTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
+                    {
+                        if (consequentDelay > 0)
+                            yield return new IssuTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
+                        else
+                            yield return new IssuTemplateMinorDelayNoSilence(this).Create(file.Filename, delay);
+                    }
                 }
             }
         }
@@ -138,6 +150,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             public Issue Create(string filename, int consequentDelay, int delay) => new Issue(this, filename, delay, consequentDelay);
         }
 
+        public class IssueTemplateDelayNoSilence : IssueTemplate
+        {
+            public IssueTemplateDelayNoSilence(ICheck check)
+                : base(check, IssueType.Warning,
+                    "\"{0}\" has a transient delay of ~{1:0.##} ms.")
+            {
+            }
+
+            public Issue Create(string filename, int delay) => new Issue(this, filename, delay);
+        }
+
         public class IssuTemplateMinorDelay : IssueTemplate
         {
             public IssuTemplateMinorDelay(ICheck check)
@@ -147,6 +170,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             public Issue Create(string filename, int consequentDelay, int delay) => new Issue(this, filename, delay, consequentDelay);
+        }
+
+        public class IssuTemplateMinorDelayNoSilence : IssueTemplate
+        {
+            public IssuTemplateMinorDelayNoSilence(ICheck check)
+                : base(check, IssueType.Negligible,
+                    "\"{0}\" has a transient delay of ~{1:0.##} ms.")
+            {
+            }
+
+            public Issue Create(string filename, int delay) => new Issue(this, filename, delay);
         }
     }
 }
