@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -271,6 +272,11 @@ namespace osu.Game.Screens.Select
             }
 
             loading.Hide();
+        }
+
+        public Bindable<MapStats> GetBindedAdjustedMapStats()
+        {
+            return advanced.AdjustedMapStats.GetBoundCopy();
         }
 
         private partial class DetailBox : Container

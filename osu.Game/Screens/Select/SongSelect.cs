@@ -305,6 +305,9 @@ namespace osu.Game.Screens.Select
             // therein it will be registered at the `OsuGame` level to properly function as a blocking overlay.
             LoadComponent(ModSelect = CreateModSelectOverlay());
 
+            var bindedStats = BeatmapDetails.Details.GetBindedAdjustedMapStats();
+            ModSelect.SetBindedMapStats(bindedStats);
+
             if (Footer != null)
             {
                 foreach (var (button, overlay) in CreateFooterButtons())
