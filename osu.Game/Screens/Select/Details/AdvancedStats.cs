@@ -113,6 +113,8 @@ namespace osu.Game.Screens.Select.Details
             updateStatistics();
         }
 
+        public Bindable<MapStats> AdjustedMapStats = new Bindable<MapStats>();
+
         private void updateStatistics()
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
@@ -146,6 +148,14 @@ namespace osu.Game.Screens.Select.Details
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
 
             updateStarDifficulty();
+
+            var temp = AdjustedMapStats.Value;
+            temp.CS.Value = FirstValue.Value.adjustedValue ?? 0;
+            temp.HP.Value = HpDrain.Value.adjustedValue ?? 0;
+            temp.OD.Value = Accuracy.Value.adjustedValue ?? 0;
+            temp.AR.Value = ApproachRate.Value.adjustedValue ?? 5;
+            AdjustedMapStats.Value = temp;
+
         }
 
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -178,6 +188,11 @@ namespace osu.Game.Screens.Select.Details
                     return;
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
+
+                var temp = AdjustedMapStats.Value;
+                temp.StarRating.Value = moddedDifficulty.Value.Stars;
+                AdjustedMapStats.Value = temp;
+
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
 
@@ -295,5 +310,11 @@ namespace osu.Game.Screens.Select.Details
                 };
             }
         }
+    }
+    public struct MapStats
+    {
+        public Bindable<double> StarRating;
+        public Bindable<double> MinBPM, MaxBPM, AvgBPM;
+        public Bindable<float> CS, HP, AR, OD;
     }
 }

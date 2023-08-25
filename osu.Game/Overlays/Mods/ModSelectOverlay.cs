@@ -25,6 +25,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select.Details;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -123,6 +124,7 @@ namespace osu.Game.Overlays.Mods
 
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
+        private ModMapInfoDisplay mapInfoDisplay = null!;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -219,6 +221,12 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
+            aboveColumnsContent.Add(mapInfoDisplay = new ModMapInfoDisplay
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft
+            });
+
             FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
@@ -244,6 +252,10 @@ namespace osu.Game.Overlays.Mods
             globalAvailableMods.BindTo(game.AvailableMods);
         }
 
+        public void SetBindedMapStats(Bindable<MapStats> stats)
+        {
+            mapInfoDisplay.Current = stats;
+        }
         public override void Hide()
         {
             base.Hide();
@@ -397,6 +409,12 @@ namespace osu.Game.Overlays.Mods
                 multiplier *= mod.ScoreMultiplier;
 
             multiplierDisplay.Current.Value = multiplier;
+        }
+
+        private void updateMapInfo()
+        {
+            if (mapInfoDisplay == null)
+                return;
         }
 
         private void updateCustomisation()
