@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -233,8 +234,41 @@ namespace osu.Game.Rulesets.Catch
             };
         }
 
-        public override double PreemptFromAr(float AR) => AR < 5 ? (1200.0 + 600.0 * (5 - AR) / 5) : (1200.0 - 750.0 * (AR - 5) / 5);
-        public override float ArFromPreempt(double preempt) => (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150)) + 5;
-        public override float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
+        public double PreemptFromAr(float AR) => AR < 5 ? (1200.0 + 600.0 * (5 - AR) / 5) : (1200.0 - 750.0 * (AR - 5) / 5);
+        public float ArFromPreempt(double preempt) => (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150)) + 5;
+        public float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
+
+        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted)
+        {
+            BeatmapDifficulty? adjustedDifficulty = null;
+            isRateAdjusted = (false, false);
+
+            if (mods.Any(m => m is IApplicableToDifficulty))
+            {
+                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(adjustedDifficulty);
+            }
+
+            if (mods.Any(m => m is ModRateAdjust))
+            {
+                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
+
+                foreach (var mod in mods.OfType<ModRateAdjust>())
+                {
+                    double speedChange = (float)mod.SpeedChange.Value;
+
+                    float ar = adjustedDifficulty.ApproachRate;
+                    float od = adjustedDifficulty.OverallDifficulty;
+
+                    adjustedDifficulty.ApproachRate = ChangeArFromRate(ar, speedChange);
+
+                    if (adjustedDifficulty.ApproachRate != ar) isRateAdjusted.AR = true;
+                }
+            }
+
+            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+        }
     }
 }

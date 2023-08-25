@@ -428,9 +428,41 @@ namespace osu.Game.Rulesets.Mania
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
 
-        public override double HitwindowFromOd(float OD) => 64.0 - 3 * OD;
-        public override float OdFromHitwindow(double hitwindow300) => (float)(64.0 - hitwindow300) / 3;
-        public override float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
+        public double HitwindowFromOd(float OD) => 64.0 - 3 * OD;
+        public float OdFromHitwindow(double hitwindow300) => (float)(64.0 - hitwindow300) / 3;
+        public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
+        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted)
+        {
+            BeatmapDifficulty? adjustedDifficulty = null;
+            isRateAdjusted = (false, false);
+
+            if (mods.Any(m => m is IApplicableToDifficulty))
+            {
+                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(adjustedDifficulty);
+            }
+
+            if (mods.Any(m => m is ModRateAdjust))
+            {
+                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
+
+                foreach (var mod in mods.OfType<ModRateAdjust>())
+                {
+                    double speedChange = (float)mod.SpeedChange.Value;
+
+                    float od = adjustedDifficulty.OverallDifficulty;
+
+                    adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(od, speedChange);
+
+                    if (adjustedDifficulty.OverallDifficulty != od) isRateAdjusted.OD = true;
+                }
+            }
+
+            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+        }
+
     }
 
     public enum PlayfieldType
