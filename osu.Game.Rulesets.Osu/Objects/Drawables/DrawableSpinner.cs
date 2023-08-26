@@ -286,7 +286,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 
-        private int wholeSpins;
+        private int currentSpins;
 
         private void updateBonusScore()
         {
@@ -295,14 +295,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int spins = (int)(Result.RateAdjustedRotation / 360);
 
-            if (spins < wholeSpins)
+            if (spins < currentSpins)
             {
                 // rewinding, silently handle
-                wholeSpins = spins;
+                currentSpins = spins;
                 return;
             }
 
-            while (wholeSpins != spins)
+            while (currentSpins != spins)
             {
                 var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
@@ -315,7 +315,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
                 }
 
-                wholeSpins++;
+                currentSpins++;
             }
         }
     }
