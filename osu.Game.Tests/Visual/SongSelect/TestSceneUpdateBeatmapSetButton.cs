@@ -251,7 +251,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 RelativeSizeAxes = Axes.Both,
                 BeatmapSets = new List<BeatmapSetInfo>
                 {
-                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo()),
+                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(5)),
                 }
             };
         }
