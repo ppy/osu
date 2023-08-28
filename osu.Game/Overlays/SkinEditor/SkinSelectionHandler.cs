@@ -31,8 +31,6 @@ namespace osu.Game.Overlays.SkinEditor
             UpdatePosition = updateDrawablePosition
         };
 
-        private float accumulatedNegativeScaling;
-
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
             // convert scale to screen space
@@ -73,31 +71,24 @@ namespace osu.Game.Overlays.SkinEditor
                     scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
             }
 
-            // If scaling reverses the selection, don't scale and accumulate the amount of scaling.
-            if (adjustedRect.Width + scale.X < 0 || adjustedRect.Height + scale.Y < 0)
-            {
-                accumulatedNegativeScaling += scale.Length; // - new Vector2(selectionRect.Width, selectionRect.Height).Length;
-
-                return true;
-            }
-
-            // Compensate for accumulated negative scaling.
-            if (Precision.AlmostBigger(accumulatedNegativeScaling, 0) && !Precision.AlmostEquals(accumulatedNegativeScaling, 0))
-            {
-                float length = scale.Length;
-                accumulatedNegativeScaling -= length;
-
-                // If the accumulated negative scaling is still positive, don't scale.
-                if (Precision.AlmostBigger(accumulatedNegativeScaling, 0)) return true;
-                scale *= Math.Abs(accumulatedNegativeScaling) / length;
-                accumulatedNegativeScaling = 0;
-            }
-
             if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
             if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
 
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
+
+            if (adjustedRect.Width < 0)
+            {
+                SelectionBox.ScaleHandlesFlip(Direction.Horizontal);
+                HandleFlip(Direction.Horizontal, false);
+            }
+            if (adjustedRect.Height < 0)
+            {
+                SelectionBox.ScaleHandlesFlip(Direction.Vertical);
+                HandleFlip(Direction.Vertical, false);
+            }
+            if (adjustedRect.Width < 0 || adjustedRect.Height < 0)
+                return true;
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
@@ -168,12 +159,6 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
-
-        protected override void OnOperationEnded()
-        {
-            base.OnOperationEnded();
-            accumulatedNegativeScaling = 0;
-        }
 
         protected override void OnSelectionChanged()
         {
