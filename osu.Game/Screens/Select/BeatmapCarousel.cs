@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Select
                     return createCarouselSet(new BeatmapSetInfo(new[] { b })
                     {
                         ID = b.BeatmapSet!.ID,
+                        OnlineID = b.BeatmapSet!.OnlineID
                     });
                 }).OfType<CarouselBeatmapSet>();
 
@@ -422,7 +423,8 @@ namespace osu.Game.Screens.Select
                 {
                     var newSet = createCarouselSet(new BeatmapSetInfo(new[] { beatmap })
                     {
-                        ID = beatmapSet.ID
+                        ID = beatmapSet.ID,
+                        OnlineID = beatmapSet.OnlineID
                     });
 
                     if (newSet != null)
