@@ -73,7 +73,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            scoreMultiplier = difficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            scoreMultiplier = difficultyPeppyStars * new OsuRuleset().GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo
+            {
+                IsForTargetRuleset = baseBeatmap.BeatmapInfo.Ruleset.OnlineID == 0,
+                CircleSize = baseBeatmap.Difficulty.CircleSize,
+                OverallDifficulty = baseBeatmap.Difficulty.OverallDifficulty,
+                CircleCount = countNormal,
+                TotalObjectCount = objectCount
+            });
 
             foreach (var obj in playableBeatmap.HitObjects)
                 simulateHit(obj);

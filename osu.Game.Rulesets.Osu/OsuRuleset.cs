@@ -259,6 +259,59 @@ namespace osu.Game.Rulesets.Osu
 
         public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new OsuLegacyScoreSimulator();
 
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case OsuModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case OsuModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case OsuModHalfTime:
+                    case OsuModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case OsuModHidden:
+                        multiplier *= 1.06;
+                        break;
+
+                    case OsuModHardRock:
+                        multiplier *= scoreV2 ? 1.10 : 1.06;
+                        break;
+
+                    case OsuModDoubleTime:
+                    case OsuModNightcore:
+                        multiplier *= scoreV2 ? 1.20 : 1.12;
+                        break;
+
+                    case OsuModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case OsuModSpunOut:
+                        multiplier *= 0.9;
+                        break;
+
+                    case OsuModRelax:
+                    case OsuModAutopilot:
+                        return 0;
+                }
+            }
+
+            return multiplier;
+        }
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new OsuRulesetConfigManager(settings, RulesetInfo);

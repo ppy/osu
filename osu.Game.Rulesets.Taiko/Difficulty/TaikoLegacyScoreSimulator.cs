@@ -76,7 +76,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            modMultiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            modMultiplier = new TaikoRuleset().GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo
+            {
+                IsForTargetRuleset = baseBeatmap.BeatmapInfo.Ruleset.OnlineID == 1,
+                CircleSize = baseBeatmap.Difficulty.CircleSize,
+                OverallDifficulty = baseBeatmap.Difficulty.OverallDifficulty,
+                CircleCount = countNormal,
+                TotalObjectCount = objectCount
+            });
 
             foreach (var obj in playableBeatmap.HitObjects)
                 simulateHit(obj);

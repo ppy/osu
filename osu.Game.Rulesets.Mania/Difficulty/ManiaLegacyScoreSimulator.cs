@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
@@ -18,9 +18,40 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
         {
-            double multiplier = mods.Where(m => m is not (ModHidden or ModHardRock or ModDoubleTime or ModFlashlight or ManiaModFadeIn))
-                                    .Select(m => m.ScoreMultiplier)
-                                    .Aggregate(1.0, (c, n) => c * n);
+            IBeatmap baseBeatmap = workingBeatmap.Beatmap;
+
+            int countNormal = 0;
+            int countSlider = 0;
+            int countSpinner = 0;
+
+            foreach (HitObject obj in baseBeatmap.HitObjects)
+            {
+                switch (obj)
+                {
+                    case IHasPath:
+                        countSlider++;
+                        break;
+
+                    case IHasDuration:
+                        countSpinner++;
+                        break;
+
+                    default:
+                        countNormal++;
+                        break;
+                }
+            }
+
+            int objectCount = countNormal + countSlider + countSpinner;
+
+            double multiplier = new ManiaRuleset().GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo
+            {
+                IsForTargetRuleset = baseBeatmap.BeatmapInfo.Ruleset.OnlineID == 3,
+                CircleSize = baseBeatmap.Difficulty.CircleSize,
+                OverallDifficulty = baseBeatmap.Difficulty.OverallDifficulty,
+                CircleCount = countNormal,
+                TotalObjectCount = objectCount
+            });
 
             ComboScore = (int)(1000000 * multiplier);
         }

@@ -313,6 +313,57 @@ namespace osu.Game.Rulesets.Mania
 
         public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new ManiaLegacyScoreSimulator();
 
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case ManiaModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case ManiaModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case ManiaModHalfTime:
+                    case ManiaModDaycore:
+                        multiplier *= 0.5;
+                        break;
+
+                    // case ManiaModSpunOut:
+                    // case ManiaModRelax:
+                    // case ManiaModAutopilot:
+                    //     multiplier *= 0;
+                    //     break;
+                }
+            }
+
+            if (difficulty.IsForTargetRuleset)
+                return multiplier;
+
+            // Apply key mod multipliers.
+
+            int originalColumns = ManiaBeatmapConverter.GetColumnCount(difficulty);
+            int actualColumns = originalColumns;
+
+            actualColumns = mods.OfType<ManiaKeyMod>().SingleOrDefault()?.KeyCount ?? actualColumns;
+            if (mods.Any(m => m is ManiaModDualStages))
+                actualColumns *= 2;
+
+            if (actualColumns > originalColumns)
+                multiplier *= 0.9;
+            else if (actualColumns < originalColumns)
+                multiplier *= 0.9 - 0.04 * (originalColumns - actualColumns);
+
+            return multiplier;
+        }
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);

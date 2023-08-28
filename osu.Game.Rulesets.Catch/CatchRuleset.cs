@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -214,6 +215,59 @@ namespace osu.Game.Rulesets.Catch
         public int LegacyID => 2;
 
         public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new CatchLegacyScoreSimulator();
+
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case CatchModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case CatchModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case CatchModHalfTime:
+                    case CatchModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case CatchModHidden:
+                        multiplier *= scoreV2 ? 1.0 : 1.06;
+                        break;
+
+                    case CatchModHardRock:
+                        multiplier *= scoreV2 ? 1.0 : 1.12;
+                        break;
+
+                    case CatchModDoubleTime:
+                    case CatchModNightcore:
+                        multiplier *= scoreV2 ? 1.0 : 1.06;
+                        break;
+
+                    case CatchModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    // case CatchModSpunOut:
+                    //     multiplier *= 0.9;
+                    //     break;
+
+                    // case CatchModAutopilot:
+                    case CatchModRelax:
+                        return 0;
+                }
+            }
+
+            return multiplier;
+        }
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
