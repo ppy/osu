@@ -419,6 +419,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmapsSplitOut)
             {
+                var newSets = new List<CarouselBeatmapSet>();
+
                 foreach (var beatmap in beatmapSet.Beatmaps)
                 {
                     var newSet = createCarouselSet(new BeatmapSetInfo(new[] { beatmap })
@@ -429,12 +431,17 @@ namespace osu.Game.Screens.Select
 
                     if (newSet != null)
                     {
+                        newSets.Add(newSet);
                         root.AddItem(newSet);
-
-                        // check if we can/need to maintain our current selection.
-                        if (previouslySelectedID != null)
-                            select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
                     }
+                }
+
+                // check if we can/need to maintain our current selection.
+                if (previouslySelectedID != null)
+                {
+                    var toSelect = newSets.FirstOrDefault(s => s.Beatmaps.Any(b => b.BeatmapInfo.ID == previouslySelectedID))
+                                   ?? newSets.FirstOrDefault();
+                    select(toSelect);
                 }
             }
             else
