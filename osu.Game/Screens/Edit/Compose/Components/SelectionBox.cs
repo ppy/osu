@@ -307,6 +307,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return button;
         }
 
+        public void ScaleHandlesFlip(Direction direction) => dragHandles.ScaleHandlesFlip(direction);
+
         private void addScaleHandle(Anchor anchor)
         {
             var handle = new SelectionBoxScaleHandle
