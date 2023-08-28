@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
+        [Cached]
+        private Bindable<BeatmapInfo> adjustedInfo { get; set; } = new Bindable<BeatmapInfo>();
+
         protected BeatmapCarousel Carousel { get; private set; } = null!;
 
         private ParallaxContainer wedgeBackground = null!;
@@ -305,8 +308,8 @@ namespace osu.Game.Screens.Select
             // therein it will be registered at the `OsuGame` level to properly function as a blocking overlay.
             LoadComponent(ModSelect = CreateModSelectOverlay());
 
-            var bindedStats = BeatmapDetails.Details.GetBindedAdjustedMapStats();
-            ModSelect.SetBindedMapStats(bindedStats);
+            //var bindedStats = BeatmapDetails.Details.GetBindedAdjustedMapStats();
+            //ModSelect.SetBindedMapStats(bindedStats);
 
             if (Footer != null)
             {
@@ -583,6 +586,7 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
 
             ModSelect.SelectedMods.BindTo(selectedMods);
+            //BeatmapDetails.AdjustedInfo.BindTo(adjustedInfo);
 
             beginLooping();
         }

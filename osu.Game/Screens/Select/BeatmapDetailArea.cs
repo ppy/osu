@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,6 +30,9 @@ namespace osu.Game.Screens.Select
         }
 
         public readonly BeatmapDetails Details;
+
+        //[Cached]
+        //public Bindable<BeatmapInfo> AdjustedInfo { get; private set; } = new Bindable<BeatmapInfo>();
 
         protected Bindable<BeatmapDetailAreaTabItem> CurrentTab => tabControl.Current;
 
