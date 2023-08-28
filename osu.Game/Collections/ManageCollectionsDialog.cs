@@ -23,6 +23,9 @@ namespace osu.Game.Collections
 
         private AudioFilter lowPassFilter = null!;
 
+        protected override string PopInSampleName => @"UI/overlay-big-pop-in";
+        protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
+
         public ManageCollectionsDialog()
         {
             Anchor = Anchor.Centre;
