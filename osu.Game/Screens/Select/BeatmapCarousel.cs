@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet? selectedBeatmapSet;
 
-        private IEnumerable<BeatmapSetInfo> originalBeatmapSetsDetached = Enumerable.Empty<BeatmapSetInfo>();
+        private List<BeatmapSetInfo> originalBeatmapSetsDetached = new List<BeatmapSetInfo>();
 
         /// <summary>
         /// Raised when the <see cref="SelectedBeatmapInfo"/> is changed.
@@ -381,6 +381,8 @@ namespace osu.Game.Screens.Select
             if (!root.BeatmapSetsByID.TryGetValue(beatmapSetID, out var existingSets))
                 return;
 
+            originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSetID);
+
             foreach (var set in existingSets)
             {
                 foreach (var beatmap in set.Beatmaps)
@@ -401,6 +403,9 @@ namespace osu.Game.Screens.Select
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
             Guid? previouslySelectedID = null;
+
+            originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSet.ID);
+            originalBeatmapSetsDetached.Add(beatmapSet.Detach());
 
             // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
             if (selectedBeatmapSet?.BeatmapSet.ID == beatmapSet.ID)
