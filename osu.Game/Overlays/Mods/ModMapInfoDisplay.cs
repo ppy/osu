@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -12,14 +13,13 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select.Details;
 using osu.Game.Localisation;
 using osuTK;
 
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModMapInfoDisplay : Container, IHasCurrentValue<MapStats>
+    public partial class ModMapInfoDisplay : Container, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
         private const float transition_duration = 200;
@@ -28,36 +28,40 @@ namespace osu.Game.Overlays.Mods
         private readonly Box labelBackground;
         private readonly FillFlowContainer content;
 
-        public Bindable<MapStats> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
-        private readonly BindableWithCurrent<MapStats> current = new BindableWithCurrent<MapStats>();
+        //public Bindable<double> Current
+        //{
+        //    get => current.Current;
+        //    set => current.Current = value;
+        //}
+        //private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        public Bindable<double> Current { get; set; } = new BindableWithCurrent<double>();
+
+        //[Resolved]
+        //private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        protected Func<double, osuTK.Graphics.Color4> GetColor;
+
         /// <summary>
         /// Text to display in the left area of the display.
         /// </summary>
-        //protected abstract LocalisableString Label { get; }
-        protected LocalisableString Label => CommonStrings.Finish;
-        //protected string Label { get; }
+        protected LocalisableString Label;
 
         protected virtual float ValueAreaWidth => 56;
 
-        protected virtual string CounterFormat => @"N0";
+        protected virtual string CounterFormat => @"0.00";
 
         protected override Container<Drawable> Content => content;
 
         protected readonly RollingCounter<double> Counter;
 
-        public ModMapInfoDisplay()
+        public ModMapInfoDisplay(LocalisableString label, Func<double, osuTK.Graphics.Color4> colorFunc)
         {
+            Label = label;
+            GetColor = colorFunc;
             Height = HEIGHT;
             AutoSizeAxes = Axes.X;
 
@@ -125,7 +129,7 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Current = { BindTarget = Current.Value.StarRating }
+                                        Current = { BindTarget = Current }
                                     }
                                 }
                             }
@@ -146,39 +150,17 @@ namespace osu.Game.Overlays.Mods
             Current.BindValueChanged(e =>
             {
                 //var effect = CalculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
-                setColours(e.NewValue.StarRating.Value);
+                setColours(e.NewValue);
             }, true);
         }
 
         /// <summary>
         /// Fades colours of text and its background according to displayed value.
         /// </summary>
-        /// <param name="stars">random number.</param>
-        private void setColours(double stars)
+        /// <param name="value">value</param>
+        private void setColours(double value)
         {
-            contentBackground.FadeColour(colours.ForStarDifficulty(stars), transition_duration, Easing.OutQuint);
-        }
-
-        /// <summary>
-        /// Converts signed integer into <see cref="ModEffect"/>. Negative values are counted as difficulty reduction, positive as increase.
-        /// </summary>
-        /// <param name="comparison">Value to convert. Will arrive from comparison between <see cref="Current"/> bindable once it changes and it's <see cref="Bindable{T}.Default"/>.</param>
-        /// <returns>Effect of the value.</returns>
-        protected virtual ModEffect CalculateEffectForComparison(int comparison)
-        {
-            if (comparison == 0)
-                return ModEffect.NotChanged;
-            if (comparison < 0)
-                return ModEffect.DifficultyReduction;
-
-            return ModEffect.DifficultyIncrease;
-        }
-
-        protected enum ModEffect
-        {
-            NotChanged,
-            DifficultyReduction,
-            DifficultyIncrease
+            contentBackground.FadeColour(GetColor(value), transition_duration, Easing.OutQuint);
         }
 
         private partial class EffectCounter : RollingCounter<double>

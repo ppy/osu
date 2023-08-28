@@ -274,11 +274,6 @@ namespace osu.Game.Screens.Select
             loading.Hide();
         }
 
-        public Bindable<MapStats> GetBindedAdjustedMapStats()
-        {
-            return advanced.AdjustedMapStats.GetBoundCopy();
-        }
-
         private partial class DetailBox : Container
         {
             private readonly Container content;

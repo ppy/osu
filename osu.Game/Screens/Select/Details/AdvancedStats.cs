@@ -46,6 +46,11 @@ namespace osu.Game.Screens.Select.Details
 
         private IBeatmapInfo beatmapInfo;
 
+#nullable enable
+        [Resolved]
+        private Bindable<BeatmapInfo>? adjustedInfo { get; set; } = null;
+#nullable disable
+
         public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
@@ -99,6 +104,21 @@ namespace osu.Game.Screens.Select.Details
         private ModSettingChangeTracker modSettingChangeTracker;
         private ScheduledDelegate debouncedStatisticsUpdate;
 
+        private void updateBindedInfo()
+        {
+            if (adjustedInfo == null) return;
+
+            BeatmapInfo adjusted = (BeatmapInfo)beatmapInfo;
+            adjusted.Difficulty.CircleSize = FirstValue.Value.adjustedValue ?? 0;
+            adjusted.Difficulty.DrainRate = HpDrain.Value.adjustedValue ?? 0;
+            adjusted.Difficulty.ApproachRate = ApproachRate.Value.adjustedValue ?? 5;
+            adjusted.Difficulty.OverallDifficulty = Accuracy.Value.adjustedValue ?? 0;
+            adjusted.StarRating = starDifficulty.Value.adjustedValue ?? 0;
+
+            adjustedInfo.Value = adjusted;
+            adjustedInfo.TriggerChange();
+        }
+
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             modSettingChangeTracker?.Dispose();
@@ -112,8 +132,6 @@ namespace osu.Game.Screens.Select.Details
 
             updateStatistics();
         }
-
-        public Bindable<MapStats> AdjustedMapStats = new Bindable<MapStats>();
 
         private void updateStatistics()
         {
@@ -149,13 +167,6 @@ namespace osu.Game.Screens.Select.Details
 
             updateStarDifficulty();
 
-            var temp = AdjustedMapStats.Value;
-            temp.CS.Value = FirstValue.Value.adjustedValue ?? 0;
-            temp.HP.Value = HpDrain.Value.adjustedValue ?? 0;
-            temp.OD.Value = Accuracy.Value.adjustedValue ?? 0;
-            temp.AR.Value = ApproachRate.Value.adjustedValue ?? 5;
-            AdjustedMapStats.Value = temp;
-
         }
 
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -188,10 +199,7 @@ namespace osu.Game.Screens.Select.Details
                     return;
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
-
-                var temp = AdjustedMapStats.Value;
-                temp.StarRating.Value = moddedDifficulty.Value.Stars;
-                AdjustedMapStats.Value = temp;
+                updateBindedInfo();
 
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
@@ -310,11 +318,5 @@ namespace osu.Game.Screens.Select.Details
                 };
             }
         }
-    }
-    public struct MapStats
-    {
-        public Bindable<double> StarRating;
-        public Bindable<double> MinBPM, MaxBPM, AvgBPM;
-        public Bindable<float> CS, HP, AR, OD;
     }
 }
