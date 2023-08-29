@@ -57,54 +57,55 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!isHitSound(file.Filename))
                         continue;
 
-                    Waveform waveform = new Waveform(stream);
-
-                    var points = waveform.GetPoints();
-
-                    // Skip muted samples
-                    if (points.Length == 0 || points.Sum(getAverageAmplitude) <= silence_threshold)
-                        continue;
-
-                    float maxAmplitude = points.Select(getAverageAmplitude).Max();
-
-                    int consequentDelay = 0;
-                    int delay = 0;
-                    float amplitude = 0;
-
-                    while (delay + consequentDelay < points.Length)
+                    using (Waveform waveform = new Waveform(stream))
                     {
-                        amplitude += getAverageAmplitude(points[delay]);
+                        var points = waveform.GetPoints();
 
-                        // Reached peak amplitude/transient
-                        if (amplitude >= maxAmplitude)
-                            break;
+                        // Skip muted samples
+                        if (points.Length == 0 || points.Sum(getAverageAmplitude) <= silence_threshold)
+                            continue;
 
-                        amplitude *= falloff_factor;
+                        float maxAmplitude = points.Select(getAverageAmplitude).Max();
 
-                        if (amplitude < silence_threshold)
+                        int consequentDelay = 0;
+                        int delay = 0;
+                        float amplitude = 0;
+
+                        while (delay + consequentDelay < points.Length)
                         {
-                            amplitude = 0;
-                            consequentDelay++;
+                            amplitude += getAverageAmplitude(points[delay]);
+
+                            // Reached peak amplitude/transient
+                            if (amplitude >= maxAmplitude)
+                                break;
+
+                            amplitude *= falloff_factor;
+
+                            if (amplitude < silence_threshold)
+                            {
+                                amplitude = 0;
+                                consequentDelay++;
+                            }
+
+                            delay++;
                         }
 
-                        delay++;
-                    }
-
-                    if (consequentDelay >= delay_threshold)
-                        yield return new IssueTemplateConsequentDelay(this).Create(file.Filename, consequentDelay);
-                    else if (consequentDelay + delay >= delay_threshold)
-                    {
-                        if (consequentDelay > 0)
-                            yield return new IssueTemplateDelay(this).Create(file.Filename, consequentDelay, delay);
-                        else
-                            yield return new IssueTemplateDelayNoSilence(this).Create(file.Filename, delay);
-                    }
-                    else if (consequentDelay + delay >= delay_threshold_negligible)
-                    {
-                        if (consequentDelay > 0)
-                            yield return new IssuTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
-                        else
-                            yield return new IssuTemplateMinorDelayNoSilence(this).Create(file.Filename, delay);
+                        if (consequentDelay >= delay_threshold)
+                            yield return new IssueTemplateConsequentDelay(this).Create(file.Filename, consequentDelay);
+                        else if (consequentDelay + delay >= delay_threshold)
+                        {
+                            if (consequentDelay > 0)
+                                yield return new IssueTemplateDelay(this).Create(file.Filename, consequentDelay, delay);
+                            else
+                                yield return new IssueTemplateDelayNoSilence(this).Create(file.Filename, delay);
+                        }
+                        else if (consequentDelay + delay >= delay_threshold_negligible)
+                        {
+                            if (consequentDelay > 0)
+                                yield return new IssuTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
+                            else
+                                yield return new IssuTemplateMinorDelayNoSilence(this).Create(file.Filename, delay);
+                        }
                     }
                 }
             }
