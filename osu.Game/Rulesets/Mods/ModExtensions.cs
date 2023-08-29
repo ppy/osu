@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Mods
                 {
                     User = new APIUser
                     {
-                        // TODO: Some fields weren't copied from replayData.User (namely IsBot and Id). Should ModCreatedUser inherit from APIUser so we could pass it verbatim to avoid future mistakes ?
                         Id = replayData.User.OnlineID,
                         Username = replayData.User.Username,
                         IsBot = replayData.User.IsBot,
