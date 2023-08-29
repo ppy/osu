@@ -260,7 +260,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
-            StartTimeBindable.BindValueChanged(onStartTimeChanged);
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -311,9 +310,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
-            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
-            StartTimeBindable.ValueChanged -= onStartTimeChanged;
-
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
@@ -333,6 +329,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Entry.NestedEntries.RemoveAll(nestedEntry => nestedEntry is SyntheticHitObjectEntry);
             ClearNestedHitObjects();
 
+            // Changes to `HitObject` properties trigger default application, which triggers `State` updates.
+            // When a new hitobject is applied, `OnApply()` automatically performs a state update.
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
             entry.RevertResult -= onRevertResult;
@@ -375,8 +373,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
 
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
-
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
         private void onRevertResult()
@@ -393,6 +389,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             Debug.Assert(Entry != null);
             Apply(Entry);
+
+            // Applied defaults indicate a change in hit object state.
+            // We need to update the judgement result time to the new end time
+            // and update state to ensure the hit object fades out at the correct time.
+            if (Result is not null)
+            {
+                Result.TimeOffset = 0;
+                updateState(State.Value, true);
+            }
 
             DefaultsApplied?.Invoke(this);
         }
