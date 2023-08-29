@@ -73,14 +73,14 @@ namespace osu.Game.Overlays.SkinEditor
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
 
-            if (adjustedRect.Width < 0 || adjustedRect.Height < 0)
+            if (adjustedRect.Width <= 0 || adjustedRect.Height <= 0)
             {
-                if (adjustedRect.Width < 0)
+                if (adjustedRect.Width <= 0)
                 {
                     SelectionBox.FlipScaleHandles(Direction.Horizontal);
                     HandleFlip(Direction.Horizontal, false);
                 }
-                if (adjustedRect.Height < 0)
+                if (adjustedRect.Height <= 0)
                 {
                     SelectionBox.FlipScaleHandles(Direction.Vertical);
                     HandleFlip(Direction.Vertical, false);
@@ -114,10 +114,11 @@ namespace osu.Game.Overlays.SkinEditor
 
                 updateDrawablePosition(drawableItem, newPositionInAdjusted);
 
+                var currentScaledDelta = scaledDelta;
                 if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
-                    scaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
+                    currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
 
-                drawableItem.Scale *= scaledDelta;
+                drawableItem.Scale *= currentScaledDelta;
             }
 
             return true;
