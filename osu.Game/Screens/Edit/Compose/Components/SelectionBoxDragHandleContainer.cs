@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             allDragHandles.Add(handle);
         }
 
-        public void ScaleHandlesFlip(Direction direction)
+        public void FlipScaleHandles(Direction direction)
         {
             foreach (var handle in scaleHandles)
             {

@@ -73,18 +73,20 @@ namespace osu.Game.Overlays.SkinEditor
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
 
-            if (adjustedRect.Width < 0)
-            {
-                SelectionBox.ScaleHandlesFlip(Direction.Horizontal);
-                HandleFlip(Direction.Horizontal, false);
-            }
-            if (adjustedRect.Height < 0)
-            {
-                SelectionBox.ScaleHandlesFlip(Direction.Vertical);
-                HandleFlip(Direction.Vertical, false);
-            }
             if (adjustedRect.Width < 0 || adjustedRect.Height < 0)
+            {
+                if (adjustedRect.Width < 0)
+                {
+                    SelectionBox.FlipScaleHandles(Direction.Horizontal);
+                    HandleFlip(Direction.Horizontal, false);
+                }
+                if (adjustedRect.Height < 0)
+                {
+                    SelectionBox.FlipScaleHandles(Direction.Vertical);
+                    HandleFlip(Direction.Vertical, false);
+                }
                 return true;
+            }
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
@@ -113,9 +115,8 @@ namespace osu.Game.Overlays.SkinEditor
                 updateDrawablePosition(drawableItem, newPositionInAdjusted);
 
                 if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
-                {
                     scaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
-                }
+
                 drawableItem.Scale *= scaledDelta;
             }
 
