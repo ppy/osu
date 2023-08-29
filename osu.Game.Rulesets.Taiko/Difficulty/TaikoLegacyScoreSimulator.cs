@@ -16,14 +16,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     internal class TaikoLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore { get; private set; }
+        public long AccuracyScore { get; private set; }
 
-        public int ComboScore { get; private set; }
+        public long ComboScore { get; private set; }
 
         public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
 
-        private int legacyBonusScore;
-        private int modernBonusScore;
+        private long legacyBonusScore;
+        private long modernBonusScore;
         private int combo;
 
         private double modMultiplier;

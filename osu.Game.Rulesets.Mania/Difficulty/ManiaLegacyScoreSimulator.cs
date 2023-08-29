@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     internal class ManiaLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore => 0;
-        public int ComboScore { get; private set; }
+        public long AccuracyScore => 0;
+        public long ComboScore { get; private set; }
         public double BonusScoreRatio => 0;
 
         public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)

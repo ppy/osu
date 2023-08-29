@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
         /// </summary>
-        int AccuracyScore { get; }
+        long AccuracyScore { get; }
 
         /// <summary>
         /// The combo-multiplied portion of the legacy (ScoreV1) total score.
         /// </summary>
-        int ComboScore { get; }
+        long ComboScore { get; }
 
         /// <summary>
         /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.

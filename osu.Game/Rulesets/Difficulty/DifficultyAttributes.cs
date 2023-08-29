@@ -51,12 +51,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The accuracy portion of the legacy (ScoreV1) total score.
         /// </summary>
-        public int LegacyAccuracyScore { get; set; }
+        public long LegacyAccuracyScore { get; set; }
 
         /// <summary>
         /// The combo-multiplied portion of the legacy (ScoreV1) total score.
         /// </summary>
-        public int LegacyComboScore { get; set; }
+        public long LegacyComboScore { get; set; }
 
         /// <summary>
         /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
@@ -106,8 +106,8 @@ namespace osu.Game.Rulesets.Difficulty
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
 
             // Temporarily allow these attributes to not exist so as to not block releases of server-side components while these attributes aren't populated/used yet.
-            LegacyAccuracyScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_ACCURACY_SCORE);
-            LegacyComboScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_COMBO_SCORE);
+            LegacyAccuracyScore = (long)values.GetValueOrDefault(ATTRIB_ID_LEGACY_ACCURACY_SCORE);
+            LegacyComboScore = (long)values.GetValueOrDefault(ATTRIB_ID_LEGACY_COMBO_SCORE);
             LegacyBonusScoreRatio = values.GetValueOrDefault(ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO);
         }
     }
