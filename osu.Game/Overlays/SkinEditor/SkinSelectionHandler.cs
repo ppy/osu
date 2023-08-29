@@ -80,11 +80,13 @@ namespace osu.Game.Overlays.SkinEditor
                     SelectionBox.FlipScaleHandles(Direction.Horizontal);
                     HandleFlip(Direction.Horizontal, false);
                 }
+
                 if (adjustedRect.Height <= 0)
                 {
                     SelectionBox.FlipScaleHandles(Direction.Vertical);
                     HandleFlip(Direction.Vertical, false);
                 }
+
                 return true;
             }
 
