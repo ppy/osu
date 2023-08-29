@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int delay_threshold = 5;
         private const int delay_threshold_negligible = 1;
 
-        private readonly string[] audioExtensions = { "mp3", "ogg", "wav" };
-
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Delayed hit sounds.");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
@@ -49,9 +47,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                 using (Stream? stream = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
                 {
                     if (stream == null)
-                        continue;
-
-                    if (!hasAudioExtension(file.Filename))
                         continue;
 
                     if (!isHitSound(file.Filename))
@@ -111,10 +106,11 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLowerInvariant().EndsWith);
-
         private bool isHitSound(string filename)
         {
+            if (!AudioCheckUtils.HasAudioExtension(filename))
+                return false;
+
             // <bank>-<sampleset>
             string[] parts = filename.ToLowerInvariant().Split('-');
 
