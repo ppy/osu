@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConsequentDelay(this),
             new IssueTemplateDelay(this),
             new IssueTemplateDelayNoSilence(this),
-            new IssuTemplateMinorDelay(this),
-            new IssuTemplateMinorDelayNoSilence(this),
+            new IssueTemplateMinorDelay(this),
+            new IssueTemplateMinorDelayNoSilence(this),
         };
 
         private float getAverageAmplitude(Waveform.Point point) => (point.AmplitudeLeft + point.AmplitudeRight) / 2;
@@ -97,9 +97,9 @@ namespace osu.Game.Rulesets.Edit.Checks
                         else if (consequentDelay + delay >= delay_threshold_negligible)
                         {
                             if (consequentDelay > 0)
-                                yield return new IssuTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
+                                yield return new IssueTemplateMinorDelay(this).Create(file.Filename, consequentDelay, delay);
                             else
-                                yield return new IssuTemplateMinorDelayNoSilence(this).Create(file.Filename, delay);
+                                yield return new IssueTemplateMinorDelayNoSilence(this).Create(file.Filename, delay);
                         }
                     }
                 }
@@ -157,9 +157,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             public Issue Create(string filename, int delay) => new Issue(this, filename, delay);
         }
 
-        public class IssuTemplateMinorDelay : IssueTemplate
+        public class IssueTemplateMinorDelay : IssueTemplate
         {
-            public IssuTemplateMinorDelay(ICheck check)
+            public IssueTemplateMinorDelay(ICheck check)
                 : base(check, IssueType.Negligible,
                     "\"{0}\" has a transient delay of ~{1:0.##} ms, of which {2:0.##} ms is complete silence.")
             {
@@ -168,9 +168,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             public Issue Create(string filename, int consequentDelay, int delay) => new Issue(this, filename, delay, consequentDelay);
         }
 
-        public class IssuTemplateMinorDelayNoSilence : IssueTemplate
+        public class IssueTemplateMinorDelayNoSilence : IssueTemplate
         {
-            public IssuTemplateMinorDelayNoSilence(ICheck check)
+            public IssueTemplateMinorDelayNoSilence(ICheck check)
                 : base(check, IssueType.Negligible,
                     "\"{0}\" has a transient delay of ~{1:0.##} ms.")
             {

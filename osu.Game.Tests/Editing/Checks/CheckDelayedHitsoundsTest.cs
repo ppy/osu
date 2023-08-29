@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Editing.Checks
                 var issues = check.Run(getContext(resourceStream)).ToList();
 
                 Assert.That(issues, Has.Count.EqualTo(1));
-                Assert.That(issues.Single().Template is CheckDelayedHitsounds.IssuTemplateMinorDelay);
+                Assert.That(issues.Single().Template is CheckDelayedHitsounds.IssueTemplateMinorDelay);
             }
         }
 
