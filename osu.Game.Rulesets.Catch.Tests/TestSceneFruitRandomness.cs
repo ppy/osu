@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddSliderStep("start time", 500, 600, 0, x =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = x;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
         }
 
@@ -44,6 +46,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("Initialize start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
 
                 fruitRotation = drawableFruit.DisplayRotation;
                 bananaRotation = drawableBanana.DisplayRotation;
@@ -54,6 +58,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("change start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = another_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
 
             AddAssert("fruit rotation is changed", () => drawableFruit.DisplayRotation != fruitRotation);
@@ -64,6 +70,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("reset start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
 
             AddAssert("rotation and size restored", () =>
