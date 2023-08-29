@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int delay_threshold_negligible = 1;
 
         private readonly string[] audioExtensions = { "mp3", "ogg", "wav" };
-        private readonly string[] bankNames = { HitSampleInfo.BANK_NORMAL, HitSampleInfo.BANK_SOFT, HitSampleInfo.BANK_DRUM };
-        private readonly string[] sampleSets = { HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_FINISH, HitSampleInfo.HIT_CLAP };
 
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Delayed hit sounds.");
 
@@ -125,7 +123,8 @@ namespace osu.Game.Rulesets.Edit.Checks
             string bank = parts[0];
             string sampleSet = parts[1];
 
-            return bankNames.Contains(bank) && sampleSets.Any(sampleSet.StartsWith);
+            return HitSampleInfo.AllBanks.Contains(bank)
+                   && HitSampleInfo.AllAdditions.Concat(new[] { HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FLOURISH }).Any(sampleSet.StartsWith);
         }
 
         public class IssueTemplateConsequentDelay : IssueTemplate
