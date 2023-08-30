@@ -245,11 +245,6 @@ namespace osu.Game.Rulesets.Taiko
                         multiplier *= 1.06;
                         break;
 
-                    // case TaikoModSpunOut:
-                    //     multiplier *= 0.9;
-                    //     break;
-
-                    // case TaikoModAutopilot:
                     case TaikoModRelax:
                         return 0;
                 }

@@ -335,12 +335,6 @@ namespace osu.Game.Rulesets.Mania
                     case ManiaModDaycore:
                         multiplier *= 0.5;
                         break;
-
-                    // case ManiaModSpunOut:
-                    // case ManiaModRelax:
-                    // case ManiaModAutopilot:
-                    //     multiplier *= 0;
-                    //     break;
                 }
             }
 

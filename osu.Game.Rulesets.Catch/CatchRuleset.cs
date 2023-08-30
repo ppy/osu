@@ -256,11 +256,6 @@ namespace osu.Game.Rulesets.Catch
                         multiplier *= 1.12;
                         break;
 
-                    // case CatchModSpunOut:
-                    //     multiplier *= 0.9;
-                    //     break;
-
-                    // case CatchModAutopilot:
                     case CatchModRelax:
                         return 0;
                 }
