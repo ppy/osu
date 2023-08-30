@@ -3,10 +3,8 @@
 
 using System;
 using System.Linq;
-using FFmpeg.AutoGen;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
