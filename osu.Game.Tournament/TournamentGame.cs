@@ -48,8 +48,6 @@ namespace osu.Game.Tournament
         {
             frameworkConfig.BindWith(FrameworkSetting.WindowedSize, windowSize);
 
-            windowSize.MinValue = new Size(TournamentSceneManager.REQUIRED_WIDTH, TournamentSceneManager.STREAM_AREA_HEIGHT);
-
             windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
             Add(loadingSpinner = new LoadingSpinner(true, true)
