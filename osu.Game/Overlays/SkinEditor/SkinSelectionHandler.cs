@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             // copy to mutate, as we will need to compare to the original later on.
             var adjustedRect = selectionRect;
+            bool isRotated = false;
 
             // for now aspect lock scale adjustments that occur at corners..
             if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
@@ -59,6 +60,7 @@ namespace osu.Game.Overlays.SkinEditor
             // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
             else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0)))
             {
+                isRotated = true;
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.
                     scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
@@ -69,6 +71,10 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
             if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
+
+            // Maintain the selection's centre position if dragging from the centre anchors and selection is rotated.
+            if (isRotated && anchor.HasFlagFast(Anchor.x1)) adjustedRect.X -= scale.X / 2;
+            if (isRotated && anchor.HasFlagFast(Anchor.y1)) adjustedRect.Y -= scale.Y / 2;
 
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
