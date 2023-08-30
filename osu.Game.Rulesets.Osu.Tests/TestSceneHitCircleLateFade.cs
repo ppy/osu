@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using FFmpeg.AutoGen;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
@@ -13,6 +15,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -23,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private float? alphaAtMiss;
 
         [Test]
-        public void TestHitCircleClassicMod()
+        public void TestHitCircleClassicModMiss()
         {
             AddStep("Create hit circle", () =>
             {
@@ -61,8 +64,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Transparent when missed", () => alphaAtMiss == 0);
         }
 
+        /// <summary>
+        /// No early fade is expected to be applied if the hit circle has been hit.
+        /// </summary>
         [Test]
-        public void TestHitCircleNoMod()
+        public void TestHitCircleClassicModHit()
+        {
+            AddStep("Create hit circle", () =>
+            {
+                SelectedMods.Value = new Mod[] { new OsuModClassic() };
+                createCircle(true);
+            });
+        }
+
+        [Test]
+        public void TestHitCircleNoModMiss()
         {
             AddStep("Create hit circle", () =>
             {
@@ -72,6 +88,16 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("Wait until circle is missed", () => alphaAtMiss.IsNotNull());
             AddAssert("Opaque when missed", () => alphaAtMiss == 1);
+        }
+
+        [Test]
+        public void TestHitCircleNoModHit()
+        {
+            AddStep("Create hit circle", () =>
+            {
+                SelectedMods.Value = Array.Empty<Mod>();
+                createCircle(true);
+            });
         }
 
         [Test]
@@ -100,24 +126,27 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Head circle opaque when missed", () => alphaAtMiss == 1);
         }
 
-        private void createCircle()
+        private void createCircle(bool auto = false)
         {
             alphaAtMiss = null;
 
-            DrawableHitCircle drawableHitCircle = new DrawableHitCircle(new HitCircle
+            TestDrawableHitCircle drawableHitCircle = new TestDrawableHitCircle(new HitCircle
             {
                 StartTime = Time.Current + 500,
-                Position = new Vector2(250)
-            });
+                Position = new Vector2(250),
+            }, auto);
+
+            drawableHitCircle.Scale = new Vector2(2f);
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
                 mod.ApplyToDrawableHitObject(drawableHitCircle);
 
             drawableHitCircle.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableHitCircle.OnNewResult += (_, _) =>
+            drawableHitCircle.OnNewResult += (_, result) =>
             {
-                alphaAtMiss = drawableHitCircle.Alpha;
+                if (!result.IsHit)
+                    alphaAtMiss = drawableHitCircle.Alpha;
             };
 
             Child = drawableHitCircle;
@@ -138,6 +167,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 })
             });
 
+            drawableSlider.Scale = new Vector2(2f);
+
             drawableSlider.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             drawableSlider.OnLoadComplete += _ =>
@@ -145,12 +176,35 @@ namespace osu.Game.Rulesets.Osu.Tests
                 foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
                     mod.ApplyToDrawableHitObject(drawableSlider.HeadCircle);
 
-                drawableSlider.HeadCircle.OnNewResult += (_, _) =>
+                drawableSlider.HeadCircle.OnNewResult += (_, result) =>
                 {
-                    alphaAtMiss = drawableSlider.HeadCircle.Alpha;
+                    if (!result.IsHit)
+                        alphaAtMiss = drawableSlider.HeadCircle.Alpha;
                 };
             };
             Child = drawableSlider;
+        }
+
+        protected partial class TestDrawableHitCircle : DrawableHitCircle
+        {
+            private readonly bool auto;
+
+            public TestDrawableHitCircle(HitCircle h, bool auto)
+                : base(h)
+            {
+                this.auto = auto;
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                if (auto && !userTriggered && timeOffset >= 0 && CheckHittable?.Invoke(this, Time.Current) != false)
+                {
+                    // force success
+                    ApplyResult(r => r.Type = HitResult.Great);
+                }
+                else
+                    base.CheckForResult(userTriggered, timeOffset);
+            }
         }
     }
 }
