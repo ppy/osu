@@ -68,11 +68,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestHitCircleClassicModHit()
         {
+            TestDrawableHitCircle circle = null!;
+
             AddStep("Create hit circle", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModClassic() };
-                createCircle(true);
+                circle = createCircle(true);
             });
+
+            AddUntilStep("Wait until circle is hit", () => circle.Result?.Type == HitResult.Great);
+            AddUntilStep("Wait for miss window", () => Clock.CurrentTime, () => Is.GreaterThanOrEqualTo(circle.HitObject.StartTime + circle.HitObject.HitWindows.WindowFor(HitResult.Miss)));
+            AddAssert("Check circle is still visible", () => circle.Alpha, () => Is.GreaterThan(0));
         }
 
         [Test]
@@ -124,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Head circle opaque when missed", () => alphaAtMiss == 1);
         }
 
-        private void createCircle(bool auto = false)
+        private TestDrawableHitCircle createCircle(bool shouldHit = false)
         {
             alphaAtMiss = null;
 
@@ -132,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 500,
                 Position = new Vector2(250),
-            }, auto);
+            }, shouldHit);
 
             drawableHitCircle.Scale = new Vector2(2f);
 
@@ -148,6 +154,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             Child = drawableHitCircle;
+
+            return drawableHitCircle;
         }
 
         private void createSlider()
@@ -180,22 +188,23 @@ namespace osu.Game.Rulesets.Osu.Tests
                         alphaAtMiss = drawableSlider.HeadCircle.Alpha;
                 };
             };
+
             Child = drawableSlider;
         }
 
         protected partial class TestDrawableHitCircle : DrawableHitCircle
         {
-            private readonly bool auto;
+            private readonly bool shouldHit;
 
-            public TestDrawableHitCircle(HitCircle h, bool auto)
+            public TestDrawableHitCircle(HitCircle h, bool shouldHit)
                 : base(h)
             {
-                this.auto = auto;
+                this.shouldHit = shouldHit;
             }
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (auto && !userTriggered && timeOffset >= 0 && CheckHittable?.Invoke(this, Time.Current) != false)
+                if (shouldHit && !userTriggered && timeOffset >= 0 && CheckHittable?.Invoke(this, Time.Current) != false)
                 {
                     // force success
                     ApplyResult(r => r.Type = HitResult.Great);
