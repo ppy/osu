@@ -112,17 +112,25 @@ namespace osu.Game.Tournament.Screens.Schedule
 
         private void refresh()
         {
-            IEnumerable<TournamentMatch> upcoming =
-                allMatches
-                    .Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
+            const int days_for_displays = 4;
 
             IEnumerable<ConditionalTournamentMatch> conditionals =
                 allMatches
-                    .Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
+                    .Where(m => !m.Completed.Value && (m.Team1.Value == null || m.Team2.Value == null) && Math.Abs(m.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < days_for_displays)
                     .SelectMany(m => m.ConditionalMatches.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
 
-            upcoming = upcoming.Concat(conditionals);
-            upcoming = upcoming.OrderBy(p => p.Date.Value).Take(8);
+            IEnumerable<TournamentMatch> upcoming =
+                allMatches
+                    .Where(m => !m.Completed.Value && m.Team1.Value != null && m.Team2.Value != null && Math.Abs(m.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < days_for_displays)
+                    .Concat(conditionals)
+                    .OrderBy(m => m.Date.Value)
+                    .Take(8);
+
+            var recent =
+                allMatches
+                    .Where(m => m.Completed.Value && m.Team1.Value != null && m.Team2.Value != null && Math.Abs(m.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < days_for_displays)
+                    .OrderByDescending(m => m.Date.Value)
+                    .Take(8);
 
             ScheduleContainer comingUpNext;
 
@@ -146,12 +154,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.4f,
-                                    ChildrenEnumerable = allMatches
-                                                         .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null
-                                                                     && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
-                                                         .OrderByDescending(p => p.Date.Value)
-                                                         .Take(8)
-                                                         .Select(p => new ScheduleMatch(p))
+                                    ChildrenEnumerable = recent.Select(p => new ScheduleMatch(p))
                                 },
                                 new ScheduleContainer("upcoming matches")
                                 {
