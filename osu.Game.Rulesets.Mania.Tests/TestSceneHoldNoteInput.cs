@@ -194,6 +194,25 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         /// <summary>
         ///     -----[           ]-----
+        ///          xox         o
+        /// </summary>
+        [Test]
+        public void TestPressAtStartThenReleaseAndImmediatelyRepress()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_head + 1),
+                new ManiaReplayFrame(time_head + 2, ManiaAction.Key1),
+                new ManiaReplayFrame(time_tail),
+            });
+
+            assertHeadJudgement(HitResult.Perfect);
+            assertTailJudgement(HitResult.Meh);
+        }
+
+        /// <summary>
+        ///     -----[           ]-----
         ///          xo  x               o
         /// </summary>
         [Test]
