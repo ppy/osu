@@ -20,7 +20,7 @@ namespace osu.Game.Online.API
 
         public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
-            Username = @"Dummy",
+            Username = @"Local user",
             Id = DUMMY_USER_ID,
         });
 
