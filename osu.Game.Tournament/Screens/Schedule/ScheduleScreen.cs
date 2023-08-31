@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,6 +20,7 @@ namespace osu.Game.Tournament.Screens.Schedule
 {
     public partial class ScheduleScreen : TournamentScreen
     {
+        private readonly BindableList<TournamentMatch> allMatches = new BindableList<TournamentMatch>();
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
         private Container mainContainer = null!;
         private LadderInfo ladder = null!;
@@ -101,16 +103,23 @@ namespace osu.Game.Tournament.Screens.Schedule
         {
             base.LoadComplete();
 
+            allMatches.BindTo(ladder.Matches);
+            allMatches.BindCollectionChanged((_, _) => refresh());
+
             currentMatch.BindTo(ladder.CurrentMatch);
-            currentMatch.BindValueChanged(matchChanged, true);
+            currentMatch.BindValueChanged(_ => refresh(), true);
         }
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
+        private void refresh()
         {
-            var upcoming = ladder.Matches.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
-            var conditionals = ladder
-                               .Matches.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
-                               .SelectMany(m => m.ConditionalMatches.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
+            IEnumerable<TournamentMatch> upcoming =
+                allMatches
+                    .Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
+
+            IEnumerable<ConditionalTournamentMatch> conditionals =
+                allMatches
+                    .Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
+                    .SelectMany(m => m.ConditionalMatches.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
 
             upcoming = upcoming.Concat(conditionals);
             upcoming = upcoming.OrderBy(p => p.Date.Value).Take(8);
@@ -137,12 +146,12 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.4f,
-                                    ChildrenEnumerable = ladder.Matches
-                                                               .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null
-                                                                           && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
-                                                               .OrderByDescending(p => p.Date.Value)
-                                                               .Take(8)
-                                                               .Select(p => new ScheduleMatch(p))
+                                    ChildrenEnumerable = allMatches
+                                                         .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null
+                                                                     && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
+                                                         .OrderByDescending(p => p.Date.Value)
+                                                         .Take(8)
+                                                         .Select(p => new ScheduleMatch(p))
                                 },
                                 new ScheduleContainer("upcoming matches")
                                 {
@@ -161,7 +170,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                 }
             };
 
-            if (match.NewValue != null)
+            if (currentMatch.Value != null)
             {
                 comingUpNext.Child = new FillFlowContainer
                 {
@@ -170,12 +179,12 @@ namespace osu.Game.Tournament.Screens.Schedule
                     Spacing = new Vector2(30),
                     Children = new Drawable[]
                     {
-                        new ScheduleMatch(match.NewValue, false)
+                        new ScheduleMatch(currentMatch.Value, false)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value ?? string.Empty)
+                        new TournamentSpriteTextWithBackground(currentMatch.Value.Round.Value?.Name.Value ?? string.Empty)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -185,7 +194,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Text = match.NewValue.Team1.Value?.FullName + " vs " + match.NewValue.Team2.Value?.FullName,
+                            Text = currentMatch.Value.Team1.Value?.FullName + " vs " + currentMatch.Value.Team2.Value?.FullName,
                             Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
                         },
                         new FillFlowContainer
@@ -196,7 +205,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
-                                new ScheduleMatchDate(match.NewValue.Date.Value)
+                                new ScheduleMatchDate(currentMatch.Value.Date.Value)
                                 {
                                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
                                 }
