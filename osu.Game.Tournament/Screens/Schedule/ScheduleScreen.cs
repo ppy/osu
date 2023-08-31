@@ -294,6 +294,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             {
                                 Direction = FillDirection.Vertical,
                                 RelativeSizeAxes = Axes.Both,
+                                Spacing = new Vector2(0, -6),
                                 Margin = new MarginPadding(10)
                             },
                         }
