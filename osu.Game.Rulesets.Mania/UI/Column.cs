@@ -112,7 +112,6 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
-            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
         }
 
         private void onSourceChanged()

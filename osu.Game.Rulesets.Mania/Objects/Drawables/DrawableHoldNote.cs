@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private Container<DrawableHoldNoteHead> headContainer;
         private Container<DrawableHoldNoteTail> tailContainer;
-        private Container<DrawableHoldNoteTick> tickContainer;
 
         private PausableSkinnableSound slidingSample;
 
@@ -110,7 +109,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     RelativeSizeAxes = Axes.X
                 },
-                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
                 slidingSample = new PausableSkinnableSound { Looping = true }
             });
@@ -118,7 +116,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             maskedContents.AddRange(new[]
             {
                 bodyPiece.CreateProxy(),
-                tickContainer.CreateProxy(),
                 tailContainer.CreateProxy(),
             });
         }
@@ -153,10 +150,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 case DrawableHoldNoteTail tail:
                     tailContainer.Child = tail;
                     break;
-
-                case DrawableHoldNoteTick tick:
-                    tickContainer.Add(tick);
-                    break;
             }
         }
 
@@ -165,7 +158,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.ClearNestedHitObjects();
             headContainer.Clear(false);
             tailContainer.Clear(false);
-            tickContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -177,9 +169,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 case HeadNote head:
                     return new DrawableHoldNoteHead(head);
-
-                case HoldNoteTick tick:
-                    return new DrawableHoldNoteTick(tick);
             }
 
             return base.CreateNestedHitObject(hitObject);
@@ -266,12 +255,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (Tail.AllJudged)
             {
-                foreach (var tick in tickContainer)
-                {
-                    if (!tick.Judged)
-                        tick.MissForcefully();
-                }
-
                 if (Tail.IsHit)
                     ApplyResult(r => r.Type = r.Judgement.MaxResult);
                 else

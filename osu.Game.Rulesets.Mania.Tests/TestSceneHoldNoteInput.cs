@@ -54,7 +54,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
             assertNoteJudgement(HitResult.IgnoreMiss);
         }
@@ -73,7 +72,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Perfect);
             assertNoteJudgement(HitResult.IgnoreHit);
         }
@@ -92,7 +90,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
             assertNoteJudgement(HitResult.IgnoreMiss);
         }
@@ -111,7 +108,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -129,7 +125,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -149,7 +144,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -169,7 +163,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Perfect);
         }
 
@@ -188,7 +181,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -227,7 +219,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -247,7 +238,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Meh);
         }
 
@@ -265,7 +255,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -283,7 +272,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Meh);
         }
 
@@ -377,7 +365,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             }, beatmap);
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
 
             assertHitObjectJudgement(note, HitResult.Good);
@@ -424,7 +411,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             }, beatmap);
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
 
             assertHitObjectJudgement(note, HitResult.Great);
@@ -444,7 +430,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Meh);
         }
 
@@ -496,42 +481,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         [Test]
-        public void TestHitTailBeforeLastTick()
-        {
-            const int tick_rate = 8;
-            const double tick_spacing = TimingControlPoint.DEFAULT_BEAT_LENGTH / tick_rate;
-            const double time_last_tick = time_head + tick_spacing * (int)((time_tail - time_head) / tick_spacing - 1);
-
-            var beatmap = new Beatmap<ManiaHitObject>
-            {
-                HitObjects =
-                {
-                    new HoldNote
-                    {
-                        StartTime = time_head,
-                        Duration = time_tail - time_head,
-                        Column = 0,
-                    }
-                },
-                BeatmapInfo =
-                {
-                    Difficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
-                    Ruleset = new ManiaRuleset().RulesetInfo
-                },
-            };
-
-            performTest(new List<ReplayFrame>
-            {
-                new ManiaReplayFrame(time_head, ManiaAction.Key1),
-                new ManiaReplayFrame(time_last_tick - 5)
-            }, beatmap);
-
-            assertHeadJudgement(HitResult.Perfect);
-            assertLastTickJudgement(HitResult.LargeTickMiss);
-            assertTailJudgement(HitResult.Ok);
-        }
-
-        [Test]
         public void TestZeroLength()
         {
             var beatmap = new Beatmap<ManiaHitObject>
@@ -569,12 +518,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void assertNoteJudgement(HitResult result)
             => AddAssert($"hold note judged as {result}", () => judgementResults.Single(j => j.HitObject is HoldNote).Type, () => Is.EqualTo(result));
-
-        private void assertTickJudgement(HitResult result)
-            => AddAssert($"any tick judged as {result}", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Select(j => j.Type), () => Does.Contain(result));
-
-        private void assertLastTickJudgement(HitResult result)
-            => AddAssert($"last tick judged as {result}", () => judgementResults.Last(j => j.HitObject is HoldNoteTick).Type, () => Is.EqualTo(result));
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
