@@ -47,10 +47,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             // copy to mutate, as we will need to compare to the original later on.
             var adjustedRect = selectionRect;
-
-            // first, remove any scale axis we are not interested in.
-            if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
-            if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
+            bool isRotated = false;
 
             // for now aspect lock scale adjustments that occur at corners..
             if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
@@ -61,8 +58,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
             // ..or if any of the selection have been rotated.
             // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0)))
+            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0)))
             {
+                isRotated = true;
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.
                     scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
@@ -74,13 +72,28 @@ namespace osu.Game.Overlays.SkinEditor
             if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
             if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
 
+            // Maintain the selection's centre position if dragging from the centre anchors and selection is rotated.
+            if (isRotated && anchor.HasFlagFast(Anchor.x1)) adjustedRect.X -= scale.X / 2;
+            if (isRotated && anchor.HasFlagFast(Anchor.y1)) adjustedRect.Y -= scale.Y / 2;
+
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
 
+            if (adjustedRect.Width <= 0 || adjustedRect.Height <= 0)
+            {
+                Axes toFlip = Axes.None;
+
+                if (adjustedRect.Width <= 0) toFlip |= Axes.X;
+                if (adjustedRect.Height <= 0) toFlip |= Axes.Y;
+
+                SelectionBox.PerformFlipFromScaleHandles(toFlip);
+                return true;
+            }
+
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
-                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
+                adjustedRect.Width / selectionRect.Width,
+                adjustedRect.Height / selectionRect.Height
             );
 
             foreach (var b in SelectedBlueprints)
@@ -102,7 +115,12 @@ namespace osu.Game.Overlays.SkinEditor
                 );
 
                 updateDrawablePosition(drawableItem, newPositionInAdjusted);
-                drawableItem.Scale *= scaledDelta;
+
+                var currentScaledDelta = scaledDelta;
+                if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
+                    currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
+
+                drawableItem.Scale *= currentScaledDelta;
             }
 
             return true;
