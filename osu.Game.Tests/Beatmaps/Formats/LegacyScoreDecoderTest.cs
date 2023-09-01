@@ -87,6 +87,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
+        [Test]
+        public void TestDecodeLegacyOnlineID()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay-with-legacy-online-id.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.That(score.ScoreInfo.OnlineID, Is.EqualTo(-1));
+                Assert.That(score.ScoreInfo.LegacyOnlineID, Is.EqualTo(255));
+            }
+        }
+
         [TestCase(3, true)]
         [TestCase(6, false)]
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
