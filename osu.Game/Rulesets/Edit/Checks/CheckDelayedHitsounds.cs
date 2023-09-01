@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             string sampleSet = parts[1];
 
             return HitSampleInfo.AllBanks.Contains(bank)
-                   && HitSampleInfo.AllAdditions.Concat(new[] { HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FLOURISH }).Any(sampleSet.StartsWith);
+                   && HitSampleInfo.AllAdditions.Append(HitSampleInfo.HIT_NORMAL).Any(sampleSet.StartsWith);
         }
 
         public class IssueTemplateConsequentDelay : IssueTemplate
