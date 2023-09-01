@@ -200,7 +200,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
+            assertCombo(1);
             assertTailJudgement(HitResult.Meh);
+            assertCombo(1);
         }
 
         /// <summary>
@@ -518,6 +520,9 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void assertNoteJudgement(HitResult result)
             => AddAssert($"hold note judged as {result}", () => judgementResults.Single(j => j.HitObject is HoldNote).Type, () => Is.EqualTo(result));
+
+        private void assertCombo(int combo)
+            => AddAssert($"combo is {combo}", () => currentPlayer.ScoreProcessor.Combo.Value, () => Is.EqualTo(combo));
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
