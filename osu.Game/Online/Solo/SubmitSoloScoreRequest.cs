@@ -10,12 +10,12 @@ namespace osu.Game.Online.Solo
     {
         private readonly int beatmapId;
 
-        public SubmitSoloScoreRequest(ScoreInfo scoreInfo, long scoreId, int beatmapId)
-            : base(scoreInfo, scoreId)
+        public SubmitSoloScoreRequest(ScoreInfo scoreInfo, long scoreTokenId, int beatmapId)
+            : base(scoreInfo, scoreTokenId)
         {
             this.beatmapId = beatmapId;
         }
 
-        protected override string Target => $@"beatmaps/{beatmapId}/solo/scores/{ScoreId}";
+        protected override string Target => $@"beatmaps/{beatmapId}/solo/scores/{ScoreTokenId}";
     }
 }

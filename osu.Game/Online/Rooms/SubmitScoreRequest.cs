@@ -14,12 +14,12 @@ namespace osu.Game.Online.Rooms
     {
         public readonly SoloScoreInfo Score;
 
-        protected readonly long ScoreId;
+        protected readonly long ScoreTokenId;
 
-        protected SubmitScoreRequest(ScoreInfo scoreInfo, long scoreId)
+        protected SubmitScoreRequest(ScoreInfo scoreInfo, long scoreTokenId)
         {
             Score = SoloScoreInfo.ForSubmission(scoreInfo);
-            ScoreId = scoreId;
+            ScoreTokenId = scoreTokenId;
         }
 
         protected override WebRequest CreateWebRequest()

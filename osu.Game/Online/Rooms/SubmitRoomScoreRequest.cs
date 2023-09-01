@@ -17,6 +17,6 @@ namespace osu.Game.Online.Rooms
             this.playlistItemId = playlistItemId;
         }
 
-        protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores/{ScoreId}";
+        protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores/{ScoreTokenId}";
     }
 }
