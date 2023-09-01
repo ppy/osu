@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Container<SelectionBlueprint<T>> SelectionBlueprints { get; private set; }
 
-        protected SelectionHandler<T> SelectionHandler { get; private set; }
+        public SelectionHandler<T> SelectionHandler { get; private set; }
 
         private readonly Dictionary<T, SelectionBlueprint<T>> blueprintMap = new Dictionary<T, SelectionBlueprint<T>>();
 
