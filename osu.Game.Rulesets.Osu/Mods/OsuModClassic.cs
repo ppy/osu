@@ -85,13 +85,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyEarlyFading(DrawableHitCircle circle)
         {
-            circle.ApplyCustomUpdateState += (o, _) =>
+            circle.ApplyCustomUpdateState += (dho, state) =>
             {
-                using (o.BeginAbsoluteSequence(o.StateUpdateTime))
+                using (dho.BeginAbsoluteSequence(dho.StateUpdateTime))
                 {
-                    double okWindow = o.HitObject.HitWindows.WindowFor(HitResult.Ok);
-                    double lateMissFadeTime = o.HitObject.HitWindows.WindowFor(HitResult.Meh) - okWindow;
-                    o.Delay(okWindow).FadeOut(lateMissFadeTime);
+                    if (state != ArmedState.Hit)
+                    {
+                        double okWindow = dho.HitObject.HitWindows.WindowFor(HitResult.Ok);
+                        double lateMissFadeTime = dho.HitObject.HitWindows.WindowFor(HitResult.Meh) - okWindow;
+                        dho.Delay(okWindow).FadeOut(lateMissFadeTime);
+                    }
                 }
             };
         }
