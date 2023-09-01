@@ -12,6 +12,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,10 +32,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override float SamplePlaybackPosition => CalculateDrawableRelativePosition(this);
 
         /// <summary>
-        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
-        /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
+        /// What action this <see cref="DrawableOsuHitObject"/> should take in response to a
+        /// click at the given time value.
+        /// If non-null, judgements will be ignored for return values of <see cref="ClickAction.Ignore"/>
+        /// and <see cref="ClickAction.Shake"/>, and this hit object will be shaken for return values of
+        /// <see cref="ClickAction.Shake"/>.
         /// </summary>
-        public Func<DrawableHitObject, double, bool> CheckHittable;
+        public Func<DrawableHitObject, double, HitResult, ClickAction> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
