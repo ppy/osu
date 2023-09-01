@@ -101,9 +101,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.OnlineID = sr.ReadInt64();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.OnlineID = sr.ReadInt32();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
                 byte[] compressedScoreInfo = null;
 
