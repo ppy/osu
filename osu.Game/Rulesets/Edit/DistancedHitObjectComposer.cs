@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             RightToolbox.Add(new EditorToolboxGroup("snapping")
             {
