@@ -10,8 +10,8 @@ namespace osu.Game.Online.Solo
     {
         private readonly int beatmapId;
 
-        public SubmitSoloScoreRequest(ScoreInfo scoreInfo, long scoreTokenId, int beatmapId)
-            : base(scoreInfo, scoreTokenId)
+        public SubmitSoloScoreRequest(ScoreInfo scoreInfo, ScoreToken scoreToken, int beatmapId)
+            : base(scoreInfo, scoreToken.ID)
         {
             this.beatmapId = beatmapId;
         }

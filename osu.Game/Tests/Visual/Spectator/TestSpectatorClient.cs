@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
@@ -136,7 +137,7 @@ namespace osu.Game.Tests.Visual.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
+        protected override Task BeginPlayingInternal(ScoreToken? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);

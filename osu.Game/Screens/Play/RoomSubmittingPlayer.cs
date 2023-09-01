@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Diagnostics;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
@@ -33,7 +34,9 @@ namespace osu.Game.Screens.Play
             return new CreateRoomScoreRequest(roomId, PlaylistItem.ID, Game.VersionHash);
         }
 
-        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
+        protected override ScoreToken RetrieveScoreToken(APIScoreToken token) => new ScoreToken(token.ID, ScoreTokenType.Multiplayer);
+
+        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {
             Debug.Assert(Room.RoomID.Value != null);
             return new SubmitRoomScoreRequest(score.ScoreInfo, token, Room.RoomID.Value.Value, PlaylistItem.ID);

@@ -82,7 +82,7 @@ namespace osu.Game.Online.Spectator
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
-        private long? currentScoreToken;
+        private ScoreToken? currentScoreToken;
         private ScoreProcessor? currentScoreProcessor;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
@@ -174,7 +174,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
+        public void BeginPlaying(ScoreToken? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
@@ -281,7 +281,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        protected abstract Task BeginPlayingInternal(long? scoreToken, SpectatorState state);
+        protected abstract Task BeginPlayingInternal(ScoreToken? scoreToken, SpectatorState state);
 
         protected abstract Task SendFramesInternal(FrameDataBundle bundle);
 

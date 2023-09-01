@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
@@ -261,7 +262,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFramesPurgedBeforeEndingPlay()
         {
-            AddStep("begin playing", () => spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), new Score()));
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(new ScoreToken(0, ScoreTokenType.Solo), TestGameplayState.Create(new OsuRuleset()), new Score()));
 
             AddStep("send frames and finish play", () =>
             {

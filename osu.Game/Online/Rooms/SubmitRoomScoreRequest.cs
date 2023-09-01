@@ -10,8 +10,8 @@ namespace osu.Game.Online.Rooms
         private readonly long roomId;
         private readonly long playlistItemId;
 
-        public SubmitRoomScoreRequest(ScoreInfo scoreInfo, long scoreId, long roomId, long playlistItemId)
-            : base(scoreInfo, scoreId)
+        public SubmitRoomScoreRequest(ScoreInfo scoreInfo, ScoreToken scoreToken, long roomId, long playlistItemId)
+            : base(scoreInfo, scoreToken.ID)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;

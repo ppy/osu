@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -29,7 +30,8 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
         /// </summary>
-        private long? token;
+        [CanBeNull]
+        private ScoreToken token;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.Play
             req.Success += r =>
             {
                 Logger.Log($"Score submission token retrieved ({r.ID})");
-                token = r.ID;
+                token = RetrieveScoreToken(r);
                 tcs.SetResult(true);
             };
             req.Failure += handleTokenFailure;
@@ -177,12 +179,18 @@ namespace osu.Game.Screens.Play
         protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
 
         /// <summary>
+        /// Constructs a <see cref="ScoreToken"/> for later use
+        /// from the <see cref="APIScoreToken"/> returned by web.
+        /// </summary>
+        protected abstract ScoreToken RetrieveScoreToken(APIScoreToken token);
+
+        /// <summary>
         /// Construct a request to submit the score.
         /// Will only be invoked if the request constructed via <see cref="CreateTokenRequest"/> was successful.
         /// </summary>
         /// <param name="score">The score to be submitted.</param>
         /// <param name="token">The submission token.</param>
-        protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
+        protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token);
 
         private Task submitScore(Score score)
         {
@@ -198,7 +206,7 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
 
             scoreSubmissionSource = new TaskCompletionSource<bool>();
-            var request = CreateSubmissionRequest(score, token.Value);
+            var request = CreateSubmissionRequest(score, token);
 
             request.Success += s =>
             {

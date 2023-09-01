@@ -48,7 +48,7 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override async Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
+        protected override async Task BeginPlayingInternal(ScoreToken? scoreToken, SpectatorState state)
         {
             if (!IsConnected.Value)
                 return;

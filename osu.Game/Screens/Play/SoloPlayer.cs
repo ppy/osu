@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
 
+        protected override ScoreToken RetrieveScoreToken(APIScoreToken token) => new ScoreToken(token.ID, ScoreTokenType.Solo);
+
         protected override Task ImportScore(Score score)
         {
             // Before importing a score, stop binding the leaderboard with its score source.
@@ -64,7 +67,7 @@ namespace osu.Game.Screens.Play
             return base.ImportScore(score);
         }
 
-        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
+        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {
             IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo;
 

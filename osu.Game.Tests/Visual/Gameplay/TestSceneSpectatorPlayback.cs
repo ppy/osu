@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
@@ -147,7 +148,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
 
-                spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), recordingScore);
+                spectatorClient.BeginPlaying(new ScoreToken(0, ScoreTokenType.Solo), TestGameplayState.Create(new OsuRuleset()), recordingScore);
                 spectatorClient.OnNewFrames += onNewFrames;
             });
         }

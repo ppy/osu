@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
@@ -69,7 +70,7 @@ namespace osu.Game.Tests.Visual
             return base.CreateTokenRequest();
         }
 
-        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
+        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {
             SubmittedScore = score;
             return base.CreateSubmissionRequest(score, token);
