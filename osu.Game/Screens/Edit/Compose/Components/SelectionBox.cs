@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -307,7 +308,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return button;
         }
 
-        public void FlipScaleHandles(Direction direction) => dragHandles.FlipScaleHandles(direction);
+        /// <remarks>
+        /// This method should be called when a selection needs to be flipped
+        /// because of an ongoing scale handle drag that would otherwise cause width or height to go negative.
+        /// </remarks>
+        public void PerformFlipFromScaleHandles(Axes axes)
+        {
+            if (axes.HasFlagFast(Axes.X))
+            {
+                dragHandles.FlipScaleHandles(Direction.Horizontal);
+                OnFlip?.Invoke(Direction.Horizontal, false);
+            }
+
+            if (axes.HasFlagFast(Axes.Y))
+            {
+                dragHandles.FlipScaleHandles(Direction.Vertical);
+                OnFlip?.Invoke(Direction.Vertical, false);
+            }
+        }
 
         private void addScaleHandle(Anchor anchor)
         {
