@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -50,12 +49,6 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override bool RelativeScaleBeatLengths => true;
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
-
-        public new ScrollVisualisationMethod VisualisationMethod
-        {
-            get => base.VisualisationMethod;
-            set => base.VisualisationMethod = value;
-        }
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();

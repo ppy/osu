@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private ScrollVisualisationMethod visualisationMethod = ScrollVisualisationMethod.Sequential;
 
-        protected ScrollVisualisationMethod VisualisationMethod
+        public ScrollVisualisationMethod VisualisationMethod
         {
             get => visualisationMethod;
             set
