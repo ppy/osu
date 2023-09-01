@@ -79,8 +79,8 @@ namespace osu.Game.Screens.Play
 
             req.Success += r =>
             {
-                Logger.Log($"Score submission token retrieved ({r.ID})");
                 token = RetrieveScoreToken(r);
+                Logger.Log($"Score submission token retrieved ({token})");
                 tcs.SetResult(true);
             };
             req.Failure += handleTokenFailure;
