@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -252,6 +253,58 @@ namespace osu.Game.Online.Chat
                 return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
 
             return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
+        }
+
+        /// <summary>
+        /// Given a <see cref="LinkDetails"/>, return a fully formed URL which can be used to resolve the context in a browser.
+        /// </summary>
+        /// <param name="link">The link details to provide context.</param>
+        /// <returns>A valid URL, or null if the link could not be resolved into a URL.</returns>
+        public static string? GetUrl(LinkDetails link)
+        {
+            switch (link.Action)
+            {
+                case LinkAction.External:
+                    string url = (string)link.Argument;
+
+                    if (url.StartsWith('/'))
+                        url = $"https://{WebsiteRootUrl}{url}";
+
+                    return url;
+
+                case LinkAction.OpenBeatmap:
+                    return $@"https://{WebsiteRootUrl}/beatmaps/{link.Argument}";
+
+                case LinkAction.OpenBeatmapSet:
+                    return $@"https://{WebsiteRootUrl}/beatmapsets/{link.Argument}";
+
+                case LinkAction.OpenUserProfile:
+                    var user = (IUser)link.Argument;
+
+                    return user.OnlineID > 1
+                        ? $@"https://{WebsiteRootUrl}/users/{user.OnlineID}"
+                        : $@"https://{WebsiteRootUrl}/users/{user.Username}";
+
+                case LinkAction.OpenWiki:
+                    return $@"https://{WebsiteRootUrl}/wiki/{link.Argument}";
+
+                case LinkAction.OpenChangelog:
+                    return $@"https://{WebsiteRootUrl}/home/changelog/{link.Argument}";
+
+                case LinkAction.OpenChannel:
+                    return $@"osu://chan/{link.Argument}";
+
+                case LinkAction.OpenEditorTimestamp:
+                    return $@"osu://edit/{link.Argument}";
+
+                case LinkAction.Spectate:
+                    return $@"osu://spectate/{link.Argument}";
+
+                case LinkAction.JoinMultiplayerMatch:
+                    return $@"osump://{link.Argument}";
+            }
+
+            return null;
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)

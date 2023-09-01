@@ -39,16 +39,18 @@ namespace osu.Game.Graphics.Containers.Markdown
         private void load()
         {
             var textDrawable = CreateSpriteText().With(t => t.Text = text);
+            var parts = new[] { textDrawable };
 
             InternalChildren = new Drawable[]
             {
                 textDrawable,
-                new OsuMarkdownLinkCompiler(new[] { textDrawable })
+                new OsuMarkdownLinkCompiler(parts)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
                     TooltipText = title ?? Url,
-                }
+                },
+                new LinkFlowContainer.LinkContextMenuProvider(parts, Url, OnLinkPressed),
             };
         }
 

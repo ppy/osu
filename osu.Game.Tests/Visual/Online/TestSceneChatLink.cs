@@ -12,6 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
@@ -135,7 +136,7 @@ namespace osu.Game.Tests.Visual.Online
                     var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                     return linkSprites.All(d => d.Colour == linkColour)
-                           && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                           && newLine.DrawableContentFlow.Where(d => d is OsuSpriteText).Except(linkSprites).All(d => d.Colour == textColour);
                 }
             }
         }

@@ -30,6 +30,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
@@ -197,116 +198,120 @@ namespace osu.Game.Screens.Select
 
                 const float top_height = 0.7f;
 
-                Children = new Drawable[]
+                Child = new OsuContextMenuContainer
                 {
-                    difficultyColourBar = new Container
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 20f,
-                        Children = new[]
+                        difficultyColourBar = new Container
                         {
-                            new Box
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 20f,
+                            Children = new[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Width = top_height,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
-                                Alpha = 0.5f,
-                                X = top_height,
-                                Width = 1 - top_height,
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = top_height,
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    RelativePositionAxes = Axes.Both,
+                                    Alpha = 0.5f,
+                                    X = top_height,
+                                    Width = 1 - top_height,
+                                }
                             }
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Name = "Topleft-aligned metadata",
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f },
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Children = new Drawable[]
+                        },
+                        new FillFlowContainer
                         {
-                            VersionLabel = new TruncatingSpriteText
+                            Name = "Topleft-aligned metadata",
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f },
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Children = new Drawable[]
                             {
-                                Text = beatmapInfo.DifficultyName,
-                                Font = OsuFont.GetFont(size: 24, italics: true),
-                                RelativeSizeAxes = Axes.X,
-                            },
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Name = "Topright-aligned metadata",
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
-                        AutoSizeAxes = Axes.Both,
-                        Shear = wedged_container_shear,
-                        Spacing = new Vector2(0f, 5f),
-                        Children = new Drawable[]
-                        {
-                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                Alpha = 0f,
-                            },
-                            new BeatmapSetOnlineStatusPill
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                TextSize = 11,
-                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                Status = beatmapInfo.Status,
-                                Alpha = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? 0 : 1
+                                VersionLabel = new TruncatingSpriteText
+                                {
+                                    Text = beatmapInfo.DifficultyName,
+                                    Font = OsuFont.GetFont(size: 24, italics: true),
+                                    RelativeSizeAxes = Axes.X,
+                                },
                             }
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Name = "Centre-aligned metadata",
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.TopLeft,
-                        Y = -7,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Left = 25, Right = shear_width },
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Children = new Drawable[]
+                        },
+                        new FillFlowContainer
                         {
-                            TitleLabel = new TruncatingSpriteText
+                            Name = "Topright-aligned metadata",
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
+                            AutoSizeAxes = Axes.Both,
+                            Shear = wedged_container_shear,
+                            Spacing = new Vector2(0f, 5f),
+                            Children = new Drawable[]
                             {
-                                Current = { BindTarget = titleBinding },
-                                Font = OsuFont.GetFont(size: 28, italics: true),
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            ArtistLabel = new TruncatingSpriteText
+                                starRatingDisplay = new StarRatingDisplay(default, animated: true)
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Shear = -wedged_container_shear,
+                                    Alpha = 0f,
+                                },
+                                new BeatmapSetOnlineStatusPill
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Shear = -wedged_container_shear,
+                                    TextSize = 11,
+                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                    Status = beatmapInfo.Status,
+                                    Alpha = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? 0 : 1
+                                }
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            Name = "Centre-aligned metadata",
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.TopLeft,
+                            Y = -7,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Left = 25, Right = shear_width },
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Children = new Drawable[]
                             {
-                                Current = { BindTarget = artistBinding },
-                                Font = OsuFont.GetFont(size: 17, italics: true),
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            MapperContainer = new FillFlowContainer
-                            {
-                                Margin = new MarginPadding { Top = 10 },
-                                Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both,
-                                Child = getMapper(metadata),
-                            },
-                            infoLabelContainer = new FillFlowContainer
-                            {
-                                Margin = new MarginPadding { Top = 20 },
-                                Spacing = new Vector2(20, 0),
-                                AutoSizeAxes = Axes.Both,
+                                TitleLabel = new TruncatingSpriteText
+                                {
+                                    Current = { BindTarget = titleBinding },
+                                    Font = OsuFont.GetFont(size: 28, italics: true),
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                ArtistLabel = new TruncatingSpriteText
+                                {
+                                    Current = { BindTarget = artistBinding },
+                                    Font = OsuFont.GetFont(size: 17, italics: true),
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                MapperContainer = new FillFlowContainer
+                                {
+                                    Margin = new MarginPadding { Top = 10 },
+                                    Direction = FillDirection.Horizontal,
+                                    AutoSizeAxes = Axes.Both,
+                                    Child = getMapper(metadata),
+                                },
+                                infoLabelContainer = new FillFlowContainer
+                                {
+                                    Margin = new MarginPadding { Top = 20 },
+                                    Spacing = new Vector2(20, 0),
+                                    AutoSizeAxes = Axes.Both,
+                                }
                             }
                         }
                     }
