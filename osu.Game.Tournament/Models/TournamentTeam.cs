@@ -51,7 +51,7 @@ namespace osu.Game.Tournament.Models
 
         public Bindable<int> LastYearPlacing = new BindableInt
         {
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 256
         };
 

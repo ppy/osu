@@ -21,7 +21,9 @@ namespace osu.Game.IO.Archives
             this.path = Path.GetFullPath(path);
         }
 
-        public override Stream GetStream(string name) => File.OpenRead(Path.Combine(path, name));
+        public override Stream GetStream(string name) => File.OpenRead(GetFullPath(name));
+
+        public string GetFullPath(string filename) => Path.Combine(path, filename);
 
         public override void Dispose()
         {

@@ -14,7 +14,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
-using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,14 +21,14 @@ namespace osu.Game.Tournament.Components
 {
     public partial class SongBar : CompositeDrawable
     {
-        private TournamentBeatmap? beatmap;
+        private IBeatmapInfo? beatmap;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public TournamentBeatmap? Beatmap
+        public IBeatmapInfo? Beatmap
         {
             set
             {
@@ -37,7 +36,7 @@ namespace osu.Game.Tournament.Components
                     return;
 
                 beatmap = value;
-                update();
+                refreshContent();
             }
         }
 
@@ -49,7 +48,7 @@ namespace osu.Game.Tournament.Components
             set
             {
                 mods = value;
-                update();
+                refreshContent();
             }
         }
 
@@ -71,19 +70,25 @@ namespace osu.Game.Tournament.Components
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            Masking = true;
+            CornerRadius = 5;
+
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Colour = colours.Gray3,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 flow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    LayoutDuration = 500,
-                    LayoutEasing = Easing.OutQuint,
                     Direction = FillDirection.Full,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -93,7 +98,7 @@ namespace osu.Game.Tournament.Components
             Expanded = true;
         }
 
-        private void update()
+        private void refreshContent()
         {
             if (beatmap == null)
             {
