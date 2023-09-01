@@ -21,8 +21,9 @@ namespace osu.Game.Rulesets.Mods
                 {
                     User = new APIUser
                     {
-                        Id = APIUser.SYSTEM_USER_ID,
+                        Id = replayData.User.OnlineID,
                         Username = replayData.User.Username,
+                        IsBot = replayData.User.IsBot,
                     }
                 }
             };
