@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
-                // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
+                // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield.
                 FlashlightDim = e.NewValue ? 0.8f : 0.0f;
             }
 
