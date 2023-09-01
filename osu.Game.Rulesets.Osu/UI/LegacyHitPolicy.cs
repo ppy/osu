@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Objects;
@@ -22,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
     /// </summary>
     public class LegacyHitPolicy : IHitPolicy
     {
-        public IHitObjectContainer HitObjectContainer { get; set; }
+        public IHitObjectContainer? HitObjectContainer { get; set; }
 
         private readonly double hittableRange;
 
@@ -37,6 +35,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public virtual ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
         {
+            if (HitObjectContainer == null)
+                throw new InvalidOperationException($"{nameof(HitObjectContainer)} should be set before {nameof(CheckHittable)} is called.");
+
             var aliveObjects = HitObjectContainer.AliveObjects.ToList();
             int index = aliveObjects.IndexOf(hitObject);
 
