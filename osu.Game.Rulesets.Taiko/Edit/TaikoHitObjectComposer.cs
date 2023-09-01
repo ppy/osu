@@ -9,7 +9,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public partial class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
+    public partial class TaikoHitObjectComposer : ScrollingHitObjectComposer<TaikoHitObject>
     {
         protected override bool ApplyHorizontalCentering => false;
 
