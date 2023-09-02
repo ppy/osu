@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         [Cached]
-        private Bindable<BeatmapInfo> adjustedInfo { get; set; } = new Bindable<BeatmapInfo>();
+        private Bindable<BeatmapShortInfo> adjustedInfo { get; set; } = new Bindable<BeatmapShortInfo>();
 
         protected BeatmapCarousel Carousel { get; private set; } = null!;
 

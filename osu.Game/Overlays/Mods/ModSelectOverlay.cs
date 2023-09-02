@@ -222,13 +222,18 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            aboveColumnsContent.Add(mapInfoContainer = new ModMapInfoContainer
+            FooterContent.Add(mapInfoContainer = new ModMapInfoContainer
             {
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Padding = new MarginPadding
+                {
+                    Vertical = PADDING,
+                    Horizontal = 70
+                },
             });
 
-            FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
+            FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -248,7 +253,7 @@ namespace osu.Game.Overlays.Mods
                     DarkerColour = colours.Pink2,
                     LighterColour = colours.Pink1
                 })
-            };
+            });
 
             globalAvailableMods.BindTo(game.AvailableMods);
         }
@@ -413,7 +418,7 @@ namespace osu.Game.Overlays.Mods
             if (mapInfoContainer == null)
                 return;
 
-            //mapInfoDisplay.Current.Value = 5;
+            mapInfoContainer.UpdateValues();
         }
 
         private void updateCustomisation()
