@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacyMainCirclePiece : CompositeDrawable
     {
+        private static readonly Vector2 circle_piece_size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+
         public override bool RemoveCompletedTransforms => false;
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             this.priorityLookupPrefix = priorityLookupPrefix;
             this.hasNumber = hasNumber;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = circle_piece_size;
         }
 
         [BackgroundDependencyLoader]
@@ -68,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
             InternalChildren = new[]
             {
-                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTextureWithMaxSize(circleName, circle_piece_size) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d, maxSize: circle_piece_size))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
