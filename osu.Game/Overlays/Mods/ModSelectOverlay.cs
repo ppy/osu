@@ -222,41 +222,44 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            FooterContent.Add(mapInfoContainer = new ModMapInfoContainer
+            FooterContent.Children = new Drawable[]
             {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Padding = new MarginPadding
+                mapInfoContainer = new ModMapInfoContainer
                 {
-                    Vertical = PADDING,
-                    Horizontal = 70
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Padding = new MarginPadding
+                    {
+                        Vertical = PADDING,
+                        Horizontal = 70
+                    }
                 },
-            });
-
-            FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Horizontal,
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                Padding = new MarginPadding
+                footerButtonFlow = new FillFlowContainer<ShearedButton>
                 {
-                    Vertical = PADDING,
-                    Horizontal = 70
-                },
-                Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons().Prepend(BackButton = new ShearedButton(BUTTON_WIDTH)
-                {
-                    Text = CommonStrings.Back,
-                    Action = Hide,
-                    DarkerColour = colours.Pink2,
-                    LighterColour = colours.Pink1
-                })
-            });
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Horizontal,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Padding = new MarginPadding
+                    {
+                        Vertical = PADDING,
+                        Horizontal = 70
+                    },
+                    Spacing = new Vector2(10),
+                    ChildrenEnumerable = CreateFooterButtons().Prepend(BackButton = new ShearedButton(BUTTON_WIDTH)
+                    {
+                        Text = CommonStrings.Back,
+                        Action = Hide,
+                        DarkerColour = colours.Pink2,
+                        LighterColour = colours.Pink1
+                    })
+                }
+            };
 
             globalAvailableMods.BindTo(game.AvailableMods);
         }
+
         public override void Hide()
         {
             base.Hide();
