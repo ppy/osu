@@ -176,7 +176,6 @@ namespace osu.Game.Screens.Select.Details
 
             updateBindedInfo(); // to faster UI response (without SR calculation)
             updateStarDifficulty();
-
         }
 
         private CancellationTokenSource starDifficultyCancellationSource;
