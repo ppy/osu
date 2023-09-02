@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK;
 using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
@@ -18,16 +19,16 @@ namespace osu.Game.Skinning
     public static partial class LegacySkinExtensions
     {
         public static Drawable? GetAnimation(this ISkin? source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
-                                             bool startAtCurrentTime = true, double? frameLength = null)
-            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength);
+                                             bool startAtCurrentTime = true, double? frameLength = null, Vector2? maxSize = null)
+            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength, maxSize);
 
         public static Drawable? GetAnimation(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
-                                             string animationSeparator = "-", bool startAtCurrentTime = true, double? frameLength = null)
+                                             string animationSeparator = "-", bool startAtCurrentTime = true, double? frameLength = null, Vector2? maxSize = null)
         {
             if (source == null)
                 return null;
 
-            var textures = GetTextures(source, componentName, wrapModeS, wrapModeT, animatable, animationSeparator, out var retrievalSource);
+            var textures = GetTextures(source, componentName, wrapModeS, wrapModeT, animatable, animationSeparator, maxSize, out var retrievalSource);
 
             switch (textures.Length)
             {
@@ -53,7 +54,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, out ISkin? retrievalSource)
+        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, Vector2? maxSize, out ISkin? retrievalSource)
         {
             retrievalSource = null;
 
@@ -78,7 +79,9 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            var singleTexture = retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
+            var singleTexture = maxSize != null
+                ? retrievalSource.GetTextureWithMaxSize(componentName, maxSize.Value, wrapModeS, wrapModeT)
+                : retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
 
             return singleTexture != null
                 ? new[] { singleTexture }
@@ -88,9 +91,11 @@ namespace osu.Game.Skinning
             {
                 for (int i = 0; true; i++)
                 {
-                    Texture? texture;
+                    var texture = maxSize != null
+                        ? skin.GetTextureWithMaxSize(getFrameName(i), maxSize.Value, wrapModeS, wrapModeT)
+                        : skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT);
 
-                    if ((texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT)) == null)
+                    if (texture == null)
                         break;
 
                     yield return texture;
@@ -98,6 +103,20 @@ namespace osu.Game.Skinning
             }
 
             string getFrameName(int frameIndex) => $"{componentName}{animationSeparator}{frameIndex}";
+        }
+
+        public static Texture? GetTextureWithMaxSize(this ISkin source, string componentName, Vector2 maxSize, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
+        {
+            var texture = source.GetTexture(componentName, wrapModeS, wrapModeT);
+            if (texture == null)
+                return texture;
+
+            if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
+                return texture;
+
+            // use scale adjust property for downscaling the texture in order to meet the specified maximum dimensions.
+            texture.ScaleAdjust *= Math.Max(texture.DisplayWidth / maxSize.X, texture.DisplayHeight / maxSize.Y);
+            return texture;
         }
 
         public static bool HasFont(this ISkin source, LegacyFont font)
